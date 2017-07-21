@@ -1,0 +1,5 @@
+{
+  "validateUserUrl": "驗證使用者帳號使用的推文文章HTTP位址",
+  "validateBoard": "C_Chat",
+  "validateAID": "驗證使用者帳號使用的推文文章在板上的AID"
+}

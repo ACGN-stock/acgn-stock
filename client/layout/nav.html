@@ -1,0 +1,23 @@
+<template name="nav">
+  <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+    <button class="navbar-toggler navbar-toggler-right" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <span class="navbar-brand">PTT ACGN股票交易市場</span>
+    <div class="{{getNavLinkListClassList}}">
+      <ul class="navbar-nav">
+        {{#each navLinkKey in navLinkList}}
+          {{> navLink data=navLinkKey}}
+        {{/each}}
+      </ul>
+    </div>
+  </nav>
+</template>
+
+<template name="navLink">
+  <li class="{{getClassList}}">
+    <a class="nav-link" href="#">
+      {{getLinkText}}
+    </a>
+  </li>
+</template>

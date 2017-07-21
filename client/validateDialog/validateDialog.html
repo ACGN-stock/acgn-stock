@@ -1,0 +1,50 @@
+<template name="validateDialog">
+  <div class="modal fade show" style="display: block;" role="dialog">
+    <div class="modal-dialog" role="document">
+      <form class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">登入╱註冊</h5>
+        </div>
+        {{#if validateCode}}
+          <div class="modal-body">
+            <div class="form-group">
+              您的PTT帳號
+              <span class="text-info">{{validateUserName}}</span>
+              尚未通過驗證，
+              <br />
+              請在PTT {{validateBoard}}板的文章{{validateAID}}底下，
+              <br />使用帳號
+              <span class="text-info">{{validateUserName}}</span>
+              以<span class="text-danger">推</span>文的方式輸入驗證碼
+              <span class="text-primary">{{validateCode}}</span>。
+            </div>
+          </div>
+        {{else}}
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="loginUserName">PTT帳號：</label>
+              <input
+                id="loginUserName"
+                class="form-control"
+                type="text"
+                placeholder="請輸入您的PTT帳號"
+              />
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">密碼：</label>
+              <input
+                id="loginPassword"
+                class="form-control"
+                type="password"
+                placeholder="請輸入登入密碼，建議不要跟PTT密碼相同。"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" style="cursor: pointer;">登入╱註冊</button>
+          </div>
+        {{/if}}
+      </form>
+    </div>
+  </div>
+</template>
