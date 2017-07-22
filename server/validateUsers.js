@@ -1,13 +1,10 @@
+'use strict';
 import { _ } from 'meteor/underscore';
-import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
+import { dbValidatingUsers } from '../db/dbValidatingUsers';
 import config from '../config.json';
-
-const validatingUsers = new Mongo.Collection('validatingUsers', {
-  idGeneration: 'STRING'
-});
 
 Meteor.methods({
   loginOrRegister(username, password) {
@@ -18,7 +15,7 @@ Meteor.methods({
       return true;
     }
     else {
-      const existValidatingUser = validatingUsers.findOne({username, password});
+      const existValidatingUser = dbValidatingUsers.findOne({username, password});
       let validateCode;
       if (existValidatingUser) {
         validateCode = existValidatingUser.validateCode;
@@ -26,7 +23,7 @@ Meteor.methods({
       else {
         validateCode = generateValidateCode();
         const insertTime = new Date();
-        validatingUsers.insert({username, password, validateCode, insertTime});
+        dbValidatingUsers.insert({username, password, validateCode, insertTime});
       }
 
       return validateCode;
@@ -48,7 +45,7 @@ const getValidateUserUrlBodySync = Meteor.wrapAsync((callback) => {
   });
 });
 function validateUsers() {
-  const validatingUserList = validatingUsers.find().fetch();
+  const validatingUserList = dbValidatingUsers.find().fetch();
   if (validatingUserList.length > 0) {
     const $pushList = getValidateUserUrlBodySync();
     validatingUserList.forEach((validatingUser) => {
@@ -63,11 +60,11 @@ function validateUsers() {
             Accounts.setPassword(existUser._id, password, {
               logout: true
             });
-            validatingUsers.remove(validatingUser._id);
+            dbValidatingUsers.remove(validatingUser._id);
           }
           else {
             Accounts.createUser({username, password});
-            validatingUsers.remove(validatingUser._id);
+            dbValidatingUsers.remove(validatingUser._id);
           }
         }
       }

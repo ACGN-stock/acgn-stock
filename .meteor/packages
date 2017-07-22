@@ -18,3 +18,6 @@ ecmascript@0.8.1              # Enable ECMAScript2015+ syntax in app code
 shell-server@0.2.4            # Server-side component of the `meteor shell` command
 accounts-base
 accounts-password
+percolate:migrations
+aldeed:simple-schema
+aldeed:collection2
