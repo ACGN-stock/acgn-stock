@@ -5,8 +5,8 @@
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">登入╱註冊</h5>
         </div>
-        {{#if validateCode}}
-          <div class="modal-body">
+        <div class="modal-body">
+          {{#if validateCode}}
             <div class="form-group">
               您的PTT帳號
               <span class="text-info">{{validateUserName}}</span>
@@ -18,9 +18,7 @@
               以<span class="text-danger">推</span>文的方式輸入驗證碼
               <span class="text-primary">{{validateCode}}</span>。
             </div>
-          </div>
-        {{else}}
-          <div class="modal-body">
+          {{else}}
             <div class="form-group">
               <label for="loginUserName">PTT帳號：</label>
               <input
@@ -39,11 +37,22 @@
                 placeholder="請輸入登入密碼，建議不要跟PTT密碼相同。"
               />
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" style="cursor: pointer;">登入╱註冊</button>
-          </div>
-        {{/if}}
+          {{/if}}
+        </div>
+        <div class="modal-footer">
+          {{#if validateCode}}
+            <button type="reset" class="btn btn-secondary" style="cursor: pointer;">
+              取消
+            </button>
+            <button type="submit" class="btn btn-primary" style="cursor: pointer;">
+              進行驗證
+            </button>
+          {{else}}
+            <button type="submit" class="btn btn-primary" style="cursor: pointer;">
+              登入╱註冊
+            </button>
+          {{/if}}
+        </div>
       </form>
     </div>
   </div>

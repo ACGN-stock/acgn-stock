@@ -7,6 +7,7 @@ import { handleError } from '../utils/handleError';
 
 const validateUserName = new ReactiveVar('');
 const validateCode = new ReactiveVar('');
+let password = '';
 Template.validateDialog.helpers({
   validateUserName() {
     return validateUserName.get();
@@ -22,26 +23,46 @@ Template.validateDialog.helpers({
   }
 });
 Template.validateDialog.events({
+  reset() {
+    validateUserName.set('');
+    validateCode.set('');
+  },
   submit(event, templateInstance) {
     event.preventDefault();
-    const username = templateInstance.$('#loginUserName').val();
-    const password = templateInstance.$('#loginPassword').val();
+    if (validateCode.get()) {
+      Meteor.call('validateAccount', validateUserName.get(), (error) => {
+        if (error) {
+          handleError(error);
+        }
+        else {
+          Meteor.loginWithPassword(validateUserName.get(), password, (error) => {
+            if (error) {
+              handleError(error);
+            }
+          });
+        }
+      });
+    }
+    else {
+      const username = templateInstance.$('#loginUserName').val();
+      password = templateInstance.$('#loginPassword').val();
 
-    Meteor.call('loginOrRegister', username, password, (error, result) => {
-      if (error) {
-        handleError(error);
-      }
-      else if (result === true) {
-        Meteor.loginWithPassword(username, password, (error) => {
-          if (error) {
-            handleError(error);
-          }
-        });
-      }
-      else {
-        validateUserName.set(username);
-        validateCode.set(result);
-      }
-    });
+      Meteor.call('loginOrRegister', username, password, (error, result) => {
+        if (error) {
+          handleError(error);
+        }
+        else if (result === true) {
+          Meteor.loginWithPassword(username, password, (error) => {
+            if (error) {
+              handleError(error);
+            }
+          });
+        }
+        else {
+          validateUserName.set(username);
+          validateCode.set(result);
+        }
+      });
+    }
   }
 });

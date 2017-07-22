@@ -39,11 +39,13 @@ const schema = new SimpleSchema({
   },
   wealth: {
     type: SimpleSchema.Integer,
-    min: 0
+    min: 0,
+    defaultValue: 0
   },
   vote: {
     type: SimpleSchema.Integer,
-    min: 0
+    min: 0,
+    defaultValue: 0
   }
 });
 Meteor.users.attachSchema(schema);
