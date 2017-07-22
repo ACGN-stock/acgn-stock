@@ -5,44 +5,15 @@
     "ecmaVersion": 6,
     "ecmaFeatures": {
       "impliedStrict": true,
-      "jsx": true,
-      "experimentalObjectRestSpread": true
+      "experimentalObjectRestSpread": false
     }
   },
   "env": {
     "browser": true,
     "es6": true
   },
-  "plugins": [
-    "react"
-  ],
+  "plugins": [],
   "rules": {
-    "react/jsx-boolean-value": ["error", "always"],
-    "react/jsx-closing-bracket-location": "error",
-    "react/jsx-equals-spacing": ["error", "never"],
-    "react/jsx-curly-spacing": ["error", "never", {
-      "allowMultiline": false
-    }],
-    "react/jsx-filename-extension": ["error", {
-      "extensions": [".jsx"]
-    }],
-    "react/jsx-first-prop-new-line": ["error", "multiline"],
-    "react/jsx-indent": ["error", 2],
-    "react/jsx-indent-props": ["error", 2],
-    "react/jsx-key": "error",
-    "react/jsx-max-props-per-line": ["error", {
-      "maximum": 3
-    }],
-    "react/jsx-no-bind": "error",
-    "react/jsx-no-duplicate-props": "error",
-    "react/jsx-no-target-blank": "error",
-    "react/jsx-no-undef": "error",
-    "react/jsx-pascal-case": "error",
-    "react/jsx-space-before-closing": "error",
-    "react/jsx-tag-spacing": "error",
-    "react/jsx-uses-react": "error",
-    "react/jsx-uses-vars": "error",
-    "react/jsx-wrap-multilines": "error",
     "no-console": "error",
     "no-debugger": "error",
     "no-unsafe-negation": "error",
@@ -105,7 +76,6 @@
     "indent": ["error", 2, {
       "SwitchCase": 1
     }],
-    "jsx-quotes": ["off"],
     "key-spacing": ["error", {
       "beforeColon": false,
       "afterColon": true,
