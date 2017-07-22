@@ -2,6 +2,7 @@
 import { Mongo } from 'meteor/mongo';
 import { SimpleSchema } from 'meteor/aldeed:simple-schema';
 
+//待驗證的PTT使用者資料集
 export const dbValidatingUsers = new Mongo.Collection('validatingUsers');
 export default dbValidatingUsers;
 
@@ -21,7 +22,7 @@ const schema = new SimpleSchema({
     type: String,
     regEx: /^[0-9a-zA-Z]{10}$/
   },
-  insertTime: {
+  createdAt: {
     type: Date
   }
 });

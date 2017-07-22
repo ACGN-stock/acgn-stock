@@ -22,8 +22,8 @@ Meteor.methods({
       }
       else {
         validateCode = generateValidateCode();
-        const insertTime = new Date();
-        dbValidatingUsers.insert({username, password, validateCode, insertTime});
+        const createdAt = new Date();
+        dbValidatingUsers.insert({username, password, validateCode, createdAt});
       }
 
       return validateCode;

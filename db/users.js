@@ -7,26 +7,8 @@ const schema = new SimpleSchema({
     type: String,
     regEx: /^[0-9a-zA-Z]{4,}$/
   },
-  emails: {
-    type: Array,
-    optional: true
-  },
-  'emails.$': {
-    type: Object
-  },
-  'emails.$.address': {
-    type: String,
-    regEx: SimpleSchema.RegEx.Email
-  },
-  'emails.$.verified': {
-    type: Boolean
-  },
   createdAt: {
     type: Date
-  },
-  profile: {
-    type: Object,
-    optional: true
   },
   services: {
     type: Object,
