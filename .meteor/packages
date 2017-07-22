@@ -21,3 +21,4 @@ accounts-password
 percolate:migrations
 aldeed:simple-schema
 aldeed:collection2
+kadira:flow-router
