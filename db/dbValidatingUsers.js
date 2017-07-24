@@ -1,6 +1,6 @@
 'use strict';
 import { Mongo } from 'meteor/mongo';
-import { SimpleSchema } from 'meteor/aldeed:simple-schema';
+import SimpleSchema from 'simpl-schema';
 
 //待驗證的PTT使用者資料集
 export const dbValidatingUsers = new Mongo.Collection('validatingUsers');
@@ -11,7 +11,7 @@ const schema = new SimpleSchema({
   //使用者PTT帳號
   username: {
     type: String,
-    regEx: /^[0-9a-zA-Z]{4,}$/
+    regEx: /^[0-9a-zA-Z]{4,12}$/
   },
   //使用者登入密碼
   password: {

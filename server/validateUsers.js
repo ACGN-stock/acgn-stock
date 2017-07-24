@@ -4,7 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { dbValidatingUsers } from '../db/dbValidatingUsers';
-import config from '../config.json';
+import config from '../config';
 
 Meteor.methods({
   loginOrRegister(username, password) {
@@ -65,9 +65,9 @@ const getValidateUserUrlBodySync = Meteor.wrapAsync((callback) => {
     }
   });
 });
-function validateUsers(checkUsername) {
+export function validateUsers(checkUsername) {
   let checkResult = false;
-  const validatingUserList = dbValidatingUsers.find().fetch();
+  const validatingUserList = dbValidatingUsers.find({}, {disableOplog: true}).fetch();
   if (validatingUserList.length > 0) {
     const $pushList = getValidateUserUrlBodySync();
     validatingUserList.forEach((validatingUser) => {
@@ -85,11 +85,11 @@ function validateUsers(checkUsername) {
             Accounts.setPassword(existUser._id, password, {
               logout: true
             });
-            dbValidatingUsers.remove(validatingUser._id);
+            dbValidatingUsers.remove({_id: validatingUser._id});
           }
           else {
             Accounts.createUser({username, password});
-            dbValidatingUsers.remove(validatingUser._id);
+            dbValidatingUsers.remove({_id: validatingUser._id});
           }
         }
       }

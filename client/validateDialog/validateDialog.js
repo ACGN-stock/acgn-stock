@@ -2,7 +2,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import config from '../../config.json';
+import { config } from '../../config';
 import { handleError } from '../utils/handleError';
 
 const validateUserName = new ReactiveVar('');
@@ -34,13 +34,7 @@ Template.validateDialog.events({
         if (error) {
           handleError(error);
         }
-        else {
-          Meteor.loginWithPassword(validateUserName.get(), password, (error) => {
-            if (error) {
-              handleError(error);
-            }
-          });
-        }
+        Meteor.loginWithPassword(validateUserName.get(), password);
       });
     }
     else {

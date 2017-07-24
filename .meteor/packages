@@ -19,6 +19,6 @@ shell-server@0.2.4            # Server-side component of the `meteor shell` comm
 accounts-base
 accounts-password
 percolate:migrations
-aldeed:simple-schema
-aldeed:collection2
 kadira:flow-router
+babrahams:transactions
+aldeed:collection2-core
