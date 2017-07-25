@@ -1,6 +1,6 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
-import { tx } from 'meteor/babrahams:transactions';
+import { lockManager } from '../methods/lockManager';
 import { config } from '../config';
 import { dbLog } from '../db/dbLog';
 
@@ -13,12 +13,11 @@ export function paySalary() {
   }, {
     disableOplog: true
   }).forEach((user) => {
+    const unlock = lockManager.lock([user._id], true);
     dbLog.insert({
       logType: '發薪紀錄',
       username: [user.username],
       price: beginSalary
-    }, {
-      tx: true
     });
     Meteor.users.update({
       _id: user._id
@@ -29,20 +28,17 @@ export function paySalary() {
       $inc: {
         'profile.money': beginSalary
       }
-    }, {
-      tx: true
     });
+    unlock();
   });
   counter -= 1;
   if (counter === 0) {
-    tx.start('發薪紀錄');
     Meteor.users.find({}, {disableOplog: true}).forEach((user) => {
+      const unlock = lockManager.lock([user._id], true);
       dbLog.insert({
         logType: '發薪紀錄',
         username: [user.username],
         price: salaryPerPay
-      }, {
-        tx: true
       });
       Meteor.users.update({
         _id: user._id
@@ -53,11 +49,9 @@ export function paySalary() {
         $inc: {
           'profile.money': salaryPerPay
         }
-      }, {
-        tx: true
       });
+      unlock();
     });
-    tx.commit();
     counter = paySalaryCounter;
   }
 }

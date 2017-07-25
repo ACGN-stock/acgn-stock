@@ -1,57 +1,28 @@
 'use strict';
-import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
+import { lockManager } from '../methods/lockManager';
 import { dbValidatingUsers } from '../db/dbValidatingUsers';
-import config from '../config';
+import { config } from '../config';
 
-Meteor.methods({
-  loginOrRegister(username, password) {
-    check(username, String);
-    check(password, String);
-
-    if (Meteor.users.findOne({username})) {
-      return true;
-    }
-    else {
-      const existValidatingUser = dbValidatingUsers.findOne({username, password});
-      let validateCode;
-      if (existValidatingUser) {
-        validateCode = existValidatingUser.validateCode;
+if (Meteor.isServer) {
+  Meteor.methods({
+    validateAccount(username) {
+      check(username, String);
+      const unlock = lockManager.lock(['validate']);
+      const result = validateUsers(username);
+      unlock();
+      if (result) {
+        return true;
       }
       else {
-        validateCode = generateValidateCode();
-        const createdAt = new Date();
-        dbValidatingUsers.insert({username, password, validateCode, createdAt});
+        throw new Meteor.Error('[403] Forbidden', '驗證未能通過，請確定推文位置、推文文章、推文方式與推文驗證碼是否正確！');
       }
-
-      return validateCode;
     }
-  }
-});
-
-const randomStringList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-function generateValidateCode() {
-  return _.sample(randomStringList, 10).join('');
+  });
 }
 
-let lastValidateTime = Date.now();
-Meteor.methods({
-  validateAccount(username) {
-    check(username, String);
-    if (Date.now() - lastValidateTime < 60000) {
-      throw new Meteor.Error('[429] Too Many Requests', '驗證中心忙碌中，請稍候再試...');
-    }
-    const result = validateUsers(username);
-    if (result) {
-      return true;
-    }
-    else {
-      throw new Meteor.Error('[403] Forbidden', '驗證未能通過，請確定推文位置、推文文章、推文方式與推文驗證碼是否正確！');
-    }
-  }
-});
 const getValidateUserUrlBodySync = Meteor.wrapAsync((callback) => {
   const request = require('request');
   const cheerio = require('cheerio');
@@ -65,7 +36,7 @@ const getValidateUserUrlBodySync = Meteor.wrapAsync((callback) => {
     }
   });
 });
-export function validateUsers(checkUsername) {
+function validateUsers(checkUsername) {
   let checkResult = false;
   const validatingUserList = dbValidatingUsers.find({}, {disableOplog: true}).fetch();
   if (validatingUserList.length > 0) {
@@ -95,7 +66,6 @@ export function validateUsers(checkUsername) {
       }
     });
   }
-  lastValidateTime = Date.now();
 
   return checkResult;
 }
