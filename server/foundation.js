@@ -171,6 +171,7 @@ export function checkFoundCompany() {
           totalRelease: totalRelease,
           lastPrice: lastPrice,
           totalValue: totalRelease * lastPrice,
+          candidateList: [foundation.manager],
           createdAt: createdAt
         }, {
           tx: true,

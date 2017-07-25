@@ -33,7 +33,9 @@ function doSeasonWorks() {
     //當商業季度結束時，若有正在競選經理人的公司，則計算出選舉結果。
     electManager();
     //更新商業季度
-    dbSeasonRecord.remove({_id: seasonRecord._id});
+    dbSeasonRecord.remove({
+      _id: seasonRecord._id
+    });
     dbSeasonRecord.insert({
       startDate: new Date(),
       endDate: new Date(Date.now() + config.seasonTime)

@@ -64,23 +64,21 @@ const schema = new SimpleSchema({
     min: 0
   },
   //選舉經理時的候選者列表
-  electList: {
-    type: Array,
-    defaultValue: []
+  candidateList: {
+    type: Array
   },
-  'electList.$': {
+  'candidateList.$': {
     type: String
   },
   //選舉經理時的各候選者的支持董事列表
-  electVotes: {
+  voteList: {
     type: Array,
-    defaultValue: []
+    defaultValue: [ [] ]
   },
-  'electVotes.$': [String],
+  'voteList.$': [String],
   //公司上市日期
   createdAt: {
     type: Date
   }
 });
 dbCompanies.attachSchema(schema);
-
