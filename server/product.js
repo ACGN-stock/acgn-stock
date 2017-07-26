@@ -59,7 +59,8 @@ export function earnProfit() {
       dbLog.insert({
         logType: '公司營利',
         companyName: name,
-        amount: totalProfit
+        amount: totalProfit,
+        createdAt: new Date()
       });
       //經理人分紅
       const managerProfit = Math.ceil(companyProfit.profit * config.managerProfitPercent);
@@ -67,7 +68,8 @@ export function earnProfit() {
         logType: '營利分紅',
         username: [companyData.manager],
         companyName: name,
-        amount: managerProfit
+        amount: managerProfit,
+        createdAt: new Date()
       });
       Meteor.users.update({
         username: companyData.manager
@@ -93,7 +95,8 @@ export function earnProfit() {
           logType: '營利分紅',
           username: [director.username],
           companyName: name,
-          amount: directorProfit
+          amount: directorProfit,
+          createdAt: new Date()
         });
         Meteor.users.update({
           username: director.username

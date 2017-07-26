@@ -6,6 +6,7 @@ import { dbCompanies } from '../db/dbCompanies';
 import { dbOrders } from '../db/dbOrders';
 import { dbLog } from '../db/dbLog';
 import { dbDirectors } from '../db/dbDirectors';
+import { dbPrice } from '../db/dbPrice';
 import { config } from '../config';
 
 export function tradeStocks() {
@@ -52,7 +53,8 @@ export function tradeStocks() {
             username: [buyOrderData.username, sellOrderData.username],
             companyName: sellOrderData.companyName,
             price: buyOrderData.unitPrice,
-            amount: tradeNumber
+            amount: tradeNumber,
+            createdAt: new Date()
           });
           const existDirectorData = dbDirectors.findOne({
             companyName: companyName,
@@ -104,7 +106,8 @@ export function tradeStocks() {
               companyName: buyOrderData.companyName,
               price: buyOrderData.unitPrice,
               amount: buyOrderData.amount,
-              message: buyOrderData.orderType
+              message: buyOrderData.orderType,
+              createdAt: new Date()
             });
             dbOrders.remove({
               _id: buyOrderData._id
@@ -120,7 +123,8 @@ export function tradeStocks() {
             companyName: sellOrderData.companyName,
             price: sellOrderData.unitPrice,
             amount: sellOrderData.amount,
-            message: sellOrderData.orderType
+            message: sellOrderData.orderType,
+            createdAt: new Date()
           });
           dbOrders.remove({
             _id: sellOrderData._id
@@ -133,7 +137,8 @@ export function tradeStocks() {
             username: [sellOrderData.username],
             companyName: sellOrderData.companyName,
             price: sellOrderData.unitPrice,
-            amount: sellOrderData.amount
+            amount: sellOrderData.amount,
+            createdAt: new Date()
           });
           dbOrders.remove({
             _id: sellOrderData._id
@@ -147,6 +152,11 @@ export function tradeStocks() {
           lastPrice: lastPrice,
           totalValue: lastPrice * companyData.totalRelease
         }
+      });
+      dbPrice.insert({
+        companyName: companyName,
+        price: lastPrice,
+        createdAt: new Date()
       });
     }
     unlock();
@@ -183,8 +193,9 @@ export function releaseStocks() {
         let releaseStocksAmount = Math.round(Math.random() * releaseChance);
         dbLog.insert({
           logType: '公司釋股',
-          companyName: companyData.name,
-          amount: releaseStocksAmount
+          companyName: companyName,
+          amount: releaseStocksAmount,
+          createdAt: new Date()
         });
         let lastPrice = companyData.lastPrice;
         dbOrders.find({
@@ -205,9 +216,10 @@ export function releaseStocks() {
           dbLog.insert({
             logType: '交易紀錄',
             username: [buyOrderData.username],
-            companyName: companyData.name,
+            companyName: companyName,
             price: buyOrderData.unitPrice,
-            amount: tradeNumber
+            amount: tradeNumber,
+            createdAt: new Date()
           });
           const existDirectorData = dbDirectors.findOne({
             companyName: companyData.name,
@@ -238,7 +250,8 @@ export function releaseStocks() {
               companyName: buyOrderData.companyName,
               price: buyOrderData.unitPrice,
               amount: buyOrderData.amount,
-              message: buyOrderData.orderType
+              message: buyOrderData.orderType,
+              createdAt: new Date()
             });
             dbOrders.remove({
               _id: buyOrderData._id
@@ -270,6 +283,11 @@ export function releaseStocks() {
           $inc: {
             totalRelease: releaseStocksAmount
           }
+        });
+        dbPrice.insert({
+          companyName: companyName,
+          price: lastPrice,
+          createdAt: new Date()
         });
       }
       unlock();

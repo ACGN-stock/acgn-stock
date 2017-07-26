@@ -15,12 +15,14 @@ const schema = new SimpleSchema({
     max: 10
   },
   //訊息時間
-  time: {
+  createdAt: {
     type: Date
   },
+  //訊息來源
   source: {
     type: String
   },
+  //訊息應該只會自動散發給特定使用者
   onlyForUsers: [String],
   //訊息內容
   message: {

@@ -38,7 +38,8 @@ export function createBuyOrder(user, orderData) {
     username: [username],
     companyName: companyName,
     price: orderData.price,
-    amount: orderData.amount
+    amount: orderData.amount,
+    createdAt: new Date()
   });
   Meteor.users.update({
     _id: user._id
@@ -83,7 +84,8 @@ export function createSellOrder(user, orderData) {
     username: [username],
     companyName: companyName,
     price: orderData.price,
-    amount: orderData.amount
+    amount: orderData.amount,
+    createdAt: new Date()
   });
   if (directorData.stocks === orderData.amount) {
     dbDirectors.remove({companyName, username});
@@ -129,7 +131,8 @@ export function retrieveOrder(user, orderId) {
     companyName: companyName,
     price: orderData.price,
     amount: (orderData.amount - orderData.done),
-    message: orderData.orderType
+    message: orderData.orderType,
+    createdAt: new Date()
   });
   Meteor.users.update({_id: user._id}, {
     $inc: {

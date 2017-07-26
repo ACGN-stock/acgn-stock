@@ -29,7 +29,8 @@ function accuseCompany(user, companyName, message) {
     logType: '舉報公司',
     username: [user.username],
     companyName: companyName,
-    message: message
+    message: message,
+    createdAt: new Date()
   });
   unlock();
 }
@@ -58,7 +59,8 @@ function accuseProduct(user, productId, message) {
     username: [user.username],
     companyName: productData.companyName,
     productId: productId,
-    message: message
+    message: message,
+    createdAt: new Date()
   });
   unlock();
 }

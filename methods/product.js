@@ -23,17 +23,13 @@ export function createProduct(user, productData) {
   }
   const unlock = lockManager.lock([user._id, 'product']);
   productData.createdAt = new Date();
-  const productId = dbProducts.insert(productData, {
-    tx: true,
-    instant: true
-  });
+  const productId = dbProducts.insert(productData);
   dbLog.insert({
     logType: '產品發布',
     username: [manager],
     companyName: companyName,
-    productId: productId
-  }, {
-    tx: true
+    productId: productId,
+    createdAt: new Date()
   });
   unlock();
 }
@@ -63,7 +59,8 @@ export function retrieveProduct(user, productId) {
     logType: '產品下架',
     username: [manager],
     companyName: companyName,
-    productId: productId
+    productId: productId,
+    createdAt: new Date()
   });
   dbProducts.remove({_id: productId});
   unlock();
@@ -95,7 +92,8 @@ export function voteProduct(user, productId) {
     logType: '推薦產品',
     username: [username],
     companyName: productData.companyName,
-    productId: productId
+    productId: productId,
+    createdAt: new Date()
   });
   Meteor.users.update({
     _id: user._id

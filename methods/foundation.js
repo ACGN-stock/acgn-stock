@@ -28,7 +28,8 @@ export function foundCompany(user, foundCompanyData) {
   dbLog.insert({
     logType: '創立公司',
     username: [name.manager],
-    companyName: name
+    companyName: name,
+    createdAt: new Date()
   });
   dbFoundations.insert(foundCompanyData);
   unlock();
@@ -71,7 +72,8 @@ export function investFoundCompany(user, foundCompanyId, amount) {
     logType: '參予投資',
     username: [username],
     companyName: foundCompanyData.name,
-    amount: amount
+    amount: amount,
+    createdAt: new Date()
   });
   Meteor.users.update({
     _id: user._id

@@ -17,7 +17,8 @@ export function paySalary() {
     dbLog.insert({
       logType: '發薪紀錄',
       username: [user.username],
-      price: beginSalary
+      price: beginSalary,
+      createdAt: new Date()
     });
     Meteor.users.update({
       _id: user._id
@@ -38,7 +39,8 @@ export function paySalary() {
       dbLog.insert({
         logType: '發薪紀錄',
         username: [user.username],
-        price: salaryPerPay
+        price: salaryPerPay,
+        createdAt: new Date()
       });
       Meteor.users.update({
         _id: user._id

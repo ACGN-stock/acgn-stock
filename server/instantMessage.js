@@ -7,10 +7,9 @@ import { dbInstantMessage } from '../db/dbInstantMessage';
 
 Meteor.publish('instantMessage', function(username) {
   check(username, String);
-  const time = new Date( Date.now() - 30000 );
   dbInstantMessage.find({
-    time: {
-      $gte: time
+    createdAt: {
+      $gte: new Date( Date.now() - 30000 )
     }
   }).observeChanges({
     added: (id, fields) => {
@@ -22,16 +21,16 @@ Meteor.publish('instantMessage', function(username) {
   });
 });
 
-const time = new Date( Date.now() - 30000 );
+//當有新log建立時自動散發至instantMessage中
 dbLog.find({
-  time: {
-    $gte: time
+  createdAt: {
+    $gte: new Date( Date.now() - 30000 )
   }
 }).observeChanges({
   added: (id, log) => {
     let instantMessage = {
       type: log.logType,
-      time: log.createdAt,
+      createdAt: log.createdAt,
       onlyForUsers: [],
       source: ''
     };

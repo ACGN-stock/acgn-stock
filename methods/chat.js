@@ -15,8 +15,8 @@ Meteor.methods({
 
 function chat(user, message) {
   dbInstantMessage.insert({
-    time: new Date(),
     type: '即時聊天',
+    createdAt: new Date(),
     source: user.username,
     message: message
   });

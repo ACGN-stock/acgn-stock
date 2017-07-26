@@ -41,7 +41,8 @@ export function electManager() {
         logType: '就任經理',
         username: companyData.candidateList,
         companyName: companyName,
-        message: message
+        message: message,
+        createdAt: new Date()
       });
       dbCompanies.update({
         _id: companyData._id
@@ -77,7 +78,8 @@ export function electManager() {
       username: [winner.username],
       companyName: companyName,
       message: message,
-      amount: winner.stocks
+      amount: winner.stocks,
+      createdAt: new Date()
     });
     dbCompanies.update({
       _id: companyData._id

@@ -35,7 +35,8 @@ function revokeCompany(user, companyName, message) {
     logType: '公司撤銷',
     username: [companyData.manager],
     companyName: companyName,
-    message: message
+    message: message,
+    createdAt: new Date()
   });
   dbCompanies.remove({
     _id: companyData._id
@@ -72,7 +73,8 @@ function revokeManagerQualification(admin, username, message) {
   dbLog.insert({
     logType: '取消資格',
     username: [admin.username, username],
-    message: message
+    message: message,
+    createdAt: new Date()
   });
   dbCompanies.find({
     $or: [
@@ -143,7 +145,8 @@ function editCompany(user, companyName, newCompanyData) {
   dbLog.insert({
     logType: '經理管理',
     username: [companyData.manager],
-    companyName: companyName
+    companyName: companyName,
+    createdAt: new Date()
   });
   dbCompanies.update({
     _id: companyData._id
@@ -177,7 +180,8 @@ function resignManager(user, companyName) {
   dbLog.insert({
     logType: '辭職紀錄',
     username: [user.username],
-    companyName: companyName
+    companyName: companyName,
+    createdAt: new Date()
   });
   const {candidateList, voteList} = companyData.candidateList;
   const candidateIndex = _.findIndex(candidateList, user.username);
@@ -230,7 +234,8 @@ function contendManager(user, companyName) {
   dbLog.insert({
     logType: '參選紀錄',
     username: [user.username],
-    companyName: companyName
+    companyName: companyName,
+    createdAt: new Date()
   });
   dbCompanies.update({
     _id: companyData._id
@@ -282,7 +287,8 @@ function supportManager(director, companyName, username) {
   dbLog.insert({
     logType: '支持紀錄',
     username: [director.username, username],
-    companyName: companyName
+    companyName: companyName,
+    createdAt: new Date()
   });
   dbCompanies.update({
     _id: companyData._id

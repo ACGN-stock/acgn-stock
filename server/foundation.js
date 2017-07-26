@@ -6,6 +6,7 @@ import { dbFoundations } from '../db/dbFoundations';
 import { dbLog } from '../db/dbLog';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
+import { dbPrice } from '../db/dbPrice';
 import { config } from '../config';
 
 const {foundExpireTime, foundationNeedUsers, beginReleaseStock} = config;
@@ -27,7 +28,8 @@ export function checkFoundCompany() {
         dbLog.insert({
           logType: '創立失敗',
           username: _.pluck(invest, 'username'),
-          companyName: name
+          companyName: name,
+          createdAt: new Date()
         });
         dbFoundations.remove({
           _id: foundationData._id
@@ -60,7 +62,8 @@ export function checkFoundCompany() {
           logType: '創立成功',
           username: _.pluck(sortedInvest, 'username'),
           companyName: name,
-          price: lastPrice
+          price: lastPrice,
+          createdAt: createdAt
         });
         const companyId = dbCompanies.insert({
           name: name,
@@ -75,6 +78,11 @@ export function checkFoundCompany() {
           candidateList: [foundationData.manager],
           createdAt: createdAt
         });
+        dbPrice.insert({
+          companyName: name,
+          price: lastPrice,
+          createdAt: createdAt
+        });
         dbFoundations.remove({
           _id: foundationData._id
         });
@@ -84,6 +92,7 @@ export function checkFoundCompany() {
             username: [username],
             companyName: foundationData.name,
             amount: stocks,
+            createdAt: createdAt
           });
           dbDirectors.insert({companyId, username, stocks, createdAt});
         });
