@@ -20,5 +20,4 @@ accounts-base
 accounts-password
 percolate:migrations
 kadira:flow-router
-babrahams:transactions
 aldeed:collection2-core

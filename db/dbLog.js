@@ -26,14 +26,14 @@ export const logTypeList = [
   '產品發布', //username0發表了companyName公司的productId產品
   '產品下架', //username0下架了companyName公司的productId產品
   '推薦產品', //username0推薦了companyName公司的productId產品
-  '選擇經理', //username0贊成username1成為companyName公司的經理人
-  '開票紀錄', //本季度companyName公司的經理人將由username0擔任
+  '支持紀錄', //username0支持username1擔任companyName公司的經理人
+  '就任經理', //username0在message商業季度(以amount數量的支持股份)擊敗了所有競爭對手，成為companyName公司的經理人。
   '公司營利', //companyName公司本商業季度一共獲利amount
   '營利分紅', //username0得到了companyName公司的分紅amount
   '舉報公司', //username0以message理由舉報了companyName公司
   '舉報產品', //username0以message理由舉報了companyName公司的productId產品
   '公司撤銷', //username0以message理由撤銷了companyName公司
-  '取消資格' //username0以message理由取消了username1擔任經理人的資格
+  '取消資格' //username0以message理由取消了username1擔任companyName公司經理人的資格
 ];
 
 //schema

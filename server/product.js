@@ -1,129 +1,15 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-import { tx } from 'meteor/babrahams:transactions';
+import { lockManager } from '../methods/lockManager';
 import { dbProducts } from '../db/dbProducts';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbLog } from '../db/dbLog';
 import { dbDirectors } from '../db/dbDirectors';
 import { config } from '../config';
 
-Meteor.methods({
-  createProduct(productData) {
-    check(this.userId, String);
-    createProduct(Meteor.user(), productData);
-
-    return true;
-  }
-});
-
-export function createProduct(user, productData) {
-  const manager = user.username;
-  const companyName = productData.companyName;
-  if (! dbCompanies.findOne({companyName, manager})) {
-    throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
-  }
-  productData.createdAt = new Date();
-  tx.start('產品發布');
-  const productId = dbProducts.insert(productData, {
-    tx: true,
-    instant: true
-  });
-  dbLog.insert({
-    logType: '產品發布',
-    username: [manager],
-    companyName: companyName,
-    productId: productId
-  }, {
-    tx: true
-  });
-  tx.commit();
-}
-
-Meteor.methods({
-  retrieveProduct(productId) {
-    check(this.userId, String);
-    check(productId, String);
-    retrieveProduct(Meteor.user(), productId);
-
-    return true;
-  }
-});
-
-export function retrieveProduct(user, productId) {
-  const manager = user.username;
-  const productData = dbProducts.findOne(productId);
-  const companyName = productData.companyName;
-  if (! dbCompanies.findOne({companyName, manager})) {
-    throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
-  }
-  tx.start('產品下架');
-  dbLog.insert({
-    logType: '產品下架',
-    username: [manager],
-    companyName: companyName,
-    productId: productId
-  }, {
-    tx: true
-  });
-  dbProducts.remove({_id: productId}, {
-    tx: true
-  });
-  tx.commit();
-}
-
-Meteor.methods({
-  voteProduct(productId) {
-    check(this.userId, String);
-    check(productId, String);
-    voteProduct(Meteor.user(), productId);
-
-    return true;
-  }
-});
-
-export function voteProduct(user, productId) {
-  if (user.profile.vote < 1) {
-    throw new Meteor.Error(403, '使用者已經沒有多餘的推薦票可以推薦！');
-  }
-  const productData = dbProducts.findOne({
-    _id: productId
-  });
-  if (productData) {
-    const username = user.username;
-    tx.start('推薦產品');
-    dbLog.insert({
-      logType: '推薦產品',
-      username: [username],
-      companyName: productData.companyName,
-      productId: productId
-    }, {
-      tx: true
-    });
-    Meteor.users.update({
-      _id: user._id
-    }, {
-      $inc: {
-        'profile.vote': -1
-      }
-    }, {
-      tx: true
-    });
-    dbProducts.update({
-      _id: productId
-    }, {
-      $inc: {
-        vote: 1
-      }
-    }, {
-      tx: true
-    });
-    tx.commit();
-  }
-}
-
 export function earnProfit() {
+  const unlock = lockManager.lock(['product'], true);
   //總收益由config與當前驗證通過的使用者數量有關
   const allProfit = config.seasonProfitPerUser * Meteor.users.find({}, {disableOplog: true}).count();
   //取出所有參加本季度投票競賽的產品
@@ -165,17 +51,15 @@ export function earnProfit() {
     companyProfit.profit += baseProfit;
   });
   //發放收益給公司經理人與董事會
-  tx.start('營利分紅');
   _.each(companyProfitList, (companyProfit) => {
-    const name = companyProfit.companyName;
+    const name = companyProfit.companyName;    
     const companyData = dbCompanies.findOne({name});
     if (companyData) {
+      const unlock = lockManager.lock([companyData.name], true);
       dbLog.insert({
         logType: '公司營利',
         companyName: name,
         amount: totalProfit
-      }, {
-        tx: true
       });
       //經理人分紅
       const managerProfit = Math.ceil(companyProfit.profit * config.managerProfitPercent);
@@ -184,8 +68,6 @@ export function earnProfit() {
         username: [companyData.manager],
         companyName: name,
         amount: managerProfit
-      }, {
-        tx: true
       });
       Meteor.users.update({
         username: companyData.manager
@@ -193,8 +75,6 @@ export function earnProfit() {
         $inc: {
           'profile.money': managerProfit
         }
-      }, {
-        tx: true
       });
       const totalProfit = companyProfit.profit - managerProfit;
       let leftProfit = totalProfit;
@@ -214,8 +94,6 @@ export function earnProfit() {
           username: [director.username],
           companyName: name,
           amount: directorProfit
-        }, {
-          tx: true
         });
         Meteor.users.update({
           username: director.username
@@ -223,11 +101,10 @@ export function earnProfit() {
           $inc: {
             'profile.money': directorProfit
           }
-        }, {
-          tx: true
         });
         leftProfit -= directorProfit;
       });
+      unlock();
     }
   });
   //所有投票榜上的產品下榜
@@ -237,8 +114,6 @@ export function earnProfit() {
     $set: {
       overdue: 2
     }
-  }, {
-    tx: true
   });
   //依當季推出的產品數量重設所有使用者的推薦票數
   const newVoteNumber = Math.floor(dbProducts.find({overdue: 0}, {disableOplog: true}).count() / 10);
@@ -246,8 +121,6 @@ export function earnProfit() {
     $set: {
       'profile.vote': newVoteNumber
     }
-  }, {
-    tx: true
   });
   //所有當季推出的產品進投票榜
   dbProducts.update({
@@ -256,8 +129,6 @@ export function earnProfit() {
     $set: {
       overdue: 1
     }
-  }, {
-    tx: true
   });
-  tx.commit();
+  unlock();
 }
