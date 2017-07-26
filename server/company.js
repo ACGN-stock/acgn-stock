@@ -10,8 +10,8 @@ export function electManager() {
   dbCompanies.find({
     $or: [
       {
-        candidateList: {
-          $not: {
+        $nor: {
+          candidateList: {
             $size: 1
           }
         }

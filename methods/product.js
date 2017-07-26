@@ -9,6 +9,12 @@ import { dbLog } from '../db/dbLog';
 Meteor.methods({
   createProduct(productData) {
     check(this.userId, String);
+    check(productData, {
+      name: String,
+      companyName: String,
+      type: String,
+      url: String
+    });
     createProduct(Meteor.user(), productData);
 
     return true;

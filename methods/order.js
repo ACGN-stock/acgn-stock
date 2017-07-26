@@ -1,6 +1,6 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 import { lockManager } from './lockManager';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbOrders } from '../db/dbOrders';
@@ -10,6 +10,12 @@ import { dbDirectors } from '../db/dbDirectors';
 Meteor.methods({
   createBuyOrder(orderData) {
     check(this.userId, String);
+    check(orderData, {
+      companyName: String,
+      orderType: String,
+      unitPrice: Match.Integer,
+      amount: Match.Integer
+    });
     createBuyOrder(Meteor.user(), orderData);
 
     return true;

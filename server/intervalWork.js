@@ -27,7 +27,7 @@ function doIntervalWork() {
 //商業季度結束檢查
 function doSeasonWorks() {
   const seasonRecord = dbSeasonRecord.findOne();
-  if (Date.now() >= seasonRecord.endDate.getTime()) {
+  if (seasonRecord && Date.now() >= seasonRecord.endDate.getTime()) {
     //當商業季度結束時，結算所有公司的營利額，推進所有產品的狀態進度，並根據上季產品的數量發給使用者推薦票。
     earnProfit();
     //當商業季度結束時，若有正在競選經理人的公司，則計算出選舉結果。
@@ -36,11 +36,11 @@ function doSeasonWorks() {
     dbSeasonRecord.remove({
       _id: seasonRecord._id
     });
-    dbSeasonRecord.insert({
-      startDate: new Date(),
-      endDate: new Date(Date.now() + config.seasonTime)
-    });
   }
+  dbSeasonRecord.insert({
+    startDate: new Date(),
+    endDate: new Date(Date.now() + config.seasonTime)
+  });
 }
 
 Meteor.publish('seasonRecord', function () {

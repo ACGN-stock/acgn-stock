@@ -15,7 +15,7 @@ export function checkFoundCompany() {
   dbFoundations
     .find({
       createdAt: {
-        $gte: foundExpireDate
+        $lt: foundExpireDate
       }
     }, {
       disableOplog: true
@@ -27,7 +27,7 @@ export function checkFoundCompany() {
       if (invest.length < foundationNeedUsers) {
         dbLog.insert({
           logType: '創立失敗',
-          username: _.pluck(invest, 'username'),
+          username: [foundationData.manager].concat(_.pluck(invest, 'username')),
           companyName: name,
           createdAt: new Date()
         });
@@ -60,7 +60,7 @@ export function checkFoundCompany() {
 
         dbLog.insert({
           logType: '創立成功',
-          username: _.pluck(sortedInvest, 'username'),
+          username: [foundationData.manager].concat(_.pluck(sortedInvest, 'username')),
           companyName: name,
           price: lastPrice,
           createdAt: createdAt

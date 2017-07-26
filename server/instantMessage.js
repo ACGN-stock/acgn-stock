@@ -32,7 +32,7 @@ dbLog.find({
       type: log.logType,
       createdAt: log.createdAt,
       onlyForUsers: [],
-      source: ''
+      source: '!system'
     };
     switch (log.logType) {
       case '發薪紀錄': {
@@ -154,6 +154,6 @@ dbLog.find({
 });
 
 //每隔30秒自動清空server端的instantMessage資料
-Meteor.setInterval(() => {
-  dbInstantMessage.remove({});
-}, 30000);
+// Meteor.setInterval(() => {
+//   dbInstantMessage.remove({});
+// }, 30000);

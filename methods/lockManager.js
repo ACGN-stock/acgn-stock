@@ -13,7 +13,7 @@ export const lockManager = {
     this.lockIdList(idList, isServer);
 
     const timeoutId = Meteor.setTimeout(unlock, 60000);
-    const unlock = function() {
+    const unlock = () => {
       Meteor.clearTimeout(timeoutId);
       this.unLockIdList(idList, isServer);
     };

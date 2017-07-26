@@ -166,7 +166,7 @@ Meteor.methods({
   }
 });
 
-function resignManager(user, companyName) {
+export function resignManager(user, companyName) {
   const companyData = dbCompanies.findOne({
     name: companyName
   });
@@ -211,7 +211,7 @@ Meteor.methods({
   }
 });
 
-function contendManager(user, companyName) {
+export function contendManager(user, companyName) {
   const companyData = dbCompanies.findOne({
     name: companyName
   });
@@ -249,17 +249,17 @@ function contendManager(user, companyName) {
 }
 
 Meteor.methods({
-  supportManager(companyName, username) {
+  supportCandidate(companyName, username) {
     check(this.userId, String);
     check(companyName, String);
     check(username, String);
-    supportManager(Meteor.user(), companyName, username);
+    supportCandidate(Meteor.user(), companyName, username);
 
     return true;
   }
 });
 
-function supportManager(director, companyName, username) {
+export function supportCandidate(director, companyName, username) {
   const companyData = dbCompanies.findOne({
     name: companyName
   });
@@ -274,16 +274,20 @@ function supportManager(director, companyName, username) {
   if (_.includes(voteList[candidateIndex], director.username)) {
     throw new Meteor.Error(403, '使用者已經正在支持' + username + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
   }
+  const directorName = director.username;
   const directorData = dbDirectors.findOne({
     companyName: companyName,
-    username: director.username
+    username: directorName
   });
   if (! directorData) {
     throw new Meteor.Error(401, '使用者並非「' + companyName + '」公司的董事，無法支持經理人！');
   }
-  const unlock = lockManager.lock([director._id, companyName]);
-  voteList[candidateIndex].push(director.username);
+  const newVoteList = _.map(voteList, (votes) => {
+    return _.without(votes, directorName);
+  });
+  newVoteList[candidateIndex].push(directorName);
 
+  const unlock = lockManager.lock([director._id, companyName]);
   dbLog.insert({
     logType: '支持紀錄',
     username: [director.username, username],
@@ -294,7 +298,7 @@ function supportManager(director, companyName, username) {
     _id: companyData._id
   }, {
     $set: {
-      voteList: voteList
+      voteList: newVoteList
     }
   });
   unlock();

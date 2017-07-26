@@ -1,7 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 import { lockManager } from './lockManager';
 import { dbFoundations } from '../db/dbFoundations';
 import { dbLog } from '../db/dbLog';
@@ -11,6 +11,13 @@ import { config } from '../config';
 Meteor.methods({
   foundCompany(foundCompanyData) {
     check(this.userId, String);
+    check(foundCompanyData, {
+      name: String,
+      tags: [String],
+      puctureSmall: new Match.Optional(String),
+      puctureBig: new Match.Optional(String),
+      description: String
+    });
     foundCompany(Meteor.user(), foundCompanyData);
 
     return true;
@@ -23,11 +30,11 @@ export function foundCompany(user, foundCompanyData) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
   }
   const unlock = lockManager.lock([user._id, name]);
-  foundCompanyData.manager = user;
+  foundCompanyData.manager = user.username;
   foundCompanyData.createdAt = new Date();
   dbLog.insert({
     logType: '創立公司',
-    username: [name.manager],
+    username: [user.username],
     companyName: name,
     createdAt: new Date()
   });
