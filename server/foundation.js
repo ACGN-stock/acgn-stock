@@ -59,7 +59,8 @@ export function checkFoundCompany() {
         dbLog.insert({
           logType: '創立成功',
           username: _.pluck(sortedInvest, 'username'),
-          companyName: name
+          companyName: name,
+          price: lastPrice
         });
         const companyId = dbCompanies.insert({
           name: name,

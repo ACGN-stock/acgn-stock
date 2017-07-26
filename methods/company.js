@@ -69,6 +69,11 @@ function revokeManagerQualification(admin, username, message) {
     throw new Meteor.Error(404, '找不到使用者「' + username + '」！');
   }
   const unlock = lockManager.lock([admin._id]);
+  dbLog.insert({
+    logType: '取消資格',
+    username: [admin.username, username],
+    message: message
+  });
   dbCompanies.find({
     $or: [
       {
@@ -94,12 +99,6 @@ function revokeManagerQualification(admin, username, message) {
       candidateList.splice(candidateIndex, 1);
       voteList.splice(candidateIndex, 1);
     }
-    dbLog.insert({
-      logType: '取消資格',
-      username: [admin.username, username],
-      companyName: companyData.name,
-      message: message
-    });
     dbCompanies.update({
       _id: companyData._id
     }, {
