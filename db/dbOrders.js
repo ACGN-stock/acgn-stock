@@ -35,14 +35,12 @@ const schema = new SimpleSchema({
   //交易股份數量
   amount: {
     type: SimpleSchema.Integer,
-    min: 1,
-    max: 1000
+    min: 1
   },
   //已處理完畢的數量
   done: {
     type: SimpleSchema.Integer,
-    min: 1,
-    max: 1000,
+    min: 0,
     defaultValue: 0
   },
   //下單日期

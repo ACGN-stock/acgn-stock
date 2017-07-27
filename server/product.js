@@ -52,13 +52,13 @@ export function earnProfit() {
   });
   //發放收益給公司經理人與董事會
   _.each(companyProfitList, (companyProfit) => {
-    const name = companyProfit.companyName;    
-    const companyData = dbCompanies.findOne({name});
+    const companyName = companyProfit.companyName;    
+    const companyData = dbCompanies.findOne({companyName});
     if (companyData) {
-      const unlock = lockManager.lock([companyData.name], true);
+      const unlock = lockManager.lock([companyName], true);
       dbLog.insert({
         logType: '公司營利',
-        companyName: name,
+        companyName: companyName,
         amount: totalProfit,
         createdAt: new Date()
       });
@@ -67,7 +67,7 @@ export function earnProfit() {
       dbLog.insert({
         logType: '營利分紅',
         username: [companyData.manager],
-        companyName: name,
+        companyName: companyName,
         amount: managerProfit,
         createdAt: new Date()
       });
@@ -83,7 +83,7 @@ export function earnProfit() {
       const totalReleaseStocks = companyData.totalRelease;
       //發放營利給所有董事
       dbDirectors.find({
-        companyName: name
+        companyName: companyName
       }, {
         sort: {
           stocks: -1
@@ -94,7 +94,7 @@ export function earnProfit() {
         dbLog.insert({
           logType: '營利分紅',
           username: [director.username],
-          companyName: name,
+          companyName: companyName,
           amount: directorProfit,
           createdAt: new Date()
         });

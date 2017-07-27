@@ -11,52 +11,60 @@ import { foundCompany, investFoundCompany } from '../methods/foundation';
 import { createBuyOrder, createSellOrder, retrieveOrder } from '../methods/order';
 import { createProduct, voteProduct } from '../methods/product';
 import { resignManager, contendManager, supportCandidate } from '../methods/company';
+import { config } from '../config';
 
 if (Meteor.users.find().count() < 1) {
   for (let i = 1; i <= 30; i += 1) {
     Accounts.createUser({
       username: 'user' + i,
-      password: 'user' + i
+      password: 'user' + i,
+      profile: {
+        money: config.beginMoney
+      }
     });
   }
 }
 
 Meteor.users.find().forEach((user) => {
-  doSomethingAfterRandomTime(user);
+  doSomethingAfterRandomTime(user._id);
 });
 
-function doSomethingAfterRandomTime(user) {
-  const randomTime = randomNumber(30000, 10000);
-  console.log(user.username + ' will do something after ' + randomTime + 'ms.');
+function doSomethingAfterRandomTime(userId) {
+  const randomTime = randomNumber(60000, 30000);
   Meteor.setTimeout(() => {
-    try {
-      doSomething(user);
-    }
-    catch(e) {
-      console.log(e);
-    }
-    doSomethingAfterRandomTime(user);
+    // try {
+    //   doSomething(userId);
+    // }
+    // catch(e) {
+    //   console.log(e);
+    // }
+    doSomething(userId);
+    doSomethingAfterRandomTime(userId);
   }, randomTime);
 }
 
-function doSomething(user) {
+function doSomething(userId) {
+  const user = Meteor.users.findOne(userId);
   const username = user.username;
-  console.log(username + ' is doing something...');
+  // console.log(username + ' is doing something...');
   const foundationNumber = dbFoundations.find().count();
-  if (foundationNumber < 1 || (foundationNumber < 3 && probability(25))) {
+  if (foundationNumber < 1 && probability(25)) {
     console.log(username + ' want to found a company!');
     foundCompany(user, {
-      name: _.uniqueId('company'),
+      companyName: 'company' + Date.now(),
       tags: ['forTest'],
       description: 'for test test test test'
     });
   }
-  else if (foundationNumber > 0 && user.profile.money > 200) {
-    console.log(username + ' want to invest a found company!');
-    const foundationData = _.sample(dbFoundations.find().fetch());
-    investFoundCompany(user, foundationData._id, randomNumber(user.profile.money - 200, 100));
+  else if (foundationNumber > 0 && user.profile.money > 5000) {
+    const investMoney = randomNumber(user.profile.money - 200, 100);
+    if (investMoney > 100) {
+      console.log(username + ' want to invest a found company!');
+      const foundationData = _.sample(dbFoundations.find().fetch());
+      investFoundCompany(user, foundationData._id, investMoney);
+    }
   }
-  if (user.profile.money > 200 && probability(50) && dbCompanies.find().count() > 0) {
+  else if (user.profile.money > 200 && probability(50) && dbCompanies.find().count() > 0) {
     const companyData = _.sample(dbCompanies.find().fetch());
     const useMoney = randomNumber(user.profile.money);
     const unitPrice = randomNumber(companyData.lastPrice + 100);
@@ -65,9 +73,8 @@ function doSomething(user) {
       console.log(username + ' want to buy some stocks!');
 
       createBuyOrder(user, {
-        companyName: companyData.name,
-        orderType: '購入',
-        unitPrice: unitPrice,
+        companyName: companyData.companyName,
+        unitPrice: unitPrice || 1,
         amount: amount
       });
     }
@@ -75,27 +82,26 @@ function doSomething(user) {
   const directorNumber = dbDirectors.find({username}).count();
   if (probability(directorNumber * 5)) {
     const directorData = _.sample(dbDirectors.find({username}).fetch());
-    const name = directorData.companyName;
-    const companyData = dbCompanies.findOne({name});
+    const companyName = directorData.companyName;
+    const companyData = dbCompanies.findOne({companyName});
     if (probability(25)) {
       console.log(username + ' want to sell some stocks!');
 
       createSellOrder(user, {
-        companyName: name,
-        orderType: '賣出',
-        unitPrice: randomNumber(companyData.lastPrice, randomNumber(companyData.lastPrice)),
+        companyName: companyName,
+        unitPrice: randomNumber(companyData.lastPrice, randomNumber(companyData.lastPrice)) || 1,
         amount: probability(10) ? directorData.stocks : randomNumber(directorData.stocks)
       });
     }
     else {
       console.log(username + ' support a candidate!');
       const candidate = _.sample(companyData.candidateList);
-      supportCandidate(user, name, candidate);
+      supportCandidate(user, companyName, candidate);
     }
   }
-  if (probability(dbOrders.find().count() * 5)) {
+  if (probability(dbOrders.find({username}).count())) {
     console.log(username + ' want to cancel a order!');
-    const orderData = _.sample(dbOrders.find().fetch());
+    const orderData = _.sample(dbOrders.find({username}).fetch());
     retrieveOrder(user, orderData._id);
   }
   const beManagerCompanies = dbCompanies.find({manager: username}).fetch();
@@ -103,21 +109,21 @@ function doSomething(user) {
     if (probability(5)) {
       console.log(username + ' want to resign a manager!');
       const companyData = _.sample(beManagerCompanies);
-      resignManager(user, companyData.name);
+      resignManager(user, companyData.companyName);
     }
     else if (probability(30)) {
       console.log(username + ' want to create a product!');
       const companyData = _.sample(beManagerCompanies);
       const randomSuffix = Date.now();
       createProduct(user, {
-        name: 'product' + randomSuffix,
-        companyName: companyData.name,
+        productName: 'product' + randomSuffix,
+        companyName: companyData.companyName,
         type: '繪圖',
         url: generateUrl(randomSuffix)
       });
     }
   }
-  else {
+  else if (probability(5)) {
     const matchCompanies = dbCompanies.find({
       $nor: [
         {
@@ -132,7 +138,7 @@ function doSomething(user) {
     if (matchCompanies.length) {
       console.log(username + ' want to contend a manager!');
       const companyData = _.sample(matchCompanies);
-      contendManager(user, companyData.name);
+      contendManager(user, companyData.companyName);
     }
   }
   if (user.profile.vote > 0 && dbProducts.find({overdue: 1}).count() > 0) {

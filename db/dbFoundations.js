@@ -9,7 +9,7 @@ export default dbFoundations;
 //schema
 const schema = new SimpleSchema({
   //公司名稱
-  name: {
+  companyName: {
     type: String,
     min: 1,
     max: 100

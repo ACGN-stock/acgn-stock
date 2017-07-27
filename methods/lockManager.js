@@ -64,10 +64,10 @@ else {
   lockManager.lockedList = [];
   lockManager.isLocked = function(id, isServer) {
     if (isServer) {
-      return _.includes(this.serverLockedList, id);
+      return _.contains(this.serverLockedList, id);
     }
     else {
-      return _.includes(this.serverLockedList, id) || _.includes(this.lockedItem, id);
+      return _.contains(this.serverLockedList, id) || _.contains(this.lockedItem, id);
     }
   };
   lockManager.lockIdList = function(idList, isServer) {

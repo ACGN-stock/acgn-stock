@@ -28,7 +28,7 @@ export function tradeStocks() {
   }).fetch();
   const sellOrderGroupByCompanyHash = _.groupBy(allSellOrders, 'companyName');
   _.each(sellOrderGroupByCompanyHash, (sellOrderList, companyName) => {
-    const companyData = dbCompanies.findOne({name: companyName});
+    const companyData = dbCompanies.findOne({companyName});
     const unlock = lockManager.lock([companyName], true);
     if (companyData) {
       let lastPrice = 0;
@@ -45,7 +45,7 @@ export function tradeStocks() {
           if (buyOrderData.unitPrice < sellOrderData.unitPrice) {
             return false;
           }
-          const tradeNumber = Math.min(sellOrderData.amount - sellOrderData.done, buyOrderData.amount - sellOrderData.done);
+          const tradeNumber = Math.min(sellOrderData.amount - sellOrderData.done, buyOrderData.amount - buyOrderData.done);
           sellOrderData.done += tradeNumber;
           buyOrderData.done += tradeNumber;
           dbLog.insert({
@@ -133,7 +133,7 @@ export function tradeStocks() {
         //若沒有買單可以滿足賣單，且此賣單期望單價在(lastPrice || 1)以上，則取消之
         else if (sellOrderData.unitPrice > (lastPrice || 1)) {
           dbLog.insert({
-            logType: '賣單取消',
+            logType: '賣單撤銷',
             username: [sellOrderData.username],
             companyName: sellOrderData.companyName,
             price: sellOrderData.unitPrice,
@@ -174,7 +174,7 @@ export function releaseStocks() {
     }, {
       disableOplog: true
     }).forEach((companyData) => {
-      const companyName = companyData.name;
+      const companyName = companyData.companyName;
       const unlock = lockManager.lock([companyName], true);
       const lastPrice = companyData.lastPrice;
       let releaseChance = 0;

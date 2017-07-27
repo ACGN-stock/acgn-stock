@@ -10,7 +10,7 @@ Meteor.methods({
   createProduct(productData) {
     check(this.userId, String);
     check(productData, {
-      name: String,
+      productName: String,
       companyName: String,
       type: String,
       url: String

@@ -17,7 +17,7 @@ export const productTypeList = [
 //schema
 const schema = new SimpleSchema({
   //產品名稱
-  name: {
+  productName: {
     type: String,
     min: 4,
     max: 255

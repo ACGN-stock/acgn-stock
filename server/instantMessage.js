@@ -13,7 +13,7 @@ Meteor.publish('instantMessage', function(username) {
     }
   }).observeChanges({
     added: (id, fields) => {
-      if (_.includes(fields.onlyForUsers, username) === false) {
+      if (_.contains(fields.onlyForUsers, username) === false) {
         return false;
       }
       this.add('instantMessage', id, fields);
@@ -70,7 +70,7 @@ dbLog.find({
         break;
       }
       case '取消下單': {
-        instantMessage.message = log.username[0] + '取消了以每股$' + log.price + '單價' + log.message + log.amount + '數量的「' + log.companyName + '」公司股票的訂單！';
+        instantMessage.message = log.username[0] + '取消了以每股$' + log.price + '的單價' + log.message + log.amount + '數量的「' + log.companyName + '」公司股票的訂單！';
         break;
       }
       case '訂單完成': {
@@ -80,7 +80,7 @@ dbLog.find({
       }
       case '賣單撤銷': {
         instantMessage.onlyForUsers = log.username;
-        instantMessage.message = '由於當前股價跌落期望值，你以$' + log.price + '單價賣出' + log.amount + '數量的「' + log.companyName + '」公司股票的訂單被取銷了！';
+        instantMessage.message = '由於當前股價跌落期望值，你以$' + log.price + '的單價賣出' + log.amount + '數量的「' + log.companyName + '」公司股票的訂單被取銷了！';
         break;
       }
       case '公司釋股': {

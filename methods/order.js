@@ -43,7 +43,7 @@ export function createBuyOrder(user, orderData) {
     logType: '購買下單',
     username: [username],
     companyName: companyName,
-    price: orderData.price,
+    price: orderData.unitPrice,
     amount: orderData.amount,
     createdAt: new Date()
   });
@@ -89,7 +89,7 @@ export function createSellOrder(user, orderData) {
     logType: '販賣下單',
     username: [username],
     companyName: companyName,
-    price: orderData.price,
+    price: orderData.unitPrice,
     amount: orderData.amount,
     createdAt: new Date()
   });
@@ -124,6 +124,9 @@ export function retrieveOrder(user, orderId) {
   if (! orderData) {
     throw new Meteor.Error(404, '訂單已完成或已撤回，撤回訂單失敗！');
   }
+  if (user.username !== orderData.username) {
+    throw new Meteor.Error(401, '該訂單並非使用者所有，撤回訂單失敗！');
+  }
   const companyName = orderData.companyName;
   const unlock = lockManager.lock([user._id, companyName]);
   const username = user.username;
@@ -135,7 +138,7 @@ export function retrieveOrder(user, orderId) {
     logType: '取消下單',
     username: [username],
     companyName: companyName,
-    price: orderData.price,
+    price: orderData.unitPrice,
     amount: (orderData.amount - orderData.done),
     message: orderData.orderType,
     createdAt: new Date()

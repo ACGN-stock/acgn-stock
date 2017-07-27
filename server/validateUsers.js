@@ -59,7 +59,10 @@ function validateUsers(checkUsername) {
             dbValidatingUsers.remove({_id: validatingUser._id});
           }
           else {
-            Accounts.createUser({username, password});
+            const profile = {
+              money: config.beginMoney
+            };
+            Accounts.createUser({username, password, profile});
             dbValidatingUsers.remove({_id: validatingUser._id});
           }
         }

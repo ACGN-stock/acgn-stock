@@ -12,7 +12,7 @@ Meteor.methods({
   foundCompany(foundCompanyData) {
     check(this.userId, String);
     check(foundCompanyData, {
-      name: String,
+      companyName: String,
       tags: [String],
       puctureSmall: new Match.Optional(String),
       puctureBig: new Match.Optional(String),
@@ -25,17 +25,17 @@ Meteor.methods({
 });
 
 export function foundCompany(user, foundCompanyData) {
-  const name = foundCompanyData.name;
-  if (dbFoundations.findOne({name}) || dbCompanies.findOne({name})) {
+  const companyName = foundCompanyData.companyName;
+  if (dbFoundations.findOne({companyName}) || dbCompanies.findOne({companyName})) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
   }
-  const unlock = lockManager.lock([user._id, name]);
+  const unlock = lockManager.lock([user._id, companyName]);
   foundCompanyData.manager = user.username;
   foundCompanyData.createdAt = new Date();
   dbLog.insert({
     logType: '創立公司',
     username: [user.username],
-    companyName: name,
+    companyName: companyName,
     createdAt: new Date()
   });
   dbFoundations.insert(foundCompanyData);
@@ -56,7 +56,7 @@ Meteor.methods({
 export function investFoundCompany(user, foundCompanyId, amount) {
   const minimumInvest = Math.ceil(config.beginReleaseStock / config.foundationNeedUsers);
   if (amount < minimumInvest) {
-    throw new Meteor.Error(403, '最低投資金額為' + amount + '！');
+    throw new Meteor.Error(403, '最低投資金額為' + minimumInvest + '！');
   }
   const foundCompanyData = dbFoundations.findOne(foundCompanyId);
   if (! foundCompanyData) {
@@ -65,7 +65,7 @@ export function investFoundCompany(user, foundCompanyId, amount) {
   if (user.profile.money < amount) {
     throw new Meteor.Error(403, '金錢不足，無法投資！');
   }
-  const unlock = lockManager.lock([user._id, foundCompanyData.name]);
+  const unlock = lockManager.lock([user._id, foundCompanyData.companyName]);
   const username = user.username;
   const invest = foundCompanyData.invest;
   const existsInvest = _.findWhere(invest, {username});
@@ -78,7 +78,7 @@ export function investFoundCompany(user, foundCompanyId, amount) {
   dbLog.insert({
     logType: '參予投資',
     username: [username],
-    companyName: foundCompanyData.name,
+    companyName: foundCompanyData.companyName,
     amount: amount,
     createdAt: new Date()
   });

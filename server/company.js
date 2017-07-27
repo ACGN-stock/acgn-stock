@@ -10,14 +10,12 @@ export function electManager() {
   dbCompanies.find({
     $or: [
       {
-        $nor: {
-          candidateList: {
-            $size: 1
-          }
+        'candidateList.1': {
+          $exists: true
         }
       },
       {
-        manager: ''
+        manager: '!none'
       }
     ]
   }, {

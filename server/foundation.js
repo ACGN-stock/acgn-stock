@@ -22,13 +22,13 @@ export function checkFoundCompany() {
     })
     .forEach((foundationData) => {
       const invest = foundationData.invest;
-      const name = foundationData.name;
-      const unlock = lockManager.lock([name], true);
+      const companyName = foundationData.companyName;
+      const unlock = lockManager.lock([companyName], true);
       if (invest.length < foundationNeedUsers) {
         dbLog.insert({
           logType: '創立失敗',
           username: [foundationData.manager].concat(_.pluck(invest, 'username')),
-          companyName: name,
+          companyName: companyName,
           createdAt: new Date()
         });
         dbFoundations.remove({
@@ -61,12 +61,12 @@ export function checkFoundCompany() {
         dbLog.insert({
           logType: '創立成功',
           username: [foundationData.manager].concat(_.pluck(sortedInvest, 'username')),
-          companyName: name,
+          companyName: companyName,
           price: lastPrice,
           createdAt: createdAt
         });
-        const companyId = dbCompanies.insert({
-          name: name,
+        dbCompanies.insert({
+          companyName: companyName,
           manager: foundationData.manager,
           tags: foundationData.tags,
           puctureSmall: foundationData.puctureSmall,
@@ -79,7 +79,7 @@ export function checkFoundCompany() {
           createdAt: createdAt
         });
         dbPrice.insert({
-          companyName: name,
+          companyName: companyName,
           price: lastPrice,
           createdAt: createdAt
         });
@@ -88,13 +88,13 @@ export function checkFoundCompany() {
         });
         _.each(directors, ({username, stocks}) => {
           dbLog.insert({
-            logType: '創立分股',
+            logType: '創立得股',
             username: [username],
-            companyName: foundationData.name,
+            companyName: companyName,
             amount: stocks,
             createdAt: createdAt
           });
-          dbDirectors.insert({companyId, username, stocks, createdAt});
+          dbDirectors.insert({companyName, username, stocks, createdAt});
         });
       }
       unlock();

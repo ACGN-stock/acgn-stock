@@ -18,9 +18,7 @@ Meteor.methods({
 });
 
 function accuseCompany(user, companyName, message) {
-  const companyData = dbCompanies.findOne({
-    name: companyName
-  });
+  const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }

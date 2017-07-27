@@ -24,9 +24,7 @@ function revokeCompany(user, companyName, message) {
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(401, '權限不足！');
   }
-  const companyData = dbCompanies.findOne({
-    name: companyName
-  });
+  const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
@@ -88,15 +86,13 @@ function revokeManagerQualification(admin, username, message) {
   }, {
     disableOplog: true
   }).forEach((companyData) => {
-    const companyName = companyData.name;
+    const companyName = companyData.companyName;
     const unlock = lockManager.lock([companyName]);
     if (companyData.manager === username) {
       companyData.manager = '';
     }
     const {candidateList, voteList} = companyData;
-    const candidateIndex = _.findIndex(candidateList, (candidate) => {
-      return (candidate === username);
-    });
+    const candidateIndex = _.indexOf(candidateList, username);
     if (candidateIndex !== -1) {
       candidateList.splice(candidateIndex, 1);
       voteList.splice(candidateIndex, 1);
@@ -132,9 +128,7 @@ Meteor.methods({
 });
 
 function editCompany(user, companyName, newCompanyData) {
-  const companyData = dbCompanies.findOne({
-    name: companyName
-  });
+  const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
@@ -167,9 +161,7 @@ Meteor.methods({
 });
 
 export function resignManager(user, companyName) {
-  const companyData = dbCompanies.findOne({
-    name: companyName
-  });
+  const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
@@ -184,7 +176,7 @@ export function resignManager(user, companyName) {
     createdAt: new Date()
   });
   const {candidateList, voteList} = companyData.candidateList;
-  const candidateIndex = _.findIndex(candidateList, user.username);
+  const candidateIndex = _.indexOf(candidateList, user.username);
   if (candidateIndex !== -1) {
     candidateList.splice(candidateIndex, 1);
     voteList.splice(candidateIndex, 1);
@@ -193,7 +185,7 @@ export function resignManager(user, companyName) {
     _id: companyData._id
   }, {
     $set: {
-      manager: '',
+      manager: '!none',
       candidateList: candidateList,
       voteList: voteList
     }
@@ -212,9 +204,7 @@ Meteor.methods({
 });
 
 export function contendManager(user, companyName) {
-  const companyData = dbCompanies.findOne({
-    name: companyName
-  });
+  const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
@@ -222,7 +212,7 @@ export function contendManager(user, companyName) {
     throw new Meteor.Error(403, '使用者已經是該公司的經理人了！');
   }
   const {candidateList, voteList} = companyData;
-  if (_.includes(candidateList, user.username)) {
+  if (_.contains(candidateList, user.username)) {
     throw new Meteor.Error(403, '使用者已經是該公司的經理人候選者了！');
   }
   if (user.profile.revokeQualification) {
@@ -260,18 +250,16 @@ Meteor.methods({
 });
 
 export function supportCandidate(director, companyName, username) {
-  const companyData = dbCompanies.findOne({
-    name: companyName
-  });
+  const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
   const {candidateList, voteList} = companyData;
-  const candidateIndex = _.findIndex(candidateList, username);
+  const candidateIndex = _.indexOf(candidateList, username);
   if (candidateIndex === -1) {
     throw new Meteor.Error(403, username + '並未競爭「' + companyName + '」公司經理人，無法進行支持！');
   }
-  if (_.includes(voteList[candidateIndex], director.username)) {
+  if (_.contains(voteList[candidateIndex], director.username)) {
     throw new Meteor.Error(403, '使用者已經正在支持' + username + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
   }
   const directorName = director.username;

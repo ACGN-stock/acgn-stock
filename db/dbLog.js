@@ -16,8 +16,8 @@ export const logTypeList = [
   '購買下單', //username0想要用每股$price的單價購買amount數量的「companyName」公司股票！
   '販賣下單', //username0想要用每股$price的單價販賣amount數量的「companyName」公司股票！
   '取消下單', //username0取消了以每股$price單價message(購入/賣出)amount數量的companyName股票的訂單！
-  '訂單完成', //username0以每股$price單價message(購入/賣出)amount數量的「companyName」公司股票的訂單已經全數交易完畢！
-  '賣單撤銷', //由於當前股價跌落期望值，username0以$price單價賣出amount數量的「companyName」公司股票的訂單被取銷了！
+  '訂單完成', //username0以每股$price的單價message(購入/賣出)amount數量的「companyName」公司股票的訂單已經全數交易完畢！
+  '賣單撤銷', //由於當前股價跌落期望值，username0以$price的單價賣出amount數量的「companyName」公司股票的訂單被取銷了！
   '公司釋股', //由於大量的高價買單需求，「companyName」公司釋出了amount數量的股票！
   '交易紀錄', //username0以$price的單價向(username1 || companyName)購買了amount數量的「companyName」公司股票！
   '辭職紀錄', //username0辭去了「companyName」公司的經理人職務！
