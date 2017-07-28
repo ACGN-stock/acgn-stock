@@ -8,7 +8,11 @@ export const lockManager = {
       return this.isLocked(id, isServer);
     });
     if (isLocked) {
-      throw new Meteor.Error(503, '伺服器忙錄中...請稍候再試！');
+      // console.log(this.serverLockedList, this.lockedList);
+      throw new Meteor.Error(503, '伺服器忙錄中...請稍候再試！', {
+        serverLockedList: this.serverLockedList,
+        lockedList: this.lockedList
+      });
     }
     this.lockIdList(idList, isServer);
 
@@ -37,11 +41,13 @@ if (typeof Set === 'function') {
   lockManager.lockIdList = function(idList, isServer) {
     if (isServer) {
       _.each(idList, (id) => {
+        // console.log('lock 「' + id + '」!');
         this.serverLockedList.add(id);
       });
     }
     else {
       _.each(idList, (id) => {
+        // console.log('lock 「' + id + '」!');
         this.lockedList.add(id);
       });
     }
@@ -49,11 +55,13 @@ if (typeof Set === 'function') {
   lockManager.unLockIdList = function(idList, isServer) {
     if (isServer) {
       _.each(idList, (id) => {
+        // console.log('unlock 「' + id + '」!');
         this.serverLockedList.delete(id);
       });
     }
     else {
       _.each(idList, (id) => {
+        // console.log('unlock 「' + id + '」!');
         this.lockedList.delete(id);
       });
     }

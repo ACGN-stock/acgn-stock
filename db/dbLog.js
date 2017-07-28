@@ -49,8 +49,7 @@ const schema = new SimpleSchema({
     optional: true
   },
   'username.$': {
-    type: String,
-    regEx: /^[0-9a-zA-Z]{4,12}$/
+    type: String
   },
   //紀錄相關的公司ID
   companyName: {

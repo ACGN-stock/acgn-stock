@@ -48,7 +48,7 @@ function doSomething(userId) {
   const username = user.username;
   // console.log(username + ' is doing something...');
   const foundationNumber = dbFoundations.find().count();
-  if (foundationNumber < 1 && probability(25)) {
+  if (foundationNumber < 3 && probability(25)) {
     console.log(username + ' want to found a company!');
     foundCompany(user, {
       companyName: 'company' + Date.now(),
@@ -94,9 +94,11 @@ function doSomething(userId) {
       });
     }
     else {
-      console.log(username + ' support a candidate!');
-      const candidate = _.sample(companyData.candidateList);
-      supportCandidate(user, companyName, candidate);
+      const candidateIndex = randomNumber(companyData.candidateList.length) - 1;
+      if (! _.contains(companyData.voteList[candidateIndex], username)) {
+        console.log(username + ' support a candidate!');
+        supportCandidate(user, companyName, companyData.candidateList[candidateIndex]);
+      }
     }
   }
   if (probability(dbOrders.find({username}).count())) {

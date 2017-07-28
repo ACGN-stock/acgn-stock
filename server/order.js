@@ -89,6 +89,8 @@ export function tradeStocks() {
             $inc: {
               done: tradeNumber
             }
+          }, {
+            multi: true
           });
           Meteor.users.update({
             username: sellOrderData.username

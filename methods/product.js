@@ -112,7 +112,7 @@ export function voteProduct(user, productId) {
     _id: productId
   }, {
     $inc: {
-      vote: 1
+      votes: 1
     }
   });
   unlock();

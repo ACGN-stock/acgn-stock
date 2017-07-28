@@ -25,7 +25,7 @@ export function electManager() {
     if (companyData.candidateList.length === 0) {
       return true;
     }
-    const companyName = companyData.name;
+    const companyName = companyData.companyName;
     const unlock = lockManager.lock([companyName], true);
     const seasonRecord = dbSeasonRecord.findOne();
     const message = (
@@ -47,7 +47,7 @@ export function electManager() {
       }, {
         $set: {
           manager: companyData.candidateList[0],
-          candidateList: [winner.username],
+          candidateList: companyData.candidateList,
           voteList: [ [] ]
         }
       });
