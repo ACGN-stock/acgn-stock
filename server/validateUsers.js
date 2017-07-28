@@ -2,7 +2,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
-import { lockManager } from '../methods/lockManager';
+import { lockManager } from '../lockManager';
 import { dbValidatingUsers } from '../db/dbValidatingUsers';
 import { config } from '../config';
 

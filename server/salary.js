@@ -1,6 +1,6 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
-import { lockManager } from '../methods/lockManager';
+import { lockManager } from '../lockManager';
 import { config } from '../config';
 import { dbLog } from '../db/dbLog';
 

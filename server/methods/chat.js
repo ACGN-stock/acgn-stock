@@ -1,7 +1,7 @@
 'use strict';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
-import { dbInstantMessage } from '../db/dbInstantMessage';
+import { dbInstantMessage } from '../../db/dbInstantMessage';
 
 Meteor.methods({
   chat(message) {

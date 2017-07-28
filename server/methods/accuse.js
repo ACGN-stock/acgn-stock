@@ -1,10 +1,10 @@
 'use strict';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
-import { lockManager } from './lockManager';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbProducts } from '../db/dbProducts';
-import { dbLog } from '../db/dbLog';
+import { lockManager } from '../../lockManager';
+import { dbCompanies } from '../../db/dbCompanies';
+import { dbProducts } from '../../db/dbProducts';
+import { dbLog } from '../../db/dbLog';
 
 Meteor.methods({
   accuseCompany(companyName, message) {

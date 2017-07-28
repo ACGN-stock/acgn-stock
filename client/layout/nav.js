@@ -2,7 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { controller } from './controller';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 
 const navLinkHash = {
   personalInfo: '個人資訊',
@@ -36,7 +36,7 @@ Template.nav.events({
 
 Template.navLink.helpers({
   getClassList() {
-    return 'nav-item' + (controller.currentPage === this.data ? ' active' : '');
+    return 'nav-item' + (FlowRouter.getRouteName() === this.data ? ' active' : '');
   },
   getLinkText() {
     return navLinkHash[this.data];
@@ -45,6 +45,6 @@ Template.navLink.helpers({
 Template.navLink.events({
   click(event, templateInstance) {
     event.preventDefault();
-    controller.currentPage = templateInstance.data.data;
+    FlowRouter.go(FlowRouter.path(templateInstance.data));
   }
 });

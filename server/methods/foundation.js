@@ -2,11 +2,11 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
-import { lockManager } from './lockManager';
-import { dbFoundations } from '../db/dbFoundations';
-import { dbLog } from '../db/dbLog';
-import { dbCompanies } from '../db/dbCompanies';
-import { config } from '../config';
+import { lockManager } from '../../lockManager';
+import { dbFoundations } from '../../db/dbFoundations';
+import { dbLog } from '../../db/dbLog';
+import { dbCompanies } from '../../db/dbCompanies';
+import { config } from '../../config';
 
 Meteor.methods({
   foundCompany(foundCompanyData) {

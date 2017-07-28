@@ -1,10 +1,10 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { lockManager } from './lockManager';
-import { dbProducts } from '../db/dbProducts';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbLog } from '../db/dbLog';
+import { lockManager } from '../../lockManager';
+import { dbProducts } from '../../db/dbProducts';
+import { dbCompanies } from '../../db/dbCompanies';
+import { dbLog } from '../../db/dbLog';
 
 Meteor.methods({
   createProduct(productData) {

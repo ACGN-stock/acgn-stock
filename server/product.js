@@ -1,7 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { lockManager } from '../methods/lockManager';
+import { lockManager } from '../lockManager';
 import { dbProducts } from '../db/dbProducts';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbLog } from '../db/dbLog';

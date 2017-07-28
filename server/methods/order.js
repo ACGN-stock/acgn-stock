@@ -1,11 +1,11 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
-import { lockManager } from './lockManager';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbOrders } from '../db/dbOrders';
-import { dbLog } from '../db/dbLog';
-import { dbDirectors } from '../db/dbDirectors';
+import { lockManager } from '../../lockManager';
+import { dbCompanies } from '../../db/dbCompanies';
+import { dbOrders } from '../../db/dbOrders';
+import { dbLog } from '../../db/dbLog';
+import { dbDirectors } from '../../db/dbDirectors';
 
 Meteor.methods({
   createBuyOrder(orderData) {

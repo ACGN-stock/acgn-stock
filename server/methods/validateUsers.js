@@ -2,8 +2,8 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { lockManager } from './lockManager';
-import { dbValidatingUsers } from '../db/dbValidatingUsers';
+import { lockManager } from '../../lockManager';
+import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 
 Meteor.methods({
   loginOrRegister(username, password) {

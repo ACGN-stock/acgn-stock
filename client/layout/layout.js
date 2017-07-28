@@ -1,9 +1,10 @@
 'use strict';
 import { Template } from 'meteor/templating';
-import { controller } from './controller';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 
 Template.layout.helpers({
   currentPage() {
-    return controller.currentPage;
+    return FlowRouter.getRouteName();
   }
 });
+

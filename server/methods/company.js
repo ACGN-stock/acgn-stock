@@ -2,12 +2,12 @@
 import { _ } from 'meteor/underscore';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
-import { lockManager } from './lockManager';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbDirectors } from '../db/dbDirectors';
-import { dbOrders } from '../db/dbOrders';
-import { dbProducts } from '../db/dbProducts';
-import { dbLog } from '../db/dbLog';
+import { lockManager } from '../../lockManager';
+import { dbCompanies } from '../../db/dbCompanies';
+import { dbDirectors } from '../../db/dbDirectors';
+import { dbOrders } from '../../db/dbOrders';
+import { dbProducts } from '../../db/dbProducts';
+import { dbLog } from '../../db/dbLog';
 
 Meteor.methods({
   revokeCompany(companyName, message) {
