@@ -1,5 +1,6 @@
 'use strict';
 export const config = {
+  websiteName: 'PTT ACGN股票交易市場', //網站名稱
   validateUserUrl: '', //驗證使用者帳號使用的推文文章PTT Web版頁面url
   validateBoard: 'C_Chat', //驗證使用者帳號使用的推文文章所在的PTT板面
   validateAID: '', //驗證使用者帳號使用的推文文章在板上的AID

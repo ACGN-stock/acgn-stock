@@ -1,18 +1,9 @@
 'use strict';
-import { _ } from 'meteor/underscore';
+import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-
-const navLinkHash = {
-  personalInfo: '個人資訊',
-  stockSummary: '股市總覽',
-  stockQuery: '股票查詢',
-  accountQuery: '帳號查詢',
-  productCenter: '產品中心',
-  seasonalReport: '季度報告'
-};
-const navLinkList = _.keys(navLinkHash);
+import { pageNameHash } from '../../routes';
 
 const navLinkListCollapsed = new ReactiveVar(true);
 Template.nav.helpers({
@@ -23,12 +14,23 @@ Template.nav.helpers({
     else {
       return 'collapse navbar-collapse show';
     }
-  },
-  navLinkList() {
-    return navLinkList;
   }
 });
 Template.nav.events({
+  'click .dropdown .dropdown-toggle'(event) {
+    event.preventDefault();
+    const $dropdownMenu = $(event.currentTarget).siblings('.dropdown-menu');
+    const slideUp = () => {
+      $dropdownMenu.slideUp('fast', () => {
+        $(document).off('click', slideUp);
+        $dropdownMenu.removeClass('show');
+      });
+    };
+    $dropdownMenu.slideDown('fast', () => {
+      $dropdownMenu.addClass('show');
+      $(document).on('click', slideUp);
+    });
+  },
   'click button'() {
     navLinkListCollapsed.set(! navLinkListCollapsed.get());
   }
@@ -36,15 +38,12 @@ Template.nav.events({
 
 Template.navLink.helpers({
   getClassList() {
-    return 'nav-item' + (FlowRouter.getRouteName() === this.data ? ' active' : '');
+    return 'nav-item' + (FlowRouter.getRouteName() === this.page ? ' active' : '');
+  },
+  getHref() {
+    return FlowRouter.path(this.page);
   },
   getLinkText() {
-    return navLinkHash[this.data];
-  }
-});
-Template.navLink.events({
-  click(event, templateInstance) {
-    event.preventDefault();
-    FlowRouter.go(FlowRouter.path(templateInstance.data));
+    return pageNameHash[this.page];
   }
 });

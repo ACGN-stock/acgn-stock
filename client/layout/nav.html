@@ -1,22 +1,67 @@
 <template name="nav">
   <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+    <span class="navbar-brand dropdown" title="當前登入使用者：{{currentUser.username}}">
+      <a class="dropdown-toggle" href="#">
+        <i class="fa fa-user-o" aria-hidden="true"></i>
+        {{currentUser.username}}
+      </a>
+      <div class="dropdown-menu px-3 text-right" aria-labelledby="navbarDropdownMenuLink">
+        <li title="現有資金：${{currentUser.profile.money}}">
+          <span class="float-left">
+            <i class="fa fa-usd" aria-hidden="true"></i>
+          </span>
+          {{currentUser.profile.money}}
+        </li>
+        <li title="現有推薦票：{{currentUser.profile.vote}}張">
+          <span class="float-left">
+            <i class="fa fa-money" aria-hidden="true"></i>
+          </span>
+          {{currentUser.profile.vote}}
+        </li>
+        <a href="#" title="登出">
+          <span class="float-left">
+            <i class="fa fa-sign-out" aria-hidden="true"></i>
+          </span>
+          登出
+        </a>
+      </div>
+    </span>
     <button class="navbar-toggler navbar-toggler-right" type="button">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <span class="navbar-brand">PTT ACGN股票交易市場</span>
     <div class="{{getNavLinkListClassList}}">
       <ul class="navbar-nav">
-        {{#each navLinkKey in navLinkList}}
-          {{> navLink data=navLinkKey}}
-        {{/each}}
+        {{#navLinkGroup text='交易大廳'}}
+          {{> navLink page='instantMessage'}}
+          {{> navLink page='stockSummary'}}
+          {{> navLink page='productCenter'}}
+        {{/navLinkGroup}}
+        {{#navLinkGroup text='資訊查詢'}}
+          {{> navLink page='seasonalReport'}}
+          {{> navLink page='accountQuery'}}
+          {{> navLink page='accuseRecord'}}
+        {{/navLinkGroup}}
       </ul>
     </div>
   </nav>
 </template>
 
+<template name="navLinkGroup">
+  <div class="note">
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+        {{{this.text}}}
+      </a>
+      <div class="dropdown-menu px-3" aria-labelledby="navbarDropdownMenuLink">
+        {{> Template.contentBlock}}
+      </div>
+    </li>
+  </div>
+</template>
+
 <template name="navLink">
   <li class="{{getClassList}}">
-    <a class="nav-link" href="#">
+    <a class="nav-link" href="{{getHref}}">
       {{getLinkText}}
     </a>
   </li>
