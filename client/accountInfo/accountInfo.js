@@ -27,12 +27,22 @@ Template.accountInfoSearchForm.helpers({
   }
 });
 Template.accountInfoSearchForm.events({
+  'change [name="lookMode"][value="self"]'() {
+    const path = FlowRouter.path('accountInfo');
+    FlowRouter.go(path);
+  },
   submit(event, templateInstance) {
     event.preventDefault();
-    const path = FlowRouter.path('accountInfo', {
-      username: templateInstance.$searchUsername.val()
-    });
-    FlowRouter.go(path);
+    const username = templateInstance.$searchUsername.val();
+    if (!username || username === Meteor.user().username) {
+      const path = FlowRouter.path('accountInfo');
+      FlowRouter.go(path);
+      rSearchUsername.set('');
+    }
+    else {
+      const path = FlowRouter.path('accountInfo', {username});
+      FlowRouter.go(path);
+    }
   }
 });
 

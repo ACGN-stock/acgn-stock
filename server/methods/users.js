@@ -119,6 +119,9 @@ Meteor.publish('accountInfoLog', function(username, offset) {
   check(this.userId, String);
   check(username, String);
   check(offset, Match.Integer);
+  if (! username) {
+    username = Meteor.users.findOne(this.userId).username;
+  }
 
   dbLog.find({username}, {
     sort: {
