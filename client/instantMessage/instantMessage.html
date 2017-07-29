@@ -1,3 +1,39 @@
 <template name="instantMessage">
-  即時訊息
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">即時訊息</h1>
+      {{> instantMessageChatForm}}
+    </div>
+    {{> instantMessageList}}
+  </div>
+</template>
+
+<template name="instantMessageChatForm">
+  <form>
+    <div class="input-group">
+      <input
+        class="form-control"
+        type="text"
+        name="message"
+        placeholder="請輸入要發言的內容"
+      />
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-primary">
+          聊天發言
+        </button>
+      </span>
+    </div>
+  </form>
+</template>
+
+<template name="instantMessageList">
+  <div class="card-block">
+    {{#each messageList}}
+      <div>
+        <span class="text-info d-inline-block text-right" style="width: 220px;">({{formatDateText this.createdAt}})</span>
+        {{{getTypeHtml this}}}
+        {{this.message}}
+      </div>
+    {{/each}}
+  </div>
 </template>

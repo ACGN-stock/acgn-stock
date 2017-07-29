@@ -1,5 +1,6 @@
 'use strict';
 import { $ } from 'meteor/jquery';
+import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -33,6 +34,10 @@ Template.nav.events({
   },
   'click button'() {
     rNavLinkListCollapsed.set(! rNavLinkListCollapsed.get());
+  },
+  'click [data-action="logout"]'(event) {
+    event.preventDefault();
+    Meteor.logout();
   }
 });
 

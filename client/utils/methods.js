@@ -6,7 +6,6 @@ import { handleError } from './handleError';
 
 Meteor.call = (function(_super) {
   function call(...args) {
-    console.log(...args);
     isLoading.set(true);
     const lastArg = _.last(args);
     if (typeof lastArg === 'function') {

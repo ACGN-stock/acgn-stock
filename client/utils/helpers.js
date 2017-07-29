@@ -1,5 +1,4 @@
 'use strict';
-import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 
 Template.registerHelper('formatDateText', function(date) {
@@ -14,9 +13,9 @@ Template.registerHelper('formatDateText', function(date) {
     '/' +
     padZero(date.getDate()) +
     ' ' +
-    padZero(date.getHours()) + 
+    padZero(date.getHours()) +
     ':' +
-    padZero(date.getMinutes()) + 
+    padZero(date.getMinutes()) +
     ':' +
     padZero(date.getSeconds())
   );

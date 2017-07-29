@@ -1,5 +1,4 @@
 'use strict';
-import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { config } from './config';

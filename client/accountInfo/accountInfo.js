@@ -1,5 +1,4 @@
 'use strict';
-import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -9,10 +8,12 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { isLoading } from '../layout/loading';
 
 export const rSearchUsername = new ReactiveVar('');
-Template.accountInfo.onRendered(function() {
-  this.autorun(() => {
-    this.subscribe('accountInfo', rSearchUsername.get());
-  });
+Template.accountInfo.onCreated(function() {
+  if (Meteor.userId()) {
+    this.autorun(() => {
+      this.subscribe('accountInfo', rSearchUsername.get());
+    });
+  }
 });
 
 Template.accountInfoSearchForm.onRendered(function() {
@@ -34,7 +35,7 @@ Template.accountInfoSearchForm.events({
   submit(event, templateInstance) {
     event.preventDefault();
     const username = templateInstance.$searchUsername.val();
-    if (!username || username === Meteor.user().username) {
+    if (! username || username === Meteor.user().username) {
       const path = FlowRouter.path('accountInfo');
       FlowRouter.go(path);
       rSearchUsername.set('');
@@ -68,11 +69,13 @@ Template.accountInfoManageCompanyLink.helpers({
   }
 });
 
-Template.accountInfoLogList.onRendered(function() {
-  this.autorun(() => {
-    this.logOffset = 0;
-    this.subscribe('accountInfoLog', rSearchUsername.get(), this.logOffset);
-  });
+Template.accountInfoLogList.onCreated(function() {
+  if (Meteor.userId()) {
+    this.autorun(() => {
+      this.logOffset = 0;
+      this.subscribe('accountInfoLog', rSearchUsername.get(), this.logOffset);
+    });
+  }
 });
 Template.accountInfoLogList.helpers({
   logList() {
@@ -94,7 +97,7 @@ Template.accountInfoLogList.events({
       isLoading.set(false);
     });
   }
-})
+});
 
 Template.accountInfoLog.helpers({
   getLogDescriptionHtml(logData) {
@@ -106,24 +109,24 @@ Template.accountInfoLog.helpers({
         return '從系統領取了薪水$' + logData.price + '。';
       }
       case '創立公司': {
-        return '發起了「' +  logData.companyName + '」的新公司創立計劃。';
+        return '發起了「' + logData.companyName + '」的新公司創立計劃。';
       }
       case '參與投資': {
-        return '向「' +  logData.companyName + '」的新公司創立計劃投資了$' + logData.amount + '。';
+        return '向「' + logData.companyName + '」的新公司創立計劃投資了$' + logData.amount + '。';
       }
       case '創立失敗': {
-        return '由於參與的「' +  logData.companyName + '」的新公司創立計劃失敗，領回了所有投資金額。';
+        return '由於參與的「' + logData.companyName + '」的新公司創立計劃失敗，領回了所有投資金額。';
       }
       case '創立成功': {
         if (logData.username[0] === Meteor.user().username) {
-          return '發起的「' +  generateCompanyLink(logData.companyName) + '」的新公司創立計劃獲得成功，自動就任該公司經理人。';
+          return '發起的「' + generateCompanyLink(logData.companyName) + '」的新公司創立計劃獲得成功，自動就任該公司經理人。';
         }
         else {
-          return '參與的「' +  generateCompanyLink(logData.companyName) + '」的新公司創立計劃獲得成功。';
+          return '參與的「' + generateCompanyLink(logData.companyName) + '」的新公司創立計劃獲得成功。';
         }
       }
       case '創立得股': {
-        return '獲得了' + logData.amount + '數量的「' +  generateCompanyLink(logData.companyName) + '」公司創立股份。';
+        return '獲得了' + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司創立股份。';
       }
       case '購買下單': {
         return '下達了以每股單價$' + logData.price + '的單價購入' + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司股票的訂單。';
@@ -132,13 +135,13 @@ Template.accountInfoLog.helpers({
         return '下達了以每股單價$' + logData.price + '的單價賣出' + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司股票的訂單。';
       }
       case '取消下單': {
-        return '取消了以每股單價$' + logData.price + '的單價' + logData.message  + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司股票的訂單，並付出了$1的手續費。';
+        return '取消了以每股單價$' + logData.price + '的單價' + logData.message + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司股票的訂單，並付出了$1的手續費。';
       }
       case '訂單完成': {
-        return '以每股單價$' + logData.price + '的單價' + logData.message  + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司股票的訂單已全數交易完成。';
+        return '以每股單價$' + logData.price + '的單價' + logData.message + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司股票的訂單已全數交易完成。';
       }
       case '賣單撤銷': {
-        return '由於股價低落，以每股單價$' + logData.price + '的單價賣出'  + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司股票的訂單被系統自動取消了。';
+        return '由於股價低落，以每股單價$' + logData.price + '的單價賣出' + logData.amount + '數量的「' + generateCompanyLink(logData.companyName) + '」公司股票的訂單被系統自動取消了。';
       }
       case '交易紀錄': {
         if (logData.username[0] === Meteor.user().username) {
@@ -170,7 +173,12 @@ Template.accountInfoLog.helpers({
         return '支持' + logData.username[1] + '擔任「' + generateCompanyLink(logData.companyName) + '」公司的經理人。';
       }
       case '就任經理': {
-        return '在' + logData.message + '商業季度' + (logData.amount ? ('以' + logData.amount + '數量的支持股份') : '') + '擊敗了所有競爭對手，取代' + logData.username[1] + '成為「' + generateCompanyLink(logData.companyName) + '」公司的經理人。';
+        return (
+          '在' + logData.message + '商業季度' +
+          (logData.amount ? ('以' + logData.amount + '數量的支持股份') : '') +
+          '擊敗了所有競爭對手，取代' + logData.username[1] +
+          '成為「' + generateCompanyLink(logData.companyName) + '」公司的經理人。'
+        );
       }
       case '營利分紅': {
         return '得到了來自「' + generateCompanyLink(logData.companyName) + '」公司的營利分紅$' + logData.amount + '。';

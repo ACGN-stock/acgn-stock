@@ -2,23 +2,44 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
+import { lockManager } from '../lockManager';
 import { dbLog } from '../db/dbLog';
 import { dbInstantMessage } from '../db/dbInstantMessage';
 
-Meteor.publish('instantMessage', function(username) {
-  check(username, String);
+Meteor.methods({
+  instantMessageChat(message) {
+    check(this.userId, String);
+    check(message, String);
+    const userId = this.userId;
+    const unlock = lockManager.lock([userId]);
+    const username = Meteor.users.findOne(userId).username;
+    dbInstantMessage.insert({
+      type: '聊天發言',
+      createdAt: new Date(),
+      onlyForUsers: [],
+      source: username,
+      message: message
+    });
+    unlock();
+  }
+});
+
+Meteor.publish('instantMessage', function() {
+  check(this.userId, String);
+  const username = Meteor.users.findOne(this.userId).username;
   dbInstantMessage.find({
     createdAt: {
       $gte: new Date( Date.now() - 30000 )
     }
   }).observeChanges({
     added: (id, fields) => {
-      if (_.contains(fields.onlyForUsers, username) === false) {
+      if (fields.onlyForUsers.length > 0 && _.contains(fields.onlyForUsers, username) === false) {
         return false;
       }
-      this.add('instantMessage', id, fields);
+      this.added('instantMessage', id, fields);
     }
   });
+  this.ready();
 });
 
 //當有新log建立時自動散發至instantMessage中
@@ -32,7 +53,7 @@ dbLog.find({
       type: log.logType,
       createdAt: log.createdAt,
       onlyForUsers: [],
-      source: '!system'
+      source: '!'
     };
     switch (log.logType) {
       case '發薪紀錄': {
@@ -154,6 +175,6 @@ dbLog.find({
 });
 
 //每隔30秒自動清空server端的instantMessage資料
-// Meteor.setInterval(() => {
-//   dbInstantMessage.remove({});
-// }, 30000);
+Meteor.setInterval(() => {
+  dbInstantMessage.remove({});
+}, 30000);
