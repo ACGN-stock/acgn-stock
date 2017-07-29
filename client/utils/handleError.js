@@ -1,6 +1,6 @@
 'use strict';
 
 export function handleError(error) {
-  window.alert('[' + error.error + ']' + error.reason);
+  window.alert(error.reason + ' [' + error.error + ']');
 }
 export default handleError;

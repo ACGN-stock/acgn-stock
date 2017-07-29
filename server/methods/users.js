@@ -48,6 +48,9 @@ Meteor.methods({
     if (result) {
       return true;
     }
+    else if (Meteor.users.findOne({username})) {
+      return true;
+    }
     else {
       throw new Meteor.Error('[403] Forbidden', '驗證未能通過，請確定推文位置、推文文章、推文方式與推文驗證碼是否正確！');
     }

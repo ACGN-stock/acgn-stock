@@ -34,7 +34,11 @@ Template.validateDialog.events({
         if (error) {
           handleError(error);
         }
-        Meteor.loginWithPassword(validateUserName.get(), password);
+        Meteor.loginWithPassword(validateUserName.get(), password, (error) => {
+          if (error) {
+            handleError(error);
+          }
+        });
       });
     }
     else {
