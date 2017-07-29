@@ -1,19 +1,19 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { isLoading } from '../layout/loading';
+import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
 
 Meteor.call = (function(_super) {
   function call(...args) {
-    isLoading.set(true);
+    addTask();
     const lastArg = _.last(args);
     if (typeof lastArg === 'function') {
       args[args.length - 1] = function(error, result) {
         if (error) {
           handleError(error);
         }
-        isLoading.set(false);
+        resolveTask();
         lastArg(error, result);
       };
     }
@@ -22,7 +22,7 @@ Meteor.call = (function(_super) {
         if (error) {
           handleError(error);
         }
-        isLoading.set(false);
+        resolveTask();
       });
     }
 

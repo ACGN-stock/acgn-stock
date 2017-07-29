@@ -5,13 +5,14 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
-import { isLoading } from '../layout/loading';
+import { addTask, resolveTask } from '../layout/loading';
 
 export const rSearchUsername = new ReactiveVar('');
 Template.accountInfo.onCreated(function() {
   if (Meteor.userId()) {
     this.autorun(() => {
-      this.subscribe('accountInfo', rSearchUsername.get());
+      addTask();
+      this.subscribe('accountInfo', rSearchUsername.get(), resolveTask);
     });
   }
 });
@@ -92,10 +93,8 @@ Template.accountInfoLogList.events({
   'click [data-action="more"]'(event, templateInstance) {
     event.preventDefault();
     templateInstance.logOffset += 50;
-    isLoading.set(true);
-    templateInstance.subscribe('accountInfoLog', rSearchUsername.get(), templateInstance.logOffset, () => {
-      isLoading.set(false);
-    });
+    addTask();
+    templateInstance.subscribe('accountInfoLog', rSearchUsername.get(), templateInstance.logOffset, resolveTask);
   }
 });
 
