@@ -38,6 +38,9 @@ if (Meteor.isServer) {
       }, {
         unique: true
       });
+      dbDirectors.rawCollection().createIndex({
+        username: 1
+      });
       dbFoundations.rawCollection().createIndex({
         createdAt: 1
       });

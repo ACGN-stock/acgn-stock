@@ -224,7 +224,7 @@ export function releaseStocks() {
             createdAt: new Date()
           });
           const existDirectorData = dbDirectors.findOne({
-            companyName: companyData.name,
+            companyName: companyData.companyName,
             username: buyOrderData.username
           });
           if (existDirectorData) {
@@ -238,7 +238,7 @@ export function releaseStocks() {
           }
           else {
             dbDirectors.insert({
-              companyName: companyData.name,
+              companyName: companyData.companyName,
               username: buyOrderData.username,
               stocks: tradeNumber
             });
