@@ -1,7 +1,7 @@
 'use strict';
 import { Template } from 'meteor/templating';
 
-Template.registerHelper('formatDateText', function(date) {
+export function formatDateText(date) {
   if (! date) {
     return '????/??/?? ??:??:??';
   }
@@ -19,7 +19,7 @@ Template.registerHelper('formatDateText', function(date) {
     ':' +
     padZero(date.getSeconds())
   );
-});
+}
 
 function padZero(n) {
   if (n < 10) {
@@ -29,3 +29,5 @@ function padZero(n) {
     return '' + n;
   }
 }
+
+Template.registerHelper('formatDateText', formatDateText);

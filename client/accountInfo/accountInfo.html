@@ -2,7 +2,9 @@
   <div class="card">
     <div class="card-block">
       <h1 class="card-title mb-1">帳號資訊</h1>
+      <hr />
       {{> accountInfoSearchForm}}
+      <hr />
     </div>
     {{> accountInfoBasic}}
     {{> accountInfoLogList}}
@@ -58,6 +60,7 @@
   {{#with lookUser}}
     <div class="card-block">
       <h2 class="card-title mb-1">使用者「{{this.username}}」的帳號資訊：</h2>
+      <hr />
       <div>
         帳號驗證日期：{{formatDateText this.createdAt}}
       </div>
@@ -80,6 +83,7 @@
       {{#each manageCompanies this.username}}
         {{> accountInfoManageCompanyLink}}
       {{/each}}
+      <hr />
     </div>
   {{/with}}
 </template>
@@ -95,6 +99,7 @@
 <template name="accountInfoLogList">
   <div class="card-block">
     <h2 class="card-title mb-1">所有相關紀錄：</h2>
+    <hr />
     {{#each logList}}
       {{> accountInfoLog}}
     {{else}}

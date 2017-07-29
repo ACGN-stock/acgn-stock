@@ -46,7 +46,7 @@ Meteor.methods({
   investFoundCompany(foundCompanyId, amount) {
     check(this.userId, String);
     check(foundCompanyId, String);
-    check(amount, Number);
+    check(amount, Match.Integer);
     investFoundCompany(Meteor.user(), foundCompanyId, amount);
 
     return true;
@@ -96,3 +96,9 @@ export function investFoundCompany(user, foundCompanyId, amount) {
   });
   unlock();
 }
+
+Meteor.publish('foundationPlan', function() {
+  check(this.userId, String);
+
+  return dbFoundations.find();
+});

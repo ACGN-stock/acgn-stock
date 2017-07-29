@@ -55,6 +55,14 @@ FlowRouter.route('/foundationPlan', {
     }
   }
 });
+FlowRouter.route('/foundCompany', {
+  name: 'foundCompany',
+  action() {
+    if (Meteor.isClient) {
+      document.title = config.websiteName + ' - 發起新創計劃';
+    }
+  }
+});
 FlowRouter.route('/productCenter', {
   name: 'productCenter',
   action() {
