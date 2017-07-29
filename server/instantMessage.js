@@ -44,7 +44,7 @@ dbLog.find({
         instantMessage.message = log.username[0] + '發起了「' + log.companyName + '」的新公司創立計劃，誠意邀請有意者投資！';
         break;
       }
-      case '參予投資': {
+      case '參與投資': {
         instantMessage.message = log.username[0] + '向「' + log.companyName + '公司創立計劃」投資了$' + log.amount + '！';
         break;
       }
@@ -120,7 +120,7 @@ dbLog.find({
         return false;
       }
       case '就任經理': {
-        instantMessage.message = log.username[0] + '在' + log.message + '商業季度' + (log.amount ? '以' + log.amount + '數量的支持股份' : '') + '擊敗了所有競爭對手，成為「' + log.companyName + '」公司的經理人！';
+        instantMessage.message = log.username[0] + '在' + log.message + '商業季度' + (log.amount ? '以' + log.amount + '數量的支持股份' : '') + '擊敗了所有競爭對手，' + (log.username[1] === '!none' ? '' : '取代' + log.username[1]) + '成為「' + log.companyName + '」公司的經理人！';
         break;
       }
       case '公司營利': {

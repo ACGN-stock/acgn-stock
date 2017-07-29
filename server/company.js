@@ -73,7 +73,7 @@ export function electManager() {
     const winner = _.last(sortedCandidateList);
     dbLog.insert({
       logType: '就任經理',
-      username: [winner.username],
+      username: [winner.username, companyData.manager],
       companyName: companyName,
       message: message,
       amount: winner.stocks,

@@ -76,7 +76,7 @@ export function investFoundCompany(user, foundCompanyId, amount) {
     invest.push({username, amount});
   }
   dbLog.insert({
-    logType: '參予投資',
+    logType: '參與投資',
     username: [username],
     companyName: foundCompanyData.companyName,
     amount: amount,

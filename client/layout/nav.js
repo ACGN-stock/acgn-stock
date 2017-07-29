@@ -5,10 +5,10 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { pageNameHash } from '../../routes';
 
-const navLinkListCollapsed = new ReactiveVar(true);
+const rNavLinkListCollapsed = new ReactiveVar(true);
 Template.nav.helpers({
   getNavLinkListClassList() {
-    if (navLinkListCollapsed.get()) {
+    if (rNavLinkListCollapsed.get()) {
       return 'collapse navbar-collapse';
     }
     else {
@@ -32,7 +32,7 @@ Template.nav.events({
     });
   },
   'click button'() {
-    navLinkListCollapsed.set(! navLinkListCollapsed.get());
+    rNavLinkListCollapsed.set(! rNavLinkListCollapsed.get());
   }
 });
 

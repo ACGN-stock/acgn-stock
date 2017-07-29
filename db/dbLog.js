@@ -7,9 +7,10 @@ export const dbLog = new Mongo.Collection('log');
 export default dbLog;
 
 export const logTypeList = [
+  '驗證通過', //帳號驗證通過，領取起始資金$price。
   '發薪紀錄', //系統向username0發給了price的薪水！
   '創立公司', //username0發起了「companyName」的新公司創立計劃，誠意邀請有意者投資！
-  '參予投資', //username0向「companyName公司創立計劃」投資了$amount！
+  '參與投資', //username0向「companyName公司創立計劃」投資了$amount！
   '創立失敗', //username...等人投資的「companyName公司創立計劃」由於投資人數不足失敗了，投資金額將全數返回！
   '創立成功', //username...等人投資的「companyName公司創立計劃」成功了，該公司正式上市，初始股價為$price！
   '創立得股', //(username0)對「companyName公司創立計劃」的投資為你帶來了amount數量的公司股票！
@@ -27,7 +28,7 @@ export const logTypeList = [
   '產品下架', //username0將一項「companyName」公司的產品給下架了！
   '推薦產品', //username0推薦了「companyName」公司的#productId產品！
   '支持紀錄', //username0支持username1擔任「companyName」公司的經理人！
-  '就任經理', //username0在message商業季度(以amount數量的支持股份)擊敗了所有競爭對手，成為「companyName」公司的經理人！
+  '就任經理', //username0在message商業季度(以amount數量的支持股份)擊敗了所有競爭對手，取代username1成為「companyName」公司的經理人！
   '公司營利', //「companyName」公司本商業季度一共獲利$amount！
   '營利分紅', //username0得到了「companyName」公司的分紅$amount！
   '舉報公司', //username0以「message」理由舉報了「companyName」公司！
