@@ -14,6 +14,7 @@ FlowRouter.route('/', {
 export const pageNameHash = {
   instantMessage: '即時訊息',
   stockSummary: '股市總覽',
+  foundationPlan: '新創計劃',
   productCenter: '產品中心',
   seasonalReport: '季度報告',
   accountQuery: '帳號查詢',

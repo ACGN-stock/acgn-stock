@@ -7,10 +7,10 @@ import { dbCompanies } from '../db/dbCompanies';
 import { dbOrders } from '../db/dbOrders';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbProducts } from '../db/dbProducts';
-import { foundCompany, investFoundCompany } from '../methods/foundation';
-import { createBuyOrder, createSellOrder, retrieveOrder } from '../methods/order';
-import { createProduct, voteProduct } from '../methods/product';
-import { resignManager, contendManager, supportCandidate } from '../methods/company';
+import { foundCompany, investFoundCompany } from '../server/methods/foundation';
+import { createBuyOrder, createSellOrder, retrieveOrder } from '../server/methods/order';
+import { createProduct, voteProduct } from '../server/methods/product';
+import { resignManager, contendManager, supportCandidate } from '../server/methods/company';
 import { config } from '../config';
 
 if (Meteor.users.find().count() < 1) {
