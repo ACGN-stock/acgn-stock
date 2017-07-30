@@ -41,6 +41,9 @@ export function tradeStocks() {
           if (buyOrderData.done >= buyOrderData.amount) {
             return true;
           }
+          if (sellOrderData.username === buyOrderData.username) {
+            return true;
+          }
           lastPrice = buyOrderData.unitPrice;
           if (buyOrderData.unitPrice < sellOrderData.unitPrice) {
             return false;
