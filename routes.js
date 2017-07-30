@@ -63,14 +63,14 @@ FlowRouter.route('/foundCompany', {
     }
   }
 });
-FlowRouter.route('/foundCompany/:foundationId', {
-  name: 'editFoundationPlan',
-  action() {
-    if (Meteor.isClient) {
-      document.title = config.websiteName + ' - 編輯新創計劃';
-    }
-  }
-});
+// FlowRouter.route('/foundCompany/:foundationId', {
+//   name: 'editFoundationPlan',
+//   action() {
+//     if (Meteor.isClient) {
+//       document.title = config.websiteName + ' - 編輯新創計劃';
+//     }
+//   }
+// });
 FlowRouter.route('/productCenter', {
   name: 'productCenter',
   action() {

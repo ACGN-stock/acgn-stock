@@ -18,19 +18,19 @@ Template.createFoundationPlan.helpers({
     };
   }
 });
-Template.editFoundationPlan.onCreated(function() {
-  if (Meteor.userId()) {
-    addTask();
-    this.subscribe('foundationPlan', resolveTask);
-  }
-});
-Template.editFoundationPlan.helpers({
-  editData() {
-    const foundationId = FlowRouter.getParam('foundationId');
+// Template.editFoundationPlan.onCreated(function() {
+//   if (Meteor.userId()) {
+//     addTask();
+//     this.subscribe('foundationPlan', resolveTask);
+//   }
+// });
+// Template.editFoundationPlan.helpers({
+//   editData() {
+//     const foundationId = FlowRouter.getParam('foundationId');
 
-    return dbFoundations.findOne(foundationId);
-  }
-});
+//     return dbFoundations.findOne(foundationId);
+//   }
+// });
 
 inheritUtilForm(Template.foundCompanyForm);
 Template.foundCompanyForm.onCreated(function() {
@@ -106,16 +106,27 @@ function handleInputChange(event) {
 }
 
 function saveModel(model) {
-  Meteor.call('foundCompany', model, () => {
-    const path = FlowRouter.path('foundationPlan');
-    FlowRouter.go(path);
-  });
+  if (model._id) {
+    Meteor.call('foundCompany', model, () => {
+      const path = FlowRouter.path('foundationPlan');
+      FlowRouter.go(path);
+    });
+  }
+  else {
+    Meteor.call('foundCompany', model, () => {
+      const path = FlowRouter.path('foundationPlan');
+      FlowRouter.go(path);
+    });
+  }
 }
 
 const previewPictureType = new ReactiveVar('');
 Template.foundCompanyForm.helpers({
   isPreview(pictureType) {
     return previewPictureType.get() === pictureType;
+  },
+  getFoundationPlanHref() {
+    return FlowRouter.path('foundationPlan');
   }
 });
 

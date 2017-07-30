@@ -45,7 +45,8 @@ Template.foundationPlanInfo.helpers({
     return formatDateText(expireDate);
   },
   isManager(manager) {
-    return Meteor.user().username === manager;
+    // return Meteor.user().username === manager;
+    return false;
   },
   getEditHref(foundationId) {
     return FlowRouter.path('editFoundationPlan', {foundationId});

@@ -31,6 +31,7 @@
         type="text"
         name="companyName"
         placeholder="請輸入要建立的角色名稱"
+        value="{{valueOf 'companyName'}}"
       />
       <small class="form-text text-warning">請勿為已存在的角色創立計劃。</small>
       {{{errorHtmlOf 'companyName'}}}
@@ -122,12 +123,12 @@
     </div>
     <div class="form-group">
       <label for="companyName">角色介紹：</label>
-      <textarea class="form-control" name="description" rows="5" placeholder="請輸入對這個角色的完整介紹"></textarea>
+      <textarea class="form-control" name="description" rows="5" placeholder="請輸入對這個角色的完整介紹">{{valueOf 'description'}}</textarea>
       {{{errorHtmlOf 'description'}}}
     </div>
     <div class="text-right">
       <button class="btn btn-primary">送出</button>
-      <button class="btn btn-secondary">重設</button>
+      <a class="btn btn-secondary" href="{{getFoundationPlanHref}}">取消</a>
     </div>
   </form>
 </template>
