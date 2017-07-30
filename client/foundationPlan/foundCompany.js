@@ -6,8 +6,8 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-import { dbFoundations } from '../../db/dbFoundations';
-import { addTask, resolveTask } from '../layout/loading';
+// import { dbFoundations } from '../../db/dbFoundations';
+// import { addTask, resolveTask } from '../layout/loading';
 
 Template.createFoundationPlan.helpers({
   defaultData() {
