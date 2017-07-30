@@ -98,7 +98,5 @@ export function investFoundCompany(user, foundCompanyId, amount) {
 }
 
 Meteor.publish('foundationPlan', function() {
-  check(this.userId, String);
-
   return dbFoundations.find();
 });

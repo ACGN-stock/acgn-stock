@@ -113,7 +113,6 @@ function validateUsers(checkUsername) {
 }
 
 Meteor.publish('accountInfo', function(username) {
-  check(this.userId, String);
   check(username, String);
 
   const result = [];
@@ -150,10 +149,9 @@ Meteor.publish('accountInfo', function(username) {
   return result;
 });
 Meteor.publish('accountInfoLog', function(username, offset) {
-  check(this.userId, String);
   check(username, String);
   check(offset, Match.Integer);
-  if (! username) {
+  if (! username && this.userId) {
     username = Meteor.users.findOne(this.userId).username;
   }
 
