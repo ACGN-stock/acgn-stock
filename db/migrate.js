@@ -63,6 +63,12 @@ if (Meteor.isServer) {
         unitPrice: 1
       });
       dbProducts.rawCollection().createIndex({
+        companyName: 1,
+        url: 1
+      }, {
+        unique: true
+      });
+      dbProducts.rawCollection().createIndex({
         overdue: 1
       });
       dbValidatingUsers.rawCollection().createIndex({

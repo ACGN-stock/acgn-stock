@@ -27,6 +27,10 @@ export function createProduct(user, productData) {
   if (! dbCompanies.findOne({companyName, manager})) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
   }
+  const url = productData.url;
+  if (dbProducts.findOne({companyName, url})) {
+    throw new Meteor.Error(403, '相同的產品已經被推出過了！');
+  }
   const unlock = lockManager.lock([user._id, 'product']);
   productData.createdAt = new Date();
   const productId = dbProducts.insert(productData);
