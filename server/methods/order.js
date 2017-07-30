@@ -12,7 +12,6 @@ Meteor.methods({
     check(this.userId, String);
     check(orderData, {
       companyName: String,
-      orderType: String,
       unitPrice: Match.Integer,
       amount: Match.Integer
     });
@@ -61,6 +60,11 @@ export function createBuyOrder(user, orderData) {
 Meteor.methods({
   createSellOrder(orderData) {
     check(this.userId, String);
+    check(orderData, {
+      companyName: String,
+      unitPrice: Match.Integer,
+      amount: Match.Integer
+    });
     createSellOrder(Meteor.user(), orderData);
 
     return true;

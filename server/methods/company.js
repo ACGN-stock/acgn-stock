@@ -1,6 +1,6 @@
 'use strict';
 import { _ } from 'meteor/underscore';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import { lockManager } from '../../lockManager';
 import { dbCompanies } from '../../db/dbCompanies';
@@ -291,3 +291,104 @@ export function supportCandidate(director, companyName, username) {
   });
   unlock();
 }
+
+Meteor.methods({
+  changeChairmanTitle(companyName, chairmanTitle) {
+    check(this.userId, String);
+    check(companyName, String);
+    check(chairmanTitle, String);
+    changeChairmanTitle(Meteor.user(), companyName, chairmanTitle);
+
+    return true;
+  }
+})
+
+function changeChairmanTitle(user, companyName, chairmanTitle) {
+  const username = user.username;
+  const chairmanData = dbDirectors.findOne({companyName}, {
+    sort: {
+      stocks: -1
+    },
+    limit: 1
+  });
+  if (chairmanData.username !== username) {
+    throw new Meteor.Error(401, '使用者並非該公司的董事長，無法修改董事長頭銜！');
+  }
+  dbCompanies.update({companyName}, {
+    $set: {
+      chairmanTitle: chairmanTitle
+    }
+  });
+}
+
+Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
+  check(this.userId, String);
+  check(keyword, String);
+  check(isOnlyShowMine, Boolean);
+  check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
+  check(offset, Match.Integer);
+  const username = Meteor.users.findOne(this.userId).username;
+  const filter = {};
+  if (keyword) {
+    const reg = new RegExp(keyword, 'i');
+    filter.$or =[
+      {
+        companyName: reg
+      },
+      {
+        manager: reg
+      },
+      {
+        chairmanTitle: reg
+      },
+      {
+        tags: reg
+      }
+    ];
+  }
+  if (isOnlyShowMine) {
+    const orderCompanyNameList = dbOrders.find({username}).map((orderData) => {
+      return orderData.companyName;
+    });
+    const directoryCompanyNameList = dbDirectors.find({username}).map((orderData) => {
+      return orderData.companyName;
+    });
+    filter.companyName = {
+      $in: _.unique(orderCompanyNameList.concat(directoryCompanyNameList))
+    };
+  }
+  const sort = {
+    [sortBy]: -1
+  };
+  const skip = offset;
+  const limit = 10 + offset;
+
+  return dbCompanies.find(filter, {sort, skip, limit});
+});
+
+Meteor.publish('queryChairman', function(companyName) {
+  check(this.userId, String);
+  check(companyName, String);
+
+  return dbDirectors.find({companyName}, {
+    limit: 1,
+    sort: {
+      stocks: -1
+    }
+  });
+});
+
+Meteor.publish('queryOwnStocks', function(companyName) {
+  check(this.userId, String);
+  check(companyName, String);
+  const username = Meteor.users.findOne(this.userId).username;
+
+  return dbDirectors.find({username, companyName});
+});
+
+Meteor.publish('queryMyOrder', function() {
+  check(this.userId, String);
+  const username = Meteor.users.findOne(this.userId).username;
+
+  return dbOrders.find({username});
+});

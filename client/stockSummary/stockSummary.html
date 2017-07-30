@@ -1,3 +1,124 @@
 <template name="stockSummary">
-  股市總覽
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">股市總覽</h1>
+      <hr />
+      {{> stockFilterForm}}
+      <hr />
+      {{#each companyList}}
+        {{> companySummary}}
+      {{/each}}
+      <a class="h3 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+    </div>
+  </div>
+</template>
+
+<template name="stockFilterForm">
+  <form class="form-inline">
+    <button class="{{isOnlyShowMineBtnClass}}" type="button" data-action="toggleIsOnlyShowMine">
+      只列出我所持有的股票
+    </button>
+    <div class="btn-group mr-1">
+      <button class="{{sortByBtnClass 'lastPrice'}}" value="lastPrice" type="button" data-action="sortBy">
+        依股價排序
+      </button>
+      <button class="{{sortByBtnClass 'totalValue'}}" value="totalValue" type="button" data-action="sortBy">
+        依總市值排序
+      </button>
+      <button class="{{sortByBtnClass 'createdAt'}}" value="createdAt" type="button" data-action="sortBy">
+        依建立日期排序
+      </button>
+    </div>
+    <div class="input-group">
+      <input
+        class="form-control"
+        style="width: 150px"
+        type="text"
+        name="keyword"
+        placeholder="請輸入關鍵字"
+        value="{{keyword}}"
+      />
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-search" aria-hidden="true"></i>
+          搜索
+        </button>
+      </span>
+    </div>
+  </form>
+</template>
+
+<template name="companySummary">
+  <div class="company-summary">
+    <div class="row">
+      <div class="picture">
+        {{#if this.pictureSmall}}
+          <img src="{{this.pictureSmall}}" />
+        {{else}}
+          無圖示
+        {{/if}}
+      </div>
+      <div class="col info">
+        <div class="row">
+          <div class="title">角色名稱：</div>
+          <div class="col content" title="{{this.companyName}}">{{{getCompanyLink this.companyName}}}</div>
+          <div class="title">經理人：</div>
+          <div class="col content" title="{{getManager this.manager}}">{{getManager this.manager}}</div>
+          <div class="title">創立日期：</div>
+          <div class="col content" title="{{formatDateText this.createdAt}}">{{formatDateText this.createdAt}}</div>
+        </div>
+        <div class="row">
+          <div class="title">搜索標籤：</div>
+          <div class="col content" title="{{displayTagList this.tags}}">{{{displayTagList this.tags}}}</div>
+        </div>
+        <div class="row">
+          <div class="title">股票單價：</div>
+          <div class="col content text-right" title="{{this.lastPrice}}">${{this.lastPrice}}</div>
+          <div class="title">總市值：</div>
+          <div class="col content text-right" title="{{this.totalValue}}">$ {{this.totalValue}}</div>
+          <div class="title text-truncate" title="{{this.totalValue}}">
+            {{#if isChairman this.companyName}}
+              <a href="#" data-action="changeChairmanTitle">
+                {{this.chairmanTitle}}：
+              </a>
+            {{else}}
+              {{this.chairmanTitle}}：
+            {{/if}}
+          </div>
+          <div class="col content" title="{{getChainman this.companyName}}">
+            {{getChainman this.companyName}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="extra">
+      {{#if isManager this.manager}}
+        <div class="mb-1">
+          您是該公司的經理人。
+          <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
+            經營管理
+          </a>
+        </div>
+      {{/if}}
+      <div class="mb-1">
+        您在該公司持有{{getStockAmount this.companyName}}數量的股份，股權比例為{{getStockPercentage this.companyName this.totalRelease}}%。
+        <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
+          購入
+        </button>
+        {{#if getStockAmount this.companyName}}
+          <button class="btn btn-info btn-sm" type="button" data-action="createSellOrder">
+            賣出
+          </button>
+        {{/if}}
+      </div>
+      {{#each haveOrderList this.companyName}}
+        <div class="mb-1">
+          您有一筆以單價${{unitPrice}}{{orderType}}數量{{amount}}股份的訂單尚未交易完成，目前已處理了{{done}}數量。
+          <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{_id}}">
+            取消訂單
+          </button>
+        </div>
+      {{/each}}
+    </div>
+  </div>
 </template>

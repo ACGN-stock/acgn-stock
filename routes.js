@@ -47,6 +47,14 @@ FlowRouter.route('/company/:companyName', {
     }
   }
 });
+FlowRouter.route('/manageCompany/:companyId', {
+  name: 'manageCompany',
+  action() {
+    if (Meteor.isClient) {
+      document.title = config.websiteName + ' - 經營管理';
+    }
+  }
+});
 FlowRouter.route('/foundationPlan', {
   name: 'foundationPlan',
   action() {

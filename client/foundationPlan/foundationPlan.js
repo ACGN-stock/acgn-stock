@@ -32,7 +32,7 @@ Template.foundationPlanInfo.helpers({
     return tagList.join('、');
   },
   investPplsNumberClass(investNumber) {
-    return (investNumber > config.foundationNeedUsers) ? 'col content text-success text-right' : 'col content text-danger text-right';
+    return (investNumber >= config.foundationNeedUsers) ? 'col content text-success text-right' : 'col content text-danger text-right';
   },
   getTotalInvest(investList) {
     return _.reduce(investList, (totalInvest, investData) => {
@@ -44,8 +44,10 @@ Template.foundationPlanInfo.helpers({
 
     return formatDateText(expireDate);
   },
-  isManager(manager) {
-    // return Meteor.user().username === manager;
+  // isManager(manager) {
+  //   return Meteor.user().username === manager;
+  // }
+  isManager() {
     return false;
   },
   getEditHref(foundationId) {

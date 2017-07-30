@@ -1,5 +1,6 @@
 'use strict';
 import { Template } from 'meteor/templating';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 
 export function formatDateText(date) {
   if (! date) {
@@ -31,3 +32,15 @@ function padZero(n) {
 }
 
 Template.registerHelper('formatDateText', formatDateText);
+
+export function getCompanyLinkHref(companyName) {
+  return FlowRouter.path('company', {companyName});
+}
+Template.registerHelper('getCompanyLinkHref', getCompanyLinkHref);
+
+export function getCompanyLink(companyName) {
+  const href = getCompanyLinkHref(companyName);
+
+  return '<a href="' + href + '">' + companyName + '</a>';
+}
+Template.registerHelper('getCompanyLink', getCompanyLink);
