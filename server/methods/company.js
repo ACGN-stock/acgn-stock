@@ -322,12 +322,10 @@ function changeChairmanTitle(user, companyName, chairmanTitle) {
 }
 
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
-  check(this.userId, String);
   check(keyword, String);
   check(isOnlyShowMine, Boolean);
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
   check(offset, Match.Integer);
-  const username = Meteor.users.findOne(this.userId).username;
   const filter = {};
   if (keyword) {
     const reg = new RegExp(keyword, 'i');
@@ -346,7 +344,9 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
       }
     ];
   }
-  if (isOnlyShowMine) {
+  const user = this.userId ? Meteor.users.findOne(this.userId) : null;
+  const username = user ? user.username : '';
+  if (username && isOnlyShowMine) {
     const orderCompanyNameList = dbOrders.find({username}).map((orderData) => {
       return orderData.companyName;
     });
@@ -367,7 +367,6 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
 });
 
 Meteor.publish('queryChairman', function(companyName) {
-  check(this.userId, String);
   check(companyName, String);
 
   return dbDirectors.find({companyName}, {
@@ -379,16 +378,22 @@ Meteor.publish('queryChairman', function(companyName) {
 });
 
 Meteor.publish('queryOwnStocks', function(companyName) {
-  check(this.userId, String);
   check(companyName, String);
-  const username = Meteor.users.findOne(this.userId).username;
+  if (this.userId) {
+    const username = Meteor.users.findOne(this.userId).username;
 
-  return dbDirectors.find({username, companyName});
+    return dbDirectors.find({username, companyName});
+  }
+
+  return null;
 });
 
 Meteor.publish('queryMyOrder', function() {
-  check(this.userId, String);
-  const username = Meteor.users.findOne(this.userId).username;
+  if (this.userId) {
+    const username = Meteor.users.findOne(this.userId).username;
 
-  return dbOrders.find({username});
+    return dbOrders.find({username});
+  }
+
+  return null;
 });
