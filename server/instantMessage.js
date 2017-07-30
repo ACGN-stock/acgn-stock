@@ -1,5 +1,4 @@
 'use strict';
-import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { lockManager } from '../lockManager';
@@ -24,28 +23,10 @@ Meteor.methods({
   }
 });
 
-Meteor.publish('instantMessage', function() {
-  check(this.userId, String);
-  const username = Meteor.users.findOne(this.userId).username;
-  dbInstantMessage.find({
-    createdAt: {
-      $gte: new Date( Date.now() - 30000 )
-    }
-  }).observeChanges({
-    added: (id, fields) => {
-      if (fields.onlyForUsers.length > 0 && _.contains(fields.onlyForUsers, username) === false) {
-        return false;
-      }
-      this.added('instantMessage', id, fields);
-    }
-  });
-  this.ready();
-});
-
 //當有新log建立時自動散發至instantMessage中
 dbLog.find({
   createdAt: {
-    $gte: new Date( Date.now() - 30000 )
+    $gte: new Date( Date.now() - 60000 )
   }
 }).observeChanges({
   added: (id, log) => {
@@ -174,7 +155,7 @@ dbLog.find({
   }
 });
 
-//每隔30秒自動清空server端的instantMessage資料
+//每隔60秒自動清空server端的instantMessage資料
 Meteor.setInterval(() => {
   dbInstantMessage.remove({});
-}, 30000);
+}, 60000);

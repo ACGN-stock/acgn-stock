@@ -1,4 +1,5 @@
 'use strict';
+import { _ } from 'meteor/underscore';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import { dbInstantMessage } from '../../db/dbInstantMessage';
@@ -21,3 +22,21 @@ function chat(user, message) {
     message: message
   });
 }
+
+Meteor.publish('instantMessage', function() {
+  const user = this.userId ? Meteor.users.findOne(this.userId) : null;
+  const username = user ? user.username : '';
+  dbInstantMessage.find({
+    createdAt: {
+      $gte: new Date( Date.now() - 60000 )
+    }
+  }).observeChanges({
+    added: (id, fields) => {
+      if (username && fields.onlyForUsers.length > 0 && _.contains(fields.onlyForUsers, username) === false) {
+        return false;
+      }
+      this.added('instantMessage', id, fields);
+    }
+  });
+  this.ready();
+});
