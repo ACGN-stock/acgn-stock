@@ -44,6 +44,12 @@ Template.foundationPlanInfo.helpers({
 
     return formatDateText(expireDate);
   },
+  isManager(manager) {
+    return Meteor.user().username === manager;
+  },
+  getEditHref(foundationId) {
+    return FlowRouter.path('editFoundationPlan', {foundationId});
+  },
   alreadyInvest(investList) {
     const username = Meteor.user().username;
     const investData = _.findWhere(investList, {username});

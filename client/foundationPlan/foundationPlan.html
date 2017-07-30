@@ -4,10 +4,10 @@
       <h1 class="card-title mb-1">新創計劃</h1>
       <hr />
       <h3 class="card-subtitle mb-2 text-muted">
-        募資中的新創計劃列表：
+        募資中的新計劃列表：
         <a class="btn btn-primary float-right" href="{{getFoundCompanyHref}}">
           <i class="fa fa-plus-square" aria-hidden="true"></i>
-          新的計劃
+          建立新角色
         </a>
       </h3>
       {{#each foundationList}}
@@ -21,15 +21,15 @@
   <div class="company-summary">
     <div class="row">
       <div class="picture">
-        {{#if this.puctureSmall}}
-          <img src="{{this.puctureSmall}}" />
+        {{#if this.pictureSmall}}
+          <img src="{{this.pictureSmall}}" />
         {{else}}
           無圖示
         {{/if}}
       </div>
       <div class="col info">
         <div class="row">
-          <div class="title">公司名稱：</div>
+          <div class="title">角色名稱：</div>
           <div class="col content" title="{{this.companyName}}">{{this.companyName}}</div>
           <div class="title">經理人：</div>
           <div class="col content" title="{{this.manager}}">{{this.manager}}</div>
@@ -50,17 +50,31 @@
         </div>
       </div>
     </div>
+    <div class="extra" style="white-space: pre;">角色簡介：
+{{this.description}}</div>
     <div class="extra">
+      {{#if isManager this.manager}}
+        <div class="mb-1">
+          您是此創立計劃的發起人。
+          <a class="btn btn-primary btn-sm" href="{{getEditHref this._id}}">
+            修改計劃
+          </a>
+        </div>
+      {{/if}}
       {{#if alreadyInvest this.invest}}
-        您已經向此計劃投資了$ {{alreadyInvest this.invest}}。
-        <button class="btn btn-primary btn-sm" type="button" data-action="invest">
-          追加投資
-        </button>
+        <div class="mb-1">
+          您已經向此計劃投資了$ {{alreadyInvest this.invest}}。
+          <button class="btn btn-primary btn-sm" type="button" data-action="invest">
+            追加投資
+          </button>
+        </div>
       {{else}}
-        您尚未對此計劃進行過投資。
-        <button class="btn btn-primary btn-sm" type="button" data-action="invest">
-          進行投資
-        </button>
+        <div class="mb-1">
+          您尚未對此計劃進行過投資。
+          <button class="btn btn-primary btn-sm" type="button" data-action="invest">
+            進行投資
+          </button>
+        </div>
       {{/if}}
     </div>
   </div>

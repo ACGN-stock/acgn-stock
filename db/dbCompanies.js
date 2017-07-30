@@ -18,6 +18,12 @@ const schema = new SimpleSchema({
   manager: {
     type: String
   },
+  //董事長的稱謂
+  chairmanTitle: {
+    type: String,
+    max: 20,
+    defaultValue: '董事長'
+  },
   //相關搜索用Tag
   tags: {
     type: Array,
@@ -29,14 +35,14 @@ const schema = new SimpleSchema({
     max: 50
   },
   //小圖
-  puctureSmall: {
+  pictureSmall: {
     type: String,
     regEx: /^data:image\/[a-z0-9-+.]+;base64,([A-Za-z0-9!$&',()*+;=\-._~:@/?%\s]*)$/,
     max: 1048576,
     optional: true
   },
   //大圖
-  puctureBig: {
+  pictureBig: {
     type: String,
     regEx: /^data:image\/[a-z0-9-+.]+;base64,([A-Za-z0-9!$&',()*+;=\-._~:@/?%\s]*)$/,
     max: 2097152,

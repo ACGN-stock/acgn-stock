@@ -56,6 +56,9 @@ if (Meteor.isServer) {
         createdAt: -1
       });
       dbOrders.rawCollection().createIndex({
+        username: 1
+      });
+      dbOrders.rawCollection().createIndex({
         orderType: 1,
         unitPrice: 1
       });

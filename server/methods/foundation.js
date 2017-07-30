@@ -14,8 +14,8 @@ Meteor.methods({
     check(foundCompanyData, {
       companyName: String,
       tags: [String],
-      puctureSmall: new Match.Optional(String),
-      puctureBig: new Match.Optional(String),
+      pictureSmall: new Match.Optional(String),
+      pictureBig: new Match.Optional(String),
       description: String
     });
     foundCompany(Meteor.user(), foundCompanyData);

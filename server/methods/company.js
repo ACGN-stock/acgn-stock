@@ -117,8 +117,8 @@ Meteor.methods({
     check(companyName, String);
     check(newCompanyData, {
       tags: [String],
-      puctureSmall: String,
-      puctureBig: String,
+      pictureSmall: String,
+      pictureBig: String,
       description: String
     });
     editCompany(Meteor.user(), companyName, newCompanyData);

@@ -56,10 +56,18 @@ FlowRouter.route('/foundationPlan', {
   }
 });
 FlowRouter.route('/foundCompany', {
-  name: 'foundCompany',
+  name: 'createFoundationPlan',
   action() {
     if (Meteor.isClient) {
       document.title = config.websiteName + ' - 發起新創計劃';
+    }
+  }
+});
+FlowRouter.route('/foundCompany/:foundationId', {
+  name: 'editFoundationPlan',
+  action() {
+    if (Meteor.isClient) {
+      document.title = config.websiteName + ' - 編輯新創計劃';
     }
   }
 });

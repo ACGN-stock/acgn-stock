@@ -29,14 +29,14 @@ const schema = new SimpleSchema({
     max: 50
   },
   //小圖
-  puctureSmall: {
+  pictureSmall: {
     type: String,
     regEx: /^data:image\/[a-z0-9-+.]+;base64,([A-Za-z0-9!$&',()*+;=\-._~:@/?%\s]*)$/,
     max: 1048576,
     optional: true
   },
   //大圖
-  puctureBig: {
+  pictureBig: {
     type: String,
     regEx: /^data:image\/[a-z0-9-+.]+;base64,([A-Za-z0-9!$&',()*+;=\-._~:@/?%\s]*)$/,
     max: 2097152,
@@ -46,7 +46,7 @@ const schema = new SimpleSchema({
   description: {
     type: String,
     min: 10,
-    max: 1000
+    max: 3000
   },
   //投資人列表
   invest: {

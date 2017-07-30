@@ -15,8 +15,7 @@ export const orderTypeList = [
 const schema = new SimpleSchema({
   //訂單所有者的PTT帳號
   username: {
-    type: String,
-    regEx: /^[0-9a-zA-Z]{4,12}$/
+    type: String
   },
   //訂單股份的所屬公司名稱
   companyName: {
