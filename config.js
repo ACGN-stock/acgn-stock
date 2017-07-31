@@ -5,7 +5,7 @@ export const config = {
   validateBoard: 'C_Chat', //驗證使用者帳號使用的推文文章所在的PTT板面
   validateAID: '', //驗證使用者帳號使用的推文文章在板上的AID
   intervalTimer: 60000, //每隔多少微秒進行一次工作檢查
-  foundExpireTime: 300000, //創立公司的投資時間期限，單位為微秒
+  foundExpireTime: 3600000, //創立公司的投資時間期限，單位為微秒
   foundationNeedUsers: 10, //創立公司所需要的投資人數量
   beginReleaseStock: 1000, //公司初創時的初始總釋出股份數量(可能會有些微誤差)
   beginMoney: 10000, //所有使用者驗證通過後的起始資金數量

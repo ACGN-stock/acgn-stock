@@ -8,6 +8,7 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
+import { dbPrice } from '../../db/dbPrice';
 
 Meteor.methods({
   revokeCompany(companyName, message) {
@@ -364,6 +365,74 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   const limit = 10 + offset;
 
   return dbCompanies.find(filter, {sort, skip, limit});
+});
+
+Meteor.publish('companyDetail', function(companyName) {
+  check(companyName, String);
+  const servenDayAgo = new Date(Date.now() - 604800000);
+
+  return [
+    dbCompanies.find({companyName}),
+    dbPrice.find({
+      companyName: companyName,
+      createdAt: {
+        $gte: servenDayAgo
+      }
+    })
+  ];
+});
+
+Meteor.publish('companyDirector', function(companyName, offset) {
+  check(companyName, String);
+
+  return dbDirectors.find({companyName}, {
+    sort: {
+      stocks: -1
+    },
+    limit: 10 + offset
+  });
+});
+
+Meteor.publish('companyLog', function(companyName, offset) {
+  check(companyName, String);
+
+  return dbLog.find({companyName}, {
+    sort: {
+      createdAt: -1
+    },
+    limit: 50 + offset
+  });
+});
+
+Meteor.publish('companyOrder', function(companyName, offset) {
+  check(companyName, String);
+
+  return dbOrders.find({companyName}, {
+    sort: {
+      orderType: 1,
+      unitPrice: 1
+    },
+    limit: 50 + offset
+  });
+});
+
+Meteor.publish('companyCurrentProduct', function(companyName) {
+  check(companyName, String);
+  const overdue = 1;
+
+  return dbProducts.find({companyName, overdue});
+});
+
+Meteor.publish('companyOldProduct', function(companyName, offset) {
+  check(companyName, String);
+  const overdue = 2;
+
+  return dbProducts.find({companyName, overdue}, {
+    sort: {
+      createdAt: -1
+    },
+    limit: 10 + offset
+  });
 });
 
 Meteor.publish('queryChairman', function(companyName) {

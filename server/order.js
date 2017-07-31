@@ -283,10 +283,8 @@ export function releaseStocks() {
         }, {
           $set: {
             lastPrice: lastPrice,
-            totalValue: lastPrice * (companyData.totalRelease + releaseStocksAmount)
-          },
-          $inc: {
-            totalRelease: releaseStocksAmount
+            totalValue: lastPrice * (companyData.totalRelease + releaseStocksAmount),
+            totalRelease: companyData.totalRelease + releaseStocksAmount
           }
         });
         dbPrice.insert({
@@ -301,5 +299,6 @@ export function releaseStocks() {
   }
 }
 function generateRandomCounter() {
-  return 60 + Math.round(Math.random() * 300);
+  // return 60 + Math.round(Math.random() * 300);
+  return 5 + Math.round(Math.random() * 10);
 }

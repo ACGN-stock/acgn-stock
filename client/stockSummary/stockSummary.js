@@ -21,10 +21,8 @@ Template.stockSummary.onCreated(function() {
     });
     this.autorun(() => {
       dbCompanies.find().forEach((companyData) => {
-        addTask();
-        this.subscribe('queryChairman', companyData.companyName, resolveTask);
-        addTask();
-        this.subscribe('queryOwnStocks', companyData.companyName, resolveTask);
+        this.subscribe('queryChairman', companyData.companyName);
+        this.subscribe('queryOwnStocks', companyData.companyName);
       });
     });
     addTask();

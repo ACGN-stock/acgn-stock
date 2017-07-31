@@ -2,6 +2,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Migrations } from 'meteor/percolate:migrations';
 import { dbCompanies } from './dbCompanies';
+import { dbPrice } from './dbPrice';
 import { dbDirectors } from './dbDirectors';
 import { dbFoundations } from './dbFoundations';
 import { dbInstantMessage } from './dbInstantMessage';
@@ -31,6 +32,10 @@ if (Meteor.isServer) {
       });
       dbCompanies.rawCollection().createIndex({
         totalValue: -1
+      });
+      dbPrice.rawCollection().createIndex({
+        companyName: 1,
+        createdAt: -1
       });
       dbDirectors.rawCollection().createIndex({
         companyName: 1,

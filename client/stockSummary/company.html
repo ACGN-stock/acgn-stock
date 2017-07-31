@@ -1,0 +1,154 @@
+<template name="company">
+  <div class="card">
+    {{#with companyData}}
+      <div class="card-block">
+        <h1 class="card-title mb-1">{{this.companyName}}</h1>
+        <hr />
+        {{> companyDetail}}
+      </div>
+    {{else}}
+      <div class="card-block">
+        查無資料，該公司可能已被撤銷！
+      </div>
+    {{/with}}
+    {{> companyLogList}}
+  </div>
+</template>
+
+<template name="companyDetail">
+  <div class="company-detail">
+    <div class="row">
+      <div class="picture">
+        {{#if this.pictureBig}}
+          <img src="{{this.pictureBig}}" />
+        {{else}}
+          無圖示
+        {{/if}}
+      </div>
+      <div class="col chart">
+        股價走勢施工中
+      </div>
+    </div>
+    <div class="extra">
+      <div class="row">
+        <div class="title">經理人：</div>
+        <div class="col">{{this.manager}}</div>
+        <div class="title">股票價格：</div>
+        <div class="col text-right">$ {{this.lastPrice}}</div>
+        <div class="title">總釋出股票：</div>
+        <div class="col text-right">{{this.totalRelease}}</div>
+        <div class="title">總市值：</div>
+        <div class="col text-right">$ {{this.totalValue}}</div>
+      </div>
+    </div>
+    <div class="extra" style="white-space: pre;padding: 5px 15px;"><h4>角色簡介</h4>{{this.description}}</div>
+    <div class="extra">
+      <div class="row">
+        {{> companyCurrentProductList companyName=this.companyName}}
+        {{> companyOldProductList companyName=this.companyName}}
+      </div>
+    </div>
+    <div class="extra">
+      <div class="row">
+        {{> companyDirectorList companyName=this.companyName totalRelease=this.totalRelease}}
+        {{> companyOrderList companyName=this.companyName}}
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="companyCurrentProductList">
+  <div class="col-6">
+    <h4>當季產品</h4>
+    <div class="row mb-1">
+      <div class="col-4 text-center">產品名稱</div>
+      <div class="col-4 text-center">得票數</div>
+      <div class="col-4 text-center">投票</div>
+    </div>
+    {{#each product in productList}}
+      <div class="row mb-1">
+        <div class="col-4 text-truncate">
+          <a href="{{product.url}}" target="_blank">{{product.productName}}</a>
+        </div>
+        <div class="col-4 text-center">{{product.votes}}</div>
+        <div class="col-4 text-center">
+          <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
+            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    {{/each}}
+  </div>
+</template>
+
+<template name="companyOldProductList">
+  <div class="col-6">
+    <h4>過去產品</h4>
+    <div class="row mb-1">
+      <div class="col-9 text-center">產品名稱</div>
+      <div class="col-3 text-center">總得票</div>
+    </div>
+    {{#each product in productList}}
+      <div class="row mb-1">
+        <div class="col-9 text-truncate">
+          <a href="{{product.url}}" target="_blank">{{product.productName}}</a>
+        </div>
+        <div class="col-3 text-center">{{product.votes}}</div>
+      </div>
+    {{/each}}
+    <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+  </div>
+</template>
+
+<template name="companyDirectorList">
+  <div class="col-6">
+    <h4>董事成員</h4>
+    <div class="row mb-1">
+      <div class="col-4 text-center">使用者帳號</div>
+      <div class="col-4 text-right">股份數</div>
+      <div class="col-4 text-right">比例</div>
+    </div>
+    {{#each director in directorList}}
+      <div class="row mb-1">
+        <div class="col-4 text-center text-truncate">
+          {{director.username}}
+        </div>
+        <div class="col-4 text-right">
+          {{director.stocks}}
+        </div>
+        <div class="col-4 text-right">
+          {{getPercentage director.stocks}} %
+        </div>
+      </div>
+    {{/each}}
+    <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+  </div>
+</template>
+
+<template name="companyOrderList">
+  <div class="col-6">
+    <h4>市場訂單</h4>
+    {{#each order in orderList}}
+      <div>
+        {{getOrderDescription order}}
+      </div>
+    {{/each}}
+    <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+  </div>
+</template>
+
+<template name="companyLogList">
+  <div class="card-block">
+    <h2 class="card-title mb-1">所有相關紀錄：</h2>
+    <hr />
+    {{#each log in logList}}
+      <div>
+        <span class="text-info d-inline-block text-right" style="width: 220px;">({{formatDateText log.createdAt}})</span>
+        {{{getLogDescriptionHtml log}}}
+      </div>
+    {{else}}
+      查無資料！
+    {{/each}}
+    <a class="h3 d-block text-center" href="#" data-action="more">查看更早之前的紀錄...</a>
+  </div>
+</template>
