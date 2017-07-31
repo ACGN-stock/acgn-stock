@@ -91,34 +91,36 @@
         </div>
       </div>
     </div>
-    <div class="extra">
-      {{#if isManager this.manager}}
-        <div class="mb-1">
-          您是該公司的經理人。
-          <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
-            經營管理
-          </a>
-        </div>
-      {{/if}}
-      <div class="mb-1">
-        您在該公司持有{{getStockAmount this.companyName}}數量的股份，股權比例為{{getStockPercentage this.companyName this.totalRelease}}%。
-        <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
-          購入
-        </button>
-        {{#if getStockAmount this.companyName}}
-          <button class="btn btn-info btn-sm" type="button" data-action="createSellOrder">
-            賣出
-          </button>
+    {{#if currentUser}}
+      <div class="extra">
+        {{#if isManager this.manager}}
+          <div class="mb-1">
+            您是該公司的經理人。
+            <a class="btn btn-primary btn-sm" href="{{getManageHref this.companyName}}">
+              經營管理
+            </a>
+          </div>
         {{/if}}
-      </div>
-      {{#each haveOrderList this.companyName}}
         <div class="mb-1">
-          您有一筆以單價${{unitPrice}}{{orderType}}數量{{amount}}股份的訂單尚未交易完成，目前已處理了{{done}}數量。
-          <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{_id}}">
-            取消訂單
+          您在該公司持有{{getStockAmount this.companyName}}數量的股份，股權比例為{{getStockPercentage this.companyName this.totalRelease}}%。
+          <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
+            購入
           </button>
+          {{#if getStockAmount this.companyName}}
+            <button class="btn btn-info btn-sm" type="button" data-action="createSellOrder">
+              賣出
+            </button>
+          {{/if}}
         </div>
-      {{/each}}
-    </div>
+        {{#each haveOrderList this.companyName}}
+          <div class="mb-1">
+            您有一筆以單價${{unitPrice}}{{orderType}}數量{{amount}}股份的訂單尚未交易完成，目前已處理了{{done}}數量。
+            <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{_id}}">
+              取消訂單
+            </button>
+          </div>
+        {{/each}}
+      </div>
+    {{/if}}
   </div>
 </template>

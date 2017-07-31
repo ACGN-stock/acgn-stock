@@ -6,32 +6,22 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-// import { dbFoundations } from '../../db/dbFoundations';
-// import { addTask, resolveTask } from '../layout/loading';
+import { dbCompanies } from '../../db/dbCompanies';
 
-Template.createFoundationPlan.helpers({
-  defaultData() {
-    return {
-      companyName: '',
-      tags: [],
-      description: ''
-    };
+Template.manageCompany.onCreated(function() {
+  const companyName = FlowRouter.getParam('companyName');
+  this.subscribe('companyDetail', companyName);
+});
+Template.manageCompany.helpers({
+  companyData() {
+    const companyName = FlowRouter.getParam('companyName');
+
+    return dbCompanies.findOne({companyName});
   }
 });
-// Template.editFoundationPlan.onCreated(function() {
-//   addTask();
-//   this.subscribe('foundationPlan', resolveTask);
-// });
-// Template.editFoundationPlan.helpers({
-//   editData() {
-//     const foundationId = FlowRouter.getParam('foundationId');
 
-//     return dbFoundations.findOne(foundationId);
-//   }
-// });
-
-inheritUtilForm(Template.foundCompanyForm);
-Template.foundCompanyForm.onCreated(function() {
+inheritUtilForm(Template.companyEditForm);
+Template.companyEditForm.onCreated(function() {
   this.validateModel = validateModel;
   this.handleInputChange = handleInputChange;
   this.saveModel = saveModel;
@@ -39,12 +29,6 @@ Template.foundCompanyForm.onCreated(function() {
 
 function validateModel(model) {
   const error = {};
-  if (! model.companyName.length) {
-    error.companyName = '請輸入角色名稱！';
-  }
-  if (model.companyName.length > 100) {
-    error.companyName = '角色名稱字數過長！';
-  }
   if (model.tags.length > 50) {
     error.tags = '標籤數量過多！';
   }
@@ -104,31 +88,25 @@ function handleInputChange(event) {
 }
 
 function saveModel(model) {
-  if (model._id) {
-    Meteor.call('foundCompany', model, () => {
-      const path = FlowRouter.path('foundationPlan');
-      FlowRouter.go(path);
-    });
-  }
-  else {
-    Meteor.call('foundCompany', model, () => {
-      const path = FlowRouter.path('foundationPlan');
-      FlowRouter.go(path);
-    });
-  }
+  const companyName = model.companyName;
+  const submitData = _.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description');
+  Meteor.call('editCompany', companyName, submitData, () => {
+    const path = FlowRouter.path('company', {companyName});
+    FlowRouter.go(path);
+  });
 }
 
 const previewPictureType = new ReactiveVar('');
-Template.foundCompanyForm.helpers({
+Template.companyEditForm.helpers({
   isPreview(pictureType) {
     return previewPictureType.get() === pictureType;
   },
-  getFoundationPlanHref() {
-    return FlowRouter.path('foundationPlan');
+  getCompanyHref(companyName) {
+    return FlowRouter.path('company', {companyName});
   }
 });
 
-Template.foundCompanyForm.events({
+Template.companyEditForm.events({
   'click [data-remove-tag]'(event, templatInstance) {
     const tag = $(event.currentTarget).attr('data-remove-tag');
     const model = _.clone(templatInstance.model.get());

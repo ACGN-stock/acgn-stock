@@ -2,7 +2,15 @@
   <div class="card">
     {{#with companyData}}
       <div class="card-block">
-        <h1 class="card-title mb-1">{{this.companyName}}</h1>
+        <h1 class="card-title">{{this.companyName}}</h1>
+        {{#if isManager this.manager}}
+          <div class="card-subtitle mb-1">
+            您是該公司的經理人。
+            <a class="btn btn-primary btn-sm" href="{{getManageHref this.companyName}}">
+              經營管理
+            </a>
+          </div>
+        {{/if}}
         <hr />
         {{> companyDetail}}
       </div>

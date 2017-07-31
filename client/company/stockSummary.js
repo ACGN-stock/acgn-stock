@@ -89,8 +89,8 @@ Template.companySummary.helpers({
   getManager(manager) {
     return manager === '!none' ? '無' : manager;
   },
-  getManageHref(companyId) {
-    return FlowRouter.path('manageCompany', {companyId});
+  getManageHref(companyName) {
+    return FlowRouter.path('manageCompany', {companyName});
   },
   isChairman(companyName) {
     const chairman = dbDirectors.findOne({companyName}, {
@@ -116,20 +116,20 @@ Template.companySummary.helpers({
   },
   isManager(manager) {
     const user = Meteor.user();
-    const username = user && username;
+    const username = user && user.username;
 
     return username === manager;
   },
   getStockAmount(companyName) {
     const user = Meteor.user();
-    const username = user && username;
+    const username = user && user.username;
     const ownStockData = dbDirectors.findOne({username, companyName});
 
     return ownStockData ? ownStockData.stocks : 0;
   },
   getStockPercentage(companyName, totalRelease) {
     const user = Meteor.user();
-    const username = user && username;
+    const username = user && user.username;
     const ownStockData = dbDirectors.findOne({username, companyName});
 
     if (ownStockData) {
@@ -141,7 +141,7 @@ Template.companySummary.helpers({
   },
   haveStock(companyName) {
     const user = Meteor.user();
-    const username = user && username;
+    const username = user && user.username;
     const ownStockData = dbDirectors.findOne({username, companyName});
 
     return ownStockData;
@@ -192,7 +192,7 @@ Template.companySummary.events({
     if (unitPrice >= 1 && unitPrice <= maximumUnitPrice) {
       const companyName = templateInstance.data.companyName;
       const user = Meteor.user();
-      const username = user && username;
+      const username = user && user.username;
       const directorData = dbDirectors.findOne({username, companyName});
       const maximumAmount = directorData.stocks;
       const amount = parseInt(window.prompt(`請輸入總賣出數量：(1~${maximumAmount})`), 10);

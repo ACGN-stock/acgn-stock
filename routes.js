@@ -40,7 +40,7 @@ FlowRouter.route('/company/:companyName', {
     DocHead.setTitle(config.websiteName + ' - 「' + params.companyName + '」公司資訊');
   }
 });
-FlowRouter.route('/manageCompany/:companyId', {
+FlowRouter.route('/manageCompany/:companyName', {
   name: 'manageCompany',
   action() {
     DocHead.setTitle(config.websiteName + ' - 經營管理');

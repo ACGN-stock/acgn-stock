@@ -19,6 +19,15 @@ Template.company.helpers({
     const companyName = FlowRouter.getParam('companyName');
 
     return dbCompanies.findOne({companyName});
+  },
+  isManager(manager) {
+    const user = Meteor.user();
+    const username = user && user.username;
+
+    return username === manager;
+  },
+  getManageHref(companyName) {
+    return FlowRouter.path('manageCompany', {companyName});
   }
 });
 
