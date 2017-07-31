@@ -7,6 +7,7 @@ import { lockManager } from '../../lockManager';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbLog } from '../../db/dbLog';
+import { dbConfig } from '../../db/dbConfig';
 import { config } from '../../config';
 
 Meteor.methods({
@@ -60,7 +61,8 @@ Meteor.methods({
 const getValidateUserUrlBodySync = Meteor.wrapAsync((callback) => {
   const request = require('request');
   const cheerio = require('cheerio');
-  request(config.validateUserUrl, (error, response, body) => {
+  const configData = dbConfig.findOne();
+  request(configData.validateUserUrl, (error, response, body) => {
     if (error) {
       callback(error);
     }
@@ -100,7 +102,8 @@ function validateUsers(checkUsername) {
             dbLog.insert({
               logType: '驗證通過',
               username: [username],
-              price: config.beginMoney
+              price: config.beginMoney,
+              createdAt: new Date()
             });
             dbValidatingUsers.remove({_id: validatingUser._id});
           }

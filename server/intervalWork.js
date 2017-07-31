@@ -5,7 +5,7 @@ import { paySalary } from './salary';
 // import { earnProfit } from './product';
 import { tradeStocks, releaseStocks } from './order';
 // import { electManager } from './company';
-import { dbSeasonRecord } from '../db/dbSeasonRecord';
+// import { dbConfig } from '../db/dbConfig';
 import { config } from '../config';
 
 Meteor.setInterval(doIntervalWork, config.intervalTimer);
@@ -26,29 +26,22 @@ function doIntervalWork() {
 
 //商業季度結束檢查
 // function doSeasonWorks() {
-//   let seasonRecord = dbSeasonRecord.findOne();
-//   if (! seasonRecord) {
-//     dbSeasonRecord.insert({
-//       startDate: new Date(),
-//       endDate: new Date(Date.now() + config.seasonTime)
-//     });
-//     seasonRecord = dbSeasonRecord.findOne();
-//   }
-//   if (Date.now() >= seasonRecord.endDate.getTime()) {
+//   const configData = dbConfig.findOne();
+//   if (Date.now() >= configData.currentSeasonEndDate.getTime()) {
 //     //當商業季度結束時，結算所有公司的營利額，推進所有產品的狀態進度，並根據上季產品的數量發給使用者推薦票。
 //     earnProfit();
 //     //當商業季度結束時，若有正在競選經理人的公司，則計算出選舉結果。
 //     electManager();
 //     //更新商業季度
-//     dbSeasonRecord.update(seasonRecord._id, {
+//     dbConfig.update(configData._id, {
 //       $set: {
-//         startDate: new Date(),
-//         endDate: new Date(Date.now() + config.seasonTime)
+//         currentSeasonStartDate: new Date(),
+//         currentSeasonEndDate: new Date(Date.now() + config.seasonTime),
+//         lastSeasonStartDate: configData.currentSeasonStartDate,
+//         lastSeasonEndDate: configData.currentSeasonEndDate
 //       }
 //     });
 //   }
 // }
 
-Meteor.publish('seasonRecord', function () {
-  return dbSeasonRecord.findOne();
-});
+

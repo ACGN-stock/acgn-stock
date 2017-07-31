@@ -37,6 +37,11 @@ dbLog.find({
       source: '!'
     };
     switch (log.logType) {
+      case '驗證通過': {
+        instantMessage.onlyForUsers = log.username;
+        instantMessage.message = log.username[0] + '的帳號驗證通過，領取起始資金$' + log.price + '。';
+        break;
+      }
       case '發薪紀錄': {
         instantMessage.onlyForUsers = log.username;
         instantMessage.message = '系統向' + log.username[0] + '發給了' + log.price + '的薪水！';

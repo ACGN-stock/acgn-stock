@@ -6,7 +6,7 @@ const schema = new SimpleSchema({
   //使用者PTT帳號名稱
   username: {
     type: String,
-    regEx: /^[0-9a-zA-Z]{4,12}$/
+    regEx: /^[0-9a-zA-Z]{2,20}$/
   },
   //驗證成功日期
   createdAt: {

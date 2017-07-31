@@ -11,7 +11,7 @@ const schema = new SimpleSchema({
   //使用者PTT帳號
   username: {
     type: String,
-    regEx: /^[0-9a-zA-Z]{4,12}$/
+    regEx: /^[0-9a-zA-Z]{2,20}$/
   },
   //使用者登入密碼
   password: {

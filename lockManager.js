@@ -9,7 +9,7 @@ export const lockManager = {
     });
     if (isLocked) {
       // console.log(this.serverLockedList, this.lockedList);
-      throw new Meteor.Error(503, '伺服器忙錄中...請稍候再試！', {
+      throw new Meteor.Error(503, '伺服器忙碌中...請稍候再試！', {
         serverLockedList: this.serverLockedList,
         lockedList: this.lockedList
       });

@@ -32,6 +32,9 @@ Template.foundationPlanInfo.helpers({
   investPplsNumberClass(investNumber) {
     return (investNumber >= config.foundationNeedUsers) ? 'col content text-success text-right' : 'col content text-danger text-right';
   },
+  foundationNeedUsers() {
+    return config.foundationNeedUsers;
+  },
   getTotalInvest(investList) {
     return _.reduce(investList, (totalInvest, investData) => {
       return totalInvest + investData.amount;

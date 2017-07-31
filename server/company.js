@@ -4,7 +4,7 @@ import { lockManager } from '../lockManager';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbLog } from '../db/dbLog';
-import { dbSeasonRecord } from '../db/dbSeasonRecord';
+import { dbConfig } from '../db/dbConfig';
 
 export function electManager() {
   dbCompanies.find({
@@ -27,11 +27,11 @@ export function electManager() {
     }
     const companyName = companyData.companyName;
     const unlock = lockManager.lock([companyName], true);
-    const seasonRecord = dbSeasonRecord.findOne();
+    const configData = dbConfig.findOne();
     const message = (
-      convertDateToText(seasonRecord.startDate) +
+      convertDateToText(configData.currentSeasonStartDate) +
       '～' +
-      convertDateToText(seasonRecord.endDate)
+      convertDateToText(configData.currentSeasonEndDate)
     );
     //沒有經理人且只有一位競選人的情況下，直接當選
     if (companyData.candidateList.length === 1) {
