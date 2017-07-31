@@ -19,9 +19,7 @@ Template.instantMessageChatForm.events({
 });
 
 Template.instantMessageList.onCreated(function() {
-  if (Meteor.userId()) {
-    this.subscribe('instantMessage');
-  }
+  this.subscribe('instantMessage');
 });
 Template.instantMessageList.helpers({
   messageList() {

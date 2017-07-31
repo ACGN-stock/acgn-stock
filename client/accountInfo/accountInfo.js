@@ -10,12 +10,10 @@ import { getCompanyLink } from '../utils/helpers';
 
 export const rSearchUsername = new ReactiveVar('');
 Template.accountInfo.onCreated(function() {
-  if (Meteor.userId()) {
-    this.autorun(() => {
-      addTask();
-      this.subscribe('accountInfo', rSearchUsername.get(), resolveTask);
-    });
-  }
+  this.autorun(() => {
+    addTask();
+    this.subscribe('accountInfo', rSearchUsername.get(), resolveTask);
+  });
 });
 
 Template.accountInfoSearchForm.onRendered(function() {

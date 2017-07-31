@@ -9,10 +9,8 @@ import { config } from '../../config';
 import { addTask, resolveTask } from '../layout/loading';
 
 Template.foundationPlan.onCreated(function() {
-  if (Meteor.userId()) {
-    addTask();
-    this.subscribe('foundationPlan', resolveTask);
-  }
+  addTask();
+  this.subscribe('foundationPlan', resolveTask);
 });
 Template.foundationPlan.helpers({
   getFoundCompanyHref() {

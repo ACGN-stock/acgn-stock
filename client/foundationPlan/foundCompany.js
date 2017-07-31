@@ -19,10 +19,8 @@ Template.createFoundationPlan.helpers({
   }
 });
 // Template.editFoundationPlan.onCreated(function() {
-//   if (Meteor.userId()) {
-//     addTask();
-//     this.subscribe('foundationPlan', resolveTask);
-//   }
+//   addTask();
+//   this.subscribe('foundationPlan', resolveTask);
 // });
 // Template.editFoundationPlan.helpers({
 //   editData() {
