@@ -5,6 +5,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { config } from '../../config';
 import { handleError } from '../utils/handleError';
 
+export const rShowLoginDialog = new ReactiveVar(false);
 const validateUserName = new ReactiveVar('');
 const validateCode = new ReactiveVar('');
 let password = '';
@@ -26,6 +27,7 @@ Template.validateDialog.events({
   reset() {
     validateUserName.set('');
     validateCode.set('');
+    rShowLoginDialog.set(false);
   },
   submit(event, templateInstance) {
     event.preventDefault();

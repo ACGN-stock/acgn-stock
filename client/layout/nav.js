@@ -5,6 +5,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { pageNameHash } from '../../routes';
+import { rShowLoginDialog } from './validateDialog';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 Template.nav.helpers({
@@ -18,6 +19,10 @@ Template.nav.helpers({
   }
 });
 Template.nav.events({
+  'click [data-action="login"]'(event) {
+    event.preventDefault();
+    rShowLoginDialog.set(true);
+  },
   'click .dropdown .dropdown-toggle'(event) {
     event.preventDefault();
     const $dropdownMenu = $(event.currentTarget).siblings('.dropdown-menu');

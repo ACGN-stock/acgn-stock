@@ -13,30 +13,32 @@
 
 <template name="accountInfoSearchForm">
   <form class="form-inline">
-    <div class="form-check mr-3">
-      <label class="form-check-label">
-        <input
-          class="form-check-input"
-          type="radio"
-          name="lookMode"
-          value="self"
-          checked="{{isInLookMode 'self'}}"
-        />
-        查詢自己日誌
-      </label>
-    </div>
-    <div class="form-check mr-3">
-      <label class="form-check-label">
-        <input
-          class="form-check-input"
-          type="radio"
-          name="lookMode"
-          value="other"
-          checked="{{isInLookMode 'other'}}"
-        />
-        查詢他人日誌
-      </label>
-    </div>
+    {{#if currentUser}}
+      <div class="form-check mr-3">
+        <label class="form-check-label">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="lookMode"
+            value="self"
+            checked="{{isInLookMode 'self'}}"
+          />
+          查詢自己日誌
+        </label>
+      </div>
+      <div class="form-check mr-3">
+        <label class="form-check-label">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="lookMode"
+            value="other"
+            checked="{{isInLookMode 'other'}}"
+          />
+          查詢他人日誌
+        </label>
+      </div>
+    {{/if}}
     <div class="input-group">
       <input
         class="form-control"

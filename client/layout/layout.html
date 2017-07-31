@@ -28,12 +28,11 @@
 </body>
 
 <template name="layout">
-  {{#if currentUser}}
-    <div class="container">
-      {{> nav}}
-      {{> Template.dynamic template=currentPage}}
-    </div>
-  {{else}}
+  <div class="container">
+    {{> nav}}
+    {{> Template.dynamic template=currentPage}}
+  </div>
+  {{#if showLoginDialog}}
     {{> validateDialog}}
   {{/if}}
 </template>

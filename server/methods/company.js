@@ -367,6 +367,38 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   return dbCompanies.find(filter, {sort, skip, limit});
 });
 
+Meteor.publish('queryChairman', function(companyName) {
+  check(companyName, String);
+
+  return dbDirectors.find({companyName}, {
+    limit: 1,
+    sort: {
+      stocks: -1
+    }
+  });
+});
+
+Meteor.publish('queryOwnStocks', function(companyName) {
+  check(companyName, String);
+  if (this.userId) {
+    const username = Meteor.users.findOne(this.userId).username;
+
+    return dbDirectors.find({username, companyName});
+  }
+
+  return null;
+});
+
+Meteor.publish('queryMyOrder', function() {
+  if (this.userId) {
+    const username = Meteor.users.findOne(this.userId).username;
+
+    return dbOrders.find({username});
+  }
+
+  return null;
+});
+
 Meteor.publish('companyDetail', function(companyName) {
   check(companyName, String);
   const servenDayAgo = new Date(Date.now() - 604800000);
@@ -433,36 +465,4 @@ Meteor.publish('companyOldProduct', function(companyName, offset) {
     },
     limit: 10 + offset
   });
-});
-
-Meteor.publish('queryChairman', function(companyName) {
-  check(companyName, String);
-
-  return dbDirectors.find({companyName}, {
-    limit: 1,
-    sort: {
-      stocks: -1
-    }
-  });
-});
-
-Meteor.publish('queryOwnStocks', function(companyName) {
-  check(companyName, String);
-  if (this.userId) {
-    const username = Meteor.users.findOne(this.userId).username;
-
-    return dbDirectors.find({username, companyName});
-  }
-
-  return null;
-});
-
-Meteor.publish('queryMyOrder', function() {
-  if (this.userId) {
-    const username = Meteor.users.findOne(this.userId).username;
-
-    return dbOrders.find({username});
-  }
-
-  return null;
 });

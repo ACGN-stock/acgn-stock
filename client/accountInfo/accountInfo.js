@@ -34,8 +34,9 @@ Template.accountInfoSearchForm.events({
   },
   submit(event, templateInstance) {
     event.preventDefault();
+    const user = Meteor.user();
     const username = templateInstance.$searchUsername.val();
-    if (! username || username === Meteor.user().username) {
+    if (! username || (user && username === user.username)) {
       const path = FlowRouter.path('accountInfo');
       FlowRouter.go(path);
       rSearchUsername.set('');
@@ -79,8 +80,10 @@ Template.accountInfoLogList.onCreated(function() {
 });
 Template.accountInfoLogList.helpers({
   logList() {
+    const user = Meteor.user();
+
     return dbLog.find({
-      username: rSearchUsername.get() || Meteor.user().username
+      username: rSearchUsername.get() || (user && user.username)
     }, {
       sort: {
         createdAt: -1
@@ -99,6 +102,8 @@ Template.accountInfoLogList.events({
 
 Template.accountInfoLog.helpers({
   getLogDescriptionHtml(logData) {
+    const user = Meteor.user();
+    const username = (user && user.username);
     switch (logData.logType) {
       case '驗證通過': {
         return '帳號驗證通過，領取起始資金$' + logData.price + '。';
@@ -116,7 +121,7 @@ Template.accountInfoLog.helpers({
         return '由於參與的「' + logData.companyName + '」的新公司創立計劃失敗，領回了所有投資金額。';
       }
       case '創立成功': {
-        if (logData.username[0] === Meteor.user().username) {
+        if (logData.username[0] === username) {
           return '發起的「' + getCompanyLink(logData.companyName) + '」的新公司創立計劃獲得成功，自動就任該公司經理人。';
         }
         else {
@@ -142,7 +147,7 @@ Template.accountInfoLog.helpers({
         return '由於股價低落，以每股單價$' + logData.price + '的單價賣出' + logData.amount + '數量的「' + getCompanyLink(logData.companyName) + '」公司股票的訂單被系統自動取消了。';
       }
       case '交易紀錄': {
-        if (logData.username[0] === Meteor.user().username) {
+        if (logData.username[0] === username) {
           return '以$' + logData.price + '的單價向' + (logData.username[1] || ('「' + getCompanyLink(logData.companyName) + '」公司')) + '購買了' + logData.amount + '數量的「' + logData.companyName + '」公司股票！';
         }
         else {

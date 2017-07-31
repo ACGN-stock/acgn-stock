@@ -13,21 +13,17 @@ export const rKeyword = new ReactiveVar('');
 export const rIsOnlyShowMine = new ReactiveVar(false);
 export const rSortBy = new ReactiveVar('lastPrice');
 Template.stockSummary.onCreated(function() {
-  if (Meteor.userId()) {
-    this.autorun(() => {
-      this.stockOffset = 0;
-      addTask();
-      this.subscribe('stockSummary', rKeyword.get(), rIsOnlyShowMine.get(), rSortBy.get(), this.stockOffset, resolveTask);
+  this.autorun(() => {
+    this.stockOffset = 0;
+    this.subscribe('stockSummary', rKeyword.get(), rIsOnlyShowMine.get(), rSortBy.get(), this.stockOffset);
+  });
+  this.autorun(() => {
+    dbCompanies.find().forEach((companyData) => {
+      this.subscribe('queryChairman', companyData.companyName);
+      this.subscribe('queryOwnStocks', companyData.companyName);
     });
-    this.autorun(() => {
-      dbCompanies.find().forEach((companyData) => {
-        this.subscribe('queryChairman', companyData.companyName);
-        this.subscribe('queryOwnStocks', companyData.companyName);
-      });
-    });
-    addTask();
-    this.subscribe('queryMyOrder', resolveTask);
-  }
+  });
+  this.subscribe('queryMyOrder');
 });
 Template.stockSummary.helpers({
   companyList() {
@@ -103,8 +99,10 @@ Template.companySummary.helpers({
       },
       limit: 1
     });
+    const user = Meteor.user();
+    const username = user && username;
 
-    return chairman && Meteor.user().username === chairman.username;
+    return chairman && user === chairman.username;
   },
   getChainman(companyName) {
     const chairman = dbDirectors.findOne({companyName}, {
@@ -117,16 +115,21 @@ Template.companySummary.helpers({
     return chairman ? chairman.username : '無';
   },
   isManager(manager) {
-    return Meteor.user().username === manager;
+    const user = Meteor.user();
+    const username = user && username;
+
+    return username === manager;
   },
   getStockAmount(companyName) {
-    const username = Meteor.user().username;
+    const user = Meteor.user();
+    const username = user && username;
     const ownStockData = dbDirectors.findOne({username, companyName});
 
     return ownStockData ? ownStockData.stocks : 0;
   },
   getStockPercentage(companyName, totalRelease) {
-    const username = Meteor.user().username;
+    const user = Meteor.user();
+    const username = user && username;
     const ownStockData = dbDirectors.findOne({username, companyName});
 
     if (ownStockData) {
@@ -137,13 +140,15 @@ Template.companySummary.helpers({
     }
   },
   haveStock(companyName) {
-    const username = Meteor.user().username;
+    const user = Meteor.user();
+    const username = user && username;
     const ownStockData = dbDirectors.findOne({username, companyName});
 
     return ownStockData;
   },
   haveOrderList(companyName) {
-    const username = Meteor.user().username;
+    const user = Meteor.user();
+    const username = user && user.username;
 
     return dbOrders.find({username, companyName});
   }
@@ -186,7 +191,8 @@ Template.companySummary.events({
     const unitPrice = parseInt(window.prompt(`請輸入您期望賣出的每股單價：(1~${maximumUnitPrice})`), 10);
     if (unitPrice >= 1 && unitPrice <= maximumUnitPrice) {
       const companyName = templateInstance.data.companyName;
-      const username = Meteor.user().username;
+      const user = Meteor.user();
+      const username = user && username;
       const directorData = dbDirectors.findOne({username, companyName});
       const maximumAmount = directorData.stocks;
       const amount = parseInt(window.prompt(`請輸入總賣出數量：(1~${maximumAmount})`), 10);

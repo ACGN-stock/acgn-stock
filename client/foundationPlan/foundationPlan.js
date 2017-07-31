@@ -52,7 +52,8 @@ Template.foundationPlanInfo.helpers({
     return FlowRouter.path('editFoundationPlan', {foundationId});
   },
   alreadyInvest(investList) {
-    const username = Meteor.user().username;
+    const user = Meteor.user();
+    const username = user && user.username;
     const investData = _.findWhere(investList, {username});
 
     return investData ? investData.amount : 0;
