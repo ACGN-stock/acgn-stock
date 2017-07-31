@@ -44,18 +44,20 @@
     <div class="extra" style="white-space: pre;padding: 5px 15px;"><h4>角色簡介</h4>{{this.description}}</div>
     <div class="extra">
       <div class="row">
-        {{> companyCurrentProductList companyName=this.companyName}}
-        {{> companyOldProductList companyName=this.companyName}}
-      </div>
-    </div>
-    <div class="extra">
-      <div class="row">
         {{> companyDirectorList companyName=this.companyName totalRelease=this.totalRelease}}
         {{> companyOrderList companyName=this.companyName}}
       </div>
     </div>
   </div>
 </template>
+<!--
+    <div class="extra">
+      <div class="row">
+        {{> companyCurrentProductList companyName=this.companyName}}
+        {{> companyOldProductList companyName=this.companyName}}
+      </div>
+    </div>
+-->
 
 <template name="companyCurrentProductList">
   <div class="col-6">
