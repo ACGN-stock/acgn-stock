@@ -41,6 +41,11 @@ const schema = new SimpleSchema({
       revokeQualification: {
         type: Boolean,
         defaultValue: false
+      },
+      stone: {
+        type: SimpleSchema.Integer,
+        min: 0,
+        defaultValue: 0
       }
     })
   },

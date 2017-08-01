@@ -23,4 +23,3 @@ const schema = new SimpleSchema({
   }
 });
 dbDirectors.attachSchema(schema);
-

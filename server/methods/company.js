@@ -363,8 +363,11 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   };
   const skip = offset;
   const limit = 10 + offset;
+  const fields = {
+    pictureBig: 0
+  };
 
-  return dbCompanies.find(filter, {sort, skip, limit});
+  return dbCompanies.find(filter, {sort, skip, limit, fields});
 });
 
 Meteor.publish('queryChairman', function(companyName) {
@@ -404,7 +407,11 @@ Meteor.publish('companyDetail', function(companyName) {
   const servenDayAgo = new Date(Date.now() - 604800000);
 
   return [
-    dbCompanies.find({companyName}),
+    dbCompanies.find({companyName}, {
+      fields: {
+        pictureSmall: 0
+      }
+    }),
     dbPrice.find({
       companyName: companyName,
       createdAt: {

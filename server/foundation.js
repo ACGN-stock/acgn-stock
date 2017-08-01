@@ -1,6 +1,6 @@
 'use strict';
 import { _ } from 'meteor/underscore';
-import { Meteor } from 'meteor/meteor';
+// import { Meteor } from 'meteor/meteor';
 import { lockManager } from '../lockManager';
 import { dbFoundations } from '../db/dbFoundations';
 import { dbLog } from '../db/dbLog';
@@ -25,22 +25,22 @@ export function checkFoundCompany() {
       const companyName = foundationData.companyName;
       const unlock = lockManager.lock([companyName], true);
       if (invest.length < foundationNeedUsers) {
-        dbLog.insert({
-          logType: '創立失敗',
-          username: [foundationData.manager].concat(_.pluck(invest, 'username')),
-          companyName: companyName,
-          createdAt: new Date()
-        });
-        dbFoundations.remove({
-          _id: foundationData._id
-        });
-        _.each(invest, ({username, amount}) => {
-          Meteor.users.update({username}, {
-            $inc: {
-              'profile.money': amount
-            }
-          });
-        });
+        // dbLog.insert({
+        //   logType: '創立失敗',
+        //   username: [foundationData.manager].concat(_.pluck(invest, 'username')),
+        //   companyName: companyName,
+        //   createdAt: new Date()
+        // });
+        // dbFoundations.remove({
+        //   _id: foundationData._id
+        // });
+        // _.each(invest, ({username, amount}) => {
+        //   Meteor.users.update({username}, {
+        //     $inc: {
+        //       'profile.money': amount
+        //     }
+        //   });
+        // });
       }
       else {
         const totalInvest = _.reduce(invest, (sum, investData) => {

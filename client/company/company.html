@@ -33,9 +33,7 @@
           無圖示
         {{/if}}
       </div>
-      <div class="col chart">
-        股價走勢施工中
-      </div>
+      <div class="col chart"></div>
     </div>
     <div class="extra">
       <div class="row">
@@ -53,7 +51,7 @@
     <div class="extra">
       <div class="row">
         {{> companyDirectorList companyName=this.companyName totalRelease=this.totalRelease}}
-        {{> companyOrderList companyName=this.companyName}}
+        {{> companyOrderList this}}
       </div>
     </div>
   </div>
@@ -137,10 +135,25 @@
 
 <template name="companyOrderList">
   <div class="col-6">
-    <h4>市場訂單</h4>
+    <h4>
+      市場訂單
+      <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
+        購入
+      </button>
+      {{#if getStockAmount this.companyName}}
+        <button class="btn btn-info btn-sm" type="button" data-action="createSellOrder">
+          賣出
+        </button>
+      {{/if}}
+    </h4>
     {{#each order in orderList}}
       <div>
         {{getOrderDescription order}}
+        {{#if isUser order.username}}
+          <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
+            取消訂單
+          </button>
+        {{/if}}
       </div>
     {{/each}}
     <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>

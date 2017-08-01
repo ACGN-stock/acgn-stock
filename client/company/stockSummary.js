@@ -8,6 +8,7 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { addTask, resolveTask } from '../layout/loading';
+import { createBuyOrder, createSellOrder, retrieveOrder } from '../utils/methods';
 
 export const rKeyword = new ReactiveVar('');
 export const rIsOnlyShowMine = new ReactiveVar(false);
@@ -93,26 +94,26 @@ Template.companySummary.helpers({
     return FlowRouter.path('manageCompany', {companyName});
   },
   isChairman(companyName) {
-    const chairman = dbDirectors.findOne({companyName}, {
+    const chairmanData = dbDirectors.findOne({companyName}, {
       sort: {
         stocks: -1
       },
       limit: 1
     });
     const user = Meteor.user();
-    const username = user && username;
+    const username = user && user.username;
 
-    return chairman && user === chairman.username;
+    return chairmanData ? (username === chairmanData.username) : false;
   },
   getChainman(companyName) {
-    const chairman = dbDirectors.findOne({companyName}, {
+    const chairmanData = dbDirectors.findOne({companyName}, {
       sort: {
         stocks: -1
       },
       limit: 1
     });
 
-    return chairman ? chairman.username : '無';
+    return chairmanData ? chairmanData.username : '無';
   },
   isManager(manager) {
     const user = Meteor.user();
@@ -166,57 +167,16 @@ Template.companySummary.events({
   },
   'click [data-action="createBuyOrder"]'(event, templateInstance) {
     event.preventDefault();
-    const userMoney = Meteor.user().profile.money;
-    const maximumUnitPrice = userMoney;
-    const unitPrice = parseInt(window.prompt(`請輸入您期望購入的每股單價：(1~${maximumUnitPrice})`), 10);
-    if (unitPrice >= 1 && unitPrice <= maximumUnitPrice) {
-      const maximumAmount = Math.floor(userMoney / unitPrice);
-      const amount = parseInt(window.prompt(`請輸入總購入數量：(1~${maximumAmount})`), 10);
-      if (amount >= 1 && amount <= maximumAmount) {
-        const companyName = templateInstance.data.companyName;
-        Meteor.call('createBuyOrder', {companyName, unitPrice, amount});
-      }
-      else {
-        window.alert('不正確的數量設定！');
-      }
-    }
-    else {
-      window.alert('不正確的單價設定！');
-    }
+    createBuyOrder(Meteor.user(), templateInstance.data);
   },
   'click [data-action="createSellOrder"]'(event, templateInstance) {
     event.preventDefault();
-    const companyData = templateInstance.data;
-    const maximumUnitPrice = companyData.lastPrice || 1;
-    const unitPrice = parseInt(window.prompt(`請輸入您期望賣出的每股單價：(1~${maximumUnitPrice})`), 10);
-    if (unitPrice >= 1 && unitPrice <= maximumUnitPrice) {
-      const companyName = templateInstance.data.companyName;
-      const user = Meteor.user();
-      const username = user && user.username;
-      const directorData = dbDirectors.findOne({username, companyName});
-      const maximumAmount = directorData.stocks;
-      const amount = parseInt(window.prompt(`請輸入總賣出數量：(1~${maximumAmount})`), 10);
-      if (amount >= 1 && amount <= maximumAmount) {
-        Meteor.call('createSellOrder', {companyName, unitPrice, amount});
-      }
-      else {
-        window.alert('不正確的數量設定！');
-      }
-    }
-    else {
-      window.alert('不正確的單價設定！');
-    }
+    createSellOrder(Meteor.user(), templateInstance.data);
   },
   'click [data-cancel-order]'(event) {
     event.preventDefault();
     const orderId = $(event.currentTarget).attr('data-cancel-order');
     const orderData = dbOrders.findOne(orderId);
-    const message = '' +
-      '確定要取消「以$' + orderData.lastPrice +
-      '單價' + orderData.orderType + '數量' + orderData.amount + '的「' +
-      orderData.companyName + '」公司股份」這筆訂單嗎？（付出手續費一元）';
-    if (window.confirm(message)) {
-      Meteor.call('retrieveOrder', orderId);
-    }
+    retrieveOrder(orderData);
   }
 });

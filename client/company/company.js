@@ -8,11 +8,14 @@ import { dbProducts } from '../../db/dbProducts';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbLog } from '../../db/dbLog';
+import { dbPrice } from '../../db/dbPrice';
 import { addTask, resolveTask } from '../layout/loading';
+import { createBuyOrder, createSellOrder, retrieveOrder } from '../utils/methods';
 
 Template.company.onCreated(function() {
   const companyName = FlowRouter.getParam('companyName');
-  this.subscribe('companyDetail', companyName);
+  addTask();
+  this.subscribe('companyDetail', companyName, resolveTask);
 });
 Template.company.helpers({
   companyData() {
@@ -29,6 +32,104 @@ Template.company.helpers({
   getManageHref(companyName) {
     return FlowRouter.path('manageCompany', {companyName});
   }
+});
+
+Template.companyDetail.onRendered(function() {
+  const companyName = this.data.companyName;
+  this.$chart = this.$('.chart');
+  this.chart = null;
+  this.autorun(() => {
+    if (this.chart) {
+      this.chart.destroy();
+    }
+    this.$chart
+      .empty()
+      .html('<canvas style="max-height:300px;"></canvas>');
+    const ctx = this.$chart.find('canvas');
+    const data = dbPrice
+      .find({companyName}, {
+        sort: {
+          createdAt: 1
+        }
+      })
+      .map((priceData) => {
+        return {
+          x: priceData.createdAt.getTime(),
+          y: priceData.price
+        };
+      });
+    this.chart = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [
+          {
+            label: '股價走勢',
+            data: data
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        animation: {
+          duration: 0
+        },
+        legend: {
+          onClick: $.noop
+        },
+        scales: {
+          xAxes: [
+            {
+              type: 'time',
+              position: 'bottom',
+              gridLines: {
+                drawTicks: true
+              },
+              scaleLabel: {
+                display: false
+              },
+              ticks: {
+                autoSkip: true,
+                autoSkipPadding: 10,
+                round: true,
+                maxRotation: 0,
+                padding: 5
+              },
+              time: {
+                parser: 'x',
+                tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
+                displayFormats: {
+                  year: 'YYYY',
+                  quarter: 'YYYY Qo',
+                  month: 'YYYY/MM',
+                  week: 'YYYY/MM/DD',
+                  day: 'YYYY/MM/DD',
+                  hour: 'MM/DD HH:mm',
+                  minute: 'MM/DD HH:mm',
+                  second: 'HH:mm:ss',
+                  millisecond: 'mm:ss.SSS'
+                }
+              }
+            }
+          ],
+          yAxes: [
+            {
+              type: 'linear',
+              position: 'left',
+              gridLines: {
+                drawTicks: true
+              },
+              ticks: {
+                beginAtZero: true,
+                callback: function(value) {
+                  return '$' + value;
+                }
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
 });
 
 Template.companyCurrentProductList.onCreated(function() {
@@ -113,13 +214,20 @@ Template.companyOrderList.onCreated(function() {
   this.subscribe('companyOrder', this.data.companyName, this.offset);
 });
 Template.companyOrderList.helpers({
+  getStockAmount() {
+    const user = Meteor.user();
+    const username = user && user.username;
+    const companyName = this.companyName;
+    const ownStockData = dbDirectors.findOne({username, companyName});
+
+    return ownStockData ? ownStockData.stocks : 0;
+  },
   orderList() {
     const companyName = this.companyName;
 
     return dbOrders.find({companyName}, {
       sort: {
-        orderType: 1,
-        unitPrice: 1
+        createdAt: -1
       }
     });
   },
@@ -128,9 +236,28 @@ Template.companyOrderList.helpers({
     const number = amount - done;
 
     return `${username}以$${unitPrice}單價${orderType}數量${number}。`;
+  },
+  isUser(orderUserName) {
+    const user = Meteor.user();
+
+    return user && user.username === orderUserName;
   }
 });
 Template.companyOrderList.events({
+  'click [data-action="createBuyOrder"]'(event, templateInstance) {
+    event.preventDefault();
+    createBuyOrder(Meteor.user(), templateInstance.data);
+  },
+  'click [data-action="createSellOrder"]'(event, templateInstance) {
+    event.preventDefault();
+    createSellOrder(Meteor.user(), templateInstance.data);
+  },
+  'click [data-cancel-order]'(event) {
+    event.preventDefault();
+    const orderId = $(event.currentTarget).attr('data-cancel-order');
+    const orderData = dbOrders.findOne(orderId);
+    retrieveOrder(orderData);
+  },
   'click [data-action="more"]'(event, templateInstance) {
     event.preventDefault();
     templateInstance.offset += 50;

@@ -53,10 +53,10 @@ function validateModel(model) {
       error.tags = '單一標籤不可超過50個字！';
     }
   });
-  if (model.pictureSmall && model.pictureSmall.length > 1048576) {
+  if (model.pictureSmall && model.pictureSmall.length > 262144) {
     error.pictureSmall = '檔案過大！';
   }
-  if (model.pictureBig && model.pictureBig.length > 2097152) {
+  if (model.pictureBig && model.pictureBig.length > 1048576) {
     error.pictureBig = '檔案過大！';
   }
   if (model.description.length < 10) {

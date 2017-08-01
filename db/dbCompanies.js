@@ -38,14 +38,14 @@ const schema = new SimpleSchema({
   pictureSmall: {
     type: String,
     regEx: /^data:image\/[a-z0-9-+.]+;base64,([A-Za-z0-9!$&',()*+;=\-._~:@/?%\s]*)$/,
-    max: 1048576,
+    max: 262144,
     optional: true
   },
   //大圖
   pictureBig: {
     type: String,
     regEx: /^data:image\/[a-z0-9-+.]+;base64,([A-Za-z0-9!$&',()*+;=\-._~:@/?%\s]*)$/,
-    max: 2097152,
+    max: 1048576,
     optional: true
   },
   //介紹描述

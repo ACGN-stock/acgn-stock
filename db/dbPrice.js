@@ -15,7 +15,7 @@ const schema = new SimpleSchema({
   //價格
   price: {
     type: SimpleSchema.Integer,
-    min: 0
+    min: 1
   },
   //交易日期
   createdAt: {

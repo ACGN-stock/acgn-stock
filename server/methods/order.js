@@ -25,13 +25,23 @@ export function createBuyOrder(user, orderData) {
   if (orderData.unitPrice < 1) {
     throw new Meteor.Error(403, '購買單價不可小於1！');
   }
+  if (orderData.amount < 1) {
+    throw new Meteor.Error(403, '購買數量不可小於1！');
+  }
   const totalCost = orderData.unitPrice * orderData.amount;
   if (user.profile.money < totalCost) {
     throw new Meteor.Error(403, '剩餘金錢不足，訂單無法成立！');
   }
   const companyName = orderData.companyName;
-  if (! dbCompanies.findOne({companyName})) {
+  const companyData = dbCompanies.findOne({companyName});
+  if (! companyData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
+  }
+  if (orderData.unitPrice < (companyData.lastPrice / 2)) {
+    throw new Meteor.Error(403, '最低買入價格不可低於該股票當前價格的一半！');
+  }
+  if (orderData.unitPrice > (companyData.lastPrice * 2)) {
+    throw new Meteor.Error(403, '最高買入價格不可高於該股票當前價格的兩倍！');
   }
   const unlock = lockManager.lock([user._id, companyName]);
   const username = user.username;
@@ -72,18 +82,27 @@ Meteor.methods({
 });
 
 export function createSellOrder(user, orderData) {
+  if (orderData.unitPrice < 1) {
+    throw new Meteor.Error(403, '販賣單價不可小於1！');
+  }
+  if (orderData.amount < 1) {
+    throw new Meteor.Error(403, '販賣數量不可小於1！');
+  }
   const companyName = orderData.companyName;
   const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
   }
+  if (orderData.unitPrice < (companyData.lastPrice / 2)) {
+    throw new Meteor.Error(403, '最低售出價格不可低於該股票當前價格的一半！');
+  }
+  if (orderData.unitPrice > (companyData.lastPrice * 2)) {
+    throw new Meteor.Error(403, '最高售出價格不可高於該股票當前價格的兩倍！');
+  }
   const username = user.username;
   const directorData = dbDirectors.findOne({companyName, username});
   if (! directorData || directorData.stocks < orderData.amount) {
     throw new Meteor.Error(403, '擁有的股票數量不足，訂單無法成立！');
-  }
-  if (orderData.unitPrice > (companyData.lastPrice || 1)) {
-    throw new Meteor.Error(403, '最低售出價格不可高於該股票的最後售出價格！');
   }
   const unlock = lockManager.lock([user._id, companyName]);
   orderData.username = username;

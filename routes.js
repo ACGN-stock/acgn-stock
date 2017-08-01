@@ -4,7 +4,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
 import { config } from './config';
 
-//basic route
+//default route
 FlowRouter.route('/', {
   name: 'tutorial',
   action() {
@@ -13,6 +13,7 @@ FlowRouter.route('/', {
 });
 
 export const pageNameHash = {
+  tutorial: '教學導覽',
   instantMessage: '即時訊息',
   stockSummary: '股市總覽',
   foundationPlan: '新創計劃',

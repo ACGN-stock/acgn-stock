@@ -7,6 +7,7 @@ import { dbOrders } from '../db/dbOrders';
 import { dbLog } from '../db/dbLog';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbPrice } from '../db/dbPrice';
+import { dbDebugger } from '../db/dbDebugger';
 import { config } from '../config';
 
 export function tradeStocks() {
@@ -31,10 +32,22 @@ export function tradeStocks() {
     const companyData = dbCompanies.findOne({companyName});
     const unlock = lockManager.lock([companyName], true);
     if (companyData) {
+      dbDebugger.insert({
+        time: new Date(),
+        message: 'start resolve sell order of company [' + companyName + ']...'
+      });
       let lastPrice = 0;
       const buyOrderList = buyOrderGroupByCompanyHash[companyName] || [];
       _.each(sellOrderList, (sellOrderData) => {
+        dbDebugger.insert({
+          time: new Date(),
+          message: 'start look sell order:' + JSON.stringify(sellOrderData)
+        });
         _.every(buyOrderList, (buyOrderData) => {
+          dbDebugger.insert({
+            time: new Date(),
+            message: 'start look buy order:' + JSON.stringify(buyOrderData)
+          });
           if (sellOrderData.done >= sellOrderData.amount) {
             return false;
           }
@@ -44,26 +57,35 @@ export function tradeStocks() {
           if (sellOrderData.username === buyOrderData.username) {
             return true;
           }
-          lastPrice = buyOrderData.unitPrice;
           if (buyOrderData.unitPrice < sellOrderData.unitPrice) {
             return false;
           }
           const tradeNumber = Math.min(sellOrderData.amount - sellOrderData.done, buyOrderData.amount - buyOrderData.done);
           sellOrderData.done += tradeNumber;
           buyOrderData.done += tradeNumber;
+          lastPrice = buyOrderData.unitPrice;
+
           dbLog.insert({
             logType: '交易紀錄',
             username: [buyOrderData.username, sellOrderData.username],
-            companyName: sellOrderData.companyName,
+            companyName: companyName,
             price: buyOrderData.unitPrice,
             amount: tradeNumber,
             createdAt: new Date()
+          });
+          dbDebugger.insert({
+            time: new Date(),
+            message: 'sell order [' + sellOrderData._id + '] and buy order id [' + buyOrderData._id + '] deal!, price is ' + buyOrderData.unitPrice + ', trade number is [' + tradeNumber + '].'
           });
           const existDirectorData = dbDirectors.findOne({
             companyName: companyName,
             username: buyOrderData.username
           });
           if (existDirectorData) {
+            dbDebugger.insert({
+              time: new Date(),
+              message: 'buyer [' + buyOrderData.username + '] already has companyName[' + companyName + '] stocks[' + existDirectorData.stocks + '], increas [' + tradeNumber + '] instead.'
+            });
             dbDirectors.update({
               _id: existDirectorData._id
             }, {
@@ -73,27 +95,20 @@ export function tradeStocks() {
             });
           }
           else {
+            dbDebugger.insert({
+              time: new Date(),
+              message: 'insert director data of buyer username[' + buyOrderData.username + '] companyName[' + companyName + '] stocks[' + tradeNumber + '].'
+            });
             dbDirectors.insert({
               companyName: companyName,
               username: buyOrderData.username,
               stocks: tradeNumber
             });
           }
-          dbOrders.update({
-            $or: [
-              {
-                _id: sellOrderData._id
-              },
-              {
-                _id: buyOrderData._id
-              }
-            ]
-          }, {
-            $inc: {
-              done: tradeNumber
-            }
-          }, {
-            multi: true
+
+          dbDebugger.insert({
+            time: new Date(),
+            message: 'increase seller money of username[' + sellOrderData.username + '] money[' + (tradeNumber * buyOrderData.unitPrice) + '].'
           });
           Meteor.users.update({
             username: sellOrderData.username
@@ -105,6 +120,10 @@ export function tradeStocks() {
 
           //訂單完成
           if (buyOrderData.done === buyOrderData.amount) {
+            dbDebugger.insert({
+              time: new Date(),
+              message: 'buy order [' + buyOrderData._id + '] is all done, delete it.'
+            });
             dbLog.insert({
               logType: '訂單完成',
               username: [buyOrderData.username],
@@ -118,10 +137,25 @@ export function tradeStocks() {
               _id: buyOrderData._id
             });
           }
+          else {
+            dbDebugger.insert({
+              time: new Date(),
+              message: 'increase done number of buy order [' + buyOrderData._id + '] done[' + tradeNumber + '].'
+            });
+            dbOrders.update( buyOrderData._id, {
+              $inc: {
+                done: tradeNumber
+              }
+            });
+          }
 
           return true;
         });
         if (sellOrderData.done === sellOrderData.amount) {
+          dbDebugger.insert({
+            time: new Date(),
+            message: 'seller order [' + sellOrderData._id + '] is all done, delete it.'
+          });
           dbLog.insert({
             logType: '訂單完成',
             username: [sellOrderData.username],
@@ -135,34 +169,37 @@ export function tradeStocks() {
             _id: sellOrderData._id
           });
         }
-        //若沒有買單可以滿足賣單，且此賣單期望單價在(lastPrice || 1)以上，則取消之
-        else if (sellOrderData.unitPrice > (lastPrice || 1)) {
-          dbLog.insert({
-            logType: '賣單撤銷',
-            username: [sellOrderData.username],
-            companyName: sellOrderData.companyName,
-            price: sellOrderData.unitPrice,
-            amount: sellOrderData.amount,
-            createdAt: new Date()
+        else {
+          dbDebugger.insert({
+            time: new Date(),
+            message: 'set done number of seller order [' + sellOrderData._id + '] done[' + sellOrderData.done + '].'
           });
-          dbOrders.remove({
-            _id: sellOrderData._id
+          dbOrders.update(sellOrderData._id, {
+            $set: {
+              done: sellOrderData.done
+            }
           });
         }
       });
-      dbCompanies.update({
-        _id: companyData._id
-      }, {
-        $set: {
-          lastPrice: lastPrice,
-          totalValue: lastPrice * companyData.totalRelease
-        }
-      });
-      dbPrice.insert({
-        companyName: companyName,
-        price: lastPrice,
-        createdAt: new Date()
-      });
+      if (lastPrice > 0) {
+        dbDebugger.insert({
+          time: new Date(),
+          message: 'set price of companyName[' + companyName + '] lastPrice[' + lastPrice + '] totalValue[' + (lastPrice * companyData.totalRelease) + '].'
+        });
+        dbCompanies.update({
+          _id: companyData._id
+        }, {
+          $set: {
+            lastPrice: lastPrice,
+            totalValue: lastPrice * companyData.totalRelease
+          }
+        });
+        dbPrice.insert({
+          companyName: companyName,
+          price: lastPrice,
+          createdAt: new Date()
+        });
+      }
     }
     unlock();
   });
@@ -174,7 +211,7 @@ export function releaseStocks() {
   if (releaseStocksCounter === 0) {
     dbCompanies.find({
       lastPrice: {
-        $gt: 1
+        $gt: config.releaseStocksThreshold
       }
     }, {
       disableOplog: true
@@ -183,6 +220,11 @@ export function releaseStocks() {
       const unlock = lockManager.lock([companyName], true);
       const lastPrice = companyData.lastPrice;
       let releaseChance = 0;
+      let needAmount = 0;
+      dbDebugger.insert({
+        time: new Date(),
+        message: 'look release chance of companyName[' + companyName + '], current price[' + lastPrice + ']...'
+      });
       dbOrders.find({
         orderType: '購入',
         unitPrice: {
@@ -191,11 +233,24 @@ export function releaseStocks() {
       }, {
         disableOplog: true
       }).forEach((orderData) => {
+        needAmount += orderData.amount;
         releaseChance += (orderData.unitPrice - lastPrice) * orderData.amount;
+        dbDebugger.insert({
+          time: new Date(),
+          message: 'have buy order data: ' + JSON.stringify(orderData)
+        });
+      });
+      dbDebugger.insert({
+        time: new Date(),
+        message: 'final releaseChance[' + releaseChance + '] needAmount[' + needAmount + '].'
       });
 
       if (Math.random() * releaseChance > config.releaseStocksChance) {
-        let releaseStocksAmount = Math.round(Math.random() * releaseChance);
+        let releaseStocksAmount = Math.round(Math.random() * needAmount / 2);
+        dbDebugger.insert({
+          time: new Date(),
+          message: 'final releaseAmount[' + releaseStocksAmount + '].'
+        });
         dbLog.insert({
           logType: '公司釋股',
           companyName: companyName,
@@ -218,6 +273,10 @@ export function releaseStocks() {
           const tradeNumber = Math.min(releaseStocksAmount, buyOrderData.amount - buyOrderData.done);
           buyOrderData.done += tradeNumber;
           releaseStocksAmount -= tradeNumber;
+          dbDebugger.insert({
+            time: new Date(),
+            message: 'buy order id [' + buyOrderData._id + '] get release stock! price[' + lastPrice + '], tradeNumber[' + tradeNumber + '].'
+          });
           dbLog.insert({
             logType: '交易紀錄',
             username: [buyOrderData.username],
@@ -227,10 +286,14 @@ export function releaseStocks() {
             createdAt: new Date()
           });
           const existDirectorData = dbDirectors.findOne({
-            companyName: companyData.companyName,
+            companyName: companyName,
             username: buyOrderData.username
           });
           if (existDirectorData) {
+            dbDebugger.insert({
+              time: new Date(),
+              message: 'buyer [' + buyOrderData.username + '] already has companyName[' + companyName + '] stocks[' + existDirectorData.stocks + '], increas [' + tradeNumber + '] instead.'
+            });
             dbDirectors.update({
               _id: existDirectorData._id
             }, {
@@ -240,8 +303,12 @@ export function releaseStocks() {
             });
           }
           else {
+            dbDebugger.insert({
+              time: new Date(),
+              message: 'insert director data of buyer username[' + buyOrderData.username + '] companyName[' + companyName + '] stocks[' + tradeNumber + '].'
+            });
             dbDirectors.insert({
-              companyName: companyData.companyName,
+              companyName: companyName,
               username: buyOrderData.username,
               stocks: tradeNumber
             });
@@ -249,6 +316,10 @@ export function releaseStocks() {
 
           //訂單完成
           if (buyOrderData.done === buyOrderData.amount) {
+            dbDebugger.insert({
+              time: new Date(),
+              message: 'buy order [' + buyOrderData._id + '] is all done, delete it.'
+            });
             dbLog.insert({
               logType: '訂單完成',
               username: [buyOrderData.username],
@@ -263,24 +334,22 @@ export function releaseStocks() {
             });
           }
           else {
-            dbOrders.update({
-              $or: [
-                {
-                  _id: buyOrderData._id
-                }
-              ]
-            }, {
+            dbDebugger.insert({
+              time: new Date(),
+              message: 'increase done number of buy order [' + buyOrderData._id + '] done[' + tradeNumber + '].'
+            });
+            dbOrders.update(buyOrderData._id, {
               $inc: {
                 done: tradeNumber
               }
             });
           }
-
-          return true;
         });
-        dbCompanies.update({
-          _id: companyData._id
-        }, {
+        dbDebugger.insert({
+          time: new Date(),
+          message: 'set price of companyName[' + companyName + '] lastPrice[' + lastPrice + '] totalValue[' + (lastPrice * companyData.totalRelease) + '] totalRelease[' + (companyData.totalRelease + releaseStocksAmount) + '].'
+        });
+        dbCompanies.update(companyData._id, {
           $set: {
             lastPrice: lastPrice,
             totalValue: lastPrice * (companyData.totalRelease + releaseStocksAmount),
@@ -299,6 +368,5 @@ export function releaseStocks() {
   }
 }
 function generateRandomCounter() {
-  // return 60 + Math.round(Math.random() * 300);
-  return 5 + Math.round(Math.random() * 10);
+  return 60 + Math.round(Math.random() * 10);
 }
