@@ -65,14 +65,33 @@ function doSomething(userId) {
       investFoundCompany(user, foundationData._id, investMoney);
     }
   }
-  else if (user.profile.money > 200 && probability(50) && dbCompanies.find().count() > 0) {
-    const companyData = _.sample(dbCompanies.find().fetch());
+  const orderList = dbOrders.find({username}).fetch();
+  if (probability(orderList * 2)) {
+    console.log(username + ' want to cancel a order!');
+    const orderData = _.sample(orderList);
+    retrieveOrder(user, orderData._id);
+  }
+  const sellOrderList = _.where(orderList, {
+    orderType: '賣出'
+  });
+  const sellOrderCompanyNameList = _.chain(sellOrderList)
+    .pluck('companyName')
+    .unique()
+    .value();
+  const canBuyStockCompanyList = dbCompanies
+    .find({
+      companyName: {
+        $nin: sellOrderCompanyNameList
+      }
+    })
+    .fetch();
+  if (canBuyStockCompanyList.length > 0 && probability(50)) {
+    const companyData = _.sample(canBuyStockCompanyList);
     const useMoney = randomNumber(user.profile.money);
     const unitPrice = randomNumber(companyData.lastPrice * 2, Math.ceil(companyData.lastPrice / 2));
     const amount = Math.floor(useMoney / unitPrice);
     if (amount > 0) {
-      console.log(username + ' want to buy some stocks!');
-
+      console.log(username + ' want to buy stocks of 「' + companyData.companyName + '」!');
       createBuyOrder(user, {
         companyName: companyData.companyName,
         unitPrice: unitPrice || 1,
@@ -80,32 +99,41 @@ function doSomething(userId) {
       });
     }
   }
-    const directorData = _.sample(dbDirectors.find({username}).fetch());
-    if (directorData) {
-      const companyName = directorData.companyName;
-      const companyData = dbCompanies.findOne({companyName});
-      if (probability(25)) {
-        console.log(username + ' want to sell some stocks!');
-
-        createSellOrder(user, {
-          companyName: companyName,
-          unitPrice: randomNumber(companyData.lastPrice * 2, Math.ceil(companyData.lastPrice / 2)),
-          amount: probability(10) ? directorData.stocks : randomNumber(directorData.stocks)
-        });
+  const buyOrderList = _.where(orderList, {
+    orderType: '購入'
+  });
+  const buyOrderCompanyNameList = _.chain(buyOrderList)
+    .pluck('companyName')
+    .unique()
+    .value();
+  const canSellStockList = dbDirectors
+    .find({
+      username: username,
+      companyName: {
+        $nin: buyOrderCompanyNameList
       }
-      // else {
-      //   const candidateIndex = randomNumber(companyData.candidateList.length) - 1;
-      //   if (! _.contains(companyData.voteList[candidateIndex], username)) {
-      //     console.log(username + ' support a candidate!');
-      //     supportCandidate(user, companyName, companyData.candidateList[candidateIndex]);
-      //   }
-      // }
+    })
+    .fetch();
+  if (canSellStockList.length > 0 && probability(50)) {
+    const directorData = _.sample(canSellStockList);
+    const companyName = directorData.companyName;
+    const companyData = dbCompanies.findOne({companyName});
+    console.log(username + ' want to sell some stocks of 「' + companyName + '」!');
+
+    createSellOrder(user, {
+      companyName: companyName,
+      unitPrice: randomNumber(companyData.lastPrice * 2, Math.ceil(companyData.lastPrice / 2)),
+      amount: probability(10) ? directorData.stocks : randomNumber(directorData.stocks)
+    });
   }
-  if (probability(dbOrders.find({username}).count())) {
-    console.log(username + ' want to cancel a order!');
-    const orderData = _.sample(dbOrders.find({username}).fetch());
-    retrieveOrder(user, orderData._id);
-  }
+
+  // else {
+  //   const candidateIndex = randomNumber(companyData.candidateList.length) - 1;
+  //   if (! _.contains(companyData.voteList[candidateIndex], username)) {
+  //     console.log(username + ' support a candidate!');
+  //     supportCandidate(user, companyName, companyData.candidateList[candidateIndex]);
+  //   }
+  // }
   // const beManagerCompanies = dbCompanies.find({manager: username}).fetch();
   // if (beManagerCompanies.length) {
   //   if (probability(5)) {

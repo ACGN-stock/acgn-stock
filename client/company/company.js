@@ -212,6 +212,7 @@ Template.companyDirectorList.events({
 Template.companyOrderList.onCreated(function() {
   this.offset = 0;
   this.subscribe('companyOrder', this.data.companyName, this.offset);
+  this.subscribe('queryMyOrder');
 });
 Template.companyOrderList.helpers({
   getStockAmount() {
@@ -222,12 +223,34 @@ Template.companyOrderList.helpers({
 
     return ownStockData ? ownStockData.stocks : 0;
   },
-  orderList() {
+  myOrderList() {
     const companyName = this.companyName;
+    const user = Meteor.user();
+    const username = user && user.username;
 
-    return dbOrders.find({companyName}, {
+    return dbOrders.find({
+      companyName: companyName,
+      username: username
+    }, {
       sort: {
         createdAt: -1
+      }
+    });
+  },
+  orderList() {
+    const companyName = this.companyName;
+    const user = Meteor.user();
+    const username = user && user.username;
+
+    return dbOrders.find({
+      companyName: companyName,
+      username: {
+        $ne: username
+      }
+    }, {
+      sort: {
+        orderType: 1,
+        unitPrice: 1
       }
     });
   },

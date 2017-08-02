@@ -47,7 +47,7 @@
         <div class="col text-right">$ {{this.totalValue}}</div>
       </div>
     </div>
-    <div class="extra" style="white-space: pre;padding: 5px 15px;"><h4>角色簡介</h4>{{this.description}}</div>
+    <div class="extra" style="white-space: pre-wrap;padding: 5px 15px;"><h4>角色簡介</h4>{{this.description}}</div>
     <div class="extra">
       <div class="row">
         {{> companyDirectorList companyName=this.companyName totalRelease=this.totalRelease}}
@@ -146,14 +146,17 @@
         </button>
       {{/if}}
     </h4>
+    {{#each order in myOrderList}}
+      <div>
+        {{getOrderDescription order}}
+        <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
+          取消訂單
+        </button>
+      </div>
+    {{/each}}
     {{#each order in orderList}}
       <div>
         {{getOrderDescription order}}
-        {{#if isUser order.username}}
-          <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
-            取消訂單
-          </button>
-        {{/if}}
       </div>
     {{/each}}
     <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>

@@ -1,6 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
+import { dbOrders } from '../../db/dbOrders';
 import { dbDirectors } from '../../db/dbDirectors';
 import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
@@ -34,6 +35,17 @@ Meteor.call = (function(_super) {
 }(Meteor.call));
 
 export function createBuyOrder(user, companyData) {
+  const companyName = companyData.companyName;
+  const existsSellOrder = dbOrders.findOne({
+    companyName: companyName,
+    username: user.username,
+    orderType: '賣出'
+  });
+  if (existsSellOrder) {
+    window.alert('您有賣出該公司股票的訂單正在執行中，無法同時下達購買的訂單！');
+
+    return false;
+  }
   const userMoney = user.profile.money;
   const minimumUnitPrice = Math.max(Math.ceil(companyData.lastPrice / 2), 1);
   const maximumUnitPrice = userMoney;
@@ -60,11 +72,21 @@ export function createBuyOrder(user, companyData) {
 
     return false;
   }
-  const companyName = companyData.companyName;
   Meteor.call('createBuyOrder', {companyName, unitPrice, amount});
 }
 
 export function createSellOrder(user, companyData) {
+  const companyName = companyData.companyName;
+  const existsBuyOrder = dbOrders.findOne({
+    companyName: companyName,
+    username: user.username,
+    orderType: '購入'
+  });
+  if (existsBuyOrder) {
+    window.alert('您有買入該公司股票的訂單正在執行中，無法同時下達賣出的訂單！');
+
+    return false;
+  }
   const minimumUnitPrice = Math.max(Math.ceil(companyData.lastPrice / 2), 1);
   const maximumUnitPrice = companyData.lastPrice * 2;
   const unitPrice = parseInt(window.prompt(`請輸入您期望賣出的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`), 10);
@@ -73,7 +95,6 @@ export function createSellOrder(user, companyData) {
 
     return false;
   }
-  const companyName = companyData.companyName;
   const username = user && user.username;
   const directorData = dbDirectors.findOne({username, companyName});
   const maximumAmount = directorData.stocks;

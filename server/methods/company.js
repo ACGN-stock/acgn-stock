@@ -118,8 +118,8 @@ Meteor.methods({
     check(companyName, String);
     check(newCompanyData, {
       tags: [String],
-      pictureSmall: new Match.Optional(String),
-      pictureBig: new Match.Optional(String),
+      pictureSmall: new Match.Maybe(String),
+      pictureBig: new Match.Maybe(String),
       description: String
     });
     editCompany(Meteor.user(), companyName, newCompanyData);
@@ -338,9 +338,6 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
         manager: reg
       },
       {
-        chairmanTitle: reg
-      },
-      {
         tags: reg
       }
     ];
@@ -428,6 +425,7 @@ Meteor.publish('companyDirector', function(companyName, offset) {
     sort: {
       stocks: -1
     },
+    skip: offset,
     limit: 10 + offset
   });
 });
@@ -439,6 +437,7 @@ Meteor.publish('companyLog', function(companyName, offset) {
     sort: {
       createdAt: -1
     },
+    skip: offset,
     limit: 50 + offset
   });
 });
@@ -451,6 +450,7 @@ Meteor.publish('companyOrder', function(companyName, offset) {
       orderType: 1,
       unitPrice: 1
     },
+    skip: offset,
     limit: 50 + offset
   });
 });
@@ -470,6 +470,7 @@ Meteor.publish('companyOldProduct', function(companyName, offset) {
     sort: {
       createdAt: -1
     },
+    skip: offset,
     limit: 10 + offset
   });
 });

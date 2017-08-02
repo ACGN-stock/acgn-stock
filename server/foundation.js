@@ -98,6 +98,6 @@ export function checkFoundCompany() {
         });
       }
       unlock();
-    })
+    });
 }
 

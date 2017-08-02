@@ -171,3 +171,19 @@ Meteor.publish('accountInfoLog', function(username, offset) {
   });
   this.ready();
 });
+
+Meteor.publish('validateUser', function(username) {
+  check(username, String);
+
+  dbValidatingUsers.find({username}).observeChanges({
+    added: (id, fields) => {
+      this.added('validatingUsers', id, fields);
+    },
+    removed: (id) => {
+      this.removed('validatingUsers', id);
+      this.stop();
+    }
+  });
+
+  this.ready();
+});

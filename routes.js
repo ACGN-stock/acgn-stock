@@ -56,29 +56,27 @@ FlowRouter.route('/foundationPlan', {
 FlowRouter.route('/foundCompany', {
   name: 'createFoundationPlan',
   action() {
-    DocHead.setTitle(document.title = config.websiteName + ' - 發起新創計劃');
+    DocHead.setTitle(config.websiteName + ' - 發起新創計劃');
   }
 });
-// FlowRouter.route('/foundCompany/:foundationId', {
-//   name: 'editFoundationPlan',
-//   action() {
-//     if (Meteor.isClient) {
-//       document.title = config.websiteName + ' - 編輯新創計劃';
-//     }
-//   }
-// });
+FlowRouter.route('/foundCompany/:foundationId', {
+  name: 'editFoundationPlan',
+  action() {
+    if (Meteor.isClient) {
+      DocHead.setTitle(config.websiteName + ' - 編輯新創計劃');
+    }
+  }
+});
 FlowRouter.route('/productCenter', {
   name: 'productCenter',
   action() {
-    DocHead.setTitle(document.title = config.websiteName + ' - 產品中心');
+    DocHead.setTitle(config.websiteName + ' - 產品中心');
   }
 });
 FlowRouter.route('/seasonalReport', {
   name: 'seasonalReport',
   action() {
-    if (Meteor.isClient) {
-      document.title = config.websiteName + ' - 季度報告';
-    }
+    DocHead.setTitle(config.websiteName + ' - 季度報告');
   }
 });
 FlowRouter.route('/accountInfo', {

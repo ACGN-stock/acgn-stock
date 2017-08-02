@@ -14,8 +14,8 @@ Meteor.methods({
     check(foundCompanyData, {
       companyName: String,
       tags: [String],
-      pictureSmall: new Match.Optional(String),
-      pictureBig: new Match.Optional(String),
+      pictureSmall: new Match.Maybe(String),
+      pictureBig: new Match.Maybe(String),
       description: String
     });
     foundCompany(Meteor.user(), foundCompanyData);
@@ -39,6 +39,51 @@ export function foundCompany(user, foundCompanyData) {
     createdAt: new Date()
   });
   dbFoundations.insert(foundCompanyData);
+  unlock();
+}
+
+Meteor.methods({
+  editFoundCompany(foundCompanyData) {
+    check(this.userId, String);
+    check(foundCompanyData, {
+      _id: String,
+      companyName: String,
+      tags: [String],
+      pictureSmall: new Match.Maybe(String),
+      pictureBig: new Match.Maybe(String),
+      description: String
+    });
+    editFoundCompany(Meteor.user(), foundCompanyData);
+
+    return true;
+  }
+});
+
+export function editFoundCompany(user, foundCompanyData) {
+  const oldFoundCompanyData = dbFoundations.findOne(foundCompanyData._id);
+  if (! oldFoundCompanyData) {
+    throw new Meteor.Error(404, '找不到要編輯的新創計劃，該新創計劃可能已經創立成功或失敗！');
+  }
+  if (user.username !== oldFoundCompanyData.manager) {
+    throw new Meteor.Error(401, '並非該新創計劃的發起人，無法編輯該新創計劃！');
+  }
+  const companyName = foundCompanyData.companyName;
+  if (dbCompanies.findOne({companyName})) {
+    throw new Meteor.Error(403, '已有相同名稱的公司上市，無法創立同名公司！');
+  }
+  const existsSameNameFoundCompanyData = dbFoundations.findOne({
+    _id: {
+      $ne: oldFoundCompanyData._id
+    },
+    companyName: companyName
+  });
+  if (existsSameNameFoundCompanyData) {
+    throw new Meteor.Error(403, '已有相同名稱的公司正在創立中，無法創立同名公司！');
+  }
+  const unlock = lockManager.lock([user._id, companyName]);
+  dbFoundations.update(foundCompanyData._id, {
+    $set: _.omit(foundCompanyData, '_id')
+  });
   unlock();
 }
 
@@ -97,6 +142,39 @@ export function investFoundCompany(user, foundCompanyId, amount) {
   unlock();
 }
 
-Meteor.publish('foundationPlan', function() {
-  return dbFoundations.find();
+Meteor.publish('foundationPlan', function(keyword, offset) {
+  check(keyword, String);
+  check(offset, Match.Integer);
+  const filter = {};
+  if (keyword) {
+    const reg = new RegExp(keyword, 'i');
+    filter.$or =[
+      {
+        companyName: reg
+      },
+      {
+        manager: reg
+      },
+      {
+        tags: reg
+      }
+    ];
+  }
+
+  return dbFoundations.find(filter, {
+    sort: {
+      createdAt: 1
+    },
+    skip: offset,
+    limit: 10 + offset,
+    fields: {
+      pictureBig: 0
+    }
+  });
+});
+
+Meteor.publish('foundationPlanById', function(foundationId) {
+  check(foundationId, String);
+
+  return dbFoundations.find(foundationId);
 });

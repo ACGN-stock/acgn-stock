@@ -6,8 +6,9 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-// import { dbFoundations } from '../../db/dbFoundations';
-// import { addTask, resolveTask } from '../layout/loading';
+import { dbFoundations } from '../../db/dbFoundations';
+import { addTask, resolveTask } from '../layout/loading';
+import { check, Match } from 'meteor/check';
 
 Template.createFoundationPlan.helpers({
   defaultData() {
@@ -18,17 +19,18 @@ Template.createFoundationPlan.helpers({
     };
   }
 });
-// Template.editFoundationPlan.onCreated(function() {
-//   addTask();
-//   this.subscribe('foundationPlan', resolveTask);
-// });
-// Template.editFoundationPlan.helpers({
-//   editData() {
-//     const foundationId = FlowRouter.getParam('foundationId');
+Template.editFoundationPlan.onCreated(function() {
+  const foundationId = FlowRouter.getParam('foundationId');
+  addTask();
+  this.subscribe('foundationPlanById', foundationId, resolveTask);
+});
+Template.editFoundationPlan.helpers({
+  editData() {
+    const foundationId = FlowRouter.getParam('foundationId');
 
-//     return dbFoundations.findOne(foundationId);
-//   }
-// });
+    return dbFoundations.findOne(foundationId);
+  }
+});
 
 inheritUtilForm(Template.foundCompanyForm);
 Template.foundCompanyForm.onCreated(function() {
@@ -105,15 +107,20 @@ function handleInputChange(event) {
 
 function saveModel(model) {
   if (model._id) {
-    Meteor.call('foundCompany', model, () => {
-      const path = FlowRouter.path('foundationPlan');
-      FlowRouter.go(path);
+    const editData = _.omit(model, 'manager', 'invest', 'createdAt');
+    Meteor.call('editFoundCompany', editData, (error) => {
+      if (! error) {
+        const path = FlowRouter.path('foundationPlan');
+        FlowRouter.go(path);
+      }
     });
   }
   else {
-    Meteor.call('foundCompany', model, () => {
-      const path = FlowRouter.path('foundationPlan');
-      FlowRouter.go(path);
+    Meteor.call('foundCompany', model, (error) => {
+      if (! error) {
+        const path = FlowRouter.path('foundationPlan');
+        FlowRouter.go(path);
+      }
     });
   }
 }

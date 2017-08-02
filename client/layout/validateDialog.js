@@ -4,18 +4,34 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { handleError } from '../utils/handleError';
 import { dbConfig } from '../../db/dbConfig';
+import { dbValidatingUsers } from '../../db/dbValidatingUsers';
+import { addTask, resolveTask } from '../layout/loading';
 
 export const rShowLoginDialog = new ReactiveVar(false);
-const validateUserName = new ReactiveVar('');
-const validateCode = new ReactiveVar('');
+const rValidateUserName = new ReactiveVar('');
+const rValidateCode = new ReactiveVar('');
 let password = '';
 
 Template.validateDialog.onCreated(function() {
   this.subscribe('dbConfig');
+  this.autorun(() => {
+    const usermame = rValidateUserName.get();
+    if (usermame) {
+      this.subscribe('validateUser', usermame);
+    }
+  });
+  dbValidatingUsers.find().observeChanges({
+    removed: () => {
+      const usermame = rValidateUserName.get();
+      if (usermame && password) {
+        Meteor.loginWithPassword(usermame, password, resolveTask);
+      }
+    }
+  });
 });
 Template.validateDialog.helpers({
   validateUserName() {
-    return validateUserName.get();
+    return rValidateUserName.get();
   },
   validateBoard() {
     const configData = dbConfig.findOne();
@@ -28,28 +44,20 @@ Template.validateDialog.helpers({
     return configData ? configData.validateUserAID : '';
   },
   validateCode() {
-    return validateCode.get();
+    return rValidateCode.get();
   }
 });
 Template.validateDialog.events({
   reset() {
-    validateUserName.set('');
-    validateCode.set('');
+    rValidateUserName.set('');
+    password = '';
+    rValidateCode.set('');
     rShowLoginDialog.set(false);
   },
   submit(event, templateInstance) {
     event.preventDefault();
-    if (validateCode.get()) {
-      Meteor.call('validateAccount', validateUserName.get(), (error) => {
-        if (error) {
-          handleError(error);
-        }
-        Meteor.loginWithPassword(validateUserName.get(), password, (error) => {
-          if (error) {
-            handleError(error);
-          }
-        });
-      });
+    if (rValidateCode.get()) {
+      Meteor.call('validateAccount', rValidateUserName.get());
     }
     else {
       const username = templateInstance.$('#loginUserName').val();
@@ -59,12 +67,10 @@ Template.validateDialog.events({
 
         return false;
       }
+      rValidateUserName.set(username);
 
       Meteor.call('loginOrRegister', username, password, (error, result) => {
-        if (error) {
-          handleError(error);
-        }
-        else if (result === true) {
+        if (result === true) {
           Meteor.loginWithPassword(username, password, (error) => {
             if (error) {
               handleError(error);
@@ -72,8 +78,7 @@ Template.validateDialog.events({
           });
         }
         else {
-          validateUserName.set(username);
-          validateCode.set(result);
+          rValidateCode.set(result);
         }
       });
     }

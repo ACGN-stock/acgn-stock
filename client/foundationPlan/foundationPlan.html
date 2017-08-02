@@ -12,11 +12,36 @@
           </a>
         {{/if}}
       </h3>
+      <hr />
+      {{> foundationFilterForm}}
+      <hr />
       {{#each foundationList}}
         {{> foundationPlanInfo}}
       {{/each}}
+      <a class="h3 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
     </div>
   </div>
+</template>
+
+<template name="foundationFilterForm">
+  <form class="form-inline">
+    <div class="input-group">
+      <input
+        class="form-control"
+        style="width: 300px"
+        type="text"
+        name="keyword"
+        placeholder="請輸入關鍵字"
+        value="{{keyword}}"
+      />
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-search" aria-hidden="true"></i>
+          搜索
+        </button>
+      </span>
+    </div>
+  </form>
 </template>
 
 <template name="foundationPlanInfo">
@@ -52,7 +77,7 @@
         </div>
       </div>
     </div>
-    <div class="extra" style="white-space: pre;"><h4>角色簡介：</h4>{{this.description}}</div>
+    <div class="extra" style="white-space: pre-wrap;"><h4>角色簡介：</h4>{{this.description}}</div>
     {{#if currentUser}}
       <div class="extra">
         {{#if isManager this.manager}}

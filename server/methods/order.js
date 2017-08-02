@@ -33,6 +33,15 @@ export function createBuyOrder(user, orderData) {
     throw new Meteor.Error(403, '剩餘金錢不足，訂單無法成立！');
   }
   const companyName = orderData.companyName;
+  const username = user.username;
+  const existsSellOrder = dbOrders.findOne({
+    companyName: companyName,
+    username: user.username,
+    orderType: '賣出'
+  });
+  if (existsSellOrder) {
+    throw new Meteor.Error(403, '有賣出該公司股票的訂單正在執行中，無法同時下達購買的訂單！');
+  }
   const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
@@ -44,7 +53,6 @@ export function createBuyOrder(user, orderData) {
     throw new Meteor.Error(403, '最高買入價格不可高於該股票當前價格的兩倍！');
   }
   const unlock = lockManager.lock([user._id, companyName]);
-  const username = user.username;
   orderData.username = username;
   orderData.orderType = '購入';
   orderData.createdAt = new Date();
@@ -89,6 +97,15 @@ export function createSellOrder(user, orderData) {
     throw new Meteor.Error(403, '販賣數量不可小於1！');
   }
   const companyName = orderData.companyName;
+  const username = user.username;
+  const existsBuyOrder = dbOrders.findOne({
+    companyName: companyName,
+    username: user.username,
+    orderType: '購入'
+  });
+  if (existsBuyOrder) {
+    throw new Meteor.Error(403, '有買入該公司股票的訂單正在執行中，無法同時下達賣出的訂單！');
+  }
   const companyData = dbCompanies.findOne({companyName});
   if (! companyData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
@@ -99,7 +116,6 @@ export function createSellOrder(user, orderData) {
   if (orderData.unitPrice > (companyData.lastPrice * 2)) {
     throw new Meteor.Error(403, '最高售出價格不可高於該股票當前價格的兩倍！');
   }
-  const username = user.username;
   const directorData = dbDirectors.findOne({companyName, username});
   if (! directorData || directorData.stocks < orderData.amount) {
     throw new Meteor.Error(403, '擁有的股票數量不足，訂單無法成立！');

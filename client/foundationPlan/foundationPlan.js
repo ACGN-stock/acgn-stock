@@ -3,14 +3,19 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '../../db/dbFoundations';
 import { formatDateText } from '../utils/helpers';
 import { config } from '../../config';
 import { addTask, resolveTask } from '../layout/loading';
 
+export const rKeyword = new ReactiveVar('');
 Template.foundationPlan.onCreated(function() {
-  addTask();
-  this.subscribe('foundationPlan', resolveTask);
+  this.offset = 0;
+  this.autorun(() => {
+    addTask();
+    this.subscribe('foundationPlan', rKeyword.get(), this.offset, resolveTask);
+  });
 });
 Template.foundationPlan.helpers({
   getFoundCompanyHref() {
@@ -22,6 +27,29 @@ Template.foundationPlan.helpers({
         createdAt: 1
       }
     });
+  }
+});
+Template.foundationPlan.events({
+  'click [data-action="more"]'(event, templateInstance) {
+    event.preventDefault();
+    templateInstance.offset += 10;
+    addTask();
+    templateInstance.subscribe('foundationPlan', rKeyword.get(), templateInstance.offset, resolveTask);
+  }
+});
+
+Template.foundationFilterForm.onRendered(function() {
+  this.$keyword = this.$('[name="keyword"]');
+});
+Template.foundationFilterForm.helpers({
+  keyword() {
+    return rKeyword.get();
+  }
+});
+Template.foundationFilterForm.events({
+  submit(event, templateInstance) {
+    event.preventDefault();
+    rKeyword.set(templateInstance.$keyword.val());
   }
 });
 
@@ -45,11 +73,10 @@ Template.foundationPlanInfo.helpers({
 
     return formatDateText(expireDate);
   },
-  // isManager(manager) {
-  //   return Meteor.user().username === manager;
-  // }
-  isManager() {
-    return false;
+  isManager(manager) {
+    const user = Meteor.user();
+
+    return user && user.username === manager;
   },
   getEditHref(foundationId) {
     return FlowRouter.path('editFoundationPlan', {foundationId});
