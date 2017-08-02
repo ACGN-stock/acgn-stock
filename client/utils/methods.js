@@ -48,7 +48,7 @@ export function createBuyOrder(user, companyData) {
   }
   const userMoney = user.profile.money;
   const minimumUnitPrice = Math.max(Math.ceil(companyData.lastPrice / 2), 1);
-  const maximumUnitPrice = userMoney;
+  const maximumUnitPrice = Math.min(userMoney, companyData.lastPrice * 2);
   if (minimumUnitPrice > maximumUnitPrice) {
     window.alert('您的金錢不足以購買此公司的股票！');
 
