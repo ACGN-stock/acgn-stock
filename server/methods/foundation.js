@@ -147,6 +147,7 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
   check(offset, Match.Integer);
   const filter = {};
   if (keyword) {
+    keyword = keyword.replace(/\\/g, '\\\\');
     const reg = new RegExp(keyword, 'i');
     filter.$or =[
       {

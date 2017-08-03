@@ -7,6 +7,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { dbCompanies } from '../../db/dbCompanies';
+import { regImageDataUrl } from '../utils/regexp';
 
 Template.manageCompany.onCreated(function() {
   const companyName = FlowRouter.getParam('companyName');
@@ -32,21 +33,29 @@ function validateModel(model) {
   if (model.tags.length > 50) {
     error.tags = '標籤數量過多！';
   }
-  _.each(model.tags, (tag) => {
-    if (tag.length > 50) {
-      error.tags = '單一標籤不可超過50個字！';
-    }
-  });
+  else {
+    _.each(model.tags, (tag) => {
+      if (tag.length > 50) {
+        error.tags = '單一標籤不可超過50個字！';
+      }
+    });
+  }
   if (model.pictureSmall && model.pictureSmall.length > 262144) {
-    error.pictureSmall = '檔案過大！';
+    error.pictureSmall = '檔案Size過大！';
+  }
+  else if (! regImageDataUrl.test(model.pictureSmall)) {
+    error.pictureSmall = '檔案格式不符！';
   }
   if (model.pictureBig && model.pictureBig.length > 1048576) {
-    error.pictureBig = '檔案過大！';
+    error.pictureBig = '檔案Size過大！';
+  }
+  else if (! regImageDataUrl.test(model.pictureBig)) {
+    error.pictureBig = '檔案格式不符！';
   }
   if (model.description.length < 10) {
     error.description = '介紹文字過少！';
   }
-  if (model.description.length > 3000) {
+  else if (model.description.length > 3000) {
     error.description = '介紹文字過多！';
   }
 
@@ -67,7 +76,7 @@ function handleInputChange(event) {
       const reader = new FileReader();
       const file = event.currentTarget.files[0];
       if (! file) {
-        model[fieldName] = null;
+        delete model[fieldName];
         this.model.set(model);
 
         return false;

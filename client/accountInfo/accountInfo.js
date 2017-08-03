@@ -71,12 +71,10 @@ Template.accountInfoManageCompanyLink.helpers({
 });
 
 Template.accountInfoLogList.onCreated(function() {
-  if (Meteor.userId()) {
-    this.autorun(() => {
-      this.logOffset = 0;
-      this.subscribe('accountInfoLog', rSearchUsername.get(), this.logOffset);
-    });
-  }
+  this.autorun(() => {
+    this.offset = 0;
+    this.subscribe('accountInfoLog', rSearchUsername.get(), this.offset);
+  });
 });
 Template.accountInfoLogList.helpers({
   logList() {
@@ -94,9 +92,9 @@ Template.accountInfoLogList.helpers({
 Template.accountInfoLogList.events({
   'click [data-action="more"]'(event, templateInstance) {
     event.preventDefault();
-    templateInstance.logOffset += 50;
+    templateInstance.offset += 50;
     addTask();
-    templateInstance.subscribe('accountInfoLog', rSearchUsername.get(), templateInstance.logOffset, resolveTask);
+    templateInstance.subscribe('accountInfoLog', rSearchUsername.get(), templateInstance.offset, resolveTask);
   }
 });
 

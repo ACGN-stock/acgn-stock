@@ -8,6 +8,9 @@ import { handleError } from './handleError';
 
 Meteor.call = (function(_super) {
   function call(...args) {
+    if (! Meteor.status().connected) {
+      window.alert('糟了，伺服器好像掛了！[503]');
+    }
     addTask();
     const lastArg = _.last(args);
     if (typeof lastArg === 'function') {

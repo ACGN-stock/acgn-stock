@@ -6,6 +6,7 @@ import { handleError } from '../utils/handleError';
 import { dbConfig } from '../../db/dbConfig';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { addTask, resolveTask } from '../layout/loading';
+import { regUsername } from '../utils/regexp';
 
 export const rShowLoginDialog = new ReactiveVar(false);
 const rValidateUserName = new ReactiveVar('');
@@ -24,6 +25,7 @@ Template.validateDialog.onCreated(function() {
     removed: () => {
       const usermame = rValidateUserName.get();
       if (usermame && password) {
+        addTask();
         Meteor.loginWithPassword(usermame, password, resolveTask);
       }
     }
@@ -42,6 +44,11 @@ Template.validateDialog.helpers({
     const configData = dbConfig.findOne();
 
     return configData ? configData.validateUserAID : '';
+  },
+  validateUrl() {
+    const configData = dbConfig.findOne();
+
+    return configData ? configData.validateUserUrl : '';
   },
   validateCode() {
     return rValidateCode.get();
@@ -62,7 +69,7 @@ Template.validateDialog.events({
     else {
       const username = templateInstance.$('#loginUserName').val();
       password = templateInstance.$('#loginPassword').val();
-      if (! username || ! password) {
+      if (! username || ! regUsername.test(username) || ! password) {
         window.alert('錯誤的帳號或密碼格式！');
 
         return false;
