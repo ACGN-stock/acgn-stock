@@ -40,17 +40,21 @@ function validateModel(model) {
       }
     });
   }
-  if (model.pictureSmall && model.pictureSmall.length > 262144) {
-    error.pictureSmall = '檔案Size過大！';
+  if (model.pictureSmall) {
+    if (model.pictureSmall.length > 262144) {
+      error.pictureSmall = '檔案Size過大！';
+    }
+    else if (! regImageDataUrl.test(model.pictureSmall)) {
+      error.pictureSmall = '檔案格式不符！';
+    }
   }
-  else if (! regImageDataUrl.test(model.pictureSmall)) {
-    error.pictureSmall = '檔案格式不符！';
-  }
-  if (model.pictureBig && model.pictureBig.length > 1048576) {
-    error.pictureBig = '檔案Size過大！';
-  }
-  else if (! regImageDataUrl.test(model.pictureBig)) {
-    error.pictureBig = '檔案格式不符！';
+  if (model.pictureBig) {
+    if (model.pictureBig.length > 1048576) {
+      error.pictureBig = '檔案Size過大！';
+    }
+    else if (! regImageDataUrl.test(model.pictureBig)) {
+      error.pictureBig = '檔案格式不符！';
+    }
   }
   if (model.description.length < 10) {
     error.description = '介紹文字過少！';

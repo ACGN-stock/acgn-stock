@@ -64,6 +64,7 @@ Template.companyDetail.onRendered(function() {
         datasets: [
           {
             label: '股價走勢',
+            lineTension: 0,
             data: data
           }
         ]
