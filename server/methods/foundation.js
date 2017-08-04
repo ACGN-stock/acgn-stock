@@ -2,7 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
-import { lockManager } from '../../lockManager';
+import { resourceManager } from '../resourceManager';
 import { dbFoundations } from '../../db/dbFoundations';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
@@ -29,7 +29,6 @@ export function foundCompany(user, foundCompanyData) {
   if (dbFoundations.findOne({companyName}) || dbCompanies.findOne({companyName})) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
   }
-  const unlock = lockManager.lock([user._id, companyName]);
   foundCompanyData.manager = user.username;
   foundCompanyData.createdAt = new Date();
   dbLog.insert({
@@ -39,7 +38,6 @@ export function foundCompany(user, foundCompanyData) {
     createdAt: new Date()
   });
   dbFoundations.insert(foundCompanyData);
-  unlock();
 }
 
 Meteor.methods({
@@ -80,66 +78,88 @@ export function editFoundCompany(user, foundCompanyData) {
   if (existsSameNameFoundCompanyData) {
     throw new Meteor.Error(403, '已有相同名稱的公司正在創立中，無法創立同名公司！');
   }
-  const unlock = lockManager.lock([user._id, companyName]);
-  dbFoundations.update(foundCompanyData._id, {
-    $set: _.omit(foundCompanyData, '_id')
+  resourceManager.throwErrorIsResourceIsLock(['foundation' + companyName]);
+  //先鎖定資源，再更新
+  resourceManager.request('editFoundCompany', ['foundation' + companyName], (release) => {
+    dbFoundations.update(foundCompanyData._id, {
+      $set: _.omit(foundCompanyData, '_id')
+    });
+    release();
   });
-  unlock();
 }
 
 Meteor.methods({
-  investFoundCompany(foundCompanyId, amount) {
+  investFoundCompany(companyName, amount) {
     check(this.userId, String);
-    check(foundCompanyId, String);
+    check(companyName, String);
     check(amount, Match.Integer);
-    investFoundCompany(Meteor.user(), foundCompanyId, amount);
+    investFoundCompany(Meteor.user(), companyName, amount);
 
     return true;
   }
 });
 
-export function investFoundCompany(user, foundCompanyId, amount) {
+export function investFoundCompany(user, companyName, amount) {
   const minimumInvest = Math.ceil(config.beginReleaseStock / config.foundationNeedUsers);
   if (amount < minimumInvest) {
     throw new Meteor.Error(403, '最低投資金額為' + minimumInvest + '！');
   }
-  const foundCompanyData = dbFoundations.findOne(foundCompanyId);
-  if (! foundCompanyData) {
-    throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
-  }
   if (user.profile.money < amount) {
     throw new Meteor.Error(403, '金錢不足，無法投資！');
   }
-  const unlock = lockManager.lock([user._id, foundCompanyData.companyName]);
+  const foundCompanyData = dbFoundations.findOne({companyName});
+  if (! foundCompanyData) {
+    throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
+  }
   const username = user.username;
-  const invest = foundCompanyData.invest;
-  const existsInvest = _.findWhere(invest, {username});
-  if (existsInvest) {
-    existsInvest.amount += amount;
-  }
-  else {
-    invest.push({username, amount});
-  }
-  dbLog.insert({
-    logType: '參與投資',
-    username: [username],
-    companyName: foundCompanyData.companyName,
-    amount: amount,
-    createdAt: new Date()
-  });
-  Meteor.users.update({
-    _id: user._id
-  }, {
-    $inc: {
-      'profile.money': amount * -1
+  //先鎖定資源，再重新讀取一次資料進行運算
+  resourceManager.throwErrorIsResourceIsLock(['foundation' + companyName, 'user' + username]);
+  resourceManager.request('investFoundCompany', ['foundation' + companyName, 'user' + username], (release) => {
+    const user = Meteor.users.findOne({username});
+    if (user.profile.money < amount) {
+      throw new Meteor.Error(403, '金錢不足，無法投資！');
     }
+    const foundCompanyData = dbFoundations.findOne({companyName});
+    if (! foundCompanyData) {
+      throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
+    }
+    const invest = foundCompanyData.invest;
+    const existsInvest = _.findWhere(invest, {username});
+    if (existsInvest) {
+      existsInvest.amount += amount;
+    }
+    else {
+      invest.push({username, amount});
+    }
+    dbLog.insert({
+      logType: '參與投資',
+      username: [username],
+      companyName: foundCompanyData.companyName,
+      amount: amount,
+      createdAt: new Date()
+    });
+    Meteor.users.update(
+      {
+        _id: user._id
+      },
+      {
+        $inc: {
+          'profile.money': amount * -1
+        }
+      }
+    );
+    dbFoundations.update(
+      {
+        companyName: companyName
+      },
+      {
+        $set: {
+          invest: invest
+        }
+      }
+    );
+    release();
   });
-  dbFoundations.update({
-    _id: foundCompanyId
-  }, {
-    $set: {invest}
-  });
-  unlock();
 }
 
 Meteor.publish('foundationPlan', function(keyword, offset) {

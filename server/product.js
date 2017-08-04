@@ -1,7 +1,6 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { lockManager } from '../lockManager';
 import { dbProducts } from '../db/dbProducts';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbLog } from '../db/dbLog';
@@ -9,7 +8,6 @@ import { dbDirectors } from '../db/dbDirectors';
 import { config } from '../config';
 
 export function earnProfit() {
-  const unlock = lockManager.lock(['product'], true);
   //總收益由config與當前驗證通過的使用者數量有關
   const allProfit = config.seasonProfitPerUser * Meteor.users.find({}, {disableOplog: true}).count();
   //取出所有參加本季度投票競賽的產品
@@ -54,7 +52,6 @@ export function earnProfit() {
       const companyName = companyProfit.companyName;    
       const companyData = dbCompanies.findOne({companyName});
       if (companyData) {
-        const unlock = lockManager.lock([companyName], true);
         const totalProfit = companyProfit.profit;
         dbLog.insert({
           logType: '公司營利',
@@ -109,7 +106,6 @@ export function earnProfit() {
           });
           leftProfit -= directorProfit;
         });
-        unlock();
       }
     });
     //所有投票榜上的產品下榜
@@ -142,5 +138,4 @@ export function earnProfit() {
   }, {
     multi: true
   });
-  unlock();
 }

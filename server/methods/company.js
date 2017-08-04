@@ -2,7 +2,6 @@
 import { _ } from 'meteor/underscore';
 import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
-import { lockManager } from '../../lockManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
@@ -29,7 +28,6 @@ function revokeCompany(user, companyName, message) {
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
-  const unlock = lockManager.lock([user._id, companyName]);
   dbLog.insert({
     logType: '公司撤銷',
     username: [companyData.manager],
@@ -49,7 +47,6 @@ function revokeCompany(user, companyName, message) {
   dbProducts.remove({
     companyName: companyName
   });
-  unlock();
 }
 
 Meteor.methods({
@@ -68,7 +65,6 @@ function revokeManagerQualification(admin, username, message) {
   if (! user) {
     throw new Meteor.Error(404, '找不到使用者「' + username + '」！');
   }
-  const unlock = lockManager.lock([admin._id]);
   dbLog.insert({
     logType: '取消資格',
     username: [admin.username, username],
@@ -87,8 +83,6 @@ function revokeManagerQualification(admin, username, message) {
   }, {
     disableOplog: true
   }).forEach((companyData) => {
-    const companyName = companyData.companyName;
-    const unlock = lockManager.lock([companyName]);
     if (companyData.manager === username) {
       companyData.manager = '';
     }
@@ -107,9 +101,7 @@ function revokeManagerQualification(admin, username, message) {
         voteList: voteList
       }
     });
-    unlock();
   });
-  unlock();
 }
 
 Meteor.methods({
@@ -136,7 +128,6 @@ function editCompany(user, companyName, newCompanyData) {
   if (user.username !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
-  const unlock = lockManager.lock([user._id, companyName]);
   dbLog.insert({
     logType: '經理管理',
     username: [companyData.manager],
@@ -148,7 +139,6 @@ function editCompany(user, companyName, newCompanyData) {
   }, {
     $set: newCompanyData
   });
-  unlock();
 }
 
 Meteor.methods({
@@ -169,7 +159,6 @@ export function resignManager(user, companyName) {
   if (user.username !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
-  const unlock = lockManager.lock([user._id, companyName]);
   dbLog.insert({
     logType: '辭職紀錄',
     username: [user.username],
@@ -191,7 +180,6 @@ export function resignManager(user, companyName) {
       voteList: voteList
     }
   });
-  unlock();
 }
 
 Meteor.methods({
@@ -219,7 +207,6 @@ export function contendManager(user, companyName) {
   if (user.profile.revokeQualification) {
     throw new Meteor.Error(401, '使用者的競選經理人資格已經被取消了！');
   }
-  const unlock = lockManager.lock([user._id, companyName]);
   candidateList.push(user.username);
   voteList.push([]);
   dbLog.insert({
@@ -236,7 +223,6 @@ export function contendManager(user, companyName) {
       voteList: voteList
     }
   });
-  unlock();
 }
 
 Meteor.methods({
@@ -276,7 +262,6 @@ export function supportCandidate(director, companyName, username) {
   });
   newVoteList[candidateIndex].push(directorName);
 
-  const unlock = lockManager.lock([director._id, companyName]);
   dbLog.insert({
     logType: '支持紀錄',
     username: [director.username, username],
@@ -290,7 +275,6 @@ export function supportCandidate(director, companyName, username) {
       voteList: newVoteList
     }
   });
-  unlock();
 }
 
 Meteor.methods({

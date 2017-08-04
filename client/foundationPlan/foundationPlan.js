@@ -96,7 +96,7 @@ Template.foundationPlanInfo.events({
     const maximumInvest = Meteor.user().profile.money;
     const amount = parseInt(window.prompt(`要投資多少金額？(${minimumInvest}~${maximumInvest})`), 10);
     if (amount >= minimumInvest && amount <= maximumInvest) {
-      Meteor.call('investFoundCompany', templaceInstance.data._id, amount);
+      Meteor.call('investFoundCompany', templaceInstance.data.companyName, amount);
     }
     else {
       window.alert('不正確的金額數字！');

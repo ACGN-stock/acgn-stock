@@ -40,7 +40,9 @@
         <div class="title">經理人：</div>
         <div class="col">{{this.manager}}</div>
         <div class="title">股票價格：</div>
-        <div class="col text-right">$ {{this.lastPrice}}</div>
+        <div class="{{priceDisplayClass this.lastPrice this.listPrice}}">
+          $ {{this.lastPrice}}({{this.listPrice}})
+        </div>
         <div class="title">總釋出股票：</div>
         <div class="col text-right">{{this.totalRelease}}</div>
         <div class="title">總市值：</div>

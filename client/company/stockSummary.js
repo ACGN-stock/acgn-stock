@@ -90,8 +90,16 @@ Template.companySummary.helpers({
   getManager(manager) {
     return manager === '!none' ? '無' : manager;
   },
-  getManageHref(companyName) {
-    return FlowRouter.path('manageCompany', {companyName});
+  priceDisplayClass(lastPrice, listPrice) {
+    if (lastPrice > listPrice) {
+      return 'col content text-right text-danger';
+    }
+    else if (listPrice > lastPrice) {
+      return 'col content text-right text-success';
+    }
+    else {
+      return 'col content text-right';
+    }
   },
   isChairman(companyName) {
     const chairmanData = dbDirectors.findOne({companyName}, {
@@ -120,6 +128,9 @@ Template.companySummary.helpers({
     const username = user && user.username;
 
     return username === manager;
+  },
+  getManageHref(companyName) {
+    return FlowRouter.path('manageCompany', {companyName});
   },
   getStockAmount(companyName) {
     const user = Meteor.user();

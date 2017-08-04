@@ -1,7 +1,6 @@
 'use strict';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
-import { lockManager } from '../../lockManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
@@ -22,7 +21,6 @@ function accuseCompany(user, companyName, message) {
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
-  const unlock = lockManager.lock([user._id]);
   dbLog.insert({
     logType: '舉報公司',
     username: [user.username],
@@ -30,7 +28,6 @@ function accuseCompany(user, companyName, message) {
     message: message,
     createdAt: new Date()
   });
-  unlock();
 }
 
 Meteor.methods({
@@ -51,7 +48,6 @@ function accuseProduct(user, productId, message) {
   if (! productData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + productId + '」的產品！');
   }
-  const unlock = lockManager.lock([user._id]);
   dbLog.insert({
     logType: '舉報產品',
     username: [user.username],
@@ -60,5 +56,4 @@ function accuseProduct(user, productId, message) {
     message: message,
     createdAt: new Date()
   });
-  unlock();
 }

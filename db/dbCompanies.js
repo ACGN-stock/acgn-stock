@@ -64,7 +64,12 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 0
   },
-  //預估總市值
+  //參考每股單價
+  listPrice: {
+    type: SimpleSchema.Integer,
+    min: 0
+  },
+  //參考總市值
   totalValue: {
     type: SimpleSchema.Integer,
     min: 0

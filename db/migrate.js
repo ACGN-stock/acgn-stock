@@ -84,6 +84,20 @@ if (Meteor.isServer) {
       });
     }
   });
+  Migrations.add({
+    version: 2,
+    name: 'log schma change for instant message.',
+    up() {
+      dbLog.update({}, {
+        $set: {
+          resolve: true
+        }
+      });
+      dbLog.rawCollection().createIndex({
+        resolve: 1
+      });
+    }
+  });
 
   Meteor.startup(() => {
     Migrations.migrateTo('latest');

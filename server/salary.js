@@ -1,6 +1,5 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
-import { lockManager } from '../lockManager';
 import { config } from '../config';
 import { dbLog } from '../db/dbLog';
 
@@ -8,10 +7,10 @@ const {salaryPerPay, paySalaryCounter} = config;
 let counter = paySalaryCounter;
 export function paySalary() {
   counter -= 1;
-  if (counter === 0) {
+  if (counter <= 0) {
+    counter = paySalaryCounter;
     const now = new Date();
     Meteor.users.find({}, {disableOplog: true}).forEach((user) => {
-      const unlock = lockManager.lock([user._id], true);
       dbLog.insert({
         logType: '發薪紀錄',
         username: [user.username],
@@ -28,8 +27,6 @@ export function paySalary() {
           'profile.money': salaryPerPay
         }
       });
-      unlock();
     });
-    counter = paySalaryCounter;
   }
 }

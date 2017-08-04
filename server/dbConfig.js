@@ -1,5 +1,4 @@
 'use strict';
-import { Meteor } from 'meteor/meteor';
 import { config } from '../config';
 import { dbConfig } from '../db/dbConfig';
 
@@ -12,7 +11,3 @@ if (! dbConfig.findOne()) {
     currentSeasonEndDate: new Date(Date.now() + config.seasonTime)
   });
 }
-
-Meteor.publish('dbConfig', function () {
-  return dbConfig.find();
-});

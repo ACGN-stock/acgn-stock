@@ -3,23 +3,52 @@ import { Meteor } from 'meteor/meteor';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
 // import { earnProfit } from './product';
-import { tradeStocks, releaseStocks } from './order';
-// import { electManager } from './company';
+// import { electManager, recordListPrice, releaseStocks } from './company';
+import { recordListPrice, releaseStocks } from './company';
 // import { dbConfig } from '../db/dbConfig';
 import { config } from '../config';
+import { threadId, shouldReplaceThread } from './thread';
+import { dbResourceLock } from '../db/dbResourceLock';
 
-Meteor.setInterval(doIntervalWork, config.intervalTimer);
+Meteor.startup(function() {
+  Meteor.setInterval(intervalCheck, config.intervalTimer);
+});
 
-//週期工作檢查
+function intervalCheck() {
+  const inrervalCheckLock = dbResourceLock.findOne('intervalCheck');
+  if (! inrervalCheckLock) {
+    dbResourceLock.insert({
+      _id: 'intervalCheck',
+      task: 'intervalCheck',
+      threadId: threadId,
+      time: new Date()
+    });
+    doIntervalWork();
+  }
+  else if (inrervalCheckLock.threadId === threadId) {
+    doIntervalWork();
+  }
+  else if (shouldReplaceThread(inrervalCheckLock.threadId)) {
+    dbResourceLock.update('intervalCheck', {
+      $set: {
+        threadId: threadId,
+        time: new Date()
+      }
+    });
+    doIntervalWork();
+  }
+}
+
+//週期檢查工作內容
 function doIntervalWork() {
   //檢查所有創立中且投資時間截止的公司是否成功創立
   checkFoundCompany();
   //當發薪時間到時，發給所有驗證通過的使用者薪水
   paySalary();
-  //處理使用者的股票買賣訂單
-  tradeStocks();
   //隨機時間讓符合條件的公司釋出股票
   releaseStocks();
+  //隨機時間紀錄公司的參考價格
+  recordListPrice();
   //商業季度結束檢查
   // doSeasonWorks();
 }

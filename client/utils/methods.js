@@ -52,8 +52,8 @@ export function createBuyOrder(user, companyData) {
     return false;
   }
   const userMoney = user.profile.money;
-  const minimumUnitPrice = Math.max(Math.ceil(companyData.lastPrice / 2), 1);
-  const maximumUnitPrice = Math.min(userMoney, companyData.lastPrice * 2);
+  const minimumUnitPrice = Math.max(Math.ceil(companyData.listPrice / 2), 1);
+  const maximumUnitPrice = Math.min(userMoney, companyData.listPrice * 2);
   if (minimumUnitPrice > maximumUnitPrice) {
     window.alert('您的金錢不足以購買此公司的股票！');
 
@@ -92,8 +92,8 @@ export function createSellOrder(user, companyData) {
 
     return false;
   }
-  const minimumUnitPrice = Math.max(Math.ceil(companyData.lastPrice / 2), 1);
-  const maximumUnitPrice = companyData.lastPrice * 2;
+  const minimumUnitPrice = Math.max(Math.ceil(companyData.listPrice / 2), 1);
+  const maximumUnitPrice = companyData.listPrice * 2;
   const unitPrice = parseInt(window.prompt(`請輸入您期望賣出的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`), 10);
   if (! unitPrice || unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
     window.alert('不正確的價格設定！');

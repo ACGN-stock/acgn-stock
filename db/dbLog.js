@@ -84,6 +84,11 @@ const schema = new SimpleSchema({
     max: 255,
     optional: true
   },
+  //是否已被即時訊息處理
+  resolve: {
+    type: Boolean,
+    defaultValue: false
+  },
   //紀錄日期
   createdAt: {
     type: Date

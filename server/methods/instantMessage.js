@@ -5,23 +5,20 @@ import { Meteor } from 'meteor/meteor';
 import { dbInstantMessage } from '../../db/dbInstantMessage';
 
 Meteor.methods({
-  chat(message) {
+  instantMessageChat(message) {
     check(this.userId, String);
     check(message, String);
-    chat(Meteor.user(), message);
-
-    return true;
+    const userId = this.userId;
+    const username = Meteor.users.findOne(userId).username;
+    dbInstantMessage.insert({
+      type: '聊天發言',
+      createdAt: new Date(),
+      onlyForUsers: [],
+      source: username,
+      message: message
+    });
   }
 });
-
-function chat(user, message) {
-  dbInstantMessage.insert({
-    type: '即時聊天',
-    createdAt: new Date(),
-    source: user.username,
-    message: message
-  });
-}
 
 Meteor.publish('instantMessage', function() {
   const user = this.userId ? Meteor.users.findOne(this.userId) : null;

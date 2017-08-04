@@ -132,6 +132,19 @@ Template.companyDetail.onRendered(function() {
     });
   });
 });
+Template.companyDetail.helpers({
+  priceDisplayClass(lastPrice, listPrice) {
+    if (lastPrice > listPrice) {
+      return 'col text-right text-danger';
+    }
+    else if (listPrice > lastPrice) {
+      return 'col text-right text-success';
+    }
+    else {
+      return 'col text-right';
+    }
+  }
+});
 
 Template.companyCurrentProductList.onCreated(function() {
   this.subscribe('companyCurrentProduct', this.data.companyName);

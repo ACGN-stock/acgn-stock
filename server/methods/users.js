@@ -3,7 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
-import { lockManager } from '../../lockManager';
+import { resourceManager } from '../resourceManager';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbLog } from '../../db/dbLog';
@@ -43,9 +43,13 @@ function generateValidateCode() {
 Meteor.methods({
   validateAccount(username) {
     check(username, String);
-    const unlock = lockManager.lock(['validate']);
-    const result = validateUsers(username);
-    unlock();
+    resourceManager.throwErrorIsResourceIsLock(['validateAccount']);
+    //先鎖定資源，再重新讀取一次資料進行運算
+    let result;
+    resourceManager.request('validateAccount', ['validateAccount'], (release) => {
+      result = validateUsers(username);
+      release();
+    });
     if (result) {
       return true;
     }

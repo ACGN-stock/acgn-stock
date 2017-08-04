@@ -73,7 +73,9 @@
         </div>
         <div class="row">
           <div class="title">股票單價：</div>
-          <div class="col content text-right" title="{{this.lastPrice}}">${{this.lastPrice}}</div>
+          <div class="{{priceDisplayClass this.lastPrice this.listPrice}}" title="{{this.lastPrice}}">
+            $ {{this.lastPrice}}({{this.listPrice}})
+          </div>
           <div class="title">總市值：</div>
           <div class="col content text-right" title="{{this.totalValue}}">$ {{this.totalValue}}</div>
           <div class="title text-truncate" title="{{this.totalValue}}">

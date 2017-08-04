@@ -1,7 +1,7 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { lockManager } from '../../lockManager';
+import { resourceManager } from '../resourceManager';
 import { dbProducts } from '../../db/dbProducts';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbLog } from '../../db/dbLog';
@@ -31,7 +31,6 @@ export function createProduct(user, productData) {
   if (dbProducts.findOne({companyName, url})) {
     throw new Meteor.Error(403, '相同的產品已經被推出過了！');
   }
-  const unlock = lockManager.lock([user._id, 'product']);
   productData.createdAt = new Date();
   const productId = dbProducts.insert(productData);
   dbLog.insert({
@@ -41,7 +40,6 @@ export function createProduct(user, productData) {
     productId: productId,
     createdAt: new Date()
   });
-  unlock();
 }
 
 Meteor.methods({
@@ -64,7 +62,6 @@ export function retrieveProduct(user, productId) {
   if (! dbCompanies.findOne({companyName, manager})) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
   }
-  const unlock = lockManager.lock([user._id, productId, 'product']);
   dbLog.insert({
     logType: '產品下架',
     username: [manager],
@@ -73,7 +70,6 @@ export function retrieveProduct(user, productId) {
     createdAt: new Date()
   });
   dbProducts.remove({_id: productId});
-  unlock();
 }
 
 Meteor.methods({
@@ -96,28 +92,45 @@ export function voteProduct(user, productId) {
   if (! productData) {
     throw new Meteor.Error(404, '不存在的產品！');
   }
-  const unlock = lockManager.lock([user._id, productId, 'product']);
   const username = user.username;
-  dbLog.insert({
-    logType: '推薦產品',
-    username: [username],
-    companyName: productData.companyName,
-    productId: productId,
-    createdAt: new Date()
+  resourceManager.throwErrorIsResourceIsLock(['earnProfit', 'user' + username]);
+  //先鎖定資源，再重新讀取一次資料進行運算
+  resourceManager.request('createBuyOrder', ['earnProfit', 'user' + username], (release) => {
+    const user = Meteor.users.findOne({username});
+    dbLog.insert({
+      logType: '推薦產品',
+      username: [username],
+      companyName: productData.companyName,
+      productId: productId,
+      createdAt: new Date()
+    });
+    Meteor.users.update(
+      {
+        _id: user._id
+      },
+      {
+        $inc: {
+          'profile.vote': -1
+        }
+      }
+    );
+    dbProducts.update(
+      {
+        _id: productId
+      },
+      {
+        $inc: {
+          votes: 1
+        }
+      }
+    );
+    release();
   });
-  Meteor.users.update({
-    _id: user._id
-  }, {
-    $inc: {
-      'profile.vote': -1
-    }
-  });
-  dbProducts.update({
-    _id: productId
-  }, {
-    $inc: {
-      votes: 1
-    }
-  });
-  unlock();
 }
+
+Meteor.publish('companyFutureProduct', function(companyName) {
+  check(companyName, String);
+  const overdue = 0;
+
+  return dbProducts.find({companyName, overdue});
+});

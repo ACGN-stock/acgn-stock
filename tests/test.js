@@ -14,7 +14,7 @@ import { createBuyOrder, createSellOrder, retrieveOrder } from '../server/method
 import { config } from '../config';
 
 if (Meteor.users.find().count() < 1) {
-  for (let i = 1; i <= 10; i += 1) {
+  for (let i = 1; i <= 30; i += 1) {
     Accounts.createUser({
       username: 'user' + i,
       password: 'user' + i,
@@ -30,7 +30,7 @@ Meteor.users.find().forEach((user) => {
 });
 
 function doSomethingAfterRandomTime(userId) {
-  const randomTime = randomNumber(60000, 30000);
+  const randomTime = randomNumber(30000, 5000);
   Meteor.setTimeout(() => {
     // try {
     //   doSomething(userId);
@@ -62,7 +62,7 @@ function doSomething(userId) {
     if (investMoney > 100) {
       console.log(username + ' want to invest a found company!');
       const foundationData = _.sample(dbFoundations.find().fetch());
-      investFoundCompany(user, foundationData._id, investMoney);
+      investFoundCompany(user, foundationData.companyName, investMoney);
     }
   }
   const orderList = dbOrders.find({username}).fetch();
@@ -88,7 +88,7 @@ function doSomething(userId) {
   if (canBuyStockCompanyList.length > 0 && probability(50)) {
     const companyData = _.sample(canBuyStockCompanyList);
     const useMoney = randomNumber(user.profile.money);
-    const unitPrice = randomNumber(companyData.lastPrice * 2, Math.ceil(companyData.lastPrice / 2));
+    const unitPrice = randomNumber(companyData.listPrice * 2, Math.ceil(companyData.listPrice / 2));
     const amount = Math.floor(useMoney / unitPrice);
     if (amount > 0) {
       console.log(username + ' want to buy stocks of 「' + companyData.companyName + '」!');
@@ -122,7 +122,7 @@ function doSomething(userId) {
 
     createSellOrder(user, {
       companyName: companyName,
-      unitPrice: randomNumber(companyData.lastPrice * 2, Math.ceil(companyData.lastPrice / 2)),
+      unitPrice: randomNumber(companyData.listPrice * 2, Math.ceil(companyData.listPrice / 2)),
       amount: probability(10) ? directorData.stocks : randomNumber(directorData.stocks)
     });
   }
