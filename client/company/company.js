@@ -2,6 +2,7 @@
 import { Meteor } from 'meteor/meteor';
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
+import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbProducts } from '../../db/dbProducts';
@@ -194,10 +195,11 @@ Template.companyOldProductList.events({
   }
 });
 
+const rDirectorOffset = new ReactiveVar(0);
 Template.companyDirectorList.onCreated(function() {
-  this.offset = 0;
+  rDirectorOffset.set(0);
   this.subscribe('queryOwnStocks', this.data.companyName);
-  this.subscribe('companyDirector', this.data.companyName, this.offset);
+  this.subscribe('companyDirector', this.data.companyName, rDirectorOffset.get());
 });
 Template.companyDirectorList.helpers({
   directorList() {
@@ -206,27 +208,34 @@ Template.companyDirectorList.helpers({
     return dbDirectors.find({companyName}, {
       sort: {
         stocks: -1
-      }
+      },
+      limit: rDirectorOffset.get() + 10
     });
   },
   getPercentage(stocks) {
     const templateInstance = Template.instance();
 
     return Math.round(stocks / templateInstance.data.totalRelease * 10000) / 100;
+  },
+  heveMore() {
+    const companyName = this.companyName;
+
+    return (rDirectorOffset.get() + 10) <= dbDirectors.find({companyName}).count();
   }
 });
 Template.companyDirectorList.events({
   'click [data-action="more"]'(event, templateInstance) {
     event.preventDefault();
-    templateInstance.offset += 10;
+    rDirectorOffset.set(rDirectorOffset.get() + 10);
     addTask();
-    templateInstance.subscribe('companyDirector', templateInstance.data.companyName, templateInstance.offset, resolveTask);
+    templateInstance.subscribe('companyDirector', templateInstance.data.companyName, rDirectorOffset.get(), resolveTask);
   }
 });
 
+const rOrderOffset = new ReactiveVar(0);
 Template.companyOrderList.onCreated(function() {
-  this.offset = 0;
-  this.subscribe('companyOrder', this.data.companyName, this.offset);
+  rOrderOffset.set(0);
+  this.subscribe('companyOrder', this.data.companyName, rOrderOffset.get());
   this.subscribe('queryMyOrder');
 });
 Template.companyOrderList.helpers({
@@ -243,31 +252,38 @@ Template.companyOrderList.helpers({
     const user = Meteor.user();
     const username = user && user.username;
 
-    return dbOrders.find({
-      companyName: companyName,
-      username: username
-    }, {
-      sort: {
-        createdAt: -1
+    return dbOrders.find(
+      {
+        companyName: companyName,
+        username: username
+      }, {
+        sort: {
+          createdAt: -1
+        },
+        limit: rDirectorOffset.get() + 10
       }
-    });
+    );
   },
   orderList() {
     const companyName = this.companyName;
     const user = Meteor.user();
     const username = user && user.username;
 
-    return dbOrders.find({
-      companyName: companyName,
-      username: {
-        $ne: username
+    return dbOrders.find(
+      {
+        companyName: companyName,
+        username: {
+          $ne: username
+        }
+      },
+      {
+        sort: {
+          orderType: 1,
+          unitPrice: 1
+        },
+        limit: rOrderOffset.get() + 10
       }
-    }, {
-      sort: {
-        orderType: 1,
-        unitPrice: 1
-      }
-    });
+    );
   },
   getOrderDescription(orderData) {
     const {username, orderType, unitPrice, amount, done} = orderData;
@@ -275,10 +291,20 @@ Template.companyOrderList.helpers({
 
     return `${username}以$${unitPrice}單價${orderType}數量${number}。`;
   },
-  isUser(orderUserName) {
+  heveMore() {
+    const companyName = this.companyName;
     const user = Meteor.user();
+    const username = user && user.username;
+    const orderCount = dbOrders
+      .find({
+        companyName: companyName,
+        username: {
+          $ne: username
+        }
+      })
+      .count();
 
-    return user && user.username === orderUserName;
+    return (rOrderOffset.get() + 10) <= orderCount;
   }
 });
 Template.companyOrderList.events({
@@ -298,16 +324,17 @@ Template.companyOrderList.events({
   },
   'click [data-action="more"]'(event, templateInstance) {
     event.preventDefault();
-    templateInstance.offset += 50;
+    rOrderOffset.set(rOrderOffset.get() + 10);
     addTask();
-    templateInstance.subscribe('companyDirector', templateInstance.data.companyName, templateInstance.offset, resolveTask);
+    templateInstance.subscribe('companyOrder', templateInstance.data.companyName, rOrderOffset.get(), resolveTask);
   }
 });
 
+const rLogOffset = new ReactiveVar(0);
 Template.companyLogList.onCreated(function() {
   const companyName = FlowRouter.getParam('companyName');
-  this.offset = 0;
-  this.subscribe('companyLog', companyName, this.offset);
+  rLogOffset.set(0);
+  this.subscribe('companyLog', companyName, rLogOffset.get());
 });
 Template.companyLogList.helpers({
   logList() {
@@ -316,7 +343,8 @@ Template.companyLogList.helpers({
     return dbLog.find({companyName}, {
       sort: {
         createdAt: -1
-      }
+      },
+      limit: rLogOffset.get() + 50
     });
   },
   getLogDescriptionHtml(logData) {
@@ -400,14 +428,20 @@ Template.companyLogList.helpers({
         return logData.username[0] + '以「' + logData.message + '」理由舉報了公司的' + (productData ? '產品「' + productData.productName + '」' : '一項產品') + '。';
       }
     }
+  },
+  haveMore() {
+    const companyName = FlowRouter.getParam('companyName');
+    const logCount = dbLog.find({companyName}).count();
+
+    return (rLogOffset.get() + 50) <= logCount;
   }
 });
 Template.companyLogList.events({
   'click [data-action="more"]'(event, templateInstance) {
     event.preventDefault();
-    templateInstance.offset += 50;
+    rLogOffset.set(rLogOffset.get() + 50);
     const companyName = FlowRouter.getParam('companyName');
     addTask();
-    templateInstance.subscribe('companyLog', companyName, templateInstance.offset, resolveTask);
+    templateInstance.subscribe('companyLog', companyName, rLogOffset.get(), resolveTask);
   }
 });

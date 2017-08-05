@@ -131,7 +131,9 @@
         </div>
       </div>
     {{/each}}
-    <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+    {{#if heveMore}}
+      <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+    {{/if}}
   </div>
 </template>
 
@@ -161,7 +163,9 @@
         {{getOrderDescription order}}
       </div>
     {{/each}}
-    <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+    {{#if heveMore}}
+      <a class="h5 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+    {{/if}}
   </div>
 </template>
 
@@ -177,6 +181,8 @@
     {{else}}
       查無資料！
     {{/each}}
-    <a class="h3 d-block text-center" href="#" data-action="more">查看更早之前的紀錄...</a>
+    {{#if haveMore}}
+      <a class="h3 d-block text-center" href="#" data-action="more">查看更早之前的紀錄...</a>
+    {{/if}}
   </div>
 </template>

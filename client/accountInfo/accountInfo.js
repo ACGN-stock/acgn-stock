@@ -39,7 +39,6 @@ Template.accountInfoSearchForm.events({
     if (! username || (user && username === user.username)) {
       const path = FlowRouter.path('accountInfo');
       FlowRouter.go(path);
-      rSearchUsername.set('');
     }
     else {
       const path = FlowRouter.path('accountInfo', {username});
@@ -70,31 +69,47 @@ Template.accountInfoManageCompanyLink.helpers({
   }
 });
 
+export const logOffset = new ReactiveVar(0);
 Template.accountInfoLogList.onCreated(function() {
+  logOffset.set(0);
   this.autorun(() => {
-    this.offset = 0;
-    this.subscribe('accountInfoLog', rSearchUsername.get(), this.offset);
+    const user = Meteor.user();
+    const username = user && user.username;
+    this.subscribe('accountInfoLog', (rSearchUsername.get() || username), logOffset.get());
   });
 });
 Template.accountInfoLogList.helpers({
   logList() {
     const user = Meteor.user();
+    const username = user && user.username;
 
-    return dbLog.find({
-      username: rSearchUsername.get() || (user && user.username)
-    }, {
-      sort: {
-        createdAt: -1
+    return dbLog.find(
+      {
+        username: rSearchUsername.get() || username
+      },
+      {
+        sort: {
+          createdAt: -1
+        }
       }
-    });
+    );
+  },
+  haveMore() {
+    const user = Meteor.user();
+    const username = user && user.username;
+    const logCount = dbLog
+      .find({
+        username: rSearchUsername.get() || username
+      })
+      .count();
+
+    return (logOffset.get() + 50) <= logCount;
   }
 });
 Template.accountInfoLogList.events({
-  'click [data-action="more"]'(event, templateInstance) {
+  'click [data-action="more"]'(event) {
     event.preventDefault();
-    templateInstance.offset += 50;
-    addTask();
-    templateInstance.subscribe('accountInfoLog', rSearchUsername.get(), templateInstance.offset, resolveTask);
+    logOffset.set(logOffset.get() + 50);
   }
 });
 

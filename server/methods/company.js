@@ -436,7 +436,7 @@ Meteor.publish('companyOrder', function(companyName, offset) {
       unitPrice: 1
     },
     skip: offset,
-    limit: 50 + offset
+    limit: 10 + offset
   });
 });
 

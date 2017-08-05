@@ -158,6 +158,7 @@ Meteor.publish('accountInfo', function(username) {
 Meteor.publish('accountInfoLog', function(username, offset) {
   check(username, String);
   check(offset, Match.Integer);
+  console.log(username, offset);
   if (! username && this.userId) {
     username = Meteor.users.findOne(this.userId).username;
   }
@@ -166,9 +167,9 @@ Meteor.publish('accountInfoLog', function(username, offset) {
     sort: {
       createdAt: -1
     },
-    skip: offset,
     limit: 50 + offset
-  }).observeChanges({
+  })
+  .observeChanges({
     added: (id, fields) => {
       this.added('log', id, fields);
     }

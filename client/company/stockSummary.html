@@ -8,7 +8,9 @@
       {{#each companyList}}
         {{> companySummary}}
       {{/each}}
-      <a class="h3 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+      {{#if haveMore}}
+        <a class="h3 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
+      {{/if}}
     </div>
   </div>
 </template>

@@ -7,7 +7,9 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { dbCompanies } from '../../db/dbCompanies';
+import { productTypeList, dbProducts } from '../../db/dbProducts';
 import { regImageDataUrl } from '../utils/regexp';
+import SimpleSchema from 'simpl-schema';
 
 Template.manageCompany.onCreated(function() {
   const companyName = FlowRouter.getParam('companyName');
@@ -23,12 +25,12 @@ Template.manageCompany.helpers({
 
 inheritUtilForm(Template.companyEditForm);
 Template.companyEditForm.onCreated(function() {
-  this.validateModel = validateModel;
-  this.handleInputChange = handleInputChange;
-  this.saveModel = saveModel;
+  this.validateModel = validateCompanyModel;
+  this.handleInputChange = handleCompanyInputChange;
+  this.saveModel = saveCompanyModel;
 });
 
-function validateModel(model) {
+function validateCompanyModel(model) {
   const error = {};
   if (model.tags.length > 50) {
     error.tags = '標籤數量過多！';
@@ -68,7 +70,7 @@ function validateModel(model) {
   }
 }
 
-function handleInputChange(event) {
+function handleCompanyInputChange(event) {
   switch (event.currentTarget.name) {
     case 'tags': {
       break;
@@ -100,7 +102,7 @@ function handleInputChange(event) {
   }
 }
 
-function saveModel(model) {
+function saveCompanyModel(model) {
   const companyName = model.companyName;
   const submitData = _.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description');
   Meteor.call('editCompany', companyName, submitData, () => {
@@ -152,4 +154,86 @@ function addNewTag(event, templatInstance) {
   model.tags = _.unique(model.tags);
   templatInstance.model.set(model);
   $input.val('');
+}
+
+const rInAddProductMode = new ReactiveVar(false);
+Template.companyProductManage.onCreated(function() {
+  rInAddProductMode.set(false);
+  this.subscribe('companyFutureProduct', this.data.companyName);
+});
+Template.companyProductManage.helpers({
+  inAddMode() {
+    return rInAddProductMode.get();
+  },
+  defaultProductData() {
+    return {
+      productName: '',
+      companyName: this.companyName,
+      type: productTypeList[0],
+      url: ''
+    };
+  },
+  productList() {
+    return dbProducts.find(
+      {
+        companyName: this.companyName,
+        overdue: 0
+      },
+      {
+        sort: {
+          createdAt: 1
+        }
+      }
+    );
+  }
+});
+Template.companyProductManage.events({
+  'click [data-action="addProduct"]'(event) {
+    event.preventDefault();
+    rInAddProductMode.set(true);
+  },
+  'click [data-retrieve]'(event) {
+    const productId = $(event.currentTarget).attr('data-retrieve');
+    const productData = dbProducts.findOne(productId);
+    if (productData && window.confirm('確定要刪除「' + productData.productName + '」這項待上架產品嗎？')) {
+      Meteor.call('retrieveProduct', productId);
+    }
+  }
+});
+
+inheritUtilForm(Template.companyProductEditForm);
+Template.companyProductEditForm.onCreated(function() {
+  this.validateModel = validateProductModel;
+  this.saveModel = saveProductModel;
+});
+Template.companyProductEditForm.helpers({
+  productTypeList() {
+    return productTypeList;
+  }
+});
+Template.companyProductEditForm.events({
+  reset() {
+    rInAddProductMode.set(false);
+  }
+});
+
+function validateProductModel(model) {
+  const error = {};
+  if (model.productName.length < 4) {
+    error.productName = '產品名稱字數過短！';
+  }
+  else if (model.productName.length > 255) {
+    error.productName = '產品名稱字數過長！';
+  }
+  if (! SimpleSchema.RegEx.Url.test(model.url)) {
+    error.url = '連結格式錯誤！';
+  }
+
+  if (_.size(error) > 0) {
+    return error;
+  }
+}
+
+function saveProductModel(model) {
+  Meteor.call('createProduct', model);
 }

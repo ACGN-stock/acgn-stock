@@ -9,12 +9,13 @@ import { formatDateText } from '../utils/helpers';
 import { config } from '../../config';
 import { addTask, resolveTask } from '../layout/loading';
 
-export const rKeyword = new ReactiveVar('');
+const rKeyword = new ReactiveVar('');
+const rFoundationOffset = new ReactiveVar(0);
 Template.foundationPlan.onCreated(function() {
-  this.offset = 0;
+  rFoundationOffset.set(0);
   this.autorun(() => {
     addTask();
-    this.subscribe('foundationPlan', rKeyword.get(), this.offset, resolveTask);
+    this.subscribe('foundationPlan', rKeyword.get(), rFoundationOffset.get(), resolveTask);
   });
 });
 Template.foundationPlan.helpers({
@@ -25,16 +26,20 @@ Template.foundationPlan.helpers({
     return dbFoundations.find({}, {
       sort: {
         createdAt: 1
-      }
+      },
+      limit: rFoundationOffset.get() + 10
     });
+  },
+  haveMore() {
+    return (rFoundationOffset.get() + 10) <= dbFoundations.find({}).count();
   }
 });
 Template.foundationPlan.events({
   'click [data-action="more"]'(event, templateInstance) {
     event.preventDefault();
-    templateInstance.offset += 10;
+    rFoundationOffset.set(rFoundationOffset.get() + 10);
     addTask();
-    templateInstance.subscribe('foundationPlan', rKeyword.get(), templateInstance.offset, resolveTask);
+    templateInstance.subscribe('foundationPlan', rKeyword.get(), rFoundationOffset.get(), resolveTask);
   }
 });
 

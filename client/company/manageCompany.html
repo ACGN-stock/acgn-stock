@@ -7,6 +7,7 @@
         <hr />
         {{> companyEditForm}}
       </div>
+      {{> companyProductManage}}
     </div>
   {{else}}
     查無資料，該公司可能已被撤銷！
@@ -108,6 +109,95 @@
     <div class="text-right">
       <button class="btn btn-primary">送出</button>
       <a class="btn btn-secondary" href="{{getCompanyHref companyName}}">取消</a>
+    </div>
+  </form>
+</template>
+
+<template name="companyProductManage">
+  <div class="card-block">
+    <h3 class="card-title mb-1">產品管理</h3>
+    <h5 class="card-subtitle text-muted">
+      在這裡準備下個商業季度上架的商品
+      <button class="btn btn-primary btn-sm float-right" type="button" data-action="addProduct">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+        新增
+      </button>
+    </h5>
+    <hr />
+    {{#if inAddMode}}
+      {{#with defaultProductData}}
+        {{> companyProductEditForm}}
+      {{/with}}
+      <hr />
+    {{/if}}
+    <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+      <thead>
+        <tr>
+          <th class="text-center">產品名稱</th>
+          <th class="text-center" style="width: 60px;">類別</th>
+          <th class="text-center" style="width: 60px;">刪除</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each product in productList}}
+          <tr>
+            <td class="text-left text-truncate px-2">
+              <a href="{{product.url}}" title="{{product.productName}}" target="_blank">
+                {{product.productName}}
+              </a>
+            </td>
+            <td class="text-center">
+              {{product.type}}
+            </td>
+            <td class="text-center px-2">
+              <button class="btn btn-danger btn-sm" type="button" data-retrieve="{{product._id}}">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+                刪除
+              </button>
+            </td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<template name="companyProductEditForm">
+  <form>
+    <div class="form-group">
+      <label for="productName">產品名稱：</label>
+      <input
+        class="form-control"
+        type="text"
+        name="productName"
+        value="{{valueOf 'productName'}}"
+        placeholder="請輸入產品名稱"
+      />
+      {{{errorHtmlOf 'productName'}}}
+    </div>
+    <div class="form-group">
+      <label for="type">產品類別：</label>
+      <select class="form-control" name="type">
+        {{#each type in productTypeList}}
+          <option value="{{type}}">{{type}}</option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'type'}}}
+    </div>
+    <div class="form-group">
+      <label for="url">產品連結：</label>
+      <input
+        class="form-control"
+        type="url"
+        name="url"
+        value="{{valueOf 'url'}}"
+        placeholder="http://"
+      />
+      {{{errorHtmlOf 'url'}}}
+    </div>
+    <div class="text-right">
+      <button class="btn btn-primary" type="submit">送出</button>
+      <button class="btn btn-secondary" type="reset">取消</button>
     </div>
   </form>
 </template>

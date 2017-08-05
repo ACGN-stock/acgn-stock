@@ -10,6 +10,6 @@ console.log('a thread is start as unique id:' + threadId + '.');
 // });
 
 export const shouldReplaceThread = _.memoize(function(anotherThreadId) {
-  return threadId < anotherThreadId;
+  return threadId > anotherThreadId;
 });
 

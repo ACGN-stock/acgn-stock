@@ -10,13 +10,14 @@ import { dbOrders } from '../../db/dbOrders';
 import { addTask, resolveTask } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder } from '../utils/methods';
 
-export const rKeyword = new ReactiveVar('');
-export const rIsOnlyShowMine = new ReactiveVar(false);
-export const rSortBy = new ReactiveVar('lastPrice');
+const rKeyword = new ReactiveVar('');
+const rIsOnlyShowMine = new ReactiveVar(false);
+const rSortBy = new ReactiveVar('lastPrice');
+const rStockOffset = new ReactiveVar(0);
 Template.stockSummary.onCreated(function() {
+  rStockOffset.set(0);
   this.autorun(() => {
-    this.stockOffset = 0;
-    this.subscribe('stockSummary', rKeyword.get(), rIsOnlyShowMine.get(), rSortBy.get(), this.stockOffset);
+    this.subscribe('stockSummary', rKeyword.get(), rIsOnlyShowMine.get(), rSortBy.get(), rStockOffset.get());
   });
   this.autorun(() => {
     dbCompanies.find().forEach((companyData) => {
@@ -31,16 +32,20 @@ Template.stockSummary.helpers({
     return dbCompanies.find({}, {
       sort: {
         [rSortBy.get()]: -1
-      }
+      },
+      limit: rStockOffset.get() + 10
     });
+  },
+  haveMore() {
+    return (rStockOffset.get() + 10) <= dbCompanies.find({}).count();
   }
 });
 Template.stockSummary.events({
   'click [data-action="more"]'(event, templateInstance) {
     event.preventDefault();
-    templateInstance.stockOffset += 10;
+    rStockOffset.set(rStockOffset.get() + 10);
     addTask();
-    templateInstance.subscribe('stockSummary', rKeyword.get(), rIsOnlyShowMine.get(), rSortBy.get(), templateInstance.stockOffset, resolveTask);
+    templateInstance.subscribe('stockSummary', rKeyword.get(), rIsOnlyShowMine.get(), rSortBy.get(), rStockOffset.get(), resolveTask);
   }
 });
 
@@ -71,14 +76,17 @@ Template.stockFilterForm.helpers({
 Template.stockFilterForm.events({
   'click [data-action="toggleIsOnlyShowMine"]'() {
     const newValue = ! rIsOnlyShowMine.get();
+    rStockOffset.set(0);
     rIsOnlyShowMine.set(newValue);
   },
   'click [data-action="sortBy"]'(event) {
     const newValue = $(event.currentTarget).val();
+    rStockOffset.set(0);
     rSortBy.set(newValue);
   },
   'submit'(event, templateInstance) {
     event.preventDefault();
+    rStockOffset.set(0);
     rKeyword.set(templateInstance.$keyword.val());
   }
 });

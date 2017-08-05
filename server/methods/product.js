@@ -32,14 +32,7 @@ export function createProduct(user, productData) {
     throw new Meteor.Error(403, '相同的產品已經被推出過了！');
   }
   productData.createdAt = new Date();
-  const productId = dbProducts.insert(productData);
-  dbLog.insert({
-    logType: '產品發布',
-    username: [manager],
-    companyName: companyName,
-    productId: productId,
-    createdAt: new Date()
-  });
+  dbProducts.insert(productData);
 }
 
 Meteor.methods({
@@ -62,13 +55,6 @@ export function retrieveProduct(user, productId) {
   if (! dbCompanies.findOne({companyName, manager})) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
   }
-  dbLog.insert({
-    logType: '產品下架',
-    username: [manager],
-    companyName: companyName,
-    productId: productId,
-    createdAt: new Date()
-  });
   dbProducts.remove({_id: productId});
 }
 

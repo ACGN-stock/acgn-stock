@@ -107,7 +107,9 @@
     {{else}}
       查無資料！
     {{/each}}
-    <a class="h3 d-block text-center" href="#" data-action="more">查看更早之前的紀錄...</a>
+    {{#if haveMore}}
+      <a class="h3 d-block text-center" href="#" data-action="more">查看更早之前的紀錄...</a>
+    {{/if}}
   </div>
 </template>
 
