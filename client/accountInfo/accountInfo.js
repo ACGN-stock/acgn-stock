@@ -141,9 +141,6 @@ Template.accountInfoLog.helpers({
       case '訂單完成': {
         return '以每股單價$' + logData.price + '的單價' + logData.message + logData.amount + '數量的「' + getCompanyLink(logData.companyName) + '」公司股票的訂單已全數交易完成。';
       }
-      case '賣單撤銷': {
-        return '由於股價低落，以每股單價$' + logData.price + '的單價賣出' + logData.amount + '數量的「' + getCompanyLink(logData.companyName) + '」公司股票的訂單被系統自動取消了。';
-      }
       case '交易紀錄': {
         if (logData.username[0] === username) {
           return '以$' + logData.price + '的單價向' + (logData.username[1] || ('「' + getCompanyLink(logData.companyName) + '」公司')) + '購買了' + logData.amount + '數量的「' + logData.companyName + '」公司股票！';
@@ -160,12 +157,6 @@ Template.accountInfoLog.helpers({
       }
       case '經理管理': {
         return '以經理人的身份修改了「' + getCompanyLink(logData.companyName) + '」公司的一些資訊。';
-      }
-      case '產品發布': {
-        return '以經理人的身份為「' + getCompanyLink(logData.companyName) + '」公司發表了一項新產品。';
-      }
-      case '產品下架': {
-        return '以經理人的身份將「' + getCompanyLink(logData.companyName) + '」公司的一項產品給下架了。';
       }
       case '推薦產品': {
         return '向「' + getCompanyLink(logData.companyName) + '」公司的一項產品投了一張推薦票。';

@@ -9,9 +9,9 @@ export const resourceManager = {
   request(task, resourceList, callback) {
     const resourceLock = this.getResourceLock(resourceList);
     if (resourceLock) {
-      const message = '' +
-        'thread[' + threadId + '] is requesting resource' + JSON.stringify(resourceList) +
-        ' for task [' + task + '] but need to wait for lock' + JSON.stringify(resourceLock) + '.';
+      // const message = '' +
+      //   'thread[' + threadId + '] is requesting resource' + JSON.stringify(resourceList) +
+      //   ' for task [' + task + '] but need to wait for lock' + JSON.stringify(resourceLock) + '.';
       // dbDebugger.insert({
       //   time: new Date(),
       //   message: message

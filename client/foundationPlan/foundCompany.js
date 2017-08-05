@@ -119,7 +119,7 @@ function handleInputChange(event) {
 
 function saveModel(model) {
   if (model._id) {
-    const submitData = _.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description');
+    const submitData = _.pick(model, '_id', 'companyName', 'tags', 'pictureSmall', 'pictureBig', 'description');
     Meteor.call('editFoundCompany', submitData, (error) => {
       if (! error) {
         const path = FlowRouter.path('foundationPlan');

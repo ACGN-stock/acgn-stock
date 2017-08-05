@@ -84,11 +84,6 @@ function handleInstantMessage() {
           instantMessage.message = '您以每股$' + log.price + '的單價' + log.message + log.amount + '數量的「' + log.companyName + '」公司股票的訂單已經全數交易完畢！';
           break;
         }
-        case '賣單撤銷': {
-          instantMessage.onlyForUsers = log.username;
-          instantMessage.message = '由於當前股價跌落期望值，你以$' + log.price + '的單價賣出' + log.amount + '數量的「' + log.companyName + '」公司股票的訂單被取銷了！';
-          break;
-        }
         case '公司釋股': {
           instantMessage.message = '由於大量的高價買單需求，「' + log.companyName + '」公司釋出了' + log.amount + '數量的股票！';
           break;
@@ -107,14 +102,6 @@ function handleInstantMessage() {
         }
         case '經理管理': {
           instantMessage.message = log.username[0] + '修改了「' + log.companyName + '」公司的資訊！';
-          break;
-        }
-        case '產品發布': {
-          instantMessage.message = log.username[0] + '為「' + log.companyName + '」公司發表了一項新產品！';
-          break;
-        }
-        case '產品下架': {
-          instantMessage.message = log.username[0] + '將一項「' + log.companyName + '」公司的產品給下架了！';
           break;
         }
         //推薦產品不進即時訊息

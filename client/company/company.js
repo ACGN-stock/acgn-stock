@@ -196,6 +196,7 @@ Template.companyOldProductList.events({
 
 Template.companyDirectorList.onCreated(function() {
   this.offset = 0;
+  this.subscribe('queryOwnStocks', this.data.companyName);
   this.subscribe('companyDirector', this.data.companyName, this.offset);
 });
 Template.companyDirectorList.helpers({
@@ -211,7 +212,7 @@ Template.companyDirectorList.helpers({
   getPercentage(stocks) {
     const templateInstance = Template.instance();
 
-    return Math.round(stocks / templateInstance.data.totalRelease * 1000) / 100;
+    return Math.round(stocks / templateInstance.data.totalRelease * 10000) / 100;
   }
 });
 Template.companyDirectorList.events({
@@ -345,13 +346,10 @@ Template.companyLogList.helpers({
         return logData.username[0] + '下達了以每股單價$' + logData.price + '的單價賣出' + logData.amount + '數量股票的訂單。';
       }
       case '取消下單': {
-        return logData.username[0] + '取消了以每股單價$' + logData.price + '的單價購入' + logData.amount + '數量股票的訂單。';
+        return logData.username[0] + '取消了以每股單價$' + logData.price + '的單價' + logData.message + logData.amount + '數量股票的訂單。';
       }
       case '訂單完成': {
         return logData.username[0] + '以每股單價$' + logData.price + '的單價' + logData.message + logData.amount + '數量股票的訂單已全數交易完成。';
-      }
-      case '賣單撤銷': {
-        return '由於股價低落，' + logData.username[0] + '以每股單價$' + logData.price + '的單價賣出' + logData.amount + '數量股票的訂單被系統自動取消了。';
       }
       case '交易紀錄': {
         if (logData.username[1]) {
@@ -369,12 +367,6 @@ Template.companyLogList.helpers({
       }
       case '經理管理': {
         return logData.username[0] + '以經理人的身份修改了公司資訊。';
-      }
-      case '產品發布': {
-        return logData.username[0] + '以經理人的身份籌備了一項新產品。';
-      }
-      case '產品下架': {
-        return logData.username[0] + '以經理人的身份取消了一項新產品。';
       }
       case '推薦產品': {
         const productData = dbProducts.findOne(logData.productId);

@@ -25,7 +25,21 @@ function intervalCheck() {
     });
     doIntervalWork();
   }
+  else if ((Date.now() - inrervalCheckLock.time.getTime()) > (config.intervalTimer * 3)) {
+    dbResourceLock.update('intervalCheck', {
+      $set: {
+        threadId: threadId,
+        time: new Date()
+      }
+    });
+    doIntervalWork();
+  }
   else if (inrervalCheckLock.threadId === threadId) {
+    dbResourceLock.update('intervalCheck', {
+      $set: {
+        time: new Date()
+      }
+    });
     doIntervalWork();
   }
   else if (shouldReplaceThread(inrervalCheckLock.threadId)) {

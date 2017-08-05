@@ -91,13 +91,7 @@ export function createBuyOrder(user, orderData) {
       amount: orderData.amount,
       createdAt: new Date()
     });
-    Meteor.users.update({
-      _id: user._id
-    }, {
-      $inc: {
-        'profile.money': totalCost * -1
-      }
-    });
+    let indeedCost = 0;
     let lastPrice = companyData.lastPrice;
     dbOrders
       .find(
@@ -123,6 +117,7 @@ export function createBuyOrder(user, orderData) {
         if (tradeNumber > 0) {
           orderData.done += tradeNumber;
           lastPrice = sellOrderData.unitPrice;
+          indeedCost += (lastPrice * tradeNumber);
           dbLog.insert({
             logType: '交易紀錄',
             username: [username, sellOrderData.username],
@@ -147,6 +142,15 @@ export function createBuyOrder(user, orderData) {
       });
     updateCompanyLastPrice(companyData, lastPrice);
     if (orderData.done < orderData.amount) {
+      const leftAmount = orderData.amount - orderData.done;
+      const leftCost = leftAmount * orderData.unitPrice;
+      Meteor.users.update({
+        _id: user._id
+      }, {
+        $inc: {
+          'profile.money': (indeedCost + leftCost) * -1
+        }
+      });
       dbOrders.insert(orderData);
     }
     else {
@@ -158,6 +162,13 @@ export function createBuyOrder(user, orderData) {
         amount: orderData.amount,
         message: orderData.orderType,
         createdAt: new Date()
+      });
+      Meteor.users.update({
+        _id: user._id
+      }, {
+        $inc: {
+          'profile.money': indeedCost * -1
+        }
       });
     }
     release();
@@ -336,6 +347,7 @@ export function changeStocksAmount(username, companyName, amount) {
   }
   else {
     if (existDirectorData) {
+      amount *= -1;
       if (existDirectorData.stocks > amount) {
         dbDirectors.update(
           {
@@ -346,7 +358,7 @@ export function changeStocksAmount(username, companyName, amount) {
               stocks: amount * -1
             }
           }
-        );        
+        );
       }
       else if (existDirectorData.stocks === amount) {
         dbDirectors.remove(existDirectorData._id);
