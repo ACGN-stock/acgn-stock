@@ -60,7 +60,10 @@ export function createBuyOrder(user, companyData) {
     return false;
   }
   const unitPrice = parseInt(window.prompt(`請輸入您期望購入的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`), 10);
-  if (! unitPrice || unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
+  if (!  unitPrice) {
+    return false;
+  }
+  if (unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
     window.alert('不正確的價格設定！');
 
     return false;
@@ -72,7 +75,10 @@ export function createBuyOrder(user, companyData) {
     return false;
   }
   const amount = parseInt(window.prompt(`請輸入總購入數量：(1~${maximumAmount})`), 10);
-  if (! amount || amount < 1 || amount > maximumAmount) {
+  if (! amount) {
+    return false;
+  }
+  if (amount < 1 || amount > maximumAmount) {
     window.alert('不正確的數量設定！');
 
     return false;
@@ -95,7 +101,10 @@ export function createSellOrder(user, companyData) {
   const minimumUnitPrice = Math.max(Math.ceil(companyData.listPrice / 2), 1);
   const maximumUnitPrice = companyData.listPrice * 2;
   const unitPrice = parseInt(window.prompt(`請輸入您期望賣出的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`), 10);
-  if (! unitPrice || unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
+  if (! unitPrice) {
+    return false;
+  }
+  if (unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
     window.alert('不正確的價格設定！');
 
     return false;
@@ -104,7 +113,10 @@ export function createSellOrder(user, companyData) {
   const directorData = dbDirectors.findOne({username, companyName});
   const maximumAmount = directorData.stocks;
   const amount = parseInt(window.prompt(`請輸入總賣出數量：(1~${maximumAmount})`), 10);
-  if (! amount || amount < 1 || amount > maximumAmount) {
+  if (! amount) {
+    return false;
+  }
+  if (amount < 1 || amount > maximumAmount) {
     window.alert('不正確的數量設定！');
 
     return false;

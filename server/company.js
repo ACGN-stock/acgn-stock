@@ -13,6 +13,7 @@ let releaseStocksCounter = config.releaseStocksCounter;
 export function releaseStocks() {
   releaseStocksCounter -= 1;
   if (releaseStocksCounter <= 0) {
+    console.info('start release stocks...');
     releaseStocksCounter = config.releaseStocksCounter;
     const maxPriceCompany = dbCompanies.findOne({}, {
       sort: {
@@ -114,7 +115,10 @@ export function releaseStocks() {
 
 let recordListPriceConter = generateRecordListPriceConter();
 export function recordListPrice() {
+  recordListPriceConter -= 1;
+  console.info('recordListPrice', recordListPriceConter);
   if (recordListPriceConter <= 0) {
+    console.info('start record list price...');
     recordListPriceConter = generateRecordListPriceConter();
     dbCompanies
       .find(
@@ -128,7 +132,7 @@ export function recordListPrice() {
           const companyName = companyData.companyName;
           //先鎖定資源，再重新讀取一次資料進行運算
           resourceManager.request('recordListPrice', ['companyOrder' + companyName], (release) => {
-            const companyData = dbCompanies.findOne(companyData._id);
+            const companyData = dbCompanies.findOne({companyName});
             dbCompanies.update(companyData._id, {
               $set: {
                 listPrice: companyData.lastPrice,
@@ -146,7 +150,7 @@ function generateRecordListPriceConter() {
   const min = config.recordListPriceMinCounter;
   const max = (config.recordListPriceMaxCounter - min);
 
-  return min + Math.random() * max;
+  return min + Math.floor(Math.random() * max);
 }
 
 export function electManager() {
