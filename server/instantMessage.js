@@ -103,7 +103,6 @@ function handleInstantMessage() {
           instantMessage.message = log.username[0] + '修改了「' + log.companyName + '」公司的資訊！';
           break;
         }
-        //推薦產品不進即時訊息
         case '推薦產品': {
           instantMessage.message = log.username[0] + '向「' + log.companyName + '」公司的一項產品投了一張推薦票，使其獲得了$' + log.price + '的營利額！';
           break;
