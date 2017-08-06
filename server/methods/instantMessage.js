@@ -23,17 +23,22 @@ Meteor.methods({
 Meteor.publish('instantMessage', function() {
   const user = this.userId ? Meteor.users.findOne(this.userId) : null;
   const username = user ? user.username : '';
-  dbInstantMessage.find({
-    createdAt: {
-      $gte: new Date( Date.now() - 60000 )
-    }
-  }).observeChanges({
-    added: (id, fields) => {
-      if (username && fields.onlyForUsers.length > 0 && _.contains(fields.onlyForUsers, username) === false) {
-        return false;
+  const observer = dbInstantMessage
+    .find({
+      createdAt: {
+        $gte: new Date( Date.now() - 60000 )
       }
-      this.added('instantMessage', id, fields);
-    }
-  });
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        if (username && fields.onlyForUsers.length > 0 && _.contains(fields.onlyForUsers, username) === false) {
+          return false;
+        }
+        this.added('instantMessage', id, fields);
+      }
+    });
   this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
 });

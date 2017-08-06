@@ -180,15 +180,27 @@ Meteor.publish('accountInfoLog', function(username, offset) {
   check(username, String);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbLog.find({username}).count();
-  this.added('pagination', 'accountInfoLog', {total});
-
   const firstLogData = dbLog.findOne({username}, {
     sort: {
       createdAt: 1
     } 
   });
+
+  let initialized = false;
+  let total = dbLog
+    .find(
+      {
+        username: {
+          $in: [username, '!all']
+        },
+        createdAt: {
+          $gte: firstLogData.createdAt
+        }
+      }
+    )
+    .count();
+  this.added('pagination', 'accountInfoLog', {total});
+
   const observer = dbLog
     .find(
       {
