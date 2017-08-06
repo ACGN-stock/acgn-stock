@@ -42,8 +42,7 @@ function handleInstantMessage() {
           break;
         }
         case '發薪紀錄': {
-          instantMessage.onlyForUsers = log.username;
-          instantMessage.message = '系統向' + log.username[0] + '發給了' + log.price + '的薪水！';
+          instantMessage.message = '系統向所有已驗證通過的使用者發給了' + log.price + '的薪水！';
           break;
         }
         case '創立公司': {

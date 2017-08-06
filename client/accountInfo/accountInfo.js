@@ -125,7 +125,9 @@ Template.accountInfoLogList.helpers({
   logList() {
     return dbLog.find(
       {
-        username: rSearchUsername.get()
+        username: {
+          $in: [rSearchUsername.get(), '!all']
+        }
       },
       {
         sort: {

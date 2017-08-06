@@ -10,23 +10,23 @@ export function paySalary() {
   if (counter <= 0) {
     counter = paySalaryCounter;
     const now = new Date();
-    Meteor.users.find({}, {disableOplog: true}).forEach((user) => {
-      dbLog.insert({
-        logType: '發薪紀錄',
-        username: [user.username],
-        price: salaryPerPay,
-        createdAt: new Date()
-      });
-      Meteor.users.update({
-        _id: user._id
-      }, {
-        $set: {
-          lastPayDay: now
-        },
+    Meteor.users.update(
+      {
+        createdAt: {
+          $gte: now
+        }
+      },
+      {
         $inc: {
           'profile.money': salaryPerPay
         }
-      });
+      }
+    );
+    dbLog.insert({
+      logType: '發薪紀錄',
+      username: ['!all'],
+      price: salaryPerPay,
+      createdAt: now
     });
   }
 }

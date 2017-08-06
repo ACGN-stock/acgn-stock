@@ -184,15 +184,29 @@ Meteor.publish('accountInfoLog', function(username, offset) {
   let total = dbLog.find({username}).count();
   this.added('pagination', 'accountInfoLog', {total});
 
+  const firstLogData = dbLog.findOne({username}, {
+    sort: {
+      createdAt: 1
+    } 
+  });
   const observer = dbLog
-    .find({username}, {
-      sort: {
-        createdAt: -1
+    .find(
+      {
+        username: {
+          $in: [username, '!all']
+        },
+        createdAt: {
+          $gte: firstLogData.createdAt
+        }
       },
-      skip: offset,
-      limit: 30,
-      disableOplog: true
-    })
+      {
+        sort: {
+          createdAt: -1
+        },
+        skip: offset,
+        limit: 30
+      }
+    )
     .observeChanges({
       added: (id, fields) => {
         this.added('log', id, fields);
