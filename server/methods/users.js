@@ -141,41 +141,79 @@ Meteor.publish('accountOwnStocks', function(username, offset) {
   check(username, String);
   check(offset, Match.Integer);
 
-  const total = dbDirectors.find({username}).count();
+  let initialized = false;
+  let total = dbDirectors.find({username}).count();
   this.added('pagination', 'accountOwnStocks', {total});
 
-  dbDirectors
+  const observer = dbDirectors
     .find({username}, {
       skip: offset,
       limit: 10
     })
-    .forEach((directorData) => {
-      this.added('directors', directorData._id, directorData);
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('directors', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('pagination', 'accountOwnStocks', {total});
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('directors', id, fields);
+      },
+      removed: (id) => {
+        this.removed('directors', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('pagination', 'accountOwnStocks', {total});
+        }
+      }
     });
+  initialized = true;
   this.ready();
-
-  return [];
+  this.onStop(() => {
+    observer.stop();
+  });
 });
 
 Meteor.publish('accountInfoLog', function(username, offset) {
   check(username, String);
   check(offset, Match.Integer);
 
-  const total = dbLog.find({username}).count();
+  let initialized = false;
+  let total = dbLog.find({username}).count();
   this.added('pagination', 'accountInfoLog', {total});
 
-  dbLog
+  const observer = dbLog
     .find({username}, {
       sort: {
         createdAt: -1
       },
       skip: offset,
-      limit: 30
+      limit: 30,
+      disableOplog: true
     })
-    .forEach((logData) => {
-      this.added('log', logData._id, logData);
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('log', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('pagination', 'accountInfoLog', {total});
+        }
+      },
+      removed: (id) => {
+        this.removed('log', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('pagination', 'accountInfoLog', {total});
+        }
+      }
     });
+  initialized = true;
   this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
 });
 
 Meteor.publish('validateUser', function(username) {
