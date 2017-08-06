@@ -60,7 +60,7 @@ export function createBuyOrder(user, companyData) {
     return false;
   }
   const unitPrice = parseInt(window.prompt(`請輸入您期望購入的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`), 10);
-  if (!  unitPrice) {
+  if (! unitPrice) {
     return false;
   }
   if (unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {

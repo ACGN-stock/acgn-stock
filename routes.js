@@ -81,12 +81,23 @@ FlowRouter.route('/seasonalReport', {
 });
 FlowRouter.route('/accountInfo', {
   name: 'accountInfo',
+  triggersEnter: [
+    (context, redirect) => {
+      if (Meteor.isClient) {
+        const user = Meteor.user();
+        if (user) {
+          redirect('/accountInfo/' + user.username);
+        }
+      }
+    }
+  ],
   action() {
-    DocHead.setTitle(config.websiteName + ' - 帳號資訊');
+    DocHead.setTitle(config.websiteName + ' - 查詢帳號資訊');
     if (Meteor.isClient) {
-      const { rSearchUsername, logOffset } = require('./client/accountInfo/accountInfo');
+      const { rSearchUsername, logOffset, ownStocksOffset } = require('./client/accountInfo/accountInfo');
       rSearchUsername.set('');
       logOffset.set(0);
+      ownStocksOffset.set(0);
     }
   }
 });
@@ -95,9 +106,10 @@ FlowRouter.route('/accountInfo/:username', {
   action(params) {
     DocHead.setTitle(config.websiteName + ' - 「' + params.username + '」帳號資訊');
     if (Meteor.isClient) {
-      const { rSearchUsername, logOffset } = require('./client/accountInfo/accountInfo');
+      const { rSearchUsername, logOffset, ownStocksOffset } = require('./client/accountInfo/accountInfo');
       rSearchUsername.set(params.username);
       logOffset.set(0);
+      ownStocksOffset.set(0);
     }
   }
 });

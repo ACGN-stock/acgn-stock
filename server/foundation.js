@@ -35,6 +35,11 @@ export function checkFoundCompany() {
         //先鎖定資源，再重新讀取一次資料進行運算
         resourceManager.request('checkFoundCompany', ['foundation' + companyName], (release) => {
           const foundationData = dbFoundations.findOne({companyName});
+          if (! foundationData) {
+            release();
+
+            return false;
+          }
           const invest = foundationData.invest;
           const totalInvest = _.reduce(invest, (sum, investData) => {
             return sum + investData.amount;

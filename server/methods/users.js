@@ -6,6 +6,7 @@ import { Accounts } from 'meteor/accounts-base';
 import { resourceManager } from '../resourceManager';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbDirectors } from '../../db/dbDirectors';
 import { dbLog } from '../../db/dbLog';
 import { dbConfig } from '../../db/dbConfig';
 import { config } from '../../config';
@@ -122,57 +123,58 @@ function validateUsers(checkUsername) {
 Meteor.publish('accountInfo', function(username) {
   check(username, String);
 
-  const result = [];
-  if (username) {
-    result.push(
-      Meteor.users.find({username}, {
-        fields: {
-          username: 1,
-          profile: 1,
-          createdAt: 1
-        }
-      })
-    );
-  }
-  else {
-    result.push(
-      Meteor.users.find({
-        _id: this.userId
-      }, {
-        fields: {
-          username: 1,
-          profile: 1,
-          createdAt: 1
-        }
-      })
-    );
-  }
-  result.push(
+  return [
+    Meteor.users.find({username}, {
+      fields: {
+        username: 1,
+        profile: 1,
+        createdAt: 1
+      }
+    }),
     dbCompanies.find({
       manager: username
     })
-  );
-
-  return result;
+  ];
 });
+
+Meteor.publish('accountOwnStocks', function(username, offset) {
+  check(username, String);
+  check(offset, Match.Integer);
+
+  const total = dbDirectors.find({username}).count();
+  this.added('pagination', 'accountOwnStocks', {total});
+
+  dbDirectors
+    .find({username}, {
+      skip: offset,
+      limit: 10
+    })
+    .forEach((directorData) => {
+      this.added('directors', directorData._id, directorData);
+    });
+  this.ready();
+
+  return [];
+});
+
 Meteor.publish('accountInfoLog', function(username, offset) {
   check(username, String);
   check(offset, Match.Integer);
-  if (! username && this.userId) {
-    username = Meteor.users.findOne(this.userId).username;
-  }
 
-  dbLog.find({username}, {
-    sort: {
-      createdAt: -1
-    },
-    limit: 50 + offset
-  })
-  .observeChanges({
-    added: (id, fields) => {
-      this.added('log', id, fields);
-    }
-  });
+  const total = dbLog.find({username}).count();
+  this.added('pagination', 'accountInfoLog', {total});
+
+  dbLog
+    .find({username}, {
+      sort: {
+        createdAt: -1
+      },
+      skip: offset,
+      limit: 30
+    })
+    .forEach((logData) => {
+      this.added('log', logData._id, logData);
+    });
   this.ready();
 });
 

@@ -99,7 +99,15 @@ Template.foundationPlanInfo.events({
     event.preventDefault();
     const minimumInvest = Math.ceil(config.beginReleaseStock / config.foundationNeedUsers);
     const maximumInvest = Meteor.user().profile.money;
+    if (minimumInvest > maximumInvest) {
+      window.alert('您的金錢不足以進行投資！');
+
+      return false;
+    }
     const amount = parseInt(window.prompt(`要投資多少金額？(${minimumInvest}~${maximumInvest})`), 10);
+    if (! amount) {
+      return false;
+    }
     if (amount >= minimumInvest && amount <= maximumInvest) {
       Meteor.call('investFoundCompany', templaceInstance.data.companyName, amount);
     }

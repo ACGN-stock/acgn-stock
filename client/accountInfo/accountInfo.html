@@ -7,6 +7,7 @@
       <hr />
     </div>
     {{> accountInfoBasic}}
+    {{> accountInfoOwnStocks}}
     {{> accountInfoLogList}}
   </div>
 </template>
@@ -98,6 +99,24 @@
   </div>
 </template>
 
+<template name="accountInfoOwnStocks">
+  <div class="card-block">
+    <h2 class="card-title mb-1">擁有公司股票：</h2>
+    <hr />
+    {{#each directorData in directorList}}
+      <div>
+        擁有 「<a href="{{getCompanyLinkHref directorData.companyName}}">{{directorData.companyName}}</a>」
+        公司的{{directorData.stocks}}股股票。
+      </div>
+    {{else}}
+      查無資料！
+    {{/each}}
+    {{#with paginationData}}
+      {{> pagination}}
+    {{/with}}
+  </div>
+</template>
+
 <template name="accountInfoLogList">
   <div class="card-block">
     <h2 class="card-title mb-1">所有相關紀錄：</h2>
@@ -107,9 +126,9 @@
     {{else}}
       查無資料！
     {{/each}}
-    {{#if haveMore}}
-      <a class="h3 d-block text-center" href="#" data-action="more">查看更早之前的紀錄...</a>
-    {{/if}}
+    {{#with paginationData}}
+      {{> pagination}}
+    {{/with}}
   </div>
 </template>
 

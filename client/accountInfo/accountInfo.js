@@ -5,14 +5,18 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbDirectors } from '../../db/dbDirectors';
 import { addTask, resolveTask } from '../layout/loading';
 import { getCompanyLink } from '../utils/helpers';
 
 export const rSearchUsername = new ReactiveVar('');
 Template.accountInfo.onCreated(function() {
   this.autorun(() => {
-    addTask();
-    this.subscribe('accountInfo', rSearchUsername.get(), resolveTask);
+    const username = rSearchUsername.get();
+    if (username) {
+      addTask();
+      this.subscribe('accountInfo', username, resolveTask);
+    }
   });
 });
 
@@ -21,29 +25,38 @@ Template.accountInfoSearchForm.onRendered(function() {
 });
 Template.accountInfoSearchForm.helpers({
   isInLookMode(lookMode) {
-    return (rSearchUsername.get() === '' ? 'self' : 'other') === lookMode;
+    if (rSearchUsername.get() === '') {
+      return 'other';
+    }
+    else {
+      const user = Meteor.user();
+      const username = user ? user.username : '';
+
+      return (rSearchUsername.get() === username ? 'self' : 'other') === lookMode;
+    }
   },
   searchUsername() {
-    return rSearchUsername.get();
+    const user = Meteor.user();
+    const username = user ? user.username : '';
+    const searchUsername = rSearchUsername.get();
+
+    return (searchUsername === username) ? '' : searchUsername;
   }
 });
 Template.accountInfoSearchForm.events({
   'change [name="lookMode"][value="self"]'() {
-    const path = FlowRouter.path('accountInfo');
-    FlowRouter.go(path);
-  },
-  submit(event, templateInstance) {
-    event.preventDefault();
     const user = Meteor.user();
-    const username = templateInstance.$searchUsername.val();
-    if (! username || (user && username === user.username)) {
-      const path = FlowRouter.path('accountInfo');
-      FlowRouter.go(path);
-    }
-    else {
+    if (user) {
+      const username = user.username;
       const path = FlowRouter.path('accountInfo', {username});
       FlowRouter.go(path);
     }
+  },
+  submit(event, templateInstance) {
+    event.preventDefault();
+    const username = templateInstance.$searchUsername.val();
+    const path = FlowRouter.path('accountInfo', {username});
+    FlowRouter.go(path);
   }
 });
 
@@ -55,7 +68,7 @@ Template.accountInfoBasic.helpers({
       return Meteor.users.findOne({username});
     }
     else {
-      return Meteor.user();
+      return null;
     }
   },
   manageCompanies(manager) {
@@ -69,23 +82,50 @@ Template.accountInfoManageCompanyLink.helpers({
   }
 });
 
+export const ownStocksOffset = new ReactiveVar(0);
+Template.accountInfoOwnStocks.onCreated(function() {
+  ownStocksOffset.set(0);
+  this.autorun(() => {
+    const username = rSearchUsername.get();
+    if (username) {
+      addTask();
+      this.subscribe('accountOwnStocks', username, ownStocksOffset.get(), resolveTask);
+    }
+  });
+});
+Template.accountInfoOwnStocks.helpers({
+  directorList() {
+    const username = rSearchUsername.get();
+
+    return dbDirectors.find({username});
+  }
+});
+Template.accountInfoOwnStocks.helpers({
+  paginationData() {
+    return {
+      subscribe: 'accountOwnStocks',
+      dataNumberPerPage: 10,
+      offset: ownStocksOffset
+    };
+  }
+});
+
 export const logOffset = new ReactiveVar(0);
 Template.accountInfoLogList.onCreated(function() {
   logOffset.set(0);
   this.autorun(() => {
-    const user = Meteor.user();
-    const username = user && user.username;
-    this.subscribe('accountInfoLog', (rSearchUsername.get() || username), logOffset.get());
+    const username = rSearchUsername.get();
+    if (username) {
+      addTask();
+      this.subscribe('accountInfoLog', username, logOffset.get(), resolveTask);
+    }
   });
 });
 Template.accountInfoLogList.helpers({
   logList() {
-    const user = Meteor.user();
-    const username = user && user.username;
-
     return dbLog.find(
       {
-        username: rSearchUsername.get() || username
+        username: rSearchUsername.get()
       },
       {
         sort: {
@@ -94,16 +134,12 @@ Template.accountInfoLogList.helpers({
       }
     );
   },
-  haveMore() {
-    const user = Meteor.user();
-    const username = user && user.username;
-    const logCount = dbLog
-      .find({
-        username: rSearchUsername.get() || username
-      })
-      .count();
-
-    return (logOffset.get() + 50) <= logCount;
+  paginationData() {
+    return {
+      subscribe: 'accountInfoLog',
+      dataNumberPerPage: 30,
+      offset: logOffset
+    };
   }
 });
 Template.accountInfoLogList.events({
@@ -161,7 +197,7 @@ Template.accountInfoLog.helpers({
           return '以$' + logData.price + '的單價向' + (logData.username[1] || ('「' + getCompanyLink(logData.companyName) + '」公司')) + '購買了' + logData.amount + '數量的「' + logData.companyName + '」公司股票！';
         }
         else {
-          return '以$' + logData.price + '的單價向' + logData.username[1] + '賣出了' + logData.amount + '數量的「' + logData.companyName + '」公司股票！';
+          return '以$' + logData.price + '的單價向' + logData.username[0] + '賣出了' + logData.amount + '數量的「' + logData.companyName + '」公司股票！';
         }
       }
       case '辭職紀錄': {

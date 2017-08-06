@@ -13,7 +13,6 @@ let releaseStocksCounter = config.releaseStocksCounter;
 export function releaseStocks() {
   releaseStocksCounter -= 1;
   if (releaseStocksCounter <= 0) {
-    console.info('start release stocks...');
     releaseStocksCounter = config.releaseStocksCounter;
     const maxPriceCompany = dbCompanies.findOne({}, {
       sort: {
@@ -116,9 +115,7 @@ export function releaseStocks() {
 let recordListPriceConter = generateRecordListPriceConter();
 export function recordListPrice() {
   recordListPriceConter -= 1;
-  console.info('recordListPrice', recordListPriceConter);
   if (recordListPriceConter <= 0) {
-    console.info('start record list price...');
     recordListPriceConter = generateRecordListPriceConter();
     dbCompanies
       .find(
@@ -136,7 +133,7 @@ export function recordListPrice() {
             dbCompanies.update(companyData._id, {
               $set: {
                 listPrice: companyData.lastPrice,
-                totalValue: companyData.totalValue * companyData.totalRelease
+                totalValue: companyData.lastPrice * companyData.totalRelease
               }
             });
             release();

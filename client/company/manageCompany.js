@@ -150,7 +150,13 @@ Template.companyEditForm.events({
 function addNewTag(event, templatInstance) {
   const $input = templatInstance.$input.filter('[name="tags"]');
   const model = _.clone(templatInstance.model.get());
-  model.tags.push($input.val());
+  const tag = $input.val().trim();
+  if (! tag) {
+    window.alert('請輸入標籤名稱！');
+
+    return false;
+  }
+  model.tags.push(tag);
   model.tags = _.unique(model.tags);
   templatInstance.model.set(model);
   $input.val('');
