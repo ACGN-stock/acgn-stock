@@ -69,6 +69,12 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 0
   },
+  //當季已營利
+  profit: {
+    type: SimpleSchema.Integer,
+    min: 0,
+    defaultValue: 0
+  },
   //參考總市值
   totalValue: {
     type: SimpleSchema.Integer,

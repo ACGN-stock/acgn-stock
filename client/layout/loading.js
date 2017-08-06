@@ -14,6 +14,22 @@ export function resolveTask() {
     isLoading.set(false);
   }
 }
+export function inheritedShowLoadingOnSubscribing(template) {
+  template.onCreated(function() {
+    const rIsDataReady = new ReactiveVar(false);
+    this.autorun(() => {
+      rIsDataReady.set(this.subscriptionsReady());
+    });
+    this.autorun(() => {
+      if (rIsDataReady.get()) {
+        resolveTask();
+      }
+      else {
+        addTask();
+      }
+    });
+  });
+}
 
 Template.loading.helpers({
   loadingOverlayClass() {

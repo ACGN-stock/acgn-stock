@@ -7,9 +7,10 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
-import { addTask, resolveTask } from '../layout/loading';
+import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder } from '../utils/methods';
 
+inheritedShowLoadingOnSubscribing(Template.stockSummary);
 const rKeyword = new ReactiveVar('');
 const rIsOnlyShowMine = new ReactiveVar(false);
 const rSortBy = new ReactiveVar('lastPrice');
@@ -21,8 +22,7 @@ Template.stockSummary.onCreated(function() {
     const isOnlyShowMine = rIsOnlyShowMine.get();
     const sort = rSortBy.get();
     const offset = rStockOffset.get();
-    addTask();
-    this.subscribe('stockSummary', keyword, isOnlyShowMine, sort, offset, resolveTask);
+    this.subscribe('stockSummary', keyword, isOnlyShowMine, sort, offset);
   });
   this.autorun(() => {
     dbCompanies.find().forEach((companyData) => {

@@ -6,16 +6,32 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
-import { addTask, resolveTask } from '../layout/loading';
+import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { getCompanyLink } from '../utils/helpers';
 
+inheritedShowLoadingOnSubscribing(Template.accountInfo);
 export const rSearchUsername = new ReactiveVar('');
+export const ownStocksOffset = new ReactiveVar(0);
+export const logOffset = new ReactiveVar(0);
 Template.accountInfo.onCreated(function() {
   this.autorun(() => {
     const username = rSearchUsername.get();
     if (username) {
-      addTask();
-      this.subscribe('accountInfo', username, resolveTask);
+      this.subscribe('accountInfo', username);
+    }
+  });
+  ownStocksOffset.set(0);
+  this.autorun(() => {
+    const username = rSearchUsername.get();
+    if (username) {
+      this.subscribe('accountOwnStocks', username, ownStocksOffset.get());
+    }
+  });
+  logOffset.set(0);
+  this.autorun(() => {
+    const username = rSearchUsername.get();
+    if (username) {
+      this.subscribe('accountInfoLog', username, logOffset.get());
     }
   });
 });
@@ -82,17 +98,6 @@ Template.accountInfoManageCompanyLink.helpers({
   }
 });
 
-export const ownStocksOffset = new ReactiveVar(0);
-Template.accountInfoOwnStocks.onCreated(function() {
-  ownStocksOffset.set(0);
-  this.autorun(() => {
-    const username = rSearchUsername.get();
-    if (username) {
-      addTask();
-      this.subscribe('accountOwnStocks', username, ownStocksOffset.get(), resolveTask);
-    }
-  });
-});
 Template.accountInfoOwnStocks.helpers({
   directorList() {
     const username = rSearchUsername.get();
@@ -110,17 +115,6 @@ Template.accountInfoOwnStocks.helpers({
   }
 });
 
-export const logOffset = new ReactiveVar(0);
-Template.accountInfoLogList.onCreated(function() {
-  logOffset.set(0);
-  this.autorun(() => {
-    const username = rSearchUsername.get();
-    if (username) {
-      addTask();
-      this.subscribe('accountInfoLog', username, logOffset.get(), resolveTask);
-    }
-  });
-});
 Template.accountInfoLogList.helpers({
   logList() {
     return dbLog.find(
@@ -212,7 +206,7 @@ Template.accountInfoLog.helpers({
         return '以經理人的身份修改了「' + getCompanyLink(logData.companyName) + '」公司的一些資訊。';
       }
       case '推薦產品': {
-        return '向「' + getCompanyLink(logData.companyName) + '」公司的一項產品投了一張推薦票。';
+        return '向「' + getCompanyLink(logData.companyName) + '」公司的一項產品投了一張推薦票，使其獲得了$' + logData.price + '的營利額。';
       }
       case '支持紀錄': {
         return '支持' + logData.username[1] + '擔任「' + getCompanyLink(logData.companyName) + '」公司的經理人。';

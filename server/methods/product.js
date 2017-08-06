@@ -4,6 +4,7 @@ import { check } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
 import { dbProducts } from '../../db/dbProducts';
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbSeason } from '../../db/dbSeason';
 import { dbLog } from '../../db/dbLog';
 
 Meteor.methods({
@@ -78,16 +79,27 @@ export function voteProduct(user, productId) {
   if (! productData) {
     throw new Meteor.Error(404, '不存在的產品！');
   }
+  const seasonData = dbSeason.findOne({}, {
+    sort: {
+      beginDate: -1
+    }
+  });
+  const votePrice = seasonData.votePrice;
   const username = user.username;
-  resourceManager.throwErrorIsResourceIsLock(['earnProfit', 'user' + username]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'user' + username]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('createBuyOrder', ['earnProfit', 'user' + username], (release) => {
+  resourceManager.request('voteProduct', ['season', 'user' + username], (release) => {
     const user = Meteor.users.findOne({username});
+    if (user.profile.vote < 1) {
+      throw new Meteor.Error(403, '使用者已經沒有多餘的推薦票可以推薦！');
+    }
+    const companyName = productData.companyName;
     dbLog.insert({
       logType: '推薦產品',
       username: [username],
-      companyName: productData.companyName,
+      companyName: companyName,
       productId: productId,
+      price: votePrice,
       createdAt: new Date()
     });
     Meteor.users.update(
@@ -100,6 +112,11 @@ export function voteProduct(user, productId) {
         }
       }
     );
+    dbCompanies.update({companyName}, {
+      $inc: {
+        profit: votePrice
+      }
+    });
     dbProducts.update(
       {
         _id: productId

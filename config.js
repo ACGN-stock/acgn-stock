@@ -12,8 +12,9 @@ export const config = {
   beginMoney: 10000, //所有使用者驗證通過後的起始資金數量
   salaryPerPay: 1000, //所有驗證通過的使用者每隔一段時間可以固定領取的薪資數量
   releaseStocksChance: 100000, //決定每個公司釋出股票的機率，數值越高機率越低（就需要更多的優值買單才能提高機率）
-  seasonTime: 259200000, //每個商業季度的持續時間，單位為微秒
-  seasonProfitPerUser: 10000, //每個商業季度、每個驗證的使用者皆會產生多少營利給排名靠前的企業
-  managerProfitPercent: 0.05 //經理人獲得公司營利分紅的比例
+  seasonTime: 10800000, //每個商業季度的持續時間，單位為微秒
+  seasonProfitPerUser: 100, //每個商業季度、每個驗證的使用者的「所有推薦票加總」將產生多少可能營利額
+  managerProfitPercent: 0.05, //經理人獲得公司營利分紅的比例
+  costFromProfit: 0.05 //系統將扣除多少公司的營利做為公司營運成本
 };
 export default config;

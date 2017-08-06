@@ -7,15 +7,15 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '../../db/dbFoundations';
 import { formatDateText } from '../utils/helpers';
 import { config } from '../../config';
-import { addTask, resolveTask } from '../layout/loading';
+import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 
+inheritedShowLoadingOnSubscribing(Template.foundationPlan);
 const rKeyword = new ReactiveVar('');
 const rFoundationOffset = new ReactiveVar(0);
 Template.foundationPlan.onCreated(function() {
   rFoundationOffset.set(0);
   this.autorun(() => {
-    addTask();
-    this.subscribe('foundationPlan', rKeyword.get(), rFoundationOffset.get(), resolveTask);
+    this.subscribe('foundationPlan', rKeyword.get(), rFoundationOffset.get());
   });
 });
 Template.foundationPlan.helpers({
@@ -39,11 +39,9 @@ Template.foundationPlan.helpers({
   }
 });
 Template.foundationPlan.events({
-  'click [data-action="more"]'(event, templateInstance) {
+  'click [data-action="more"]'(event) {
     event.preventDefault();
     rFoundationOffset.set(rFoundationOffset.get() + 10);
-    addTask();
-    templateInstance.subscribe('foundationPlan', rKeyword.get(), rFoundationOffset.get(), resolveTask);
   }
 });
 

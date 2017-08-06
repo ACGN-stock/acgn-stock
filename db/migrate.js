@@ -9,6 +9,7 @@ import { dbInstantMessage } from './dbInstantMessage';
 import { dbLog } from './dbLog';
 import { dbOrders } from './dbOrders';
 import { dbProducts } from './dbProducts';
+import { dbSeason } from './dbSeason';
 import { dbValidatingUsers } from './dbValidatingUsers';
 
 if (Meteor.isServer) {
@@ -95,6 +96,15 @@ if (Meteor.isServer) {
       });
       dbLog.rawCollection().createIndex({
         resolve: 1
+      });
+    }
+  });
+  Migrations.add({
+    version: 3,
+    name: 'season data.',
+    up() {
+      dbSeason.rawCollection().createIndex({
+        beginDate: -1
       });
     }
   });

@@ -23,7 +23,7 @@ export const logTypeList = [
   '辭職紀錄', //username0辭去了「companyName」公司的經理人職務！
   '參選紀錄', //username0開始競選「companyName」公司的經理人職務！
   '經理管理', //username0修改了「companyName」公司的資訊！
-  '推薦產品', //username0推薦了「companyName」公司的#productId產品！
+  '推薦產品', //username0推薦了#productId產品，使「companyName」公司獲得了$price的營利額！
   '支持紀錄', //username0支持username1擔任「companyName」公司的經理人！
   '就任經理', //username0在message商業季度(以amount數量的支持股份)擊敗了所有競爭對手，取代username1成為「companyName」公司的經理人！
   '公司營利', //「companyName」公司本商業季度一共獲利$amount！

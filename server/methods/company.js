@@ -433,40 +433,162 @@ Meteor.publish('companyDetail', function(companyName) {
   ];
 });
 
+Meteor.publish('todayDealAmount', function(companyName) {
+  check(companyName, String);
+  const todayBegin = new Date().setHours(0, 0, 0, 0);
+  const filter = {
+    logType: '交易紀錄',
+    companyName: companyName,
+    createdAt: {
+      $gte: todayBegin
+    }
+  };
+
+  let total = 0;
+  this.added('pagination', 'todayDealAmount', {total});
+
+  const observer = dbLog
+    .find(filter)
+    .observeChanges({
+      added: (id, fields) => {
+        console.log(fields);
+        total += fields.amount;
+        this.changed('pagination', 'todayDealAmount', {total});
+      }
+    });
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
+});
+
 Meteor.publish('companyDirector', function(companyName, offset) {
   check(companyName, String);
 
-  return dbDirectors.find({companyName}, {
-    sort: {
-      stocks: -1
-    },
-    skip: offset,
-    limit: 10 + offset
+  let initialized = false;
+  let total = dbDirectors.find({companyName}).count();
+  this.added('pagination', 'companyDirector', {total});
+
+  const observer = dbDirectors
+    .find({companyName}, {
+      sort: {
+        stocks: -1
+      },
+      skip: offset,
+      limit: 10 + offset
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('directors', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('pagination', 'companyDirector', {total});
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('directors', id, fields);
+      },
+      removed: (id) => {
+        this.removed('directors', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('pagination', 'companyDirector', {total});
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
   });
 });
 
 Meteor.publish('companyLog', function(companyName, offset) {
   check(companyName, String);
 
-  return dbLog.find({companyName}, {
-    sort: {
-      createdAt: -1
-    },
-    skip: offset,
-    limit: 50 + offset
+  let initialized = false;
+  let total = dbLog.find({companyName}).count();
+  this.added('pagination', 'companyLog', {total});
+
+  const observer = dbLog
+    .find({companyName}, {
+      sort: {
+        createdAt: -1
+      },
+      skip: offset,
+      limit: 30
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('log', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('pagination', 'companyLog', {total});
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('log', id, fields);
+      },
+      removed: (id) => {
+        this.removed('log', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('pagination', 'companyLog', {total});
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
   });
 });
 
-Meteor.publish('companyOrder', function(companyName, offset) {
+Meteor.publish('companyOrder', function(companyName, type, offset) {
   check(companyName, String);
+  check(type, new Match.OneOf('購入', '賣出'));
 
-  return dbOrders.find({companyName}, {
-    sort: {
-      orderType: 1,
-      unitPrice: 1
-    },
-    skip: offset,
-    limit: 10 + offset
+  const paginationId = 'companyOrder' + type;
+  let initialized = false;
+  let total = dbOrders.find({companyName}).count();
+  this.added('pagination', paginationId, {total});
+
+  const observer = dbOrders.find(
+      {
+        companyName: companyName,
+        orderType: type
+      },
+      {
+        sort: {
+          unitPrice: type === '賣出' ? 1 : -1
+        },
+        skip: offset,
+        limit: 10
+      }
+    )
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('orders', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('pagination', paginationId, {total});
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('orders', id, fields);
+      },
+      removed: (id) => {
+        this.removed('orders', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('pagination', paginationId, {total});
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
   });
 });
 

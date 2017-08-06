@@ -105,7 +105,8 @@ function handleInstantMessage() {
         }
         //推薦產品不進即時訊息
         case '推薦產品': {
-          return false;
+          instantMessage.message = log.username[0] + '向「' + log.companyName + '」公司的一項產品投了一張推薦票，使其獲得了$' + log.price + '的營利額！';
+          break;
         }
         //支持紀錄不進即時訊息
         case '支持紀錄': {

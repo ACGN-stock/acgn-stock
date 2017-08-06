@@ -4,7 +4,7 @@ import { $ } from 'meteor/jquery';
 import { Mongo } from 'meteor/mongo';
 import { Template } from 'meteor/templating';
 
-const dbPagination = new Mongo.Collection('pagination');
+export const dbPagination = new Mongo.Collection('pagination');
 
 Template.pagination.helpers({
   haveData() {

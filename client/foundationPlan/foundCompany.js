@@ -7,9 +7,14 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { dbFoundations } from '../../db/dbFoundations';
-import { addTask, resolveTask } from '../layout/loading';
+import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { regImageDataUrl } from '../utils/regexp';
 
+inheritedShowLoadingOnSubscribing(Template.company);
+Template.createFoundationPlan.onCreated(function() {
+  const foundationId = FlowRouter.getParam('foundationId');
+  this.subscribe('foundationPlanById', foundationId);
+});
 Template.createFoundationPlan.helpers({
   defaultData() {
     return {
@@ -18,11 +23,6 @@ Template.createFoundationPlan.helpers({
       description: ''
     };
   }
-});
-Template.editFoundationPlan.onCreated(function() {
-  const foundationId = FlowRouter.getParam('foundationId');
-  addTask();
-  this.subscribe('foundationPlanById', foundationId, resolveTask);
 });
 Template.editFoundationPlan.helpers({
   editData() {
