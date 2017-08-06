@@ -349,7 +349,37 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     pictureBig: 0
   };
 
-  return dbCompanies.find(filter, {sort, skip, limit, fields});
+  let initialized = false;
+  let total = dbCompanies.find(filter).count();
+  this.added('pagination', 'stockSummary', {total});
+
+  const observer = dbCompanies
+    .find(filter, {sort, skip, limit, fields})
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('companies', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('pagination', 'stockSummary', {total});
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('companies', id, fields);
+      },
+      removed: (id) => {
+        this.removed('companies', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('pagination', 'stockSummary', {total});
+        }
+      }
+    });
+
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
 });
 
 Meteor.publish('queryChairman', function(companyName) {

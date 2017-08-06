@@ -17,7 +17,12 @@ const rStockOffset = new ReactiveVar(0);
 Template.stockSummary.onCreated(function() {
   rStockOffset.set(0);
   this.autorun(() => {
-    this.subscribe('stockSummary', rKeyword.get(), rIsOnlyShowMine.get(), rSortBy.get(), rStockOffset.get());
+    const keyword = rKeyword.get();
+    const isOnlyShowMine = rIsOnlyShowMine.get();
+    const sort = rSortBy.get();
+    const offset = rStockOffset.get();
+    addTask();
+    this.subscribe('stockSummary', keyword, isOnlyShowMine, sort, offset, resolveTask);
   });
   this.autorun(() => {
     dbCompanies.find().forEach((companyData) => {
@@ -36,16 +41,18 @@ Template.stockSummary.helpers({
       limit: rStockOffset.get() + 10
     });
   },
-  haveMore() {
-    return (rStockOffset.get() + 10) <= dbCompanies.find({}).count();
+  paginationData() {
+    return {
+      subscribe: 'stockSummary',
+      dataNumberPerPage: 10,
+      offset: rStockOffset
+    };
   }
 });
 Template.stockSummary.events({
-  'click [data-action="more"]'(event, templateInstance) {
+  'click [data-action="more"]'(event) {
     event.preventDefault();
     rStockOffset.set(rStockOffset.get() + 10);
-    addTask();
-    templateInstance.subscribe('stockSummary', rKeyword.get(), rIsOnlyShowMine.get(), rSortBy.get(), rStockOffset.get(), resolveTask);
   }
 });
 

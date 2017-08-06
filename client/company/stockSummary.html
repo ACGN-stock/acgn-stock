@@ -8,9 +8,9 @@
       {{#each companyList}}
         {{> companySummary}}
       {{/each}}
-      {{#if haveMore}}
-        <a class="h3 mt-3 d-block text-center" href="#" data-action="more">查看更多...</a>
-      {{/if}}
+      {{#with paginationData}}
+        {{> pagination}}
+      {{/with}}
     </div>
   </div>
 </template>

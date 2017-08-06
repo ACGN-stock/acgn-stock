@@ -30,8 +30,12 @@ Template.foundationPlan.helpers({
       limit: rFoundationOffset.get() + 10
     });
   },
-  haveMore() {
-    return (rFoundationOffset.get() + 10) <= dbFoundations.find({}).count();
+  paginationData() {
+    return {
+      subscribe: 'foundationPlan',
+      dataNumberPerPage: 10,
+      offset: rFoundationOffset
+    };
   }
 });
 Template.foundationPlan.events({

@@ -182,15 +182,44 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
     ];
   }
 
-  return dbFoundations.find(filter, {
-    sort: {
-      createdAt: 1
-    },
-    skip: offset,
-    limit: 10 + offset,
-    fields: {
-      pictureBig: 0
-    }
+  let initialized = false;
+  let total = dbFoundations.find(filter).count();
+  this.added('pagination', 'foundationPlan', {total});
+
+  const observer = dbFoundations
+    .find(filter, {
+      sort: {
+        createdAt: 1
+      },
+      skip: offset,
+      limit: 10,
+      fields: {
+        pictureBig: 0
+      }
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('foundations', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('pagination', 'foundationPlan', {total});
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('foundations', id, fields);
+      },
+      removed: (id) => {
+        this.removed('foundations', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('pagination', 'foundationPlan', {total});
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
   });
 });
 
