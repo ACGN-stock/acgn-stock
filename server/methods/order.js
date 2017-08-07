@@ -118,25 +118,43 @@ export function createBuyOrder(user, orderData) {
           orderData.done += tradeNumber;
           lastPrice = sellOrderData.unitPrice;
           indeedCost += (lastPrice * tradeNumber);
-          dbLog.insert({
-            logType: '交易紀錄',
-            username: [username, sellOrderData.username],
-            companyName: companyName,
-            price: lastPrice,
-            amount: tradeNumber,
-            createdAt: new Date()
-          });
           changeStocksAmount(username, companyName, tradeNumber);
-          Meteor.users.update(
-            {
-              username: sellOrderData.username
-            },
-            {
+          if (sellOrderData.username === '!system') {
+            dbLog.insert({
+              logType: '交易紀錄',
+              username: [username],
+              companyName: companyName,
+              price: lastPrice,
+              amount: tradeNumber,
+              createdAt: new Date()
+            });
+            dbCompanies.update({companyName}, {
               $inc: {
-                'profile.money': lastPrice * tradeNumber
+                profit: lastPrice * tradeNumber
               }
-            }
-          );
+            });
+          }
+          else {
+            const sellerUsername = sellOrderData.username;
+            dbLog.insert({
+              logType: '交易紀錄',
+              username: [username, sellerUsername],
+              companyName: companyName,
+              price: lastPrice,
+              amount: tradeNumber,
+              createdAt: new Date()
+            });
+            Meteor.users.update(
+              {
+                username: sellerUsername
+              },
+              {
+                $inc: {
+                  'profile.money': lastPrice * tradeNumber
+                }
+              }
+            );
+          }
         }
         resolveOrder(sellOrderData, tradeNumber);
       });
@@ -379,9 +397,10 @@ export function resolveOrder(orderData, done) {
   }
   const finalDone = orderData.done + done;
   if (finalDone === orderData.amount) {
+    const orderUserName = orderData.username === '!system' ? orderData.companyName : orderData.username;
     dbLog.insert({
       logType: '訂單完成',
-      username: [orderData.username],
+      username: [orderUserName],
       companyName: orderData.companyName,
       price: orderData.unitPrice,
       amount: orderData.amount,

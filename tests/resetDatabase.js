@@ -74,7 +74,7 @@ Meteor.startup(function() {
     const logData = dbLog.findOne({
       username: userData.username,
       logType: {
-        $nin: ['驗證通過', '創立成功', '創立失敗', '創立得股']
+        $nin: ['驗證通過', '發薪紀錄', '創立成功', '創立失敗', '創立得股']
       }
     });
     if (logData) {

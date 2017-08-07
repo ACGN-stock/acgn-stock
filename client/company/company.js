@@ -379,7 +379,8 @@ Template.companySellOrderList.helpers({
     );
   },
   getOrderDescription(orderData) {
-    const {username, orderType, unitPrice, amount, done} = orderData;
+    const username = orderData.username === '!system' ? orderData.companyName : orderData.username;
+    const {orderType, unitPrice, amount, done} = orderData;
     const number = amount - done;
 
     return `${username}以$${unitPrice}單價${orderType}數量${number}。`;
@@ -431,7 +432,7 @@ Template.companyLogList.helpers({
         return logData.username[0] + '獲得了' + logData.amount + '數量的公司股份。';
       }
       case '公司釋股': {
-        return '由於股票供不應求，公司釋出了' + logData.amount + '數量的股票到市場上。';
+        return '由於股價持續高漲，公司釋出了' + logData.amount + '數量的股票到市場上以套取利潤。';
       }
       case '購買下單': {
         return logData.username[0] + '下達了以每股單價$' + logData.price + '的單價購入' + logData.amount + '數量股票的訂單。';
@@ -480,7 +481,7 @@ Template.companyLogList.helpers({
         );
       }
       case '公司營利': {
-        return '在上季推出的產品獲得了$' + logData.amount + '的營利。';
+        return '在本季度的總營利額為$' + logData.amount + '。';
       }
       case '營利分紅': {
         return '發放了公司的營利分紅$' + logData.amount + '給' + logData.username[0] + '。';

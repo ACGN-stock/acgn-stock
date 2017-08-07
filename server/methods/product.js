@@ -1,6 +1,6 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
 import { dbProducts } from '../../db/dbProducts';
 import { dbCompanies } from '../../db/dbCompanies';
@@ -33,7 +33,11 @@ export function createProduct(user, productData) {
     throw new Meteor.Error(403, '相同的產品已經被推出過了！');
   }
   productData.createdAt = new Date();
-  dbProducts.insert(productData);
+  resourceManager.throwErrorIsResourceIsLock(['season']);
+  resourceManager.request('createProduct', ['season'], (release) => {
+    dbProducts.insert(productData);
+    release();
+  });
 }
 
 Meteor.methods({
@@ -56,7 +60,11 @@ export function retrieveProduct(user, productId) {
   if (! dbCompanies.findOne({companyName, manager})) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
   }
-  dbProducts.remove({_id: productId});
+  resourceManager.throwErrorIsResourceIsLock(['season']);
+  resourceManager.request('retrieveProduct', ['season'], (release) => {
+    dbProducts.remove({_id: productId});
+    release();
+  });
 }
 
 Meteor.methods({
@@ -84,6 +92,9 @@ export function voteProduct(user, productId) {
       beginDate: -1
     }
   });
+  if (! seasonData) {
+    throw new Meteor.Error(500, '商業季度尚未開始！');
+  }
   const votePrice = seasonData.votePrice;
   const username = user.username;
   resourceManager.throwErrorIsResourceIsLock(['season', 'user' + username]);
@@ -136,4 +147,77 @@ Meteor.publish('companyFutureProduct', function(companyName) {
   const overdue = 0;
 
   return dbProducts.find({companyName, overdue});
+});
+
+Meteor.publish('season', function(offset) {
+  check(offset, Match.Integer);
+
+  return dbSeason.find({}, {
+    sort: {
+      beginDate: -1
+    },
+    skip: offset === 0 ? 0 : (offset - 1),
+    limit: 3
+  });
+});
+
+Meteor.publish('productList', function({beginTime, endTime, sortBy, sortDir, offset}) {
+  check(beginTime, Number);
+  check(endTime, Number);
+  check(sortBy, new Match.OneOf('votes', 'type', 'companyName'));
+  check(sortDir, new Match.OneOf(1, -1));
+  check(offset, Match.Integer);
+  const beginDate = new Date(beginTime);
+  const endDate = new Date(endTime);
+
+  let initialized = false;
+  let total = dbProducts
+    .find(
+      {
+        createdAt: {
+          $gte: beginDate,
+          $lte: endDate
+        }
+      }
+    )
+    .count();
+  this.added('pagination', 'productList', {total});
+
+  const observer = dbProducts
+    .find(
+      {
+        createdAt: {
+          $gte: beginDate,
+          $lte: endDate
+        }
+      },
+      {
+        sort: {
+          [sortBy]: sortDir
+        },
+        skip: offset,
+        limit: 30
+      }
+    )
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('products', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('pagination', 'productList', {total});
+        }
+      },
+      removed: (id) => {
+        this.removed('products', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('pagination', 'productList', {total});
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
 });

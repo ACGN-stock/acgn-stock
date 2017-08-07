@@ -1,3 +1,92 @@
 <template name="productCenter">
-  產品中心施工中
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">產品中心</h1>
+      <hr />
+      {{> chooseSeasonForm}}
+      <hr />
+      {{> productListTable}}
+    </div>
+  </div>
+</template>
+
+<template name="chooseSeasonForm">
+  <form class="text-center">
+    <button
+      class="btn btn-info btn-sm float-left"
+      type="button"
+      disabled="{{isSeasonLinkDisabled 1}}"
+      data-action="addOffset"
+    >
+      <span aria-hidden="true">&laquo;</span>
+    </button>
+    商業季度：
+    {{formatDateText seasonBegin}}
+    ～
+    {{formatDateText seasonEnd}}
+    <button
+      class="btn btn-info btn-sm float-right"
+      type="button"
+      disabled="{{isSeasonLinkDisabled -1}}"
+      data-action="minusOffset"
+    >
+      <span aria-hidden="true">&raquo;</span>
+    </button>
+  </form>
+</template>
+
+<template name="productListTable">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center">產品名稱</th>
+        <th class="text-center">
+          公司名稱
+        </th>
+        <th class="text-center" style="width: 120px;">
+          類別
+        </th>
+        <th class="text-center" style="width: 120px;">
+          得票數
+          <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each product in productList}}
+        <tr>
+          <td class="text-left text-truncate px-2">
+            <a href="{{product.url}}" title="{{product.productName}}" target="_blank">
+              {{product.productName}}
+            </a>
+          </td>
+          <td class="text-left text-truncate px-2">
+            <a href="{{getCompanyLinkHref product.companyName}}" title="{{product.companyName}}">
+              {{product.companyName}}
+            </a>
+          </td>
+          <td class="text-center">
+            {{product.type}}
+          </td>
+          <td class="text-center px-2">
+            {{#if canVote}}
+              <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
+                {{product.votes}}
+                <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+              </button>
+            {{else}}
+              {{product.votes}}
+            {{/if}}
+          </td>
+        </tr>
+      {{else}}
+        <tr>
+          <td class="text-center" colspan="4">當季度沒有任何產品上架！</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{#with paginationData}}
+    {{> pagination}}
+  {{/with}}
 </template>
