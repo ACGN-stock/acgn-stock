@@ -6,8 +6,8 @@
         <hr />
         <h2 class="card-subtitle mb-2 text-muted">
           {{this.chairmanTitle}}：
-          {{getChainman this.companyName}}
-          {{#if isChairman this.companyName}}
+          {{getChainman}}
+          {{#if isChairman}}
             <a class="btn btn-primary btn-sm" href="#" data-action="changeChairmanTitle">
               修改頭銜
             </a>

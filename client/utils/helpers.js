@@ -1,6 +1,15 @@
 'use strict';
+import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { dbVariables } from '../../db/dbVariables';
+
+Meteor.subscribe('variables');
+
+Template.registerHelper('getVariable', function(variableName) {
+  return dbVariables.get(variableName);
+});
+
 
 export function formatDateText(date) {
   if (! date) {

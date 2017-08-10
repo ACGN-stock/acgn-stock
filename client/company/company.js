@@ -10,9 +10,9 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
-import { dbPagination } from '../utils/pagination';
+import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { createBuyOrder, createSellOrder, retrieveOrder } from '../utils/methods';
+import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.company);
 const rDirectorOffset = new ReactiveVar(0);
@@ -25,17 +25,19 @@ Template.company.onCreated(function() {
   this.subscribe('companyDetail', companyName);
   this.subscribe('companyCurrentProduct', companyName);
   this.subscribe('queryOwnStocks', companyName);
+  this.subscribe('todayDealAmount', companyName);
+  this.subscribe('queryChairmanAsVariable', companyName);
   rDirectorOffset.set(0);
   this.autorun(() => {
     this.subscribe('companyDirector', companyName, rDirectorOffset.get());
   });
   rBuyOrderOffset.set(0);
   this.autorun(() => {
-    this.subscribe('companyOrder', companyName, '購入', rBuyOrderOffset.get());
+    this.subscribe('companyOrderExcludeMe', companyName, '購入', rBuyOrderOffset.get());
   });
   rSellOrderOffset.set(0);
   this.autorun(() => {
-    this.subscribe('companyOrder', companyName, '賣出', rSellOrderOffset.get());
+    this.subscribe('companyOrderExcludeMe', companyName, '賣出', rSellOrderOffset.get());
   });
   rLogOffset.set(0);
   this.autorun(() => {
@@ -48,27 +50,17 @@ Template.company.helpers({
 
     return dbCompanies.findOne({companyName});
   },
-  isChairman(companyName) {
-    const chairmanData = dbDirectors.findOne({companyName}, {
-      sort: {
-        stocks: -1
-      },
-      limit: 1
-    });
+  isChairman() {
     const user = Meteor.user();
-    const username = user && user.username;
-
-    return chairmanData ? (username === chairmanData.username) : false;
+    if (user) {
+      return user.username === dbVariables.get('queryChairmanName');
+    }
+    else {
+      return false;
+    }
   },
-  getChainman(companyName) {
-    const chairmanData = dbDirectors.findOne({companyName}, {
-      sort: {
-        stocks: -1
-      },
-      limit: 1
-    });
-
-    return chairmanData ? chairmanData.username : '無';
+  getChainman() {
+    return dbVariables.get('queryChairmanName');
   },
   isManager(manager) {
     const user = Meteor.user();
@@ -81,15 +73,10 @@ Template.company.helpers({
   }
 });
 Template.company.events({
-  'click [data-action="changeChairmanTitle"]'(event, templateInstance) {
-    const companyData = templateInstance.data;
-    const chairmanTitle = window.prompt('要修改董事長的頭銜嗎？', companyData.chairmanTitle);
-    if (chairmanTitle && chairmanTitle.length <= 20) {
-      Meteor.call('changeChairmanTitle', companyData.companyName, chairmanTitle);
-    }
-    else {
-      window.alert('無效的頭銜名稱！');
-    }
+  'click [data-action="changeChairmanTitle"]'() {
+    const companyName = FlowRouter.getParam('companyName');
+    const companyData = dbCompanies.findOne({companyName});
+    changeChairmanTitle(companyData);
   }
 });
 
@@ -122,7 +109,7 @@ Template.companyDetail.onRendered(function() {
       data: {
         datasets: [
           {
-            label: '股價走勢',
+            label: '一日股價走勢',
             lineTension: 0,
             data: data
           }
@@ -190,7 +177,6 @@ Template.companyDetail.onRendered(function() {
       }
     });
   });
-  this.subscribe('todayDealAmount', companyName);
 });
 Template.companyDetail.helpers({
   priceDisplayClass(lastPrice, listPrice) {
@@ -205,9 +191,7 @@ Template.companyDetail.helpers({
     }
   },
   getTodayDealAmount() {
-    const paginationData = dbPagination.findOne('todayDealAmount');
-
-    return paginationData ? paginationData.total : 0;
+    return dbVariables.get('totalCountOfTodayDeal');
   }
 });
 
@@ -248,16 +232,10 @@ Template.companyDirectorList.helpers({
   },
   paginationData() {
     return {
-      subscribe: 'companyDirector',
+      useVariableForTotalCount: 'totalCountOfCompanyDirector',
       dataNumberPerPage: 10,
       offset: rDirectorOffset
     };
-  }
-});
-Template.companyDirectorList.events({
-  'click [data-action="more"]'(event) {
-    event.preventDefault();
-    rDirectorOffset.set(rDirectorOffset.get() + 10);
   }
 });
 
@@ -265,42 +243,43 @@ Template.companyBuyOrderList.helpers({
   myOrderList() {
     const companyName = this.companyName;
     const user = Meteor.user();
-    const username = user && user.username;
+    if (user) {
+      const username = user.username;
 
-    return dbOrders.find(
-      {
-        companyName: companyName,
-        orderType: '購入',
-        username: username
-      }, {
-        sort: {
-          createdAt: -1
+      return dbOrders.find(
+        {
+          companyName: companyName,
+          orderType: '購入',
+          username: username
         },
-        limit: rBuyOrderOffset.get() + 10
-      }
-    );
+        {
+          sort: {
+            createdAt: -1
+          }
+        }
+      );
+    }
   },
   orderList() {
     const companyName = this.companyName;
+    const filter = {
+      companyName: companyName,
+      orderType:  '購入'
+    };
     const user = Meteor.user();
-    const username = user && user.username;
+    if (user) {
+      filter.username = {
+        $ne: user.username
+      };
+    }
 
-    return dbOrders.find(
-      {
-        companyName: companyName,
-        orderType: '購入',
-        username: {
-          $ne: username
-        }
+    return dbOrders.find(filter, {
+      sort: {
+        unitPrice: -1,
+        createdAt: 1
       },
-      {
-        sort: {
-          orderType: 1,
-          unitPrice: 1
-        },
-        limit: rBuyOrderOffset.get() + 10
-      }
-    );
+      limit: 10
+    });
   },
   getOrderDescription(orderData) {
     const {username, orderType, unitPrice, amount, done} = orderData;
@@ -310,7 +289,7 @@ Template.companyBuyOrderList.helpers({
   },
   paginationData() {
     return {
-      subscribe: 'companyOrder購入',
+      useVariableForTotalCount: 'totalCountOfCompanyOrder購入',
       dataNumberPerPage: 10,
       offset: rBuyOrderOffset
     };
@@ -341,42 +320,44 @@ Template.companySellOrderList.helpers({
   myOrderList() {
     const companyName = this.companyName;
     const user = Meteor.user();
-    const username = user && user.username;
+    if (user) {
+      const username = user.username;
 
-    return dbOrders.find(
-      {
-        companyName: companyName,
-        orderType: '賣出',
-        username: username
-      }, {
-        sort: {
-          createdAt: -1
+      return dbOrders.find(
+        {
+          companyName: companyName,
+          orderType: '賣出',
+          username: username
         },
-        limit: rSellOrderOffset.get() + 10
-      }
-    );
+        {
+          sort: {
+            createdAt: -1
+          },
+          limit: rSellOrderOffset.get() + 10
+        }
+      );
+    }
   },
   orderList() {
     const companyName = this.companyName;
+    const filter = {
+      companyName: companyName,
+      orderType:  '賣出'
+    };
     const user = Meteor.user();
-    const username = user && user.username;
+    if (user) {
+      filter.username = {
+        $ne: user.username
+      };
+    }
 
-    return dbOrders.find(
-      {
-        companyName: companyName,
-        orderType: '賣出',
-        username: {
-          $ne: username
-        }
+    return dbOrders.find(filter, {
+      sort: {
+        unitPrice: 1,
+        createdAt: 1
       },
-      {
-        sort: {
-          orderType: 1,
-          unitPrice: 1
-        },
-        limit: rSellOrderOffset.get() + 10
-      }
-    );
+      limit: 10
+    });
   },
   getOrderDescription(orderData) {
     const username = orderData.username === '!system' ? orderData.companyName : orderData.username;
@@ -387,7 +368,7 @@ Template.companySellOrderList.helpers({
   },
   paginationData() {
     return {
-      subscribe: 'companyOrder賣出',
+      useVariableForTotalCount: 'totalCountOfCompanyOrder賣出',
       dataNumberPerPage: 10,
       offset: rSellOrderOffset
     };
@@ -432,7 +413,7 @@ Template.companyLogList.helpers({
         return logData.username[0] + '獲得了' + logData.amount + '數量的公司股份。';
       }
       case '公司釋股': {
-        return '由於股價持續高漲，公司釋出了' + logData.amount + '數量的股票到市場上以套取利潤。';
+        return '由於股價持續高漲，公司以$' + logData.price + '的價格釋出了' + logData.amount + '數量的股票到市場上以套取利潤。';
       }
       case '購買下單': {
         return logData.username[0] + '下達了以每股單價$' + logData.price + '的單價購入' + logData.amount + '數量股票的訂單。';
@@ -498,15 +479,9 @@ Template.companyLogList.helpers({
   },
   paginationData() {
     return {
-      subscribe: 'companyLog',
+      useVariableForTotalCount: 'totalCountOfcompanyLog',
       dataNumberPerPage: 30,
       offset: rLogOffset
     };
-  }
-});
-Template.companyLogList.events({
-  'click [data-action="more"]'(event) {
-    event.preventDefault();
-    rLogOffset.set(rLogOffset.get() + 50);
   }
 });

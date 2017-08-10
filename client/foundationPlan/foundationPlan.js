@@ -32,16 +32,10 @@ Template.foundationPlan.helpers({
   },
   paginationData() {
     return {
-      subscribe: 'foundationPlan',
+      useVariableForTotalCount: 'totalCountOfFoundationPlan',
       dataNumberPerPage: 10,
       offset: rFoundationOffset
     };
-  }
-});
-Template.foundationPlan.events({
-  'click [data-action="more"]'(event) {
-    event.preventDefault();
-    rFoundationOffset.set(rFoundationOffset.get() + 10);
   }
 });
 
@@ -57,6 +51,7 @@ Template.foundationFilterForm.events({
   submit(event, templateInstance) {
     event.preventDefault();
     rKeyword.set(templateInstance.$keyword.val());
+    rFoundationOffset.set(0);
   }
 });
 

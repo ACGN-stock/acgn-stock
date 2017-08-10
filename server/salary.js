@@ -20,6 +20,9 @@ export function paySalary() {
         $inc: {
           'profile.money': salaryPerPay
         }
+      },
+      {
+        multi: true
       }
     );
     dbLog.insert({

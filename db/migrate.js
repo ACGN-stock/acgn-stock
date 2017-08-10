@@ -2,13 +2,18 @@
 import { Meteor } from 'meteor/meteor';
 import { Migrations } from 'meteor/percolate:migrations';
 import { dbCompanies } from './dbCompanies';
-import { dbPrice } from './dbPrice';
 import { dbDirectors } from './dbDirectors';
 import { dbFoundations } from './dbFoundations';
 import { dbInstantMessage } from './dbInstantMessage';
 import { dbLog } from './dbLog';
 import { dbOrders } from './dbOrders';
+import { dbPrice } from './dbPrice';
 import { dbProducts } from './dbProducts';
+import { dbProductLike } from './dbProductLike';
+import { dbRankCompanyPrice } from './dbRankCompanyPrice';
+import { dbRankCompanyProfit } from './dbRankCompanyProfit';
+import { dbRankCompanyValue } from './dbRankCompanyValue';
+import { dbRankUserWealth } from './dbRankUserWealth';
 import { dbSeason } from './dbSeason';
 import { dbValidatingUsers } from './dbValidatingUsers';
 
@@ -17,11 +22,14 @@ if (Meteor.isServer) {
     version: 1,
     name: 'Create indexes.',
     up() {
-      dbCompanies.rawCollection().createIndex({
-        companyName: 1
-      }, {
-        unique: true
-      });
+      dbCompanies.rawCollection().createIndex(
+        {
+          companyName: 1
+        },
+        {
+          unique: true
+        }
+      );
       dbCompanies.rawCollection().createIndex({
         manager: 1
       });
@@ -38,23 +46,29 @@ if (Meteor.isServer) {
         companyName: 1,
         createdAt: -1
       });
-      dbDirectors.rawCollection().createIndex({
-        companyName: 1,
-        username: 1
-      }, {
-        unique: true
-      });
+      dbDirectors.rawCollection().createIndex(
+        {
+          companyName: 1,
+          username: 1
+        },
+        {
+          unique: true
+        }
+      );
       dbDirectors.rawCollection().createIndex({
         username: 1
       });
       dbFoundations.rawCollection().createIndex({
         createdAt: 1
       });
-      dbFoundations.rawCollection().createIndex({
-        companyName: 1
-      }, {
-        unique: true
-      });
+      dbFoundations.rawCollection().createIndex(
+        {
+          companyName: 1
+        },
+        {
+          unique: true
+        }
+      );
       dbInstantMessage.rawCollection().createIndex({
         createdAt: -1
       });
@@ -68,21 +82,27 @@ if (Meteor.isServer) {
         orderType: 1,
         unitPrice: 1
       });
-      dbProducts.rawCollection().createIndex({
-        companyName: 1,
-        url: 1
-      }, {
-        unique: true
-      });
+      dbProducts.rawCollection().createIndex(
+        {
+          companyName: 1,
+          url: 1
+        },
+        {
+          unique: true
+        }
+      );
       dbProducts.rawCollection().createIndex({
         overdue: 1
       });
-      dbValidatingUsers.rawCollection().createIndex({
-        username: 1,
-        password: 1
-      }, {
-        unique: true
-      });
+      dbValidatingUsers.rawCollection().createIndex(
+        {
+          username: 1,
+          password: 1
+        },
+        {
+          unique: true
+        }
+      );
     }
   });
   Migrations.add({
@@ -105,6 +125,38 @@ if (Meteor.isServer) {
     up() {
       dbSeason.rawCollection().createIndex({
         beginDate: -1
+      });
+    }
+  });
+  Migrations.add({
+    version: 4,
+    name: 'produect new schema.',
+    up() {
+      dbProducts.rawCollection().createIndex({
+        seasonId: 1,
+        likeCont: -1
+      });
+      dbProductLike.rawCollection().createIndex({
+        productId: 1,
+        username: 1
+      });
+    }
+  });
+  Migrations.add({
+    version: 5,
+    name: 'rank indexes.',
+    up() {
+      dbRankCompanyPrice.rawCollection().createIndex({
+        seasonId: 1
+      });
+      dbRankCompanyValue.rawCollection().createIndex({
+        seasonId: 1
+      });
+      dbRankCompanyProfit.rawCollection().createIndex({
+        seasonId: 1
+      });
+      dbRankUserWealth.rawCollection().createIndex({
+        seasonId: 1
       });
     }
   });

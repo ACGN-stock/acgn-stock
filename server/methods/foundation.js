@@ -26,7 +26,7 @@ Meteor.methods({
 
 export function foundCompany(user, foundCompanyData) {
   const companyName = foundCompanyData.companyName;
-  if (dbFoundations.findOne({companyName}) || dbCompanies.findOne({companyName})) {
+  if (dbFoundations.find({companyName}).count() > 0 || dbCompanies.find({companyName}).count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
   }
   foundCompanyData.manager = user.username;
@@ -58,7 +58,12 @@ Meteor.methods({
 });
 
 export function editFoundCompany(user, foundCompanyData) {
-  const oldFoundCompanyData = dbFoundations.findOne(foundCompanyData._id);
+  const oldFoundCompanyData = dbFoundations.findOne(foundCompanyData._id, {
+    fields: {
+      _id: 1,
+      manager: 1
+    }
+  });
   if (! oldFoundCompanyData) {
     throw new Meteor.Error(404, '找不到要編輯的新創計劃，該新創計劃可能已經創立成功或失敗！');
   }
@@ -66,16 +71,18 @@ export function editFoundCompany(user, foundCompanyData) {
     throw new Meteor.Error(401, '並非該新創計劃的發起人，無法編輯該新創計劃！');
   }
   const companyName = foundCompanyData.companyName;
-  if (dbCompanies.findOne({companyName})) {
+  if (dbCompanies.find({companyName}).count()) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市，無法創立同名公司！');
   }
-  const existsSameNameFoundCompanyData = dbFoundations.findOne({
-    _id: {
-      $ne: oldFoundCompanyData._id
-    },
-    companyName: companyName
-  });
-  if (existsSameNameFoundCompanyData) {
+  const existsSameNameFoundCompanies = dbFoundations
+    .find({
+      _id: {
+        $ne: oldFoundCompanyData._id
+      },
+      companyName: companyName
+    })
+    .count();
+  if (existsSameNameFoundCompanies.length > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司正在創立中，無法創立同名公司！');
   }
   resourceManager.throwErrorIsResourceIsLock(['foundation' + companyName]);
@@ -100,15 +107,15 @@ Meteor.methods({
 });
 
 export function investFoundCompany(user, companyName, amount) {
-  const minimumInvest = Math.ceil(config.beginReleaseStock / config.foundationNeedUsers);
+  const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
   if (amount < minimumInvest) {
     throw new Meteor.Error(403, '最低投資金額為' + minimumInvest + '！');
   }
   if (user.profile.money < amount) {
     throw new Meteor.Error(403, '金錢不足，無法投資！');
   }
-  const foundCompanyData = dbFoundations.findOne({companyName});
-  if (! foundCompanyData) {
+  const foundCompanyData = dbFoundations.find({companyName}).count();
+  if (foundCompanyData.length < 1) {
     throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
   }
   const username = user.username;
@@ -119,7 +126,12 @@ export function investFoundCompany(user, companyName, amount) {
     if (user.profile.money < amount) {
       throw new Meteor.Error(403, '金錢不足，無法投資！');
     }
-    const foundCompanyData = dbFoundations.findOne({companyName});
+    const foundCompanyData = dbFoundations.findOne({companyName}, {
+      fields: {
+        _id: 1,
+        invest: 1
+      }
+    });
     if (! foundCompanyData) {
       throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
     }
@@ -134,30 +146,20 @@ export function investFoundCompany(user, companyName, amount) {
     dbLog.insert({
       logType: '參與投資',
       username: [username],
-      companyName: foundCompanyData.companyName,
+      companyName: companyName,
       amount: amount,
       createdAt: new Date()
     });
-    Meteor.users.update(
-      {
-        _id: user._id
-      },
-      {
-        $inc: {
-          'profile.money': amount * -1
-        }
+    Meteor.users.update(user._id, {
+      $inc: {
+        'profile.money': amount * -1
       }
-    );
-    dbFoundations.update(
-      {
-        companyName: companyName
-      },
-      {
-        $set: {
-          invest: invest
-        }
+    });
+    dbFoundations.update(foundCompanyData._id, {
+      $set: {
+        invest: invest
       }
-    );
+    });
     release();
   });
 }
@@ -184,7 +186,9 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
 
   let initialized = false;
   let total = dbFoundations.find(filter).count();
-  this.added('pagination', 'foundationPlan', {total});
+  this.added('variables', 'totalCountOfFoundationPlan', {
+    value: total
+  });
 
   const observer = dbFoundations
     .find(filter, {
@@ -202,7 +206,9 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
         this.added('foundations', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('pagination', 'foundationPlan', {total});
+          this.changed('variables', 'totalCountOfFoundationPlan', {
+            value: total
+          });
         }
       },
       changed: (id, fields) => {
@@ -212,7 +218,9 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
         this.removed('foundations', id);
         if (initialized) {
           total -= 1;
-          this.changed('pagination', 'foundationPlan', {total});
+          this.changed('variables', 'totalCountOfFoundationPlan', {
+            value: total
+          });
         }
       }
     });

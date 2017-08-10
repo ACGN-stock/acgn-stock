@@ -113,7 +113,7 @@ Template.productListTable.helpers({
   },
   paginationData() {
     return {
-      subscribe: 'productList',
+      useVariableForTotalCount: 'totalCountOfProductList',
       dataNumberPerPage: 30,
       offset: rProductOffset
     };

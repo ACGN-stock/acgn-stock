@@ -21,23 +21,28 @@ Meteor.methods({
     return true;
   }
 });
-
 export function createProduct(user, productData) {
   const manager = user.username;
   const companyName = productData.companyName;
-  if (! dbCompanies.findOne({companyName, manager})) {
+  if (dbCompanies.find({companyName, manager}).count() < 1) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
   }
   const url = productData.url;
-  if (dbProducts.findOne({companyName, url})) {
+  if (dbProducts.find({companyName, url}).count() > 0) {
     throw new Meteor.Error(403, '相同的產品已經被推出過了！');
   }
-  productData.createdAt = new Date();
   resourceManager.throwErrorIsResourceIsLock(['season']);
-  resourceManager.request('createProduct', ['season'], (release) => {
-    dbProducts.insert(productData);
-    release();
+  const seasonData = dbSeason.findOne({}, {
+    sort: {
+      createdAt: -1
+    },
+    fields: {
+      _id: 1
+    }
   });
+  productData.seasonId = seasonData._id;
+  productData.createdAt = new Date();
+  dbProducts.insert(productData);
 }
 
 Meteor.methods({
@@ -49,7 +54,6 @@ Meteor.methods({
     return true;
   }
 });
-
 export function retrieveProduct(user, productId) {
   const manager = user.username;
   const productData = dbProducts.findOne(productId);
@@ -57,14 +61,11 @@ export function retrieveProduct(user, productId) {
     throw new Meteor.Error(404, '不存在的產品！');
   }
   const companyName = productData.companyName;
-  if (! dbCompanies.findOne({companyName, manager})) {
+  if (dbCompanies.find({companyName, manager}).count() < 1) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season']);
-  resourceManager.request('retrieveProduct', ['season'], (release) => {
-    dbProducts.remove({_id: productId});
-    release();
-  });
+  dbProducts.remove({_id: productId});
 }
 
 Meteor.methods({
@@ -76,16 +77,16 @@ Meteor.methods({
     return true;
   }
 });
-
 export function voteProduct(user, productId) {
   if (user.profile.vote < 1) {
     throw new Meteor.Error(403, '使用者已經沒有多餘的推薦票可以推薦！');
   }
-  const productData = dbProducts.findOne({
-    _id: productId
-  });
+  const productData = dbProducts.findOne(productId);
   if (! productData) {
     throw new Meteor.Error(404, '不存在的產品！');
+  }
+  if (productData.overdue !== 1) {
+    throw new Meteor.Error(401, '該產品的投票截止日期已經超過了！');
   }
   const seasonData = dbSeason.findOne({}, {
     sort: {
@@ -95,16 +96,21 @@ export function voteProduct(user, productId) {
   if (! seasonData) {
     throw new Meteor.Error(500, '商業季度尚未開始！');
   }
+  const companyName = productData.companyName;
   const votePrice = seasonData.votePrice;
   const username = user.username;
-  resourceManager.throwErrorIsResourceIsLock(['season', 'user' + username]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'companyProfit' + companyName, 'user' + username]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('voteProduct', ['season', 'user' + username], (release) => {
-    const user = Meteor.users.findOne({username});
+  resourceManager.request('voteProduct', ['companyProfit' + companyName, 'user' + username], (release) => {
+    const user = Meteor.users.findOne({username}, {
+      fields: {
+        _id: 1,
+        profile: 1
+      }
+    });
     if (user.profile.vote < 1) {
       throw new Meteor.Error(403, '使用者已經沒有多餘的推薦票可以推薦！');
     }
-    const companyName = productData.companyName;
     dbLog.insert({
       logType: '推薦產品',
       username: [username],
@@ -113,31 +119,21 @@ export function voteProduct(user, productId) {
       price: votePrice,
       createdAt: new Date()
     });
-    Meteor.users.update(
-      {
-        _id: user._id
-      },
-      {
-        $inc: {
-          'profile.vote': -1
-        }
+    Meteor.users.update(user._id, {
+      $inc: {
+        'profile.vote': -1
       }
-    );
+    });
     dbCompanies.update({companyName}, {
       $inc: {
         profit: votePrice
       }
     });
-    dbProducts.update(
-      {
-        _id: productId
-      },
-      {
-        $inc: {
-          votes: 1
-        }
+    dbProducts.update(productId, {
+      $inc: {
+        votes: 1
       }
-    );
+    });
     release();
   });
 }
@@ -156,62 +152,50 @@ Meteor.publish('season', function(offset) {
     sort: {
       beginDate: -1
     },
-    skip: offset === 0 ? 0 : (offset - 1),
+    skip: offset + 1,
     limit: 3
   });
 });
 
-Meteor.publish('productList', function({beginTime, endTime, sortBy, sortDir, offset}) {
-  check(beginTime, Number);
-  check(endTime, Number);
+Meteor.publish('seasonProductList', function({seasonId, sortBy, sortDir, offset}) {
+  check(seasonId, String);
   check(sortBy, new Match.OneOf('votes', 'type', 'companyName'));
   check(sortDir, new Match.OneOf(1, -1));
   check(offset, Match.Integer);
-  const beginDate = new Date(beginTime);
-  const endDate = new Date(endTime);
 
   let initialized = false;
   let total = dbProducts
-    .find(
-      {
-        createdAt: {
-          $gte: beginDate,
-          $lte: endDate
-        }
-      }
-    )
+    .find({seasonId})
     .count();
-  this.added('pagination', 'productList', {total});
+  this.added('variables', 'totalCountOfProductList', {
+    value: total
+  });
 
   const observer = dbProducts
-    .find(
-      {
-        createdAt: {
-          $gte: beginDate,
-          $lte: endDate
-        }
+    .find({seasonId}, {
+      sort: {
+        [sortBy]: sortDir
       },
-      {
-        sort: {
-          [sortBy]: sortDir
-        },
-        skip: offset,
-        limit: 30
-      }
-    )
+      skip: offset,
+      limit: 30
+    })
     .observeChanges({
       added: (id, fields) => {
         this.added('products', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('pagination', 'productList', {total});
+          this.changed('variables', 'totalCountOfProductList', {
+            value: total
+          });
         }
       },
       removed: (id) => {
         this.removed('products', id);
         if (initialized) {
           total -= 1;
-          this.changed('pagination', 'productList', {total});
+          this.changed('variables', 'totalCountOfProductList', {
+            value: total
+          });
         }
       }
     });

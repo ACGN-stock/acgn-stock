@@ -21,8 +21,15 @@ Meteor.methods({
 });
 
 Meteor.publish('instantMessage', function() {
-  const user = this.userId ? Meteor.users.findOne(this.userId) : null;
-  const username = user ? user.username : '';
+  let username = false;
+  if (this.userId) {
+    const user = Meteor.users.findOne(this.userId, {
+      fields: {
+        username: 1
+      }
+    });
+    username = user.username;
+  }
   const observer = dbInstantMessage
     .find({
       createdAt: {

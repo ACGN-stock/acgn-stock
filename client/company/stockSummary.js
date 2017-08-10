@@ -8,7 +8,7 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { createBuyOrder, createSellOrder, retrieveOrder } from '../utils/methods';
+import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.stockSummary);
 const rKeyword = new ReactiveVar('');
@@ -27,10 +27,16 @@ Template.stockSummary.onCreated(function() {
   this.autorun(() => {
     dbCompanies.find().forEach((companyData) => {
       this.subscribe('queryChairman', companyData.companyName);
-      this.subscribe('queryOwnStocks', companyData.companyName);
     });
   });
-  this.subscribe('queryMyOrder');
+  if (Meteor.user()) {
+    this.autorun(() => {
+      dbCompanies.find().forEach((companyData) => {
+        this.subscribe('queryOwnStocks', companyData.companyName);
+      });
+    });
+    this.subscribe('queryMyOrder');
+  }
 });
 Template.stockSummary.helpers({
   companyList() {
@@ -43,16 +49,10 @@ Template.stockSummary.helpers({
   },
   paginationData() {
     return {
-      subscribe: 'stockSummary',
+      useVariableForTotalCount: 'totalCountOfStockSummary',
       dataNumberPerPage: 10,
       offset: rStockOffset
     };
-  }
-});
-Template.stockSummary.events({
-  'click [data-action="more"]'(event) {
-    event.preventDefault();
-    rStockOffset.set(rStockOffset.get() + 10);
   }
 });
 
@@ -183,13 +183,7 @@ Template.companySummary.helpers({
 Template.companySummary.events({
   'click [data-action="changeChairmanTitle"]'(event, templateInstance) {
     const companyData = templateInstance.data;
-    const chairmanTitle = window.prompt('要修改董事長的頭銜嗎？', companyData.chairmanTitle);
-    if (chairmanTitle && chairmanTitle.length <= 20) {
-      Meteor.call('changeChairmanTitle', companyData.companyName, chairmanTitle);
-    }
-    else {
-      window.alert('無效的頭銜名稱！');
-    }
+    changeChairmanTitle(companyData);
   },
   'click [data-action="createBuyOrder"]'(event, templateInstance) {
     event.preventDefault();

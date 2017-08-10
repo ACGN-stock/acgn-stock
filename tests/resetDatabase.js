@@ -7,7 +7,7 @@ import { dbInstantMessage } from '../db/dbInstantMessage';
 import { dbLog } from '../db/dbLog';
 import { dbOrders } from '../db/dbOrders';
 import { dbPrice } from '../db/dbPrice';
-// import { dbProducts } from '../db/dbProducts';
+import { dbProducts } from '../db/dbProducts';
 import { dbResourceLock } from '../db/dbResourceLock';
 import { dbValidatingUsers } from '../db/dbValidatingUsers';
 import { Meteor } from 'meteor/meteor';
@@ -70,6 +70,7 @@ Meteor.startup(function() {
     }
   );
   dbInstantMessage.remove({});
+  let stoneCount = 0;
   Meteor.users.find().forEach((userData) => {
     const logData = dbLog.findOne({
       username: userData.username,
@@ -84,11 +85,13 @@ Meteor.startup(function() {
           'profile.stone': 1
         }
       });
+      stoneCount += 1;
     }
     else {
       console.log('user[' + userData.username + '] don\'t have log data.');
     }
   });
+  console.log('total give ' + stoneCount + ' stones to ' + stoneCount + ' users!');
   dbLog.remove({
     logType: {
       $ne: '驗證通過'
@@ -96,13 +99,18 @@ Meteor.startup(function() {
   });
   dbOrders.remove({});
   dbPrice.remove({});
+  dbProducts.remove({});
   dbResourceLock.remove({});
   dbValidatingUsers.remove({});
-  Meteor.users.update({}, {
-    $set: {
-      'profile.money': 10000
+  Meteor.users.update(
+    {},
+    {
+      $set: {
+        'profile.money': 10000
+      }
+    },
+    {
+      multi: true
     }
-  }, {
-    multi: true
-  });
+  );
 });

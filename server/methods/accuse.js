@@ -17,7 +17,11 @@ Meteor.methods({
 });
 
 function accuseCompany(user, companyName, message) {
-  const companyData = dbCompanies.findOne({companyName});
+  const companyData = dbCompanies.findOne({companyName}, {
+    fields: {
+      companyName: 1
+    }
+  });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
@@ -42,8 +46,10 @@ Meteor.methods({
 });
 
 function accuseProduct(user, productId, message) {
-  const productData = dbProducts.findOne({
-    _id: productId
+  const productData = dbProducts.findOne(productId, {
+    fields: {
+      companyName: 1
+    }
   });
   if (! productData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + productId + '」的產品！');

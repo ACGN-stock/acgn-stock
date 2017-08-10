@@ -26,6 +26,16 @@ const schema = new SimpleSchema({
   companyName: {
     type: String
   },
+  //推出季度
+  seasonId: {
+    type: String
+  },
+  //此產品的狀態。0 => 當季推出產品，1 => 上季推出產品，待投票結算營利中，2 => 過季產品。
+  overdue: {
+    type: Number,
+    allowedValues: [0, 1, 2],
+    defaultValue: 0
+  },
   //產品類別
   type: {
     type: String,
@@ -35,14 +45,13 @@ const schema = new SimpleSchema({
   url: {
     type: SimpleSchema.RegEx.Url
   },
-  //此產品的狀態。0 => 當季推出產品，1 => 上季推出產品，待投票結算營利中，2 => 過季產品。
-  overdue: {
-    type: Number,
-    allowedValues: [0, 1, 2],
-    defaultValue: 0
-  },
   //總票數
   votes: {
+    type: SimpleSchema.Integer,
+    defaultValue: 0
+  },
+  //喜愛股東數
+  likeCount: {
     type: SimpleSchema.Integer,
     defaultValue: 0
   },

@@ -10,11 +10,6 @@ import { dbFoundations } from '../../db/dbFoundations';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { regImageDataUrl } from '../utils/regexp';
 
-inheritedShowLoadingOnSubscribing(Template.company);
-Template.createFoundationPlan.onCreated(function() {
-  const foundationId = FlowRouter.getParam('foundationId');
-  this.subscribe('foundationPlanById', foundationId);
-});
 Template.createFoundationPlan.helpers({
   defaultData() {
     return {
@@ -23,6 +18,11 @@ Template.createFoundationPlan.helpers({
       description: ''
     };
   }
+});
+inheritedShowLoadingOnSubscribing(Template.editFoundationPlan);
+Template.editFoundationPlan.onCreated(function() {
+  const foundationId = FlowRouter.getParam('foundationId');
+  this.subscribe('foundationPlanById', foundationId);
 });
 Template.editFoundationPlan.helpers({
   editData() {

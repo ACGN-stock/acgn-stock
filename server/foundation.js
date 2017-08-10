@@ -1,6 +1,6 @@
 'use strict';
 import { _ } from 'meteor/underscore';
-// import { Meteor } from 'meteor/meteor';
+import { Meteor } from 'meteor/meteor';
 import { resourceManager } from './resourceManager';
 import { dbFoundations } from '../db/dbFoundations';
 import { dbLog } from '../db/dbLog';
@@ -9,8 +9,15 @@ import { dbDirectors } from '../db/dbDirectors';
 import { dbPrice } from '../db/dbPrice';
 import { config } from '../config';
 
-const {foundExpireTime, foundationNeedUsers, beginReleaseStock} = config;
+const {foundExpireTime, foundationNeedUsers, minReleaseStock} = config;
 export function checkFoundCompany() {
+  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
+  const priceBulk = dbPrice.rawCollection().initializeUnorderedBulkOp();
+  const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
+  const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+  let haveSuccessFoundations = false;
+  let haveFailFoundations = false;
   const foundExpireDate = new Date(Date.now() - foundExpireTime);
   dbFoundations
     .find(
@@ -23,18 +30,25 @@ export function checkFoundCompany() {
         fields: {
           _id: 1,
           companyName: 1,
-          invest: 1,
-          manager: 1,
+          invest: 1
         },
         disableOplog: true
       }
     )
     .forEach((foundationData) => {
       const companyName = foundationData.companyName;
-      if (foundationData.invest.length >= foundationNeedUsers) {
+      const invest = foundationData.invest;
+      if (invest.length >= foundationNeedUsers) {
+        haveSuccessFoundations = true;
         //先鎖定資源，再重新讀取一次資料進行運算
         resourceManager.request('checkFoundCompany', ['foundation' + companyName], (release) => {
-          const foundationData = dbFoundations.findOne({companyName});
+          const foundationData = dbFoundations.findOne({companyName}, {
+            fields: {
+              _id: 1,
+              invest: 1,
+              manager: 1,
+            }
+          });
           if (! foundationData) {
             release();
 
@@ -44,9 +58,10 @@ export function checkFoundCompany() {
           const totalInvest = _.reduce(invest, (sum, investData) => {
             return sum + investData.amount;
           }, 0);
+          const shouldReleaseStocks = Math.max(minReleaseStock, Math.floor(totalInvest / 10));
           const sortedInvest = _.sortBy(invest, 'amount').reverse();
           const directors = _.map(sortedInvest, ({username, amount}) => {
-            const stocks = Math.round(amount / totalInvest * beginReleaseStock) || 1;
+            const stocks = Math.ceil(amount / totalInvest * shouldReleaseStocks);
 
             return {username, stocks};
           });
@@ -56,16 +71,17 @@ export function checkFoundCompany() {
           const lastPrice = Math.round(totalInvest / totalRelease);
           const createdAt = new Date();
 
-          dbLog.insert({
+          logBulk.insert({
             logType: '創立成功',
             username: [foundationData.manager].concat(_.pluck(sortedInvest, 'username')),
             companyName: companyName,
             price: lastPrice,
             createdAt: createdAt
           });
-          dbCompanies.insert({
+          companiesBulk.insert({
             companyName: companyName,
             manager: foundationData.manager,
+            chairmanTitle: '董事長',
             tags: foundationData.tags,
             pictureSmall: foundationData.pictureSmall,
             pictureBig: foundationData.pictureBig,
@@ -74,48 +90,75 @@ export function checkFoundCompany() {
             lastPrice: lastPrice,
             listPrice: lastPrice,
             totalValue: totalRelease * lastPrice,
+            profit: 0,
             candidateList: [foundationData.manager],
+            voteList: [ [] ],
             createdAt: createdAt
           });
-          dbPrice.insert({
+          priceBulk.insert({
             companyName: companyName,
             price: lastPrice,
             createdAt: createdAt
           });
-          dbFoundations.remove({
-            _id: foundationData._id
-          });
+          dbFoundations.remove(foundationData._id);
           _.each(directors, ({username, stocks}) => {
-            dbLog.insert({
+            logBulk.insert({
               logType: '創立得股',
               username: [username],
               companyName: companyName,
               amount: stocks,
               createdAt: createdAt
             });
-            dbDirectors.insert({companyName, username, stocks, createdAt});
+            directorsBulk.insert({companyName, username, stocks, createdAt});
           });
           release();
         });
       }
       else {
-        // dbLog.insert({
-        //   logType: '創立失敗',
-        //   username: [foundationData.manager].concat(_.pluck(invest, 'username')),
-        //   companyName: companyName,
-        //   createdAt: new Date()
-        // });
-        // dbFoundations.remove({
-        //   _id: foundationData._id
-        // });
-        // _.each(invest, ({username, amount}) => {
-        //   Meteor.users.update({username}, {
-        //     $inc: {
-        //       'profile.money': amount
-        //     }
-        //   });
-        // });
+        haveFailFoundations = true;
+        logBulk.insert({
+          logType: '創立失敗',
+          username: [foundationData.manager].concat(_.pluck(invest, 'username')),
+          companyName: companyName,
+          createdAt: new Date()
+        });
+        //先鎖定資源，再重新讀取一次資料進行運算
+        resourceManager.request('checkFoundCompany', ['foundation' + companyName], (release) => {
+          const foundationData = dbFoundations.findOne({companyName}, {
+            fields: {
+              _id: 1,
+              invest: 1
+            }
+          });
+          if (! foundationData) {
+            release();
+
+            return false;
+          }
+          dbFoundations.remove(foundationData._id);
+          _.each(foundationData.invest, ({username, amount}) => {
+            usersBulk
+              .find({username})
+              .updateOne({
+                $inc: {
+                  'profile.money': amount
+                }
+              });
+          });
+          release();
+        });
       }
     });
+  if (haveSuccessFoundations || haveFailFoundations) {
+    logBulk.execute();
+    if (haveSuccessFoundations) {
+      companiesBulk.execute();
+      priceBulk.execute();
+      directorsBulk.execute();
+    }
+    if (haveFailFoundations) {
+      usersBulk.execute();
+    }
+  }
 }
 

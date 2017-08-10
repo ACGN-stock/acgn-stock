@@ -8,7 +8,7 @@ import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbLog } from '../../db/dbLog';
-import { dbConfig } from '../../db/dbConfig';
+import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
 
 Meteor.methods({
@@ -16,7 +16,7 @@ Meteor.methods({
     check(username, String);
     check(password, String);
 
-    if (Meteor.users.findOne({username})) {
+    if (Meteor.users.find({username}).count() > 0) {
       return true;
     }
     else {
@@ -54,7 +54,7 @@ Meteor.methods({
     if (result) {
       return true;
     }
-    else if (Meteor.users.findOne({username})) {
+    else if (Meteor.users.find({username}).count() > 0) {
       return true;
     }
     else {
@@ -66,8 +66,7 @@ Meteor.methods({
 const getValidateUserUrlBodySync = Meteor.wrapAsync((callback) => {
   const request = require('request');
   const cheerio = require('cheerio');
-  const configData = dbConfig.findOne();
-  request(configData.validateUserUrl, (error, response, body) => {
+  request(dbVariables.get('validateUserUrl'), (error, response, body) => {
     if (error) {
       callback(error);
     }
@@ -92,7 +91,11 @@ function validateUsers(checkUsername) {
             checkResult = true;
           }
           const password = validatingUser.password;
-          const existUser = Meteor.users.findOne({username});
+          const existUser = Meteor.users.findOne({username}, {
+            fields: {
+              _id: 1
+            }
+          });
           if (existUser) {
             Accounts.setPassword(existUser._id, password, {
               logout: true
@@ -131,9 +134,18 @@ Meteor.publish('accountInfo', function(username) {
         createdAt: 1
       }
     }),
-    dbCompanies.find({
-      manager: username
-    })
+    dbCompanies
+      .find(
+        {
+          manager: username
+        },
+        {
+          fields: {
+            companyName: 1,
+            manager: 1
+          }
+        }
+      )
   ];
 });
 
@@ -143,7 +155,9 @@ Meteor.publish('accountOwnStocks', function(username, offset) {
 
   let initialized = false;
   let total = dbDirectors.find({username}).count();
-  this.added('pagination', 'accountOwnStocks', {total});
+  this.added('variables', 'totalCountOfAccountOwnStocks', {
+    value: total
+  });
 
   const observer = dbDirectors
     .find({username}, {
@@ -155,7 +169,9 @@ Meteor.publish('accountOwnStocks', function(username, offset) {
         this.added('directors', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('pagination', 'accountOwnStocks', {total});
+          this.changed('variables', 'totalCountOfAccountOwnStocks', {
+            value: total
+          });
         }
       },
       changed: (id, fields) => {
@@ -165,7 +181,9 @@ Meteor.publish('accountOwnStocks', function(username, offset) {
         this.removed('directors', id);
         if (initialized) {
           total -= 1;
-          this.changed('pagination', 'accountOwnStocks', {total});
+          this.changed('variables', 'totalCountOfAccountOwnStocks', {
+            value: total
+          });
         }
       }
     });
@@ -185,6 +203,7 @@ Meteor.publish('accountInfoLog', function(username, offset) {
       createdAt: 1
     } 
   });
+  const firstLogDate = firstLogData ? firstLogData.createdAt : new Date();
 
   let initialized = false;
   let total = dbLog
@@ -194,12 +213,14 @@ Meteor.publish('accountInfoLog', function(username, offset) {
           $in: [username, '!all']
         },
         createdAt: {
-          $gte: firstLogData.createdAt
+          $gte: firstLogDate
         }
       }
     )
     .count();
-  this.added('pagination', 'accountInfoLog', {total});
+  this.added('variables', 'totalCountOfAccountInfoLog', {
+    value: total
+  });
 
   const observer = dbLog
     .find(
@@ -208,7 +229,7 @@ Meteor.publish('accountInfoLog', function(username, offset) {
           $in: [username, '!all']
         },
         createdAt: {
-          $gte: firstLogData.createdAt
+          $gte: firstLogDate
         }
       },
       {
@@ -224,14 +245,18 @@ Meteor.publish('accountInfoLog', function(username, offset) {
         this.added('log', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('pagination', 'accountInfoLog', {total});
+          this.changed('variables', 'totalCountOfAccountInfoLog', {
+            value: total
+          });
         }
       },
       removed: (id) => {
         this.removed('log', id);
         if (initialized) {
           total -= 1;
-          this.changed('pagination', 'accountInfoLog', {total});
+          this.changed('variables', 'totalCountOfAccountInfoLog', {
+            value: total
+          });
         }
       }
     });

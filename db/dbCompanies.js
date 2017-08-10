@@ -89,8 +89,7 @@ const schema = new SimpleSchema({
   },
   //選舉經理時的各候選者的支持董事列表
   voteList: {
-    type: Array,
-    defaultValue: [ [] ]
+    type: Array
   },
   'voteList.$': [String],
   //公司上市日期

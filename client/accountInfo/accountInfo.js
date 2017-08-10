@@ -108,7 +108,7 @@ Template.accountInfoOwnStocks.helpers({
 Template.accountInfoOwnStocks.helpers({
   paginationData() {
     return {
-      subscribe: 'accountOwnStocks',
+      useVariableForTotalCount: 'totalCountOfAccountOwnStocks',
       dataNumberPerPage: 10,
       offset: ownStocksOffset
     };
@@ -132,16 +132,10 @@ Template.accountInfoLogList.helpers({
   },
   paginationData() {
     return {
-      subscribe: 'accountInfoLog',
+      useVariableForTotalCount: 'totalCountOfAccountInfoLog',
       dataNumberPerPage: 30,
       offset: logOffset
     };
-  }
-});
-Template.accountInfoLogList.events({
-  'click [data-action="more"]'(event) {
-    event.preventDefault();
-    logOffset.set(logOffset.get() + 50);
   }
 });
 

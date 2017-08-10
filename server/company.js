@@ -6,38 +6,42 @@ import { dbCompanies } from '../db/dbCompanies';
 import { dbOrders } from '../db/dbOrders';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbLog } from '../db/dbLog';
-import { dbConfig } from '../db/dbConfig';
+import { dbSeason } from '../db/dbSeason';
 import { config } from '../config';
 
-let releaseStocksCounter = config.releaseStocksCounter;
+let releaseStocksCounter = generateReleaseStocksConter();
 export function releaseStocks() {
   releaseStocksCounter -= 1;
   if (releaseStocksCounter <= 0) {
-    releaseStocksCounter = config.releaseStocksCounter;
-    const avgData = dbCompanies.aggregate(
-      [
-        {
-          $group: {
-            _id: null,
-            avgPrice: {
-              $avg: '$lastPrice'
-            }
-          }
-        }
-      ]
-    );
-    if (! avgData[0]) {
+    releaseStocksCounter = generateReleaseStocksConter();
+    const maxPriceCompany = dbCompanies.findOne({}, {
+      sort: {
+        lastPrice: -1
+      }
+    });
+    if (! maxPriceCompany) {
       return false;
     }
-    const avgPrice = Math.round(avgData[0].avgPrice);
+    //釋股門檻價格
+    const thresholdPrice = Math.round(maxPriceCompany.lastPrice / 2);
     dbCompanies
       .find(
         {
           lastPrice: {
-            $gt: avgPrice
+            $gt: thresholdPrice
           }
         },
         {
+          fields: {
+            _id: 1,
+            companyName: 1,
+            manager: 1,
+            lastPrice: 1,
+            listPrice: 1,
+            totalRelease: 1,
+            profit: 1,
+            totalValue: 1
+          },
           disableOplog: true
         }
       )
@@ -53,13 +57,25 @@ export function releaseStocks() {
         }
         //先鎖定資源，再重新讀取一次資料進行運算
         resourceManager.request('releaseStocks', ['season', 'companyOrder' + companyName], (release) => {
-          const companyData = dbCompanies.findOne({companyName});
+          const companyData = dbCompanies.findOne({companyName}, {
+            fields: {
+              _id: 1,
+              companyName: 1,
+              manager: 1,
+              lastPrice: 1,
+              listPrice: 1,
+              totalRelease: 1,
+              profit: 1,
+              totalValue: 1
+            }
+          });
           const maxReleaseStocks = Math.floor(companyData.totalRelease * 0.05);
-          const releaseStocks = 1 + Math.floor(Math.random() * Math.min(companyData.lastPrice - avgPrice, maxReleaseStocks));
+          const releaseStocks = 1 + Math.floor(Math.random() * Math.min(companyData.lastPrice - thresholdPrice, maxReleaseStocks) / 2);
           dbLog.insert({
             logType: '公司釋股',
             companyName: companyName,
             amount: releaseStocks,
+            price: companyData.listPrice,
             createdAt: new Date()
           });
           dbCompanies.update(companyData._id, {
@@ -80,7 +96,8 @@ export function releaseStocks() {
               },
               {
                 sort: {
-                  unitPrice: -1
+                  unitPrice: -1,
+                  createdAt: 1
                 },
                 disableOplog: true
               }
@@ -128,6 +145,13 @@ export function releaseStocks() {
   }
 }
 
+function generateReleaseStocksConter() {
+  const min = config.releaseStocksMinCounter;
+  const max = (config.releaseStocksMaxCounter - min);
+
+  return min + Math.floor(Math.random() * max);
+}
+
 let recordListPriceConter = generateRecordListPriceConter();
 export function recordListPrice() {
   recordListPriceConter -= 1;
@@ -137,6 +161,12 @@ export function recordListPrice() {
       .find(
         {},
         {
+          fields: {
+            _id: 1,
+            companyName: 1,
+            lastPrice: 1,
+            listPrice: 1
+          },
           disableOplog: true
         }
       )
@@ -144,8 +174,14 @@ export function recordListPrice() {
         if (companyData.lastPrice !== companyData.listPrice) {
           const companyName = companyData.companyName;
           //先鎖定資源，再重新讀取一次資料進行運算
-          resourceManager.request('recordListPrice', ['companyOrder' + companyName], (release) => {
-            const companyData = dbCompanies.findOne({companyName});
+          resourceManager.request('recordListPrice', ['season', 'companyOrder' + companyName], (release) => {
+            const companyData = dbCompanies.findOne({companyName}, {
+              fields: {
+                _id: 1,
+                lastPrice: 1,
+                totalRelease: 1
+              }
+            });
             dbCompanies.update(companyData._id, {
               $set: {
                 listPrice: companyData.lastPrice,
@@ -182,20 +218,32 @@ export function electManager() {
         ]
       },
       {
+        fields: {
+          _id: 1,
+          companyName: 1,
+          manager: 1,
+          candidateList: 1,
+          voteList: 1
+        },
         disableOplog: true
-      })
+      }
+    )
     .forEach((companyData) => {
       //沒有經理人也沒有競選人的情況，不予處理
       if (companyData.candidateList.length === 0) {
         return true;
       }
       const companyName = companyData.companyName;
-      resourceManager.request('electManager', ['companyElect' + companyName], (release) => {
-        const configData = dbConfig.findOne();
+      resourceManager.request('electManager', ['season', 'companyElect' + companyName], (release) => {
+        const seasonData = dbSeason.findOne({}, {
+          sort: {
+            createdAt: -1
+          }
+        });
         const message = (
-          convertDateToText(configData.currentSeasonStartDate) +
+          convertDateToText(seasonData.beginDate) +
           '～' +
-          convertDateToText(configData.currentSeasonEndDate)
+          convertDateToText(seasonData.endDate)
         );
         //沒有經理人且只有一位競選人的情況下，直接當選
         if (companyData.candidateList.length === 1) {

@@ -3,7 +3,6 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { handleError } from '../utils/handleError';
-import { dbConfig } from '../../db/dbConfig';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { addTask, resolveTask } from '../layout/loading';
 import { regUsername } from '../utils/regexp';
@@ -14,7 +13,6 @@ const rValidateCode = new ReactiveVar('');
 let password = '';
 
 Template.validateDialog.onCreated(function() {
-  this.subscribe('dbConfig');
   this.autorun(() => {
     const usermame = rValidateUserName.get();
     if (usermame) {
@@ -34,21 +32,6 @@ Template.validateDialog.onCreated(function() {
 Template.validateDialog.helpers({
   validateUserName() {
     return rValidateUserName.get();
-  },
-  validateBoard() {
-    const configData = dbConfig.findOne();
-
-    return configData ? configData.validateUserBoardName : '';
-  },
-  validateAID() {
-    const configData = dbConfig.findOne();
-
-    return configData ? configData.validateUserAID : '';
-  },
-  validateUrl() {
-    const configData = dbConfig.findOne();
-
-    return configData ? configData.validateUserUrl : '';
   },
   validateCode() {
     return rValidateCode.get();

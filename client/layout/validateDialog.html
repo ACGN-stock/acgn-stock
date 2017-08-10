@@ -12,8 +12,10 @@
               <span class="text-info">{{validateUserName}}</span>
               尚未通過驗證，
               <br />
-              請在PTT {{validateBoard}}板的文章
-              <a href="{{validateUrl}}" target="_blank">{{validateAID}}</a>底下，
+              請在PTT {{getVariable validateUserBoardName}}板的文章
+              <a href="{{getVariable 'validateUserUrl'}}" target="_blank">
+                {{getVariable 'validateUserAID'}}
+              </a>底下，
               <br />使用帳號
               <span class="text-info">{{validateUserName}}</span>
               以<span class="text-danger">推</span>文的方式輸入驗證碼
@@ -21,7 +23,7 @@
               <br/>
               <span class="text-danger">
                 注意！本系統驗證方式是透過PTT Web版抓取網頁進行分析，而PTT Web版通常需要5~10分鐘才會更新最新的推文，
-                請確認<a href="{{validateUrl}}" target="_blank">驗證文章</a>最底下已經出現你的驗證推文之後再點擊驗證按鈕，
+                請確認<a href="{{getVariable 'validateUserUrl'}}" target="_blank">驗證文章</a>最底下已經出現你的驗證推文之後再點擊驗證按鈕，
                 以減少不必要伺服器負載，感謝您的配合！
               </span>
             </div>

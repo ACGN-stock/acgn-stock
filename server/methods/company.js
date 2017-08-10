@@ -2,107 +2,13 @@
 import { _ } from 'meteor/underscore';
 import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
+import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
-
-Meteor.methods({
-  revokeCompany(companyName, message) {
-    check(this.userId, String);
-    check(companyName, String);
-    check(message, String);
-    revokeCompany(Meteor.user(), companyName, message);
-
-    return true;
-  }
-});
-
-function revokeCompany(user, companyName, message) {
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(401, '權限不足！');
-  }
-  const companyData = dbCompanies.findOne({companyName});
-  if (! companyData) {
-    throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
-  }
-  dbLog.insert({
-    logType: '公司撤銷',
-    username: [companyData.manager],
-    companyName: companyName,
-    message: message,
-    createdAt: new Date()
-  });
-  dbCompanies.remove({
-    _id: companyData._id
-  });
-  dbDirectors.remove({
-    companyName: companyName
-  });
-  dbOrders.remove({
-    companyName: companyName
-  });
-  dbProducts.remove({
-    companyName: companyName
-  });
-}
-
-Meteor.methods({
-  revokeManagerQualification(username, message) {
-    check(this.userId, String);
-    check(message, String);
-    revokeManagerQualification(Meteor.user(), username, message);
-  }
-});
-
-function revokeManagerQualification(admin, username, message) {
-  if (! admin.profile.isAdmin) {
-    throw new Meteor.Error(401, '使用者並非管理員！');
-  }
-  const user = Meteor.users.findOne({username});
-  if (! user) {
-    throw new Meteor.Error(404, '找不到使用者「' + username + '」！');
-  }
-  dbLog.insert({
-    logType: '取消資格',
-    username: [admin.username, username],
-    message: message,
-    createdAt: new Date()
-  });
-  dbCompanies.find({
-    $or: [
-      {
-        manager: username
-      },
-      {
-        candidateList: username
-      }
-    ]
-  }, {
-    disableOplog: true
-  }).forEach((companyData) => {
-    if (companyData.manager === username) {
-      companyData.manager = '';
-    }
-    const {candidateList, voteList} = companyData;
-    const candidateIndex = _.indexOf(candidateList, username);
-    if (candidateIndex !== -1) {
-      candidateList.splice(candidateIndex, 1);
-      voteList.splice(candidateIndex, 1);
-    }
-    dbCompanies.update({
-      _id: companyData._id
-    }, {
-      $set: {
-        manager: companyData.manager,
-        candidateList: candidateList,
-        voteList: voteList
-      }
-    });
-  });
-}
 
 Meteor.methods({
   editCompany(companyName, newCompanyData) {
@@ -121,7 +27,13 @@ Meteor.methods({
 });
 
 function editCompany(user, companyName, newCompanyData) {
-  const companyData = dbCompanies.findOne({companyName});
+  const companyData = dbCompanies.findOne({companyName}, {
+    fields: {
+      _id: 1,
+      companyName: 1,
+      manager: 1
+    }
+  });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
@@ -152,33 +64,53 @@ Meteor.methods({
 });
 
 export function resignManager(user, companyName) {
-  const companyData = dbCompanies.findOne({companyName});
+  const companyData = dbCompanies.findOne({companyName}, {
+    fields: {
+      manager: 1
+    }
+  });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
-  if (user.username !== companyData.manager) {
+  const username = user.username;
+  if (username !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
-  dbLog.insert({
-    logType: '辭職紀錄',
-    username: [user.username],
-    companyName: companyName,
-    createdAt: new Date()
-  });
-  const {candidateList, voteList} = companyData.candidateList;
-  const candidateIndex = _.indexOf(candidateList, user.username);
-  if (candidateIndex !== -1) {
-    candidateList.splice(candidateIndex, 1);
-    voteList.splice(candidateIndex, 1);
-  }
-  dbCompanies.update({
-    _id: companyData._id
-  }, {
-    $set: {
-      manager: '!none',
-      candidateList: candidateList,
-      voteList: voteList
+  resourceManager.throwErrorIsResourceIsLock(['elect' + companyName]);
+  //先鎖定資源，再重新讀取一次資料進行運算
+  resourceManager.request('resignManager', ['elect' + companyName], (release) => {
+    const companyData = dbCompanies.findOne({companyName}, {
+      fields: {
+        _id: 1,
+        companyName: 1,
+        manager: 1,
+        candidateList: 1,
+        voteList: 1
+      }
+    });
+    if (username !== companyData.manager) {
+      throw new Meteor.Error(401, '使用者並非該公司的經理人！');
     }
+    const {candidateList, voteList} = companyData;
+    const candidateIndex = _.indexOf(candidateList, username);
+    if (candidateIndex !== -1) {
+      candidateList.splice(candidateIndex, 1);
+      voteList.splice(candidateIndex, 1);
+    }
+    dbLog.insert({
+      logType: '辭職紀錄',
+      username: [username],
+      companyName: companyName,
+      createdAt: new Date()
+    });
+    dbCompanies.update(companyData._id, {
+      $set: {
+        manager: '!none',
+        candidateList: candidateList,
+        voteList: voteList
+      }
+    });
+    release();
   });
 }
 
@@ -193,35 +125,63 @@ Meteor.methods({
 });
 
 export function contendManager(user, companyName) {
-  const companyData = dbCompanies.findOne({companyName});
+  const companyData = dbCompanies.findOne({companyName}, {
+    fields: {
+      _id: 1,
+      companyName: 1,
+      manager: 1,
+      candidateList: 1
+    }
+  });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
-  if (user.username === companyData.manager) {
+  const username = user.username;
+  if (username === companyData.manager) {
     throw new Meteor.Error(403, '使用者已經是該公司的經理人了！');
-  }
-  const {candidateList, voteList} = companyData;
-  if (_.contains(candidateList, user.username)) {
-    throw new Meteor.Error(403, '使用者已經是該公司的經理人候選者了！');
   }
   if (user.profile.revokeQualification) {
     throw new Meteor.Error(401, '使用者的競選經理人資格已經被取消了！');
   }
-  candidateList.push(user.username);
-  voteList.push([]);
-  dbLog.insert({
-    logType: '參選紀錄',
-    username: [user.username],
-    companyName: companyName,
-    createdAt: new Date()
-  });
-  dbCompanies.update({
-    _id: companyData._id
-  }, {
-    $set: {
-      candidateList: candidateList,
-      voteList: voteList
+  const candidateList = companyData.candidateList;
+  if (_.contains(candidateList, username)) {
+    throw new Meteor.Error(403, '使用者已經是該公司的經理人候選者了！');
+  }
+  resourceManager.throwErrorIsResourceIsLock(['elect' + companyName]);
+  //先鎖定資源，再重新讀取一次資料進行運算
+  resourceManager.request('resignManager', ['elect' + companyName], (release) => {
+    const companyData = dbCompanies.findOne({companyName}, {
+      fields: {
+        _id: 1,
+        companyName: 1,
+        manager: 1,
+        candidateList: 1,
+        voteList: 1
+      }
+    });
+    if (username === companyData.manager) {
+      throw new Meteor.Error(403, '使用者已經是該公司的經理人了！');
     }
+    const candidateList = companyData.candidateList;
+    if (_.contains(candidateList, username)) {
+      throw new Meteor.Error(403, '使用者已經是該公司的經理人候選者了！');
+    }
+    const voteList = companyData.voteList;
+    candidateList.push(username);
+    voteList.push([]);
+    dbLog.insert({
+      logType: '參選紀錄',
+      username: [username],
+      companyName: companyName,
+      createdAt: new Date()
+    });
+    dbCompanies.update(companyData._id, {
+      $set: {
+        candidateList: candidateList,
+        voteList: voteList
+      }
+    });
+    release();
   });
 }
 
@@ -236,18 +196,18 @@ Meteor.methods({
   }
 });
 
-export function supportCandidate(director, companyName, username) {
-  const companyData = dbCompanies.findOne({companyName});
+export function supportCandidate(director, companyName, candidateName) {
+  const companyData = dbCompanies.findOne({companyName}, {
+    fields: {
+      _id: 1,
+      companyName: 1,
+      manager: 1,
+      candidateList: 1,
+      voteList: 1
+    }
+  });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
-  }
-  const {candidateList, voteList} = companyData;
-  const candidateIndex = _.indexOf(candidateList, username);
-  if (candidateIndex === -1) {
-    throw new Meteor.Error(403, username + '並未競爭「' + companyName + '」公司經理人，無法進行支持！');
-  }
-  if (_.contains(voteList[candidateIndex], director.username)) {
-    throw new Meteor.Error(403, '使用者已經正在支持' + username + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
   }
   const directorName = director.username;
   const directorData = dbDirectors.findOne({
@@ -257,23 +217,58 @@ export function supportCandidate(director, companyName, username) {
   if (! directorData) {
     throw new Meteor.Error(401, '使用者並非「' + companyName + '」公司的董事，無法支持經理人！');
   }
-  const newVoteList = _.map(voteList, (votes) => {
-    return _.without(votes, directorName);
-  });
-  newVoteList[candidateIndex].push(directorName);
-
-  dbLog.insert({
-    logType: '支持紀錄',
-    username: [director.username, username],
-    companyName: companyName,
-    createdAt: new Date()
-  });
-  dbCompanies.update({
-    _id: companyData._id
-  }, {
-    $set: {
-      voteList: newVoteList
+  const {candidateList, voteList} = companyData;
+  const candidateIndex = _.indexOf(candidateList, candidateName);
+  if (candidateIndex === -1) {
+    throw new Meteor.Error(403, candidateName + '並未競爭「' + companyName + '」公司經理人，無法進行支持！');
+  }
+  if (_.contains(voteList[candidateIndex], directorName)) {
+    throw new Meteor.Error(403, '使用者已經正在支持' + candidateName + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
+  }
+  resourceManager.throwErrorIsResourceIsLock(['elect' + companyName, 'user' + directorName]);
+  //先鎖定資源，再重新讀取一次資料進行運算
+  resourceManager.request('resignManager', ['elect' + companyName, 'user' + directorName], (release) => {
+    const companyData = dbCompanies.findOne({companyName}, {
+      fields: {
+        _id: 1,
+        companyName: 1,
+        manager: 1,
+        candidateList: 1,
+        voteList: 1
+      }
+    });
+    const directorData = dbDirectors.findOne({
+      companyName: companyName,
+      username: directorName
+    });
+    if (! directorData) {
+      throw new Meteor.Error(401, '使用者並非「' + companyName + '」公司的董事，無法支持經理人！');
     }
+    const {candidateList, voteList} = companyData;
+    const candidateIndex = _.indexOf(candidateList, candidateName);
+    if (candidateIndex === -1) {
+      throw new Meteor.Error(403, candidateName + '並未競爭「' + companyName + '」公司經理人，無法進行支持！');
+    }
+    if (_.contains(voteList[candidateIndex], director.username)) {
+      throw new Meteor.Error(403, '使用者已經正在支持' + candidateName + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
+    }
+    const newVoteList = _.map(voteList, (votes) => {
+      return _.without(votes, directorName);
+    });
+    newVoteList[candidateIndex].push(directorName);
+
+    dbLog.insert({
+      logType: '支持紀錄',
+      username: [directorName, candidateName],
+      companyName: companyName,
+      createdAt: new Date()
+    });
+    dbCompanies.update(companyData._id, {
+      $set: {
+        voteList: newVoteList
+      }
+    });
+    release();
   });
 }
 
@@ -327,9 +322,13 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
       }
     ];
   }
-  const user = this.userId ? Meteor.users.findOne(this.userId) : null;
-  const username = user ? user.username : '';
-  if (username && isOnlyShowMine) {
+  if (this.userId && isOnlyShowMine) {
+    const user = Meteor.users.findOne(this.userId, {
+      fields: {
+        username: 1
+      }
+    });
+    const username = user.username;
     const orderCompanyNameList = dbOrders.find({username}).map((orderData) => {
       return orderData.companyName;
     });
@@ -346,12 +345,25 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   const skip = offset;
   const limit = 10 + offset;
   const fields = {
-    pictureBig: 0
+    _id: 1,
+    companyName: 1,
+    chairmanTitle: 1,
+    tags: 1,
+    pictureSmall: 1,
+    description: 1,
+    totalRelease: 1,
+    lastPrice: 1,
+    listPrice: 1,
+    profit: 1,
+    totalValue: 1,
+    createdAt: 1
   };
 
   let initialized = false;
   let total = dbCompanies.find(filter).count();
-  this.added('pagination', 'stockSummary', {total});
+  this.added('variables', 'totalCountOfStockSummary', {
+    value: total
+  });
 
   const observer = dbCompanies
     .find(filter, {sort, skip, limit, fields})
@@ -360,7 +372,9 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
         this.added('companies', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('pagination', 'stockSummary', {total});
+          this.changed('variables', 'totalCountOfStockSummary', {
+            value: total
+          });
         }
       },
       changed: (id, fields) => {
@@ -370,7 +384,9 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
         this.removed('companies', id);
         if (initialized) {
           total -= 1;
-          this.changed('pagination', 'stockSummary', {total});
+          this.changed('variables', 'totalCountOfStockSummary', {
+            value: total
+          });
         }
       }
     });
@@ -393,41 +409,91 @@ Meteor.publish('queryChairman', function(companyName) {
   });
 });
 
+Meteor.publish('queryChairmanAsVariable', function(companyName) {
+  check(companyName, String);
+
+  this.added('variables', 'queryChairmanName', {
+    value: '???'
+  });
+  const observer = dbDirectors
+    .find({companyName}, {
+      sort: {
+        stocks: -1
+      },
+      limit: 1
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.changed('variables', 'queryChairmanName', {
+          value: fields.username
+        });
+      },
+      changed: (id, fields) => {
+        if (fields.username) {
+          this.changed('variables', 'queryChairmanName', {
+            value: fields.username
+          });
+        }
+      },
+      removed: () => {
+        this.changed('variables', 'queryChairmanName', {
+          value: '???'
+        });
+      }
+    });
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
+});
+
 Meteor.publish('queryOwnStocks', function(companyName) {
   check(companyName, String);
   if (this.userId) {
-    const username = Meteor.users.findOne(this.userId).username;
+    const user = Meteor.users.findOne(this.userId, {
+      fields: {
+        username: 1
+      }
+    });
+    const username = user.username;
 
     return dbDirectors.find({username, companyName});
   }
 
-  return null;
+  return [];
 });
 
 Meteor.publish('queryMyOrder', function() {
   if (this.userId) {
-    const username = Meteor.users.findOne(this.userId).username;
+    const user = Meteor.users.findOne(this.userId, {
+      fields: {
+        username: 1
+      }
+    });
+    const username = user.username;
 
     return dbOrders.find({username});
   }
 
-  return null;
+  return [];
 });
 
 Meteor.publish('companyDetail', function(companyName) {
   check(companyName, String);
-  const servenDayAgo = new Date(Date.now() - 604800000);
+  const aDayAgo = new Date(Date.now() - 86400000);
 
   return [
     dbCompanies.find({companyName}, {
       fields: {
-        pictureSmall: 0
+        pictureSmall: 0,
+        candidateList: 0,
+        voteList: 0
       }
     }),
     dbPrice.find({
       companyName: companyName,
       createdAt: {
-        $gte: servenDayAgo
+        $gte: aDayAgo
       }
     })
   ];
@@ -435,7 +501,7 @@ Meteor.publish('companyDetail', function(companyName) {
 
 Meteor.publish('todayDealAmount', function(companyName) {
   check(companyName, String);
-  const todayBegin = new Date().setHours(0, 0, 0, 0);
+  const todayBegin = new Date(new Date().setHours(0, 0, 0, 0));
   const filter = {
     logType: '交易紀錄',
     companyName: companyName,
@@ -445,15 +511,18 @@ Meteor.publish('todayDealAmount', function(companyName) {
   };
 
   let total = 0;
-  this.added('pagination', 'todayDealAmount', {total});
+  this.added('variables', 'totalCountOfTodayDeal', {
+    value: total
+  });
 
   const observer = dbLog
     .find(filter)
     .observeChanges({
       added: (id, fields) => {
-        console.log(fields);
         total += fields.amount;
-        this.changed('pagination', 'todayDealAmount', {total});
+        this.changed('variables', 'totalCountOfTodayDeal', {
+          value: total
+        });
       }
     });
   this.ready();
@@ -467,7 +536,9 @@ Meteor.publish('companyDirector', function(companyName, offset) {
 
   let initialized = false;
   let total = dbDirectors.find({companyName}).count();
-  this.added('pagination', 'companyDirector', {total});
+  this.added('variables', 'totalCountOfCompanyDirector', {
+    value: total
+  });
 
   const observer = dbDirectors
     .find({companyName}, {
@@ -475,14 +546,16 @@ Meteor.publish('companyDirector', function(companyName, offset) {
         stocks: -1
       },
       skip: offset,
-      limit: 10 + offset
+      limit: 10
     })
     .observeChanges({
       added: (id, fields) => {
         this.added('directors', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('pagination', 'companyDirector', {total});
+          this.changed('variables', 'totalCountOfCompanyDirector', {
+            value: total
+          });
         }
       },
       changed: (id, fields) => {
@@ -492,7 +565,9 @@ Meteor.publish('companyDirector', function(companyName, offset) {
         this.removed('directors', id);
         if (initialized) {
           total -= 1;
-          this.changed('pagination', 'companyDirector', {total});
+          this.changed('variables', 'totalCountOfCompanyDirector', {
+            value: total
+          });
         }
       }
     });
@@ -508,7 +583,9 @@ Meteor.publish('companyLog', function(companyName, offset) {
 
   let initialized = false;
   let total = dbLog.find({companyName}).count();
-  this.added('pagination', 'companyLog', {total});
+  this.added('variables', 'totalCountOfcompanyLog', {
+    value: total
+  });
 
   const observer = dbLog
     .find({companyName}, {
@@ -523,7 +600,9 @@ Meteor.publish('companyLog', function(companyName, offset) {
         this.added('log', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('pagination', 'companyLog', {total});
+          this.changed('variables', 'totalCountOfcompanyLog', {
+            value: total
+          });
         }
       },
       changed: (id, fields) => {
@@ -533,7 +612,9 @@ Meteor.publish('companyLog', function(companyName, offset) {
         this.removed('log', id);
         if (initialized) {
           total -= 1;
-          this.changed('pagination', 'companyLog', {total});
+          this.changed('variables', 'totalCountOfcompanyLog', {
+            value: total
+          });
         }
       }
     });
@@ -544,34 +625,47 @@ Meteor.publish('companyLog', function(companyName, offset) {
   });
 });
 
-Meteor.publish('companyOrder', function(companyName, type, offset) {
+Meteor.publish('companyOrderExcludeMe', function(companyName, type, offset) {
   check(companyName, String);
   check(type, new Match.OneOf('購入', '賣出'));
 
-  const paginationId = 'companyOrder' + type;
-  let initialized = false;
-  let total = dbOrders.find({companyName}).count();
-  this.added('pagination', paginationId, {total});
-
-  const observer = dbOrders.find(
-      {
-        companyName: companyName,
-        orderType: type
-      },
-      {
-        sort: {
-          unitPrice: type === '賣出' ? 1 : -1
-        },
-        skip: offset,
-        limit: 10
+  const filter = {
+    companyName: companyName,
+    orderType: type
+  };
+  if (this.userId) {
+    const user = Meteor.users.findOne(this.userId, {
+      fields: {
+        username: 1
       }
-    )
+    });
+    filter.username = {
+      $ne: user.username
+    };
+  }
+
+  const variableId = 'totalCountOfCompanyOrder' + type;
+  let initialized = false;
+  let total = dbOrders.find(filter).count();
+  this.added('variables', variableId, {
+    value: total
+  });
+
+  const observer = dbOrders.find(filter, {
+      sort: {
+        unitPrice: type === '賣出' ? 1 : -1
+      },
+      skip: offset,
+      limit: 10
+    })
     .observeChanges({
       added: (id, fields) => {
         this.added('orders', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('pagination', paginationId, {total});
+          this.changed('variables', variableId, {
+            value: total
+          });
         }
       },
       changed: (id, fields) => {
@@ -581,7 +675,9 @@ Meteor.publish('companyOrder', function(companyName, type, offset) {
         this.removed('orders', id);
         if (initialized) {
           total -= 1;
-          this.changed('pagination', paginationId, {total});
+          this.changed('variables', variableId, {
+            value: total
+          });
         }
       }
     });
@@ -599,15 +695,3 @@ Meteor.publish('companyCurrentProduct', function(companyName) {
   return dbProducts.find({companyName, overdue});
 });
 
-Meteor.publish('companyOldProduct', function(companyName, offset) {
-  check(companyName, String);
-  const overdue = 2;
-
-  return dbProducts.find({companyName, overdue}, {
-    sort: {
-      createdAt: -1
-    },
-    skip: offset,
-    limit: 10 + offset
-  });
-});

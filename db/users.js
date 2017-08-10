@@ -46,6 +46,11 @@ const schema = new SimpleSchema({
         type: SimpleSchema.Integer,
         min: 0,
         defaultValue: 0
+      },
+      costStone: {
+        type: SimpleSchema.Integer,
+        min: 0,
+        defaultValue: 0
       }
     })
   },
@@ -53,11 +58,6 @@ const schema = new SimpleSchema({
   heartbeat: {
     type: Date,
     optional: true
-  },
-  //上次領取薪水的日期
-  lastPayDay: {
-    type: Date,
-    defaultValue: new Date(0)
   }
 });
 Meteor.users.attachSchema(schema);

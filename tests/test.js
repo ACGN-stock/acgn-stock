@@ -10,7 +10,7 @@ import { dbProducts } from '../db/dbProducts';
 import { foundCompany, investFoundCompany } from '../server/methods/foundation';
 import { createBuyOrder, createSellOrder, retrieveOrder } from '../server/methods/order';
 import { createProduct, voteProduct } from '../server/methods/product';
-// import { resignManager, contendManager, supportCandidate } from '../server/methods/company';
+import { resignManager, contendManager, supportCandidate } from '../server/methods/company';
 import { config } from '../config';
 
 if (Meteor.users.find().count() < 1) {
@@ -61,7 +61,9 @@ function doSomething(userId) {
     const investMoney = randomNumber(user.profile.money - 200, 500);
     if (investMoney > 100) {
       console.log(username + ' want to invest a found company!');
-      const foundationData = _.sample(dbFoundations.find().fetch());
+      const foundationData = dbFoundations.findOne({}, {
+        skip: randomNumber(foundationNumber, 0)
+      });
       investFoundCompany(user, foundationData.companyName, investMoney);
     }
   }
@@ -79,24 +81,36 @@ function doSomething(userId) {
     .unique()
     .value();
   const canBuyStockCompanyList = dbCompanies
-    .find({
-      companyName: {
-        $nin: sellOrderCompanyNameList
+    .find(
+      {
+        companyName: {
+          $nin: sellOrderCompanyNameList
+        }
+      },
+      {
+        fields: {
+          companyName: 1,
+          listPrice: 1
+        },
+        disableOplog: true
       }
-    })
+    )
     .fetch();
   if (canBuyStockCompanyList.length > 0 && probability(50)) {
     const companyData = _.sample(canBuyStockCompanyList);
     const useMoney = randomNumber(user.profile.money);
-    const unitPrice = randomNumber(companyData.listPrice * 2, Math.ceil(companyData.listPrice / 2));
-    const amount = Math.floor(useMoney / unitPrice);
-    if (amount > 0) {
-      console.log(username + ' want to buy stocks of 「' + companyData.companyName + '」!');
-      createBuyOrder(user, {
-        companyName: companyData.companyName,
-        unitPrice: unitPrice || 1,
-        amount: amount
-      });
+    const minPrice = Math.ceil(companyData.listPrice / 2);
+    if (useMoney > minPrice) {
+      const unitPrice = randomNumber(Math.min(useMoney, companyData.listPrice * 2), Math.min(useMoney, minPrice));
+      const amount = Math.floor(useMoney / unitPrice);
+      if (amount > 0) {
+        console.log(username + ' want to buy stocks of 「' + companyData.companyName + '」!');
+        createBuyOrder(user, {
+          companyName: companyData.companyName,
+          unitPrice: unitPrice || 1,
+          amount: amount
+        });
+      }
     }
   }
   const buyOrderList = _.where(orderList, {
@@ -107,42 +121,60 @@ function doSomething(userId) {
     .unique()
     .value();
   const canSellStockList = dbDirectors
-    .find({
-      username: username,
-      companyName: {
-        $nin: buyOrderCompanyNameList
+    .find(
+      {
+        username: username,
+        companyName: {
+          $nin: buyOrderCompanyNameList
+        }
+      },
+      {
+        fields: {
+          companyName: 1,
+          stocks: 1
+        },
+        disableOplog: true
       }
-    })
+    )
     .fetch();
-  if (canSellStockList.length > 0 && probability(50)) {
+  if (canSellStockList.length > 0) {
     const directorData = _.sample(canSellStockList);
     const companyName = directorData.companyName;
-    const companyData = dbCompanies.findOne({companyName});
-    console.log(username + ' want to sell some stocks of 「' + companyName + '」!');
-
-    createSellOrder(user, {
-      companyName: companyName,
-      unitPrice: randomNumber(companyData.listPrice * 2, Math.ceil(companyData.listPrice / 2)),
-      amount: probability(10) ? directorData.stocks : randomNumber(directorData.stocks)
+    const companyData = dbCompanies.findOne({companyName}, {
+      fields: {
+        companyName: 1,
+        listPrice: 1,
+        candidateList: 1,
+        voteList: 1
+      },
+      disableOplog: true
     });
+    if (probability(50)) {
+      console.log(username + ' want to sell some stocks of 「' + companyName + '」!');
+
+      createSellOrder(user, {
+        companyName: companyName,
+        unitPrice: randomNumber(companyData.listPrice * 2, Math.ceil(companyData.listPrice / 2)),
+        amount: probability(10) ? directorData.stocks : randomNumber(directorData.stocks)
+      });
+    }
+    else {
+      const candidateIndex = randomNumber(companyData.candidateList.length) - 1;
+      if (! _.contains(companyData.voteList[candidateIndex], username)) {
+        console.log(username + ' support a candidate!');
+        supportCandidate(user, companyName, companyData.candidateList[candidateIndex]);
+      }
+    }
   }
 
-  // else {
-  //   const candidateIndex = randomNumber(companyData.candidateList.length) - 1;
-  //   if (! _.contains(companyData.voteList[candidateIndex], username)) {
-  //     console.log(username + ' support a candidate!');
-  //     supportCandidate(user, companyName, companyData.candidateList[candidateIndex]);
-  //   }
-  // }
   const beManagerCompanies = dbCompanies.find({manager: username}).fetch();
   if (beManagerCompanies.length) {
-    // if (probability(5)) {
-    //   console.log(username + ' want to resign a manager!');
-    //   const companyData = _.sample(beManagerCompanies);
-    //   resignManager(user, companyData.companyName);
-    // }
-    // else if (probability(30)) {
-    if (dbProducts.find().count() < 12) {
+    if (probability(5)) {
+      console.log(username + ' want to resign a manager!');
+      const companyData = _.sample(beManagerCompanies);
+      resignManager(user, companyData.companyName);
+    }
+    else if (dbProducts.find().count() < 12) {
       console.log(username + ' want to create a product!');
       const companyData = _.sample(beManagerCompanies);
       const randomSuffix = Date.now();
@@ -154,24 +186,33 @@ function doSomething(userId) {
       });
     }
   }
-  // else if (probability(5)) {
-  //   const matchCompanies = dbCompanies.find({
-  //     $nor: [
-  //       {
-  //         manager: username
-  //       },
-  //       {
-  //         candidateList: username
-  //       }
-  //     ]
-  //   })
-  //   .fetch();
-  //   if (matchCompanies.length) {
-  //     console.log(username + ' want to contend a manager!');
-  //     const companyData = _.sample(matchCompanies);
-  //     contendManager(user, companyData.companyName);
-  //   }
-  // }
+  else if (probability(5)) {
+    const matchCompanies = dbCompanies
+      .find(
+        {
+          $nor: [
+            {
+              manager: username
+            },
+            {
+              candidateList: username
+            }
+          ]
+        },
+        {
+          fields: {
+            companyName: 1
+          },
+          disableOplog: true
+        }
+      )
+      .fetch();
+    if (matchCompanies.length) {
+      console.log(username + ' want to contend a manager!');
+      const companyData = _.sample(matchCompanies);
+      contendManager(user, companyData.companyName);
+    }
+  }
   if (user.profile.vote > 0 && dbProducts.find({overdue: 1}).count() > 0) {
     console.log(username + ' want to recommend some product!');
     const productList = dbProducts.find({overdue: 1}).fetch();

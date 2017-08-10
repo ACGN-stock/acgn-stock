@@ -133,3 +133,13 @@ export function retrieveOrder(orderData) {
     Meteor.call('retrieveOrder', orderData._id);
   }
 }
+
+export function changeChairmanTitle(companyData) {
+  const chairmanTitle = window.prompt('要修改董事長的頭銜嗎？', companyData.chairmanTitle);
+  if (chairmanTitle && chairmanTitle.length <= 20) {
+    Meteor.call('changeChairmanTitle', companyData.companyName, chairmanTitle);
+  }
+  else {
+    window.alert('無效的頭銜名稱！');
+  }
+}
