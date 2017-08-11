@@ -31,7 +31,8 @@ export const logTypeList = [
   '舉報公司', //username0以「message」理由舉報了「companyName」公司！
   '舉報產品', //username0以「message」理由舉報了「companyName」公司的#productId產品！
   '公司撤銷', //username0以「message」理由撤銷了「companyName」公司！
-  '取消資格' //username0以「message」理由取消了username1擔任經理人的資格！
+  '取消資格', //username0以「message」理由取消了username1擔任經理人的資格！
+  '免費得石' //username0因為「message」的理由獲得了amount顆聖晶石！
 ];
 
 //schema

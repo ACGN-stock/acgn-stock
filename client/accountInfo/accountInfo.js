@@ -144,6 +144,9 @@ Template.accountInfoLog.helpers({
     const user = Meteor.user();
     const username = (user && user.username);
     switch (logData.logType) {
+      case '免費得石': {
+        return '因為「' + logData.message + '」的理由獲得了' + logData.amount + '顆聖晶石！。';
+      }
       case '驗證通過': {
         return '帳號驗證通過，領取起始資金$' + logData.price + '。';
       }
