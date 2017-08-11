@@ -1,6 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo';
 import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
 import { dbFoundations } from '../../db/dbFoundations';
@@ -44,7 +45,7 @@ Meteor.methods({
   editFoundCompany(foundCompanyData) {
     check(this.userId, String);
     check(foundCompanyData, {
-      _id: String,
+      _id: Mongo.Collection.ObjectID,
       companyName: String,
       tags: [String],
       pictureSmall: new Match.Maybe(String),
@@ -148,6 +149,7 @@ export function investFoundCompany(user, companyName, amount) {
       username: [username],
       companyName: companyName,
       amount: amount,
+      resolve: false,
       createdAt: new Date()
     });
     Meteor.users.update(user._id, {
@@ -233,6 +235,7 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
 
 Meteor.publish('foundationPlanById', function(foundationId) {
   check(foundationId, String);
+  foundationId = new Mongo.Collection.ObjectID(foundationId);
 
   return dbFoundations.find(foundationId);
 });

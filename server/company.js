@@ -76,6 +76,7 @@ export function releaseStocks() {
             companyName: companyName,
             amount: releaseStocks,
             price: companyData.listPrice,
+            resolve: false,
             createdAt: new Date()
           });
           dbCompanies.update(companyData._id, {

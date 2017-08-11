@@ -1,5 +1,6 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo';
 import { dbLog } from '../db/dbLog';
 import { dbInstantMessage } from '../db/dbInstantMessage';
 import { dbResourceLock } from '../db/dbResourceLock';
@@ -11,7 +12,6 @@ Meteor.startup(function() {
 
 function handleInstantMessage() {
   try {
-    const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
     const instantMessageBulk = dbInstantMessage.rawCollection().initializeUnorderedBulkOp();
     let needExecute = false;
     dbResourceLock.insert({
@@ -20,6 +20,7 @@ function handleInstantMessage() {
       task: 'handleInstantMessage',
       time: new Date()
     });
+    const logIdList = [];
     dbLog
       .find(
         {
@@ -30,6 +31,8 @@ function handleInstantMessage() {
         }
       )
       .forEach((log) => {
+        logIdList.push(log._id);
+        needExecute = true;
         const instantMessage = {
           type: log.logType,
           createdAt: log.createdAt,
@@ -141,18 +144,12 @@ function handleInstantMessage() {
             instantMessage.message = log.username[0] + '以「' + log.message + '」理由取消了' + log.username[1] + '擔任經理人的資格！';
             break;
           }
+          //免費得石不進即時訊息
+          case '免費得石': {
+            return false;
+          }
         }
         instantMessageBulk.insert(instantMessage);
-        logBulk
-          .find({
-            _id: log._id
-          })
-          .updateOne({
-            $set: {
-              resolve: true
-            }
-          });
-        needExecute = true;
       })
     //清除一分鐘前的即時訊息
     dbInstantMessage.remove({
@@ -161,7 +158,21 @@ function handleInstantMessage() {
       }
     });
     if (needExecute) {
-      logBulk.execute();
+      dbLog.update(
+        {
+          _id: {
+            $in: logIdList
+          }
+        },
+        {
+          $set: {
+            resolve: true
+          }
+        },
+        {
+          multi: true
+        }
+      );
       instantMessageBulk.execute();
     }
   }

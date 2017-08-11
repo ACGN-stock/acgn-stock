@@ -3,7 +3,9 @@ import SimpleSchema from 'simpl-schema';
 import { Mongo } from 'meteor/mongo';
 
 //公司股價排行榜
-export const dbRankCompanyPrice = new Mongo.Collection('rankCompanyPrice');
+export const dbRankCompanyPrice = new Mongo.Collection('rankCompanyPrice', {
+  idGeneration: 'MONGO'
+});
 export default dbRankCompanyPrice;
 
 //schema

@@ -3,7 +3,9 @@ import SimpleSchema from 'simpl-schema';
 import { Mongo } from 'meteor/mongo';
 
 //使用者財富排行榜
-export const dbRankUserWealth = new Mongo.Collection('rankUserWealth');
+export const dbRankUserWealth = new Mongo.Collection('rankUserWealth', {
+  idGeneration: 'MONGO'
+});
 export default dbRankUserWealth;
 
 //schema

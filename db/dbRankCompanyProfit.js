@@ -3,7 +3,9 @@ import SimpleSchema from 'simpl-schema';
 import { Mongo } from 'meteor/mongo';
 
 //公司營利排行榜
-export const dbRankCompanyProfit = new Mongo.Collection('rankCompanyProfit');
+export const dbRankCompanyProfit = new Mongo.Collection('rankCompanyProfit', {
+  idGeneration: 'MONGO'
+});
 export default dbRankCompanyProfit;
 
 //schema

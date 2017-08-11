@@ -296,7 +296,7 @@ function generateRankData(seasonData) {
         stocksValue: rankData.stocksValue
       });
     });
-    rankUserBulk.tojson().nBatches && rankUserBulk.execute();
+    rankUserBulk.execute();
     console.log('done insert user\'s rank data...');
   }
 }
@@ -304,8 +304,9 @@ function generateRankData(seasonData) {
 //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
 function giveBonusByStocksFromProfit() {
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  let needExecuteLogBulk = false;
   const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
-  let needExecuteBulk = false;
+  let needExecuteUserBulk = false;
   dbCompanies
     .find(
       {
@@ -324,15 +325,16 @@ function giveBonusByStocksFromProfit() {
       }
     )
     .forEach((companyData) => {
-      needExecuteBulk = true;
       const companyName = companyData.companyName;
       let leftProfit = companyData.profit;
       logBulk.insert({
         logType: '公司營利',
         companyName: companyName,
         amount: leftProfit,
+        resolve: false,
         createdAt: new Date()
       });
+      needExecuteLogBulk = true;
       //經理人分紅
       if (companyData.manager !== '!none') {
         const managerProfit = Math.ceil(leftProfit * config.managerProfitPercent);
@@ -341,6 +343,7 @@ function giveBonusByStocksFromProfit() {
           username: [companyData.manager],
           companyName: companyName,
           amount: managerProfit,
+          resolve: false,
           createdAt: new Date()
         });
         usersBulk
@@ -373,6 +376,7 @@ function giveBonusByStocksFromProfit() {
               username: [director.username],
               companyName: companyName,
               amount: directorProfit,
+              resolve: false,
               createdAt: new Date()
             });
             usersBulk
@@ -384,12 +388,15 @@ function giveBonusByStocksFromProfit() {
                   'profile.money': directorProfit
                 }
               });
+            needExecuteUserBulk = true;
             leftProfit -= directorProfit;
           }
         });
     });
-  if (needExecuteBulk) {
+  if (needExecuteLogBulk) {
     logBulk.execute();
+  }
+  if (needExecuteUserBulk) {
     usersBulk.execute();
   }
 }
@@ -452,11 +459,12 @@ function electManager(seasonData) {
             username: companyData.candidateList.slice(),
             companyName: companyName,
             message: electMessage,
+            resolve: false,
             createdAt: new Date()
           });
           companiesBulk
             .find({
-              _id: companyData._id
+              companyName: companyName
             })
             .updateOne({
               $set: {
@@ -499,11 +507,12 @@ function electManager(seasonData) {
             companyName: companyName,
             message: electMessage,
             amount: winnerData.stocks,
+            resolve: false,
             createdAt: new Date()
           });
           companiesBulk
             .find({
-              _id: companyData._id
+              companyName: companyName
             })
             .updateOne({
               $set: {

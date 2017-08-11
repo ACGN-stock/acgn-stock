@@ -3,7 +3,9 @@ import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 //交易訂單資料集
-export const dbLog = new Mongo.Collection('log');
+export const dbLog = new Mongo.Collection('log', {
+  idGeneration: 'MONGO'
+});
 export default dbLog;
 
 export const logTypeList = [

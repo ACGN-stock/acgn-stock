@@ -3,7 +3,9 @@ import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 //公司持股董事資料集
-export const dbDirectors = new Mongo.Collection('directors');
+export const dbDirectors = new Mongo.Collection('directors', {
+  idGeneration: 'MONGO'
+});
 export default dbDirectors;
 
 //schema

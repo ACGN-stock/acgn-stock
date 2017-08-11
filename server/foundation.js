@@ -39,16 +39,9 @@ export function checkFoundCompany() {
       const companyName = foundationData.companyName;
       const invest = foundationData.invest;
       if (invest.length >= foundationNeedUsers) {
-        haveSuccessFoundations = true;
         //先鎖定資源，再重新讀取一次資料進行運算
         resourceManager.request('checkFoundCompany', ['foundation' + companyName], (release) => {
-          const foundationData = dbFoundations.findOne({companyName}, {
-            fields: {
-              _id: 1,
-              invest: 1,
-              manager: 1,
-            }
-          });
+          const foundationData = dbFoundations.findOne({companyName});
           if (! foundationData) {
             release();
 
@@ -71,11 +64,13 @@ export function checkFoundCompany() {
           const lastPrice = Math.round(totalInvest / totalRelease);
           const createdAt = new Date();
 
+          haveSuccessFoundations = true;
           logBulk.insert({
             logType: '創立成功',
             username: [foundationData.manager].concat(_.pluck(sortedInvest, 'username')),
             companyName: companyName,
             price: lastPrice,
+            resolve: false,
             createdAt: createdAt
           });
           companiesBulk.insert({
@@ -107,6 +102,7 @@ export function checkFoundCompany() {
               username: [username],
               companyName: companyName,
               amount: stocks,
+              resolve: false,
               createdAt: createdAt
             });
             directorsBulk.insert({companyName, username, stocks, createdAt});
@@ -115,18 +111,12 @@ export function checkFoundCompany() {
         });
       }
       else {
-        haveFailFoundations = true;
-        logBulk.insert({
-          logType: '創立失敗',
-          username: [foundationData.manager].concat(_.pluck(invest, 'username')),
-          companyName: companyName,
-          createdAt: new Date()
-        });
         //先鎖定資源，再重新讀取一次資料進行運算
         resourceManager.request('checkFoundCompany', ['foundation' + companyName], (release) => {
           const foundationData = dbFoundations.findOne({companyName}, {
             fields: {
               _id: 1,
+              manager: 1,
               invest: 1
             }
           });
@@ -135,8 +125,16 @@ export function checkFoundCompany() {
 
             return false;
           }
+          logBulk.insert({
+            logType: '創立失敗',
+            username: [foundationData.manager].concat(_.pluck(invest, 'username')),
+            companyName: companyName,
+            resolve: false,
+            createdAt: new Date()
+          });
           dbFoundations.remove(foundationData._id);
           _.each(foundationData.invest, ({username, amount}) => {
+            haveFailFoundations = true;
             usersBulk
               .find({username})
               .updateOne({

@@ -2,6 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -26,7 +27,7 @@ Template.editFoundationPlan.onCreated(function() {
 });
 Template.editFoundationPlan.helpers({
   editData() {
-    const foundationId = FlowRouter.getParam('foundationId');
+    const foundationId = new Mongo.Collection.ObjectID(FlowRouter.getParam('foundationId'));
 
     return dbFoundations.findOne(foundationId);
   }

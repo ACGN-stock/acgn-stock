@@ -3,7 +3,9 @@ import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 //公司資料集
-export const dbCompanies = new Mongo.Collection('companies');
+export const dbCompanies = new Mongo.Collection('companies', {
+  idGeneration: 'MONGO'
+});
 export default dbCompanies;
 
 //schema

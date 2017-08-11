@@ -3,7 +3,9 @@ import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 //公司持股董事資料集
-export const dbInstantMessage = new Mongo.Collection('instantMessage');
+export const dbInstantMessage = new Mongo.Collection('instantMessage', {
+  idGeneration: 'MONGO'
+});
 export default dbInstantMessage;
 
 //schema

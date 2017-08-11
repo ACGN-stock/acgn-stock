@@ -3,7 +3,9 @@ import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 //交易訂單資料集
-export const dbPrice = new Mongo.Collection('price');
+export const dbPrice = new Mongo.Collection('price', {
+  idGeneration: 'MONGO'
+});
 export default dbPrice;
 
 //schema
