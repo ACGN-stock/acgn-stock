@@ -1,6 +1,7 @@
 'use strict';
-import { Meteor } from 'meteor/meteor';
+import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
+import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -195,50 +196,6 @@ Template.companyDetail.helpers({
   }
 });
 
-Template.companyProductList.helpers({
-  productList() {
-    const companyName = this.companyName;
-    const overdue = 1;
-
-    return dbProducts.find({companyName, overdue}, {
-      sort: {
-        createdAt: -1
-      }
-    });
-  }
-});
-Template.companyProductList.events({
-  'click [data-vote-product]'(event) {
-    event.preventDefault();
-    const productId = $(event.currentTarget).attr('data-vote-product');
-    Meteor.call('voteProduct', productId);
-  }
-});
-
-Template.companyDirectorList.helpers({
-  directorList() {
-    const companyName = this.companyName;
-
-    return dbDirectors.find({companyName}, {
-      sort: {
-        stocks: -1
-      }
-    });
-  },
-  getPercentage(stocks) {
-    const templateInstance = Template.instance();
-
-    return Math.round(stocks / templateInstance.data.totalRelease * 10000) / 100;
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfCompanyDirector',
-      dataNumberPerPage: 10,
-      offset: rDirectorOffset
-    };
-  }
-});
-
 Template.companyBuyOrderList.helpers({
   myOrderList() {
     const companyName = this.companyName;
@@ -310,12 +267,7 @@ Template.companyBuyOrderList.events({
 
 Template.companySellOrderList.helpers({
   getStockAmount() {
-    const user = Meteor.user();
-    const username = user && user.username;
-    const companyName = this.companyName;
-    const ownStockData = dbDirectors.findOne({username, companyName});
-
-    return ownStockData ? ownStockData.stocks : 0;
+    return getStockAmount(this.companyName);
   },
   myOrderList() {
     const companyName = this.companyName;
@@ -384,6 +336,129 @@ Template.companySellOrderList.events({
     const orderId = $(event.currentTarget).attr('data-cancel-order');
     const orderData = dbOrders.findOne(orderId);
     retrieveOrder(orderData);
+  }
+});
+
+
+function getStockAmount(companyName) {
+  const user = Meteor.user();
+  if (user) {
+    const username = user.username;
+    const ownStockData = dbDirectors.findOne({username, companyName});
+
+    return ownStockData ? ownStockData.stocks : 0;
+  }
+  else {
+    return 0;
+  }
+}
+
+Template.companyProductList.helpers({
+  productCenterHref() {
+    return FlowRouter.path('productCenterByCompany', {
+      companyName: this.companyName
+    });
+  },
+  productList() {
+    const companyName = this.companyName;
+    const overdue = 1;
+
+    return dbProducts.find({companyName, overdue}, {
+      sort: {
+        createdAt: -1
+      }
+    });
+  }
+});
+Template.companyProductList.events({
+  'click [data-vote-product]'(event) {
+    event.preventDefault();
+    const productId = $(event.currentTarget).attr('data-vote-product');
+    Meteor.call('voteProduct', productId);
+  }
+});
+
+Template.companyDirectorList.helpers({
+  directorList() {
+    const companyName = this.companyName;
+
+    return dbDirectors.find({companyName}, {
+      sort: {
+        stocks: -1
+      }
+    });
+  },
+  getPercentage(stocks) {
+    const templateInstance = Template.instance();
+
+    return Math.round(stocks / templateInstance.data.totalRelease * 10000) / 100;
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfCompanyDirector',
+      dataNumberPerPage: 10,
+      offset: rDirectorOffset
+    };
+  }
+});
+
+Template.companyElectInfo.helpers({
+  inElect() {
+    const candidateList = this.candidateList;
+
+    return candidateList && candidateList.length > 1;
+  },
+  canContendManager() {
+    const user = Meteor.user();
+    if (user && ! user.profile.revokeQualification) {
+      return ! _.contains(this.candidateList, user.username);
+    }
+
+    return false;
+  },
+  getSupportPercentage(candidateIndex) {
+    const instance = Template.instance();
+    const instanceData = instance.data;
+    const supportStocks = instanceData.supportStocksList[candidateIndex];
+
+    return Math.round(supportStocks / instanceData.totalRelease * 10000) / 100;
+  },
+  getSupportList(candidateIndex) {
+    const instance = Template.instance();
+    const voteList = instance.data.voteList[candidateIndex];
+
+    if (voteList.length > 0) {
+      return voteList.join('、');
+    }
+    else {
+      return '無';
+    }
+  },
+  getStockAmount() {
+    const instance = Template.instance();
+    const instanceData = instance.data;
+
+    return getStockAmount(instanceData.companyName);
+  }
+});
+Template.companyElectInfo.events({
+  'click [data-action="contendManager"]'(event, templateInstance) {
+    event.preventDefault();
+    const instanceData = templateInstance.data;
+    const companyName = instanceData.companyName;
+    if (window.confirm('你確定要競選擔任「' + companyName + '」的經理人嗎？')) {
+      Meteor.call('contendManager', companyName);
+    }
+  },
+  'click [data-support-candidate]'(event, templateInstance) {
+    event.preventDefault();
+    const instanceData = templateInstance.data;
+    const candidateList = instanceData.candidateList;
+    const candidateIndex = parseInt($(event.currentTarget).attr('data-support-candidate'), 10);
+    const candidate = candidateList[candidateIndex];
+    if (window.confirm('你確定要支持候選人「' + candidate + '」嗎？')) {
+      Meteor.call('supportCandidate', instanceData.companyName, candidate);
+    }
   }
 });
 

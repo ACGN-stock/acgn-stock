@@ -50,7 +50,7 @@
     <div class="extra">
       <div class="row">
         <div class="title">股票參考價格：</div>
-        <div class="{{priceDisplayClass this.lastPrice this.listPrice}}">
+        <div class="col text-right">
           $ {{this.listPrice}}
         </div>
         <div class="title">最後成交價格：</div>
@@ -81,66 +81,17 @@
     </div>
     <div class="extra">
       <div class="row">
-        {{> companyProductList companyName=this.companyName}}
-        {{> companyDirectorList companyName=this.companyName totalRelease=this.totalRelease}}
-      </div>
-    </div>
-    <div class="extra">
-      <div class="row">
         {{> companyBuyOrderList}}
         {{> companySellOrderList}}
       </div>
     </div>
-  </div>
-</template>
-
-<template name="companyProductList">
-  <div class="col-6">
-    <h4>當季產品</h4>
-    <div class="row mb-1">
-      <div class="col-9 text-center">產品名稱</div>
-      <div class="col-3 text-center">投票</div>
-    </div>
-    {{#each product in productList}}
-      <div class="row mb-1">
-        <div class="col-9 text-truncate">
-          <a href="{{product.url}}" target="_blank">{{product.productName}}</a>
-        </div>
-        <div class="col-3 text-center">
-          <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
-            {{product.votes}}
-            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-          </button>
-        </div>
+    <div class="extra">
+      <div class="row">
+        {{> companyProductList companyName=this.companyName}}
+        {{> companyDirectorList companyName=this.companyName totalRelease=this.totalRelease}}
       </div>
-    {{/each}}
-  </div>
-</template>
-
-<template name="companyDirectorList">
-  <div class="col-6">
-    <h4>董事成員</h4>
-    <div class="row mb-1">
-      <div class="col-4 text-center">使用者帳號</div>
-      <div class="col-4 text-right">股份數</div>
-      <div class="col-4 text-right">比例</div>
     </div>
-    {{#each director in directorList}}
-      <div class="row mb-1">
-        <div class="col-4 text-center text-truncate">
-          {{director.username}}
-        </div>
-        <div class="col-4 text-right">
-          {{director.stocks}}
-        </div>
-        <div class="col-4 text-right">
-          {{getPercentage director.stocks}} %
-        </div>
-      </div>
-    {{/each}}
-    {{#with paginationData}}
-      {{> pagination}}
-    {{/with}}
+    {{> companyElectInfo}}
   </div>
 </template>
 
@@ -197,6 +148,134 @@
     {{#with paginationData}}
       {{> pagination}}
     {{/with}}
+  </div>
+</template>
+
+<template name="companyProductList">
+  <div class="col-6">
+    <h4>
+      當季產品
+<!-- 
+      <a class="h6 text-info float-right" href="{{productCenterHref}}">
+        更多...
+      </a>
+ -->
+    </h4>
+    <div class="row mb-1">
+      <div class="col-9 text-center">產品名稱</div>
+      <div class="col-3 text-center">投票</div>
+    </div>
+    {{#each product in productList}}
+      <div class="row mb-1">
+        <div class="col-9 text-truncate">
+          <a href="{{product.url}}" target="_blank">{{product.productName}}</a>
+        </div>
+        <div class="col-3 text-center">
+          <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
+            {{product.votes}}
+            <i class="fa fa-money" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    {{else}}
+      <div class="text-center">
+        沒有任何產品！
+      </div>
+    {{/each}}
+  </div>
+</template>
+
+<template name="companyDirectorList">
+  <div class="col-6">
+    <h4>董事成員</h4>
+    <div class="row mb-1">
+      <div class="col-4 text-center">使用者帳號</div>
+      <div class="col-4 text-right">股份數</div>
+      <div class="col-4 text-right">比例</div>
+    </div>
+    {{#each director in directorList}}
+      <div class="row mb-1">
+        <div class="col-4 text-center text-truncate">
+          {{director.username}}
+        </div>
+        <div class="col-4 text-right">
+          {{director.stocks}}
+        </div>
+        <div class="col-4 text-right">
+          {{getPercentage director.stocks}} %
+        </div>
+      </div>
+    {{else}}
+      <div class="text-center">
+        沒有任何董事！
+      </div>
+    {{/each}}
+    {{#with paginationData}}
+      {{> pagination}}
+    {{/with}}
+  </div>
+</template>
+
+<template name="companyElectInfo">
+  <div class="extra">
+    <div class="row">
+      {{#if inElect}}
+        <div class="col">
+          <h4>
+            經理人競選中：
+            {{#if canContendManager}}
+              <button
+                class="btn btn-primary btn-sm"
+                type="button"
+                data-action="contendManager"
+              >
+                我也參選
+              </button>
+            {{/if}}
+          </h4>
+          <div class="row mb-1">
+            <div class="col-2 text-center">候選人</div>
+            <div class="col-2 text-center">董事會支持率</div>
+            <div class="col-8 text-center">支持者</div>
+          </div>
+          {{#each candidate in this.candidateList}}
+            <div class="row mb-1">
+              <div class="col-2 text-left text-truncate">
+                {{candidate}}
+                {{#if getStockAmount}}
+                  <button
+                    class="btn btn-primary btn-sm float-right"
+                    type="button"
+                    data-support-candidate="{{@index}}"
+                  >
+                    <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                  </button>
+                {{/if}}
+              </div>
+              <div class="col-2 text-right">
+                {{getSupportPercentage @index}} %
+              </div>
+              <div class="col-8 text-left text-truncate">
+                {{getSupportList @index}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="col">
+          目前沒有任何人想要挑戰現任經理人的位置。
+          {{#if canContendManager}}
+            <button
+              class="btn btn-primary btn-sm"
+              type="button"
+              data-action="contendManager"
+            >
+              我來挑戰
+            </button>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
   </div>
 </template>
 

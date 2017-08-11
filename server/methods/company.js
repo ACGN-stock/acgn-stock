@@ -482,22 +482,68 @@ Meteor.publish('companyDetail', function(companyName) {
   check(companyName, String);
   const aDayAgo = new Date(Date.now() - 86400000);
 
-  return [
-    dbCompanies.find({companyName}, {
+  const observer1 = dbCompanies
+    .find({companyName}, {
       fields: {
-        pictureSmall: 0,
-        candidateList: 0,
-        voteList: 0
+        pictureSmall: 0
       }
-    }),
-    dbPrice.find({
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        addSupportStocksListField(id, fields);
+        this.added('companies', id, fields);
+      },
+      changed: (id, fields) => {
+        addSupportStocksListField(id, fields);
+        this.changed('companies', id, fields);
+      }
+    });
+  const observer2 = dbPrice
+    .find({
       companyName: companyName,
       createdAt: {
         $gte: aDayAgo
       }
     })
-  ];
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('price', id, fields);
+      }
+    });
+  this.ready();
+  this.onStop(() => {
+    observer1.stop();
+    observer2.stop();
+  });
 });
+function addSupportStocksListField(companyId, fields = {}) {
+  const companyData = dbCompanies.findOne(companyId, {
+    fields: {
+      companyName: 1,
+      voteList: 1
+    }
+  });
+  const companyName = companyData.companyName;
+  fields.supportStocksList = _.map(companyData.voteList, (voteDirectorList) => {
+    return _.reduce(voteDirectorList, (supportStocks, voteDirector) => {
+      const directorData = dbDirectors.findOne(
+        {
+          companyName: companyName,
+          username: voteDirector
+        },
+        {
+          fields: {
+            stocks: 1
+          }
+        }
+      );
+      const stocks = directorData ? directorData.stocks : 0;
+
+      return supportStocks + stocks;
+    }, 0);
+  });
+}
+
 
 Meteor.publish('todayDealAmount', function(companyName) {
   check(companyName, String);
