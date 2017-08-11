@@ -57,14 +57,15 @@ function doSomething(userId) {
       description: 'for test test test test'
     });
   }
-  else if (foundationNumber > 0 && user.profile.money > 5000) {
-    const investMoney = randomNumber(user.profile.money - 200, 500);
-    if (investMoney > 100) {
+  else if (foundationNumber > 0) {
+    const investMoney = randomNumber(Math.round(user.profile.money / 4), 100);
+    if (investMoney > 100 && user.profile.money > investMoney) {
       console.log(username + ' want to invest a found company!');
       const foundationData = dbFoundations.findOne({}, {
         skip: randomNumber(foundationNumber, 0)
       });
       investFoundCompany(user, foundationData.companyName, investMoney);
+      user.profile.money -= investMoney;
     }
   }
   const orderList = dbOrders.find({username}).fetch();
@@ -98,18 +99,22 @@ function doSomething(userId) {
     .fetch();
   if (canBuyStockCompanyList.length > 0 && probability(50)) {
     const companyData = _.sample(canBuyStockCompanyList);
-    const useMoney = randomNumber(user.profile.money);
     const minPrice = Math.ceil(companyData.listPrice / 2);
-    if (useMoney > minPrice) {
-      const unitPrice = randomNumber(Math.min(useMoney, companyData.listPrice * 2), Math.min(useMoney, minPrice));
+    if (user.profile.money > minPrice) {
+      const useMoney = randomNumber(user.profile.money);
+      const maxPrice = Math.min(useMoney, companyData.listPrice * 2);
+      const unitPrice = randomNumber(maxPrice, minPrice);
       const amount = Math.floor(useMoney / unitPrice);
       if (amount > 0) {
         console.log(username + ' want to buy stocks of 「' + companyData.companyName + '」!');
-        createBuyOrder(user, {
+        const orderData = {
           companyName: companyData.companyName,
           unitPrice: unitPrice || 1,
           amount: amount
-        });
+        };
+        createBuyOrder(user, orderData);
+        orderList.push(orderData);
+        user.profile.money -= (unitPrice * amount);
       }
     }
   }
