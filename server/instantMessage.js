@@ -1,6 +1,5 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
 import { dbLog } from '../db/dbLog';
 import { dbInstantMessage } from '../db/dbInstantMessage';
 import { dbResourceLock } from '../db/dbResourceLock';
