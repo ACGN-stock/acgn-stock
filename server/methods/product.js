@@ -65,7 +65,7 @@ export function retrieveProduct(user, productId) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season']);
-  dbProducts.remove({_id: productId});
+  dbProducts.remove(productId);
 }
 
 Meteor.methods({
@@ -145,19 +145,7 @@ Meteor.publish('companyFutureProduct', function(companyName) {
   return dbProducts.find({companyName, overdue});
 });
 
-Meteor.publish('season', function(offset) {
-  check(offset, Match.Integer);
-
-  return dbSeason.find({}, {
-    sort: {
-      beginDate: -1
-    },
-    skip: offset + 1,
-    limit: 3
-  });
-});
-
-Meteor.publish('seasonProductList', function({seasonId, sortBy, sortDir, offset}) {
+Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, offset}) {
   check(seasonId, String);
   check(sortBy, new Match.OneOf('votes', 'type', 'companyName'));
   check(sortDir, new Match.OneOf(1, -1));

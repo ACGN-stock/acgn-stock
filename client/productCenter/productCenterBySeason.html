@@ -1,38 +1,28 @@
-<template name="productCenter">
+<template name="productCenterBySeason">
   <div class="card">
     <div class="card-block">
       <h1 class="card-title mb-1">產品中心</h1>
       <hr />
-      {{> chooseSeasonForm}}
+      {{> seasonNav}}
       <hr />
       {{> productListTable}}
     </div>
   </div>
 </template>
 
-<template name="chooseSeasonForm">
-  <form class="text-center">
-    <button
-      class="btn btn-info btn-sm float-left"
-      type="button"
-      disabled="{{isSeasonLinkDisabled 1}}"
-      data-action="addOffset"
-    >
+<template name="seasonNav">
+  <div class="text-center">
+    <a {{seasonLinkAttrs 'prev'}}>
       <span aria-hidden="true">&laquo;</span>
-    </button>
+    </a>
     商業季度：
     {{formatDateText seasonBegin}}
     ～
     {{formatDateText seasonEnd}}
-    <button
-      class="btn btn-info btn-sm float-right"
-      type="button"
-      disabled="{{isSeasonLinkDisabled -1}}"
-      data-action="minusOffset"
-    >
+    <a  {{seasonLinkAttrs 'next'}}>
       <span aria-hidden="true">&raquo;</span>
-    </button>
-  </form>
+    </a>
+  </div>
 </template>
 
 <template name="productListTable">
@@ -40,15 +30,17 @@
     <thead>
       <tr>
         <th class="text-center">產品名稱</th>
-        <th class="text-center">
+        <th class="text-center" style="cursor: pointer;" data-sort="companyName">
           公司名稱
+          {{{getSortIcon 'companyName'}}}
         </th>
-        <th class="text-center" style="width: 120px;">
+        <th class="text-center" style="width: 120px; cursor: pointer;" data-sort="type">
           類別
+          {{{getSortIcon 'type'}}}
         </th>
-        <th class="text-center" style="width: 120px;">
+        <th class="text-center" style="width: 120px; cursor: pointer;" data-sort="votes">
           得票數
-          <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
+          {{{getSortIcon 'votes'}}}
         </th>
       </tr>
     </thead>
@@ -70,7 +62,11 @@
           </td>
           <td class="text-center px-2">
             {{#if canVote}}
-              <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
+              <button
+                class="btn btn-primary btn-sm"
+                type="button"
+                data-vote-product="{{product._id._str}}"
+              >
                 {{product.votes}}
                 <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
               </button>

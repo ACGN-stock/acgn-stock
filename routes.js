@@ -17,7 +17,9 @@ export const pageNameHash = {
   instantMessage: '即時訊息',
   stockSummary: '股市總覽',
   foundationPlan: '新創計劃',
-  productCenter: '產品中心',
+  productCenterRedirect: '產品中心',
+  productCenterBySeason: '產品中心',
+  productCenterByCompany: '產品中心',
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
   accuseRecord: '舉報紀錄'
@@ -67,12 +69,26 @@ FlowRouter.route('/foundCompany/:foundationId', {
     }
   }
 });
+
 FlowRouter.route('/productCenter', {
-  name: 'productCenter',
+  name: 'productCenterRedirect',
   action() {
     DocHead.setTitle(config.websiteName + ' - 產品中心');
   }
 });
+FlowRouter.route('/productCenter/season/:seasonId', {
+  name: 'productCenterBySeason',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 產品中心');
+  }
+});
+FlowRouter.route('/productCenter/company/:companyName', {
+  name: 'productCenterByCompany',
+  action(params) {
+    DocHead.setTitle(config.websiteName + ' - 產品中心 - ' + params.companyName);
+  }
+});
+
 FlowRouter.route('/seasonalReport', {
   name: 'seasonalReport',
   action() {
@@ -111,11 +127,5 @@ FlowRouter.route('/accountInfo/:username', {
       logOffset.set(0);
       ownStocksOffset.set(0);
     }
-  }
-});
-FlowRouter.route('/accuseRecord', {
-  name: 'accuseRecord',
-  action() {
-    DocHead.setTitle(config.websiteName + ' - 舉報紀錄');
   }
 });
