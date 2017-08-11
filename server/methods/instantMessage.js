@@ -38,7 +38,7 @@ Meteor.publish('instantMessage', function() {
     })
     .observeChanges({
       added: (id, fields) => {
-        if (username && fields.onlyForUsers.length > 0 && _.contains(fields.onlyForUsers, username) === false) {
+        if (fields.onlyForUsers.length > 0 && ! (username && _.contains(fields.onlyForUsers, username))) {
           return false;
         }
         this.added('instantMessage', id, fields);
