@@ -94,7 +94,7 @@ Template.foundationPlanInfo.helpers({
 Template.foundationPlanInfo.events({
   'click [data-action="invest"]'(event, templaceInstance) {
     event.preventDefault();
-    const minimumInvest = Math.ceil(config.beginReleaseStock / config.foundationNeedUsers);
+    const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
     const maximumInvest = Meteor.user().profile.money;
     if (minimumInvest > maximumInvest) {
       window.alert('您的金錢不足以進行投資！');
