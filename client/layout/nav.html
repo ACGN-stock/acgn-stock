@@ -45,11 +45,11 @@
           {{> navLink page='instantMessage'}}
           {{> navLink page='stockSummary'}}
           {{> navLink page='foundationPlan'}}
-          {{> navLink page='productCenterRedirect'}}
+          {{> navLink page='productCenterBySeason' params=seasonParams}}
         {{/navLinkGroup}}
         {{#navLinkGroup text='資訊報表'}}
           {{> navLink page='tutorial'}}
-          {{> navLink page='seasonalReport'}}
+          {{> navLink page='seasonalReport' params=seasonParams}}
           {{> navLink page='accountInfo'}}
         {{/navLinkGroup}}
       </ul>

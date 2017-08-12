@@ -6,8 +6,12 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { pageNameHash } from '../../routes';
 import { rShowLoginDialog } from './validateDialog';
+import { dbSeason } from '../../db/dbSeason';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
+Template.nav.onCreated(function() {
+  this.subscribe('currentSeason');
+});
 Template.nav.helpers({
   getNavLinkListClassList() {
     if (rNavLinkListCollapsed.get()) {
@@ -15,6 +19,23 @@ Template.nav.helpers({
     }
     else {
       return 'collapse navbar-collapse show';
+    }
+  },
+  seasonParams() {
+    const previousSeasonData = dbSeason.findOne({}, {
+      sort: {
+        beginDate: -1
+      },
+      skip: 1
+    });
+
+    if (previousSeasonData) {
+      return {
+        seasonId: previousSeasonData._id
+      };
+    }
+    else {
+      return {};
     }
   }
 });
@@ -51,7 +72,7 @@ Template.navLink.helpers({
     return 'nav-item' + (FlowRouter.getRouteName() === this.page ? ' active' : '');
   },
   getHref() {
-    return FlowRouter.path(this.page);
+    return FlowRouter.path(this.page, this.params);
   },
   getLinkText() {
     return pageNameHash[this.page];

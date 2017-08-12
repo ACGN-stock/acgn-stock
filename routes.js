@@ -20,6 +20,7 @@ export const pageNameHash = {
   productCenterRedirect: '產品中心',
   productCenterBySeason: '產品中心',
   productCenterByCompany: '產品中心',
+  seasonalReportRedirect: '季度報告',
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
   accuseRecord: '舉報紀錄'
@@ -90,11 +91,18 @@ FlowRouter.route('/productCenter/company/:companyName', {
 });
 
 FlowRouter.route('/seasonalReport', {
+  name: 'seasonalReportRedirect',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 季度報告');
+  }
+});
+FlowRouter.route('/seasonalReport/:seasonId', {
   name: 'seasonalReport',
   action() {
     DocHead.setTitle(config.websiteName + ' - 季度報告');
   }
 });
+
 FlowRouter.route('/accountInfo', {
   name: 'accountInfo',
   triggersEnter: [
