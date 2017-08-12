@@ -82,3 +82,7 @@ Template.registerHelper('isChairman', isChairman);
 Template.registerHelper('add', function(value1, value2) {
   return value1 + value2;
 });
+
+Template.registerHelper('displayManager', function(manager) {
+  return manager === '!none' ? '無' : manager;
+});

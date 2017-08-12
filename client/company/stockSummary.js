@@ -109,9 +109,6 @@ Template.companySummary.helpers({
   displayTagList(tagList) {
     return tagList.join('、');
   },
-  getManager(manager) {
-    return manager === '!none' ? '無' : manager;
-  },
   priceDisplayClass(lastPrice, listPrice) {
     if (lastPrice > listPrice) {
       return 'col content text-right text-danger';

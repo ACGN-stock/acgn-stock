@@ -15,10 +15,13 @@
         </h2>
         <h3>
           經理人：
-          {{this.manager}}
+          {{displayManager this.manager}}
           {{#if isManager this.manager}}
             <a class="btn btn-primary btn-sm" href="{{getManageHref this.companyName}}">
               經營管理
+            </a>
+            <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
+              辭去職務
             </a>
           {{/if}}
         </h3>

@@ -421,13 +421,6 @@ Meteor.publish('queryChairmanAsVariable', function(companyName) {
           value: fields.username
         });
       },
-      changed: (id, fields) => {
-        if (fields.username) {
-          this.changed('variables', variableId, {
-            value: fields.username
-          });
-        }
-      },
       removed: () => {
         this.changed('variables', variableId, {
           value: '???'

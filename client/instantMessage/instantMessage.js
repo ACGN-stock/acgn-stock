@@ -24,7 +24,6 @@ const rFilterTypeList = new ReactiveVar([
   '發薪紀錄',
   '創立得股',
   '訂單完成',
-  '辭職紀錄',
   '營利分紅',
   '舉報公司',
   '舉報產品',
@@ -40,9 +39,10 @@ const rFilterTypeList = new ReactiveVar([
   '公司釋股',
   '交易紀錄',
   '參選紀錄',
+  '就任經理',
+  '辭職紀錄',
   '經理管理',
-  '推薦產品',
-  '就任經理'
+  '推薦產品'
   //以上是可以篩掉的
 ]);
 Template.instantMessageFilterButton.helpers({

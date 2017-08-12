@@ -70,6 +70,14 @@ Template.company.events({
     const companyName = FlowRouter.getParam('companyName');
     const companyData = dbCompanies.findOne({companyName});
     changeChairmanTitle(companyData);
+  },
+  'click [data-action="resignManager"]'() {
+    const companyName = FlowRouter.getParam('companyName');
+    const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + companyName + '」以表示確定。';
+    const confirmMessage = window.prompt(message);
+    if (confirmMessage === companyName) {
+      Meteor.call('resignManager', companyName);
+    }
   }
 });
 
