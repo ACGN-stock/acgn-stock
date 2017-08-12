@@ -96,7 +96,8 @@ export function checkFoundCompany() {
             createdAt: createdAt
           });
           dbFoundations.remove(foundationData._id);
-          _.each(directors, ({username, stocks}) => {
+          _.each(directors, ({username, stocks}, index) => {
+            const createdAt = new Date(Date.now() + index);
             logBulk.insert({
               logType: '創立得股',
               username: [username],
