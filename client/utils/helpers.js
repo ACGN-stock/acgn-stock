@@ -10,7 +10,6 @@ Template.registerHelper('getVariable', function(variableName) {
   return dbVariables.get(variableName);
 });
 
-
 export function formatDateText(date) {
   if (! date) {
     return '????/??/?? ??:??:??';
@@ -53,3 +52,33 @@ export function getCompanyLink(companyName) {
   return '<a href="' + href + '">' + companyName + '</a>';
 }
 Template.registerHelper('getCompanyLink', getCompanyLink);
+
+export function getCompanyProductLinkHref(companyName) {
+  return FlowRouter.path('productCenterByCompany', {companyName});
+}
+Template.registerHelper('getCompanyProductLinkHref', getCompanyProductLinkHref);
+
+export function getAccountInfoLinkHref(username) {
+  return FlowRouter.path('accountInfo', {username});
+}
+Template.registerHelper('getCompanyProductLinkHref', getCompanyProductLinkHref);
+
+export function getChainman(companyName) {
+  return dbVariables.get('chairmanNameOf' + companyName);
+}
+Template.registerHelper('getChainman', getChainman);
+
+export function isChairman(companyName) {
+  const user = Meteor.user();
+  if (user) {
+    return user.username === dbVariables.get('chairmanNameOf' + companyName);
+  }
+  else {
+    return false;
+  }
+}
+Template.registerHelper('isChairman', isChairman);
+
+Template.registerHelper('add', function(value1, value2) {
+  return value1 + value2;
+});

@@ -287,7 +287,8 @@ function changeChairmanTitle(user, companyName, chairmanTitle) {
   const username = user.username;
   const chairmanData = dbDirectors.findOne({companyName}, {
     sort: {
-      stocks: -1
+      stocks: -1,
+      createdAt: 1
     },
     limit: 1
   });
@@ -343,7 +344,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     [sortBy]: -1
   };
   const skip = offset;
-  const limit = 10 + offset;
+  const limit = 10;
   const fields = {
     _id: 1,
     companyName: 1,
@@ -398,45 +399,36 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   });
 });
 
-Meteor.publish('queryChairman', function(companyName) {
-  check(companyName, String);
-
-  return dbDirectors.find({companyName}, {
-    limit: 1,
-    sort: {
-      stocks: -1
-    }
-  });
-});
-
 Meteor.publish('queryChairmanAsVariable', function(companyName) {
   check(companyName, String);
 
-  this.added('variables', 'queryChairmanName', {
+  const variableId = 'chairmanNameOf' + companyName;
+  this.added('variables', variableId, {
     value: '???'
   });
   const observer = dbDirectors
     .find({companyName}, {
       sort: {
-        stocks: -1
+        stocks: -1,
+        createdAt: 1
       },
       limit: 1
     })
     .observeChanges({
       added: (id, fields) => {
-        this.changed('variables', 'queryChairmanName', {
+        this.changed('variables', variableId, {
           value: fields.username
         });
       },
       changed: (id, fields) => {
         if (fields.username) {
-          this.changed('variables', 'queryChairmanName', {
+          this.changed('variables', variableId, {
             value: fields.username
           });
         }
       },
       removed: () => {
-        this.changed('variables', 'queryChairmanName', {
+        this.changed('variables', variableId, {
           value: '???'
         });
       }
@@ -447,8 +439,7 @@ Meteor.publish('queryChairmanAsVariable', function(companyName) {
   });
 });
 
-Meteor.publish('queryOwnStocks', function(companyName) {
-  check(companyName, String);
+Meteor.publish('queryOwnStocks', function() {
   if (this.userId) {
     const user = Meteor.users.findOne(this.userId, {
       fields: {
@@ -457,7 +448,7 @@ Meteor.publish('queryOwnStocks', function(companyName) {
     });
     const username = user.username;
 
-    return dbDirectors.find({username, companyName});
+    return dbDirectors.find({username});
   }
 
   return [];

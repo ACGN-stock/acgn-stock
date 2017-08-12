@@ -1,6 +1,6 @@
 'use strict';
-import { Meteor } from 'meteor/meteor';
 import { $ } from 'meteor/jquery';
+import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -25,18 +25,25 @@ Template.stockSummary.onCreated(function() {
     this.subscribe('stockSummary', keyword, isOnlyShowMine, sort, offset);
   });
   this.autorun(() => {
-    dbCompanies.find().forEach((companyData) => {
-      this.subscribe('queryChairman', companyData.companyName);
-    });
+    if (Meteor.user()) {
+      this.subscribe('queryOwnStocks');
+      this.subscribe('queryMyOrder');
+    }
   });
-  if (Meteor.user()) {
-    this.autorun(() => {
-      dbCompanies.find().forEach((companyData) => {
-        this.subscribe('queryOwnStocks', companyData.companyName);
-      });
+  this.observer = dbCompanies
+    .find({}, {
+      fields: {
+        companyName: 1
+      }
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.subscribe('queryChairmanAsVariable', fields.companyName);
+      }
     });
-    this.subscribe('queryMyOrder');
-  }
+});
+Template.stockSummary.onDestroyed(function() {
+  this.observer.stop();
 });
 Template.stockSummary.helpers({
   companyList() {
@@ -115,28 +122,6 @@ Template.companySummary.helpers({
     else {
       return 'col content text-right';
     }
-  },
-  isChairman(companyName) {
-    const chairmanData = dbDirectors.findOne({companyName}, {
-      sort: {
-        stocks: -1
-      },
-      limit: 1
-    });
-    const user = Meteor.user();
-    const username = user && user.username;
-
-    return chairmanData ? (username === chairmanData.username) : false;
-  },
-  getChainman(companyName) {
-    const chairmanData = dbDirectors.findOne({companyName}, {
-      sort: {
-        stocks: -1
-      },
-      limit: 1
-    });
-
-    return chairmanData ? chairmanData.username : '無';
   },
   isManager(manager) {
     const user = Meteor.user();
