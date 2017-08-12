@@ -5,6 +5,8 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbProducts } from '../../db/dbProducts';
 import { dbSeason } from '../../db/dbSeason';
+import { dbVariables } from '../../db/dbVariables';
+import { voteProduct } from '../utils/methods';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 
 inheritedShowLoadingOnSubscribing(Template.productCenterBySeason);
@@ -12,23 +14,28 @@ const rProductSortBy = new ReactiveVar('votes');
 const rProductSortDir = new ReactiveVar(-1);
 const rProductOffset = new ReactiveVar(0);
 Template.productCenterBySeason.onCreated(function() {
+  this.subscribe('currentSeason');
   this.autorun(() => {
     const seasonId = FlowRouter.getParam('seasonId');
-    rProductOffset.set(0);
-    this.subscribe('adjacentSeason', seasonId);
+    if (seasonId) {
+      rProductOffset.set(0);
+      this.subscribe('adjacentSeason', seasonId);
+    }
   });
   this.autorun(() => {
     const seasonId = FlowRouter.getParam('seasonId');
-    this.subscribe('productListBySeasonId', {
-      seasonId: seasonId,
-      sortBy: rProductSortBy.get(),
-      sortDir: rProductSortDir.get(),
-      offset: rProductOffset.get()
-    });
+    if (seasonId) {
+      this.subscribe('productListBySeasonId', {
+        seasonId: seasonId,
+        sortBy: rProductSortBy.get(),
+        sortDir: rProductSortDir.get(),
+        offset: rProductOffset.get()
+      });
+    }
   });
 });
 
-Template.seasonNav.helpers({
+Template.productSeasonNav.helpers({
   seasonLinkAttrs(linkType) {
     const seasonId = FlowRouter.getParam('seasonId');
     const currentSeasonData = dbSeason.findOne(seasonId);
@@ -76,7 +83,7 @@ Template.seasonNav.helpers({
               }
             }
           );
-          if (navSeasonData) {
+          if (navSeasonData && navSeasonData._id !== dbVariables.get('currentSeasonId')) {
             return {
               'class': 'btn btn-info btn-sm float-right',
               'href': FlowRouter.path('productCenterBySeason', {
@@ -108,7 +115,7 @@ Template.seasonNav.helpers({
   }
 });
 
-Template.productListTable.helpers({
+Template.productListBySeasonTable.helpers({
   productList() {
     const seasonId = FlowRouter.getParam('seasonId');
 
@@ -135,8 +142,8 @@ Template.productListTable.helpers({
 
     return '';
   },
-  canVote() {
-    return this.overdue === 1;
+  canVote(product) {
+    return product.overdue === 1;
   },
   paginationData() {
     return {
@@ -146,7 +153,7 @@ Template.productListTable.helpers({
     };
   }
 });
-Template.productListTable.events({
+Template.productListBySeasonTable.events({
   'click [data-sort]'(event) {
     const sortBy = $(event.currentTarget).attr('data-sort');
     if (rProductSortBy.get() === sortBy) {
@@ -156,5 +163,10 @@ Template.productListTable.events({
       rProductSortBy.set(sortBy);
       rProductSortDir.set(-1);
     }
+  },
+  'click [data-vote-product]'(event) {
+    event.preventDefault();
+    const productId = $(event.currentTarget).attr('data-vote-product');
+    voteProduct(productId);
   }
 });

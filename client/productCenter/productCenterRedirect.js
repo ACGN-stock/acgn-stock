@@ -8,14 +8,15 @@ inheritedShowLoadingOnSubscribing(Template.productCenterRedirect);
 Template.productCenterRedirect.onCreated(function() {
   this.subscribe('currentSeason');
   this.autorun(() => {
-    const currentSeasonData = dbSeason.findOne({}, {
+    const previousSeasonData = dbSeason.findOne({}, {
       sort: {
         beginDate: -1
-      }
+      },
+      skip: 1
     });
-    if (currentSeasonData) {
+    if (previousSeasonData) {
       const path = FlowRouter.path('productCenterBySeason', {
-        seasonId: currentSeasonData._id
+        seasonId: previousSeasonData._id
       });
       FlowRouter.go(path);
     }

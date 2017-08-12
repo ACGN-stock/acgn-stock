@@ -12,6 +12,10 @@ const schema = new SimpleSchema({
   productId: {
     type: String
   },
+  //公司名稱
+  companyName: {
+    type: String
+  },
   //使用者名稱
   username: {
     type: String

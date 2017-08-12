@@ -2,7 +2,9 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
+import { dbDirectors } from '../../db/dbDirectors';
 import { dbProducts } from '../../db/dbProducts';
+import { dbProductLike } from '../../db/dbProductLike';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbSeason } from '../../db/dbSeason';
 import { dbLog } from '../../db/dbLog';
@@ -138,6 +140,45 @@ export function voteProduct(user, productId) {
   });
 }
 
+Meteor.methods({
+  likeProduct(productId) {
+    check(this.userId, String);
+    check(productId, String);
+    likeProduct(Meteor.user(), productId);
+
+    return true;
+  }
+});
+export function likeProduct(user, productId) {
+  const productData = dbProducts.findOne(productId);
+  if (! productData) {
+    throw new Meteor.Error(404, '不存在的產品！');
+  }
+  const companyName = productData.companyName;
+  const username = user.username;
+  if (dbDirectors.find({companyName, username}).count() < 1) {
+    throw new Meteor.Error(401, '至少需要擁有一張的股票才可做出股東評價！');
+  }
+  const existsLikeData = dbProductLike.findOne({productId, username});
+  if (existsLikeData) {
+    dbProductLike.remove(existsLikeData._id);
+    dbProducts.update(productId, {
+      $inc: {
+        likeCount: -1
+      }
+    });
+  }
+  else {
+    dbProductLike.insert({productId, companyName, username});
+    dbProducts.update(productId, {
+      $inc: {
+        likeCount: 1
+      }
+    });
+  }
+}
+
+
 Meteor.publish('companyFutureProduct', function(companyName) {
   check(companyName, String);
   const overdue = 0;
@@ -153,20 +194,33 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
 
   let initialized = false;
   let total = dbProducts
-    .find({seasonId})
+    .find({
+      seasonId: seasonId,
+      overdue: {
+        $gt: 0
+      }
+    })
     .count();
   this.added('variables', 'totalCountOfProductList', {
     value: total
   });
 
   const observer = dbProducts
-    .find({seasonId}, {
-      sort: {
-        [sortBy]: sortDir
+    .find(
+      {
+        seasonId: seasonId,
+        overdue: {
+          $gt: 0
+        }
       },
-      skip: offset,
-      limit: 30
-    })
+      {
+        sort: {
+          [sortBy]: sortDir
+        },
+        skip: offset,
+        limit: 30
+      }
+    )
     .observeChanges({
       added: (id, fields) => {
         this.added('products', id, fields);
@@ -176,6 +230,9 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
             value: total
           });
         }
+      },
+      changed: (id, fields) => {
+        this.changed('products', id, fields);
       },
       removed: (id) => {
         this.removed('products', id);
@@ -192,4 +249,80 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
   this.onStop(() => {
     observer.stop();
   });
+});
+
+Meteor.publish('productListByCompany', function({companyName, sortBy, sortDir, offset}) {
+  check(companyName, String);
+  check(sortBy, new Match.OneOf('likeCount', 'votes', 'type'));
+  check(sortDir, new Match.OneOf(1, -1));
+  check(offset, Match.Integer);
+
+  let initialized = false;
+  let total = dbProducts
+    .find({
+      companyName: companyName,
+      overdue: {
+        $gt: 0
+      }
+    })
+    .count();
+  this.added('variables', 'totalCountOfProductList', {
+    value: total
+  });
+
+  const observer = dbProducts
+    .find(
+      {
+        companyName: companyName,
+        overdue: {
+          $gt: 0
+        }
+      },
+      {
+        sort: {
+          [sortBy]: sortDir
+        },
+        skip: offset,
+        limit: 30
+      }
+    )
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('products', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('variables', 'totalCountOfProductList', {
+            value: total
+          });
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('products', id, fields);
+      },
+      removed: (id) => {
+        this.removed('products', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('variables', 'totalCountOfProductList', {
+            value: total
+          });
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
+});
+
+Meteor.publish('queryMyLike', function(companyName) {
+  check(companyName, String);
+  if (this.userId) {
+    const username = Meteor.user().username;
+
+    return dbProductLike.find({companyName, username});
+  }
+  
+  return [];
 });

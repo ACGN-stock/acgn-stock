@@ -319,32 +319,37 @@ function giveBonusByStocksFromProfit() {
           _id: 1,
           companyName: 1,
           manager: 1,
+          totalRelease: 1,
           profit: 1
         },
         disableOplog: true
       }
     )
     .forEach((companyData) => {
+      const now = Date.now();
       const companyName = companyData.companyName;
+      console.log('start give bonous of company[' + companyName + ']...');
       let leftProfit = companyData.profit;
+      console.log('total bonus: $' + companyData.profit);
       logBulk.insert({
         logType: '公司營利',
         companyName: companyName,
         amount: leftProfit,
         resolve: false,
-        createdAt: new Date()
+        createdAt: new Date(now)
       });
       needExecuteLogBulk = true;
       //經理人分紅
       if (companyData.manager !== '!none') {
         const managerProfit = Math.ceil(leftProfit * config.managerProfitPercent);
+        // console.log('manager bonus: $' + managerProfit);
         logBulk.insert({
           logType: '營利分紅',
           username: [companyData.manager],
           companyName: companyName,
           amount: managerProfit,
           resolve: false,
-          createdAt: new Date()
+          createdAt: new Date(now + 1)
         });
         usersBulk
           .find({
@@ -355,21 +360,27 @@ function giveBonusByStocksFromProfit() {
               'profile.money': managerProfit
             }
           });
+        needExecuteUserBulk = true;
         leftProfit -= managerProfit;
       }
       //剩餘收益先扣去公司營運成本
       leftProfit -= Math.ceil(companyData.profit * config.costFromProfit);
+      // console.log('left bonus: $' + leftProfit);
       const totalReleaseStocks = companyData.totalRelease;
+      // console.log('totalRelease stocks: ' + totalReleaseStocks);
       //發放營利給所有董事
       dbDirectors
         .find({companyName}, {
           sort: {
-            stocks: -1
+            stocks: -1,
+            createdAt: 1
           },
           disableOplog: true
         })
-        .forEach((director) => {
+        .forEach((director, index) => {
+          // console.log('director[' + director.username + '] stocks: ' + director.stocks);
           const directorProfit = Math.min(Math.ceil(leftProfit * director.stocks / totalReleaseStocks), leftProfit);
+          // console.log('director[' + director.username + '] bonus: $' + directorProfit);
           if (directorProfit > 0) {
             logBulk.insert({
               logType: '營利分紅',
@@ -377,7 +388,7 @@ function giveBonusByStocksFromProfit() {
               companyName: companyName,
               amount: directorProfit,
               resolve: false,
-              createdAt: new Date()
+              createdAt: new Date( now + 2 + index)
             });
             usersBulk
               .find({

@@ -3,14 +3,14 @@
     <div class="card-block">
       <h1 class="card-title mb-1">產品中心</h1>
       <hr />
-      {{> seasonNav}}
+      {{> productSeasonNav}}
       <hr />
-      {{> productListTable}}
+      {{> productListBySeasonTable}}
     </div>
   </div>
 </template>
 
-<template name="seasonNav">
+<template name="productSeasonNav">
   <div class="text-center">
     <a {{seasonLinkAttrs 'prev'}}>
       <span aria-hidden="true">&laquo;</span>
@@ -25,7 +25,7 @@
   </div>
 </template>
 
-<template name="productListTable">
+<template name="productListBySeasonTable">
   <table class="table-bordered" style="width: 100%; table-layout: fixed;">
     <thead>
       <tr>
@@ -53,7 +53,7 @@
             </a>
           </td>
           <td class="text-left text-truncate px-2">
-            <a href="{{getCompanyLinkHref product.companyName}}" title="{{product.companyName}}">
+            <a href="{{getCompanyProductLinkHref product.companyName}}" title="{{product.companyName}}">
               {{product.companyName}}
             </a>
           </td>
@@ -61,14 +61,14 @@
             {{product.type}}
           </td>
           <td class="text-center px-2">
-            {{#if canVote}}
+            {{#if canVote product}}
               <button
                 class="btn btn-primary btn-sm"
                 type="button"
-                data-vote-product="{{product._id._str}}"
+                data-vote-product="{{product._id}}"
               >
                 {{product.votes}}
-                <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                <i class="fa fa-money" aria-hidden="true"></i>
               </button>
             {{else}}
               {{product.votes}}

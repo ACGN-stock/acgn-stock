@@ -13,7 +13,7 @@ import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
 import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle } from '../utils/methods';
+import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.company);
 const rDirectorOffset = new ReactiveVar(0);
@@ -21,11 +21,15 @@ const rBuyOrderOffset = new ReactiveVar(0);
 const rSellOrderOffset = new ReactiveVar(0);
 const rLogOffset = new ReactiveVar(0);
 Template.company.onCreated(function() {
+  this.autorun(() => {
+    if (Meteor.user()) {
+      this.subscribe('queryMyOrder');
+      this.subscribe('queryOwnStocks');
+    }
+  });
   const companyName = FlowRouter.getParam('companyName');
-  this.subscribe('queryMyOrder');
   this.subscribe('companyDetail', companyName);
   this.subscribe('companyCurrentProduct', companyName);
-  this.subscribe('queryOwnStocks', companyName);
   this.subscribe('todayDealAmount', companyName);
   this.subscribe('queryChairmanAsVariable', companyName);
   rDirectorOffset.set(0);
@@ -50,18 +54,6 @@ Template.company.helpers({
     const companyName = FlowRouter.getParam('companyName');
 
     return dbCompanies.findOne({companyName});
-  },
-  isChairman() {
-    const user = Meteor.user();
-    if (user) {
-      return user.username === dbVariables.get('queryChairmanName');
-    }
-    else {
-      return false;
-    }
-  },
-  getChainman() {
-    return dbVariables.get('queryChairmanName');
   },
   isManager(manager) {
     const user = Meteor.user();
@@ -374,7 +366,7 @@ Template.companyProductList.events({
   'click [data-vote-product]'(event) {
     event.preventDefault();
     const productId = $(event.currentTarget).attr('data-vote-product');
-    Meteor.call('voteProduct', productId);
+    voteProduct(productId);
   }
 });
 
@@ -528,12 +520,21 @@ Template.companyLogList.helpers({
         return logData.username[0] + '開始支持' + logData.username[1] + '擔任經理人。';
       }
       case '就任經理': {
+        let extraDescription = '';
+        if (logData.username[1] !== '!none') {
+          if (logData.username[0] === logData.username[1]) {
+            extraDescription = '繼續就任公司的經理人職務。';
+          }
+          else {
+            extraDescription = '取代了' + logData.username[1] + '成為了公司的經理人。';
+          }
+        }
+
         return (
           '在' + logData.message + '商業季度' +
           logData.username[0] +
           (logData.amount ? ('以' + logData.amount + '數量的支持股份') : '') +
-          '擊敗了所有競爭對手，' + (logData.username[1] === '!none' ? '' : '取代了' + logData.username[1]) +
-          '成為了公司的經理人。'
+          '擊敗了所有競爭對手，' + extraDescription
         );
       }
       case '公司營利': {

@@ -3,10 +3,12 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbPrice } from '../../db/dbPrice';
+import { dbProducts } from '../../db/dbProducts';
+import { dbProductLike } from '../../db/dbProductLike';
 import { dbLog } from '../../db/dbLog';
-import { dbDirectors } from '../../db/dbDirectors';
 
 Meteor.methods({
   createBuyOrder(orderData) {
@@ -409,6 +411,14 @@ export function changeStocksAmount(username, companyName, amount) {
       }
       else if (existDirectorData.stocks === amount) {
         dbDirectors.remove(existDirectorData._id);
+        dbProductLike.find({companyName, username}).forEach((likeData) => {
+          dbProducts.update(likeData.productId, {
+            $inc: {
+              likeCount: -1
+            }
+          });
+          dbProductLike.remove(likeData._id);
+        });
       }
       else {
         throw new Meteor.Error(500, '試圖扣除使用者[' + username + ']股票[' + companyName + ']數量[' + amount + ']但數量不足！');
