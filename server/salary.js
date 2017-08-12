@@ -13,7 +13,7 @@ export function paySalary() {
     Meteor.users.update(
       {
         createdAt: {
-          $gte: now
+          $lte: now
         }
       },
       {
