@@ -348,6 +348,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   const fields = {
     _id: 1,
     companyName: 1,
+    manager: 1,
     chairmanTitle: 1,
     tags: 1,
     pictureSmall: 1,

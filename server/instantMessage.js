@@ -31,7 +31,6 @@ function handleInstantMessage() {
       )
       .forEach((log) => {
         logIdList.push(log._id);
-        needExecute = true;
         const instantMessage = {
           type: log.logType,
           createdAt: log.createdAt,
@@ -39,10 +38,9 @@ function handleInstantMessage() {
           source: '!'
         };
         switch (log.logType) {
+          //驗證通過不進即時訊息
           case '驗證通過': {
-            instantMessage.onlyForUsers = log.username;
-            instantMessage.message = log.username[0] + '的帳號驗證通過，領取起始資金$' + log.price + '。';
-            break;
+            return false;
           }
           case '發薪紀錄': {
             instantMessage.message = '系統向所有已驗證通過的使用者發給了' + log.price + '的薪水！';
@@ -149,7 +147,8 @@ function handleInstantMessage() {
           }
         }
         instantMessageBulk.insert(instantMessage);
-      })
+        needExecute = true;
+      });
     //清除一分鐘前的即時訊息
     dbInstantMessage.remove({
       createdAt: {

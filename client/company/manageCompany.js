@@ -241,5 +241,7 @@ function validateProductModel(model) {
 }
 
 function saveProductModel(model) {
-  Meteor.call('createProduct', model);
+  Meteor.call('createProduct', model, () => {
+    rInAddProductMode.set(false);
+  });
 }

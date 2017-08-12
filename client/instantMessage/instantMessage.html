@@ -5,9 +5,29 @@
       <hr />
       {{#if currentUser}}
         {{> instantMessageChatForm}}
+        <hr />
       {{/if}}
+      <form>
+        <div class="form-group">
+          篩選器：
+          <div class="btn-group">
+            {{> instantMessageFilterButton type='聊天發言'}}
+            {{> instantMessageFilterButton type='創立公司'}}
+            {{> instantMessageFilterButton type='參與投資'}}
+            {{> instantMessageFilterButton type='創立失敗'}}
+            {{> instantMessageFilterButton type='創立成功'}}
+            {{> instantMessageFilterButton type='取消下單'}}
+            {{> instantMessageFilterButton type='公司釋股'}}
+            {{> instantMessageFilterButton type='交易紀錄'}}
+            {{> instantMessageFilterButton type='參選紀錄'}}
+            {{> instantMessageFilterButton type='經理管理'}}
+            {{> instantMessageFilterButton type='推薦產品'}}
+            {{> instantMessageFilterButton type='就任經理'}}
+          </div>
+        </div>
+      </form>
+      {{> instantMessageList}}
     </div>
-    {{> instantMessageList}}
   </div>
 </template>
 
@@ -29,8 +49,14 @@
   </form>
 </template>
 
+<template name="instantMessageFilterButton">
+  <button class="{{btnClass}}" type="button">
+    {{btnText}}
+  </button>
+</template>
+
 <template name="instantMessageList">
-  <div class="card-block">
+  <div>
     {{#each messageList}}
       <div>
         <span class="text-info d-inline-block text-right" style="width: 220px;">({{formatDateText this.createdAt}})</span>
