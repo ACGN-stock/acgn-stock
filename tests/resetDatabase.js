@@ -37,27 +37,27 @@ Meteor.startup(function() {
   dbCompanies.remove({});
   dbDebugger.remove({});
   dbDirectors.remove({});
-  dbFoundations.find().forEach((foundationData) => {
-    const companyName = foundationData.companyName;
-    if (dbFoundations.find({companyName}).count() > 1) {
-      console.log('remove foundations[' + companyName + '] because have same name foundations.');
-      dbFoundations.remove(foundationData._id);
-    }
-    else if (typeof foundationData._id === 'string') {
-      console.log('re insert foundations[' + companyName + '] because have incrorect _id.');
-      dbFoundations.remove(foundationData._id);
-      dbFoundations.insert({
-        companyName: companyName,
-        manager: foundationData.manager,
-        tags: foundationData.tags,
-        pictureSmall: foundationData.pictureSmall,
-        pictureBig: foundationData.pictureBig,
-        description: foundationData.description,
-        invest: [],
-        createdAt: now
-      });
-    }
-  });
+  // dbFoundations.find().forEach((foundationData) => {
+  //   const companyName = foundationData.companyName;
+  //   if (dbFoundations.find({companyName}).count() > 1) {
+  //     console.log('remove foundations[' + companyName + '] because have same name foundations.');
+  //     dbFoundations.remove(foundationData._id);
+  //   }
+  //   else if (typeof foundationData._id === 'string') {
+  //     console.log('re insert foundations[' + companyName + '] because have incrorect _id.');
+  //     dbFoundations.remove(foundationData._id);
+  //     dbFoundations.insert({
+  //       companyName: companyName,
+  //       manager: foundationData.manager,
+  //       tags: foundationData.tags,
+  //       pictureSmall: foundationData.pictureSmall,
+  //       pictureBig: foundationData.pictureBig,
+  //       description: foundationData.description,
+  //       invest: [],
+  //       createdAt: now
+  //     });
+  //   }
+  // });
   dbFoundations.update(
     {},
     {
