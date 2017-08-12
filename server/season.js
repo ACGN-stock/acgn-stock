@@ -511,7 +511,10 @@ function electManager(seasonData) {
             };
           });
           const sortedVoteStocksList = _.sortBy(voteStocksList, 'stocks');
-          const winnerData = _.last(sortedVoteStocksList);
+          const winnerStocks = _.last(sortedVoteStocksList).stocks;
+          const winnerData = _.findWhere(voteStocksList, {
+            stocks: winnerStocks
+          });
           logBulk.insert({
             logType: '就任經理',
             username: [winnerData.username, companyData.manager],
