@@ -190,7 +190,7 @@ Template.accountInfoLog.helpers({
           return '以$' + logData.price + '的單價向' + (logData.username[1] || ('「' + getCompanyLink(logData.companyName) + '」公司')) + '購買了' + logData.amount + '數量的「' + logData.companyName + '」公司股票！';
         }
         else {
-          return '以$' + logData.price + '的單價向' + logData.username[0] + '賣出了' + logData.amount + '數量的「' + logData.companyName + '」公司股票！';
+          return '以$' + logData.price + '的單價向' + logData.username[0] + '賣出了' + logData.amount + '數量的「' + getCompanyLink(logData.companyName) + '」公司股票！';
         }
       }
       case '辭職紀錄': {
