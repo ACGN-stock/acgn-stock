@@ -1,3 +1,198 @@
 <template name="seasonalReport">
-  季度報告施工中
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">季度報告</h1>
+      <hr />
+      {{> reportSeasonNav}}
+      <hr />
+      <form>
+        {{> reportTableSelectButton type='userRankTable'}}
+        {{> reportTableSelectButton type='companyProfitRankTable'}}
+        {{> reportTableSelectButton type='companyValueRankTable'}}
+        {{> reportTableSelectButton type='companyPriceRankTable'}}
+      </form>
+      <hr />
+      <h3 class="card-title mb-1">{{displayTableTitle}}</h3>
+      {{> Template.dynamic template=showTableType}}
+    </div>
+  </div>
+</template>
+
+<template name="reportSeasonNav">
+  <div class="text-center">
+    <a {{seasonLinkAttrs 'prev'}}>
+      <span aria-hidden="true">&laquo;</span>
+    </a>
+    商業季度：
+    {{formatDateText seasonBegin}}
+    ～
+    {{formatDateText seasonEnd}}
+    <a  {{seasonLinkAttrs 'next'}}>
+      <span aria-hidden="true">&raquo;</span>
+    </a>
+  </div>
+</template>
+
+<template name="reportTableSelectButton">
+  <button
+    class="{{btnClass}}"
+    value="userRankTable"
+    type="button"
+  >
+    {{btnText}}
+  </button>
+</template>
+
+<template name="userRankTable">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center" style="width: 120px;">排名</th>
+        <th class="text-center">使用者名稱</th>
+        <th class="text-center" style="width: 120px;">持有現金</th>
+        <th class="text-center" style="width: 200px;">持股總值</th>
+        <th class="text-center" style="width: 200px;">
+          總財富
+          <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each rankData in rankList}}
+        <tr>
+          <td class="text-center">
+            {{add @index 1}}
+          </td>
+          <td class="text-left">
+            <a href="{{getAccountInfoLinkHref}} rankData.username">
+              {{rankData.username}}
+            </a>
+          </td>
+          <td class="text-right">
+            $ {{rankData.money}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.stocksValue}}
+          </td>
+          <td class="text-right">
+            $ {{add rankData.money rankData.stocksValue}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</template>
+
+<template name="companyProfitRankTable">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center" style="width: 120px;">排名</th>
+        <th class="text-center">公司名稱</th>
+        <th class="text-center" style="width: 120px;">收盤股價</th>
+        <th class="text-center" style="width: 120px;">總市值</th>
+        <th class="text-center" style="width: 120px;">
+          當季營利
+          <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each rankData in rankList}}
+        <tr>
+          <td class="text-center">
+            {{add @index 1}}
+          </td>
+          <td class="text-left">
+            {{{getCompanyLink rankData.companyName}}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.lastPrice}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.totalValue}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.profit}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</template>
+
+<template name="companyValueRankTable">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center" style="width: 120px;">排名</th>
+        <th class="text-center">公司名稱</th>
+        <th class="text-center" style="width: 120px;">收盤股價</th>
+        <th class="text-center" style="width: 120px;">
+          總市值
+          <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
+        </th>
+        <th class="text-center" style="width: 120px;">當季營利</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each rankData in rankList}}
+        <tr>
+          <td class="text-center">
+            {{add @index 1}}
+          </td>
+          <td class="text-left">
+            {{{getCompanyLink rankData.companyName}}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.lastPrice}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.totalValue}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.profit}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</template>
+
+<template name="companyPriceRankTable">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center" style="width: 120px;">排名</th>
+        <th class="text-center">公司名稱</th>
+        <th class="text-center" style="width: 120px;">
+          收盤股價
+          <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
+        </th>
+        <th class="text-center" style="width: 120px;">總市值</th>
+        <th class="text-center" style="width: 120px;">當季營利</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each rankData in rankList}}
+        <tr>
+          <td class="text-center">
+            {{add @index 1}}
+          </td>
+          <td class="text-left">
+            {{{getCompanyLink rankData.companyName}}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.lastPrice}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.totalValue}}
+          </td>
+          <td class="text-right">
+            $ {{rankData.profit}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
 </template>

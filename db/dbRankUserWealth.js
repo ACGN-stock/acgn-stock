@@ -25,10 +25,6 @@ const schema = new SimpleSchema({
   //持股總價值
   stocksValue: {
     type: SimpleSchema.Integer
-  },
-  //總財富
-  wealth: {
-    type: SimpleSchema.Integer
   }
 });
 dbRankUserWealth.attachSchema(schema);

@@ -3,6 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbOrders } from '../../db/dbOrders';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbProducts } from '../../db/dbProducts';
 import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
 
@@ -141,5 +142,23 @@ export function changeChairmanTitle(companyData) {
   }
   else {
     window.alert('無效的頭銜名稱！');
+  }
+}
+
+export function voteProduct(productId) {
+  const user = Meteor.user();
+  if (! user) {
+    window.alert('您尚未登入，無法向產品投推薦票！');
+
+    return false;
+  }
+  if (user.profile.vote < 1) {
+    window.alert('您的推薦票數量不足，無法繼續推薦產品！');
+
+    return false;
+  }
+  const productData = dbProducts.findOne(productId);
+  if (window.confirm('您的推薦票剩餘' + user.profile.vote + '張，確定要向產品「' + productData.productName + '」投出推薦票嗎？')) {
+    Meteor.call('voteProduct', productId);
   }
 }
