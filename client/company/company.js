@@ -23,10 +23,12 @@ const rLogOffset = new ReactiveVar(0);
 Template.company.onCreated(function() {
   this.autorun(() => {
     if (Meteor.user()) {
-      const companyName = FlowRouter.getParam('companyName');
       this.subscribe('queryMyOrder');
       this.subscribe('queryOwnStocks');
-      this.subscribe('queryMyLike', companyName);
+      const companyName = FlowRouter.getParam('companyName');
+      if (companyName) {
+        this.subscribe('queryMyLike', companyName);
+      }
     }
   });
   const companyName = FlowRouter.getParam('companyName');
