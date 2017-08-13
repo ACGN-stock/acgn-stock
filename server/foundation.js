@@ -52,8 +52,7 @@ export function checkFoundCompany() {
             return sum + investData.amount;
           }, 0);
           const shouldReleaseStocks = Math.max(minReleaseStock, Math.floor(totalInvest / 10));
-          const sortedInvest = _.sortBy(invest, 'amount').reverse();
-          const directors = _.map(sortedInvest, ({username, amount}) => {
+          const directors = _.map(invest, ({username, amount}) => {
             const stocks = Math.ceil(amount / totalInvest * shouldReleaseStocks);
 
             return {username, stocks};
@@ -67,7 +66,7 @@ export function checkFoundCompany() {
           haveSuccessFoundations = true;
           logBulk.insert({
             logType: '創立成功',
-            username: [foundationData.manager].concat(_.pluck(sortedInvest, 'username')),
+            username: [foundationData.manager].concat(_.pluck(invest, 'username')),
             companyName: companyName,
             price: lastPrice,
             resolve: false,
