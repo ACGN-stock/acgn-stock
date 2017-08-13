@@ -20,6 +20,26 @@ Template.instantMessageChatForm.events({
   }
 });
 
+const messageTypeGroupHash = {
+  '交易相關': [
+    '交易紀錄',
+    '購買下單',
+    '販賣下單',
+    '取消下單',
+    '公司釋股'
+  ],
+  '新創相關': [
+    '創立公司',
+    '參與投資',
+    '創立失敗',
+    '創立成功'
+  ],
+  '競選相關': [
+    '參選紀錄',
+    '就任經理',
+    '辭職紀錄'
+  ]
+};
 const rFilterTypeList = new ReactiveVar([
   '發薪紀錄',
   '創立得股',
@@ -35,9 +55,11 @@ const rFilterTypeList = new ReactiveVar([
   '參與投資',
   '創立失敗',
   '創立成功',
-  '取消下單',
   '公司釋股',
   '交易紀錄',
+  '購買下單',
+  '販賣下單',
+  '取消下單',
   '參選紀錄',
   '就任經理',
   '辭職紀錄',
@@ -47,7 +69,9 @@ const rFilterTypeList = new ReactiveVar([
 ]);
 Template.instantMessageFilterButton.helpers({
   btnClass() {
-    if (_.contains(rFilterTypeList.get(), this.type)) {
+    const btnType = this.type;
+    const messageTypeList = messageTypeGroupHash[btnType] || [btnType];
+    if (_.contains(rFilterTypeList.get(), messageTypeList[0])) {
       return 'btn btn-sm btn-primary';
     }
     else {
@@ -59,17 +83,16 @@ Template.instantMessageFilterButton.helpers({
   }
 });
 Template.instantMessageFilterButton.events({
-  'click button'(event, templateInstance) {
+  'click'(event, templateInstance) {
     event.preventDefault();
     const btnType = templateInstance.data.type;
+    const messageTypeList = messageTypeGroupHash[btnType] || [btnType];
     const previousFilterTypeList = rFilterTypeList.get();
-    if (_.contains(previousFilterTypeList, btnType)) {
-      rFilterTypeList.set(_.without(previousFilterTypeList, btnType));
+    if (_.intersection(previousFilterTypeList, messageTypeList).length > 0) {
+      rFilterTypeList.set(_.difference(previousFilterTypeList, messageTypeList));
     }
     else {
-      const nextFilterTypeList = previousFilterTypeList.slice();
-      nextFilterTypeList.push(btnType);
-      rFilterTypeList.set(nextFilterTypeList);
+      rFilterTypeList.set(previousFilterTypeList.concat(messageTypeList));
     }
   }
 });
