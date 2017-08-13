@@ -477,13 +477,13 @@ export function updateCompanyLastPrice(companyData, lastPrice) {
         lastPrice: lastPrice
       }
     });
-    const companyName = companyData.companyName;
-    dbPrice.insert({
-      companyName: companyName,
-      price: lastPrice,
-      createdAt: new Date()
-    });
   }
+  const companyName = companyData.companyName;
+  dbPrice.insert({
+    companyName: companyName,
+    price: lastPrice,
+    createdAt: new Date()
+  });
 }
 
 Meteor.methods({
