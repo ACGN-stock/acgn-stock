@@ -375,6 +375,10 @@ function giveBonusByStocksFromProfit() {
             stocks: -1,
             createdAt: 1
           },
+          fields: {
+            username: 1,
+            stocks: 1
+          },
           disableOplog: true
         })
         .forEach((director, index) => {
