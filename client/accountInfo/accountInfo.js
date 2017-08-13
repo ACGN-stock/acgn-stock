@@ -141,8 +141,7 @@ Template.accountInfoLogList.helpers({
 
 Template.accountInfoLog.helpers({
   getLogDescriptionHtml(logData) {
-    const user = Meteor.user();
-    const username = (user && user.username);
+    const username = rSearchUsername.get();
     switch (logData.logType) {
       case '免費得石': {
         return '因為「' + logData.message + '」的理由獲得了' + logData.amount + '顆聖晶石！。';
@@ -188,6 +187,9 @@ Template.accountInfoLog.helpers({
       case '交易紀錄': {
         if (logData.username[0] === username) {
           return '以$' + logData.price + '的單價向' + (logData.username[1] || ('「' + getCompanyLink(logData.companyName) + '」公司')) + '購買了' + logData.amount + '數量的「' + logData.companyName + '」公司股票！';
+        }
+        else if (logData.username[1]) {
+          return '以$' + logData.price + '的單價向' + logData.username[0] + '賣出了' + logData.amount + '數量的「' + getCompanyLink(logData.companyName) + '」公司股票！';
         }
         else {
           return '以$' + logData.price + '的單價向' + logData.username[0] + '賣出了' + logData.amount + '數量的「' + getCompanyLink(logData.companyName) + '」公司股票！';
