@@ -36,7 +36,7 @@ export function createProduct(user, productData) {
   resourceManager.throwErrorIsResourceIsLock(['season']);
   const seasonData = dbSeason.findOne({}, {
     sort: {
-      createdAt: -1
+      beginDate: -1
     },
     fields: {
       _id: 1
@@ -280,7 +280,8 @@ Meteor.publish('productListByCompany', function({companyName, sortBy, sortDir, o
       },
       {
         sort: {
-          [sortBy]: sortDir
+          [sortBy]: sortDir,
+          createdAt: -1
         },
         skip: offset,
         limit: 30
