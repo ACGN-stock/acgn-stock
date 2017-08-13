@@ -13,7 +13,7 @@ import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
 import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct } from '../utils/methods';
+import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.company);
 const rDirectorOffset = new ReactiveVar(0);
@@ -23,8 +23,10 @@ const rLogOffset = new ReactiveVar(0);
 Template.company.onCreated(function() {
   this.autorun(() => {
     if (Meteor.user()) {
+      const companyName = FlowRouter.getParam('companyName');
       this.subscribe('queryMyOrder');
       this.subscribe('queryOwnStocks');
+      this.subscribe('queryMyLike', companyName);
     }
   });
   const companyName = FlowRouter.getParam('companyName');
@@ -32,6 +34,12 @@ Template.company.onCreated(function() {
   this.subscribe('companyCurrentProduct', companyName);
   this.subscribe('todayDealAmount', companyName);
   this.subscribe('queryChairmanAsVariable', companyName);
+  this.subscribe('productListByCompany', {
+    companyName: companyName,
+    sortBy: 'likeCount',
+    sortDir: -1,
+    offset: 0
+  });
   rDirectorOffset.set(0);
   this.autorun(() => {
     this.subscribe('companyDirector', companyName, rDirectorOffset.get());
@@ -67,11 +75,13 @@ Template.company.helpers({
 });
 Template.company.events({
   'click [data-action="changeChairmanTitle"]'() {
+    event.preventDefault();
     const companyName = FlowRouter.getParam('companyName');
     const companyData = dbCompanies.findOne({companyName});
     changeChairmanTitle(companyData);
   },
-  'click [data-action="resignManager"]'() {
+  'click [data-action="resignManager"]'(event) {
+    event.preventDefault();
     const companyName = FlowRouter.getParam('companyName');
     const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + companyName + '」以表示確定。';
     const confirmMessage = window.prompt(message);
@@ -339,7 +349,6 @@ Template.companySellOrderList.events({
   }
 });
 
-
 function getStockAmount(companyName) {
   const user = Meteor.user();
   if (user) {
@@ -353,12 +362,7 @@ function getStockAmount(companyName) {
   }
 }
 
-Template.companyProductList.helpers({
-  productCenterHref() {
-    return FlowRouter.path('productCenterByCompany', {
-      companyName: this.companyName
-    });
-  },
+Template.companyCurrentProductList.helpers({
   productList() {
     const companyName = this.companyName;
     const overdue = 1;
@@ -370,11 +374,37 @@ Template.companyProductList.helpers({
     });
   }
 });
-Template.companyProductList.events({
+Template.companyCurrentProductList.events({
   'click [data-vote-product]'(event) {
     event.preventDefault();
     const productId = $(event.currentTarget).attr('data-vote-product');
     voteProduct(productId);
+  }
+});
+
+Template.companyAllPrudctList.helpers({
+  productCenterHref() {
+    return FlowRouter.path('productCenterByCompany', {
+      companyName: this.companyName
+    });
+  },
+  productList() {
+    const companyName = this.companyName;
+
+    return dbProducts.find({companyName}, {
+      sort: {
+        likeCount: -1,
+        createdAt: -1
+      }
+    });
+  }
+});
+Template.companyAllPrudctList.events({
+  'click [data-like-product]'(event) {
+    event.preventDefault();
+    const productId = $(event.currentTarget).attr('data-like-product');
+    const companyName = FlowRouter.getParam('companyName');
+    likeProduct(productId, companyName);
   }
 });
 
@@ -393,12 +423,30 @@ Template.companyDirectorList.helpers({
 
     return Math.round(stocks / templateInstance.data.totalRelease * 10000) / 100;
   },
+  getMessage(message) {
+    return message || '無';
+  },
   paginationData() {
     return {
       useVariableForTotalCount: 'totalCountOfCompanyDirector',
       dataNumberPerPage: 10,
       offset: rDirectorOffset
     };
+  },
+  getMyMessage(companyName) {
+    const username = Meteor.user().username;
+
+    return dbDirectors.findOne({username, companyName}).message;
+  },
+  getStockAmount(companyName) {
+    return getStockAmount(companyName);
+  }
+});
+Template.companyDirectorList.events({
+  'submit form'(event, templateInstance) {
+    event.preventDefault();
+    const message = templateInstance.$('[name="message"]').val();
+    Meteor.call('directorMessage', templateInstance.data.companyName, message);
   }
 });
 

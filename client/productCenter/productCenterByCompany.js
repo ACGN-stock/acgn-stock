@@ -4,10 +4,9 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbDirectors } from '../../db/dbDirectors';
 import { dbProducts } from '../../db/dbProducts';
-import { dbProductLike } from '../../db/dbProductLike';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
+import { likeProduct } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.productCenterByCompany);
 const rProductSortBy = new ReactiveVar('likeCount');
@@ -88,27 +87,8 @@ Template.productListByCompanyTable.events({
   },
   'click [data-like-product]'(event) {
     event.preventDefault();
-    const user = Meteor.user();
-    if (! user) {
-      window.alert('您尚未登入，無法向產品作出股東評價！');
-
-      return false;
-    }
-    const companyName = FlowRouter.getParam('companyName');
-    const username = user.username;
-    if (dbDirectors.find({companyName, username}).count() < 1) {
-      window.alert('您至少需要擁有一張「' + companyName + '」的股票才可對公司產品做出股東評價！');
-
-      return false;
-    }
     const productId = $(event.currentTarget).attr('data-like-product');
-    if (dbProductLike.find({productId, username}).count() > 0) {
-      if (window.confirm('您已經對此產品做出過正面評價，要收回評價嗎？')) {
-        Meteor.call('likeProduct', productId);
-      }
-    }
-    else {
-      Meteor.call('likeProduct', productId);
-    }
+    const companyName = FlowRouter.getParam('companyName');
+    likeProduct(productId, companyName);
   }
 });

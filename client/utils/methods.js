@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbOrders } from '../../db/dbOrders';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbProducts } from '../../db/dbProducts';
+import { dbProductLike } from '../../db/dbProductLike';
 import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
 
@@ -160,5 +161,28 @@ export function voteProduct(productId) {
   const productData = dbProducts.findOne(productId);
   if (window.confirm('您的推薦票剩餘' + user.profile.vote + '張，確定要向產品「' + productData.productName + '」投出推薦票嗎？')) {
     Meteor.call('voteProduct', productId);
+  }
+}
+
+export function likeProduct(productId, companyName) {
+  const user = Meteor.user();
+  if (! user) {
+    window.alert('您尚未登入，無法向產品作出股東評價！');
+
+    return false;
+  }
+  const username = user.username;
+  if (dbDirectors.find({companyName, username}).count() < 1) {
+    window.alert('您至少需要擁有一張「' + companyName + '」的股票才可對公司產品做出股東評價！');
+
+    return false;
+  }
+  if (dbProductLike.find({productId, username}).count() > 0) {
+    if (window.confirm('您已經對此產品做出過正面評價，要收回評價嗎？')) {
+      Meteor.call('likeProduct', productId);
+    }
+  }
+  else {
+    Meteor.call('likeProduct', productId);
   }
 }

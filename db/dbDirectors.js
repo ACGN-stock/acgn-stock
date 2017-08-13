@@ -22,6 +22,12 @@ const schema = new SimpleSchema({
   stocks: {
     type: SimpleSchema.Integer,
     min: 1
+  },
+  //要在董事會成員裡留的言
+  message: {
+    type: String,
+    max: 100,
+    optional: true
   }
 });
 dbDirectors.attachSchema(schema);

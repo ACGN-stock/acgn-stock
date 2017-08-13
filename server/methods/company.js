@@ -302,6 +302,33 @@ function changeChairmanTitle(user, companyName, chairmanTitle) {
   });
 }
 
+Meteor.methods({
+  directorMessage(companyName, message) {
+    check(this.userId, String);
+    check(companyName, String);
+    check(message, String);
+    directorMessage(Meteor.user(), companyName, message);
+
+    return true;
+  }
+});
+function directorMessage(user, companyName, message) {
+  const username = user.username;
+  const directorData = dbDirectors.findOne({companyName, username}, {
+    fields: {
+      _id: 1
+    }
+  });
+  if (! directorData) {
+    throw new Meteor.Error(401, '使用者並未持有該公司的股票，無法進行董事留言！');
+  }
+  dbDirectors.update(directorData._id, {
+    $set: {
+      message: message
+    }
+  });
+}
+
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
   check(keyword, String);
   check(isOnlyShowMine, Boolean);
