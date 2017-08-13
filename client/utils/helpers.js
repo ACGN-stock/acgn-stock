@@ -61,7 +61,7 @@ Template.registerHelper('getCompanyProductLinkHref', getCompanyProductLinkHref);
 export function getAccountInfoLinkHref(username) {
   return FlowRouter.path('accountInfo', {username});
 }
-Template.registerHelper('getCompanyProductLinkHref', getCompanyProductLinkHref);
+Template.registerHelper('getAccountInfoLinkHref', getAccountInfoLinkHref);
 
 export function getChainman(companyName) {
   return dbVariables.get('chairmanNameOf' + companyName);
