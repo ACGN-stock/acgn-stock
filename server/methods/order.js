@@ -240,7 +240,11 @@ export function createSellOrder(user, orderData) {
   if (existsBuyOrder) {
     throw new Meteor.Error(403, '有買入該公司股票的訂單正在執行中，無法同時下達賣出的訂單！');
   }
-  const directorData = dbDirectors.findOne({companyName, username});
+  const directorData = dbDirectors.findOne({companyName, username}, {
+    fields: {
+      stocks: 1
+    }
+  });
   if (! directorData || directorData.stocks < orderData.amount) {
     throw new Meteor.Error(403, '擁有的股票數量不足，訂單無法成立！');
   }
@@ -264,7 +268,11 @@ export function createSellOrder(user, orderData) {
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyName]);
   //先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('createSellOrder', ['companyOrder' + companyName], (release) => {
-    const directorData = dbDirectors.findOne({companyName, username});
+    const directorData = dbDirectors.findOne({companyName, username}, {
+      fields: {
+        stocks: 1
+      }
+    });
     if (! directorData || directorData.stocks < orderData.amount) {
       throw new Meteor.Error(403, '擁有的股票數量不足，訂單無法成立！');
     }

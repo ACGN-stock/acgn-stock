@@ -25,7 +25,6 @@ Meteor.methods({
     return true;
   }
 });
-
 function editCompany(user, companyName, newCompanyData) {
   const companyData = dbCompanies.findOne({companyName}, {
     fields: {
@@ -62,7 +61,6 @@ Meteor.methods({
     return true;
   }
 });
-
 export function resignManager(user, companyName) {
   const companyData = dbCompanies.findOne({companyName}, {
     fields: {
@@ -123,7 +121,6 @@ Meteor.methods({
     return true;
   }
 });
-
 export function contendManager(user, companyName) {
   const companyData = dbCompanies.findOne({companyName}, {
     fields: {
@@ -195,7 +192,6 @@ Meteor.methods({
     return true;
   }
 });
-
 export function supportCandidate(director, companyName, candidateName) {
   const companyData = dbCompanies.findOne({companyName}, {
     fields: {
@@ -210,11 +206,13 @@ export function supportCandidate(director, companyName, candidateName) {
     throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
   }
   const directorName = director.username;
-  const directorData = dbDirectors.findOne({
-    companyName: companyName,
-    username: directorName
-  });
-  if (! directorData) {
+  const directorDataCount = dbDirectors
+    .find({
+      companyName: companyName,
+      username: directorName
+    })
+    .count();
+  if (directorDataCount < 1) {
     throw new Meteor.Error(401, '使用者並非「' + companyName + '」公司的董事，無法支持經理人！');
   }
   const {candidateList, voteList} = companyData;
@@ -237,11 +235,13 @@ export function supportCandidate(director, companyName, candidateName) {
         voteList: 1
       }
     });
-    const directorData = dbDirectors.findOne({
-      companyName: companyName,
-      username: directorName
-    });
-    if (! directorData) {
+    const directorDataCount = dbDirectors
+      .find({
+        companyName: companyName,
+        username: directorName
+      })
+      .count();
+    if (directorDataCount < 1) {
       throw new Meteor.Error(401, '使用者並非「' + companyName + '」公司的董事，無法支持經理人！');
     }
     const {candidateList, voteList} = companyData;
@@ -281,8 +281,7 @@ Meteor.methods({
 
     return true;
   }
-})
-
+});
 function changeChairmanTitle(user, companyName, chairmanTitle) {
   const username = user.username;
   const chairmanData = dbDirectors.findOne({companyName}, {
@@ -290,7 +289,9 @@ function changeChairmanTitle(user, companyName, chairmanTitle) {
       stocks: -1,
       createdAt: 1
     },
-    limit: 1
+    fields: {
+      username: 1
+    }
   });
   if (chairmanData.username !== username) {
     throw new Meteor.Error(401, '使用者並非該公司的董事長，無法修改董事長頭銜！');
@@ -357,12 +358,24 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
       }
     });
     const username = user.username;
-    const orderCompanyNameList = dbOrders.find({username}).map((orderData) => {
-      return orderData.companyName;
-    });
-    const directoryCompanyNameList = dbDirectors.find({username}).map((orderData) => {
-      return orderData.companyName;
-    });
+    const orderCompanyNameList = dbOrders
+      .find({username}, {
+        fields: {
+          companyName: 1
+        }
+      })
+      .map((orderData) => {
+        return orderData.companyName;
+      });
+    const directoryCompanyNameList = dbDirectors
+      .find({username}, {
+        fields: {
+          companyName: 1
+        }
+      })
+      .map((orderData) => {
+        return orderData.companyName;
+      });
     filter.companyName = {
       $in: _.unique(orderCompanyNameList.concat(directoryCompanyNameList))
     };
@@ -440,17 +453,15 @@ Meteor.publish('queryChairmanAsVariable', function(companyName) {
         stocks: -1,
         createdAt: 1
       },
+      fields: {
+        username: 1
+      },
       limit: 1
     })
     .observeChanges({
       added: (id, fields) => {
         this.changed('variables', variableId, {
           value: fields.username
-        });
-      },
-      removed: () => {
-        this.changed('variables', variableId, {
-          value: '???'
         });
       }
     });

@@ -1,12 +1,9 @@
 'use strict';
-import { _ } from 'meteor/underscore';
 import { resourceManager } from './resourceManager';
 import { changeStocksAmount, resolveOrder, updateCompanyLastPrice } from './methods/order';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbOrders } from '../db/dbOrders';
-import { dbDirectors } from '../db/dbDirectors';
 import { dbLog } from '../db/dbLog';
-import { dbSeason } from '../db/dbSeason';
 import { config } from '../config';
 
 let releaseStocksCounter = generateReleaseStocksConter();
@@ -202,24 +199,3 @@ function generateRecordListPriceConter() {
 
   return min + Math.floor(Math.random() * max);
 }
-
-function convertDateToText(date) {
-  const dateInTimeZone = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 * -1);
-
-  return (
-    dateInTimeZone.getFullYear() + '/' +
-    padZero(dateInTimeZone.getMonth() + 1) + '/' +
-    padZero(dateInTimeZone.getDate()) + ' ' +
-    padZero(dateInTimeZone.getHours()) + ':' +
-    padZero(dateInTimeZone.getMinutes())
-  );
-}
-function padZero(n) {
-  if (n < 10) {
-    return '0' + n;
-  }
-  else {
-    return n;
-  }
-}
-

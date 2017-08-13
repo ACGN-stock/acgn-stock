@@ -104,8 +104,8 @@ function generateNewSeason() {
 
 //為所有公司與使用者進行排名結算
 function generateRankData(seasonData) {
-  console.log('begining generate rank data...');
-  console.log('begining rank company price...');
+  // console.log('begining generate rank data...');
+  // console.log('begining rank company price...');
   const rankCompanyPriceList = dbCompanies
     .find({}, {
       fields: {
@@ -123,9 +123,9 @@ function generateRankData(seasonData) {
       disableOplog: true
     })
     .fetch();
-  console.log('done rank company price...');
+  // console.log('done rank company price...');
 
-  console.log('begining rank company value...');
+  // console.log('begining rank company value...');
   const rankCompanyValueList = dbCompanies
     .find({}, {
       fields: {
@@ -143,9 +143,9 @@ function generateRankData(seasonData) {
       disableOplog: true
     })
     .fetch();
-  console.log('done rank company value...');
+  // console.log('done rank company value...');
 
-  console.log('begining rank company profit...');
+  // console.log('begining rank company profit...');
   const rankCompanyProfitList = dbCompanies
     .find({}, {
       fields: {
@@ -163,9 +163,9 @@ function generateRankData(seasonData) {
       disableOplog: true
     })
     .fetch();
-  console.log('done rank company profit...');
+  // console.log('done rank company profit...');
 
-  console.log('begining rank user...');
+  // console.log('begining rank user...');
   const rankUserList = dbDirectors.aggregate([
     {
       $lookup: {
@@ -231,12 +231,12 @@ function generateRankData(seasonData) {
       $limit : 100
     }
   ]);
-  console.log('done rank user...');
+  // console.log('done rank user...');
 
   const seasonId = seasonData._id;
 
   if (rankCompanyPriceList.length > 0) {
-    console.log('start insert company\'s price rank data...');
+    // console.log('start insert company\'s price rank data...');
     const rankCompanyPriceBulk = dbRankCompanyPrice.rawCollection().initializeUnorderedBulkOp();
     _.each(rankCompanyPriceList, (rankData) => {
       rankCompanyPriceBulk.insert({
@@ -250,9 +250,9 @@ function generateRankData(seasonData) {
       });
     });
     rankCompanyPriceBulk.execute();
-    console.log('done insert company\'s price rank data...');
+    // console.log('done insert company\'s price rank data...');
 
-    console.log('start insert company\'s value rank data...');
+    // console.log('start insert company\'s value rank data...');
     const rankCompanyValueBulk = dbRankCompanyValue.rawCollection().initializeUnorderedBulkOp();
     _.each(rankCompanyValueList, (rankData) => {
       rankCompanyValueBulk.insert({
@@ -266,9 +266,9 @@ function generateRankData(seasonData) {
       });
     });
     rankCompanyValueBulk.execute();
-    console.log('done insert company\'s value rank data...');
+    // console.log('done insert company\'s value rank data...');
 
-    console.log('start insert company\'s profit rank data...');
+    // console.log('start insert company\'s profit rank data...');
     const rankCompanyProfitBulk = dbRankCompanyProfit.rawCollection().initializeUnorderedBulkOp();
     _.each(rankCompanyProfitList, (rankData) => {
       rankCompanyProfitBulk.insert({
@@ -282,11 +282,11 @@ function generateRankData(seasonData) {
       });
     });
     rankCompanyProfitBulk.execute();
-    console.log('done insert company\'s profit rank data...');
+    // console.log('done insert company\'s profit rank data...');
   }
 
   if (rankUserList.length > 0) {
-    console.log('start insert user\'s rank data...');
+    // console.log('start insert user\'s rank data...');
     const rankUserBulk = dbRankUserWealth.rawCollection().initializeUnorderedBulkOp();
     _.each(rankUserList, (rankData) => {
       rankUserBulk.insert({
@@ -297,7 +297,7 @@ function generateRankData(seasonData) {
       });
     });
     rankUserBulk.execute();
-    console.log('done insert user\'s rank data...');
+    // console.log('done insert user\'s rank data...');
   }
 }
 
@@ -328,9 +328,9 @@ function giveBonusByStocksFromProfit() {
     .forEach((companyData) => {
       const now = Date.now();
       const companyName = companyData.companyName;
-      console.log('start give bonous of company[' + companyName + ']...');
+      // console.log('start give bonous of company[' + companyName + ']...');
       let leftProfit = companyData.profit;
-      console.log('total bonus: $' + companyData.profit);
+      // console.log('total bonus: $' + companyData.profit);
       logBulk.insert({
         logType: '公司營利',
         companyName: companyName,
