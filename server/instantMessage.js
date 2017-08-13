@@ -113,8 +113,22 @@ function handleInstantMessage() {
             return false;
           }
           case '就任經理': {
-            instantMessage.message = log.username[0] + '在' + log.message + '商業季度' + (log.amount ? '以' + log.amount + '數量的支持股份' : '') + '擊敗了所有競爭對手，' + (log.username[1] === '!none' ? '' : '取代' + log.username[1]) + '成為「' + log.companyName + '」公司的經理人！';
-            break;
+            let extraDescription = '';
+            if (log.username[1] === '!none') {
+              extraDescription = '成為了公司的經理人。';
+            }
+            else if (log.username[0] === log.username[1]) {
+              extraDescription = '繼續擔任「' + log.companyName + '」公司的經理人職務。';
+            }
+            else {
+              extraDescription = '取代了' + log.username[1] + '成為了「' + log.companyName + '」公司的經理人。';
+            }
+
+            return (
+              log.username[0] + '在' + log.message + '商業季度' +
+              (log.amount ? ('以' + log.amount + '數量的支持股份') : '') +
+              '擊敗了所有競爭對手，' + extraDescription
+            );
           }
           case '公司營利': {
             instantMessage.message = '「' + log.companyName + '」公司在本商業季度一共獲利$' + log.amount + '！';

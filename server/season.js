@@ -543,12 +543,14 @@ function electManager(seasonData) {
     });
 }
 function convertDateToText(date) {
+  const dateInTimeZone = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 * -1);
+
   return (
-    date.getFullYear() + '/' +
-    padZero(date.getMonth() + 1) + '/' +
-    padZero(date.getDate()) + ' ' +
-    padZero(date.getHours()) + ':' +
-    padZero(date.getMinutes())
+    dateInTimeZone.getFullYear() + '/' +
+    padZero(dateInTimeZone.getMonth() + 1) + '/' +
+    padZero(dateInTimeZone.getDate()) + ' ' +
+    padZero(dateInTimeZone.getHours()) + ':' +
+    padZero(dateInTimeZone.getMinutes())
   );
 }
 function padZero(n) {

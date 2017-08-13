@@ -529,13 +529,14 @@ Template.companyLogList.helpers({
       }
       case '就任經理': {
         let extraDescription = '';
-        if (logData.username[1] !== '!none') {
-          if (logData.username[0] === logData.username[1]) {
-            extraDescription = '繼續就任公司的經理人職務。';
-          }
-          else {
-            extraDescription = '取代了' + logData.username[1] + '成為了公司的經理人。';
-          }
+        if (logData.username[1] === '!none') {
+          extraDescription = '成為了公司的經理人。';
+        }
+        else if (logData.username[0] === logData.username[1]) {
+          extraDescription = '繼續就任公司的經理人職務。';
+        }
+        else {
+          extraDescription = '取代了' + logData.username[1] + '成為了公司的經理人。';
         }
 
         return (

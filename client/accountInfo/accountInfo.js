@@ -209,11 +209,21 @@ Template.accountInfoLog.helpers({
         return '支持' + logData.username[1] + '擔任「' + getCompanyLink(logData.companyName) + '」公司的經理人。';
       }
       case '就任經理': {
+        let extraDescription = '';
+        if (logData.username[1] === '!none') {
+          extraDescription = '成為了「' + getCompanyLink(logData.companyName) + '」公司的經理人。';
+        }
+        else if (logData.username[0] === logData.username[1]) {
+          extraDescription = '繼續就任「' + getCompanyLink(logData.companyName) + '」公司的經理人職務。';
+        }
+        else {
+          extraDescription = '取代了' + logData.username[1] + '成為「' + getCompanyLink(logData.companyName) + '」公司的經理人。';
+        }
+
         return (
           '在' + logData.message + '商業季度' +
           (logData.amount ? ('以' + logData.amount + '數量的支持股份') : '') +
-          '擊敗了所有競爭對手，取代' + logData.username[1] +
-          '成為「' + getCompanyLink(logData.companyName) + '」公司的經理人。'
+          '擊敗了所有競爭對手，' + extraDescription
         );
       }
       case '營利分紅': {
