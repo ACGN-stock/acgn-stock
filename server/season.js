@@ -365,7 +365,8 @@ function giveBonusByStocksFromProfit() {
       }
       //剩餘收益先扣去公司營運成本
       leftProfit -= Math.ceil(companyData.profit * config.costFromProfit);
-      // console.log('left bonus: $' + leftProfit);
+      const forDirectorProfit = leftProfit;
+      // console.log('left bonus: $' + forDirectorProfit);
       const totalReleaseStocks = companyData.totalRelease;
       // console.log('totalRelease stocks: ' + totalReleaseStocks);
       //發放營利給所有董事
@@ -383,7 +384,7 @@ function giveBonusByStocksFromProfit() {
         })
         .forEach((director, index) => {
           // console.log('director[' + director.username + '] stocks: ' + director.stocks);
-          const directorProfit = Math.min(Math.ceil(leftProfit * director.stocks / totalReleaseStocks), leftProfit);
+          const directorProfit = Math.min(Math.ceil(forDirectorProfit * director.stocks / totalReleaseStocks), leftProfit);
           // console.log('director[' + director.username + '] bonus: $' + directorProfit);
           if (directorProfit > 0) {
             logBulk.insert({

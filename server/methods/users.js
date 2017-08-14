@@ -162,6 +162,7 @@ Meteor.publish('accountOwnStocks', function(username, offset) {
   const observer = dbDirectors
     .find({username}, {
       fields: {
+        username: 1,
         companyName: 1,
         stocks: 1
       },

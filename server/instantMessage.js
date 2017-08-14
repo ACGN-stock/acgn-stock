@@ -89,7 +89,7 @@ function handleInstantMessage() {
             break;
           }
           case '交易紀錄': {
-            instantMessage.message = log.username[0] + '以$' + log.price + '的單價向' + (log.username[1] || '「companyName」公司') + '購買了' + log.amount + '數量的「' + log.companyName + '」公司股票！';
+            instantMessage.message = log.username[0] + '以$' + log.price + '的單價向' + (log.username[1] || '「' + log.companyName  + '」公司') + '購買了' + log.amount + '數量的「' + log.companyName + '」公司股票！';
             break;
           }
           case '辭職紀錄': {
