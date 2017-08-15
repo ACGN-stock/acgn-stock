@@ -537,6 +537,9 @@ Template.companyLogList.helpers({
       case '創立得股': {
         return logData.username[0] + '獲得了' + logData.amount + '數量的公司股份。';
       }
+      case '創立退款': {
+        return '將$' + logData.amount + '的投資額退款回' + logData.username[0] + '。';
+      }
       case '公司釋股': {
         return '由於股價持續高漲，公司以$' + logData.price + '的價格釋出了' + logData.amount + '數量的股票到市場上以套取利潤。';
       }

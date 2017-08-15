@@ -172,6 +172,9 @@ Template.accountInfoLog.helpers({
       case '創立得股': {
         return '獲得了' + logData.amount + '數量的「' + getCompanyLink(logData.companyName) + '」公司創立股份。';
       }
+      case '創立退款': {
+        return '從「' + logData.companyName + '公司創立計劃」收回了$' + logData.amount + '的投資退款！';
+      }
       case '購買下單': {
         return '下達了以每股單價$' + logData.price + '的單價購入' + logData.amount + '數量的「' + getCompanyLink(logData.companyName) + '」公司股票的訂單。';
       }

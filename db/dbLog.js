@@ -16,6 +16,7 @@ export const logTypeList = [
   '創立失敗', //username...等人投資的「companyName公司創立計劃」由於投資人數不足失敗了，投資金額將全數返回！
   '創立成功', //username...等人投資的「companyName公司創立計劃」成功了，該公司正式上市，初始股價為$price！
   '創立得股', //(username0)對「companyName公司創立計劃」的投資為你帶來了amount數量的公司股票！
+  '創立退款', //(username0)從「companyName公司創立計劃」收回了$amount的投資退款！
   '購買下單', //username0想要用每股$price的單價購買amount數量的「companyName」公司股票！
   '販賣下單', //username0想要用每股$price的單價販賣amount數量的「companyName」公司股票！
   '取消下單', //username0取消了以每股$price單價message(購入/賣出)amount數量的companyName股票的訂單！

@@ -67,6 +67,11 @@ function handleInstantMessage() {
             instantMessage.message = '對「' + log.companyName + '公司創立計劃」的投資為你帶來了' + log.amount + '數量的公司股票！';
             break;
           }
+          case '創立退款': {
+            instantMessage.onlyForUsers = log.username;
+            instantMessage.message = '從「' + log.companyName + '公司創立計劃」收回了$' + log.amount + '的投資退款！';
+            break;
+          }
           case '購買下單': {
             instantMessage.message = log.username[0] + '想要用每股$' + log.price + '的單價購買' + log.amount + '數量的「' + log.companyName + '」公司股票！';
             break;
