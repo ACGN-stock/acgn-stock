@@ -7,13 +7,28 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { dbCompanies } from '../../db/dbCompanies';
-import { productTypeList, dbProducts } from '../../db/dbProducts';
+import { dbProducts, productTypeList } from '../../db/dbProducts';
+import { dbResourceLock } from '../../db/dbResourceLock';
+import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { regImageDataUrl } from '../utils/regexp';
 import SimpleSchema from 'simpl-schema';
 
+inheritedShowLoadingOnSubscribing(Template.manageCompany);
 Template.manageCompany.onCreated(function() {
-  const companyName = FlowRouter.getParam('companyName');
-  this.subscribe('companyDetail', companyName);
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    const companyName = FlowRouter.getParam('companyName');
+    this.subscribe('companyDetail', companyName);
+  });
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    const companyName = FlowRouter.getParam('companyName');
+    this.subscribe('companyFutureProduct', companyName);
+  });
 });
 Template.manageCompany.helpers({
   companyData() {
@@ -165,7 +180,6 @@ function addNewTag(event, templatInstance) {
 const rInAddProductMode = new ReactiveVar(false);
 Template.companyProductManage.onCreated(function() {
   rInAddProductMode.set(false);
-  this.subscribe('companyFutureProduct', this.data.companyName);
 });
 Template.companyProductManage.helpers({
   inAddMode() {

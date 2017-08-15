@@ -5,7 +5,21 @@ import { dbRankCompanyPrice } from '../../db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '../../db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '../../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../../db/dbRankUserWealth';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbSeason } from '../../db/dbSeason';
+
+Meteor.publish('isChangingSeason', function() {
+  return dbResourceLock.find(
+    {
+      _id: 'season'
+    },
+    {
+      fields: {
+        _id: 1
+      }
+    }
+  );
+});
 
 Meteor.publish('currentSeason', function() {
   const observer1 = dbSeason

@@ -4,13 +4,19 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { dbSeason } from '../../db/dbSeason';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { pageNameHash } from '../../routes';
 import { rShowLoginDialog } from './validateDialog';
-import { dbSeason } from '../../db/dbSeason';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 Template.nav.onCreated(function() {
-  this.subscribe('currentSeason');
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    this.subscribe('currentSeason');
+  });
 });
 Template.nav.helpers({
   getNavLinkListClassList() {

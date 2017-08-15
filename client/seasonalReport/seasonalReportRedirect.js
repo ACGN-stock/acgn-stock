@@ -1,12 +1,18 @@
 'use strict';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbSeason } from '../../db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 
 inheritedShowLoadingOnSubscribing(Template.seasonalReportRedirect);
 Template.seasonalReportRedirect.onCreated(function() {
-  this.subscribe('currentSeason');
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    this.subscribe('currentSeason');
+  });
   this.autorun(() => {
     const previousSeasonData = dbSeason.findOne({}, {
       sort: {

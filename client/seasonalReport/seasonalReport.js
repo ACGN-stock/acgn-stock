@@ -7,20 +7,32 @@ import { dbRankCompanyPrice } from '../../db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '../../db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '../../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../../db/dbRankUserWealth';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbSeason } from '../../db/dbSeason';
 import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 
 inheritedShowLoadingOnSubscribing(Template.seasonalReport);
 Template.seasonalReport.onCreated(function() {
-  this.subscribe('currentSeason');
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    this.subscribe('currentSeason');
+  });
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const seasonId = FlowRouter.getParam('seasonId');
     if (seasonId) {
       this.subscribe('adjacentSeason', seasonId);
     }
   });
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const seasonId = FlowRouter.getParam('seasonId');
     if (seasonId) {
       this.subscribe('rankListBySeasonId', seasonId);

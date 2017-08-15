@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { handleError } from '../utils/handleError';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { addTask, resolveTask } from '../layout/loading';
 import { regUsername } from '../utils/regexp';
@@ -14,6 +15,9 @@ let password = '';
 
 Template.validateDialog.onCreated(function() {
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const usermame = rValidateUserName.get();
     if (usermame) {
       this.subscribe('validateUser', usermame);

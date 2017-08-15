@@ -7,6 +7,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle } from '../utils/methods';
 
@@ -18,6 +19,9 @@ const rStockOffset = new ReactiveVar(0);
 Template.stockSummary.onCreated(function() {
   rStockOffset.set(0);
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const keyword = rKeyword.get();
     const isOnlyShowMine = rIsOnlyShowMine.get();
     const sort = rSortBy.get();
@@ -25,6 +29,9 @@ Template.stockSummary.onCreated(function() {
     this.subscribe('stockSummary', keyword, isOnlyShowMine, sort, offset);
   });
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     if (Meteor.user()) {
       this.subscribe('queryOwnStocks');
       this.subscribe('queryMyOrder');

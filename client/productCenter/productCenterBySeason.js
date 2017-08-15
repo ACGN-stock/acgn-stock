@@ -4,6 +4,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbProducts } from '../../db/dbProducts';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbSeason } from '../../db/dbSeason';
 import { dbVariables } from '../../db/dbVariables';
 import { voteProduct } from '../utils/methods';
@@ -14,8 +15,16 @@ const rProductSortBy = new ReactiveVar('votes');
 const rProductSortDir = new ReactiveVar(-1);
 const rProductOffset = new ReactiveVar(0);
 Template.productCenterBySeason.onCreated(function() {
-  this.subscribe('currentSeason');
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    this.subscribe('currentSeason');
+  });
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const seasonId = FlowRouter.getParam('seasonId');
     if (seasonId) {
       rProductOffset.set(0);
@@ -23,6 +32,9 @@ Template.productCenterBySeason.onCreated(function() {
     }
   });
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const seasonId = FlowRouter.getParam('seasonId');
     if (seasonId) {
       this.subscribe('productListBySeasonId', {

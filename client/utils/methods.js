@@ -3,13 +3,21 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbOrders } from '../../db/dbOrders';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbProducts } from '../../db/dbProducts';
 import { dbProductLike } from '../../db/dbProductLike';
 import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
 
+Meteor.subscribe('isChangingSeason');
+
 Meteor.call = (function(_super) {
   function call(...args) {
+    if (dbResourceLock.find('season').count()) {
+      window.alert('伺服器正忙於商業季度的切換，請稍等一下吧！[503]');
+
+      return false;
+    }
     if (! Meteor.status().connected) {
       window.alert('糟了，伺服器好像掛了！等一下再試試吧！[503]');
 

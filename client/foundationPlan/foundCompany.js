@@ -6,8 +6,9 @@ import { Mongo } from 'meteor/mongo';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { dbFoundations } from '../../db/dbFoundations';
+import { dbResourceLock } from '../../db/dbResourceLock';
+import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { regImageDataUrl } from '../utils/regexp';
 
@@ -22,8 +23,13 @@ Template.createFoundationPlan.helpers({
 });
 inheritedShowLoadingOnSubscribing(Template.editFoundationPlan);
 Template.editFoundationPlan.onCreated(function() {
-  const foundationId = FlowRouter.getParam('foundationId');
-  this.subscribe('foundationPlanById', foundationId);
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    const foundationId = FlowRouter.getParam('foundationId');
+    this.subscribe('foundationPlanById', foundationId);
+  });
 });
 Template.editFoundationPlan.helpers({
   editData() {

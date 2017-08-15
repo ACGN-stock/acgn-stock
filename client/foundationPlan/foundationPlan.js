@@ -5,6 +5,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '../../db/dbFoundations';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { formatDateText } from '../utils/helpers';
 import { config } from '../../config';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
@@ -15,6 +16,9 @@ const rFoundationOffset = new ReactiveVar(0);
 Template.foundationPlan.onCreated(function() {
   rFoundationOffset.set(0);
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     this.subscribe('foundationPlan', rKeyword.get(), rFoundationOffset.get());
   });
 });

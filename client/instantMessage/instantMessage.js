@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbInstantMessage } from '../../db/dbInstantMessage';
+import { dbResourceLock } from '../../db/dbResourceLock';
 
 Template.instantMessageChatForm.onRendered(function() {
   this.$message = this.$('[name="message"]');
@@ -98,7 +99,12 @@ Template.instantMessageFilterButton.events({
 });
 
 Template.instantMessageList.onCreated(function() {
-  this.subscribe('instantMessage');
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    this.subscribe('instantMessage');
+  });
 });
 Template.instantMessageList.helpers({
   messageList() {

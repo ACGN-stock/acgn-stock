@@ -6,6 +6,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { getCompanyLink } from '../utils/helpers';
 
@@ -15,6 +16,9 @@ export const ownStocksOffset = new ReactiveVar(0);
 export const logOffset = new ReactiveVar(0);
 Template.accountInfo.onCreated(function() {
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const username = rSearchUsername.get();
     if (username) {
       this.subscribe('accountInfo', username);
@@ -22,6 +26,9 @@ Template.accountInfo.onCreated(function() {
   });
   ownStocksOffset.set(0);
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const username = rSearchUsername.get();
     if (username) {
       this.subscribe('accountOwnStocks', username, ownStocksOffset.get());
@@ -29,6 +36,9 @@ Template.accountInfo.onCreated(function() {
   });
   logOffset.set(0);
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     const username = rSearchUsername.get();
     if (username) {
       this.subscribe('accountInfoLog', username, logOffset.get());

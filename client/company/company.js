@@ -6,11 +6,12 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbCompanies } from '../../db/dbCompanies';
-import { dbProducts } from '../../db/dbProducts';
 import { dbDirectors } from '../../db/dbDirectors';
-import { dbOrders } from '../../db/dbOrders';
 import { dbLog } from '../../db/dbLog';
+import { dbOrders } from '../../db/dbOrders';
 import { dbPrice } from '../../db/dbPrice';
+import { dbProducts } from '../../db/dbProducts';
+import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct } from '../utils/methods';
@@ -22,6 +23,9 @@ const rSellOrderOffset = new ReactiveVar(0);
 const rLogOffset = new ReactiveVar(0);
 Template.company.onCreated(function() {
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
     if (Meteor.user()) {
       this.subscribe('queryMyOrder');
       this.subscribe('queryOwnStocks');
@@ -31,31 +35,52 @@ Template.company.onCreated(function() {
       }
     }
   });
-  const companyName = FlowRouter.getParam('companyName');
-  this.subscribe('companyDetail', companyName);
-  this.subscribe('companyCurrentProduct', companyName);
-  this.subscribe('todayDealAmount', companyName);
-  this.subscribe('queryChairmanAsVariable', companyName);
-  this.subscribe('productListByCompany', {
-    companyName: companyName,
-    sortBy: 'likeCount',
-    sortDir: -1,
-    offset: 0
+  this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    const companyName = FlowRouter.getParam('companyName');
+    this.subscribe('companyDetail', companyName);
+    this.subscribe('companyCurrentProduct', companyName);
+    this.subscribe('todayDealAmount', companyName);
+    this.subscribe('queryChairmanAsVariable', companyName);
+    this.subscribe('productListByCompany', {
+      companyName: companyName,
+      sortBy: 'likeCount',
+      sortDir: -1,
+      offset: 0
+    });
   });
   rDirectorOffset.set(0);
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    const companyName = FlowRouter.getParam('companyName');
     this.subscribe('companyDirector', companyName, rDirectorOffset.get());
   });
   rBuyOrderOffset.set(0);
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    const companyName = FlowRouter.getParam('companyName');
     this.subscribe('companyOrderExcludeMe', companyName, '購入', rBuyOrderOffset.get());
   });
   rSellOrderOffset.set(0);
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    const companyName = FlowRouter.getParam('companyName');
     this.subscribe('companyOrderExcludeMe', companyName, '賣出', rSellOrderOffset.get());
   });
   rLogOffset.set(0);
   this.autorun(() => {
+    if (dbResourceLock.find('season').count()) {
+      return false;
+    }
+    const companyName = FlowRouter.getParam('companyName');
     this.subscribe('companyLog', companyName, rLogOffset.get());
   });
 });

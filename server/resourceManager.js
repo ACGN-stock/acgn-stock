@@ -79,5 +79,5 @@ export const resourceManager = {
 export default resourceManager;
 
 function randomTime() {
-  return Math.floor(Math.random() * 3000);
+  return Math.floor(Math.random() * 1000);
 }
