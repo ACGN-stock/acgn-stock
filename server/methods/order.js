@@ -398,7 +398,8 @@ export function changeStocksAmount(username, companyName, amount) {
       dbDirectors.insert({
         companyName: companyName,
         username: username,
-        stocks: amount
+        stocks: amount,
+        createdAt: new Date()
       });
     }
   }

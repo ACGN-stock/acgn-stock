@@ -23,6 +23,9 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 1
   },
+  createdAt: {
+    type: Date
+  },
   //要在董事會成員裡留的言
   message: {
     type: String,

@@ -441,7 +441,8 @@ Template.companyDirectorList.helpers({
 
     return dbDirectors.find({companyName}, {
       sort: {
-        stocks: -1
+        stocks: -1,
+        createdAt: 1
       }
     });
   },
