@@ -57,9 +57,9 @@ FlowRouter.route('/foundationPlan', {
   }
 });
 
-var foundCompanyRoute = FlowRouter.group({
-  prefix : '/foundCompany',
-  name : 'foundCompanyRoute'
+const foundCompanyRoute = FlowRouter.group({
+  prefix: '/foundCompany',
+  name: 'foundCompanyRoute'
 });
 
 foundCompanyRoute.route('/', {
@@ -78,9 +78,9 @@ foundCompanyRoute.route('/:foundationId', {
   }
 });
 
-var productCenterRoute = FlowRouter.group({
-  prefix : '/productCenter',
-  name : 'productCenterRoute'
+const productCenterRoute = FlowRouter.group({
+  prefix: '/productCenter',
+  name: 'productCenterRoute'
 });
 
 productCenterRoute.route('/', {
@@ -102,9 +102,9 @@ productCenterRoute.route('/company/:companyName', {
   }
 });
 
-var seasonalReportRoute = FlowRouter.group({
-  prefix : '/seasonalReport',
-  name : 'seasonalReportRoute'
+const seasonalReportRoute = FlowRouter.group({
+  prefix: '/seasonalReport',
+  name: 'seasonalReportRoute'
 });
 
 seasonalReportRoute.route('/', {
@@ -120,9 +120,9 @@ seasonalReportRoute.route('/:seasonId', {
   }
 });
 
-var accountInfoRoute = FlowRouter.group({
-  prefix : '/accountInfo',
-  name : 'accountInfoRoute'
+const accountInfoRoute = FlowRouter.group({
+  prefix: '/accountInfo',
+  name: 'accountInfoRoute'
 });
 
 accountInfoRoute.route('/', {
