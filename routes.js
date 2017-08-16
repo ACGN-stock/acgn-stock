@@ -56,13 +56,20 @@ FlowRouter.route('/foundationPlan', {
     DocHead.setTitle(config.websiteName + ' - 新創計劃');
   }
 });
-FlowRouter.route('/foundCompany', {
+
+var foundCompanyRoute = FlowRouter.group({
+  prefix : '/foundCompany',
+  name : 'foundCompanyRoute'
+});
+
+foundCompanyRoute.route('/', {
   name: 'createFoundationPlan',
   action() {
     DocHead.setTitle(config.websiteName + ' - 發起新創計劃');
   }
 });
-FlowRouter.route('/foundCompany/:foundationId', {
+
+foundCompanyRoute.route('/:foundationId', {
   name: 'editFoundationPlan',
   action() {
     if (Meteor.isClient) {
@@ -71,39 +78,54 @@ FlowRouter.route('/foundCompany/:foundationId', {
   }
 });
 
-FlowRouter.route('/productCenter', {
+var productCenterRoute = FlowRouter.group({
+  prefix : '/productCenter',
+  name : 'productCenterRoute'
+});
+
+productCenterRoute.route('/', {
   name: 'productCenterRedirect',
   action() {
     DocHead.setTitle(config.websiteName + ' - 產品中心');
   }
 });
-FlowRouter.route('/productCenter/season/:seasonId', {
+productCenterRoute.route('/season/:seasonId', {
   name: 'productCenterBySeason',
   action() {
     DocHead.setTitle(config.websiteName + ' - 產品中心');
   }
 });
-FlowRouter.route('/productCenter/company/:companyName', {
+productCenterRoute.route('/company/:companyName', {
   name: 'productCenterByCompany',
   action(params) {
     DocHead.setTitle(config.websiteName + ' - 產品中心 - ' + params.companyName);
   }
 });
 
-FlowRouter.route('/seasonalReport', {
+var seasonalReportRoute = FlowRouter.group({
+  prefix : '/seasonalReport',
+  name : 'seasonalReportRoute'
+});
+
+seasonalReportRoute.route('/', {
   name: 'seasonalReportRedirect',
   action() {
     DocHead.setTitle(config.websiteName + ' - 季度報告');
   }
 });
-FlowRouter.route('/seasonalReport/:seasonId', {
+seasonalReportRoute.route('/:seasonId', {
   name: 'seasonalReport',
   action() {
     DocHead.setTitle(config.websiteName + ' - 季度報告');
   }
 });
 
-FlowRouter.route('/accountInfo', {
+var accountInfoRoute = FlowRouter.group({
+  prefix : '/accountInfo',
+  name : 'accountInfoRoute'
+});
+
+accountInfoRoute.route('/', {
   name: 'accountInfo',
   triggersEnter: [
     (context, redirect) => {
@@ -125,7 +147,8 @@ FlowRouter.route('/accountInfo', {
     }
   }
 });
-FlowRouter.route('/accountInfo/:username', {
+
+accountInfoRoute.route('/:username', {
   name: 'accountInfo',
   action(params) {
     DocHead.setTitle(config.websiteName + ' - 「' + params.username + '」帳號資訊');
