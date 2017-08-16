@@ -113,6 +113,7 @@ export function createBuyOrder(user, orderData) {
     });
     let indeedCost = 0;
     let lastPrice = companyData.lastPrice;
+    let anyTradeDone = false;
     dbOrders
       .find(
         {
@@ -136,6 +137,7 @@ export function createBuyOrder(user, orderData) {
         }
         const tradeNumber = Math.min(sellOrderData.amount - sellOrderData.done, orderData.amount - orderData.done);
         if (tradeNumber > 0) {
+          anyTradeDone = true;
           orderData.done += tradeNumber;
           lastPrice = sellOrderData.unitPrice;
           indeedCost += (lastPrice * tradeNumber);
@@ -179,7 +181,9 @@ export function createBuyOrder(user, orderData) {
         }
         resolveOrder(sellOrderData, tradeNumber);
       });
-    updateCompanyLastPrice(companyData, lastPrice);
+    if (anyTradeDone) {
+      updateCompanyLastPrice(companyData, lastPrice);
+    }
     if (orderData.done < orderData.amount) {
       const leftAmount = orderData.amount - orderData.done;
       const leftCost = leftAmount * orderData.unitPrice;
@@ -315,6 +319,7 @@ export function createSellOrder(user, orderData) {
     });
     changeStocksAmount(username, companyName, orderData.amount * -1);
     let lastPrice = companyData.lastPrice;
+    let anyTradeDone = false;
     dbOrders
       .find(
         {
@@ -338,6 +343,7 @@ export function createSellOrder(user, orderData) {
         }
         const tradeNumber = Math.min(buyOrderData.amount - buyOrderData.done, orderData.amount - orderData.done);
         if (tradeNumber > 0) {
+          anyTradeDone = true;
           orderData.done += tradeNumber;
           lastPrice = buyOrderData.unitPrice;
           dbLog.insert({
@@ -357,7 +363,9 @@ export function createSellOrder(user, orderData) {
         }
         resolveOrder(buyOrderData, tradeNumber);
       });
-    updateCompanyLastPrice(companyData, lastPrice);
+    if (anyTradeDone) {
+      updateCompanyLastPrice(companyData, lastPrice);
+    }
     if (orderData.done < orderData.amount) {
       dbOrders.insert(orderData);
     }

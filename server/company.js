@@ -83,6 +83,7 @@ export function releaseStocks() {
           });
           let alreadyRelease = 0;
           let lastPrice = companyData.lastPrice;
+          let anyTradeDone = false;
           dbOrders
             .find(
               {
@@ -106,6 +107,7 @@ export function releaseStocks() {
               }
               const tradeNumber = Math.min(buyOrderData.amount - buyOrderData.done, releaseStocks - alreadyRelease);
               if (tradeNumber > 0) {
+                anyTradeDone = true;
                 alreadyRelease += tradeNumber;
                 lastPrice = buyOrderData.unitPrice;
                 dbLog.insert({
@@ -125,7 +127,9 @@ export function releaseStocks() {
               }
               resolveOrder(buyOrderData, tradeNumber);
             });
-          updateCompanyLastPrice(companyData, lastPrice);
+          if (anyTradeDone) {
+            updateCompanyLastPrice(companyData, lastPrice);
+          }
           if (alreadyRelease < releaseStocks) {
             dbOrders.insert({
               companyName: companyName,
