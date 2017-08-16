@@ -27,4 +27,3 @@ const schema = new SimpleSchema({
   }
 });
 dbValidatingUsers.attachSchema(schema);
-

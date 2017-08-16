@@ -35,7 +35,8 @@ export const logTypeList = [
   '舉報產品', //username0以「message」理由舉報了「companyName」公司的#productId產品！
   '公司撤銷', //username0以「message」理由撤銷了「companyName」公司！
   '取消資格', //username0以「message」理由取消了username1擔任經理人的資格！
-  '免費得石' //username0因為「message」的理由獲得了amount顆聖晶石！
+  '免費得石', //username0因為「message」的理由獲得了amount顆聖晶石！
+  '聊天發言' //使用者username0說道：「message」
 ];
 
 //schema
@@ -84,11 +85,6 @@ const schema = new SimpleSchema({
     min: 1,
     max: 255,
     optional: true
-  },
-  //是否已被即時訊息處理
-  resolve: {
-    type: Boolean,
-    defaultValue: false
   },
   //紀錄日期
   createdAt: {

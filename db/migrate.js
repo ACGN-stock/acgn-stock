@@ -4,7 +4,6 @@ import { Migrations } from 'meteor/percolate:migrations';
 import { dbCompanies } from './dbCompanies';
 import { dbDirectors } from './dbDirectors';
 import { dbFoundations } from './dbFoundations';
-import { dbInstantMessage } from './dbInstantMessage';
 import { dbLog } from './dbLog';
 import { dbOrders } from './dbOrders';
 import { dbPrice } from './dbPrice';
@@ -69,9 +68,6 @@ if (Meteor.isServer) {
           unique: true
         }
       );
-      dbInstantMessage.rawCollection().createIndex({
-        createdAt: -1
-      });
       dbLog.rawCollection().createIndex({
         createdAt: -1
       });
@@ -157,6 +153,20 @@ if (Meteor.isServer) {
       });
       dbRankUserWealth.rawCollection().createIndex({
         seasonId: 1
+      });
+    }
+  });
+  Migrations.add({
+    version: 6,
+    name: 'log schma change for instant message.',
+    up() {
+      dbLog.update({}, {
+        $unset: {
+          resolve: ''
+        }
+      });
+      dbLog.rawCollection().dropIndex({
+        resolve: 1
       });
     }
   });

@@ -63,6 +63,13 @@ export function getAccountInfoLinkHref(username) {
 }
 Template.registerHelper('getAccountInfoLinkHref', getAccountInfoLinkHref);
 
+export function getAccountInfoLink(username) {
+  const href = getAccountInfoLinkHref(username);
+
+  return '<a href="' + href + '">' + username + '</a>';
+}
+Template.registerHelper('getAccountInfoLink', getAccountInfoLink);
+
 export function getChainman(companyName) {
   return dbVariables.get('chairmanNameOf' + companyName);
 }

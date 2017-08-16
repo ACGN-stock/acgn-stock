@@ -1,11 +1,12 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
+import { dbLog } from '../db/dbLog';
+import { dbResourceLock } from '../db/dbResourceLock';
+import { doSeasonWorks } from './season';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
 import { recordListPrice, releaseStocks } from './company';
-import { doSeasonWorks } from './season';
 import { threadId, shouldReplaceThread } from './thread';
-import { dbResourceLock } from '../db/dbResourceLock';
 import { config } from '../config';
 
 Meteor.startup(function() {
@@ -53,14 +54,21 @@ function intervalCheck() {
 
 //週期檢查工作內容
 function doIntervalWork() {
-  // //檢查所有創立中且投資時間截止的公司是否成功創立
+  //檢查所有創立中且投資時間截止的公司是否成功創立
   checkFoundCompany();
-  // //當發薪時間到時，發給所有驗證通過的使用者薪水
+  //當發薪時間到時，發給所有驗證通過的使用者薪水
   paySalary();
-  // //隨機時間讓符合條件的公司釋出股票
+  //隨機時間讓符合條件的公司釋出股票
   releaseStocks();
-  // //隨機時間紀錄公司的參考價格
+  //隨機時間紀錄公司的參考價格
   recordListPrice();
-  // //商業季度結束檢查
+  //商業季度結束檢查
   doSeasonWorks();
+  //移除所有一分鐘以前的聊天發言紀錄
+  dbLog.remove({
+    logType: '聊天發言',
+    createdAt: {
+      $lt: new Date( Date.now() - 60000)
+    }
+  });
 }

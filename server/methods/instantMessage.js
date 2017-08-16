@@ -1,47 +1,38 @@
 'use strict';
-import { _ } from 'meteor/underscore';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
-import { dbInstantMessage } from '../../db/dbInstantMessage';
+import { dbLog } from '../../db/dbLog';
 
 Meteor.methods({
   instantMessageChat(message) {
     check(this.userId, String);
     check(message, String);
-    const userId = this.userId;
-    const username = Meteor.users.findOne(userId).username;
-    dbInstantMessage.insert({
-      type: '聊天發言',
-      createdAt: new Date(),
-      onlyForUsers: [],
-      source: username,
-      message: message
-    });
-  }
-});
-
-Meteor.publish('instantMessage', function() {
-  let username = false;
-  if (this.userId) {
     const user = Meteor.users.findOne(this.userId, {
       fields: {
         username: 1
       }
     });
-    username = user.username;
+    const username = user.username;
+    dbLog.insert({
+      logType: '聊天發言',
+      username: [username],
+      message: message,
+      resolve: false,
+      createdAt: new Date()
+    });
   }
-  const observer = dbInstantMessage
+});
+
+Meteor.publish('instantMessage', function() {
+  const observer = dbLog
     .find({
       createdAt: {
-        $gte: new Date( Date.now() - 60000 )
+        $gte: new Date( Date.now() - 300000 )
       }
     })
     .observeChanges({
       added: (id, fields) => {
-        if (fields.onlyForUsers.length > 0 && ! (username && _.contains(fields.onlyForUsers, username))) {
-          return false;
-        }
-        this.added('instantMessage', id, fields);
+        this.added('log', id, fields);
       }
     });
   this.ready();
