@@ -40,16 +40,18 @@ Template.company.onCreated(function() {
       return false;
     }
     const companyName = FlowRouter.getParam('companyName');
-    this.subscribe('companyDetail', companyName);
-    this.subscribe('companyCurrentProduct', companyName);
-    this.subscribe('todayDealAmount', companyName);
-    this.subscribe('queryChairmanAsVariable', companyName);
-    this.subscribe('productListByCompany', {
-      companyName: companyName,
-      sortBy: 'likeCount',
-      sortDir: -1,
-      offset: 0
-    });
+    if (companyName) {
+      this.subscribe('companyDetail', companyName);
+      this.subscribe('companyCurrentProduct', companyName);
+      this.subscribe('todayDealAmount', companyName);
+      this.subscribe('queryChairmanAsVariable', companyName);
+      this.subscribe('productListByCompany', {
+        companyName: companyName,
+        sortBy: 'likeCount',
+        sortDir: -1,
+        offset: 0
+      });
+    }
   });
   rDirectorOffset.set(0);
   this.autorun(() => {
@@ -57,7 +59,9 @@ Template.company.onCreated(function() {
       return false;
     }
     const companyName = FlowRouter.getParam('companyName');
-    this.subscribe('companyDirector', companyName, rDirectorOffset.get());
+    if (companyName) {
+      this.subscribe('companyDirector', companyName, rDirectorOffset.get());
+    }
   });
   rBuyOrderOffset.set(0);
   this.autorun(() => {
@@ -65,7 +69,9 @@ Template.company.onCreated(function() {
       return false;
     }
     const companyName = FlowRouter.getParam('companyName');
-    this.subscribe('companyOrderExcludeMe', companyName, '購入', rBuyOrderOffset.get());
+    if (companyName) {
+      this.subscribe('companyOrderExcludeMe', companyName, '購入', rBuyOrderOffset.get());
+    }
   });
   rSellOrderOffset.set(0);
   this.autorun(() => {
@@ -73,7 +79,9 @@ Template.company.onCreated(function() {
       return false;
     }
     const companyName = FlowRouter.getParam('companyName');
-    this.subscribe('companyOrderExcludeMe', companyName, '賣出', rSellOrderOffset.get());
+    if (companyName) {
+      this.subscribe('companyOrderExcludeMe', companyName, '賣出', rSellOrderOffset.get());
+    }
   });
   rLogOffset.set(0);
   this.autorun(() => {
@@ -81,7 +89,9 @@ Template.company.onCreated(function() {
       return false;
     }
     const companyName = FlowRouter.getParam('companyName');
-    this.subscribe('companyLog', companyName, rLogOffset.get());
+    if (companyName) {
+      this.subscribe('companyLog', companyName, rLogOffset.get());
+    }
   });
 });
 Template.company.helpers({

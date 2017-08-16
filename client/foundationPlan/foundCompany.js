@@ -28,7 +28,9 @@ Template.editFoundationPlan.onCreated(function() {
       return false;
     }
     const foundationId = FlowRouter.getParam('foundationId');
-    this.subscribe('foundationPlanById', foundationId);
+    if (foundationId) {
+      this.subscribe('foundationPlanById', foundationId);
+    }
   });
 });
 Template.editFoundationPlan.helpers({

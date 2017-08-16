@@ -20,14 +20,18 @@ Template.manageCompany.onCreated(function() {
       return false;
     }
     const companyName = FlowRouter.getParam('companyName');
-    this.subscribe('companyDetail', companyName);
+    if (companyName) {
+      this.subscribe('companyDetail', companyName);
+    }
   });
   this.autorun(() => {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
     const companyName = FlowRouter.getParam('companyName');
-    this.subscribe('companyFutureProduct', companyName);
+    if (companyName) {
+      this.subscribe('companyFutureProduct', companyName);
+    }
   });
 });
 Template.manageCompany.helpers({

@@ -45,7 +45,9 @@ Template.stockSummary.onCreated(function() {
     })
     .observeChanges({
       added: (id, fields) => {
-        this.subscribe('queryChairmanAsVariable', fields.companyName);
+        if (fields.companyName) {
+          this.subscribe('queryChairmanAsVariable', fields.companyName);
+        }
       }
     });
 });
