@@ -28,12 +28,15 @@ Template.nav.helpers({
     }
   },
   seasonParams() {
-    const previousSeasonData = dbSeason.findOne({}, {
-      sort: {
-        beginDate: -1
-      },
-      skip: 1
-    });
+    const seasonList = dbSeason
+      .find({}, {
+        sort: {
+          beginDate: -1
+        },
+        limit: 2
+      })
+      .fetch();
+    const previousSeasonData = seasonList[1] || seasonList[0];
 
     if (previousSeasonData) {
       return {
