@@ -104,6 +104,7 @@ export function checkFoundCompany() {
                 logType: '創立得股',
                 username: [username],
                 companyName: companyName,
+                price: (stockUnitPrice * stocks) + amount,
                 amount: stocks,
                 resolve: false,
                 createdAt: createdAt

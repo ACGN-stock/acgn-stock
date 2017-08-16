@@ -561,7 +561,7 @@ Template.companyLogList.helpers({
         return '公司正式創立，初始董事會成員為' + logData.username.join('、') + '。';
       }
       case '創立得股': {
-        return logData.username[0] + '獲得了' + logData.amount + '數量的公司股份。';
+        return logData.username[0] + '以$' + logData.price + '的投資額獲得了' + logData.amount + '數量的公司股份。';
       }
       case '創立退款': {
         return '將$' + logData.amount + '的投資額退款回' + logData.username[0] + '。';
