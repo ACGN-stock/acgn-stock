@@ -3,7 +3,6 @@ import { dbCompanies } from '../db/dbCompanies';
 import { dbDebugger } from '../db/dbDebugger';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbFoundations } from '../db/dbFoundations';
-import { dbInstantMessage } from '../db/dbInstantMessage';
 import { dbLog } from '../db/dbLog';
 import { dbOrders } from '../db/dbOrders';
 import { dbPrice } from '../db/dbPrice';
@@ -75,7 +74,6 @@ Meteor.startup(function() {
       multi: true
     }
   );
-  dbInstantMessage.remove({});
   let stoneCount = 0;
   Meteor.users.find().forEach((userData) => {
     const logDataCursor = dbLog.find({
