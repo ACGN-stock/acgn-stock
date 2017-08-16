@@ -5,6 +5,7 @@ import { config } from '../config';
 import { resourceManager } from './resourceManager';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
+import { dbPrice } from '../db/dbPrice';
 import { dbProducts } from '../db/dbProducts';
 import { dbRankCompanyPrice } from '../db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '../db/dbRankCompanyProfit';
@@ -48,6 +49,12 @@ export function doSeasonWorks() {
     electManager(lastSeasonData);
     //產生新的商業季度
     generateNewSeason();
+    //移除所有一天前的股價紀錄
+    dbPrice.remove({
+      createdAt: {
+        $lt: new Date( Date.now() - 86400000 )
+      }
+    });
   }
 }
 
