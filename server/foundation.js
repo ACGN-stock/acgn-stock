@@ -68,7 +68,7 @@ export function checkFoundCompany() {
 
           dbLog.insert({
             logType: '創立成功',
-            username: [foundationData.manager].concat(_.pluck(invest, 'username')),
+            username: _.union([foundationData.manager], _.pluck(invest, 'username')),
             companyName: companyName,
             price: stockUnitPrice,
             resolve: false,
@@ -118,7 +118,7 @@ export function checkFoundCompany() {
                 companyName: companyName,
                 amount: amount,
                 resolve: false,
-                createdAt: createdAt
+                createdAt: new Date(createdAt.getTime() + 1)
               });
               Meteor.users.update({username}, {
                 $inc: {
@@ -131,7 +131,7 @@ export function checkFoundCompany() {
         else {
           dbLog.insert({
             logType: '創立失敗',
-            username: [foundationData.manager].concat(_.pluck(invest, 'username')),
+            username: _.union([foundationData.manager], _.pluck(invest, 'username')),
             companyName: companyName,
             resolve: false,
             createdAt: new Date()

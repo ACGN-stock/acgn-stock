@@ -23,11 +23,12 @@ Meteor.methods({
   }
 });
 
-Meteor.publish('instantMessage', function() {
+Meteor.publish('instantMessage', function(date) {
+  check(date, Date);
   const observer = dbLog
     .find({
       createdAt: {
-        $gte: new Date( Date.now() - 300000 )
+        $gte: date
       }
     })
     .observeChanges({

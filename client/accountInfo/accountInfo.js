@@ -131,6 +131,9 @@ Template.accountInfoLogList.helpers({
       {
         username: {
           $in: [rSearchUsername.get(), '!all']
+        },
+        logType: {
+          $ne: '聊天發言'
         }
       },
       {

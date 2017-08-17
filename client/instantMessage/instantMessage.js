@@ -1,11 +1,26 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
+import { Tracker } from 'meteor/tracker';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbLog } from '../../db/dbLog';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { getCompanyLink, getAccountInfoLink } from '../utils/helpers';
+
+const rReadInstantMessageDate = new ReactiveVar(new Date());
+Tracker.autorun(function() {
+  if (dbResourceLock.find('season').count()) {
+    return false;
+  }
+  Meteor.subscribe('instantMessage', rReadInstantMessageDate.get());
+});
+Template.instantMessage.events({
+  'click [data-action="clearMessage"]'(event) {
+    event.preventDefault();
+    rReadInstantMessageDate.set(new Date());
+  }
+});
 
 Template.instantMessageChatForm.onRendered(function() {
   this.$message = this.$('[name="message"]');
@@ -106,14 +121,6 @@ Template.instantMessageFilterButton.events({
   }
 });
 
-Template.instantMessageList.onCreated(function() {
-  this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
-      return false;
-    }
-    this.subscribe('instantMessage');
-  });
-});
 Template.instantMessageList.helpers({
   logList() {
     const user = Meteor.user();
@@ -241,7 +248,7 @@ Template.instantMessageList.helpers({
         return (
           '【交易紀錄】' +
           getAccountInfoLink(log.username[0]) + '以$' + log.price + '的單價向' +
-          (getAccountInfoLink(log.username[1]) || '「' + getCompanyLink(log.companyName) + '」公司') +
+          (log.username[1] ? getAccountInfoLink(log.username[1]) : '「' + getCompanyLink(log.companyName) + '」公司') +
           '購買了' + log.amount + '數量的「' +
           getCompanyLink(log.companyName) + '」公司股票！'
         );

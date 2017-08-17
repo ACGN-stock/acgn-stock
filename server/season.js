@@ -66,7 +66,7 @@ function generateNewSeason() {
   const productCount = dbProducts.find({overdue: 0}).count();
   //本季度每個使用者可以得到多少推薦票
   const vote = Math.max(Math.floor(productCount / 10), 1);
-  const votePrice = Math.round(config.seasonProfitPerUser / vote * 100) / 100;
+  const votePrice = Math.round(config.seasonProfitPerUser / vote);
   Meteor.users.update(
     {},
     {

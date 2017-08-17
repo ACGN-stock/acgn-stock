@@ -26,7 +26,7 @@ const schema = new SimpleSchema({
   },
   //當季每張推薦票可以為產品公司產生多少營利
   votePrice: {
-    type: Number
+    type: SimpleSchema.Integer
   }
 });
 dbSeason.attachSchema(schema);
