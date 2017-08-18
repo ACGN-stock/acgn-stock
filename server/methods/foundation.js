@@ -1,4 +1,6 @@
 'use strict';
+import url from 'url';
+import querystring from 'querystring';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
@@ -24,7 +26,6 @@ Meteor.methods({
     return true;
   }
 });
-
 export function foundCompany(user, foundCompanyData) {
   const companyName = foundCompanyData.companyName;
   if (dbFoundations.find({companyName}).count() > 0 || dbCompanies.find({companyName}).count() > 0) {
@@ -57,7 +58,6 @@ Meteor.methods({
     return true;
   }
 });
-
 export function editFoundCompany(user, foundCompanyData) {
   const oldFoundCompanyData = dbFoundations.findOne(foundCompanyData._id, {
     fields: {
@@ -106,7 +106,6 @@ Meteor.methods({
     return true;
   }
 });
-
 export function investFoundCompany(user, companyName, amount) {
   const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
   if (amount < minimumInvest) {
@@ -165,6 +164,32 @@ export function investFoundCompany(user, companyName, amount) {
     release();
   });
 }
+
+//發布圖片
+WebApp.connectHandlers.use(function(req, res, next) {
+  const parsedUrl = url.parse(req.url);
+  if (parsedUrl.pathname === '/foundationPicture') {
+    const query = querystring.parse(parsedUrl.query);
+    const id = new Mongo.ObjectID(query.id);
+    const foundationData = dbFoundations.findOne(id, {
+      fields: {
+        pictureSmall: 1
+      }
+    });
+    if (foundationData) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.end(foundationData.pictureSmall || '');
+    }
+    else {
+      res.writeHead(404, {"Content-Type": "text/plain"});
+      res.write("404 Not Found\n");
+      res.end();
+    }
+  }
+  else {
+    next();
+  }
+});
 
 Meteor.publish('foundationPlan', function(keyword, offset) {
   check(keyword, String);

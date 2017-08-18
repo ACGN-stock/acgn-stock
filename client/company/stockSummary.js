@@ -114,7 +114,25 @@ Template.stockFilterForm.events({
   }
 });
 
+Template.companySummary.onCreated(function() {
+  this.rPicture = new ReactiveVar('');
+  $.ajax({
+    url: '/companyPicture',
+    data: {
+      id: this.data._id.toHexString(),
+      type: 'small'
+    },
+    success: (response) => {
+      this.rPicture.set(response);
+    }
+  });
+});
 Template.companySummary.helpers({
+  getPicture() {
+    const templateInstance = Template.instance();
+
+    return templateInstance.rPicture.get();
+  },
   displayTagList(tagList) {
     return tagList.join('、');
   },

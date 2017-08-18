@@ -1,7 +1,11 @@
 'use strict';
+import url from 'url';
+import querystring from 'querystring';
 import { _ } from 'meteor/underscore';
 import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
+import { WebApp } from 'meteor/webapp';
+import { Mongo } from 'meteor/mongo';
 import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
@@ -397,6 +401,33 @@ function queryStocksPrice(companyName) {
     });
 }
 
+//發布圖片
+WebApp.connectHandlers.use(function(req, res, next) {
+  const parsedUrl = url.parse(req.url);
+  if (parsedUrl.pathname === '/companyPicture') {
+    const query = querystring.parse(parsedUrl.query);
+    const id = new Mongo.ObjectID(query.id);
+    const fieldName = query.type === 'small' ? 'pictureSmall' : 'pictureBig';
+    const companyData = dbCompanies.findOne(id, {
+      fields: {
+        [fieldName]: 1
+      }
+    });
+    if (companyData) {
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.end(companyData[fieldName] || '');
+    }
+    else {
+      res.writeHead(404, {"Content-Type": "text/plain"});
+      res.write("404 Not Found\n");
+      res.end();
+    }
+  }
+  else {
+    next();
+  }
+});
+
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
   check(keyword, String);
   check(isOnlyShowMine, Boolean);
@@ -458,7 +489,6 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     manager: 1,
     chairmanTitle: 1,
     tags: 1,
-    pictureSmall: 1,
     description: 1,
     totalRelease: 1,
     lastPrice: 1,
@@ -571,25 +601,11 @@ Meteor.publish('queryMyOrder', function() {
 Meteor.publish('companyDetail', function(companyName) {
   check(companyName, String);
 
-  const observer = dbCompanies
-    .find({companyName}, {
-      fields: {
-        pictureSmall: 0
-      }
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        addSupportStocksListField(id, fields);
-        this.added('companies', id, fields);
-      },
-      changed: (id, fields) => {
-        addSupportStocksListField(id, fields);
-        this.changed('companies', id, fields);
-      }
-    });
-  this.ready();
-  this.onStop(() => {
-    observer.stop();
+  return dbCompanies.find({companyName}, {
+    fields: {
+      pictureBig: 0,
+      pictureSmall: 0
+    }
   });
 });
 function addSupportStocksListField(companyId, fields = {}) {

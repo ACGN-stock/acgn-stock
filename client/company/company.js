@@ -151,6 +151,20 @@ Template.company.events({
   }
 });
 
+Template.companyDetail.onCreated(function() {
+  this.rPicture = new ReactiveVar('');
+  $.ajax({
+    url: '/companyPicture',
+    data: {
+      id: this.data._id.toHexString(),
+      type: 'big'
+    },
+    success: (response) => {
+      console.log(response);
+      this.rPicture.set(response);
+    }
+  });
+});
 Template.companyDetail.onRendered(function() {
   this.$chart = this.$('.chart');
   this.chart = null;
@@ -237,6 +251,11 @@ Template.companyDetail.onRendered(function() {
   });
 });
 Template.companyDetail.helpers({
+  getPicture() {
+    const templateInstance = Template.instance();
+
+    return templateInstance.rPicture.get();
+  },
   priceDisplayClass(lastPrice, listPrice) {
     if (lastPrice > listPrice) {
       return 'col text-right text-danger';
@@ -513,9 +532,9 @@ Template.companyElectInfo.helpers({
     return false;
   },
   getSupportPercentage(candidateIndex) {
-    const instance = Template.instance();
-    const instanceData = instance.data;
-    const supportStocks = instanceData.supportStocksList[candidateIndex];
+    const instanceData = Template.instance().data;
+    const supportStocksList = instanceData.supportStocksList;
+    const supportStocks = supportStocksList ? supportStocksList[candidateIndex] : 0;
 
     return Math.round(supportStocks / instanceData.totalRelease * 10000) / 100;
   },
