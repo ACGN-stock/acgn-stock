@@ -59,10 +59,10 @@ Template.instantMessageChatForm.events({
 
 //永遠顯示的紀錄類別
 const alwaysDisplayLogTypeList = [
-  '創立得股',
-  '創立退款',
-  '訂單完成',
-  '營利分紅'
+  '發薪紀錄',
+  '公司撤銷',
+  '取消資格',
+  '聊天發言'
 ];
 //只顯示username中包含自己的紀錄類別
 const forSelfLogTypeList = [
@@ -93,7 +93,8 @@ const messageTypeGroupHash = {
     '支持紀錄'
   ]
 };
-const rFilterTypeList = new ReactiveVar(_.flatten(_.values(messageTypeGroupHash)));
+const defaultFilterValue = _.flatten(_.values(messageTypeGroupHash)).concat(alwaysDisplayLogTypeList, forSelfLogTypeList);
+const rFilterTypeList = new ReactiveVar(defaultFilterValue);
 Template.instantMessageFilterButton.helpers({
   btnClass() {
     const btnType = this.type;

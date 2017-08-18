@@ -601,11 +601,25 @@ Meteor.publish('queryMyOrder', function() {
 Meteor.publish('companyDetail', function(companyName) {
   check(companyName, String);
 
-  return dbCompanies.find({companyName}, {
-    fields: {
-      pictureBig: 0,
-      pictureSmall: 0
-    }
+  const observer = dbCompanies
+    .find({companyName}, {
+      fields: {
+        pictureSmall: 0
+      }
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        addSupportStocksListField(id, fields);
+        this.added('companies', id, fields);
+      },
+      changed: (id, fields) => {
+        addSupportStocksListField(id, fields);
+        this.changed('companies', id, fields);
+      }
+    });
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
   });
 });
 function addSupportStocksListField(companyId, fields = {}) {

@@ -160,7 +160,6 @@ Template.companyDetail.onCreated(function() {
       type: 'big'
     },
     success: (response) => {
-      console.log(response);
       this.rPicture.set(response);
     }
   });
