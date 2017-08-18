@@ -146,7 +146,7 @@ Template.instantMessageList.helpers({
   getMessageHtml(logData) {
     switch (logData.logType) {
       case '聊天發言': {
-        return '使用者' + getAccountInfoLink(logData.username[0]) + '說道：「' + logData.message + '」';
+        return getAccountInfoLink(logData.username[0]) + '說道：「' + logData.message + '」';
       }
       case '發薪紀錄': {
         return '【發薪紀錄】系統向所有已驗證通過的使用者發給了$' + logData.price + '的薪水！';
