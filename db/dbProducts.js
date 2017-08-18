@@ -12,7 +12,7 @@ export const productTypeList = [
   '影音',
   '文字',
   '三次元',
-  '裡物'
+  '裏物'
 ];
 
 //schema
