@@ -11,6 +11,7 @@ import { handleError } from './handleError';
 
 Meteor.subscribe('isChangingSeason');
 
+Meteor.nativeCall = Meteor.call;
 Meteor.call = (function(_super) {
   function call(...args) {
     if (dbResourceLock.find('season').count()) {
@@ -149,7 +150,7 @@ export function changeChairmanTitle(companyData) {
   if (chairmanTitle && chairmanTitle.length <= 20) {
     Meteor.call('changeChairmanTitle', companyData.companyName, chairmanTitle);
   }
-  else {
+  else if (chairmanTitle) {
     window.alert('無效的頭銜名稱！');
   }
 }
