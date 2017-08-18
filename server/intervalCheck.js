@@ -5,7 +5,7 @@ import { dbResourceLock } from '../db/dbResourceLock';
 import { doSeasonWorks } from './season';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
-import { recordListPrice, releaseStocks } from './company';
+import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal } from './company';
 import { threadId, shouldReplaceThread } from './thread';
 import { config } from '../config';
 
@@ -59,7 +59,8 @@ function doIntervalWork() {
   //當發薪時間到時，發給所有驗證通過的使用者薪水
   paySalary();
   //隨機時間讓符合條件的公司釋出股票
-  releaseStocks();
+  releaseStocksForHighPrice();
+  releaseStocksForNoDeal();
   //隨機時間紀錄公司的參考價格
   recordListPrice();
   //商業季度結束檢查
