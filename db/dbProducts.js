@@ -11,7 +11,8 @@ export const productTypeList = [
   'ANSI',
   '影音',
   '文字',
-  '三次元'
+  '三次元',
+  '裡物'
 ];
 
 //schema
