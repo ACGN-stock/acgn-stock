@@ -20,24 +20,39 @@ Meteor.methods({
       resolve: false,
       createdAt: new Date()
     });
-  }
-});
+  },
+  queryInstantMessage(lastTime) {
+    check(lastTime, Number);
+    lastTime = Math.max(Date.now() - 60000, lastTime);
+    const list = dbLog
+      .find(
+        {
+          createdAt: {
+            $gt: new Date(lastTime)
+          }
+        },
+        {
+          disableOplog: true
+        }
+      )
+      .map((logData) => {
+        const logTime = logData.createdAt.getTime();
+        lastTime = Math.max(lastTime, logTime);
 
-Meteor.publish('instantMessage', function(date) {
-  check(date, Date);
-  const observer = dbLog
-    .find({
-      createdAt: {
-        $gte: date
-      }
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('log', id, fields);
-      }
-    });
-  this.ready();
-  this.onStop(() => {
-    observer.stop();
-  });
+        return {
+          _id: logData._id.toHexString(),
+          logType: logData.logType,
+          username: logData.username,
+          companyName: logData.companyName,
+          orderId: logData.orderId,
+          productId: logData.productId,
+          price: logData.price,
+          amount: logData.amount,
+          message: logData.message,
+          createdAt: logTime
+        }
+      });
+
+    return {lastTime, list};
+  }
 });

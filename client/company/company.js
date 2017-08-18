@@ -9,10 +9,8 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbLog } from '../../db/dbLog';
 import { dbOrders } from '../../db/dbOrders';
-import { dbPrice } from '../../db/dbPrice';
 import { dbProducts } from '../../db/dbProducts';
 import { dbResourceLock } from '../../db/dbResourceLock';
-import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct } from '../utils/methods';
 
@@ -21,6 +19,8 @@ const rDirectorOffset = new ReactiveVar(0);
 const rBuyOrderOffset = new ReactiveVar(0);
 const rSellOrderOffset = new ReactiveVar(0);
 const rLogOffset = new ReactiveVar(0);
+const rTodayDealAmount = new ReactiveVar(0);
+const rPriceList = new ReactiveVar([]);
 Template.company.onCreated(function() {
   this.autorun(() => {
     if (dbResourceLock.find('season').count()) {
@@ -43,7 +43,6 @@ Template.company.onCreated(function() {
     if (companyName) {
       this.subscribe('companyDetail', companyName);
       this.subscribe('companyCurrentProduct', companyName);
-      this.subscribe('todayDealAmount', companyName);
       this.subscribe('queryChairmanAsVariable', companyName);
       this.subscribe('productListByCompany', {
         companyName: companyName,
@@ -93,7 +92,31 @@ Template.company.onCreated(function() {
       this.subscribe('companyLog', companyName, rLogOffset.get());
     }
   });
+  queryDealAmountAndPrice();
+  this.intervalId = Meteor.setInterval(queryDealAmountAndPrice, 30000);
 });
+Template.company.onDestroyed(function() {
+  Meteor.clearInterval(this.intervalId);
+});
+function queryDealAmountAndPrice() {
+  if (dbResourceLock.find('season').count()) {
+    return false;
+  }
+  const companyName = FlowRouter.getParam('companyName');
+  if (companyName) {
+    Meteor.nativeCall('queryTodayDealAmount', companyName, (error, result) => {
+      if (! error) {
+        rTodayDealAmount.set(result);
+      }
+    });
+    Meteor.nativeCall('queryStocksPrice', companyName, (error, result) => {
+      if (! error) {
+        rPriceList.set(result);
+      }
+    });
+  }
+}
+
 Template.company.helpers({
   companyData() {
     const companyName = FlowRouter.getParam('companyName');
@@ -129,7 +152,6 @@ Template.company.events({
 });
 
 Template.companyDetail.onRendered(function() {
-  const companyName = this.data.companyName;
   this.$chart = this.$('.chart');
   this.chart = null;
   this.autorun(() => {
@@ -140,18 +162,6 @@ Template.companyDetail.onRendered(function() {
       .empty()
       .html('<canvas style="max-height:300px;"></canvas>');
     const ctx = this.$chart.find('canvas');
-    const data = dbPrice
-      .find({companyName}, {
-        sort: {
-          createdAt: 1
-        }
-      })
-      .map((priceData) => {
-        return {
-          x: priceData.createdAt.getTime(),
-          y: priceData.price
-        };
-      });
     this.chart = new Chart(ctx, {
       type: 'scatter',
       data: {
@@ -159,7 +169,7 @@ Template.companyDetail.onRendered(function() {
           {
             label: '一日股價走勢',
             lineTension: 0,
-            data: data
+            data: rPriceList.get()
           }
         ]
       },
@@ -239,7 +249,7 @@ Template.companyDetail.helpers({
     }
   },
   getTodayDealAmount() {
-    return dbVariables.get('totalCountOfTodayDeal');
+    return rTodayDealAmount.get();
   }
 });
 
@@ -577,7 +587,7 @@ Template.companyLogList.helpers({
         return '將$' + logData.amount + '的投資額退款回' + logData.username[0] + '。';
       }
       case '公司釋股': {
-        return '由於股價持續高漲，公司以$' + logData.price + '的價格釋出了' + logData.amount + '數量的股票到市場上套取利潤。';
+        return '以$' + logData.price + '的價格釋出了' + logData.amount + '數量的股票到市場上套取利潤。';
       }
       case '購買下單': {
         return logData.username[0] + '下達了以每股單價$' + logData.price + '的單價購入' + logData.amount + '數量股票的訂單。';

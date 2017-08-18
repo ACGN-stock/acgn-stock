@@ -54,12 +54,12 @@
 
 <template name="instantMessageList">
   <div>
-    {{#each log in logList}}
+    {{#each message in messageList}}
       <div>
         <span class="text-info d-inline-block text-right" style="width: 220px;">
-          ({{formatDateText log.createdAt}})
+          ({{formatDateText message.createdAt}})
         </span>
-        {{{getTypeHtml log}}}
+        {{{getMessageHtml message}}}
       </div>
     {{/each}}
   </div>

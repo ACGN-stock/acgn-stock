@@ -330,6 +330,73 @@ function directorMessage(user, companyName, message) {
   });
 }
 
+Meteor.methods({
+  queryTodayDealAmount(companyName) {
+    check(companyName, String);
+
+    return queryTodayDealAmount(companyName);
+  }
+});
+function queryTodayDealAmount(companyName) {
+  const todayBegin = new Date(new Date().setHours(0, 0, 0, 0));
+  let amount = 0;
+  dbLog
+    .find(
+      {
+        logType: '交易紀錄',
+        companyName: companyName,
+        createdAt: {
+          $gte: todayBegin
+        }
+      },
+      {
+        fields: {
+          amount: 1
+        },
+        disableOplog: true
+      }
+    )
+    .forEach((logData) => {
+      amount += logData.amount;
+    });
+
+  return amount;
+}
+
+Meteor.methods({
+  queryStocksPrice(companyName) {
+    check(companyName, String);
+
+    return queryStocksPrice(companyName);
+  }
+})
+function queryStocksPrice(companyName) {
+  const aDayAgo = new Date(Date.now() - 86400000);
+
+  return dbPrice
+    .find(
+      {
+        companyName: companyName,
+        createdAt: {
+          $gte: aDayAgo
+        }
+      },
+      {
+        fields: {
+          createdAt: 1,
+          price: 1
+        },
+        disableOplog: true
+      }
+    )
+    .map((priceData) => {
+      return {
+        x: priceData.createdAt.getTime(),
+        y: priceData.price
+      };
+    });
+}
+
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
   check(keyword, String);
   check(isOnlyShowMine, Boolean);
@@ -503,9 +570,8 @@ Meteor.publish('queryMyOrder', function() {
 
 Meteor.publish('companyDetail', function(companyName) {
   check(companyName, String);
-  const aDayAgo = new Date(Date.now() - 86400000);
 
-  const observer1 = dbCompanies
+  const observer = dbCompanies
     .find({companyName}, {
       fields: {
         pictureSmall: 0
@@ -521,22 +587,9 @@ Meteor.publish('companyDetail', function(companyName) {
         this.changed('companies', id, fields);
       }
     });
-  const observer2 = dbPrice
-    .find({
-      companyName: companyName,
-      createdAt: {
-        $gte: aDayAgo
-      }
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('price', id, fields);
-      }
-    });
   this.ready();
   this.onStop(() => {
-    observer1.stop();
-    observer2.stop();
+    observer.stop();
   });
 });
 function addSupportStocksListField(companyId, fields = {}) {
@@ -566,39 +619,6 @@ function addSupportStocksListField(companyId, fields = {}) {
     }, 0);
   });
 }
-
-
-Meteor.publish('todayDealAmount', function(companyName) {
-  check(companyName, String);
-  const todayBegin = new Date(new Date().setHours(0, 0, 0, 0));
-  const filter = {
-    logType: '交易紀錄',
-    companyName: companyName,
-    createdAt: {
-      $gte: todayBegin
-    }
-  };
-
-  let total = 0;
-  this.added('variables', 'totalCountOfTodayDeal', {
-    value: total
-  });
-
-  const observer = dbLog
-    .find(filter)
-    .observeChanges({
-      added: (id, fields) => {
-        total += fields.amount;
-        this.changed('variables', 'totalCountOfTodayDeal', {
-          value: total
-        });
-      }
-    });
-  this.ready();
-  this.onStop(() => {
-    observer.stop();
-  });
-});
 
 Meteor.publish('companyDirector', function(companyName, offset) {
   check(companyName, String);
