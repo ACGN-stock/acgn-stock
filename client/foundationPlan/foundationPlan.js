@@ -82,7 +82,7 @@ Template.foundationPlanInfo.helpers({
     return tagList.join('、');
   },
   investPplsNumberClass(investNumber) {
-    return (investNumber >= config.foundationNeedUsers) ? 'col content text-success text-right' : 'col content text-danger text-right';
+    return (investNumber >= config.foundationNeedUsers) ? 'text-success' : 'text-danger';
   },
   foundationNeedUsers() {
     return config.foundationNeedUsers;

@@ -1,0 +1,37 @@
+.btn {
+  cursor: pointer
+}
+
+.border-grid-body {
+  border-top: 1px solid #dddddd;
+  border-left: 1px solid #dddddd;
+}
+.border-grid {
+  border-bottom: 1px solid #dddddd;
+  border-right: 1px solid #dddddd;
+}
+
+.company-summary {
+  margin-top: 15px;
+}
+
+.company-summary .picture {
+  width: 115px;
+  padding-right: 15px;
+  text-align: center;
+}
+.company-summary .picture img {
+  width: 100px;
+  height: 100px;
+}
+
+.company-detail .picture {
+  width: 315px;
+  height: 300px;
+  padding-right: 15px;
+  text-align: center;
+}
+.company-detail .picture img {
+  width: 300px;
+  height: 300px;
+}

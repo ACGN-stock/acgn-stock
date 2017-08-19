@@ -30,7 +30,7 @@
       </div>
     {{else}}
       <div class="card-block">
-        查無資料，該公司可能已被撤銷！
+        Loading...
       </div>
     {{/with}}
     {{> companyLogList}}
@@ -39,60 +39,46 @@
 
 <template name="companyDetail">
   <div class="company-detail">
-    <div class="row">
-      <div class="picture">
+    <div class="media">
+      <div class="d-sm-flex picture">
         {{#if getPicture}}
           <img src="{{getPicture}}" />
         {{else}}
           無圖示
         {{/if}}
       </div>
-      <div class="col chart"></div>
+      <div class="media-body chart" style="overflow: hidden;"></div>
     </div>
-    <div class="extra" style="white-space: pre-wrap;padding: 5px 15px;"><h4>角色簡介</h4>{{this.description}}</div>
-    <div class="extra">
-      <div class="row">
-        <div class="title">股票參考價格：</div>
-        <div class="col text-right">
-          $ {{this.listPrice}}
-        </div>
-        <div class="title">最後成交價格：</div>
-        <div class="{{priceDisplayClass this.lastPrice this.listPrice}}">
-          $ {{this.lastPrice}}
-        </div>
-        <div class="title">參考市值：</div>
-        <div class="col text-right">
-          $ {{this.totalValue}}
-        </div>
+    <div class="row border-grid-body">
+      <div class="col-12 border-grid" style="white-space: pre-wrap;padding: 5px 15px;"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">股票參考價格：</div>
+      <div class="col-8 col-md-4 col-lg-2 text-right border-grid" title="{{this.listPrice}}">
+        $ {{this.listPrice}}
       </div>
-    </div>
-    <div class="extra">
-      <div class="row">
-        <div class="title">本季營利額：</div>
-        <div class="col text-right">
-          $ {{this.profit}}
-        </div>
-        <div class="title">總釋出股票：</div>
-        <div class="col text-right">
-          {{this.totalRelease}}股
-        </div>
-        <div class="title">今日成交量：</div>
-        <div class="col text-right">
-          {{getTodayDealAmount}} 股
-        </div>
+      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">最後成交價格：</div>
+      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+        <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">$ {{this.lastPrice}}</span>
       </div>
-    </div>
-    <div class="extra">
-      <div class="row">
-        {{> companyBuyOrderList}}
-        {{> companySellOrderList}}
+      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">參考市值：</div>
+      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+        $ {{this.totalValue}}
       </div>
-    </div>
-    <div class="extra">
-      <div class="row">
-        {{> companyCurrentProductList companyName=this.companyName}}
-        {{> companyAllPrudctList companyName=this.companyName}}
+      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本季營利額：</div>
+      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+        $ {{this.profit}}
       </div>
+      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總釋出股票：</div>
+      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+        {{this.totalRelease}}股
+      </div>
+      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">今日成交量：</div>
+      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+        {{getTodayDealAmount}} 股
+      </div>
+      {{> companyBuyOrderList}}
+      {{> companySellOrderList}}
+      {{> companyCurrentProductList companyName=this.companyName}}
+      {{> companyAllPrudctList companyName=this.companyName}}
     </div>
     {{> companyDirectorList companyName=this.companyName totalRelease=this.totalRelease}}    
     {{> companyElectInfo}}
@@ -100,7 +86,7 @@
 </template>
 
 <template name="companyBuyOrderList">
-  <div class="col-6">
+  <div class="col-12 col-md-6 border-grid">
     <h4>
       市場買單
       <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
@@ -127,7 +113,7 @@
 </template>
 
 <template name="companySellOrderList">
-  <div class="col-6">
+  <div class="col-12 col-md-6 border-grid">
     <h4>
       市場賣單
       {{#if getStockAmount this.companyName}}
@@ -156,7 +142,7 @@
 </template>
 
 <template name="companyCurrentProductList">
-  <div class="col-6">
+  <div class="col-12 col-md-6 border-grid">
     <h4>
       當季產品
     </h4>
@@ -185,7 +171,7 @@
 </template>
 
 <template name="companyAllPrudctList">
-  <div class="col-6">
+  <div class="col-12 col-md-6 border-grid">
     <h4>
       董事推薦產品
     </h4>
@@ -217,7 +203,7 @@
 </template>
 
 <template name="companyDirectorList">
-  <div class="col-12">
+  <div class="border-grid">
     <h4>董事會成員</h4>
     <div class="row mb-1">
       <div class="text-center" style="width: 120px;">使用者帳號</div>
@@ -284,50 +270,46 @@
 </template>
 
 <template name="companyElectInfo">
-  <div class="extra">
-    <div class="row">
-      <div class="col">
-        <h4>
-          選舉下個商業季度的負責經理人：
-          {{#if canContendManager}}
+  <div class="border-grid">
+    <h4>
+      選舉下個商業季度的負責經理人：
+      {{#if canContendManager}}
+        <button
+          class="btn btn-primary btn-sm"
+          type="button"
+          data-action="contendManager"
+        >
+          我要參選
+        </button>
+      {{/if}}
+    </h4>
+    <div class="row mb-1">
+      <div class="col-2 text-center">候選人</div>
+      <div class="col-2 text-center">董事會支持率</div>
+      <div class="col-8 text-center">支持者</div>
+    </div>
+    {{#each candidate in this.candidateList}}
+      <div class="row mb-1">
+        <div class="col-2 text-left text-truncate">
+          {{candidate}}
+          {{#if getStockAmount}}
             <button
-              class="btn btn-primary btn-sm"
+              class="btn btn-primary btn-sm float-right"
               type="button"
-              data-action="contendManager"
+              data-support-candidate="{{@index}}"
             >
-              我要參選
+              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
             </button>
           {{/if}}
-        </h4>
-        <div class="row mb-1">
-          <div class="col-2 text-center">候選人</div>
-          <div class="col-2 text-center">董事會支持率</div>
-          <div class="col-8 text-center">支持者</div>
         </div>
-        {{#each candidate in this.candidateList}}
-          <div class="row mb-1">
-            <div class="col-2 text-left text-truncate">
-              {{candidate}}
-              {{#if getStockAmount}}
-                <button
-                  class="btn btn-primary btn-sm float-right"
-                  type="button"
-                  data-support-candidate="{{@index}}"
-                >
-                  <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-                </button>
-              {{/if}}
-            </div>
-            <div class="col-2 text-right">
-              {{getSupportPercentage @index}} %
-            </div>
-            <div class="col-8 text-left text-truncate">
-              {{getSupportList @index}}
-            </div>
-          </div>
-        {{/each}}
+        <div class="col-2 text-right">
+          {{getSupportPercentage @index}} %
+        </div>
+        <div class="col-8 text-left text-truncate">
+          {{getSupportList @index}}
+        </div>
       </div>
-    </div>
+    {{/each}}
   </div>
 </template>
 
@@ -337,7 +319,7 @@
     <hr />
     {{#each log in logList}}
       <div>
-        <span class="text-info d-inline-block text-right" style="width: 220px;">({{formatDateText log.createdAt}})</span>
+        <span class="text-info d-inline-block text-right">({{formatDateText log.createdAt}})</span>
         {{{getLogDescriptionHtml log}}}
       </div>
     {{else}}

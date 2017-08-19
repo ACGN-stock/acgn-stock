@@ -257,13 +257,10 @@ Template.companyDetail.helpers({
   },
   priceDisplayClass(lastPrice, listPrice) {
     if (lastPrice > listPrice) {
-      return 'col text-right text-danger';
+      return 'text-danger';
     }
     else if (listPrice > lastPrice) {
-      return 'col text-right text-success';
-    }
-    else {
-      return 'col text-right';
+      return 'text-success';
     }
   },
   getTodayDealAmount() {

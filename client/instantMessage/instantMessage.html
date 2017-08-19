@@ -10,14 +10,12 @@
       <form>
         <div class="form-group">
           篩選器：
-          <div class="btn-group">
-            {{> instantMessageFilterButton type='聊天發言'}}
-            {{> instantMessageFilterButton type='交易相關'}}
-            {{> instantMessageFilterButton type='新創相關'}}
-            {{> instantMessageFilterButton type='競選相關'}}
-            {{> instantMessageFilterButton type='經理管理'}}
-            {{> instantMessageFilterButton type='推薦產品'}}
-          </div>
+          {{> instantMessageFilterButton type='聊天發言'}}
+          {{> instantMessageFilterButton type='交易相關'}}
+          {{> instantMessageFilterButton type='新創相關'}}
+          {{> instantMessageFilterButton type='競選相關'}}
+          {{> instantMessageFilterButton type='經理管理'}}
+          {{> instantMessageFilterButton type='推薦產品'}}
           <button class="btn btn-sm btn-danger float-right" type="button" data-action="clearMessage">
             清除舊訊息
           </button>
@@ -56,7 +54,7 @@
   <div>
     {{#each message in messageList}}
       <div>
-        <span class="text-info d-inline-block text-right" style="width: 220px;">
+        <span class="text-info d-inline-block">
           ({{formatDateText message.createdAt}})
         </span>
         {{{getMessageHtml message}}}
