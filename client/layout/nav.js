@@ -70,6 +70,11 @@ Template.nav.events({
   'click button'() {
     rNavLinkListCollapsed.set(! rNavLinkListCollapsed.get());
   },
+  'click [data-action="switch-theme"]'(event) {
+    event.preventDefault();
+    $('#boostrap-theme').attr('href', event.target.getAttribute('rel'));
+    $('nav').removeClass('navbar-light navbar-inverse').addClass(event.target.getAttribute('nav-class'));
+  },
   'click [data-action="logout"]'(event) {
     event.preventDefault();
     Meteor.logout();
