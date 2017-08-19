@@ -4,6 +4,7 @@ import querystring from 'querystring';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
+import { WebApp } from 'meteor/webapp';
 import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
 import { dbFoundations } from '../../db/dbFoundations';
