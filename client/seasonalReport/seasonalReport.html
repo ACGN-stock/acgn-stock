@@ -47,11 +47,11 @@
   <table class="table-bordered" style="width: 100%; table-layout: fixed;">
     <thead>
       <tr>
-        <th class="text-center" style="width: 120px;">排名</th>
-        <th class="text-center">使用者名稱</th>
-        <th class="text-center" style="width: 120px;">持有現金</th>
-        <th class="text-center" style="width: 200px;">持股總值</th>
-        <th class="text-center" style="width: 200px;">
+        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
+        <th class="text-center text-truncate" title="使用者名稱">使用者名稱</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="持有現金">持有現金</th>
+        <th class="text-center text-truncate" style="max-width: 200px;" title="持股總值">持股總值</th>
+        <th class="text-center text-truncate" style="max-width: 200px;" title="總財富">
           總財富
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
@@ -60,21 +60,21 @@
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center">
+          <td class="text-center text-truncate">
             {{add @index 1}}
           </td>
-          <td class="text-left">
+          <td class="text-left text-truncate">
             <a href="{{getAccountInfoLinkHref rankData.username}}">
               {{rankData.username}}
             </a>
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.money}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.stocksValue}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{add rankData.money rankData.stocksValue}}
           </td>
         </tr>
@@ -87,11 +87,11 @@
   <table class="table-bordered" style="width: 100%; table-layout: fixed;">
     <thead>
       <tr>
-        <th class="text-center" style="width: 120px;">排名</th>
-        <th class="text-center">公司名稱</th>
-        <th class="text-center" style="width: 120px;">收盤股價</th>
-        <th class="text-center" style="width: 120px;">總市值</th>
-        <th class="text-center" style="width: 120px;">
+        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
+        <th class="text-center text-truncate">公司名稱</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="收盤股價">收盤股價</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="總市值">總市值</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="當季營利">
           當季營利
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
@@ -100,19 +100,19 @@
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center">
+          <td class="text-center text-truncate">
             {{add @index 1}}
           </td>
-          <td class="text-left">
+          <td class="text-left text-truncate">
             {{{getCompanyLink rankData.companyName}}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.lastPrice}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.totalValue}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.profit}}
           </td>
         </tr>
@@ -125,32 +125,32 @@
   <table class="table-bordered" style="width: 100%; table-layout: fixed;">
     <thead>
       <tr>
-        <th class="text-center" style="width: 120px;">排名</th>
-        <th class="text-center">公司名稱</th>
-        <th class="text-center" style="width: 120px;">收盤股價</th>
-        <th class="text-center" style="width: 120px;">
+        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
+        <th class="text-center text-truncate" title="公司名稱">公司名稱</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="收盤股價">收盤股價</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="總市值">
           總市值
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
-        <th class="text-center" style="width: 120px;">當季營利</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="當季營利">當季營利</th>
       </tr>
     </thead>
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center">
+          <td class="text-center text-truncate">
             {{add @index 1}}
           </td>
-          <td class="text-left">
+          <td class="text-left text-truncate">
             {{{getCompanyLink rankData.companyName}}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.lastPrice}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.totalValue}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.profit}}
           </td>
         </tr>
@@ -163,32 +163,32 @@
   <table class="table-bordered" style="width: 100%; table-layout: fixed;">
     <thead>
       <tr>
-        <th class="text-center" style="width: 120px;">排名</th>
-        <th class="text-center">公司名稱</th>
-        <th class="text-center" style="width: 120px;">
+        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
+        <th class="text-center text-truncate" title="公司名稱">公司名稱</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="收盤股價">
           收盤股價
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
-        <th class="text-center" style="width: 120px;">總市值</th>
-        <th class="text-center" style="width: 120px;">當季營利</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="總市值">總市值</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="當季營利">當季營利</th>
       </tr>
     </thead>
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center">
+          <td class="text-center text-truncate">
             {{add @index 1}}
           </td>
-          <td class="text-left">
+          <td class="text-left text-truncate">
             {{{getCompanyLink rankData.companyName}}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.lastPrice}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.totalValue}}
           </td>
-          <td class="text-right">
+          <td class="text-right text-truncate">
             $ {{rankData.profit}}
           </td>
         </tr>

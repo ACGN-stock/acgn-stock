@@ -29,16 +29,16 @@
   <table class="table-bordered" style="width: 100%; table-layout: fixed;">
     <thead>
       <tr>
-        <th class="text-center">產品名稱</th>
-        <th class="text-center" style="cursor: pointer;" data-sort="companyName">
+        <th class="text-center text-truncate">產品名稱</th>
+        <th class="text-center text-truncate" style="cursor: pointer;" title="公司名稱" data-sort="companyName">
           公司名稱
           {{{getSortIcon 'companyName'}}}
         </th>
-        <th class="text-center" style="width: 120px; cursor: pointer;" data-sort="type">
+        <th class="text-center text-truncate" style="max-width: 120px; cursor: pointer;" title="類別" data-sort="type">
           類別
           {{{getSortIcon 'type'}}}
         </th>
-        <th class="text-center" style="width: 120px; cursor: pointer;" data-sort="votes">
+        <th class="text-center text-truncate" style="max-width: 120px; cursor: pointer;" title="得票數" data-sort="votes">
           得票數
           {{{getSortIcon 'votes'}}}
         </th>
@@ -57,10 +57,10 @@
               {{product.companyName}}
             </a>
           </td>
-          <td class="text-center">
+          <td class="text-center text-truncate">
             {{product.type}}
           </td>
-          <td class="text-center px-2">
+          <td class="text-center text-truncate px-2">
             {{#if canVote product}}
               <button
                 class="btn btn-primary btn-sm"
