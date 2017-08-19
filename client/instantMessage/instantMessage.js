@@ -91,9 +91,15 @@ const messageTypeGroupHash = {
     '就任經理',
     '辭職紀錄',
     '支持紀錄'
+  ],
+  '經理管理': [
+    '經理管理'
+  ],
+  '推薦產品': [
+    '推薦產品'
   ]
 };
-const defaultFilterValue = _.flatten(_.values(messageTypeGroupHash)).concat(alwaysDisplayLogTypeList, forSelfLogTypeList);
+const defaultFilterValue = _.flatten(_.values(messageTypeGroupHash)).concat(alwaysDisplayLogTypeList);
 const rFilterTypeList = new ReactiveVar(defaultFilterValue);
 Template.instantMessageFilterButton.helpers({
   btnClass() {
@@ -135,8 +141,9 @@ Template.instantMessageList.helpers({
         _.contains(alwaysDisplayLogTypeList, logData.logType) ||
         _.contains(filterTypeList, logData.logType) ||
         (
+          username &&
           logData.username &&
-          logData.username[0] === username &&
+          _.contains(logData.username, username) &&
           _.contains(forSelfLogTypeList, logData.logType)
         )
       );
