@@ -54,6 +54,47 @@ const schema = new SimpleSchema({
       }
     })
   },
+  status: {
+    type: new SimpleSchema({
+      //是否為上線狀態
+      online: {
+        type: Boolean,
+        optional: true
+      },
+      //是否發呆中
+      idle: {
+        type: Boolean,
+        optional: true
+      },
+      //最後活動時間
+      lastActivity: {
+        type: Date,
+        optional: true
+      },
+      //最後上線資訊
+      lastLogin: {
+        type: new SimpleSchema({
+          //日期
+          date: {
+            type: Date,
+            optional: true
+          },
+          //IP地址
+          ipAddr: {
+            type: String,
+            optional: true
+          },
+          //使用瀏覽器
+          userAgent: {
+            type: String,
+            optional: true
+          }
+        }),
+        optional: true
+      }
+    }),
+    optional: true
+  },
   // In order to avoid an 'Exception in setInterval callback' from Meteor
   heartbeat: {
     type: Date,

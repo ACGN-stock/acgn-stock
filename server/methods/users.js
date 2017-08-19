@@ -35,7 +35,6 @@ Meteor.methods({
     }
   }
 });
-
 const randomStringList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 function generateValidateCode() {
   return _.sample(randomStringList, 10).join('');
@@ -62,7 +61,6 @@ Meteor.methods({
     }
   }
 });
-
 const getValidateUserUrlBodySync = Meteor.wrapAsync((callback) => {
   const request = require('request');
   const cheerio = require('cheerio');
@@ -286,4 +284,44 @@ Meteor.publish('validateUser', function(username) {
   });
 
   this.ready();
+});
+
+Meteor.publish('onlinePeopleNumber', function() {
+  let initialized = false;
+  let total = Meteor.users
+    .find({
+      'status.online': true
+    })
+    .count();
+  this.added('variables', 'onlinePeopleNumber', {
+    value: total
+  });
+
+  const observer = Meteor.users
+    .find({
+      'status.online': true
+    })
+    .observeChanges({
+      added: () => {
+        if (initialized) {
+          total += 1;
+          this.changed('variables', 'onlinePeopleNumber', {
+            value: total
+          });
+        }
+      },
+      removed: () => {
+        if (initialized) {
+          total -= 1;
+          this.changed('variables', 'onlinePeopleNumber', {
+            value: total
+          });
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
 });
