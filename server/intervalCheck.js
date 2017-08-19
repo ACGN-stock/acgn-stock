@@ -99,6 +99,7 @@ function doIntervalWork() {
 
 //商業季度結束檢查
 function doSeasonWorks(lastSeasonData) {
+  console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
     //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();

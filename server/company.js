@@ -11,6 +11,7 @@ export function releaseStocksForHighPrice() {
   releaseStocksForHighPriceCounter -= 1;
   if (releaseStocksForHighPriceCounter <= 0) {
     releaseStocksForHighPriceCounter = generateReleaseStocksForHighPriceConter();
+    console.info(new Date().toLocaleString() + ': releaseStocksForHighPrice');
     const maxPriceCompany = dbCompanies.findOne({}, {
       sort: {
         lastPrice: -1
@@ -161,6 +162,7 @@ export function releaseStocksForNoDeal() {
   releaseStocksForNoDealCounter -= 1;
   if (releaseStocksForNoDealCounter <= 0) {
     releaseStocksForNoDealCounter = generateReleaseStocksForNoDealConter();
+    console.info(new Date().toLocaleString() + ': releaseStocksForNoDeal');
     const checkLogTime = new Date(Date.now() - (config.releaseStocksForNoDealMinCounter * config.intervalTimer));
     dbCompanies
       .find({}, {
@@ -353,6 +355,7 @@ export function recordListPrice() {
   recordListPriceConter -= 1;
   if (recordListPriceConter <= 0) {
     recordListPriceConter = generateRecordListPriceConter();
+    console.info(new Date().toLocaleString() + ': recordListPriceConter');
     dbCompanies
       .find(
         {},

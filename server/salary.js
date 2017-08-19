@@ -9,6 +9,7 @@ export function paySalary() {
   counter -= 1;
   if (counter <= 0) {
     counter = paySalaryCounter;
+    console.info(new Date().toLocaleString() + ': paySalary');
     const now = new Date();
     Meteor.users.update(
       {
