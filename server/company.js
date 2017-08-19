@@ -56,7 +56,7 @@ export function releaseStocksForHighPrice() {
           return false;
         }
         //先鎖定資源，再重新讀取一次資料進行運算
-        resourceManager.request('releaseStocks', ['season', 'companyOrder' + companyName], (release) => {
+        resourceManager.request('releaseStocksForHighPrice', ['companyOrder' + companyName], (release) => {
           const companyData = dbCompanies.findOne({companyName}, {
             fields: {
               _id: 1,
@@ -228,7 +228,7 @@ export function releaseStocksForNoDeal() {
         const doublePriceBuyAmount = doublePriceBuyData ? doublePriceBuyData.amount : 0;
         if (doublePriceBuyAmount > (dealAmount * 10)) {
           //先鎖定資源，再重新讀取一次資料進行運算
-          resourceManager.request('releaseStocks', ['season', 'companyOrder' + companyName], (release) => {
+          resourceManager.request('releaseStocksForNoDeal', ['companyOrder' + companyName], (release) => {
             const companyData = dbCompanies.findOne({companyName}, {
               fields: {
                 _id: 1,
@@ -370,7 +370,7 @@ export function recordListPrice() {
         if (companyData.lastPrice !== companyData.listPrice) {
           const companyName = companyData.companyName;
           //先鎖定資源，再重新讀取一次資料進行運算
-          resourceManager.request('recordListPrice', ['season', 'companyOrder' + companyName], (release) => {
+          resourceManager.request('recordListPrice', ['companyOrder' + companyName], (release) => {
             const companyData = dbCompanies.findOne({companyName}, {
               fields: {
                 _id: 1,
