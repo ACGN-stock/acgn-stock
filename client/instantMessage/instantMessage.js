@@ -57,14 +57,13 @@ Template.instantMessageChatForm.events({
   }
 });
 
-//永遠顯示的紀錄類別
+//不能篩掉、永遠顯示的紀錄類別
 const alwaysDisplayLogTypeList = [
   '發薪紀錄',
   '公司撤銷',
-  '取消資格',
-  '聊天發言'
+  '取消資格'
 ];
-//只顯示username中包含自己的紀錄類別
+//不能篩掉但只顯示username中包含自己的紀錄類別
 const forSelfLogTypeList = [
   '創立得股',
   '創立退款',
@@ -73,6 +72,9 @@ const forSelfLogTypeList = [
 ];
 //篩選器可以選擇的紀錄類別
 const messageTypeGroupHash = {
+  '聊天發言': [
+    '聊天發言'
+  ],
   '交易相關': [
     '交易紀錄',
     '購買下單',
@@ -99,7 +101,11 @@ const messageTypeGroupHash = {
     '推薦產品'
   ]
 };
-const defaultFilterValue = _.flatten(_.values(messageTypeGroupHash)).concat(alwaysDisplayLogTypeList);
+const defaultFilterValue = _.chain(messageTypeGroupHash)
+  .flatten()
+  .values()
+  .value()
+  .concat(alwaysDisplayLogTypeList);
 const rFilterTypeList = new ReactiveVar(defaultFilterValue);
 Template.instantMessageFilterButton.helpers({
   btnClass() {
@@ -138,7 +144,6 @@ Template.instantMessageList.helpers({
     const filterTypeList = rFilterTypeList.get();
     const displayLogList = _.filter(rInstantMessageList.get(), (logData) => {
       return (
-        _.contains(alwaysDisplayLogTypeList, logData.logType) ||
         _.contains(filterTypeList, logData.logType) ||
         (
           username &&
