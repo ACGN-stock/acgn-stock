@@ -72,8 +72,13 @@ Template.nav.events({
   },
   'click [data-action="switch-theme"]'(event) {
     event.preventDefault();
-    $('#boostrap-theme').attr('href', event.target.getAttribute('rel'));
-    $('nav').removeClass('navbar-light navbar-inverse').addClass(event.target.getAttribute('nav-class'));
+    const $switcher = $(event.currentTarget);
+    const rel = $switcher.attr('rel');
+    $('#boostrap-theme').attr('href', rel);
+    const navClass = $switcher.attr('data-nav-class');
+    $('nav')
+      .removeClass('navbar-light navbar-inverse')
+      .addClass(navClass);
   },
   'click [data-action="logout"]'(event) {
     event.preventDefault();
