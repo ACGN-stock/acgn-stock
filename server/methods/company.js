@@ -414,7 +414,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
       }
     });
     if (companyData) {
-      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
       res.end(companyData[fieldName] || '');
     }
     else {
