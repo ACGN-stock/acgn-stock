@@ -1,5 +1,5 @@
 <template name="nav">
-  <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+  <nav id="nav" class="navbar navbar-toggleable-md navbar-light bg-faded">
     {{#if currentUser}}
       <span class="navbar-brand dropdown" title="當前登入使用者：{{currentUser.username}}">
         <a class="dropdown-toggle" href="#">
@@ -51,6 +51,14 @@
           {{> navLink page='tutorial'}}
           {{> navLink page='seasonalReport' params=seasonParams}}
           {{> navLink page='accountInfo'}}
+        {{/navLinkGroup}}
+        {{#navLinkGroup text='主題配置'}}
+          <li class="nav-item">
+            <a class="nav-link" href="#" rel="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" data-nav-class="navbar-light" data-action="switch-theme">亮色</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" rel="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.0.0-alpha.6/solar/bootstrap.min.css" data-nav-class="navbar-inverse" data-action="switch-theme">暗色</a>
+          </li>
         {{/navLinkGroup}}
       </ul>
     </div>
