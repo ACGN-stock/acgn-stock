@@ -29,7 +29,6 @@ export function formatDateText(date) {
     padZero(date.getSeconds())
   );
 }
-
 function padZero(n) {
   if (n < 10) {
     return '0' + n;
@@ -38,7 +37,6 @@ function padZero(n) {
     return '' + n;
   }
 }
-
 Template.registerHelper('formatDateText', formatDateText);
 
 export function getCompanyLinkHref(companyName) {
@@ -85,6 +83,17 @@ export function isChairman(companyName) {
   }
 }
 Template.registerHelper('isChairman', isChairman);
+
+export function isUserId(userId) {
+  const user = Meteor.user();
+  if (user) {
+    return user._id === userId;
+  }
+  else {
+    return false;
+  }
+}
+Template.registerHelper('isUserId', isUserId);
 
 Template.registerHelper('add', function(value1, value2) {
   return value1 + value2;

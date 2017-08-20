@@ -259,6 +259,16 @@ Template.accountInfoLog.helpers({
       case '取消資格': {
         return '以「' + logData.message + '」理由取消了' + logData.username[1] + '擔任經理人的資格！';
       }
+      case '廣告宣傳': {
+        return (
+          '以$ ' + logData.price + '的價格發布了一則廣告：「' + logData.message + '」！'
+        );
+      }
+      case '廣告追加': {
+        return (
+          '追加了$ ' + logData.price + '的廣告費用在廣告：「' + logData.message + '」上！'
+        );
+      }
     }
   }
 });

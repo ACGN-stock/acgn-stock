@@ -61,7 +61,9 @@ Template.instantMessageChatForm.events({
 const alwaysDisplayLogTypeList = [
   '發薪紀錄',
   '公司撤銷',
-  '取消資格'
+  '取消資格',
+  '廣告宣傳',
+  '廣告追加'
 ];
 //不能篩掉但只顯示username中包含自己的紀錄類別
 const forSelfLogTypeList = [
@@ -340,6 +342,20 @@ Template.instantMessageList.helpers({
           getAccountInfoLink(logData.username[0]) +
           '以「' + logData.message + '」理由取消了' +
           getAccountInfoLink(logData.username[1]) + '擔任經理人的資格！'
+        );
+      }
+      case '廣告宣傳': {
+        return (
+          '【廣告宣傳】' +
+          getAccountInfoLink(logData.username[0]) +
+          '以$ ' + logData.price + '的價格發布了一則廣告：「' + logData.message + '」！'
+        );
+      }
+      case '廣告追加': {
+        return (
+          '【廣告競價】' +
+          getAccountInfoLink(logData.username[0]) +
+          '追加了$ ' + logData.price + '的廣告費用在廣告：「' + logData.message + '」上！'
         );
       }
     }

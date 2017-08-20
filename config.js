@@ -17,6 +17,8 @@ export const config = {
   seasonTime: 86400000, //每個商業季度的持續時間，單位為微秒
   seasonProfitPerUser: 2000, //每個商業季度、每個驗證的使用者的「所有推薦票加總」將產生多少可能營利額
   managerProfitPercent: 0.05, //經理人獲得公司營利分紅的比例
-  costFromProfit: 0.05 //系統將扣除多少公司的營利做為公司營運成本
+  costFromProfit: 0.05, //系統將扣除多少公司的營利做為公司營運成本
+  displayAdvertisingNumber: 5, //同時最多顯示的廣告筆數
+  advertisingExpireTime: 86400000 //廣告持續時間，單位為微秒
 };
 export default config;

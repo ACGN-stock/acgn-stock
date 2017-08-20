@@ -2,6 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { resourceManager } from './resourceManager';
+import { dbAdvertising } from '../db/dbAdvertising';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbLog } from '../db/dbLog';
@@ -93,6 +94,12 @@ function doIntervalWork() {
     logType: '聊天發言',
     createdAt: {
       $lt: new Date( Date.now() - 60000)
+    }
+  });
+  //移除所有到期的廣告
+  dbAdvertising.remove({
+    createdAt: {
+      $lt: new Date( Date.now() - config.advertisingExpireTime)
     }
   });
 }

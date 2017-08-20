@@ -17,6 +17,7 @@ export const pageNameHash = {
   instantMessage: '即時訊息',
   stockSummary: '股市總覽',
   foundationPlan: '新創計劃',
+  advertising: '廣告宣傳',
   productCenterRedirect: '產品中心',
   productCenterBySeason: '產品中心',
   productCenterByCompany: '產品中心',
@@ -99,6 +100,13 @@ productCenterRoute.route('/company/:companyName', {
   name: 'productCenterByCompany',
   action(params) {
     DocHead.setTitle(config.websiteName + ' - 產品中心 - ' + params.companyName);
+  }
+});
+
+FlowRouter.route('/advertising', {
+  name: 'advertising',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 廣告宣傳');
   }
 });
 

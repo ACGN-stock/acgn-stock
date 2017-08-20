@@ -1,0 +1,113 @@
+<template name="advertising">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">
+        廣告宣傳
+      </h1>
+      {{#if inBuyMode}}
+        <hr />
+        {{#with defaultAdvertisingData}}
+          {{> buyAdvertisingForm}}
+        {{/with}}
+        <hr />
+      {{/if}}
+      <h3 class="card-subtitle text-muted">
+        進行中的廣告
+        {{#if currentUser}}
+          <button class="btn btn-primary btn-sm float-right" type="button" data-action="buyAdvertising">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            購買廣告
+          </button>
+        {{/if}}
+      </h3>
+      <hr />
+      <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+        <thead>
+          <tr>
+            <th class="text-center text-truncate" style="max-width: 60px;" title="購買者">購買者</th>
+            <th class="text-center text-truncate" title="廣告內容">廣告內容</th>
+            <th class="text-center text-truncate" style="max-width: 60px;" title="費用">費用</th>
+            <th class="text-center text-truncate" style="max-width: 160px;" title="終止日期">終止日期</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each advertising in advertisingList}}
+            <tr class="{{advertisingDisplayClass @index}}">
+              <td class="text-left text-truncate px-2">
+                <a href="{{getAccountInfoLinkHref advertising.username}}">
+                  {{advertising.username}}
+                </a>
+              </td>
+              <td class="text-left text-truncate px-2">
+                {{#if advertising.url}}
+                  <a href="{{advertising.url}}" target="_blank">{{advertising.message}}</a>
+                {{else}}
+                  {{advertising.message}}
+                {{/if}}
+              </td>
+              <td class="text-center text-truncate">
+                {{#if isUserId advertising.userId}}
+                  <button class="btn btn-primary btn-sm" type="button" data-add-pay="{{advertising._id}}">
+                    $ {{advertising.paid}}
+                  </button>
+                {{else}}
+                  $ {{advertising.paid}}
+                {{/if}}
+              </td>
+              <td class="text-center text-truncate">
+                {{formatExpireDate advertising}}
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<template name="buyAdvertisingForm">
+  <form>
+    <h3 class="card-subtitle text-muted">購買廣告</h3>
+    <div class="form-group">
+      <label for="message">廣告訊息：</label>
+      <input
+        class="form-control"
+        type="text"
+        name="message"
+        value="{{valueOf 'message'}}"
+        placeholder="請輸入廣告訊息"
+      />
+      {{{errorHtmlOf 'message'}}}
+    </div>
+    <div class="form-group">
+      <label for="url">廣告連結：</label>
+      <input
+        class="form-control"
+        type="url"
+        name="url"
+        value="{{valueOf 'url'}}"
+        placeholder="http://"
+      />
+      {{{errorHtmlOf 'url'}}}
+    </div>
+    <div>
+      需支付的廣告費用為： $ {{valueOf 'paid'}}。
+      目前可立刻顯示的最小廣告費用為： $ {{getDisplayMinimumPaid}}。
+    </div>
+    <div class="form-group">
+      <label for="extraPaid">歸加廣告費用：</label>
+      <input
+        class="form-control"
+        type="number"
+        name="extraPaid"
+        value="{{valueOf 'extraPaid'}}"
+        min="0"
+      />
+      {{{errorHtmlOf 'extraPaid'}}}
+    </div>
+    <div class="text-right">
+      <button class="btn btn-primary" type="submit">送出</button>
+      <button class="btn btn-secondary" type="reset">取消</button>
+    </div>
+  </form>
+</template>
