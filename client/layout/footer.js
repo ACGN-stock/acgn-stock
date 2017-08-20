@@ -35,7 +35,7 @@ Template.footer.helpers({
     });
   },
   onlinePeopleNumber() {
-    return dbVariables.get('onlinePeopleNumber');
+    return dbVariables.get('onlinePeopleNumber') || 0;
   }
 });
 
