@@ -1,3 +1,7 @@
+#main > .card {
+  margin-bottom: 2rem;
+}
+
 .btn {
   cursor: pointer;
 }
