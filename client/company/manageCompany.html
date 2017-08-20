@@ -10,7 +10,7 @@
       {{> companyProductManage}}
     </div>
   {{else}}
-    查無資料，該公司可能已被撤銷！
+    Loading...
   {{/with}}
 </template>
 
@@ -133,9 +133,9 @@
     <table class="table-bordered" style="width: 100%; table-layout: fixed;">
       <thead>
         <tr>
-          <th class="text-center">產品名稱</th>
-          <th class="text-center" style="width: 60px;">類別</th>
-          <th class="text-center" style="width: 60px;">刪除</th>
+          <th class="text-center text-truncate" title="產品名稱">產品名稱</th>
+          <th class="text-center text-truncate" style="max-width: 60px;" title="類別">類別</th>
+          <th class="text-center text-truncate" style="max-width: 60px;" title="刪除">刪除</th>
         </tr>
       </thead>
       <tbody>
@@ -146,10 +146,10 @@
                 {{product.productName}}
               </a>
             </td>
-            <td class="text-center">
+            <td class="text-center text-truncate">
               {{product.type}}
             </td>
-            <td class="text-center px-2">
+            <td class="text-center text-truncate px-2">
               <button class="btn btn-danger btn-sm" type="button" data-retrieve="{{product._id}}">
                 <i class="fa fa-trash" aria-hidden="true"></i>
                 刪除
