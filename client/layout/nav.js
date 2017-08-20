@@ -76,7 +76,7 @@ Template.nav.events({
     const rel = $switcher.attr('rel');
     $('#boostrap-theme').attr('href', rel);
     const navClass = $switcher.attr('data-nav-class');
-    $('nav')
+    $('#nav')
       .removeClass('navbar-light navbar-inverse')
       .addClass(navClass);
   },
