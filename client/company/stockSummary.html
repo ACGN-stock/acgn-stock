@@ -26,6 +26,9 @@
     <button class="{{sortByBtnClass 'totalValue'}}" value="totalValue" type="button" data-action="sortBy">
       依總市值排序
     </button>
+    <button class="{{sortByBtnClass 'createdAt'}}" value="createdAt" type="button" data-action="sortBy">
+      依上市日期排序
+    </button>
     <div class="input-group">
       <input
         class="form-control"
@@ -66,20 +69,10 @@
       <div class="col-8 col-lg-3 text-truncate border-grid" title="{{formatDateText this.createdAt}}">
         {{formatDateText this.createdAt}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">搜索標籤：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{displayTagList this.tags}}">
-        {{{displayTagList this.tags}}}
-      </div>
-      <div class="col-4 col-lg-3 text-right border-grid">最後成交價：</div>
-      <div class="col-8 col-lg-3 text-right border-grid" title="{{this.lastPrice}}">
+      <div class="col-4 col-lg-3 text-right border-grid">股票價格：</div>
+      <div class="col-8 col-lg-3 text-right border-grid" title="{{this.lastPrice}}({{this.listPrice}})">
         <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
-          $ {{this.lastPrice}}
-        </span>
-      </div>
-      <div class="col-4 col-lg-3 text-right border-grid">參考價格：</div>
-      <div class="col-8 col-lg-3 text-right border-grid" title="{{this.lastPrice}}">
-        <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
-          $ {{this.listPrice}}
+          $ {{this.lastPrice}}({{this.lastPrice}})
         </span>
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">總市值：</div>
