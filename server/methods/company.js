@@ -497,6 +497,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     totalValue: 1,
     createdAt: 1
   };
+  const disableOplog = true;
 
   let initialized = false;
   let total = dbCompanies.find(filter).count();
@@ -505,7 +506,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   });
 
   const observer = dbCompanies
-    .find(filter, {sort, skip, limit, fields})
+    .find(filter, {sort, skip, limit, fields, disableOplog})
     .observeChanges({
       added: (id, fields) => {
         this.added('companies', id, fields);
@@ -553,7 +554,8 @@ Meteor.publish('queryChairmanAsVariable', function(companyName) {
       fields: {
         username: 1
       },
-      limit: 1
+      limit: 1,
+      disableOplog: true
     })
     .observeChanges({
       added: (id, fields) => {
@@ -605,7 +607,8 @@ Meteor.publish('companyDetail', function(companyName) {
     .find({companyName}, {
       fields: {
         pictureSmall: 0
-      }
+      },
+      disableOplog: true
     })
     .observeChanges({
       added: (id, fields) => {
@@ -665,7 +668,8 @@ Meteor.publish('companyDirector', function(companyName, offset) {
         stocks: -1
       },
       skip: offset,
-      limit: 10
+      limit: 10,
+      disableOplog: true
     })
     .observeChanges({
       added: (id, fields) => {
@@ -712,7 +716,8 @@ Meteor.publish('companyLog', function(companyName, offset) {
         createdAt: -1
       },
       skip: offset,
-      limit: 30
+      limit: 30,
+      disableOplog: true
     })
     .observeChanges({
       added: (id, fields) => {
@@ -775,7 +780,8 @@ Meteor.publish('companyOrderExcludeMe', function(companyName, type, offset) {
         unitPrice: type === '賣出' ? 1 : -1
       },
       skip: offset,
-      limit: 10
+      limit: 10,
+      disableOplog: true
     })
     .observeChanges({
       added: (id, fields) => {
@@ -810,7 +816,8 @@ Meteor.publish('companyOrderExcludeMe', function(companyName, type, offset) {
 Meteor.publish('companyCurrentProduct', function(companyName) {
   check(companyName, String);
   const overdue = 1;
+  const disableOplog = true;
 
-  return dbProducts.find({companyName, overdue});
+  return dbProducts.find({companyName, overdue}, {disableOplog});
 });
 

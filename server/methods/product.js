@@ -218,7 +218,8 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
           [sortBy]: sortDir
         },
         skip: offset,
-        limit: 30
+        limit: 30,
+        disableOplog: true
       }
     )
     .observeChanges({
@@ -284,7 +285,8 @@ Meteor.publish('productListByCompany', function({companyName, sortBy, sortDir, o
           createdAt: -1
         },
         skip: offset,
-        limit: 10
+        limit: 10,
+        disableOplog: true
       }
     )
     .observeChanges({

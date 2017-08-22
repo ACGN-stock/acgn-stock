@@ -130,7 +130,8 @@ Meteor.publish('accountInfo', function(username) {
         username: 1,
         profile: 1,
         createdAt: 1
-      }
+      },
+      disableOplog: true
     }),
     dbCompanies
       .find(
@@ -141,7 +142,8 @@ Meteor.publish('accountInfo', function(username) {
           fields: {
             companyName: 1,
             manager: 1
-          }
+          },
+          disableOplog: true
         }
       )
   ];
@@ -165,7 +167,8 @@ Meteor.publish('accountOwnStocks', function(username, offset) {
         stocks: 1
       },
       skip: offset,
-      limit: 10
+      limit: 10,
+      disableOplog: true
     })
     .observeChanges({
       added: (id, fields) => {
@@ -240,7 +243,8 @@ Meteor.publish('accountInfoLog', function(username, offset) {
           createdAt: -1
         },
         skip: offset,
-        limit: 30
+        limit: 30,
+        disableOplog: true
       }
     )
     .observeChanges({
@@ -273,15 +277,19 @@ Meteor.publish('accountInfoLog', function(username, offset) {
 Meteor.publish('validateUser', function(username) {
   check(username, String);
 
-  dbValidatingUsers.find({username}).observeChanges({
-    added: (id, fields) => {
-      this.added('validatingUsers', id, fields);
-    },
-    removed: (id) => {
-      this.removed('validatingUsers', id);
-      this.stop();
-    }
-  });
+  dbValidatingUsers
+    .find({username}, {
+      disableOplog: true
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('validatingUsers', id, fields);
+      },
+      removed: (id) => {
+        this.removed('validatingUsers', id);
+        this.stop();
+      }
+    });
 
   this.ready();
 });
@@ -298,9 +306,14 @@ Meteor.publish('onlinePeopleNumber', function() {
   });
 
   const observer = Meteor.users
-    .find({
-      'status.online': true
-    })
+    .find(
+      {
+        'status.online': true
+      },
+      {
+        disableOplog: true
+      }
+    )
     .observeChanges({
       added: () => {
         if (initialized) {

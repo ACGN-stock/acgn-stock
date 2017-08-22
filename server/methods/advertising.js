@@ -132,7 +132,9 @@ function addAdvertisingPay(user, advertisingId, addPay) {
 }
 
 Meteor.publish('allAdvertising', function() {
-  return dbAdvertising.find();
+  return dbAdvertising.find({}, {
+    disableOplog: true
+  });
 });
 
 Meteor.publish('displayAdvertising', function() {
@@ -140,6 +142,7 @@ Meteor.publish('displayAdvertising', function() {
     sort: {
       paid: -1
     },
-    limit: config.displayAdvertisingNumber
+    limit: config.displayAdvertisingNumber,
+    disableOplog: true
   });
 });

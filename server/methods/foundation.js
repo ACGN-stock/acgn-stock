@@ -220,14 +220,17 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
 
   const observer = dbFoundations
     .find(filter, {
+      fields: {
+        tags: 0,
+        pictureSmall: 0,
+        pictureBig: 0
+      },
       sort: {
         createdAt: 1
       },
       skip: offset,
       limit: 10,
-      fields: {
-        pictureBig: 0
-      }
+      disableOplog: true
     })
     .observeChanges({
       added: (id, fields) => {

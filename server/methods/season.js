@@ -27,7 +27,8 @@ Meteor.publish('currentSeason', function() {
       sort: {
         beginDate: -1
       },
-      limit: 1
+      limit: 1,
+      disableOplog: true
     })
     .observeChanges({
       added: (id) => {
@@ -44,7 +45,8 @@ Meteor.publish('currentSeason', function() {
       sort: {
         beginDate: -1
       },
-      limit: 2
+      limit: 2,
+      disableOplog: true
     })
     .observeChanges({
       added: (id, fields) => {
@@ -80,7 +82,8 @@ Meteor.publish('adjacentSeason', function(seasonId) {
           sort: {
             beginDate: 1
           },
-          limit: 1
+          limit: 1,
+          disableOplog: true
         }
       )
       .observeChanges({
@@ -102,7 +105,8 @@ Meteor.publish('adjacentSeason', function(seasonId) {
           sort: {
             beginDate: -1
           },
-          limit: 1
+          limit: 1,
+          disableOplog: true
         }
       )
       .observeChanges({
