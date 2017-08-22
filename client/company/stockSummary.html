@@ -69,16 +69,6 @@
       <div class="col-8 col-lg-3 text-truncate border-grid" title="{{formatDateText this.createdAt}}">
         {{formatDateText this.createdAt}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">股票價格：</div>
-      <div class="col-8 col-lg-3 text-right border-grid" title="{{this.lastPrice}}({{this.listPrice}})">
-        <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
-          $ {{this.lastPrice}}({{this.lastPrice}})
-        </span>
-      </div>
-      <div class="col-4 col-lg-3 text-right border-grid">總市值：</div>
-      <div class="col-8 col-lg-3 text-right border-grid" title="{{this.totalValue}}">
-        $ {{this.totalValue}}
-      </div>
       <div class="col-4 col-lg-3 text-right text-truncate border-grid" title="{{this.chairmanTitle}}">
         {{#if isChairman this.companyName}}
           <a href="#" data-action="changeChairmanTitle">
@@ -90,6 +80,15 @@
       </div>
       <div class="col-8 col-lg-3 text-truncate border-grid" title="{{getChainman this.companyName}}">
         {{getChainman this.companyName}}
+      <div class="col-4 col-lg-3 text-right border-grid">總市值：</div>
+      <div class="col-8 col-lg-3 text-right border-grid" title="{{this.totalValue}}">
+        $ {{this.totalValue}}
+      </div>
+      <div class="col-4 col-lg-3 text-right border-grid">股票價格：</div>
+      <div class="col-8 col-lg-3 text-right border-grid" title="{{this.lastPrice}}({{this.listPrice}})">
+        <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
+          $ {{this.lastPrice}}({{this.listPrice}})
+        </span>
       </div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
