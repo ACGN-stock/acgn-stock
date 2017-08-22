@@ -284,7 +284,7 @@ Meteor.publish('productListByCompany', function({companyName, sortBy, sortDir, o
           createdAt: -1
         },
         skip: offset,
-        limit: 30
+        limit: 10
       }
     )
     .observeChanges({
