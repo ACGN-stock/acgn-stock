@@ -51,6 +51,9 @@ Template.nav.helpers({
     return {
       userId: Meteor.user()._id
     };
+  },
+  isSSL() {
+    return location.protocol === 'https:';
   }
 });
 Template.nav.events({
@@ -59,6 +62,14 @@ Template.nav.events({
     const loginType = $(event.currentTarget).attr('data-login');
     if (loginType === 'PTT') {
       rShowLoginDialog.set(true);
+    }
+    else if (loginType === 'Facebook') {
+      if (location.protocol === 'https:') {
+        Meteor.loginWithFacebook();
+      }
+      else {
+        location.href = 'https://' + location.hostname + location.pathname;
+      }
     }
     else {
       Meteor['loginWith' + loginType]();
