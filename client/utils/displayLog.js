@@ -68,7 +68,7 @@ Template.displayLog.helpers({
         return '帳號驗證通過，領取起始資金$' + logData.price + '！';
       }
       case '免費得石': {
-        return '【免費得石】因為「' + logData.message + '」的理由獲得了amount顆聖晶石！';
+        return '【免費得石】因為「' + logData.message + '」的理由獲得了' + logData.amount + '顆聖晶石！';
       }
       case '聊天發言': {
         return getUserLink(logData.userId[0]) + '說道：「' + logData.message + '」';
