@@ -26,33 +26,33 @@ Template.productCenterByCompany.onCreated(function() {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
-    const companyName = FlowRouter.getParam('companyName');
-    if (companyName) {
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
       this.subscribe('productListByCompany', {
-        companyName: companyName,
+        companyId: companyId,
         sortBy: rProductSortBy.get(),
         sortDir: rProductSortDir.get(),
         offset: rProductOffset.get()
       });
       if (Meteor.user()) {
-        this.subscribe('queryMyLike', companyName);
+        this.subscribe('queryMyLikeProduct', companyId);
       }
     }
   });
 });
 Template.productCenterByCompany.helpers({
-  companyName() {
-    return FlowRouter.getParam('companyName');
+  companyId() {
+    return FlowRouter.getParam('companyId');
   }
 });
 
 Template.productListByCompanyTable.helpers({
   productList() {
-    const companyName = FlowRouter.getParam('companyName');
+    const companyId = FlowRouter.getParam('companyId');
 
     return dbProducts.find(
       {
-        companyName: companyName
+        companyId: companyId
       },
       {
         sort: {
@@ -95,7 +95,7 @@ Template.productListByCompanyTable.events({
   'click [data-like-product]'(event) {
     event.preventDefault();
     const productId = $(event.currentTarget).attr('data-like-product');
-    const companyName = FlowRouter.getParam('companyName');
-    likeProduct(productId, companyName);
+    const companyId = FlowRouter.getParam('companyId');
+    likeProduct(productId, companyId);
   }
 });

@@ -2,7 +2,6 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbResourceLock } from '../db/dbResourceLock';
-// import { dbDebugger } from '../db/dbDebugger';
 import { threadId } from './thread';
 
 export const resourceManager = {
@@ -12,28 +11,21 @@ export const resourceManager = {
       // const message = '' +
       //   'thread[' + threadId + '] is requesting resource' + JSON.stringify(resourceList) +
       //   ' for task [' + task + '] but need to wait for lock' + JSON.stringify(resourceLock) + '.';
-      // dbDebugger.insert({
-      //   time: new Date(),
-      //   message: message
-      // });
+      // console.info(new Date(), message);
       Meteor.setTimeout(() => {
         this.request(task, resourceList, callback);
       }, randomTime());
     }
     else {
-      // dbDebugger.insert({
-      //   time: new Date(),
-      //   message: 'thread[' + threadId + '] is requesting resource' + JSON.stringify(resourceList) + ' for task[' + task + ']!'
-      // });
+      // const message = 'thread[' + threadId + '] is requesting resource' + JSON.stringify(resourceList) + ' for task[' + task + ']!';
+      // console.info(new Date(), message);
       const time = new Date();
       const release = () => {
         _.each(resourceList, (_id) => {
           dbResourceLock.remove({_id, task, threadId, time});
         });
-        // dbDebugger.insert({
-        //   time: new Date(),
-        //   message: 'thread[' + threadId + '] already release resource' + JSON.stringify(resourceList) + ' for task[' + task + ']!'
-        // });
+        // const message = 'thread[' + threadId + '] already release resource' + JSON.stringify(resourceList) + ' for task[' + task + ']!';
+        // console.info(new Date(), message);
       };
       try {
         _.each(resourceList, (_id) => {
@@ -44,10 +36,8 @@ export const resourceManager = {
       catch(e) {
         release();
         console.error('error happens while requesting resources, automatic release resources lock' + JSON.stringify({resourceList, task, threadId, time}) + '!');
-        // dbDebugger.insert({
-        //   time: new Date(),
-        //   message: 'error happens because of ' + e.stack + ', automatic release resources lock' + JSON.stringify({resourceList, task, threadId, time}) + '!'
-        // });
+        // const message = 'error happens because of ' + e.stack + ', automatic release resources lock' + JSON.stringify({resourceList, task, threadId, time}) + '!';
+        // console.info(new Date(), message);
         throw e;
       }
     }

@@ -33,13 +33,12 @@ function buyAdvertising(user, advertisingData) {
   if (user.profile.money < advertisingData.paid) {
     throw new Meteor.Error(403, '剩餘金錢不足，無法購買廣告！');
   }
-  const username = user.username;
-  resourceManager.throwErrorIsResourceIsLock(['user' + username]);
+  const userId = user._id;
+  resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('buyAdvertising', ['user' + username], (release) => {
-    const user = Meteor.users.findOne({username}, {
+  resourceManager.request('buyAdvertising', ['user' + userId], (release) => {
+    const user = Meteor.users.findOne(userId, {
       fields: {
-        username: 1,
         profile: 1
       }
     });
@@ -49,7 +48,7 @@ function buyAdvertising(user, advertisingData) {
     const createdAt = new Date();
     dbLog.insert({
       logType: '廣告宣傳',
-      username: [username],
+      userId: [userId],
       price: advertisingData.paid,
       message: advertisingData.message,
       createdAt: createdAt
@@ -60,8 +59,7 @@ function buyAdvertising(user, advertisingData) {
       }
     });
     dbAdvertising.insert({
-      userId: user._id,
-      username: user.username,
+      userId: userId,
       paid: advertisingData.paid,
       message: advertisingData.message,
       url: advertisingData.url,
@@ -96,13 +94,12 @@ function addAdvertisingPay(user, advertisingId, addPay) {
   if (! advertisingData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + advertisingId + '」的廣告！');
   }
-  const username = user.username;
-  resourceManager.throwErrorIsResourceIsLock(['user' + username]);
+  const userId = user._id;
+  resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('addAdvertisingPay', ['user' + username], (release) => {
-    const user = Meteor.users.findOne({username}, {
+  resourceManager.request('addAdvertisingPay', ['user' + userId], (release) => {
+    const user = Meteor.users.findOne(userId, {
       fields: {
-        username: 1,
         profile: 1
       }
     });
@@ -112,12 +109,12 @@ function addAdvertisingPay(user, advertisingId, addPay) {
     const createdAt = new Date();
     dbLog.insert({
       logType: '廣告追加',
-      username: [username],
+      userId: [userId],
       price: addPay,
       message: advertisingData.message,
       createdAt: createdAt
     });
-    Meteor.users.update(user._id, {
+    Meteor.users.update(userId, {
       $inc: {
         'profile.money': addPay * -1
       }

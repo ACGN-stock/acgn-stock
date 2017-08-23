@@ -13,12 +13,12 @@ export const orderTypeList = [
 
 //schema
 const schema = new SimpleSchema({
-  //訂單所有者的PTT帳號
-  username: {
+  //訂單所有者的userId
+  userId: {
     type: String
   },
-  //訂單股份的所屬公司名稱
-  companyName: {
+  //訂單股份的公司companyId
+  companyId: {
     type: String
   },
   //訂單類別

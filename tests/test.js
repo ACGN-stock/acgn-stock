@@ -19,6 +19,7 @@ if (Meteor.users.find().count() < 1) {
       username: 'user' + i,
       password: 'user' + i,
       profile: {
+        name: 'user' + i,
         money: config.beginMoney
       }
     });
@@ -45,7 +46,7 @@ function doSomethingAfterRandomTime(userId) {
 
 function doSomething(userId) {
   const user = Meteor.users.findOne(userId);
-  const username = user.username;
+  const username = user.profile.name;
   // console.log(username + ' is doing something...');
   const foundationNumber = dbFoundations.find().count();
   const companyNumber = dbCompanies.find().count();
@@ -64,11 +65,11 @@ function doSomething(userId) {
       const foundationData = dbFoundations.findOne({}, {
         skip: randomNumber(foundationNumber, 0)
       });
-      investFoundCompany(user, foundationData.companyName, investMoney);
+      investFoundCompany(user, foundationData._id, investMoney);
       user.profile.money -= investMoney;
     }
   }
-  const orderList = dbOrders.find({username}).fetch();
+  const orderList = dbOrders.find({userId}).fetch();
   if (probability(orderList * 2)) {
     console.log(username + ' want to cancel a order!');
     const orderData = _.sample(orderList);
@@ -77,15 +78,15 @@ function doSomething(userId) {
   const sellOrderList = _.where(orderList, {
     orderType: '賣出'
   });
-  const sellOrderCompanyNameList = _.chain(sellOrderList)
-    .pluck('companyName')
+  const sellOrderCompanyIdList = _.chain(sellOrderList)
+    .pluck('companyId')
     .unique()
     .value();
   const canBuyStockCompanyList = dbCompanies
     .find(
       {
         companyName: {
-          $nin: sellOrderCompanyNameList
+          $nin: sellOrderCompanyIdList
         }
       },
       {
@@ -108,7 +109,7 @@ function doSomething(userId) {
       if (amount > 0) {
         console.log(username + ' want to buy stocks of 「' + companyData.companyName + '」!');
         const orderData = {
-          companyName: companyData.companyName,
+          companyId: companyData._id,
           unitPrice: unitPrice || 1,
           amount: amount
         };
@@ -121,8 +122,8 @@ function doSomething(userId) {
   const buyOrderList = _.where(orderList, {
     orderType: '購入'
   });
-  const buyOrderCompanyNameList = _.chain(buyOrderList)
-    .pluck('companyName')
+  const buyOrderCompanyIdList = _.chain(buyOrderList)
+    .pluck('companyId')
     .unique()
     .value();
   const canSellStockList = dbDirectors
@@ -130,7 +131,7 @@ function doSomething(userId) {
       {
         username: username,
         companyName: {
-          $nin: buyOrderCompanyNameList
+          $nin: buyOrderCompanyIdList
         }
       },
       {
@@ -144,8 +145,8 @@ function doSomething(userId) {
     .fetch();
   if (canSellStockList.length > 0) {
     const directorData = _.sample(canSellStockList);
-    const companyName = directorData.companyName;
-    const companyData = dbCompanies.findOne({companyName}, {
+    const companyId = directorData.companyId;
+    const companyData = dbCompanies.findOne(companyId, {
       fields: {
         companyName: 1,
         listPrice: 1,
@@ -155,10 +156,10 @@ function doSomething(userId) {
       disableOplog: true
     });
     if (probability(50)) {
-      console.log(username + ' want to sell some stocks of 「' + companyName + '」!');
+      console.log(username + ' want to sell some stocks of 「' + companyData.companyName + '」!');
 
       createSellOrder(user, {
-        companyName: companyName,
+        companyId: companyId,
         unitPrice: randomNumber(companyData.listPrice * 2, Math.ceil(companyData.listPrice / 2)),
         amount: probability(10) ? directorData.stocks : randomNumber(directorData.stocks)
       });
@@ -167,7 +168,7 @@ function doSomething(userId) {
       const candidateIndex = randomNumber(companyData.candidateList.length) - 1;
       if (! _.contains(companyData.voteList[candidateIndex], username)) {
         console.log(username + ' support a candidate!');
-        supportCandidate(user, companyName, companyData.candidateList[candidateIndex]);
+        supportCandidate(user, companyId, companyData.candidateList[candidateIndex]);
       }
     }
   }
@@ -177,7 +178,7 @@ function doSomething(userId) {
     if (probability(5)) {
       console.log(username + ' want to resign a manager!');
       const companyData = _.sample(beManagerCompanies);
-      resignManager(user, companyData.companyName);
+      resignManager(user, companyData.companyId);
     }
     else if (dbProducts.find().count() < 12) {
       console.log(username + ' want to create a product!');
@@ -185,7 +186,7 @@ function doSomething(userId) {
       const randomSuffix = Date.now();
       createProduct(user, {
         productName: 'product' + randomSuffix,
-        companyName: companyData.companyName,
+        companyId: companyData.companyId,
         type: '繪圖',
         url: generateUrl(randomSuffix)
       });
@@ -197,10 +198,10 @@ function doSomething(userId) {
         {
           $nor: [
             {
-              manager: username
+              manager: userId
             },
             {
-              candidateList: username
+              candidateList: userId
             }
           ]
         },
@@ -215,7 +216,7 @@ function doSomething(userId) {
     if (matchCompanies.length) {
       console.log(username + ' want to contend a manager!');
       const companyData = _.sample(matchCompanies);
-      contendManager(user, companyData.companyName);
+      contendManager(user, companyData._id);
     }
   }
   if (user.profile.vote > 0 && dbProducts.find({overdue: 1}).count() > 0) {

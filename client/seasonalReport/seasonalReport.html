@@ -61,12 +61,10 @@
       {{#each rankData in rankList}}
         <tr>
           <td class="text-center text-truncate">
-            {{add @index 1}}
+            {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
-            <a href="{{getAccountInfoLinkHref rankData.username}}">
-              {{rankData.username}}
-            </a>
+            {{>userLink rankData.userId}}
           </td>
           <td class="text-right text-truncate">
             $ {{rankData.money}}
@@ -75,7 +73,7 @@
             $ {{rankData.stocksValue}}
           </td>
           <td class="text-right text-truncate">
-            $ {{add rankData.money rankData.stocksValue}}
+            $ {{plus rankData.money rankData.stocksValue}}
           </td>
         </tr>
       {{/each}}
@@ -101,10 +99,10 @@
       {{#each rankData in rankList}}
         <tr>
           <td class="text-center text-truncate">
-            {{add @index 1}}
+            {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
-            {{{getCompanyLink rankData.companyName}}}
+            {{>companyLink rankData.companyId}}
           </td>
           <td class="text-right text-truncate">
             $ {{rankData.lastPrice}}
@@ -139,10 +137,10 @@
       {{#each rankData in rankList}}
         <tr>
           <td class="text-center text-truncate">
-            {{add @index 1}}
+            {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
-            {{{getCompanyLink rankData.companyName}}}
+            {{>companyLink rankData.companyId}}
           </td>
           <td class="text-right text-truncate">
             $ {{rankData.lastPrice}}
@@ -177,10 +175,10 @@
       {{#each rankData in rankList}}
         <tr>
           <td class="text-center text-truncate">
-            {{add @index 1}}
+            {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
-            {{{getCompanyLink rankData.companyName}}}
+            {{>companyLink rankData.companyId}}
           </td>
           <td class="text-right text-truncate">
             $ {{rankData.lastPrice}}

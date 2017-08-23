@@ -40,14 +40,12 @@ Template.stockSummary.onCreated(function() {
   this.observer = dbCompanies
     .find({}, {
       fields: {
-        companyName: 1
+        _id: 1
       }
     })
     .observeChanges({
-      added: (id, fields) => {
-        if (fields.companyName) {
-          this.subscribe('queryChairmanAsVariable', fields.companyName);
-        }
+      added: (id) => {
+        this.subscribe('queryChairmanAsVariable', id);
       }
     });
 });
@@ -119,7 +117,7 @@ Template.companySummary.onCreated(function() {
   $.ajax({
     url: '/companyPicture',
     data: {
-      id: this.data._id.toHexString(),
+      id: this.data._id,
       type: 'small'
     },
     success: (response) => {
@@ -144,46 +142,29 @@ Template.companySummary.helpers({
       return 'text-success';
     }
   },
-  isManager(manager) {
-    const user = Meteor.user();
-    const username = user && user.username;
-
-    return username === manager;
+  getManageHref(companyId) {
+    return FlowRouter.path('manageCompany', {companyId});
   },
-  getManageHref(companyName) {
-    return FlowRouter.path('manageCompany', {companyName});
-  },
-  getStockAmount(companyName) {
-    const user = Meteor.user();
-    const username = user && user.username;
-    const ownStockData = dbDirectors.findOne({username, companyName});
+  getStockAmount(companyId) {
+    const userId = Meteor.user()._id;
+    const ownStockData = dbDirectors.findOne({companyId, userId});
 
     return ownStockData ? ownStockData.stocks : 0;
   },
-  getStockPercentage(companyName, totalRelease) {
-    const user = Meteor.user();
-    const username = user && user.username;
-    const ownStockData = dbDirectors.findOne({username, companyName});
+  getStockPercentage(companyId, totalRelease) {
+    const userId = Meteor.user()._id;
+    const ownStockData = dbDirectors.findOne({companyId, userId});
 
     if (ownStockData) {
       return Math.round(ownStockData.stocks / totalRelease * 10000) / 100;
     }
-    else {
-      return 0;
-    }
-  },
-  haveStock(companyName) {
-    const user = Meteor.user();
-    const username = user && user.username;
-    const ownStockData = dbDirectors.findOne({username, companyName});
 
-    return ownStockData;
+    return 0;
   },
-  haveOrderList(companyName) {
-    const user = Meteor.user();
-    const username = user && user.username;
+  ownOrderList(companyId) {
+    const userId = Meteor.user()._id;
 
-    return dbOrders.find({username, companyName});
+    return dbOrders.find({companyId, userId});
   }
 });
 Template.companySummary.events({

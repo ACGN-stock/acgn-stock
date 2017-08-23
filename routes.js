@@ -2,6 +2,7 @@
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
+import { dbCompanies } from './db/dbCompanies';
 import { config } from './config';
 
 //default route
@@ -18,10 +19,8 @@ export const pageNameHash = {
   stockSummary: '股市總覽',
   foundationPlan: '新創計劃',
   advertising: '廣告宣傳',
-  productCenterRedirect: '產品中心',
   productCenterBySeason: '產品中心',
   productCenterByCompany: '產品中心',
-  seasonalReportRedirect: '季度報告',
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
   accuseRecord: '舉報紀錄'
@@ -39,13 +38,23 @@ FlowRouter.route('/stockSummary', {
     DocHead.setTitle(config.websiteName + ' - 股市總覽');
   }
 });
-FlowRouter.route('/company/:companyName', {
+FlowRouter.route('/company/:companyId', {
   name: 'company',
   action(params) {
-    DocHead.setTitle(config.websiteName + ' - 「' + params.companyName + '」公司資訊');
+    if (Meteor.isServer) {
+      const companyData = dbCompanies.findOne(params.companyId, {
+        fields: {
+          companyName: 1
+        }
+      });
+      DocHead.setTitle(config.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
+    }
+    else {
+      DocHead.setTitle(config.websiteName + ' - 公司資訊');
+    }
   }
 });
-FlowRouter.route('/manageCompany/:companyName', {
+FlowRouter.route('/manageCompany/:companyId', {
   name: 'manageCompany',
   action() {
     DocHead.setTitle(config.websiteName + ' - 經營管理');
@@ -84,22 +93,26 @@ const productCenterRoute = FlowRouter.group({
   name: 'productCenterRoute'
 });
 
-productCenterRoute.route('/', {
-  name: 'productCenterRedirect',
-  action() {
-    DocHead.setTitle(config.websiteName + ' - 產品中心');
-  }
-});
 productCenterRoute.route('/season/:seasonId', {
   name: 'productCenterBySeason',
   action() {
     DocHead.setTitle(config.websiteName + ' - 產品中心');
   }
 });
-productCenterRoute.route('/company/:companyName', {
+productCenterRoute.route('/company/:companyId', {
   name: 'productCenterByCompany',
   action(params) {
-    DocHead.setTitle(config.websiteName + ' - 產品中心 - ' + params.companyName);
+    if (Meteor.isServer) {
+      const companyData = dbCompanies.findOne(params.companyId, {
+        fields: {
+          companyName: 1
+        }
+      });
+      DocHead.setTitle(config.websiteName + ' - 產品中心 - ' + companyData.companyName);
+    }
+    else {
+      DocHead.setTitle(config.websiteName + ' - 產品中心');
+    }
   }
 });
 
@@ -140,31 +153,26 @@ accountInfoRoute.route('/', {
       if (Meteor.isClient) {
         const user = Meteor.user();
         if (user) {
-          redirect('/accountInfo/' + user.username);
+          redirect('/accountInfo/' + user._id);
         }
       }
     }
-  ],
-  action() {
-    DocHead.setTitle(config.websiteName + ' - 查詢帳號資訊');
-    if (Meteor.isClient) {
-      const { rSearchUsername, logOffset, ownStocksOffset } = require('./client/accountInfo/accountInfo');
-      rSearchUsername.set('');
-      logOffset.set(0);
-      ownStocksOffset.set(0);
-    }
-  }
+  ]
 });
 
-accountInfoRoute.route('/:username', {
+accountInfoRoute.route('/:userId', {
   name: 'accountInfo',
   action(params) {
-    DocHead.setTitle(config.websiteName + ' - 「' + params.username + '」帳號資訊');
-    if (Meteor.isClient) {
-      const { rSearchUsername, logOffset, ownStocksOffset } = require('./client/accountInfo/accountInfo');
-      rSearchUsername.set(params.username);
-      logOffset.set(0);
-      ownStocksOffset.set(0);
+    if (Meteor.isServer) {
+      const user = Meteor.users.findOne(params.userId, {
+        fields: {
+          'profile.name': 1
+        }
+      });
+      DocHead.setTitle(config.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
+    }
+    else {
+      DocHead.setTitle(config.websiteName + ' - 帳號資訊');
     }
   }
 });

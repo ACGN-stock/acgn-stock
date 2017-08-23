@@ -33,7 +33,6 @@ Template.advertising.helpers({
 
     return {
       userId: user._id,
-      username: user.username,
       paid: 1,
       message: '',
       url: '',
@@ -67,9 +66,18 @@ Template.advertising.events({
   'click [data-add-pay]'(event) {
     event.preventDefault();
     const advertisingId = $(event.currentTarget).attr('data-add-pay');
-    const addPay = parseInt(window.prompt('請輸入要額外追加的廣告金額：', 0), 10);
-    if (addPay) {
-      Meteor.call('addAdvertisingPay', advertisingId, addPay);
+    const advertisingData = dbAdvertising.findOne(advertisingId);
+    if (advertisingData) {
+      let confirmResult = true;
+      if (advertisingData.userId !== Meteor.user._id) {
+        confirmResult = confirm('您並非該廣告的初始購買人，確定要在這個廣告上追加廣告金額嗎？');
+      }
+      if (confirmResult) {
+        const addPay = parseInt(window.prompt('請輸入要額外追加的廣告金額：', 0), 10);
+        if (addPay) {
+          Meteor.call('addAdvertisingPay', advertisingId, addPay);
+        }
+      }
     }
   }
 });

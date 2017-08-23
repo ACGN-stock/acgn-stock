@@ -52,13 +52,8 @@
 
 <template name="instantMessageList">
   <div>
-    {{#each message in messageList}}
-      <div>
-        <span class="text-info d-inline-block">
-          ({{formatDateText message.createdAt}})
-        </span>
-        {{{getMessageHtml message}}}
-      </div>
+    {{#each logData in logList}}
+      {{>displayLog logData}}
     {{/each}}
   </div>
 </template>

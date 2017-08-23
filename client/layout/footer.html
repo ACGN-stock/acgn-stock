@@ -4,7 +4,14 @@
       {{#each advertisingList}}
         {{> displayAdvertising}}
       {{/each}}
-      <div class="bg-faded text-primary text-right pr-3 py-1 rounded">
+      <div class="bg-faded text-primary text-right px-3 py-1 rounded">
+        <a
+          class="text-danger float-left"
+          href="https://github.com/mrbigmouth/acgn-stock/issues"
+          target="_blank"
+        >
+          Bug回報
+        </a>
         線上使用者人數：{{onlinePeopleNumber}}人
       </div>
     </div>
@@ -15,9 +22,7 @@
   <div class="media bg-info text px-2 py-1 my-2 rounded">
     <div class="media-body">
       來自
-      <a href="{{getAccountInfoLinkHref this.username}}">
-        {{this.username}}
-      </a>
+      {{>userLink this.userId}}
       的廣告：「
       {{#if this.url}}
         <a href="{{this.url}}" target="_blank">{{this.message}}</a>

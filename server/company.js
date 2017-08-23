@@ -34,34 +34,26 @@ export function releaseStocksForHighPrice() {
         },
         {
           fields: {
-            _id: 1,
-            companyName: 1,
-            manager: 1,
-            lastPrice: 1,
-            listPrice: 1,
-            totalRelease: 1,
-            profit: 1,
-            totalValue: 1
+            _id: 1
           },
           disableOplog: true
         }
       )
       .forEach((companyData) => {
-        const companyName = companyData.companyName;
+        const companyId = companyData._id;
         const existsReleaseOrder = dbOrders.findOne({
-          companyName: companyName,
-          username: '!system'
+          companyId: companyId,
+          userId: '!system'
         });
         //有尚存在的釋股單在市場上時不繼續釋股
         if (existsReleaseOrder) {
           return false;
         }
         //先鎖定資源，再重新讀取一次資料進行運算
-        resourceManager.request('releaseStocksForHighPrice', ['companyOrder' + companyName], (release) => {
-          const companyData = dbCompanies.findOne({companyName}, {
+        resourceManager.request('releaseStocksForHighPrice', ['companyOrder' + companyId], (release) => {
+          const companyData = dbCompanies.findOne(companyId, {
             fields: {
               _id: 1,
-              companyName: 1,
               manager: 1,
               lastPrice: 1,
               listPrice: 1,
@@ -74,13 +66,13 @@ export function releaseStocksForHighPrice() {
           const releaseStocks = 1 + Math.floor(Math.random() * Math.min(companyData.lastPrice - thresholdPrice, maxReleaseStocks) / 2);
           dbLog.insert({
             logType: '公司釋股',
-            companyName: companyName,
+            companyId: companyId,
             amount: releaseStocks,
             price: companyData.listPrice,
             resolve: false,
             createdAt: new Date()
           });
-          dbCompanies.update(companyData._id, {
+          dbCompanies.update(companyId, {
             $inc: {
               totalRelease: releaseStocks
             }
@@ -91,7 +83,7 @@ export function releaseStocksForHighPrice() {
           dbOrders
             .find(
               {
-                companyName: companyName,
+                companyId: companyId,
                 orderType: '購入',
                 unitPrice: {
                   $gte: companyData.listPrice
@@ -116,14 +108,14 @@ export function releaseStocksForHighPrice() {
                 lastPrice = buyOrderData.unitPrice;
                 dbLog.insert({
                   logType: '交易紀錄',
-                  username: [buyOrderData.username],
-                  companyName: companyName,
+                  userId: [buyOrderData.userId],
+                  companyId: companyId,
                   price: lastPrice,
                   amount: tradeNumber,
                   createdAt: new Date()
                 });
-                changeStocksAmount(buyOrderData.username, companyName, tradeNumber);
-                dbCompanies.update({companyName}, {
+                changeStocksAmount(buyOrderData.userId, companyId, tradeNumber);
+                dbCompanies.update(companyId, {
                   $inc: {
                     profit: lastPrice * tradeNumber
                   }
@@ -136,8 +128,8 @@ export function releaseStocksForHighPrice() {
           }
           if (alreadyRelease < releaseStocks) {
             dbOrders.insert({
-              companyName: companyName,
-              username: '!system',
+              companyId: companyId,
+              userId: '!system',
               orderType: '賣出',
               unitPrice: companyData.listPrice,
               amount: releaseStocks,
@@ -168,18 +160,17 @@ export function releaseStocksForNoDeal() {
       .find({}, {
         fields: {
           _id: 1,
-          companyName: 1,
           listPrice: 1
         },
         disableOplog: true
       })
       .forEach((companyData) => {
-        const companyName = companyData.companyName;
+        const companyId = companyData._id;
         const dealData = dbLog.aggregate([
           {
             $match: {
               logType: '交易紀錄',
-              companyName: companyName,
+              companyId: companyId,
               createdAt: {
                 $gte: checkLogTime
               }
@@ -199,7 +190,7 @@ export function releaseStocksForNoDeal() {
           {
             $match: {
               orderType: '購入',
-              companyName: companyName,
+              companyId: companyId,
               unitPrice: (companyData.listPrice * 2)
             }
           },
@@ -230,11 +221,9 @@ export function releaseStocksForNoDeal() {
         const doublePriceBuyAmount = doublePriceBuyData ? doublePriceBuyData.amount : 0;
         if (doublePriceBuyAmount > (dealAmount * 10)) {
           //先鎖定資源，再重新讀取一次資料進行運算
-          resourceManager.request('releaseStocksForNoDeal', ['companyOrder' + companyName], (release) => {
-            const companyData = dbCompanies.findOne({companyName}, {
+          resourceManager.request('releaseStocksForNoDeal', ['companyOrder' + companyId], (release) => {
+            const companyData = dbCompanies.findOne(companyId, {
               fields: {
-                _id: 1,
-                companyName: 1,
                 lastPrice: 1,
                 listPrice: 1,
                 totalRelease: 1,
@@ -247,7 +236,7 @@ export function releaseStocksForNoDeal() {
               {
                 $match: {
                   orderType: '購入',
-                  companyName: companyName,
+                  companyId: companyId,
                   unitPrice: releasePrice
                 }
               },
@@ -280,13 +269,13 @@ export function releaseStocksForNoDeal() {
               const releaseStocks = 1 + Math.floor(Math.random() * doublePriceBuyAmount / 2);
               dbLog.insert({
                 logType: '公司釋股',
-                companyName: companyName,
+                companyId: companyId,
                 amount: releaseStocks,
                 price: releasePrice,
                 resolve: false,
                 createdAt: new Date()
               });
-              dbCompanies.update(companyData._id, {
+              dbCompanies.update(companyId, {
                 $inc: {
                   totalRelease: releaseStocks
                 }
@@ -296,7 +285,7 @@ export function releaseStocksForNoDeal() {
               dbOrders
                 .find(
                   {
-                    companyName: companyName,
+                    companyId: companyId,
                     orderType: '購入',
                     unitPrice: releasePrice
                   },
@@ -318,14 +307,14 @@ export function releaseStocksForNoDeal() {
                     alreadyRelease += tradeNumber;
                     dbLog.insert({
                       logType: '交易紀錄',
-                      username: [buyOrderData.username],
-                      companyName: companyName,
+                      userId: [buyOrderData.userId],
+                      companyId: companyId,
                       price: releasePrice,
                       amount: tradeNumber,
                       createdAt: new Date()
                     });
-                    changeStocksAmount(buyOrderData.username, companyName, tradeNumber);
-                    dbCompanies.update({companyName}, {
+                    changeStocksAmount(buyOrderData.userId, companyId, tradeNumber);
+                    dbCompanies.update(companyId, {
                       $inc: {
                         profit: releasePrice * tradeNumber
                       }
@@ -362,7 +351,6 @@ export function recordListPrice() {
         {
           fields: {
             _id: 1,
-            companyName: 1,
             lastPrice: 1,
             listPrice: 1
           },
@@ -371,17 +359,16 @@ export function recordListPrice() {
       )
       .forEach((companyData) => {
         if (companyData.lastPrice !== companyData.listPrice) {
-          const companyName = companyData.companyName;
+          const companyId = companyData._id;
           //先鎖定資源，再重新讀取一次資料進行運算
-          resourceManager.request('recordListPrice', ['companyOrder' + companyName], (release) => {
-            const companyData = dbCompanies.findOne({companyName}, {
+          resourceManager.request('recordListPrice', ['companyOrder' + companyId], (release) => {
+            const companyData = dbCompanies.findOne(companyId, {
               fields: {
-                _id: 1,
                 lastPrice: 1,
                 totalRelease: 1
               }
             });
-            dbCompanies.update(companyData._id, {
+            dbCompanies.update(companyId, {
               $set: {
                 listPrice: companyData.lastPrice,
                 totalValue: companyData.lastPrice * companyData.totalRelease
@@ -393,7 +380,6 @@ export function recordListPrice() {
       });
   }
 }
-
 function generateRecordListPriceConter() {
   const min = config.recordListPriceMinCounter;
   const max = (config.recordListPriceMaxCounter - min);

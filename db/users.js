@@ -6,7 +6,7 @@ const schema = new SimpleSchema({
   //使用者PTT帳號名稱
   username: {
     type: String,
-    regEx: /^[0-9a-zA-Z]{2,20}$/
+    optional: true
   },
   //驗證成功日期
   createdAt: {
@@ -20,6 +20,10 @@ const schema = new SimpleSchema({
   },
   profile: {
     type: new SimpleSchema({
+      //使用者名稱
+      name: {
+        type: String
+      },
       //金錢數量
       money: {
         type: SimpleSchema.Integer,

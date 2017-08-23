@@ -196,7 +196,7 @@ function generateRankData(seasonData) {
   const rankCompanyPriceList = dbCompanies
     .find({}, {
       fields: {
-        companyName: 1,
+        _id: 1,
         lastPrice: 1,
         listPrice: 1,
         totalRelease: 1,
@@ -216,7 +216,7 @@ function generateRankData(seasonData) {
   const rankCompanyValueList = dbCompanies
     .find({}, {
       fields: {
-        companyName: 1,
+        _id: 1,
         lastPrice: 1,
         listPrice: 1,
         totalRelease: 1,
@@ -236,7 +236,7 @@ function generateRankData(seasonData) {
   const rankCompanyProfitList = dbCompanies
     .find({}, {
       fields: {
-        companyName: 1,
+        _id: 1,
         lastPrice: 1,
         listPrice: 1,
         totalRelease: 1,
@@ -257,15 +257,15 @@ function generateRankData(seasonData) {
     {
       $lookup: {
         from: 'companies',
-        localField: 'companyName',
-        foreignField: 'companyName',
+        localField: 'companyId',
+        foreignField: '_id',
         as: 'companyData'
       }
     },
     {
       $project: {
-        username: 1,
-        companyName: 1,
+        userId: 1,
+        companyId: 1,
         stocks: 1,
         listPrice: {
           $arrayElemAt: ['$companyData.listPrice', 0]
@@ -274,7 +274,7 @@ function generateRankData(seasonData) {
     },
     {
       $group: {
-        _id: '$username',
+        _id: '$userId',
         stocksValue: {
           $sum: {
             $multiply: ['$stocks', '$listPrice']
@@ -286,13 +286,13 @@ function generateRankData(seasonData) {
       $lookup: {
         from: 'users',
         localField: '_id',
-        foreignField: 'username',
+        foreignField: '_id',
         as: 'userData'
       }
     },
     {
       $project: {
-        companyName: 1,
+        companyId: 1,
         stocksValue: 1,
         money: {
           $arrayElemAt: ['$userData.profile.money', 0]
@@ -301,7 +301,7 @@ function generateRankData(seasonData) {
     },
     {
       $project: {
-        companyName: 1,
+        companyId: 1,
         money: 1,
         stocksValue: 1,
         wealth: {
@@ -328,7 +328,7 @@ function generateRankData(seasonData) {
     _.each(rankCompanyPriceList, (rankData) => {
       rankCompanyPriceBulk.insert({
         seasonId: seasonId,
-        companyName: rankData.companyName,
+        companyId: rankData._id,
         lastPrice: rankData.lastPrice,
         listPrice: rankData.listPrice,
         totalRelease: rankData.totalRelease,
@@ -344,7 +344,7 @@ function generateRankData(seasonData) {
     _.each(rankCompanyValueList, (rankData) => {
       rankCompanyValueBulk.insert({
         seasonId: seasonId,
-        companyName: rankData.companyName,
+        companyId: rankData._id,
         lastPrice: rankData.lastPrice,
         listPrice: rankData.listPrice,
         totalRelease: rankData.totalRelease,
@@ -360,7 +360,7 @@ function generateRankData(seasonData) {
     _.each(rankCompanyProfitList, (rankData) => {
       rankCompanyProfitBulk.insert({
         seasonId: seasonId,
-        companyName: rankData.companyName,
+        companyId: rankData._id,
         lastPrice: rankData.lastPrice,
         listPrice: rankData.listPrice,
         totalRelease: rankData.totalRelease,
@@ -378,7 +378,7 @@ function generateRankData(seasonData) {
     _.each(rankUserList, (rankData) => {
       rankUserBulk.insert({
         seasonId: seasonId,
-        username: rankData._id,
+        userId: rankData._id,
         money: rankData.money,
         stocksValue: rankData.stocksValue
       });
@@ -404,7 +404,6 @@ function giveBonusByStocksFromProfit() {
       {
         fields: {
           _id: 1,
-          companyName: 1,
           manager: 1,
           totalRelease: 1,
           profit: 1
@@ -414,13 +413,11 @@ function giveBonusByStocksFromProfit() {
     )
     .forEach((companyData) => {
       const now = Date.now();
-      const companyName = companyData.companyName;
-      // console.log('start give bonous of company[' + companyName + ']...');
+      const companyId = companyData._id;
       let leftProfit = companyData.profit;
-      // console.log('total bonus: $' + companyData.profit);
       logBulk.insert({
         logType: '公司營利',
-        companyName: companyName,
+        companyId: companyId,
         amount: leftProfit,
         resolve: false,
         createdAt: new Date(now)
@@ -429,18 +426,17 @@ function giveBonusByStocksFromProfit() {
       //經理人分紅
       if (companyData.manager !== '!none') {
         const managerProfit = Math.ceil(leftProfit * config.managerProfitPercent);
-        // console.log('manager bonus: $' + managerProfit);
         logBulk.insert({
           logType: '營利分紅',
-          username: [companyData.manager],
-          companyName: companyName,
+          userId: [companyData.manager],
+          companyId: companyId,
           amount: managerProfit,
           resolve: false,
           createdAt: new Date(now + 1)
         });
         usersBulk
           .find({
-            username: companyData.manager
+            _id: companyData.manager
           })
           .updateOne({
             $inc: {
@@ -453,38 +449,34 @@ function giveBonusByStocksFromProfit() {
       //剩餘收益先扣去公司營運成本
       leftProfit -= Math.ceil(companyData.profit * config.costFromProfit);
       const forDirectorProfit = leftProfit;
-      // console.log('left bonus: $' + forDirectorProfit);
       const totalReleaseStocks = companyData.totalRelease;
-      // console.log('totalRelease stocks: ' + totalReleaseStocks);
       //發放營利給所有董事
       dbDirectors
-        .find({companyName}, {
+        .find({companyId}, {
           sort: {
             stocks: -1,
             createdAt: 1
           },
           fields: {
-            username: 1,
+            userId: 1,
             stocks: 1
           },
           disableOplog: true
         })
         .forEach((director, index) => {
-          // console.log('director[' + director.username + '] stocks: ' + director.stocks);
           const directorProfit = Math.min(Math.ceil(forDirectorProfit * director.stocks / totalReleaseStocks), leftProfit);
-          // console.log('director[' + director.username + '] bonus: $' + directorProfit);
           if (directorProfit > 0) {
             logBulk.insert({
               logType: '營利分紅',
-              username: [director.username],
-              companyName: companyName,
+              userId: [director.userId],
+              companyId: companyId,
               amount: directorProfit,
               resolve: false,
               createdAt: new Date( now + 2 + index)
             });
             usersBulk
               .find({
-                username: director.username
+                _id: director.userId
               })
               .updateOne({
                 $inc: {
@@ -529,7 +521,7 @@ function electManager(seasonData) {
       },
       {
         fields: {
-          companyName: 1,
+          _id: 1,
           candidateList: 1
         },
         disableOplog: true
@@ -540,15 +532,14 @@ function electManager(seasonData) {
       if (companyData.candidateList.length === 0) {
         return true;
       }
-      const companyName = companyData.companyName;
+      const companyId = companyData._id;
       //先鎖定資源，再重新讀取一次資料進行運算
-      resourceManager.request('electManager', ['elect' + companyName], (release) => {
+      resourceManager.request('electManager', ['elect' + companyId], (release) => {
         const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
         const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
-        const companyData = dbCompanies.findOne({companyName}, {
+        const companyData = dbCompanies.findOne(companyId, {
           fields: {
             _id: 1,
-            companyName: 1,
             manager: 1,
             candidateList: 1,
             voteList: 1
@@ -559,15 +550,15 @@ function electManager(seasonData) {
         if (companyData.candidateList.length === 1) {
           logBulk.insert({
             logType: '就任經理',
-            username: companyData.candidateList.slice(),
-            companyName: companyName,
+            userId: companyData.candidateList,
+            companyId: companyId,
             message: electMessage,
             resolve: false,
             createdAt: new Date()
           });
           companiesBulk
             .find({
-              companyName: companyName
+              _id: companyId
             })
             .updateOne({
               $set: {
@@ -580,9 +571,9 @@ function electManager(seasonData) {
         else {
           const voteList = companyData.voteList;
           const directorList = dbDirectors
-            .find({companyName}, {
+            .find({companyId}, {
               fields: {
-                username: 1,
+                userId: 1,
                 stocks: 1
               },
               disableOplog: true
@@ -591,14 +582,14 @@ function electManager(seasonData) {
 
           const voteStocksList = _.map(companyData.candidateList, (candidate, index) => {
             const voteDirectorList = voteList[index];
-            let stocks = _.reduce(voteDirectorList, (stocks, username) => {
-              const directorData = _.findWhere(directorList, {username});
+            let stocks = _.reduce(voteDirectorList, (stocks, userId) => {
+              const directorData = _.findWhere(directorList, {userId});
 
               return stocks + (directorData ? directorData.stocks : 0);
             }, 0);
 
             return {
-              username: candidate,
+              userId: candidate,
               stocks: stocks
             };
           });
@@ -609,8 +600,8 @@ function electManager(seasonData) {
           });
           logBulk.insert({
             logType: '就任經理',
-            username: [winnerData.username, companyData.manager],
-            companyName: companyName,
+            userId: [winnerData.userId, companyData.manager],
+            companyId: companyId,
             message: electMessage,
             amount: winnerData.stocks,
             resolve: false,
@@ -618,12 +609,12 @@ function electManager(seasonData) {
           });
           companiesBulk
             .find({
-              companyName: companyName
+              _id: companyId
             })
             .updateOne({
               $set: {
-                manager: winnerData.username,
-                candidateList: [winnerData.username],
+                manager: winnerData.userId,
+                candidateList: [winnerData.userId],
                 voteList: [ [] ]
               }
             });

@@ -30,9 +30,8 @@
     <thead>
       <tr>
         <th class="text-center text-truncate">產品名稱</th>
-        <th class="text-center text-truncate" style="cursor: pointer;" title="公司名稱" data-sort="companyName">
+        <th class="text-center text-truncate" title="公司名稱">
           公司名稱
-          {{{getSortIcon 'companyName'}}}
         </th>
         <th class="text-center text-truncate" style="max-width: 120px; cursor: pointer;" title="類別" data-sort="type">
           類別
@@ -48,14 +47,10 @@
       {{#each product in productList}}
         <tr>
           <td class="text-left text-truncate px-2">
-            <a href="{{product.url}}" title="{{product.productName}}" target="_blank">
-              {{product.productName}}
-            </a>
+            {{>productLink product._id}}
           </td>
           <td class="text-left text-truncate px-2">
-            <a href="{{getCompanyProductLinkHref product.companyName}}" title="{{product.companyName}}">
-              {{product.companyName}}
-            </a>
+            {{>companyLink product.companyId}}
           </td>
           <td class="text-center text-truncate">
             {{product.type}}

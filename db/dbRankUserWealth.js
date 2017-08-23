@@ -14,8 +14,8 @@ const schema = new SimpleSchema({
   seasonId: {
     type: String
   },
-  //使用者名稱
-  username: {
+  //使用者ID
+  userId: {
     type: String
   },
   //擁有現金

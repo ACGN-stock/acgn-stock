@@ -10,12 +10,12 @@ export default dbDirectors;
 
 //schema
 const schema = new SimpleSchema({
-  //公司名稱
-  companyName: {
+  //公司id
+  companyId: {
     type: String
   },
-  //董事PTT帳號
-  username: {
+  //董事userId
+  userId: {
     type: String
   },
   //擁有股份

@@ -1,122 +1,67 @@
 <template name="accountInfo">
   <div class="card">
-    <div class="card-block">
-      <h1 class="card-title mb-1">帳號資訊</h1>
-      <hr />
-      {{> accountInfoSearchForm}}
-      <hr />
-    </div>
-    {{> accountInfoBasic}}
-    {{> accountInfoOwnStocks}}
-    {{> accountInfoLogList}}
+    {{#with lookUser}}
+      {{> accountInfoBasic}}
+      {{> accountInfoOwnStockList}}
+      {{> accountInfoLogList}}
+    {{/with}}
   </div>
-</template>
-
-<template name="accountInfoSearchForm">
-  <form class="form-inline">
-    {{#if currentUser}}
-      <div class="form-check mr-3">
-        <label class="form-check-label">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="lookMode"
-            value="self"
-            checked="{{isInLookMode 'self'}}"
-          />
-          查詢自己日誌
-        </label>
-      </div>
-      <div class="form-check mr-3">
-        <label class="form-check-label">
-          <input
-            class="form-check-input"
-            type="radio"
-            name="lookMode"
-            value="other"
-            checked="{{isInLookMode 'other'}}"
-          />
-          查詢他人日誌
-        </label>
-      </div>
-    {{/if}}
-    <div class="input-group">
-      <input
-        class="form-control"
-        style="width: 250px"
-        type="text"
-        name="searchUsername"
-        value="{{searchUsername}}"
-        placeholder="請輸入要查詢日誌的帳號名稱"
-      />
-      <span class="input-group-btn">
-        <button type="submit" class="btn btn-primary">
-          <i class="fa fa-search" aria-hidden="true"></i>
-          查詢
-        </button>
-      </span>
-    </div>
-  </form>
 </template>
 
 <template name="accountInfoBasic">
-  {{#with lookUser}}
-    <div class="card-block">
-      <h2 class="card-title mb-1">使用者「{{this.username}}」的帳號資訊：</h2>
-      <hr />
-      <div>
-        帳號驗證日期：{{formatDateText this.createdAt}}
-      </div>
-      <div>
-        帳號當前餘額：{{lookUser.profile.money}}
-      </div>
-      <div>
-        帳號剩餘推薦票：{{lookUser.profile.vote}}
-      </div>
-      <div>
-        帳號擁有聖晶石：{{lookUser.profile.stone}}
-      </div>
-      {{#if lookUser.profile.isAdmin}}
-        <div class="text-warning">
-          是股市秩序管理員
-        </div>
-      {{/if}}
-      {{#if lookUser.profile.revokeQualification}}
-        <div class="text-danger">
-          被撤銷了擔任經理人的資格！
-        </div>
-      {{/if}}
-      {{#each manageCompanies this.username}}
-        {{> accountInfoManageCompanyLink}}
-      {{/each}}
-      <hr />
+  <div class="card-block">
+    <h1 class="card-title mb-1">使用者「{{this.profile.name}}」的帳號資訊：</h1>
+    <hr />
+    <div>
+      帳號啟動日期：{{formatDateText this.createdAt}}
     </div>
-  {{/with}}
-</template>
-
-<template name="accountInfoManageCompanyLink">
-  <div class="text-primary">
-    是「
-    <a href="{{getHref this.companyName}}">{{this.companyName}}</a>
-    」公司的總經理。
+    <div>
+      帳號當前餘額：{{this.profile.money}}
+    </div>
+    <div>
+      帳號剩餘推薦票：{{this.profile.vote}}
+    </div>
+    <div>
+      帳號擁有聖晶石：{{this.profile.stone}}
+    </div>
+    {{#if this.profile.isAdmin}}
+      <div class="text-warning">
+        是金融管理會委員。
+      </div>
+    {{/if}}
+    {{#if this.profile.revokeQualification}}
+      <div class="text-danger">
+        被撤銷了擔任經理人的資格！
+      </div>
+    {{/if}}
+    {{#each manageCompanies}}
+      <div class="text-primary">
+        是「
+        <a href="{{getCompanyHref this._id}}">{{this.companyName}}</a>
+        」公司的總經理。
+      </div>
+    {{/each}}
   </div>
 </template>
 
-<template name="accountInfoOwnStocks">
+<template name="accountInfoOwnStockList">
   <div class="card-block">
     <h2 class="card-title mb-1">擁有公司股票：</h2>
     <hr />
     {{#each directorData in directorList}}
-      <div>
-        擁有 「<a href="{{getCompanyLinkHref directorData.companyName}}">{{directorData.companyName}}</a>」
-        公司的{{directorData.stocks}}股股票。
-      </div>
+      {{> accountInfoOwnStockCompanyLink companyId=directorData.companyId}}
     {{else}}
       查無資料！
     {{/each}}
     {{#with paginationData}}
       {{> pagination}}
     {{/with}}
+  </div>
+</template>
+
+<template name="accountInfoOwnStockCompanyLink">
+  <div>
+    擁有 「<a></a>」公司的{{this.stocks}}股股票。
   </div>
 </template>
 
@@ -125,19 +70,12 @@
     <h2 class="card-title mb-1">所有相關紀錄：</h2>
     <hr />
     {{#each logList}}
-      {{> accountInfoLog}}
+      {{> displayLog}}
     {{else}}
       查無資料！
     {{/each}}
     {{#with paginationData}}
       {{> pagination}}
     {{/with}}
-  </div>
-</template>
-
-<template name="accountInfoLog">
-  <div>
-    <span class="text-info d-inline-block text-right">({{formatDateText this.createdAt}})</span>
-    {{{getLogDescriptionHtml this}}}
   </div>
 </template>

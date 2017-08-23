@@ -1,7 +1,6 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
-import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbVariables } from '../../db/dbVariables';
 
 Meteor.subscribe('variables');
@@ -39,44 +38,15 @@ function padZero(n) {
 }
 Template.registerHelper('formatDateText', formatDateText);
 
-export function getCompanyLinkHref(companyName) {
-  return FlowRouter.path('company', {companyName});
+export function getChairmanId(companyId) {
+  return dbVariables.get('chairmanIdOf' + companyId);
 }
-Template.registerHelper('getCompanyLinkHref', getCompanyLinkHref);
+Template.registerHelper('getChairmanId', getChairmanId);
 
-export function getCompanyLink(companyName) {
-  const href = getCompanyLinkHref(companyName);
-
-  return '<a href="' + href + '">' + companyName + '</a>';
-}
-Template.registerHelper('getCompanyLink', getCompanyLink);
-
-export function getCompanyProductLinkHref(companyName) {
-  return FlowRouter.path('productCenterByCompany', {companyName});
-}
-Template.registerHelper('getCompanyProductLinkHref', getCompanyProductLinkHref);
-
-export function getAccountInfoLinkHref(username) {
-  return FlowRouter.path('accountInfo', {username});
-}
-Template.registerHelper('getAccountInfoLinkHref', getAccountInfoLinkHref);
-
-export function getAccountInfoLink(username) {
-  const href = getAccountInfoLinkHref(username);
-
-  return '<a href="' + href + '">' + username + '</a>';
-}
-Template.registerHelper('getAccountInfoLink', getAccountInfoLink);
-
-export function getChainman(companyName) {
-  return dbVariables.get('chairmanNameOf' + companyName);
-}
-Template.registerHelper('getChainman', getChainman);
-
-export function isChairman(companyName) {
+export function isChairman(companyId) {
   const user = Meteor.user();
   if (user) {
-    return user.username === dbVariables.get('chairmanNameOf' + companyName);
+    return user._id === dbVariables.get('chairmanIdOf' + companyId);
   }
   else {
     return false;
@@ -95,8 +65,12 @@ export function isUserId(userId) {
 }
 Template.registerHelper('isUserId', isUserId);
 
-Template.registerHelper('add', function(value1, value2) {
+Template.registerHelper('plus', function(value1, value2) {
   return value1 + value2;
+});
+
+Template.registerHelper('minus', function(value1, value2) {
+  return value1 - value2;
 });
 
 Template.registerHelper('displayManager', function(manager) {

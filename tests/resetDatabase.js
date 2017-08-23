@@ -1,4 +1,5 @@
 'use strict';
+import { dbAdvertising } from '../db/dbAdvertising';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDebugger } from '../db/dbDebugger';
 import { dbDirectors } from '../db/dbDirectors';
@@ -38,42 +39,46 @@ Meteor.startup(function() {
       });
     }
   });
+  dbAdvertising.remove({});
   dbCompanies.remove({});
   dbDebugger.remove({});
   dbDirectors.remove({});
-  // dbFoundations.find().forEach((foundationData) => {
-  //   const companyName = foundationData.companyName;
-  //   if (dbFoundations.find({companyName}).count() > 1) {
-  //     console.log('remove foundations[' + companyName + '] because have same name foundations.');
-  //     dbFoundations.remove(foundationData._id);
-  //   }
-  //   else if (typeof foundationData._id === 'string') {
-  //     console.log('re insert foundations[' + companyName + '] because have incrorect _id.');
-  //     dbFoundations.remove(foundationData._id);
-  //     dbFoundations.insert({
-  //       companyName: companyName,
-  //       manager: foundationData.manager,
-  //       tags: foundationData.tags,
-  //       pictureSmall: foundationData.pictureSmall,
-  //       pictureBig: foundationData.pictureBig,
-  //       description: foundationData.description,
-  //       invest: [],
-  //       createdAt: now
-  //     });
-  //   }
-  // });
-  dbFoundations.update(
-    {},
-    {
-      $set: {
-        invest: [],
-        createdAt: new Date(1502796600000)
-      }
-    },
-    {
-      multi: true
+  dbFoundations.find().forEach((foundationData) => {
+    const companyName = foundationData.companyName;
+    if (dbFoundations.find({companyName}).count() > 1) {
+      console.log('remove foundations[' + companyName + '] because have same name foundations.');
+      dbFoundations.remove(foundationData._id);
     }
-  );
+    else if (typeof foundationData._id !== 'string') {
+      console.log('re insert foundations[' + companyName + '] because have incrorect _id.');
+      dbFoundations.remove(foundationData._id);
+      dbFoundations.insert({
+        companyName: companyName,
+        manager: foundationData.manager,
+        tags: foundationData.tags,
+        pictureSmall: foundationData.pictureSmall,
+        pictureBig: foundationData.pictureBig,
+        description: foundationData.description,
+        invest: [],
+        createdAt: now
+      });
+    }
+  });
+  const startFoundationTime = 1503532800000;
+  dbFoundations
+    .find({}, {
+      field: {
+        _id: 1
+      }
+    })
+    .forEach((foundationData, index) => {
+      const timeDiff = 3900000 * Math.floor(index / 10);
+      const createdAt = new Date(startFoundationTime + timeDiff);
+      console.log('update foundation created at: ' + createdAt);
+      dbFoundations.update(foundationData._id, {
+        $set: {createdAt}
+      });
+    });
   let stoneCount = 0;
   Meteor.users.find().forEach((userData) => {
     const logDataCursor = dbLog.find({

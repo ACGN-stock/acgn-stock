@@ -6,8 +6,10 @@
         <hr />
         <h2 class="card-subtitle mb-2 text-muted">
           {{this.chairmanTitle}}：
-          {{getChainman this.companyName}}
-          {{#if isChairman this.companyName}}
+          {{#with getChairmanId this._id}}
+            {{>userLink}}
+          {{/with}}
+          {{#if isChairman this._id}}
             <a class="btn btn-primary btn-sm" href="#" data-action="changeChairmanTitle">
               修改頭銜
             </a>
@@ -15,9 +17,9 @@
         </h2>
         <h3>
           經理人：
-          {{displayManager this.manager}}
-          {{#if isManager this.manager}}
-            <a class="btn btn-primary btn-sm" href="{{getManageHref this.companyName}}">
+          {{>userLink this.manager}}
+          {{#if isUserId this.manager}}
+            <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
               經營管理
             </a>
             <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
@@ -77,10 +79,10 @@
       </div>
       {{> companyBuyOrderList}}
       {{> companySellOrderList}}
-      {{> companyCurrentProductList companyName=this.companyName}}
-      {{> companyAllPrudctList companyName=this.companyName}}
+      {{> companyCurrentProductList}}
+      {{> companyAllPrudctList}}
     </div>
-    {{> companyDirectorList companyName=this.companyName totalRelease=this.totalRelease}}    
+    {{> companyDirectorList}}    
     {{> companyElectInfo}}
   </div>
 </template>
@@ -95,7 +97,8 @@
     </h4>
     {{#each order in myOrderList}}
       <div>
-        {{getOrderDescription order}}
+        {{>userLink order.userId}}
+        以${{order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
         <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
           取消訂單
         </button>
@@ -103,7 +106,8 @@
     {{/each}}
     {{#each order in orderList}}
       <div>
-        {{getOrderDescription order}}
+        {{>userLink order.userId}}
+        以${{order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
       </div>
     {{/each}}
     {{#with paginationData}}
@@ -116,7 +120,7 @@
   <div class="col-12 col-md-6 border-grid">
     <h4>
       市場賣單
-      {{#if getStockAmount this.companyName}}
+      {{#if getStockAmount this._id}}
         <button class="btn btn-info btn-sm" type="button" data-action="createSellOrder">
           下單
         </button>
@@ -124,7 +128,8 @@
     </h4>
     {{#each order in myOrderList}}
       <div>
-        {{getOrderDescription order}}
+        {{>userLink order.userId}}
+        以${{order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
         <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
           取消訂單
         </button>
@@ -132,7 +137,8 @@
     {{/each}}
     {{#each order in orderList}}
       <div>
-        {{getOrderDescription order}}
+        {{>userLink order.userId}}
+        以${{order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
       </div>
     {{/each}}
     {{#with paginationData}}
@@ -153,7 +159,7 @@
     {{#each product in productList}}
       <div class="row mb-1">
         <div class="col-9 text-truncate">
-          <a href="{{product.url}}" target="_blank">{{product.productName}}</a>
+          {{>productLink product._id}}
         </div>
         <div class="col-3 text-center">
           <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
@@ -182,7 +188,7 @@
     {{#each product in productList}}
       <div class="row mb-1">
         <div class="col-9 text-truncate">
-          <a href="{{product.url}}" target="_blank">{{product.productName}}</a>
+          {{>productLink product._id}}
         </div>
         <div class="col-3 text-center">
           <button class="btn btn-primary btn-sm" type="button" data-like-product="{{product._id}}">
@@ -216,9 +222,8 @@
         <div
           class="text-left text-truncate"
           style="width: 120px; padding-left: 5px;"
-          title="{{director.username}}"
         >
-          {{director.username}}
+          {{>userLink director.userId}}
         </div>
         <div class="text-right"
           style="width: 80px; padding-right: 5px;"
@@ -244,7 +249,7 @@
     {{#with paginationData}}
       {{> pagination}}
     {{/with}}
-    {{#if getStockAmount this.companyName}}
+    {{#if getStockAmount this._id}}
       <form>
         <div class="form-group">
           <div class="input-group">
@@ -255,7 +260,7 @@
               name="message"
               placeholder="身為董事會成員，你可以留下一則不超過一百個字的留言，同一時間只能存在一則留言。"
               maxlength="100"
-              value="{{getMyMessage this.companyName}}"
+              value="{{getMyMessage this._id}}"
             />
             <span class="input-group-btn">
               <button class="btn btn-primary" type="submit">
@@ -291,7 +296,7 @@
     {{#each candidate in this.candidateList}}
       <div class="row mb-1">
         <div class="col-2 text-left text-truncate">
-          {{candidate}}
+          {{>userLink candidate}}
           {{#if getStockAmount}}
             <button
               class="btn btn-primary btn-sm float-right"
@@ -306,7 +311,11 @@
           {{getSupportPercentage @index}} %
         </div>
         <div class="col-8 text-left text-truncate">
-          {{getSupportList @index}}
+          {{#each supporter in supportList @index}}
+            {{>userLink supporter}}
+          {{else}}
+            無
+          {{/each}}
         </div>
       </div>
     {{/each}}
@@ -317,11 +326,8 @@
   <div class="card-block">
     <h2 class="card-title mb-1">所有相關紀錄：</h2>
     <hr />
-    {{#each log in logList}}
-      <div>
-        <span class="text-info d-inline-block text-right">({{formatDateText log.createdAt}})</span>
-        {{{getLogDescriptionHtml log}}}
-      </div>
+    {{#each logData in logList}}
+      {{>displayLog logData}}
     {{else}}
       查無資料！
     {{/each}}

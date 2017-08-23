@@ -19,26 +19,17 @@ Template.manageCompany.onCreated(function() {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
-    const companyName = FlowRouter.getParam('companyName');
-    if (companyName) {
-      this.subscribe('companyDetail', companyName);
-    }
-  });
-  this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
-      return false;
-    }
-    const companyName = FlowRouter.getParam('companyName');
-    if (companyName) {
-      this.subscribe('companyFutureProduct', companyName);
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyDataForEdit', companyId);
     }
   });
 });
 Template.manageCompany.helpers({
   companyData() {
-    const companyName = FlowRouter.getParam('companyName');
+    const companyId = FlowRouter.getParam('companyId');
 
-    return dbCompanies.findOne({companyName});
+    return dbCompanies.findOne(companyId);
   }
 });
 
@@ -47,8 +38,12 @@ Template.companyEditForm.onCreated(function() {
   this.validateModel = validateCompanyModel;
   this.handleInputChange = handleCompanyInputChange;
   this.saveModel = saveCompanyModel;
+  this.autorun(() => {
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId);
+    this.model.set(companyData);
+  });
 });
-
 function validateCompanyModel(model) {
   const error = {};
   if (model.tags.length > 50) {
@@ -88,7 +83,6 @@ function validateCompanyModel(model) {
     return error;
   }
 }
-
 function handleCompanyInputChange(event) {
   switch (event.currentTarget.name) {
     case 'tags': {
@@ -120,12 +114,11 @@ function handleCompanyInputChange(event) {
     }
   }
 }
-
 function saveCompanyModel(model) {
-  const companyName = model.companyName;
+  const companyId = model._id;
   const submitData = _.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description');
-  Meteor.call('editCompany', companyName, submitData, () => {
-    const path = FlowRouter.path('company', {companyName});
+  Meteor.call('editCompany', companyId, submitData, () => {
+    const path = FlowRouter.path('company', {companyId});
     FlowRouter.go(path);
   });
 }
@@ -135,8 +128,8 @@ Template.companyEditForm.helpers({
   isPreview(pictureType) {
     return previewPictureType.get() === pictureType;
   },
-  getCompanyHref(companyName) {
-    return FlowRouter.path('company', {companyName});
+  getCompanyHref(companyId) {
+    return FlowRouter.path('company', {companyId});
   }
 });
 
@@ -165,7 +158,6 @@ Template.companyEditForm.events({
     }
   }
 });
-
 function addNewTag(event, templatInstance) {
   const $input = templatInstance.$input.filter('[name="tags"]');
   const model = _.clone(templatInstance.model.get());
@@ -192,7 +184,7 @@ Template.companyProductManage.helpers({
   defaultProductData() {
     return {
       productName: '',
-      companyName: this.companyName,
+      companyId: this._id,
       type: productTypeList[0],
       url: ''
     };
@@ -200,7 +192,7 @@ Template.companyProductManage.helpers({
   productList() {
     return dbProducts.find(
       {
-        companyName: this.companyName,
+        companyId: this._id,
         overdue: 0
       },
       {
@@ -240,7 +232,6 @@ Template.companyProductEditForm.events({
     rInAddProductMode.set(false);
   }
 });
-
 function validateProductModel(model) {
   const error = {};
   if (model.productName.length < 4) {
@@ -257,7 +248,6 @@ function validateProductModel(model) {
     return error;
   }
 }
-
 function saveProductModel(model) {
   Meteor.call('createProduct', model, () => {
     rInAddProductMode.set(false);

@@ -2,43 +2,39 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//交易訂單資料集
+//紀錄資料集
 export const dbLog = new Mongo.Collection('log', {
   idGeneration: 'MONGO'
 });
 export default dbLog;
 
 export const logTypeList = [
-  '驗證通過', //帳號驗證通過，領取起始資金$price。
-  '發薪紀錄', //系統向username0發給了price的薪水！
-  '創立公司', //username0發起了「companyName」的新公司創立計劃，誠意邀請有意者投資！
-  '參與投資', //username0向「companyName公司創立計劃」投資了$amount！
-  '創立失敗', //username...等人投資的「companyName公司創立計劃」由於投資人數不足失敗了，投資金額將全數返回！
-  '創立成功', //username...等人投資的「companyName公司創立計劃」成功了，該公司正式上市，初始股價為$price！
-  '創立得股', //(username0)對「companyName公司創立計劃」的投資為你帶來了amount數量的公司股票！
-  '創立退款', //(username0)從「companyName公司創立計劃」收回了$amount的投資退款！
-  '購買下單', //username0想要用每股$price的單價購買amount數量的「companyName」公司股票！
-  '販賣下單', //username0想要用每股$price的單價販賣amount數量的「companyName」公司股票！
-  '取消下單', //username0取消了以每股$price單價message(購入/賣出)amount數量的companyName股票的訂單！
-  '訂單完成', //username0以每股$price的單價message(購入/賣出)amount數量的「companyName」公司股票的訂單已經全數交易完畢！
-  '公司釋股', //由於大量的高價買單需求，「companyName」公司釋出了amount數量的股票！
-  '交易紀錄', //username0以$price的單價向(username1 || companyName)購買了amount數量的「companyName」公司股票！
-  '辭職紀錄', //username0辭去了「companyName」公司的經理人職務！
-  '參選紀錄', //username0開始競選「companyName」公司的經理人職務！
-  '經理管理', //username0修改了「companyName」公司的資訊！
-  '推薦產品', //username0推薦了#productId產品，使「companyName」公司獲得了$price的營利額！
-  '支持紀錄', //username0支持username1擔任「companyName」公司的經理人！
-  '就任經理', //username0在message商業季度(以amount數量的支持股份)擊敗了所有競爭對手，取代username1成為「companyName」公司的經理人！
-  '公司營利', //「companyName」公司本商業季度一共獲利$amount！
-  '營利分紅', //username0得到了「companyName」公司的分紅$amount！
-  '舉報公司', //username0以「message」理由舉報了「companyName」公司！
-  '舉報產品', //username0以「message」理由舉報了「companyName」公司的#productId產品！
-  '公司撤銷', //username0以「message」理由撤銷了「companyName」公司！
-  '取消資格', //username0以「message」理由取消了username1擔任經理人的資格！
-  '免費得石', //username0因為「message」的理由獲得了amount顆聖晶石！
-  '聊天發言', //使用者username0說道：「message」
-  '廣告宣傳', //使用者username0以$price的價格發布了一則廣告：「message」。
-  '廣告追加' //使用者username0追加了$price的廣告費用在廣告：「message」上。
+  '驗證通過', //帳號驗證通過，領取起始資金$price！
+  '免費得石', //因為「message」的理由獲得了amount顆聖晶石！
+  '聊天發言', //userId0說道：「message」
+  '發薪紀錄', //系統向所有已驗證通過的使用者發給了$price的薪水！
+  '創立公司', //userId0發起了「message」的新公司創立計劃，誠意邀請有意者投資！
+  '參與投資', //userId0向「message公司創立計劃」投資了$amount！
+  '創立失敗', //userId...等人投資的「message公司創立計劃」由於投資人數不足失敗了，投資金額將全數返回！
+  '創立退款', //(userId0)從「message公司創立計劃」收回了$amount的投資退款！
+  '創立成功', //userId...等人投資的「companyId」成功了，該公司正式上市，初始股價為$price！
+  '創立得股', //(userId0)對「companyId」的投資為你帶來了amount數量的公司股票！
+  '購買下單', //userId0想要用每股$price的單價購買amount數量的「companyId」公司股票！
+  '販賣下單', //userId0想要用每股$price的單價販賣amount數量的「companyId」公司股票！
+  '取消下單', //userId0取消了以每股$price單價message(購入/賣出)amount數量的companyId股票的訂單！
+  '訂單完成', //userId0以每股$price的單價message(購入/賣出)amount數量的「companyId」公司股票的訂單已經全數交易完畢！
+  '公司釋股', //「companyId」公司以$price的價格釋出amount數量的股票到市場上套取利潤！
+  '交易紀錄', //userId0以$price的單價向(userId1 || companyId)購買了amount數量的「companyId」公司股票！
+  '辭職紀錄', //userId0辭去了「companyId」公司的經理人職務！
+  '參選紀錄', //userId0開始競選「companyId」公司的經理人職務！
+  '支持紀錄', //userId0支持userId1擔任「companyId」公司的經理人！
+  '就任經理', //userId0在message商業季度(以amount數量的支持股份)擊敗了所有競爭對手，取代userId1成為「companyId」公司的經理人！
+  '經理管理', //userId0修改了「companyId」公司的資訊！
+  '推薦產品', //userId0推薦了#productId產品，使「companyId」公司獲得了$price的營利額！
+  '公司營利', //「companyId」公司本商業季度一共獲利$amount！
+  '營利分紅', //userId0得到了「companyId」公司的分紅$amount！
+  '廣告宣傳', //userId0以$price的價格發布了一則廣告：「message」。
+  '廣告追加' //userId0追加了$price的廣告費用在廣告：「message」上。
 ];
 
 //schema
@@ -48,16 +44,16 @@ const schema = new SimpleSchema({
     type: String,
     allowedValues: logTypeList
   },
-  //紀錄相關者的PTT帳號
-  username: {
+  //紀錄相關者的userId陣列
+  userId: {
     type: Array,
     optional: true
   },
-  'username.$': {
+  'userId.$': {
     type: String
   },
   //紀錄相關的公司ID
-  companyName: {
+  companyId: {
     type: String,
     optional: true
   },

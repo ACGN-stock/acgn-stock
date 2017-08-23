@@ -7,15 +7,9 @@ Meteor.methods({
   instantMessageChat(message) {
     check(this.userId, String);
     check(message, String);
-    const user = Meteor.users.findOne(this.userId, {
-      fields: {
-        username: 1
-      }
-    });
-    const username = user.username;
     dbLog.insert({
       logType: '聊天發言',
-      username: [username],
+      userId: [this.userId],
       message: message,
       resolve: false,
       createdAt: new Date()
@@ -42,15 +36,15 @@ Meteor.methods({
         return {
           _id: logData._id.toHexString(),
           logType: logData.logType,
-          username: logData.username,
-          companyName: logData.companyName,
+          userId: logData.userId,
+          companyId: logData.companyId,
           orderId: logData.orderId,
           productId: logData.productId,
           price: logData.price,
           amount: logData.amount,
           message: logData.message,
           createdAt: logTime
-        }
+        };
       });
 
     return {lastTime, list};

@@ -65,7 +65,7 @@ Template.foundationPlanInfo.onCreated(function() {
   $.ajax({
     url: '/foundationPicture',
     data: {
-      id: this.data._id.toHexString()
+      id: this.data._id
     },
     success: (response) => {
       this.rPicture.set(response);
@@ -97,20 +97,21 @@ Template.foundationPlanInfo.helpers({
 
     return formatDateText(expireDate);
   },
-  isManager(manager) {
-    const user = Meteor.user();
-
-    return user && user.username === manager;
-  },
   getEditHref(foundationId) {
     return FlowRouter.path('editFoundationPlan', {foundationId});
   },
-  alreadyInvest(investList) {
+  alreadyInvest() {
     const user = Meteor.user();
-    const username = user && user.username;
-    const investData = _.findWhere(investList, {username});
+    if (user) {
+      const userId = user._id;
+      const invest = this.invest;
+      const investData = _.findWhere(invest, {userId});
+      if (investData) {
+        return investData.amount;
+      }
+    }
 
-    return investData ? investData.amount : 0;
+    return 0;
   }
 });
 Template.foundationPlanInfo.events({
@@ -128,7 +129,7 @@ Template.foundationPlanInfo.events({
       return false;
     }
     if (amount >= minimumInvest && amount <= maximumInvest) {
-      Meteor.call('investFoundCompany', templaceInstance.data.companyName, amount);
+      Meteor.call('investFoundCompany', templaceInstance.data._id, amount);
     }
     else {
       window.alert('不正確的金額數字！');

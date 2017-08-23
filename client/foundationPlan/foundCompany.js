@@ -29,7 +29,7 @@ Template.editFoundationPlan.onCreated(function() {
     }
     const foundationId = FlowRouter.getParam('foundationId');
     if (foundationId) {
-      this.subscribe('foundationPlanById', foundationId);
+      this.subscribe('foundationDataForEdit', foundationId);
     }
   });
 });

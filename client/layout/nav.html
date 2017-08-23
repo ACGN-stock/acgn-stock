@@ -51,7 +51,9 @@
         {{#navLinkGroup text='資訊報表'}}
           {{> navLink page='tutorial'}}
           {{> navLink page='seasonalReport' params=seasonParams}}
-          {{> navLink page='accountInfo'}}
+          {{#if currentUser}}
+            {{> navLink page='accountInfo' params=accountInfoParams}}
+          {{/if}}
         {{/navLinkGroup}}
         {{#navLinkGroup text='主題配置'}}
           <li class="nav-item">

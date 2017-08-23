@@ -14,8 +14,8 @@ const schema = new SimpleSchema({
   seasonId: {
     type: String
   },
-  //公司名稱
-  companyName: {
+  //公司ID
+  companyId: {
     type: String
   },
   //成交股價

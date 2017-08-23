@@ -3,9 +3,7 @@ import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 //公司資料集
-export const dbCompanies = new Mongo.Collection('companies', {
-  idGeneration: 'MONGO'
-});
+export const dbCompanies = new Mongo.Collection('companies');
 export default dbCompanies;
 
 //schema
@@ -16,7 +14,7 @@ const schema = new SimpleSchema({
     min: 1,
     max: 100
   },
-  //總經理username
+  //總經理userId
   manager: {
     type: String
   },
@@ -82,14 +80,14 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 0
   },
-  //選舉經理時的候選者列表
+  //選舉經理時的候選者userId列表
   candidateList: {
     type: Array
   },
   'candidateList.$': {
     type: String
   },
-  //選舉經理時的各候選者的支持董事列表
+  //選舉經理時的各候選者的支持董事userId列表
   voteList: {
     type: Array
   },

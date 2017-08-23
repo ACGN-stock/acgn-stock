@@ -3,7 +3,6 @@ import url from 'url';
 import querystring from 'querystring';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
 import { WebApp } from 'meteor/webapp';
 import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
@@ -32,12 +31,13 @@ export function foundCompany(user, foundCompanyData) {
   if (dbFoundations.find({companyName}).count() > 0 || dbCompanies.find({companyName}).count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
   }
-  foundCompanyData.manager = user.username;
+  const userId = user._id;
+  foundCompanyData.manager = userId;
   foundCompanyData.createdAt = new Date();
   dbLog.insert({
     logType: '創立公司',
-    username: [user.username],
-    companyName: companyName,
+    userId: [userId],
+    message: companyName,
     createdAt: new Date()
   });
   dbFoundations.insert(foundCompanyData);
@@ -47,7 +47,7 @@ Meteor.methods({
   editFoundCompany(foundCompanyData) {
     check(this.userId, String);
     check(foundCompanyData, {
-      _id: Mongo.Collection.ObjectID,
+      _id: String,
       companyName: String,
       tags: [String],
       pictureSmall: new Match.Maybe(String),
@@ -60,7 +60,8 @@ Meteor.methods({
   }
 });
 export function editFoundCompany(user, foundCompanyData) {
-  const oldFoundCompanyData = dbFoundations.findOne(foundCompanyData._id, {
+  const companyId = foundCompanyData._id;
+  const oldFoundCompanyData = dbFoundations.findOne(companyId, {
     fields: {
       _id: 1,
       manager: 1
@@ -69,28 +70,27 @@ export function editFoundCompany(user, foundCompanyData) {
   if (! oldFoundCompanyData) {
     throw new Meteor.Error(404, '找不到要編輯的新創計劃，該新創計劃可能已經創立成功或失敗！');
   }
-  if (user.username !== oldFoundCompanyData.manager) {
+  if (user._id !== oldFoundCompanyData.manager) {
     throw new Meteor.Error(401, '並非該新創計劃的發起人，無法編輯該新創計劃！');
   }
   const companyName = foundCompanyData.companyName;
   if (dbCompanies.find({companyName}).count()) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市，無法創立同名公司！');
   }
-  const existsSameNameFoundCompanies = dbFoundations
+  const sameCompanyNameCompaniesCursor = dbFoundations
     .find({
       _id: {
-        $ne: oldFoundCompanyData._id
+        $ne: companyId
       },
       companyName: companyName
-    })
-    .count();
-  if (existsSameNameFoundCompanies.length > 0) {
+    });
+  if (sameCompanyNameCompaniesCursor.count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司正在創立中，無法創立同名公司！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['foundation' + companyName]);
+  resourceManager.throwErrorIsResourceIsLock(['foundation' + companyId]);
   //先鎖定資源，再更新
-  resourceManager.request('editFoundCompany', ['foundation' + companyName], (release) => {
-    dbFoundations.update(foundCompanyData._id, {
+  resourceManager.request('editFoundCompany', ['foundation' + companyId], (release) => {
+    dbFoundations.update(companyId, {
       $set: _.omit(foundCompanyData, '_id')
     });
     release();
@@ -98,16 +98,16 @@ export function editFoundCompany(user, foundCompanyData) {
 }
 
 Meteor.methods({
-  investFoundCompany(companyName, amount) {
+  investFoundCompany(companyId, amount) {
     check(this.userId, String);
-    check(companyName, String);
+    check(companyId, String);
     check(amount, Match.Integer);
-    investFoundCompany(Meteor.user(), companyName, amount);
+    investFoundCompany(Meteor.user(), companyId, amount);
 
     return true;
   }
 });
-export function investFoundCompany(user, companyName, amount) {
+export function investFoundCompany(user, companyId, amount) {
   const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
   if (amount < minimumInvest) {
     throw new Meteor.Error(403, '最低投資金額為' + minimumInvest + '！');
@@ -115,21 +115,26 @@ export function investFoundCompany(user, companyName, amount) {
   if (user.profile.money < amount) {
     throw new Meteor.Error(403, '金錢不足，無法投資！');
   }
-  const foundCompanyData = dbFoundations.find({companyName}).count();
+  const foundCompanyData = dbFoundations.find(companyId).count();
   if (foundCompanyData.length < 1) {
     throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
   }
-  const username = user.username;
+  const userId = user._id;
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.throwErrorIsResourceIsLock(['foundation' + companyName, 'user' + username]);
-  resourceManager.request('investFoundCompany', ['foundation' + companyName, 'user' + username], (release) => {
-    const user = Meteor.users.findOne({username});
+  resourceManager.throwErrorIsResourceIsLock(['foundation' + companyId, 'user' + userId]);
+  resourceManager.request('investFoundCompany', ['foundation' + companyId, 'user' + userId], (release) => {
+    const user = Meteor.users.findOne(userId, {
+      fields: {
+        profile: 1
+      }
+    });
     if (user.profile.money < amount) {
       throw new Meteor.Error(403, '金錢不足，無法投資！');
     }
-    const foundCompanyData = dbFoundations.findOne({companyName}, {
+    const foundCompanyData = dbFoundations.findOne(companyId, {
       fields: {
         _id: 1,
+        companyName: 1,
         invest: 1
       }
     });
@@ -137,27 +142,27 @@ export function investFoundCompany(user, companyName, amount) {
       throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
     }
     const invest = foundCompanyData.invest;
-    const existsInvest = _.findWhere(invest, {username});
+    const existsInvest = _.findWhere(invest, {userId});
     if (existsInvest) {
       existsInvest.amount += amount;
     }
     else {
-      invest.push({username, amount});
+      invest.push({userId, amount});
     }
     dbLog.insert({
       logType: '參與投資',
-      username: [username],
-      companyName: companyName,
+      userId: [userId],
+      message: foundCompanyData.companyName,
       amount: amount,
       resolve: false,
       createdAt: new Date()
     });
-    Meteor.users.update(user._id, {
+    Meteor.users.update(userId, {
       $inc: {
         'profile.money': amount * -1
       }
     });
-    dbFoundations.update(foundCompanyData._id, {
+    dbFoundations.update(companyId, {
       $set: {
         invest: invest
       }
@@ -166,13 +171,13 @@ export function investFoundCompany(user, companyName, amount) {
   });
 }
 
-//發布圖片
+//以Ajax方式發布圖片
 WebApp.connectHandlers.use(function(req, res, next) {
   const parsedUrl = url.parse(req.url);
   if (parsedUrl.pathname === '/foundationPicture') {
     const query = querystring.parse(parsedUrl.query);
-    const id = new Mongo.ObjectID(query.id);
-    const foundationData = dbFoundations.findOne(id, {
+    const companyId = query.id;
+    const foundationData = dbFoundations.findOne(companyId, {
       fields: {
         pictureSmall: 1
       }
@@ -182,8 +187,10 @@ WebApp.connectHandlers.use(function(req, res, next) {
       res.end(foundationData.pictureSmall || '');
     }
     else {
-      res.writeHead(404, {"Content-Type": "text/plain"});
-      res.write("404 Not Found\n");
+      res.writeHead(404, {
+        'Content-Type': 'text/plain'
+      });
+      res.write('404 Not Found\n');
       res.end();
     }
   }
@@ -202,9 +209,6 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
     filter.$or =[
       {
         companyName: reg
-      },
-      {
-        manager: reg
       },
       {
         tags: reg
@@ -262,9 +266,13 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
   });
 });
 
-Meteor.publish('foundationPlanById', function(foundationId) {
+Meteor.publish('foundationDataForEdit', function(foundationId) {
   check(foundationId, String);
-  foundationId = new Mongo.Collection.ObjectID(foundationId);
 
-  return dbFoundations.find(foundationId);
+  return dbFoundations.find(foundationId, {
+    fields: {
+      pictureSmall: 0,
+      pictureBig: 0
+    }
+  });
 });

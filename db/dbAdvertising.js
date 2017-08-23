@@ -12,10 +12,6 @@ const schema = new SimpleSchema({
   userId: {
     type: String
   },
-  //廣告者的帳號名稱
-  username: {
-    type: String
-  },
   //廣告付費額度
   paid: {
     type: SimpleSchema.Integer,

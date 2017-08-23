@@ -14,7 +14,7 @@ Meteor.methods({
   createBuyOrder(orderData) {
     check(this.userId, String);
     check(orderData, {
-      companyName: String,
+      companyId: String,
       unitPrice: Match.Integer,
       amount: Match.Integer
     });
@@ -34,17 +34,17 @@ export function createBuyOrder(user, orderData) {
   if (user.profile.money < totalCost) {
     throw new Meteor.Error(403, '剩餘金錢不足，訂單無法成立！');
   }
-  const companyName = orderData.companyName;
-  const username = user.username;
-  const existsSellOrder = dbOrders.findOne({
-    companyName: companyName,
-    username: username,
+  const companyId = orderData.companyId;
+  const userId = user._id;
+  const existsSellOrderCursor = dbOrders.find({
+    companyId: companyId,
+    userId: userId,
     orderType: '賣出'
   });
-  if (existsSellOrder) {
+  if (existsSellOrderCursor.count() > 0) {
     throw new Meteor.Error(403, '有賣出該公司股票的訂單正在執行中，無法同時下達購買的訂單！');
   }
-  const companyData = dbCompanies.findOne({companyName}, {
+  const companyData = dbCompanies.findOne(companyId, {
     fields: {
       _id: 1,
       companyName: 1,
@@ -61,12 +61,11 @@ export function createBuyOrder(user, orderData) {
   if (orderData.unitPrice > (companyData.listPrice * 2)) {
     throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的兩倍！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyName, 'user' + username]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('createBuyOrder', ['companyOrder' + companyName, 'user' + username], (release) => {
-    const user = Meteor.users.findOne({username}, {
+  resourceManager.request('createBuyOrder', ['companyOrder' + companyId, 'user' + userId], (release) => {
+    const user = Meteor.users.findOne(userId, {
       fields: {
-        username: 1,
         profile: 1
       }
     });
@@ -74,18 +73,17 @@ export function createBuyOrder(user, orderData) {
     if (user.profile.money < totalCost) {
       throw new Meteor.Error(403, '剩餘金錢不足，訂單無法成立！');
     }
-    const existsSellOrder = dbOrders.findOne({
-      companyName: companyName,
-      username: username,
+    const existsSellOrderCursor = dbOrders.find({
+      companyId: companyId,
+      userId: userId,
       orderType: '賣出'
     });
-    if (existsSellOrder) {
+    if (existsSellOrderCursor.count() > 0) {
       throw new Meteor.Error(403, '有賣出該公司股票的訂單正在執行中，無法同時下達購買的訂單！');
     }
-    const companyData = dbCompanies.findOne({companyName}, {
+    const companyData = dbCompanies.findOne(companyId, {
       fields: {
         _id: 1,
-        companyName: 1,
         listPrice: 1,
         lastPrice: 1
       }
@@ -99,14 +97,14 @@ export function createBuyOrder(user, orderData) {
     if (orderData.unitPrice > (companyData.listPrice * 2)) {
       throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的兩倍！');
     }
-    orderData.username = username;
+    orderData.userId = userId;
     orderData.orderType = '購入';
     orderData.createdAt = new Date();
     orderData.done = 0;
     dbLog.insert({
       logType: '購買下單',
-      username: [username],
-      companyName: companyName,
+      userId: [userId],
+      companyId: companyId,
       price: orderData.unitPrice,
       amount: orderData.amount,
       createdAt: new Date()
@@ -117,7 +115,7 @@ export function createBuyOrder(user, orderData) {
     dbOrders
       .find(
         {
-          companyName: companyName,
+          companyId: companyId,
           orderType: '賣出',
           unitPrice: {
             $lte: orderData.unitPrice
@@ -141,42 +139,37 @@ export function createBuyOrder(user, orderData) {
           orderData.done += tradeNumber;
           lastPrice = sellOrderData.unitPrice;
           indeedCost += (lastPrice * tradeNumber);
-          changeStocksAmount(username, companyName, tradeNumber);
-          if (sellOrderData.username === '!system') {
+          changeStocksAmount(userId, companyId, tradeNumber);
+          if (sellOrderData.userId === '!system') {
             dbLog.insert({
               logType: '交易紀錄',
-              username: [username],
-              companyName: companyName,
+              userId: [userId],
+              companyId: companyId,
               price: lastPrice,
               amount: tradeNumber,
               createdAt: new Date()
             });
-            dbCompanies.update({companyName}, {
+            dbCompanies.update(companyId, {
               $inc: {
                 profit: lastPrice * tradeNumber
               }
             });
           }
           else {
-            const sellerUsername = sellOrderData.username;
+            const sellerUserId = sellOrderData.userId;
             dbLog.insert({
               logType: '交易紀錄',
-              username: [username, sellerUsername],
-              companyName: companyName,
+              userId: [userId, sellerUserId],
+              companyId: companyId,
               price: lastPrice,
               amount: tradeNumber,
               createdAt: new Date()
             });
-            Meteor.users.update(
-              {
-                username: sellerUsername
-              },
-              {
-                $inc: {
-                  'profile.money': lastPrice * tradeNumber
-                }
+            Meteor.users.update(userId, {
+              $inc: {
+                'profile.money': lastPrice * tradeNumber
               }
-            );
+            });
           }
         }
         resolveOrder(sellOrderData, tradeNumber);
@@ -187,7 +180,7 @@ export function createBuyOrder(user, orderData) {
     if (orderData.done < orderData.amount) {
       const leftAmount = orderData.amount - orderData.done;
       const leftCost = leftAmount * orderData.unitPrice;
-      Meteor.users.update(user._id, {
+      Meteor.users.update(userId, {
         $inc: {
           'profile.money': (indeedCost + leftCost) * -1
         }
@@ -197,8 +190,8 @@ export function createBuyOrder(user, orderData) {
     else {
       dbLog.insert({
         logType: '訂單完成',
-        username: [username],
-        companyName: orderData.companyName,
+        userId: [userId],
+        companyId: companyId,
         price: orderData.unitPrice,
         amount: orderData.amount,
         message: orderData.orderType,
@@ -218,7 +211,7 @@ Meteor.methods({
   createSellOrder(orderData) {
     check(this.userId, String);
     check(orderData, {
-      companyName: String,
+      companyId: String,
       unitPrice: Match.Integer,
       amount: Match.Integer
     });
@@ -234,17 +227,17 @@ export function createSellOrder(user, orderData) {
   if (orderData.amount < 1) {
     throw new Meteor.Error(403, '販賣數量不可小於1！');
   }
-  const username = user.username;
-  const companyName = orderData.companyName;
-  const existsBuyOrder = dbOrders.findOne({
-    companyName: companyName,
-    username: username,
+  const userId = user._id;
+  const companyId = orderData.companyId;
+  const existsBuyOrderCursor = dbOrders.find({
+    companyId: companyId,
+    userId: userId,
     orderType: '購入'
   });
-  if (existsBuyOrder) {
+  if (existsBuyOrderCursor.count() > 0) {
     throw new Meteor.Error(403, '有買入該公司股票的訂單正在執行中，無法同時下達賣出的訂單！');
   }
-  const directorData = dbDirectors.findOne({companyName, username}, {
+  const directorData = dbDirectors.findOne({companyId, userId}, {
     fields: {
       stocks: 1
     }
@@ -252,10 +245,9 @@ export function createSellOrder(user, orderData) {
   if (! directorData || directorData.stocks < orderData.amount) {
     throw new Meteor.Error(403, '擁有的股票數量不足，訂單無法成立！');
   }
-  const companyData = dbCompanies.findOne({companyName}, {
+  const companyData = dbCompanies.findOne(companyId, {
     fields: {
       _id: 1,
-      companyName: 1,
       listPrice: 1,
       lastPrice: 1
     }
@@ -269,10 +261,10 @@ export function createSellOrder(user, orderData) {
   if (orderData.unitPrice > (companyData.listPrice * 2)) {
     throw new Meteor.Error(403, '最高售出價格不可高於該股票參考價格的兩倍！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyName]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('createSellOrder', ['companyOrder' + companyName], (release) => {
-    const directorData = dbDirectors.findOne({companyName, username}, {
+  resourceManager.request('createSellOrder', ['companyOrder' + companyId, 'user' + userId], (release) => {
+    const directorData = dbDirectors.findOne({companyId, userId}, {
       fields: {
         stocks: 1
       }
@@ -280,15 +272,15 @@ export function createSellOrder(user, orderData) {
     if (! directorData || directorData.stocks < orderData.amount) {
       throw new Meteor.Error(403, '擁有的股票數量不足，訂單無法成立！');
     }
-    const existsBuyOrder = dbOrders.findOne({
-      companyName: companyName,
-      username: username,
+    const existsBuyOrderCursor = dbOrders.find({
+      companyId: companyId,
+      userId: userId,
       orderType: '購入'
     });
-    if (existsBuyOrder) {
+    if (existsBuyOrderCursor.count() > 0) {
       throw new Meteor.Error(403, '有買入該公司股票的訂單正在執行中，無法同時下達賣出的訂單！');
     }
-    const companyData = dbCompanies.findOne({companyName}, {
+    const companyData = dbCompanies.findOne(companyId, {
       fields: {
         _id: 1,
         companyName: 1,
@@ -305,25 +297,25 @@ export function createSellOrder(user, orderData) {
     if (orderData.unitPrice > (companyData.listPrice * 2)) {
       throw new Meteor.Error(403, '最高售出價格不可高於該股票參考價格的兩倍！');
     }
-    orderData.username = username;
+    orderData.userId = userId;
     orderData.orderType = '賣出';
     orderData.createdAt = new Date();
     orderData.done = 0;
     dbLog.insert({
       logType: '販賣下單',
-      username: [username],
-      companyName: companyName,
+      userId: [userId],
+      companyId: companyId,
       price: orderData.unitPrice,
       amount: orderData.amount,
       createdAt: new Date()
     });
-    changeStocksAmount(username, companyName, orderData.amount * -1);
+    changeStocksAmount(userId, companyId, orderData.amount * -1);
     let lastPrice = companyData.lastPrice;
     let anyTradeDone = false;
     dbOrders
       .find(
         {
-          companyName: companyName,
+          companyId: companyId,
           orderType: '購入',
           unitPrice: {
             $gte: orderData.unitPrice
@@ -348,14 +340,14 @@ export function createSellOrder(user, orderData) {
           lastPrice = buyOrderData.unitPrice;
           dbLog.insert({
             logType: '交易紀錄',
-            username: [buyOrderData.username, username],
-            companyName: companyName,
+            userId: [buyOrderData.userId, userId],
+            companyId: companyId,
             price: lastPrice,
             amount: tradeNumber,
             createdAt: new Date()
           });
-          changeStocksAmount(buyOrderData.username, companyName, tradeNumber);
-          Meteor.users.update({username}, {
+          changeStocksAmount(buyOrderData.userId, companyId, tradeNumber);
+          Meteor.users.update(userId, {
             $inc: {
               'profile.money': lastPrice * tradeNumber
             }
@@ -372,8 +364,8 @@ export function createSellOrder(user, orderData) {
     else {
       dbLog.insert({
         logType: '訂單完成',
-        username: [username],
-        companyName: orderData.companyName,
+        userId: [userId],
+        companyId: orderData.companyId,
         price: orderData.unitPrice,
         amount: orderData.amount,
         message: orderData.orderType,
@@ -384,28 +376,20 @@ export function createSellOrder(user, orderData) {
   });
 }
 
-export function changeStocksAmount(username, companyName, amount) {
-  const existDirectorData = dbDirectors.findOne({
-    companyName: companyName,
-    username: username
-  });
+export function changeStocksAmount(userId, companyId, amount) {
+  const existDirectorData = dbDirectors.findOne({companyId, userId});
   if (amount > 0) {
     if (existDirectorData) {
-      dbDirectors.update(
-        {
-          _id: existDirectorData._id
-        },
-        {
-          $inc: {
-            stocks: amount
-          }
+      dbDirectors.update(existDirectorData._id, {
+        $inc: {
+          stocks: amount
         }
-      );
+      });
     }
     else {
       dbDirectors.insert({
-        companyName: companyName,
-        username: username,
+        companyId: companyId,
+        userId: userId,
         stocks: amount,
         createdAt: new Date()
       });
@@ -415,20 +399,15 @@ export function changeStocksAmount(username, companyName, amount) {
     if (existDirectorData) {
       amount *= -1;
       if (existDirectorData.stocks > amount) {
-        dbDirectors.update(
-          {
-            _id: existDirectorData._id
-          },
-          {
-            $inc: {
-              stocks: amount * -1
-            }
+        dbDirectors.update(existDirectorData._id, {
+          $inc: {
+            stocks: amount * -1
           }
-        );
+        });
       }
       else if (existDirectorData.stocks === amount) {
         dbDirectors.remove(existDirectorData._id);
-        dbProductLike.find({companyName, username}).forEach((likeData) => {
+        dbProductLike.find({companyId, userId}).forEach((likeData) => {
           dbProducts.update(likeData.productId, {
             $inc: {
               likeCount: -1
@@ -438,11 +417,11 @@ export function changeStocksAmount(username, companyName, amount) {
         });
       }
       else {
-        throw new Meteor.Error(500, '試圖扣除使用者[' + username + ']股票[' + companyName + ']數量[' + amount + ']但數量不足！');
+        throw new Meteor.Error(500, '試圖扣除使用者[' + userId + ']股票[' + companyId + ']數量[' + amount + ']但數量不足！');
       }
     }
     else {
-      throw new Meteor.Error(500, '試圖扣除不存在的使用者[' + username + ']股票[' + companyName + ']數量[' + amount + ']！');
+      throw new Meteor.Error(500, '試圖扣除不存在的使用者[' + userId + ']股票[' + companyId + ']數量[' + amount + ']！');
     }
   }
 }
@@ -453,19 +432,16 @@ export function resolveOrder(orderData, done) {
   }
   const finalDone = orderData.done + done;
   if (finalDone === orderData.amount) {
-    const orderUserName = orderData.username === '!system' ? orderData.companyName : orderData.username;
     dbLog.insert({
       logType: '訂單完成',
-      username: [orderUserName],
-      companyName: orderData.companyName,
+      userId: [orderData.userId],
+      companyId: orderData.companyId,
       price: orderData.unitPrice,
       amount: orderData.amount,
       message: orderData.orderType,
       createdAt: new Date()
     });
-    dbOrders.remove({
-      _id: orderData._id
-    });
+    dbOrders.remove(orderData._id);
   }
   else if (finalDone < orderData.amount) {
     dbOrders.update(orderData._id, {
@@ -475,21 +451,21 @@ export function resolveOrder(orderData, done) {
     });
   }
   else {
-    throw new Meteor.Error(500, '試圖完成的股票交易數量[' + done + ']大於使用者[' + orderData.username + ']股票[' + orderData.companyName + ']的未完成數量[' + (orderData.amount - orderData.done) + ']！');
+    throw new Meteor.Error(500, '試圖完成的股票交易數量[' + done + ']大於使用者[' + orderData.userId + ']股票[' + orderData.companyName + ']的未完成數量[' + (orderData.amount - orderData.done) + ']！');
   }
 }
 
 export function updateCompanyLastPrice(companyData, lastPrice) {
+  const companyId = companyData._id;
   if (companyData.lastPrice !== lastPrice) {
-    dbCompanies.update(companyData._id, {
+    dbCompanies.update(companyId, {
       $set: {
         lastPrice: lastPrice
       }
     });
   }
-  const companyName = companyData.companyName;
   dbPrice.insert({
-    companyName: companyName,
+    companyId: companyId,
     price: lastPrice,
     createdAt: new Date()
   });
@@ -512,17 +488,16 @@ export function retrieveOrder(user, orderId) {
   if (! orderData) {
     throw new Meteor.Error(404, '訂單已完成或已撤回，撤回訂單失敗！');
   }
-  const username = user.username;
-  if (username !== orderData.username) {
+  const userId = user._id;
+  if (userId !== orderData.userId) {
     throw new Meteor.Error(401, '該訂單並非使用者所有，撤回訂單失敗！');
   }
-  const companyName = orderData.companyName;
-  resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyName, 'user' + username]);
+  const companyId = orderData.companyId;
+  resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('retrieveOrder', ['companyOrder' + companyName, 'user' + username], (release) => {
-    const user = Meteor.users.findOne({username}, {
+  resourceManager.request('retrieveOrder', ['companyOrder' + companyId, 'user' + userId], (release) => {
+    const user = Meteor.users.findOne(userId, {
       fields: {
-        username: 1,
         profile: 1
       }
     });
@@ -536,8 +511,8 @@ export function retrieveOrder(user, orderId) {
     const leftAmount = orderData.amount - orderData.done;
     dbLog.insert({
       logType: '取消下單',
-      username: [username],
-      companyName: companyName,
+      userId: [userId],
+      companyId: companyId,
       price: orderData.unitPrice,
       amount: leftAmount,
       message: orderData.orderType,
@@ -548,16 +523,14 @@ export function retrieveOrder(user, orderId) {
       increaseMoney += (orderData.unitPrice * (orderData.amount - orderData.done));
     }
     else {
-      changeStocksAmount(username, companyName, leftAmount);
+      changeStocksAmount(userId, companyId, leftAmount);
     }
-    Meteor.users.update({username}, {
+    Meteor.users.update(userId, {
       $inc: {
         'profile.money': increaseMoney
       }
     });
-    dbOrders.remove({
-      _id: orderData._id
-    });
+    dbOrders.remove(orderData._id);
     release();
   });
 }

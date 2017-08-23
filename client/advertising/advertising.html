@@ -34,9 +34,7 @@
           {{#each advertising in advertisingList}}
             <tr class="{{advertisingDisplayClass @index}}">
               <td class="text-left text-truncate px-2">
-                <a href="{{getAccountInfoLinkHref advertising.username}}">
-                  {{advertising.username}}
-                </a>
+                {{>userLink advertising.userId}}
               </td>
               <td class="text-left text-truncate px-2">
                 {{#if advertising.url}}
@@ -46,7 +44,7 @@
                 {{/if}}
               </td>
               <td class="text-center text-truncate">
-                {{#if isUserId advertising.userId}}
+                {{#if currentUser}}
                   <button class="btn btn-primary btn-sm" type="button" data-add-pay="{{advertising._id}}">
                     $ {{advertising.paid}}
                   </button>

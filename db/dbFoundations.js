@@ -2,10 +2,8 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//公司資料集
-export const dbFoundations = new Mongo.Collection('foundations', {
-  idGeneration: 'MONGO'
-});
+//新創資料集
+export const dbFoundations = new Mongo.Collection('foundations');
 export default dbFoundations;
 
 //schema
@@ -16,7 +14,7 @@ const schema = new SimpleSchema({
     min: 1,
     max: 100
   },
-  //創立人username
+  //創立人userId
   manager: {
     type: String
   },
@@ -57,7 +55,7 @@ const schema = new SimpleSchema({
   },
   'invest.$': {
     type: new SimpleSchema({
-      username: {
+      userId: {
         type: String
       },
       amount: {

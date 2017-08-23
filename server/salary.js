@@ -28,7 +28,7 @@ export function paySalary() {
     );
     dbLog.insert({
       logType: '發薪紀錄',
-      username: ['!all'],
+      userId: ['!all'],
       price: salaryPerPay,
       createdAt: now
     });

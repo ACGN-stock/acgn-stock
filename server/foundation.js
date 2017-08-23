@@ -21,17 +21,16 @@ export function checkFoundCompany() {
       },
       {
         fields: {
-          _id: 1,
-          companyName: 1
+          _id: 1
         },
         disableOplog: true
       }
     )
     .forEach((foundationData) => {
-      const companyName = foundationData.companyName;
+      const companyId = foundationData._id;
       //先鎖定資源，再重新讀取一次資料進行運算
-      resourceManager.request('checkFoundCompany', ['foundation' + companyName], (release) => {
-        foundationData = dbFoundations.findOne({companyName});
+      resourceManager.request('checkFoundCompany', ['foundation' + companyId], (release) => {
+        foundationData = dbFoundations.findOne(companyId);
         if (! foundationData) {
           release();
 
@@ -50,11 +49,11 @@ export function checkFoundCompany() {
           let directors;
           let totalRelease;
           do {
-            directors = _.map(invest, ({username, amount}) => {
+            directors = _.map(invest, ({userId, amount}) => {
               const stocks = Math.floor(amount / stockUnitPrice);
               amount -= (stockUnitPrice * stocks);
 
-              return {username, stocks, amount};
+              return {userId, stocks, amount};
             });
             totalRelease = _.reduce(directors, (sum, directorData) => {
               return sum + directorData.stocks;
@@ -68,14 +67,15 @@ export function checkFoundCompany() {
 
           dbLog.insert({
             logType: '創立成功',
-            username: _.union([foundationData.manager], _.pluck(invest, 'username')),
-            companyName: companyName,
+            userId: _.union([foundationData.manager], _.pluck(invest, 'userId')),
+            companyId: companyId,
             price: stockUnitPrice,
             resolve: false,
             createdAt: createdAt
           });
           dbCompanies.insert({
-            companyName: companyName,
+            _id: companyId,
+            companyName: foundationData.companyName,
             manager: foundationData.manager,
             chairmanTitle: '董事長',
             tags: foundationData.tags,
@@ -92,35 +92,35 @@ export function checkFoundCompany() {
             createdAt: createdAt
           });
           dbPrice.insert({
-            companyName: companyName,
+            companyId: companyId,
             price: stockUnitPrice,
             createdAt: createdAt
           });
-          dbFoundations.remove(foundationData._id);
-          _.each(directors, ({username, stocks, amount}, index) => {
+          dbFoundations.remove(companyId);
+          _.each(directors, ({userId, stocks, amount}, index) => {
             const createdAt = new Date(Date.now() + index + 1);
             if (stocks > 0) {
               dbLog.insert({
                 logType: '創立得股',
-                username: [username],
-                companyName: companyName,
+                userId: [userId],
+                companyId: companyId,
                 price: (stockUnitPrice * stocks) + amount,
                 amount: stocks,
                 resolve: false,
                 createdAt: createdAt
               });
-              dbDirectors.insert({companyName, username, stocks, createdAt});
+              dbDirectors.insert({companyId, userId, stocks, createdAt});
             }
             if (amount > 0) {
               dbLog.insert({
                 logType: '創立退款',
-                username: [username],
-                companyName: companyName,
+                userId: [userId],
+                message: foundationData.companyName,
                 amount: amount,
                 resolve: false,
                 createdAt: new Date(createdAt.getTime() + 1)
               });
-              Meteor.users.update({username}, {
+              Meteor.users.update(userId, {
                 $inc: {
                   'profile.money': amount
                 }
@@ -131,23 +131,23 @@ export function checkFoundCompany() {
         else {
           dbLog.insert({
             logType: '創立失敗',
-            username: _.union([foundationData.manager], _.pluck(invest, 'username')),
-            companyName: companyName,
+            userId: _.union([foundationData.manager], _.pluck(invest, 'userId')),
+            message: foundationData.companyName,
             resolve: false,
             createdAt: new Date()
           });
-          dbFoundations.remove(foundationData._id);
-          _.each(foundationData.invest, ({username, amount}, index) => {
+          dbFoundations.remove(companyId);
+          _.each(foundationData.invest, ({userId, amount}, index) => {
             const createdAt = new Date(Date.now() + index + 1);
             dbLog.insert({
               logType: '創立退款',
-              username: [username],
-              companyName: companyName,
+              userId: [userId],
+              message: foundationData.companyName,
               amount: amount,
               resolve: false,
               createdAt: createdAt
             });
-            Meteor.users.update({username}, {
+            Meteor.users.update(userId, {
               $inc: {
                 'profile.money': amount
               }

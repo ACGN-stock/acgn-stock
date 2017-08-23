@@ -5,107 +5,115 @@ import { _ } from 'meteor/underscore';
 import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
-import { Mongo } from 'meteor/mongo';
 import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbFoundations } from '../../db/dbFoundations';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
 
 Meteor.methods({
-  editCompany(companyName, newCompanyData) {
+  editCompany(companyId, newCompanyData) {
     check(this.userId, String);
-    check(companyName, String);
+    check(companyId, String);
     check(newCompanyData, {
       tags: [String],
       pictureSmall: new Match.Maybe(String),
       pictureBig: new Match.Maybe(String),
       description: String
     });
-    editCompany(Meteor.user(), companyName, newCompanyData);
+    editCompany(Meteor.user(), companyId, newCompanyData);
 
     return true;
   }
 });
-function editCompany(user, companyName, newCompanyData) {
-  const companyData = dbCompanies.findOne({companyName}, {
+function editCompany(user, companyId, newCompanyData) {
+  const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      _id: 1,
-      companyName: 1,
       manager: 1
     }
   });
   if (! companyData) {
-    throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
+    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
   }
-  if (user.username !== companyData.manager) {
+  const userId = user._id;
+  if (userId !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
+  }
+  const companyName = newCompanyData.companyName;
+  if (dbFoundations.find({companyName}).count() > 0) {
+    throw new Meteor.Error(403, '已有相同名稱的公司創立中，無法修改公司名稱！');
+  }
+  const sameCompanyNameCompaniesCursor = dbCompanies.find({
+    _id: {
+      $ne: companyId
+    },
+    companyName: companyName
+  });
+  if (sameCompanyNameCompaniesCursor.count() > 0) {
+    throw new Meteor.Error(403, '已有相同名稱的公司上市中，無法修改公司名稱！');
   }
   dbLog.insert({
     logType: '經理管理',
-    username: [companyData.manager],
-    companyName: companyName,
+    userId: [userId],
+    companyId: companyId,
     createdAt: new Date()
   });
-  dbCompanies.update({
-    _id: companyData._id
-  }, {
+  dbCompanies.update(companyId, {
     $set: newCompanyData
   });
 }
 
 Meteor.methods({
-  resignManager(companyName) {
+  resignManager(companyId) {
     check(this.userId, String);
-    check(companyName, String);
-    resignManager(Meteor.user(), companyName);
+    check(companyId, String);
+    resignManager(Meteor.user(), companyId);
 
     return true;
   }
 });
-export function resignManager(user, companyName) {
-  const companyData = dbCompanies.findOne({companyName}, {
+export function resignManager(user, companyId) {
+  const companyData = dbCompanies.findOne(companyId, {
     fields: {
       manager: 1
     }
   });
   if (! companyData) {
-    throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
+    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
   }
-  const username = user.username;
-  if (username !== companyData.manager) {
+  const userId = user._id;
+  if (userId !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['elect' + companyName]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'elect' + companyId]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('resignManager', ['elect' + companyName], (release) => {
-    const companyData = dbCompanies.findOne({companyName}, {
+  resourceManager.request('resignManager', ['elect' + companyId], (release) => {
+    const companyData = dbCompanies.findOne(companyId, {
       fields: {
-        _id: 1,
-        companyName: 1,
         manager: 1,
         candidateList: 1,
         voteList: 1
       }
     });
-    if (username !== companyData.manager) {
+    if (userId !== companyData.manager) {
       throw new Meteor.Error(401, '使用者並非該公司的經理人！');
     }
     const {candidateList, voteList} = companyData;
-    const candidateIndex = _.indexOf(candidateList, username);
+    const candidateIndex = _.indexOf(candidateList, userId);
     if (candidateIndex !== -1) {
       candidateList.splice(candidateIndex, 1);
       voteList.splice(candidateIndex, 1);
     }
     dbLog.insert({
       logType: '辭職紀錄',
-      username: [username],
-      companyName: companyName,
+      userId: [userId],
+      companyId: companyId,
       createdAt: new Date()
     });
-    dbCompanies.update(companyData._id, {
+    dbCompanies.update(companyId, {
       $set: {
         manager: '!none',
         candidateList: candidateList,
@@ -117,66 +125,59 @@ export function resignManager(user, companyName) {
 }
 
 Meteor.methods({
-  contendManager(companyName) {
+  contendManager(companyId) {
     check(this.userId, String);
-    check(companyName, String);
-    contendManager(Meteor.user(), companyName);
+    check(companyId, String);
+    contendManager(Meteor.user(), companyId);
 
     return true;
   }
 });
-export function contendManager(user, companyName) {
-  const companyData = dbCompanies.findOne({companyName}, {
+export function contendManager(user, companyId) {
+  const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      _id: 1,
-      companyName: 1,
       manager: 1,
       candidateList: 1
     }
   });
   if (! companyData) {
-    throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
+    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
   }
-  const username = user.username;
-  if (username === companyData.manager) {
+  const userId = user._id;
+  if (userId === companyData.manager) {
     throw new Meteor.Error(403, '使用者已經是該公司的經理人了！');
   }
-  if (user.profile.revokeQualification) {
-    throw new Meteor.Error(401, '使用者的競選經理人資格已經被取消了！');
-  }
   const candidateList = companyData.candidateList;
-  if (_.contains(candidateList, username)) {
+  if (_.contains(candidateList, userId)) {
     throw new Meteor.Error(403, '使用者已經是該公司的經理人候選者了！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['elect' + companyName]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'elect' + companyId]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('resignManager', ['elect' + companyName], (release) => {
-    const companyData = dbCompanies.findOne({companyName}, {
+  resourceManager.request('resignManager', ['elect' + companyId], (release) => {
+    const companyData = dbCompanies.findOne(companyId, {
       fields: {
-        _id: 1,
-        companyName: 1,
         manager: 1,
         candidateList: 1,
         voteList: 1
       }
     });
-    if (username === companyData.manager) {
+    if (userId === companyData.manager) {
       throw new Meteor.Error(403, '使用者已經是該公司的經理人了！');
     }
     const candidateList = companyData.candidateList;
-    if (_.contains(candidateList, username)) {
+    if (_.contains(candidateList, userId)) {
       throw new Meteor.Error(403, '使用者已經是該公司的經理人候選者了！');
     }
     const voteList = companyData.voteList;
-    candidateList.push(username);
+    candidateList.push(userId);
     voteList.push([]);
     dbLog.insert({
       logType: '參選紀錄',
-      username: [username],
-      companyName: companyName,
+      userId: [userId],
+      companyId: companyId,
       createdAt: new Date()
     });
-    dbCompanies.update(companyData._id, {
+    dbCompanies.update(companyId, {
       $set: {
         candidateList: candidateList,
         voteList: voteList
@@ -187,19 +188,18 @@ export function contendManager(user, companyName) {
 }
 
 Meteor.methods({
-  supportCandidate(companyName, username) {
+  supportCandidate(companyId, supportUserId) {
     check(this.userId, String);
-    check(companyName, String);
-    check(username, String);
-    supportCandidate(Meteor.user(), companyName, username);
+    check(companyId, String);
+    check(supportUserId, String);
+    supportCandidate(Meteor.user(), companyId, supportUserId);
 
     return true;
   }
 });
-export function supportCandidate(director, companyName, candidateName) {
-  const companyData = dbCompanies.findOne({companyName}, {
+export function supportCandidate(user, companyId, supportUserId) {
+  const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      _id: 1,
       companyName: 1,
       manager: 1,
       candidateList: 1,
@@ -207,32 +207,31 @@ export function supportCandidate(director, companyName, candidateName) {
     }
   });
   if (! companyData) {
-    throw new Meteor.Error(404, '找不到名稱為「' + companyName + '」的公司！');
+    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
   }
-  const directorName = director.username;
+  const userId = user._id;
   const directorDataCount = dbDirectors
     .find({
-      companyName: companyName,
-      username: directorName
+      companyId: companyId,
+      userId: userId
     })
     .count();
   if (directorDataCount < 1) {
-    throw new Meteor.Error(401, '使用者並非「' + companyName + '」公司的董事，無法支持經理人！');
+    throw new Meteor.Error(401, '使用者並非「' + companyData.companyName + '」公司的董事，無法支持經理人！');
   }
-  const {candidateList, voteList} = companyData;
-  const candidateIndex = _.indexOf(candidateList, candidateName);
+  const {companyName, candidateList, voteList} = companyData;
+  const candidateIndex = _.indexOf(candidateList, supportUserId);
   if (candidateIndex === -1) {
-    throw new Meteor.Error(403, candidateName + '並未競爭「' + companyName + '」公司經理人，無法進行支持！');
+    throw new Meteor.Error(403, '使用者' + supportUserId + '並未競爭「' + companyName + '」公司經理人，無法進行支持！');
   }
-  if (_.contains(voteList[candidateIndex], directorName)) {
-    throw new Meteor.Error(403, '使用者已經正在支持' + candidateName + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
+  if (_.contains(voteList[candidateIndex], userId)) {
+    throw new Meteor.Error(403, '使用者已經正在支持使用者' + supportUserId + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['elect' + companyName, 'user' + directorName]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'elect' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('resignManager', ['elect' + companyName, 'user' + directorName], (release) => {
-    const companyData = dbCompanies.findOne({companyName}, {
+  resourceManager.request('resignManager', ['elect' + companyId, 'user' + userId], (release) => {
+    const companyData = dbCompanies.findOne(companyId, {
       fields: {
-        _id: 1,
         companyName: 1,
         manager: 1,
         candidateList: 1,
@@ -241,33 +240,33 @@ export function supportCandidate(director, companyName, candidateName) {
     });
     const directorDataCount = dbDirectors
       .find({
-        companyName: companyName,
-        username: directorName
+        companyId: companyId,
+        userId: userId
       })
       .count();
     if (directorDataCount < 1) {
-      throw new Meteor.Error(401, '使用者並非「' + companyName + '」公司的董事，無法支持經理人！');
+      throw new Meteor.Error(401, '使用者並非「' + companyData.companyName + '」公司的董事，無法支持經理人！');
     }
-    const {candidateList, voteList} = companyData;
-    const candidateIndex = _.indexOf(candidateList, candidateName);
+    const {companyName, candidateList, voteList} = companyData;
+    const candidateIndex = _.indexOf(candidateList, supportUserId);
     if (candidateIndex === -1) {
-      throw new Meteor.Error(403, candidateName + '並未競爭「' + companyName + '」公司經理人，無法進行支持！');
+      throw new Meteor.Error(403, '使用者' + supportUserId + '並未競爭「' + companyName + '」公司經理人，無法進行支持！');
     }
-    if (_.contains(voteList[candidateIndex], director.username)) {
-      throw new Meteor.Error(403, '使用者已經正在支持' + candidateName + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
+    if (_.contains(voteList[candidateIndex], userId)) {
+      throw new Meteor.Error(403, '使用者已經正在支持使用者' + supportUserId + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
     }
     const newVoteList = _.map(voteList, (votes) => {
-      return _.without(votes, directorName);
+      return _.without(votes, userId);
     });
-    newVoteList[candidateIndex].push(directorName);
+    newVoteList[candidateIndex].push(userId);
 
     dbLog.insert({
       logType: '支持紀錄',
-      username: [directorName, candidateName],
-      companyName: companyName,
+      userId: [userId, supportUserId],
+      companyId: companyId,
       createdAt: new Date()
     });
-    dbCompanies.update(companyData._id, {
+    dbCompanies.update(companyId, {
       $set: {
         voteList: newVoteList
       }
@@ -277,30 +276,30 @@ export function supportCandidate(director, companyName, candidateName) {
 }
 
 Meteor.methods({
-  changeChairmanTitle(companyName, chairmanTitle) {
+  changeChairmanTitle(companyId, chairmanTitle) {
     check(this.userId, String);
-    check(companyName, String);
+    check(companyId, String);
     check(chairmanTitle, String);
-    changeChairmanTitle(Meteor.user(), companyName, chairmanTitle);
+    changeChairmanTitle(Meteor.user(), companyId, chairmanTitle);
 
     return true;
   }
 });
-function changeChairmanTitle(user, companyName, chairmanTitle) {
-  const username = user.username;
-  const chairmanData = dbDirectors.findOne({companyName}, {
+function changeChairmanTitle(user, companyId, chairmanTitle) {
+  const userId = user._id;
+  const chairmanData = dbDirectors.findOne({companyId}, {
     sort: {
       stocks: -1,
       createdAt: 1
     },
     fields: {
-      username: 1
+      userId: 1
     }
   });
-  if (chairmanData.username !== username) {
+  if (chairmanData.userId !== userId) {
     throw new Meteor.Error(401, '使用者並非該公司的董事長，無法修改董事長頭銜！');
   }
-  dbCompanies.update({companyName}, {
+  dbCompanies.update(companyId, {
     $set: {
       chairmanTitle: chairmanTitle
     }
@@ -308,18 +307,18 @@ function changeChairmanTitle(user, companyName, chairmanTitle) {
 }
 
 Meteor.methods({
-  directorMessage(companyName, message) {
+  directorMessage(companyId, message) {
     check(this.userId, String);
-    check(companyName, String);
+    check(companyId, String);
     check(message, String);
-    directorMessage(Meteor.user(), companyName, message);
+    directorMessage(Meteor.user(), companyId, message);
 
     return true;
   }
 });
-function directorMessage(user, companyName, message) {
-  const username = user.username;
-  const directorData = dbDirectors.findOne({companyName, username}, {
+function directorMessage(user, companyId, message) {
+  const userId = user._id;
+  const directorData = dbDirectors.findOne({companyId, userId}, {
     fields: {
       _id: 1
     }
@@ -335,20 +334,20 @@ function directorMessage(user, companyName, message) {
 }
 
 Meteor.methods({
-  queryTodayDealAmount(companyName) {
-    check(companyName, String);
+  queryTodayDealAmount(companyId) {
+    check(companyId, String);
 
-    return queryTodayDealAmount(companyName);
+    return queryTodayDealAmount(companyId);
   }
 });
-function queryTodayDealAmount(companyName) {
+function queryTodayDealAmount(companyId) {
   const todayBegin = new Date(new Date().setHours(0, 0, 0, 0));
   let amount = 0;
   dbLog
     .find(
       {
         logType: '交易紀錄',
-        companyName: companyName,
+        companyId: companyId,
         createdAt: {
           $gte: todayBegin
         }
@@ -368,19 +367,19 @@ function queryTodayDealAmount(companyName) {
 }
 
 Meteor.methods({
-  queryStocksPrice(companyName) {
-    check(companyName, String);
+  queryStocksPrice(companyId) {
+    check(companyId, String);
 
-    return queryStocksPrice(companyName);
+    return queryStocksPrice(companyId);
   }
 })
-function queryStocksPrice(companyName) {
+function queryStocksPrice(companyId) {
   const aDayAgo = new Date(Date.now() - 86400000);
 
   return dbPrice
     .find(
       {
-        companyName: companyName,
+        companyId: companyId,
         createdAt: {
           $gte: aDayAgo
         }
@@ -401,14 +400,42 @@ function queryStocksPrice(companyName) {
     });
 }
 
-//發布圖片
+//以Ajax方式發布公司名稱
+WebApp.connectHandlers.use(function(req, res, next) {
+  const parsedUrl = url.parse(req.url);
+  if (parsedUrl.pathname === '/companyName') {
+    const query = querystring.parse(parsedUrl.query);
+    const companyId = query.id;
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1
+      }
+    });
+    if (companyData) {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+      res.end(companyData.companyName);
+    }
+    else {
+      res.writeHead(404, {
+        'Content-Type': 'text/plain'
+      });
+      res.write('404 Not Found\n');
+      res.end();
+    }
+  }
+  else {
+    next();
+  }
+});
+
+//以Ajax方式發布圖片
 WebApp.connectHandlers.use(function(req, res, next) {
   const parsedUrl = url.parse(req.url);
   if (parsedUrl.pathname === '/companyPicture') {
     const query = querystring.parse(parsedUrl.query);
-    const id = new Mongo.ObjectID(query.id);
+    const companyId = query.id;
     const fieldName = query.type === 'small' ? 'pictureSmall' : 'pictureBig';
-    const companyData = dbCompanies.findOne(id, {
+    const companyData = dbCompanies.findOne(companyId, {
       fields: {
         [fieldName]: 1
       }
@@ -418,8 +445,10 @@ WebApp.connectHandlers.use(function(req, res, next) {
       res.end(companyData[fieldName] || '');
     }
     else {
-      res.writeHead(404, {"Content-Type": "text/plain"});
-      res.write("404 Not Found\n");
+      res.writeHead(404, {
+        'Content-Type': 'text/plain'
+      });
+      res.write('404 Not Found\n');
       res.end();
     }
   }
@@ -442,40 +471,35 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
         companyName: reg
       },
       {
-        manager: reg
-      },
-      {
         tags: reg
       }
     ];
   }
-  if (this.userId && isOnlyShowMine) {
-    const user = Meteor.users.findOne(this.userId, {
-      fields: {
-        username: 1
-      }
-    });
-    const username = user.username;
-    const orderCompanyNameList = dbOrders
-      .find({username}, {
+  const userId = this.userId;
+  if (userId && isOnlyShowMine) {
+    const seeCompanyIdList = dbDirectors
+      .find({userId}, {
         fields: {
-          companyName: 1
+          companyId: 1
         }
       })
-      .map((orderData) => {
-        return orderData.companyName;
+      .map((directorData) => {
+        return directorData.companyId;
       });
-    const directoryCompanyNameList = dbDirectors
-      .find({username}, {
+    const seeCompanyIdSet = new Set(seeCompanyIdList);
+    dbOrders
+      .find({userId}, {
         fields: {
-          companyName: 1
+          companyId: 1
         }
       })
-      .map((orderData) => {
-        return orderData.companyName;
+      .forEach((orderData) => {
+        seeCompanyIdSet.add(orderData.companyId);
       });
-    filter.companyName = {
-      $in: _.unique(orderCompanyNameList.concat(directoryCompanyNameList))
+
+
+    filter._id = {
+      $in: [...seeCompanyIdSet]
     };
   }
   const sort = {
@@ -488,8 +512,6 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     companyName: 1,
     manager: 1,
     chairmanTitle: 1,
-    tags: 1,
-    description: 1,
     totalRelease: 1,
     lastPrice: 1,
     listPrice: 1,
@@ -538,21 +560,21 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   });
 });
 
-Meteor.publish('queryChairmanAsVariable', function(companyName) {
-  check(companyName, String);
+Meteor.publish('queryChairmanAsVariable', function(companyId) {
+  check(companyId, String);
 
-  const variableId = 'chairmanNameOf' + companyName;
+  const variableId = 'chairmanIdOf' + companyId;
   this.added('variables', variableId, {
     value: '???'
   });
   const observer = dbDirectors
-    .find({companyName}, {
+    .find({companyId}, {
       sort: {
         stocks: -1,
         createdAt: 1
       },
       fields: {
-        username: 1
+        userId: 1
       },
       limit: 1,
       disableOplog: true
@@ -560,7 +582,7 @@ Meteor.publish('queryChairmanAsVariable', function(companyName) {
     .observeChanges({
       added: (id, fields) => {
         this.changed('variables', variableId, {
-          value: fields.username
+          value: fields.userId
         });
       }
     });
@@ -571,41 +593,30 @@ Meteor.publish('queryChairmanAsVariable', function(companyName) {
 });
 
 Meteor.publish('queryOwnStocks', function() {
-  if (this.userId) {
-    const user = Meteor.users.findOne(this.userId, {
-      fields: {
-        username: 1
-      }
-    });
-    const username = user.username;
-
-    return dbDirectors.find({username});
+  const userId = this.userId;
+  if (userId) {
+    return dbDirectors.find({userId});
   }
 
   return [];
 });
 
 Meteor.publish('queryMyOrder', function() {
-  if (this.userId) {
-    const user = Meteor.users.findOne(this.userId, {
-      fields: {
-        username: 1
-      }
-    });
-    const username = user.username;
-
-    return dbOrders.find({username});
+  const userId = this.userId;
+  if (userId) {
+    return dbOrders.find({userId});
   }
 
   return [];
 });
 
-Meteor.publish('companyDetail', function(companyName) {
-  check(companyName, String);
+Meteor.publish('companyDetail', function(companyId) {
+  check(companyId, String);
 
   const observer = dbCompanies
-    .find({companyName}, {
+    .find(companyId, {
       fields: {
+        pictureBig: 0,
         pictureSmall: 0
       },
       disableOplog: true
@@ -628,17 +639,15 @@ Meteor.publish('companyDetail', function(companyName) {
 function addSupportStocksListField(companyId, fields = {}) {
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      companyName: 1,
       voteList: 1
     }
   });
-  const companyName = companyData.companyName;
-  fields.supportStocksList = _.map(companyData.voteList, (voteDirectorList) => {
-    return _.reduce(voteDirectorList, (supportStocks, voteDirector) => {
+  fields.supportStocksList = _.map(companyData.voteList, (voteDirectorIdList) => {
+    return _.reduce(voteDirectorIdList, (supportStocks, voteDirectorId) => {
       const directorData = dbDirectors.findOne(
         {
-          companyName: companyName,
-          username: voteDirector
+          companyId: companyId,
+          userId: voteDirectorId
         },
         {
           fields: {
@@ -653,17 +662,26 @@ function addSupportStocksListField(companyId, fields = {}) {
   });
 }
 
-Meteor.publish('companyDirector', function(companyName, offset) {
-  check(companyName, String);
+Meteor.publish('companyDataForEdit', function(companyId) {
+  const overdue = 0;
+
+  return [
+    dbCompanies.find(companyId),
+    dbProducts.find({companyId, overdue})
+  ];
+});
+
+Meteor.publish('companyDirector', function(companyId, offset) {
+  check(companyId, String);
 
   let initialized = false;
-  let total = dbDirectors.find({companyName}).count();
+  let total = dbDirectors.find({companyId}).count();
   this.added('variables', 'totalCountOfCompanyDirector', {
     value: total
   });
 
   const observer = dbDirectors
-    .find({companyName}, {
+    .find({companyId}, {
       sort: {
         stocks: -1
       },
@@ -701,17 +719,17 @@ Meteor.publish('companyDirector', function(companyName, offset) {
   });
 });
 
-Meteor.publish('companyLog', function(companyName, offset) {
-  check(companyName, String);
+Meteor.publish('companyLog', function(companyId, offset) {
+  check(companyId, String);
 
   let initialized = false;
-  let total = dbLog.find({companyName}).count();
+  let total = dbLog.find({companyId}).count();
   this.added('variables', 'totalCountOfcompanyLog', {
     value: total
   });
 
   const observer = dbLog
-    .find({companyName}, {
+    .find({companyId}, {
       sort: {
         createdAt: -1
       },
@@ -749,22 +767,18 @@ Meteor.publish('companyLog', function(companyName, offset) {
   });
 });
 
-Meteor.publish('companyOrderExcludeMe', function(companyName, type, offset) {
-  check(companyName, String);
+Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
+  check(companyId, String);
   check(type, new Match.OneOf('購入', '賣出'));
 
   const filter = {
-    companyName: companyName,
+    companyId: companyId,
     orderType: type
   };
-  if (this.userId) {
-    const user = Meteor.users.findOne(this.userId, {
-      fields: {
-        username: 1
-      }
-    });
-    filter.username = {
-      $ne: user.username
+  const userId = this.userId;
+  if (userId) {
+    filter.userId = {
+      $ne: userId
     };
   }
 
@@ -813,11 +827,11 @@ Meteor.publish('companyOrderExcludeMe', function(companyName, type, offset) {
   });
 });
 
-Meteor.publish('companyCurrentProduct', function(companyName) {
-  check(companyName, String);
+Meteor.publish('companyCurrentProduct', function(companyId) {
+  check(companyId, String);
   const overdue = 1;
   const disableOplog = true;
 
-  return dbProducts.find({companyName, overdue}, {disableOplog});
+  return dbProducts.find({companyId, overdue}, {disableOplog});
 });
 

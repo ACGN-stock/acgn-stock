@@ -58,19 +58,19 @@
     </div>
     <div class="media-body row border-grid-body">
       <div class="col-4 col-lg-3 text-right border-grid">角色名稱：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{this.companyName}}">
-        {{{getCompanyLink this.companyName}}}
+      <div class="col-8 col-lg-3 text-truncate border-grid">
+        {{>companyLink this._id}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">經理人：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{displayManager this.manager}}">
-        {{displayManager this.manager}}
+      <div class="col-8 col-lg-3 text-truncate border-grid">
+        {{>userLink this.manager}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">創立日期：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{formatDateText this.createdAt}}">
+      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateText this.createdAt}}">
         {{formatDateText this.createdAt}}
       </div>
       <div class="col-4 col-lg-3 text-right text-truncate border-grid" title="{{this.chairmanTitle}}">
-        {{#if isChairman this.companyName}}
+        {{#if isChairman this._id}}
           <a href="#" data-action="changeChairmanTitle">
             {{this.chairmanTitle}}：
           </a>
@@ -78,8 +78,10 @@
           {{this.chairmanTitle}}：
         {{/if}}
       </div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{getChainman this.companyName}}">
-        {{getChainman this.companyName}}
+      <div class="col-8 col-lg-3 text-truncate border-grid">
+        {{#with getChairmanId this._id}}
+          {{>userLink}}
+        {{/with}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">總市值：</div>
       <div class="col-8 col-lg-3 text-right border-grid" title="{{this.totalValue}}">
@@ -93,26 +95,26 @@
       </div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
-          {{#if isManager this.manager}}
+          {{#if isUserId this.manager}}
             <div class="mb-1">
               您是該公司的經理人。
-              <a class="btn btn-primary btn-sm" href="{{getManageHref this.companyName}}">
+              <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
                 經營管理
               </a>
             </div>
           {{/if}}
           <div class="mb-1">
-            您在該公司持有{{getStockAmount this.companyName}}數量的股份，股權比例為{{getStockPercentage this.companyName this.totalRelease}}%。
+            您在該公司持有{{getStockAmount this._id}}數量的股份，股權比例為{{getStockPercentage this._id this.totalRelease}}%。
             <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
               購入
             </button>
-            {{#if getStockAmount this.companyName}}
+            {{#if getStockAmount this._id}}
               <button class="btn btn-info btn-sm" type="button" data-action="createSellOrder">
                 賣出
               </button>
             {{/if}}
           </div>
-          {{#each haveOrderList this.companyName}}
+          {{#each ownOrderList this._id}}
             <div class="mb-1">
               您有一筆以單價${{unitPrice}}{{orderType}}數量{{amount}}股份的訂單尚未交易完成，目前已處理了{{done}}數量。
               <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{_id}}">

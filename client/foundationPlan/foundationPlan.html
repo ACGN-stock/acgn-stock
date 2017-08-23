@@ -61,15 +61,15 @@
         {{this.companyName}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">經理人：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{displayManager this.manager}}">
-        {{displayManager this.manager}}
+      <div class="col-8 col-lg-3 text-truncate border-grid">
+        {{>userLink this.manager}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">計劃日期：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{formatDateText this.createdAt}}">
+      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateText this.createdAt}}">
         {{formatDateText this.createdAt}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">截止日期：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{getExpireDateText this.createdAt}}">
+      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{getExpireDateText this.createdAt}}">
         {{getExpireDateText this.createdAt}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">投資人數：</div>
@@ -85,15 +85,15 @@
       <div class="col-12 border-grid" style="white-space: pre-wrap;"><h4>角色簡介：</h4>{{this.description}}</div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
-          {{#if isManager this.manager}}
+          {{#if isUserId this.manager}}
             <div class="mb-1">
               您是此創立計劃的發起人。
-              <a class="btn btn-primary btn-sm" href="{{getEditHref this._id._str}}">
+              <a class="btn btn-primary btn-sm" href="{{getEditHref this._id}}">
                 修改計劃
               </a>
             </div>
           {{/if}}
-          {{#if alreadyInvest this.invest}}
+          {{#if alreadyInvest}}
             <div class="mb-1">
               您已經向此計劃投資了$ {{alreadyInvest this.invest}}。
               <button class="btn btn-primary btn-sm" type="button" data-action="invest">

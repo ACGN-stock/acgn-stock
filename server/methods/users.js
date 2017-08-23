@@ -1,8 +1,11 @@
 'use strict';
+import url from 'url';
+import querystring from 'querystring';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
+import { WebApp } from 'meteor/webapp';
 import { resourceManager } from '../resourceManager';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbCompanies } from '../../db/dbCompanies';
@@ -98,20 +101,21 @@ function validateUsers(checkUsername) {
             Accounts.setPassword(existUser._id, password, {
               logout: true
             });
-            dbValidatingUsers.remove({_id: validatingUser._id});
+            dbValidatingUsers.remove(validatingUser._id);
           }
           else {
             const profile = {
+              name: username,
               money: config.beginMoney
             };
-            Accounts.createUser({username, password, profile});
+            const userId = Accounts.createUser({username, password, profile});
             dbLog.insert({
               logType: '驗證通過',
-              username: [username],
+              userId: [userId],
               price: config.beginMoney,
               createdAt: new Date()
             });
-            dbValidatingUsers.remove({_id: validatingUser._id});
+            dbValidatingUsers.remove(validatingUser._id);
           }
         }
       }
@@ -121,13 +125,40 @@ function validateUsers(checkUsername) {
   return checkResult;
 }
 
-Meteor.publish('accountInfo', function(username) {
-  check(username, String);
+//以Ajax方式發布使用者名稱
+WebApp.connectHandlers.use(function(req, res, next) {
+  const parsedUrl = url.parse(req.url);
+  if (parsedUrl.pathname === '/userName') {
+    const query = querystring.parse(parsedUrl.query);
+    const userId = query.id;
+    const userData = Meteor.users.findOne(userId, {
+      fields: {
+        'profile.name': 1
+      }
+    });
+    if (userData) {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+      res.end(userData.profile.name);
+    }
+    else {
+      res.writeHead(404, {
+        'Content-Type': 'text/plain'
+      });
+      res.write('404 Not Found\n');
+      res.end();
+    }
+  }
+  else {
+    next();
+  }
+});
+
+Meteor.publish('accountInfo', function(userId) {
+  check(userId, String);
 
   return [
-    Meteor.users.find({username}, {
+    Meteor.users.find(userId, {
       fields: {
-        username: 1,
         profile: 1,
         createdAt: 1
       },
@@ -136,7 +167,7 @@ Meteor.publish('accountInfo', function(username) {
     dbCompanies
       .find(
         {
-          manager: username
+          manager: userId
         },
         {
           fields: {
@@ -149,21 +180,21 @@ Meteor.publish('accountInfo', function(username) {
   ];
 });
 
-Meteor.publish('accountOwnStocks', function(username, offset) {
-  check(username, String);
+Meteor.publish('accountOwnStocks', function(userId, offset) {
+  check(userId, String);
   check(offset, Match.Integer);
 
   let initialized = false;
-  let total = dbDirectors.find({username}).count();
+  let total = dbDirectors.find({userId}).count();
   this.added('variables', 'totalCountOfAccountOwnStocks', {
     value: total
   });
 
   const observer = dbDirectors
-    .find({username}, {
+    .find({userId}, {
       fields: {
-        username: 1,
-        companyName: 1,
+        userId: 1,
+        companyId: 1,
         stocks: 1
       },
       skip: offset,
@@ -200,11 +231,11 @@ Meteor.publish('accountOwnStocks', function(username, offset) {
   });
 });
 
-Meteor.publish('accountInfoLog', function(username, offset) {
-  check(username, String);
+Meteor.publish('accountInfoLog', function(userId, offset) {
+  check(userId, String);
   check(offset, Match.Integer);
 
-  const firstLogData = dbLog.findOne({username}, {
+  const firstLogData = dbLog.findOne({userId}, {
     sort: {
       createdAt: 1
     } 
@@ -215,8 +246,8 @@ Meteor.publish('accountInfoLog', function(username, offset) {
   let total = dbLog
     .find(
       {
-        username: {
-          $in: [username, '!all']
+        userId: {
+          $in: [userId, '!all']
         },
         createdAt: {
           $gte: firstLogDate
@@ -231,8 +262,8 @@ Meteor.publish('accountInfoLog', function(username, offset) {
   const observer = dbLog
     .find(
       {
-        username: {
-          $in: [username, '!all']
+        userId: {
+          $in: [userId, '!all']
         },
         createdAt: {
           $gte: firstLogDate

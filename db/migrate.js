@@ -1,6 +1,7 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { Migrations } from 'meteor/percolate:migrations';
+import { dbAdvertising } from './dbAdvertising';
 import { dbCompanies } from './dbCompanies';
 import { dbDirectors } from './dbDirectors';
 import { dbFoundations } from './dbFoundations';
@@ -21,19 +22,11 @@ if (Meteor.isServer) {
     version: 1,
     name: 'Create indexes.',
     up() {
-      dbCompanies.rawCollection().createIndex(
-        {
-          companyName: 1
-        },
-        {
-          unique: true
-        }
-      );
-      dbCompanies.rawCollection().createIndex({
-        manager: 1
+      dbAdvertising.rawCollection().createIndex({
+        paid: -1
       });
       dbCompanies.rawCollection().createIndex({
-        tags: 1
+        companyName: 1
       });
       dbCompanies.rawCollection().createIndex({
         lastPrice: -1
@@ -41,132 +34,157 @@ if (Meteor.isServer) {
       dbCompanies.rawCollection().createIndex({
         totalValue: -1
       });
-      dbPrice.rawCollection().createIndex({
-        companyName: 1,
+      dbCompanies.rawCollection().createIndex({
+        profit: -1
+      });
+      dbCompanies.rawCollection().createIndex({
         createdAt: -1
       });
-      dbDirectors.rawCollection().createIndex(
-        {
-          companyName: 1,
-          username: 1
-        },
-        {
-          unique: true
-        }
-      );
+      dbCompanies.rawCollection().createIndex({
+        manager: 1
+      });
       dbDirectors.rawCollection().createIndex({
-        username: 1
+        companyId: 1,
+        stocks: -1,
+        createdAt: 1
+      });
+      dbDirectors.rawCollection().createIndex({
+        companyId: 1,
+        userId: 1
+      });
+      dbDirectors.rawCollection().createIndex({
+        userId: 1
+      });
+      dbFoundations.rawCollection().createIndex({
+        companyName: 1
       });
       dbFoundations.rawCollection().createIndex({
         createdAt: 1
       });
-      dbFoundations.rawCollection().createIndex(
+      dbLog.rawCollection().createIndex(
         {
-          companyName: 1
+          companyId: 1,
+          createdAt: -1
         },
         {
-          unique: true
+          partialFilterExpression: {
+            logType: '交易紀錄'
+          }
+        }
+      );
+      dbLog.rawCollection().createIndex(
+        {
+          createdAt: 1
+        },
+        {
+          partialFilterExpression: {
+            logType: '聊天發言'
+          }
         }
       );
       dbLog.rawCollection().createIndex({
         createdAt: -1
       });
-      dbOrders.rawCollection().createIndex({
-        username: 1
+      dbLog.rawCollection().createIndex({
+        companyId: 1,
+        createdAt: -1
+      });
+      dbLog.rawCollection().createIndex({
+        userId: 1,
+        createdAt: -1
       });
       dbOrders.rawCollection().createIndex({
-        orderType: 1,
-        unitPrice: 1
+        companyId: 1,
+        userId: 1
       });
-      dbProducts.rawCollection().createIndex(
+      dbOrders.rawCollection().createIndex(
         {
-          companyName: 1,
-          url: 1
+          companyId: 1,
+          unitPrice: -1,
+          createdAt: 1
         },
         {
-          unique: true
+          partialFilterExpression: {
+            orderType: '購入'
+          }
         }
       );
+      dbOrders.rawCollection().createIndex(
+        {
+          companyId: 1,
+          unitPrice: 1,
+          createdAt: 1
+        },
+        {
+          partialFilterExpression: {
+            orderType: '賣出'
+          }
+        }
+      );
+      dbOrders.rawCollection().createIndex({
+        userId: 1
+      });
+      dbPrice.rawCollection().createIndex({
+        companyId: 1,
+        createdAt: -1
+      });
+      dbPrice.rawCollection().createIndex({
+        createdAt: 1
+      });
       dbProducts.rawCollection().createIndex({
         overdue: 1
       });
-      dbValidatingUsers.rawCollection().createIndex(
+      dbProducts.rawCollection().createIndex({
+        companyId: 1,
+        overdue: 1
+      });
+      dbProducts.rawCollection().createIndex(
         {
-          username: 1,
-          password: 1
+          seasonId: 1,
+          votes: -1
         },
         {
-          unique: true
+          partialFilterExpression: {
+            overdue: {
+              $gt: 0
+            }
+          }
         }
       );
-    }
-  });
-  Migrations.add({
-    version: 2,
-    name: 'log schma change for instant message.',
-    up() {
-      dbLog.update({}, {
-        $set: {
-          resolve: true
+      dbProducts.rawCollection().createIndex(
+        {
+          companyId: 1,
+          likeCount: -1
+        },
+        {
+          partialFilterExpression: {
+            overdue: {
+              $gt: 0
+            }
+          }
         }
+      );
+      dbProductLike.rawCollection().createIndex({
+        companyId: 1,
+        userId: 1
       });
-      dbLog.rawCollection().createIndex({
-        resolve: 1
+      dbRankCompanyPrice.rawCollection().createIndex({
+        season: 1
       });
-    }
-  });
-  Migrations.add({
-    version: 3,
-    name: 'season data.',
-    up() {
+      dbRankCompanyProfit.rawCollection().createIndex({
+        season: 1
+      });
+      dbRankCompanyValue.rawCollection().createIndex({
+        season: 1
+      });
+      dbRankUserWealth.rawCollection().createIndex({
+        season: 1
+      });
       dbSeason.rawCollection().createIndex({
         beginDate: -1
       });
-    }
-  });
-  Migrations.add({
-    version: 4,
-    name: 'produect new schema.',
-    up() {
-      dbProducts.rawCollection().createIndex({
-        seasonId: 1,
-        likeCont: -1
-      });
-      dbProductLike.rawCollection().createIndex({
-        productId: 1,
+      dbValidatingUsers.rawCollection().createIndex({
         username: 1
-      });
-    }
-  });
-  Migrations.add({
-    version: 5,
-    name: 'rank indexes.',
-    up() {
-      dbRankCompanyPrice.rawCollection().createIndex({
-        seasonId: 1
-      });
-      dbRankCompanyValue.rawCollection().createIndex({
-        seasonId: 1
-      });
-      dbRankCompanyProfit.rawCollection().createIndex({
-        seasonId: 1
-      });
-      dbRankUserWealth.rawCollection().createIndex({
-        seasonId: 1
-      });
-    }
-  });
-  Migrations.add({
-    version: 6,
-    name: 'log schma change for instant message.',
-    up() {
-      dbLog.update({}, {
-        $unset: {
-          resolve: ''
-        }
-      });
-      dbLog.rawCollection().dropIndex({
-        resolve: 1
       });
     }
   });

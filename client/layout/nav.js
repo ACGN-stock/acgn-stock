@@ -46,6 +46,11 @@ Template.nav.helpers({
     else {
       return {};
     }
+  },
+  accountInfoParams() {
+    return {
+      userId: Meteor.user()._id
+    };
   }
 });
 Template.nav.events({

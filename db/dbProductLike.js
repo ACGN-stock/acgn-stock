@@ -12,12 +12,12 @@ const schema = new SimpleSchema({
   productId: {
     type: String
   },
-  //公司名稱
-  companyName: {
+  //產品公司Id
+  companyId: {
     type: String
   },
-  //使用者名稱
-  username: {
+  //使用者userId
+  userId: {
     type: String
   }
 });

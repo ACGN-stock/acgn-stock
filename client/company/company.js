@@ -2,6 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
+import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -13,6 +14,7 @@ import { dbProducts } from '../../db/dbProducts';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct } from '../utils/methods';
+import { config } from '../../config';
 
 inheritedShowLoadingOnSubscribing(Template.company);
 const rDirectorOffset = new ReactiveVar(0);
@@ -29,9 +31,9 @@ Template.company.onCreated(function() {
     if (Meteor.user()) {
       this.subscribe('queryMyOrder');
       this.subscribe('queryOwnStocks');
-      const companyName = FlowRouter.getParam('companyName');
-      if (companyName) {
-        this.subscribe('queryMyLike', companyName);
+      const companyId = FlowRouter.getParam('companyId');
+      if (companyId) {
+        this.subscribe('queryMyLikeProduct', companyId);
       }
     }
   });
@@ -39,17 +41,26 @@ Template.company.onCreated(function() {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
-    const companyName = FlowRouter.getParam('companyName');
-    if (companyName) {
-      this.subscribe('companyDetail', companyName);
-      this.subscribe('companyCurrentProduct', companyName);
-      this.subscribe('queryChairmanAsVariable', companyName);
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyDetail', companyId);
+      this.subscribe('companyCurrentProduct', companyId);
+      this.subscribe('queryChairmanAsVariable', companyId);
       this.subscribe('productListByCompany', {
-        companyName: companyName,
+        companyId: companyId,
         sortBy: 'likeCount',
         sortDir: -1,
         offset: 0
       });
+    }
+  });
+  this.autorun(() => {
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      const companyData = dbCompanies.findOne(companyId);
+      if (companyData) {
+        DocHead.setTitle(config.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
+      }
     }
   });
   rDirectorOffset.set(0);
@@ -57,9 +68,9 @@ Template.company.onCreated(function() {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
-    const companyName = FlowRouter.getParam('companyName');
-    if (companyName) {
-      this.subscribe('companyDirector', companyName, rDirectorOffset.get());
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyDirector', companyId, rDirectorOffset.get());
     }
   });
   rBuyOrderOffset.set(0);
@@ -67,9 +78,9 @@ Template.company.onCreated(function() {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
-    const companyName = FlowRouter.getParam('companyName');
-    if (companyName) {
-      this.subscribe('companyOrderExcludeMe', companyName, '購入', rBuyOrderOffset.get());
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyOrderExcludeMe', companyId, '購入', rBuyOrderOffset.get());
     }
   });
   rSellOrderOffset.set(0);
@@ -77,9 +88,9 @@ Template.company.onCreated(function() {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
-    const companyName = FlowRouter.getParam('companyName');
-    if (companyName) {
-      this.subscribe('companyOrderExcludeMe', companyName, '賣出', rSellOrderOffset.get());
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyOrderExcludeMe', companyId, '賣出', rSellOrderOffset.get());
     }
   });
   rLogOffset.set(0);
@@ -87,9 +98,9 @@ Template.company.onCreated(function() {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
-    const companyName = FlowRouter.getParam('companyName');
-    if (companyName) {
-      this.subscribe('companyLog', companyName, rLogOffset.get());
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyLog', companyId, rLogOffset.get());
     }
   });
   queryDealAmountAndPrice();
@@ -102,14 +113,14 @@ function queryDealAmountAndPrice() {
   if (dbResourceLock.find('season').count()) {
     return false;
   }
-  const companyName = FlowRouter.getParam('companyName');
-  if (companyName) {
-    Meteor.nativeCall('queryTodayDealAmount', companyName, (error, result) => {
+  const companyId = FlowRouter.getParam('companyId');
+  if (companyId) {
+    Meteor.nativeCall('queryTodayDealAmount', companyId, (error, result) => {
       if (! error) {
         rTodayDealAmount.set(result);
       }
     });
-    Meteor.nativeCall('queryStocksPrice', companyName, (error, result) => {
+    Meteor.nativeCall('queryStocksPrice', companyId, (error, result) => {
       if (! error) {
         rPriceList.set(result);
       }
@@ -119,34 +130,30 @@ function queryDealAmountAndPrice() {
 
 Template.company.helpers({
   companyData() {
-    const companyName = FlowRouter.getParam('companyName');
+    const companyId = FlowRouter.getParam('companyId');
 
-    return dbCompanies.findOne({companyName});
+    return dbCompanies.findOne(companyId);
   },
-  isManager(manager) {
-    const user = Meteor.user();
-    const username = user && user.username;
-
-    return username === manager;
-  },
-  getManageHref(companyName) {
-    return FlowRouter.path('manageCompany', {companyName});
+  getManageHref(companyId) {
+    return FlowRouter.path('manageCompany', {companyId});
   }
 });
 Template.company.events({
   'click [data-action="changeChairmanTitle"]'() {
     event.preventDefault();
-    const companyName = FlowRouter.getParam('companyName');
-    const companyData = dbCompanies.findOne({companyName});
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId);
     changeChairmanTitle(companyData);
   },
   'click [data-action="resignManager"]'(event) {
     event.preventDefault();
-    const companyName = FlowRouter.getParam('companyName');
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId);
+    const companyName = companyData.companyName;
     const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + companyName + '」以表示確定。';
     const confirmMessage = window.prompt(message);
     if (confirmMessage === companyName) {
-      Meteor.call('resignManager', companyName);
+      Meteor.call('resignManager', companyId);
     }
   }
 });
@@ -156,7 +163,7 @@ Template.companyDetail.onCreated(function() {
   $.ajax({
     url: '/companyPicture',
     data: {
-      id: this.data._id.toHexString(),
+      id: this.data._id,
       type: 'big'
     },
     success: (response) => {
@@ -270,16 +277,16 @@ Template.companyDetail.helpers({
 
 Template.companyBuyOrderList.helpers({
   myOrderList() {
-    const companyName = this.companyName;
+    const companyId = this._id;
     const user = Meteor.user();
     if (user) {
-      const username = user.username;
+      const userId = user._id;
 
       return dbOrders.find(
         {
-          companyName: companyName,
+          companyId: companyId,
           orderType: '購入',
-          username: username
+          userId: userId
         },
         {
           sort: {
@@ -290,15 +297,15 @@ Template.companyBuyOrderList.helpers({
     }
   },
   orderList() {
-    const companyName = this.companyName;
+    const companyId = this._id;
     const filter = {
-      companyName: companyName,
+      companyId: companyId,
       orderType:  '購入'
     };
     const user = Meteor.user();
     if (user) {
-      filter.username = {
-        $ne: user.username
+      filter.userId = {
+        $ne: user._id
       };
     }
 
@@ -309,12 +316,6 @@ Template.companyBuyOrderList.helpers({
       },
       limit: 10
     });
-  },
-  getOrderDescription(orderData) {
-    const {username, orderType, unitPrice, amount, done} = orderData;
-    const number = amount - done;
-
-    return `${username}以$${unitPrice}單價${orderType}數量${number}。`;
   },
   paginationData() {
     return {
@@ -339,19 +340,19 @@ Template.companyBuyOrderList.events({
 
 Template.companySellOrderList.helpers({
   getStockAmount() {
-    return getStockAmount(this.companyName);
+    return getStockAmount(this._id);
   },
   myOrderList() {
-    const companyName = this.companyName;
+    const companyId = this._id;
     const user = Meteor.user();
     if (user) {
-      const username = user.username;
+      const userId = user._id;
 
       return dbOrders.find(
         {
-          companyName: companyName,
+          companyId: companyId,
           orderType: '賣出',
-          username: username
+          userId: userId
         },
         {
           sort: {
@@ -363,15 +364,15 @@ Template.companySellOrderList.helpers({
     }
   },
   orderList() {
-    const companyName = this.companyName;
+    const companyId = this._id;
     const filter = {
-      companyName: companyName,
+      companyId: companyId,
       orderType:  '賣出'
     };
     const user = Meteor.user();
     if (user) {
-      filter.username = {
-        $ne: user.username
+      filter.userId = {
+        $ne: user._id
       };
     }
 
@@ -382,13 +383,6 @@ Template.companySellOrderList.helpers({
       },
       limit: 10
     });
-  },
-  getOrderDescription(orderData) {
-    const username = orderData.username === '!system' ? orderData.companyName : orderData.username;
-    const {orderType, unitPrice, amount, done} = orderData;
-    const number = amount - done;
-
-    return `${username}以$${unitPrice}單價${orderType}數量${number}。`;
   },
   paginationData() {
     return {
@@ -411,11 +405,11 @@ Template.companySellOrderList.events({
   }
 });
 
-function getStockAmount(companyName) {
+function getStockAmount(companyId) {
   const user = Meteor.user();
   if (user) {
-    const username = user.username;
-    const ownStockData = dbDirectors.findOne({username, companyName});
+    const userId = user._id;
+    const ownStockData = dbDirectors.findOne({companyId, userId});
 
     return ownStockData ? ownStockData.stocks : 0;
   }
@@ -426,10 +420,10 @@ function getStockAmount(companyName) {
 
 Template.companyCurrentProductList.helpers({
   productList() {
-    const companyName = this.companyName;
+    const companyId = this._id;
     const overdue = 1;
 
-    return dbProducts.find({companyName, overdue}, {
+    return dbProducts.find({companyId, overdue}, {
       sort: {
         createdAt: -1
       }
@@ -447,13 +441,13 @@ Template.companyCurrentProductList.events({
 Template.companyAllPrudctList.helpers({
   productCenterHref() {
     return FlowRouter.path('productCenterByCompany', {
-      companyName: this.companyName
+      companyId: this._id
     });
   },
   productList() {
-    const companyName = this.companyName;
+    const companyId = this._id;
 
-    return dbProducts.find({companyName}, {
+    return dbProducts.find({companyId}, {
       sort: {
         likeCount: -1,
         createdAt: -1
@@ -465,16 +459,19 @@ Template.companyAllPrudctList.events({
   'click [data-like-product]'(event) {
     event.preventDefault();
     const productId = $(event.currentTarget).attr('data-like-product');
-    const companyName = FlowRouter.getParam('companyName');
-    likeProduct(productId, companyName);
+    const companyId = FlowRouter.getParam('companyId');
+    likeProduct(productId, companyId);
   }
 });
 
+Template.companyDirectorList.onRendered(function() {
+  this.$message = this.$('[name="message"]');
+});
 Template.companyDirectorList.helpers({
   directorList() {
-    const companyName = this.companyName;
+    const companyId = this._id;
 
-    return dbDirectors.find({companyName}, {
+    return dbDirectors.find({companyId}, {
       sort: {
         stocks: -1,
         createdAt: 1
@@ -496,20 +493,20 @@ Template.companyDirectorList.helpers({
       offset: rDirectorOffset
     };
   },
-  getMyMessage(companyName) {
-    const username = Meteor.user().username;
-
-    return dbDirectors.findOne({username, companyName}).message;
+  getStockAmount(companyId) {
+    return getStockAmount(companyId);
   },
-  getStockAmount(companyName) {
-    return getStockAmount(companyName);
+  getMyMessage(companyId) {
+    const userId = Meteor.user()._id;
+
+    return dbDirectors.findOne({companyId, userId}).message;
   }
 });
 Template.companyDirectorList.events({
   'submit form'(event, templateInstance) {
     event.preventDefault();
-    const message = templateInstance.$('[name="message"]').val();
-    Meteor.call('directorMessage', templateInstance.data.companyName, message);
+    const message = templateInstance.$message.val();
+    Meteor.call('directorMessage', templateInstance.data._id, message);
   }
 });
 
@@ -522,7 +519,7 @@ Template.companyElectInfo.helpers({
   canContendManager() {
     const user = Meteor.user();
     if (user && ! user.profile.revokeQualification) {
-      return ! _.contains(this.candidateList, user.username);
+      return ! _.contains(this.candidateList, user._id);
     }
 
     return false;
@@ -534,22 +531,16 @@ Template.companyElectInfo.helpers({
 
     return Math.round(supportStocks / instanceData.totalRelease * 10000) / 100;
   },
-  getSupportList(candidateIndex) {
+  supportList(candidateIndex) {
     const instance = Template.instance();
-    const voteList = instance.data.voteList[candidateIndex];
 
-    if (voteList.length > 0) {
-      return voteList.join('、');
-    }
-    else {
-      return '無';
-    }
+    return instance.data.voteList[candidateIndex];
   },
   getStockAmount() {
     const instance = Template.instance();
     const instanceData = instance.data;
 
-    return getStockAmount(instanceData.companyName);
+    return getStockAmount(instanceData._id);
   }
 });
 Template.companyElectInfo.events({
@@ -557,8 +548,8 @@ Template.companyElectInfo.events({
     event.preventDefault();
     const instanceData = templateInstance.data;
     const companyName = instanceData.companyName;
-    if (window.confirm('你確定要競選擔任「' + companyName + '」的經理人嗎？')) {
-      Meteor.call('contendManager', companyName);
+    if (window.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？')) {
+      Meteor.call('contendManager', instanceData._id);
     }
   },
   'click [data-support-candidate]'(event, templateInstance) {
@@ -567,114 +558,30 @@ Template.companyElectInfo.events({
     const candidateList = instanceData.candidateList;
     const candidateIndex = parseInt($(event.currentTarget).attr('data-support-candidate'), 10);
     const candidate = candidateList[candidateIndex];
-    if (window.confirm('你確定要支持候選人「' + candidate + '」嗎？')) {
-      Meteor.call('supportCandidate', instanceData.companyName, candidate);
-    }
+    $.ajax({
+      url: '/userName',
+      data: {
+        id: candidate
+      },
+      success: (userName) => {
+        if (window.confirm('你確定要支持候選人「' + userName + '」嗎？')) {
+          Meteor.call('supportCandidate', instanceData._id, candidate);
+        }
+      }
+    });
   }
 });
 
 Template.companyLogList.helpers({
   logList() {
-    const companyName = FlowRouter.getParam('companyName');
+    const companyId = FlowRouter.getParam('companyId');
 
-    return dbLog.find({companyName}, {
+    return dbLog.find({companyId}, {
       sort: {
         createdAt: -1
       },
       limit: rLogOffset.get() + 50
     });
-  },
-  getLogDescriptionHtml(logData) {
-    switch (logData.logType) {
-      case '創立公司': {
-        return '由' + logData.username[0] + '發起了創立計劃。';
-      }
-      case '參與投資': {
-        return logData.username[0] + '向創立計劃投資了$' + logData.amount + '。';
-      }
-      case '創立成功': {
-        return '公司正式創立，初始董事會成員為' + logData.username.join('、') + '。';
-      }
-      case '創立得股': {
-        return logData.username[0] + '以$' + logData.price + '的投資額獲得了' + logData.amount + '數量的公司股份。';
-      }
-      case '創立退款': {
-        return '將$' + logData.amount + '的投資額退款回' + logData.username[0] + '。';
-      }
-      case '公司釋股': {
-        return '以$' + logData.price + '的價格釋出了' + logData.amount + '數量的股票到市場上套取利潤。';
-      }
-      case '購買下單': {
-        return logData.username[0] + '下達了以每股單價$' + logData.price + '的單價購入' + logData.amount + '數量股票的訂單。';
-      }
-      case '販賣下單': {
-        return logData.username[0] + '下達了以每股單價$' + logData.price + '的單價賣出' + logData.amount + '數量股票的訂單。';
-      }
-      case '取消下單': {
-        return logData.username[0] + '取消了以每股單價$' + logData.price + '的單價' + logData.message + logData.amount + '數量股票的訂單。';
-      }
-      case '訂單完成': {
-        return logData.username[0] + '以每股單價$' + logData.price + '的單價' + logData.message + logData.amount + '數量股票的訂單已全數交易完成。';
-      }
-      case '交易紀錄': {
-        if (logData.username[1]) {
-          return logData.username[0] + '以$' + logData.price + '的單價向' + logData.username[1] + '購買了' + logData.amount + '數量的股票！';
-        }
-        else {
-          return logData.username[0] + '以$' + logData.price + '的單價購得了' + logData.amount + '數量的釋出股票！';
-        }
-      }
-      case '辭職紀錄': {
-        return logData.username[0] + '辭去了經理人職務。';
-      }
-      case '參選紀錄': {
-        return logData.username[0] + '參與了該商業季度的經理人競選活動。';
-      }
-      case '經理管理': {
-        return logData.username[0] + '以經理人的身份修改了公司資訊。';
-      }
-      case '推薦產品': {
-        const productData = dbProducts.findOne(logData.productId);
-
-        return '由於' + logData.username[0] + '向' + (productData ? '產品「' + productData.productName + '」' : '一項產品') + '投了一張推薦票，獲得了$' + logData.price + '的營利額。';
-      }
-      case '支持紀錄': {
-        return logData.username[0] + '開始支持' + logData.username[1] + '擔任經理人。';
-      }
-      case '就任經理': {
-        let extraDescription = '';
-        if (logData.username[1] === '!none') {
-          extraDescription = '成為了公司的經理人。';
-        }
-        else if (logData.username[0] === logData.username[1]) {
-          extraDescription = '繼續就任公司的經理人職務。';
-        }
-        else {
-          extraDescription = '取代了' + logData.username[1] + '成為了公司的經理人。';
-        }
-
-        return (
-          '在' + logData.message + '商業季度' +
-          logData.username[0] +
-          (logData.amount ? ('以' + logData.amount + '數量的支持股份') : '') +
-          '擊敗了所有競爭對手，' + extraDescription
-        );
-      }
-      case '公司營利': {
-        return '在本季度的總營利額為$' + logData.amount + '。';
-      }
-      case '營利分紅': {
-        return '發放了公司的營利分紅$' + logData.amount + '給' + logData.username[0] + '。';
-      }
-      case '舉報公司': {
-        return logData.username[0] + '以「' + logData.message + '」理由舉報了公司。';
-      }
-      case '舉報產品': {
-        const productData = dbProducts.findOne(logData.productId);
-
-        return logData.username[0] + '以「' + logData.message + '」理由舉報了公司的' + (productData ? '產品「' + productData.productName + '」' : '一項產品') + '。';
-      }
-    }
   },
   paginationData() {
     return {

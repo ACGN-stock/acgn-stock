@@ -1,10 +1,10 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { dbOrders } from '../../db/dbOrders';
+import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbOrders } from '../../db/dbOrders';
 import { dbResourceLock } from '../../db/dbResourceLock';
-import { dbProducts } from '../../db/dbProducts';
 import { dbProductLike } from '../../db/dbProductLike';
 import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
@@ -51,10 +51,10 @@ Meteor.call = (function(_super) {
 }(Meteor.call));
 
 export function createBuyOrder(user, companyData) {
-  const companyName = companyData.companyName;
+  const companyId = companyData._id;
   const existsSellOrder = dbOrders.findOne({
-    companyName: companyName,
-    username: user.username,
+    companyId: companyId,
+    userId: user._id,
     orderType: '賣出'
   });
   if (existsSellOrder) {
@@ -94,14 +94,15 @@ export function createBuyOrder(user, companyData) {
 
     return false;
   }
-  Meteor.call('createBuyOrder', {companyName, unitPrice, amount});
+  Meteor.call('createBuyOrder', {companyId, unitPrice, amount});
 }
 
 export function createSellOrder(user, companyData) {
-  const companyName = companyData.companyName;
+  const userId = user._id;
+  const companyId = companyData._id;
   const existsBuyOrder = dbOrders.findOne({
-    companyName: companyName,
-    username: user.username,
+    companyId: companyId,
+    userId: userId,
     orderType: '購入'
   });
   if (existsBuyOrder) {
@@ -120,8 +121,7 @@ export function createSellOrder(user, companyData) {
 
     return false;
   }
-  const username = user && user.username;
-  const directorData = dbDirectors.findOne({username, companyName});
+  const directorData = dbDirectors.findOne({userId, companyId});
   const maximumAmount = directorData.stocks;
   const amount = parseInt(window.prompt(`請輸入總賣出數量：(1~${maximumAmount})`), 10);
   if (! amount) {
@@ -132,23 +132,26 @@ export function createSellOrder(user, companyData) {
 
     return false;
   }
-  Meteor.call('createSellOrder', {companyName, unitPrice, amount});
+  Meteor.call('createSellOrder', {companyId, unitPrice, amount});
 }
 
 export function retrieveOrder(orderData) {
-  const message = '' +
-    '確定要取消「以$' + orderData.unitPrice +
-    '單價' + orderData.orderType + '數量' + orderData.amount + '的「' +
-    orderData.companyName + '」公司股份」這筆訂單嗎？（將付出手續費$1）';
-  if (window.confirm(message)) {
-    Meteor.call('retrieveOrder', orderData._id);
+  const companyData = dbCompanies.findOne(orderData.companyId);
+  if (companyData) {
+    const message = '' +
+      '確定要取消「以$' + orderData.unitPrice +
+      '單價' + orderData.orderType + '數量' + orderData.amount + '的「' +
+      companyData.companyName + '」公司股份」這筆訂單嗎？（將付出手續費$1）';
+    if (window.confirm(message)) {
+      Meteor.call('retrieveOrder', orderData._id);
+    }
   }
 }
 
 export function changeChairmanTitle(companyData) {
   const chairmanTitle = window.prompt('要修改董事長的頭銜嗎？', companyData.chairmanTitle);
   if (chairmanTitle && chairmanTitle.length <= 20) {
-    Meteor.call('changeChairmanTitle', companyData.companyName, chairmanTitle);
+    Meteor.call('changeChairmanTitle', companyData._id, chairmanTitle);
   }
   else if (chairmanTitle) {
     window.alert('無效的頭銜名稱！');
@@ -167,26 +170,26 @@ export function voteProduct(productId) {
 
     return false;
   }
-  const productData = dbProducts.findOne(productId);
-  if (window.confirm('您的推薦票剩餘' + user.profile.vote + '張，確定要向產品「' + productData.productName + '」投出推薦票嗎？')) {
+  if (window.confirm('您的推薦票剩餘' + user.profile.vote + '張，確定要向產品投出推薦票嗎？')) {
     Meteor.call('voteProduct', productId);
   }
 }
 
-export function likeProduct(productId, companyName) {
+export function likeProduct(productId, companyId) {
   const user = Meteor.user();
   if (! user) {
-    window.alert('您尚未登入，無法向產品作出股東評價！');
+    window.alert('您尚未登入，無法向產品進行董事推薦！');
 
     return false;
   }
-  const username = user.username;
-  if (dbDirectors.find({companyName, username}).count() < 1) {
-    window.alert('您至少需要擁有一張「' + companyName + '」的股票才可對公司產品做出股東評價！');
+  const companyData = dbCompanies.findOne(companyId);
+  const userId = user._id;
+  if (dbDirectors.find({companyId, userId}).count() < 1) {
+    window.alert('您至少需要擁有一張「' + companyData.companyName + '」的股票才可對公司產品進行董事推薦！');
 
     return false;
   }
-  if (dbProductLike.find({productId, username}).count() > 0) {
+  if (dbProductLike.find({productId, userId}).count() > 0) {
     if (window.confirm('您已經對此產品做出過正面評價，要收回評價嗎？')) {
       Meteor.call('likeProduct', productId);
     }

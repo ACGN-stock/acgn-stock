@@ -23,8 +23,8 @@ const schema = new SimpleSchema({
     min: 4,
     max: 255
   },
-  //公司名稱
-  companyName: {
+  //公司Id
+  companyId: {
     type: String
   },
   //推出季度
