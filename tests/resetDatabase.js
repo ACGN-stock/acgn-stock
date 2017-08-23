@@ -1,7 +1,6 @@
 'use strict';
 import { dbAdvertising } from '../db/dbAdvertising';
 import { dbCompanies } from '../db/dbCompanies';
-import { dbDebugger } from '../db/dbDebugger';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbFoundations } from '../db/dbFoundations';
 import { dbLog } from '../db/dbLog';
@@ -41,7 +40,6 @@ Meteor.startup(function() {
   });
   dbAdvertising.remove({});
   dbCompanies.remove({});
-  dbDebugger.remove({});
   dbDirectors.remove({});
   dbFoundations.find().forEach((foundationData) => {
     const companyName = foundationData.companyName;
@@ -68,16 +66,39 @@ Meteor.startup(function() {
   dbFoundations
     .find({}, {
       field: {
-        _id: 1
+        _id: 1,
+        manager: 1
       }
     })
     .forEach((foundationData, index) => {
       const timeDiff = 3900000 * Math.floor(index / 10);
       const createdAt = new Date(startFoundationTime + timeDiff);
       console.log('update foundation created at: ' + createdAt);
-      dbFoundations.update(foundationData._id, {
-        $set: {createdAt}
-      });
+      const manager = Meteor.users.findOne(
+        {
+          username: foundationData.manager
+        },
+        {
+          field: {
+            _id: 1
+          }
+        }
+      );
+      if (manager) {
+        dbFoundations.update(foundationData._id, {
+          $set: {
+            manager: manager._id,
+            createdAt: createdAt
+          }
+        });
+      }
+      else {
+        dbFoundations.update(foundationData._id, {
+          $set: {
+            createdAt: createdAt
+          }
+        });
+      }
     });
   let stoneCount = 0;
   Meteor.users.find().forEach((userData) => {
@@ -99,6 +120,11 @@ Meteor.startup(function() {
     else {
       console.log('user[' + userData.username + '] don\'t have log data.');
     }
+    Meteor.users.update(userData._id, {
+      $set: {
+        'profile.name': userData.username
+      }
+    });
   });
   console.log('total give ' + stoneCount + ' stones to ' + stoneCount + ' users!');
   dbLog.remove({});
@@ -127,17 +153,17 @@ Meteor.startup(function() {
   const date1 = new Date();
   const date2 = new Date(date1.getTime() + 1);
   Meteor.users.find({}).forEach((user) => {
-    const username = user.username;
-    console.log('re-insert log data of username[' + username + ']...');
+    const userId = user._id;
+    console.log('re-insert log data of userId[' + userId + ']...');
     dbLog.insert({
       logType: '驗證通過',
-      username: [username],
+      userId: [userId],
       price: 10000,
       createdAt: date1
     });
     dbLog.insert({
       logType: '免費得石',
-      username: [username],
+      userId: [userId],
       amount: user.profile.stone,
       message: '之前協助公測累積的石頭總數',
       createdAt: date2
