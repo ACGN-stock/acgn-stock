@@ -105,8 +105,7 @@ function validateUsers(checkUsername) {
           }
           else {
             const profile = {
-              name: username,
-              money: config.beginMoney
+              name: username
             };
             const userId = Accounts.createUser({username, password, profile});
             dbLog.insert({

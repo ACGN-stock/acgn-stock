@@ -1,6 +1,7 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import SimpleSchema from 'simpl-schema';
+import { config } from '../config';
 
 const schema = new SimpleSchema({
   //使用者PTT帳號名稱
@@ -28,7 +29,7 @@ const schema = new SimpleSchema({
       money: {
         type: SimpleSchema.Integer,
         min: 0,
-        defaultValue: 0
+        defaultValue: config.beginMoney
       },
       //推薦票數量
       vote: {
