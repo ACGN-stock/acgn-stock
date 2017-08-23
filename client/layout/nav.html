@@ -1,12 +1,12 @@
 <template name="nav">
   <nav id="nav" class="navbar navbar-toggleable-md navbar-light bg-faded">
     {{#if currentUser}}
-      <span class="navbar-brand dropdown" title="當前登入使用者：{{currentUser.username}}">
+      <span class="navbar-brand dropdown" title="當前登入使用者：{{currentUser.profile.name}}">
         <a class="dropdown-toggle" href="#">
           <i class="fa fa-user-o" aria-hidden="true"></i>
-          {{currentUser.username}}
+          {{currentUser.profile.name}}
         </a>
-        <div class="dropdown-menu px-3 text-right" aria-labelledby="navbarDropdownMenuLink">
+        <div class="dropdown-menu px-3 text-right">
           <li title="現有資金：${{currentUser.profile.money}}">
             <span class="float-left">
               <i class="fa fa-usd" aria-hidden="true"></i>
@@ -32,8 +32,22 @@
         </div>
       </span>
     {{else}}
-      <span class="navbar-brand">
-        <a href="#" data-action="login">未登入</a>
+      <span class="navbar-brand dropdown">
+        <a class="dropdown-toggle" href="#">未登入</a>
+        <div class="dropdown-menu px-3 text-right">
+          <a class="d-block" href="#" title="以PTT帳號登入" data-login="PTT">
+            以PTT帳號登入
+          </a>
+          <a class="d-block" href="#" title="以Google帳號登入" data-login="Google">
+            以Google帳號登入
+          </a>
+          <a class="d-block" href="#" title="以Github帳號登入" data-login="Github">
+            以Github帳號登入
+          </a>
+          <a class="d-block" href="#" title="以Facebook帳號登入" data-login="Facebook">
+            以Facebook帳號登入
+          </a>
+        </div>
       </span>
     {{/if}}
     <button class="navbar-toggler navbar-toggler-right" type="button">

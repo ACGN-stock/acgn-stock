@@ -22,6 +22,8 @@ percolate:migrations
 kadira:flow-router
 aldeed:collection2-core
 kadira:dochead
-mdg:seo
 meteorhacks:aggregate
 mizzao:user-status
+accounts-google
+accounts-github
+accounts-facebook

@@ -54,9 +54,15 @@ Template.nav.helpers({
   }
 });
 Template.nav.events({
-  'click [data-action="login"]'(event) {
+  'click [data-login]'(event) {
     event.preventDefault();
-    rShowLoginDialog.set(true);
+    const loginType = $(event.currentTarget).attr('data-login');
+    if (loginType === 'PTT') {
+      rShowLoginDialog.set(true);
+    }
+    else {
+      Meteor['loginWith' + loginType]();
+    }
   },
   'click .dropdown .dropdown-toggle'(event) {
     event.preventDefault();
