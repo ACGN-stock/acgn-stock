@@ -16,6 +16,12 @@
       帳號啟動日期：{{formatDateText this.createdAt}}
     </div>
     <div>
+      上次登入時間：{{formatDateText this.status.lastLogin.date}}
+    </div>
+    <div>
+      上次登入IP：{{this.status.lastLogin.ipAddr}}
+    </div>
+    <div>
       帳號當前餘額：{{this.profile.money}}
     </div>
     <div>
