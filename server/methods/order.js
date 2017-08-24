@@ -165,7 +165,7 @@ export function createBuyOrder(user, orderData) {
               amount: tradeNumber,
               createdAt: new Date()
             });
-            Meteor.users.update(userId, {
+            Meteor.users.update(sellerUserId, {
               $inc: {
                 'profile.money': lastPrice * tradeNumber
               }
