@@ -13,6 +13,14 @@
     <h1 class="card-title mb-1">使用者「{{this.profile.name}}」的帳號資訊：</h1>
     <hr />
     <div>
+      帳號驗證方式：
+      {{#if this.username}}
+        【PTT帳號】{{this.username}}
+      {{else}}
+        【Google帳號】{{this.services.google.email}}
+      {{/if}}
+    </div>
+    <div>
       帳號啟動日期：{{formatDateText this.createdAt}}
     </div>
     <div>
