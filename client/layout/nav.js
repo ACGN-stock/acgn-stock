@@ -10,6 +10,56 @@ import { pageNameHash } from '../../routes';
 import { rShowLoginDialog } from './validateDialog';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
+
+function updateTheme() {
+  const theme = localStorage.getItem('theme');
+  const $nav = $('#nav');
+
+  if (theme === 'light') {
+    $('#boostrap-theme').attr('href', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css');
+    $nav
+      .removeClass('navbar-inverse')
+      .addClass('navbar-light');
+    const style = document.getElementById('custom-style-dark');
+    if (style) {
+      style.remove();
+    }
+  }
+  else {
+    $('#boostrap-theme').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.0.0-alpha.6/solar/bootstrap.min.css');
+    $nav
+      .removeClass('navbar-light')
+      .addClass('navbar-inverse');
+
+    const style = document.getElementById('custom-style-dark');
+    if (! style) {
+      const style = document.createElement('style');
+      style.id = 'custom-style-dark';
+      style.type = 'text/css';
+
+      const customDarkStyleCSS = `
+        .bg-info .media-body {
+          color: #ffffff;
+        }
+        .bg-info .media-body a {
+          color: #000000;
+        }
+        .table-success a {
+          color: #000000;
+        }
+      `;
+      if (style.styleSheet) {
+        style.styleSheet.cssText = customDarkStyleCSS;
+      }
+      else {
+        style.appendChild(document.createTextNode(customDarkStyleCSS));
+      }
+
+      document.getElementsByTagName('head')[0].appendChild(style);
+    }
+  }
+}
+
 Template.nav.onCreated(function() {
   this.autorun(() => {
     if (dbResourceLock.find('season').count()) {
@@ -17,6 +67,14 @@ Template.nav.onCreated(function() {
     }
     this.subscribe('currentSeason');
   });
+});
+
+//每次開啟網頁時只確認一次預設theme
+if (! localStorage.getItem('theme')) {
+  localStorage.setItem('theme', 'light');
+}
+Template.nav.onRendered(function() {
+  updateTheme();
 });
 Template.nav.helpers({
   getNavLinkListClassList() {
@@ -95,12 +153,9 @@ Template.nav.events({
   'click [data-action="switch-theme"]'(event) {
     event.preventDefault();
     const $switcher = $(event.currentTarget);
-    const rel = $switcher.attr('rel');
-    $('#boostrap-theme').attr('href', rel);
-    const navClass = $switcher.attr('data-nav-class');
-    $('#nav')
-      .removeClass('navbar-light navbar-inverse')
-      .addClass(navClass);
+    const theme = $switcher.attr('data-theme');
+    localStorage.setItem('theme', theme);
+    updateTheme();
   },
   'click [data-action="logout"]'(event) {
     event.preventDefault();
