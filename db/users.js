@@ -1,7 +1,6 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import SimpleSchema from 'simpl-schema';
-import { config } from '../config';
 
 const schema = new SimpleSchema({
   //使用者PTT帳號名稱
@@ -29,7 +28,7 @@ const schema = new SimpleSchema({
       money: {
         type: SimpleSchema.Integer,
         min: 0,
-        defaultValue: config.beginMoney
+        defaultValue: 0
       },
       //推薦票數量
       vote: {
@@ -37,25 +36,24 @@ const schema = new SimpleSchema({
         min: 0,
         defaultValue: 0
       },
-      //是否為可審核檢舉的管理人
-      isAdmin: {
-        type: Boolean,
-        defaultValue: false
-      },
-      //是否被撤銷了經理人資格
-      revokeQualification: {
-        type: Boolean,
-        defaultValue: false
-      },
+      //聖晶石數量
       stone: {
         type: SimpleSchema.Integer,
         min: 0,
         defaultValue: 0
       },
-      costStone: {
-        type: SimpleSchema.Integer,
-        min: 0,
-        defaultValue: 0
+      //是否為金管會委員
+      isAdmin: {
+        type: Boolean,
+        defaultValue: false
+      },
+      //被禁止的權限
+      ban: {
+        type: Array,
+        defaultValue: []
+      },
+      'ban.$': {
+        type: String
       }
     })
   },
