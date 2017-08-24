@@ -135,16 +135,5 @@ Meteor.startup(function() {
       createdAt: date2
     });
   });
-  Meteor.users.update(
-    {},
-    {
-      $unset: {
-        'profile.revokeQualification': ''
-      }
-    },
-    {
-      multi: true
-    }
-  );
   console.log('reset database done!');
 });
