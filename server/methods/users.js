@@ -197,7 +197,6 @@ Meteor.publish('accountInfo', function(userId) {
 Meteor.publish('accountInfo', function(userId) {
   check(this.userId, String);
   check(userId, String);
-  const subscriber
 
   return [
     Meteor.users.find(userId, {
