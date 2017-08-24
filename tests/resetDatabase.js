@@ -41,28 +41,7 @@ Meteor.startup(function() {
   dbAdvertising.remove({});
   dbCompanies.remove({});
   dbDirectors.remove({});
-  dbFoundations.find().forEach((foundationData) => {
-    const companyName = foundationData.companyName;
-    if (dbFoundations.find({companyName}).count() > 1) {
-      console.log('remove foundations[' + companyName + '] because have same name foundations.');
-      dbFoundations.remove(foundationData._id);
-    }
-    else if (typeof foundationData._id !== 'string') {
-      console.log('re insert foundations[' + companyName + '] because have incrorect _id.');
-      dbFoundations.remove(foundationData._id);
-      dbFoundations.insert({
-        companyName: companyName,
-        manager: foundationData.manager,
-        tags: foundationData.tags,
-        pictureSmall: foundationData.pictureSmall,
-        pictureBig: foundationData.pictureBig,
-        description: foundationData.description,
-        invest: [],
-        createdAt: now
-      });
-    }
-  });
-  const startFoundationTime = 1503532800000;
+  const startFoundationTime = 1503547200000;
   dbFoundations
     .find({}, {
       field: {
@@ -74,43 +53,35 @@ Meteor.startup(function() {
       const timeDiff = 3900000 * Math.floor(index / 10);
       const createdAt = new Date(startFoundationTime + timeDiff);
       console.log('update foundation created at: ' + createdAt);
-      const manager = Meteor.users.findOne(
-        {
-          username: foundationData.manager
-        },
-        {
-          field: {
-            _id: 1
-          }
+      dbFoundations.update(foundationData._id, {
+        $set: {
+          createdAt: createdAt
         }
-      );
-      if (manager) {
-        dbFoundations.update(foundationData._id, {
-          $set: {
-            manager: manager._id,
-            createdAt: createdAt
-          }
-        });
-      }
-      else {
-        dbFoundations.update(foundationData._id, {
-          $set: {
-            createdAt: createdAt
-          }
-        });
-      }
+      });
     });
+  dbFoundations.update(
+    {},
+    {
+      $set: {
+        invest: []
+      }
+    },
+    {
+      multi: true
+    }
+  );
   let stoneCount = 0;
   Meteor.users.find().forEach((userData) => {
+    const userId = userData._id;
     const logDataCursor = dbLog.find({
-      username: userData.username,
+      userId: userId,
       logType: {
         $nin: ['驗證通過', '發薪紀錄', '創立成功', '創立失敗', '創立得股', '創立退款', '免費得石']
       }
     });
     if (logDataCursor.count() > 0) {
-      console.log('find user[' + userData.username + '] log data, increase stone by 1.');
-      Meteor.users.update(userData._id, {
+      console.log('find user[' + userId + '] log data, increase stone by 1.');
+      Meteor.users.update(userId, {
         $inc: {
           'profile.stone': 1
         }
@@ -120,11 +91,6 @@ Meteor.startup(function() {
     else {
       console.log('user[' + userData.username + '] don\'t have log data.');
     }
-    Meteor.users.update(userData._id, {
-      $set: {
-        'profile.name': userData.username
-      }
-    });
   });
   console.log('total give ' + stoneCount + ' stones to ' + stoneCount + ' users!');
   dbLog.remove({});
@@ -169,5 +135,16 @@ Meteor.startup(function() {
       createdAt: date2
     });
   });
+  Meteor.users.update(
+    {},
+    {
+      $unset: {
+        'profile.revokeQualification': ''
+      }
+    },
+    {
+      multi: true
+    }
+  );
   console.log('reset database done!');
 });
