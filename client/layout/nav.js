@@ -10,6 +10,19 @@ import { pageNameHash } from '../../routes';
 import { rShowLoginDialog } from './validateDialog';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
+
+export function updateTheme() {
+  const theme = localStorage.getItem('theme');
+  $('#nav').removeClass('navbar-light navbar-inverse');
+  if (theme === 'light') {
+    $('#boostrap-theme').attr('href', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css');
+    $('#nav').addClass('navbar-light');
+  } else {
+    $('#boostrap-theme').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.0.0-alpha.6/solar/bootstrap.min.css');
+    $('#nav').addClass('navbar-inverse');
+  }
+}
+
 Template.nav.onCreated(function() {
   this.autorun(() => {
     if (dbResourceLock.find('season').count()) {
@@ -17,6 +30,13 @@ Template.nav.onCreated(function() {
     }
     this.subscribe('currentSeason');
   });
+});
+Template.nav.onRendered(function() {
+  const theme = localStorage.getItem('theme');
+  if (!theme) {
+    localStorage.setItem('theme', 'light');
+  };
+  updateTheme();
 });
 Template.nav.helpers({
   getNavLinkListClassList() {
@@ -95,12 +115,9 @@ Template.nav.events({
   'click [data-action="switch-theme"]'(event) {
     event.preventDefault();
     const $switcher = $(event.currentTarget);
-    const rel = $switcher.attr('rel');
-    $('#boostrap-theme').attr('href', rel);
-    const navClass = $switcher.attr('data-nav-class');
-    $('#nav')
-      .removeClass('navbar-light navbar-inverse')
-      .addClass(navClass);
+    const theme = $switcher.attr('data-theme');
+    localStorage.setItem('theme', theme);
+    updateTheme();
   },
   'click [data-action="logout"]'(event) {
     event.preventDefault();
