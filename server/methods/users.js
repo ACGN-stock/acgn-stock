@@ -107,13 +107,7 @@ function validateUsers(checkUsername) {
             const profile = {
               name: username
             };
-            const userId = Accounts.createUser({username, password, profile});
-            dbLog.insert({
-              logType: '驗證通過',
-              userId: [userId],
-              price: config.beginMoney,
-              createdAt: new Date()
-            });
+            Accounts.createUser({username, password, profile});
             dbValidatingUsers.remove(validatingUser._id);
           }
         }
@@ -123,6 +117,23 @@ function validateUsers(checkUsername) {
 
   return checkResult;
 }
+Accounts.onCreateUser((options, user) => {
+  user.profile = _.defaults({}, options.profile, {
+    money: config.beginMoney,
+    vote: 0,
+    stone: 0,
+    isAdmin: false,
+    ban: []
+  });
+  dbLog.insert({
+    logType: '驗證通過',
+    userId: [user._id],
+    price: config.beginMoney,
+    createdAt: new Date()
+  });
+
+  return user;
+});
 
 //以Ajax方式發布使用者名稱
 WebApp.connectHandlers.use(function(req, res, next) {
