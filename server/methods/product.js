@@ -363,7 +363,6 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
 });
 
 Meteor.publish('queryMyLikeProduct', function(companyId) {
-  check(this.userId, String);
   check(companyId, String);
   const userId = this.userId;
   if (userId) {
@@ -373,5 +372,8 @@ Meteor.publish('queryMyLikeProduct', function(companyId) {
         url: 0
       }
     });
+  }
+  else {
+    return [];
   }
 });
