@@ -14,12 +14,38 @@ const rNavLinkListCollapsed = new ReactiveVar(true);
 export function updateTheme() {
   const theme = localStorage.getItem('theme');
   $('#nav').removeClass('navbar-light navbar-inverse');
+  var style = document.getElementById('custom-style-dark');
+  if (style !== null) {
+    style.remove();
+  }
+
   if (theme === 'light') {
     $('#boostrap-theme').attr('href', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css');
     $('#nav').addClass('navbar-light');
   } else {
     $('#boostrap-theme').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.0.0-alpha.6/solar/bootstrap.min.css');
     $('#nav').addClass('navbar-inverse');
+
+    const customDarkStyleCSS = ' \
+      .bg-info .media-body { \
+        color: #ffffff; \
+      } \
+      .bg-info .media-body a { \
+        color: #000000; \
+      } \
+      .table-success a { \
+        color: #000000; \
+      } \
+    ';
+    var style = document.createElement('style');
+    style.id = 'custom-style-dark';
+    style.type = 'text/css';
+    if(style.styleSheet){
+      style.styleSheet.cssText = customDarkStyleCSS;
+    } else {
+      style.appendChild(document.createTextNode(customDarkStyleCSS));
+    }
+    document.getElementsByTagName('head')[0].appendChild(style);
   }
 }
 
