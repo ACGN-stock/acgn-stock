@@ -11,7 +11,6 @@ import { foundCompany, investFoundCompany } from '../server/methods/foundation';
 import { createBuyOrder, createSellOrder, retrieveOrder } from '../server/methods/order';
 import { createProduct, voteProduct } from '../server/methods/product';
 import { resignManager, contendManager, supportCandidate } from '../server/methods/company';
-import { config } from '../config';
 
 if (Meteor.users.find().count() < 1) {
   for (let i = 1; i <= 30; i += 1) {
@@ -19,8 +18,7 @@ if (Meteor.users.find().count() < 1) {
       username: 'user' + i,
       password: 'user' + i,
       profile: {
-        name: 'user' + i,
-        money: config.beginMoney
+        name: 'user' + i
       }
     });
   }
