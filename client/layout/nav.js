@@ -11,41 +11,52 @@ import { rShowLoginDialog } from './validateDialog';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 
-export function updateTheme() {
+function updateTheme() {
   const theme = localStorage.getItem('theme');
-  $('#nav').removeClass('navbar-light navbar-inverse');
-  var style = document.getElementById('custom-style-dark');
-  if (style !== null) {
-    style.remove();
-  }
+  const $nav = $('#nav');
 
   if (theme === 'light') {
     $('#boostrap-theme').attr('href', 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css');
-    $('#nav').addClass('navbar-light');
-  } else {
-    $('#boostrap-theme').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.0.0-alpha.6/solar/bootstrap.min.css');
-    $('#nav').addClass('navbar-inverse');
-
-    const customDarkStyleCSS = ' \
-      .bg-info .media-body { \
-        color: #ffffff; \
-      } \
-      .bg-info .media-body a { \
-        color: #000000; \
-      } \
-      .table-success a { \
-        color: #000000; \
-      } \
-    ';
-    var style = document.createElement('style');
-    style.id = 'custom-style-dark';
-    style.type = 'text/css';
-    if(style.styleSheet){
-      style.styleSheet.cssText = customDarkStyleCSS;
-    } else {
-      style.appendChild(document.createTextNode(customDarkStyleCSS));
+    $nav
+      .removeClass('navbar-inverse')
+      .addClass('navbar-light');
+    const style = document.getElementById('custom-style-dark');
+    if (style) {
+      style.remove();
     }
-    document.getElementsByTagName('head')[0].appendChild(style);
+  }
+  else {
+    $('#boostrap-theme').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.0.0-alpha.6/solar/bootstrap.min.css');
+    $nav
+      .removeClass('navbar-light')
+      .addClass('navbar-inverse');
+
+    const style = document.getElementById('custom-style-dark');
+    if (! style) {
+      const style = document.createElement('style');
+      style.id = 'custom-style-dark';
+      style.type = 'text/css';
+
+      const customDarkStyleCSS = `
+        .bg-info .media-body {
+          color: #ffffff;
+        }
+        .bg-info .media-body a {
+          color: #000000;
+        }
+        .table-success a {
+          color: #000000;
+        }
+      `;
+      if (style.styleSheet) {
+        style.styleSheet.cssText = customDarkStyleCSS;
+      }
+      else {
+        style.appendChild(document.createTextNode(customDarkStyleCSS));
+      }
+
+      document.getElementsByTagName('head')[0].appendChild(style);
+    }
   }
 }
 
@@ -57,11 +68,12 @@ Template.nav.onCreated(function() {
     this.subscribe('currentSeason');
   });
 });
+
+//每次開啟網頁時只確認一次預設theme
+if (! localStorage.getItem('theme')) {
+  localStorage.setItem('theme', 'light');
+}
 Template.nav.onRendered(function() {
-  const theme = localStorage.getItem('theme');
-  if (!theme) {
-    localStorage.setItem('theme', 'light');
-  };
   updateTheme();
 });
 Template.nav.helpers({
