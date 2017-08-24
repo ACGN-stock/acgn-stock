@@ -21,8 +21,6 @@ const rDirectorOffset = new ReactiveVar(0);
 const rBuyOrderOffset = new ReactiveVar(0);
 const rSellOrderOffset = new ReactiveVar(0);
 const rLogOffset = new ReactiveVar(0);
-const rTodayDealAmount = new ReactiveVar(0);
-const rPriceList = new ReactiveVar([]);
 Template.company.onCreated(function() {
   this.autorun(() => {
     if (dbResourceLock.find('season').count()) {
@@ -103,11 +101,26 @@ Template.company.onCreated(function() {
       this.subscribe('companyLog', companyId, rLogOffset.get());
     }
   });
+});
+
+//定時呼叫取得今日交易量與股價走勢資料
+const rTodayDealAmount = new ReactiveVar(0);
+let lastQueryTodayDealAmountTime;
+const rPriceList = new ReactiveVar([]);
+let lastQueryStocksPriceTime;
+Template.company.onCreated(function() {
+  this.autorun(() => {
+    FlowRouter.getParam('companyId');
+    rTodayDealAmount.set(0);
+    lastQueryTodayDealAmountTime = new Date().setHours(0, 0, 0, 0) - 1;
+    rPriceList.set([]);
+    lastQueryStocksPriceTime = new Date().setHours(0, 0, 0, 0) - 1;
+  });
   queryDealAmountAndPrice();
-  this.intervalId = Meteor.setInterval(queryDealAmountAndPrice, 30000);
+  this.queryDealAmountAndPriceIntervalId = Meteor.setInterval(queryDealAmountAndPrice, 30000);
 });
 Template.company.onDestroyed(function() {
-  Meteor.clearInterval(this.intervalId);
+  Meteor.clearInterval(this.queryDealAmountAndPriceIntervalId);
 });
 function queryDealAmountAndPrice() {
   if (dbResourceLock.find('season').count()) {
@@ -115,14 +128,18 @@ function queryDealAmountAndPrice() {
   }
   const companyId = FlowRouter.getParam('companyId');
   if (companyId) {
-    Meteor.nativeCall('queryTodayDealAmount', companyId, (error, result) => {
+    Meteor.nativeCall('queryTodayDealAmount', companyId, lastQueryTodayDealAmountTime, (error, result) => {
       if (! error) {
-        rTodayDealAmount.set(result);
+        rTodayDealAmount.set(rTodayDealAmount.get() + result.data);
+        lastQueryTodayDealAmountTime = result.lastTime;
       }
     });
-    Meteor.nativeCall('queryStocksPrice', companyId, (error, result) => {
+    Meteor.nativeCall('queryStocksPrice', companyId, lastQueryStocksPriceTime, (error, result) => {
       if (! error) {
-        rPriceList.set(result);
+        if (result.list.length > 0) {
+          rPriceList.set(rPriceList.get().concat(result.list));
+        }
+        lastQueryStocksPriceTime = result.lastTime;
       }
     });
   }

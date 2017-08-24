@@ -8,7 +8,7 @@ import { WebApp } from 'meteor/webapp';
 import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
-import { dbFoundations } from '../../db/dbFoundations';
+// import { dbFoundations } from '../../db/dbFoundations';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
@@ -42,19 +42,19 @@ function editCompany(user, companyId, newCompanyData) {
   if (userId !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
-  const companyName = newCompanyData.companyName;
-  if (dbFoundations.find({companyName}).count() > 0) {
-    throw new Meteor.Error(403, '已有相同名稱的公司創立中，無法修改公司名稱！');
-  }
-  const sameCompanyNameCompaniesCursor = dbCompanies.find({
-    _id: {
-      $ne: companyId
-    },
-    companyName: companyName
-  });
-  if (sameCompanyNameCompaniesCursor.count() > 0) {
-    throw new Meteor.Error(403, '已有相同名稱的公司上市中，無法修改公司名稱！');
-  }
+  // const companyName = newCompanyData.companyName;
+  // if (dbFoundations.find({companyName}).count() > 0) {
+  //   throw new Meteor.Error(403, '已有相同名稱的公司創立中，無法修改公司名稱！');
+  // }
+  // const sameCompanyNameCompaniesCursor = dbCompanies.find({
+  //   _id: {
+  //     $ne: companyId
+  //   },
+  //   companyName: companyName
+  // });
+  // if (sameCompanyNameCompaniesCursor.count() > 0) {
+  //   throw new Meteor.Error(403, '已有相同名稱的公司上市中，無法修改公司名稱！');
+  // }
   dbLog.insert({
     logType: '經理管理',
     userId: [userId],
@@ -334,54 +334,57 @@ function directorMessage(user, companyId, message) {
 }
 
 Meteor.methods({
-  queryTodayDealAmount(companyId) {
+  queryTodayDealAmount(companyId, lastTime) {
     check(companyId, String);
+    check(lastTime, Number);
 
-    return queryTodayDealAmount(companyId);
+    return queryTodayDealAmount(companyId, lastTime);
   }
 });
-function queryTodayDealAmount(companyId) {
-  const todayBegin = new Date(new Date().setHours(0, 0, 0, 0));
-  let amount = 0;
+function queryTodayDealAmount(companyId, lastTime) {
+  lastTime = Math.max(lastTime, new Date().setHours(0, 0, 0, 0) - 1);
+  let data = 0;
   dbLog
     .find(
       {
         logType: '交易紀錄',
         companyId: companyId,
         createdAt: {
-          $gte: todayBegin
+          $gt: new Date(lastTime)
         }
       },
       {
         fields: {
-          amount: 1
+          amount: 1,
+          createdAt: 1
         },
         disableOplog: true
       }
     )
     .forEach((logData) => {
-      amount += logData.amount;
+      lastTime = Math.max(lastTime, logData.createdAt.getTime());
+      data += logData.amount;
     });
 
-  return amount;
+  return {data, lastTime};
 }
 
 Meteor.methods({
-  queryStocksPrice(companyId) {
+  queryStocksPrice(companyId, lastTime) {
     check(companyId, String);
+    check(lastTime, Number);
 
-    return queryStocksPrice(companyId);
+    return queryStocksPrice(companyId, lastTime);
   }
 })
-function queryStocksPrice(companyId) {
-  const aDayAgo = new Date(Date.now() - 86400000);
-
-  return dbPrice
+function queryStocksPrice(companyId, lastTime) {
+  lastTime = Math.max(lastTime, new Date().setHours(0, 0, 0, 0) - 1);
+  const list = dbPrice
     .find(
       {
         companyId: companyId,
         createdAt: {
-          $gte: aDayAgo
+          $gt: new Date(lastTime)
         }
       },
       {
@@ -393,11 +396,16 @@ function queryStocksPrice(companyId) {
       }
     )
     .map((priceData) => {
+      const x = priceData.createdAt.getTime();
+      lastTime = Math.max(lastTime, x);
+
       return {
-        x: priceData.createdAt.getTime(),
+        x: x,
         y: priceData.price
       };
     });
+
+  return {list, lastTime};
 }
 
 //以Ajax方式發布公司名稱
