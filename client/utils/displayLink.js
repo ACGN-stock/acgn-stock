@@ -8,6 +8,9 @@ Template.userLink.onRendered(function() {
   if (userId === '!none') {
     this.$('a').text('無');
   }
+  else if (userId === '!system') {
+    this.$('a').text('系統');
+  }
   else if (userId) {
     const $link = this.$('a');
     $.ajax({
