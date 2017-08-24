@@ -2,19 +2,20 @@
 import { Meteor } from 'meteor/meteor';
 import { config } from '../config';
 import { dbLog } from '../db/dbLog';
+import { dbVariables } from '../db/dbVariables';
 
-const {salaryPerPay, paySalaryCounter} = config;
-let counter = paySalaryCounter;
+const {salaryPerPay} = config;
 export function paySalary() {
-  counter -= 1;
-  if (counter <= 0) {
-    counter = paySalaryCounter;
-    console.info(new Date().toLocaleString() + ': paySalary');
-    const now = new Date();
+  const todayBeginTime = new Date().setHours(0, 0, 0, 0);
+  const lastPayTime = dbVariables.get('lastPayTime');
+  if (! lastPayTime || lastPayTime.setHours(0, 0, 0, 0) !== todayBeginTime) {
+    const thisPayTime = new Date();
+    dbVariables.set('lastPayTime', thisPayTime);
+    console.info(thisPayTime.toLocaleString() + ': paySalary');
     Meteor.users.update(
       {
         createdAt: {
-          $lte: now
+          $lte: thisPayTime
         }
       },
       {
@@ -30,7 +31,7 @@ export function paySalary() {
       logType: '發薪紀錄',
       userId: ['!all'],
       price: salaryPerPay,
-      createdAt: now
+      createdAt: thisPayTime
     });
   }
 }

@@ -2,7 +2,6 @@
 export const config = {
   websiteName: 'PTT ACGN股票交易市場', //網站名稱
   intervalTimer: 60000, //每隔多少微秒進行一次工作檢查
-  paySalaryCounter: 1440, //每隔多少次工作檢查就付多少薪水給所有驗證通過的使用者
   releaseStocksForHighPriceMinCounter: 60, //公司檢查是否要釋出股票的最小隨機工作檢查次數
   releaseStocksForHighPriceMaxCounter: 180, //公司檢查是否要釋出股票的最大隨機工作檢查次數
   releaseStocksForNoDealMinCounter: 1440, //公司檢查是否要釋出股票的最小隨機工作檢查次數
