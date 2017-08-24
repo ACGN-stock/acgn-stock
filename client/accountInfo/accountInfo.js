@@ -1,5 +1,4 @@
 'use strict';
-import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
@@ -84,33 +83,13 @@ Template.accountInfoOwnStockList.helpers({
     const userId = FlowRouter.getParam('userId');
 
     return dbDirectors.find({userId});
-  }
-});
-Template.accountInfoOwnStockList.helpers({
+  },
   paginationData() {
     return {
       useVariableForTotalCount: 'totalCountOfAccountOwnStocks',
       dataNumberPerPage: 10,
       offset: ownStocksOffset
     };
-  }
-});
-
-Template.accountInfoOwnStockCompanyLink.onRendered(function() {
-  const companyId = this.data.companyId;
-  if (companyId) {
-    $.ajax({
-      url: '/companyName',
-      data: {
-        id: companyId
-      },
-      success: (companyName) => {
-        const path = FlowRouter.path('company', {companyId});
-        this.$('a')
-          .attr('href', path)
-          .text(companyName);
-      }
-    });
   }
 });
 
