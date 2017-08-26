@@ -10,6 +10,7 @@ import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { regImageDataUrl } from '../utils/regexp';
+import { alertDialog } from '../layout/alertDialog';
 
 Template.createFoundationPlan.helpers({
   defaultData() {
@@ -186,7 +187,7 @@ function addNewTag(event, templatInstance) {
   const model = _.clone(templatInstance.model.get());
   const tag = $input.val().trim();
   if (! tag) {
-    window.alert('請輸入標籤名稱！');
+    alertDialog.alert('請輸入標籤名稱！');
 
     return false;
   }
