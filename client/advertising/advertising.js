@@ -12,7 +12,7 @@ import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from
 import { formatDateText } from '../utils/helpers';
 import { config } from '../../config';
 import { integerString } from '../utils/regexp';
-import { AlertDialog } from '../layout/alertDialog';
+import { alertDialog } from '../layout/alertDialog';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInBuyAdvertisingMode = new ReactiveVar(false);
@@ -68,32 +68,34 @@ Template.advertising.events({
     event.preventDefault();
     const advertisingId = $(event.currentTarget).attr('data-add-pay');
     const advertisingData = dbAdvertising.findOne(advertisingId);
-    const confirmHandler = function(confirmResult) {
-      if (confirmResult) {
-        AlertDialog.dialog({
-          type: 'prompt',
-          title: '追加廣告金額',
-          message: '請輸入要額外追加的廣告金額：',
-          defaultValue: null,
-          callback: function(result) {
-            const addPay = parseInt(result, 10);
-            if (addPay) {
-              Meteor.call('addAdvertisingPay', advertisingId, addPay);
-            }
+    if (advertisingData) {
+      if (advertisingData.userId !== Meteor.user()._id) {
+        alertDialog.confirm('您並非該廣告的初始購買人，確定要在這個廣告上追加廣告金額嗎？', (result) => {
+          if (result) {
+            showAskAddPayDialog(advertisingId);
           }
         });
       }
-    };
-    if (advertisingData) {
-      if (advertisingData.userId !== Meteor.user._id) {
-        AlertDialog.confirm('您並非該廣告的初始購買人，確定要在這個廣告上追加廣告金額嗎？', confirmHandler);
-      }
       else {
-        confirmHandler(true);
+        showAskAddPayDialog(advertisingId);
       }
     }
   }
 });
+function showAskAddPayDialog(advertisingId) {
+  alertDialog.dialog({
+    type: 'prompt',
+    title: '追加廣告金額',
+    message: '請輸入要額外追加的廣告金額：',
+    defaultValue: null,
+    callback: function(result) {
+      const addPay = parseInt(result, 10);
+      if (addPay) {
+        Meteor.call('addAdvertisingPay', advertisingId, addPay);
+      }
+    }
+  });
+}
 
 inheritUtilForm(Template.buyAdvertisingForm);
 Template.buyAdvertisingForm.onCreated(function() {
