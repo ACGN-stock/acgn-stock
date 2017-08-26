@@ -10,7 +10,7 @@ import { dbResourceLock } from '../../db/dbResourceLock';
 import { formatDateText } from '../utils/helpers';
 import { config } from '../../config';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { AlertDialog } from '../layout/alertDialog';
+import { alertDialog } from '../layout/alertDialog';
 
 inheritedShowLoadingOnSubscribing(Template.foundationPlan);
 const rKeyword = new ReactiveVar('');
@@ -121,12 +121,12 @@ Template.foundationPlanInfo.events({
     const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
     const maximumInvest = Meteor.user().profile.money;
     if (minimumInvest > maximumInvest) {
-      AlertDialog.alert('您的金錢不足以進行投資！');
+      alertDialog.alert('您的金錢不足以進行投資！');
 
       return false;
     }
 
-    AlertDialog.dialog({
+    alertDialog.dialog({
       type: 'prompt',
       title: '投資',
       message: `要投資多少金額？(${minimumInvest}~${maximumInvest})`,
@@ -140,7 +140,7 @@ Template.foundationPlanInfo.events({
           Meteor.call('investFoundCompany', templaceInstance.data._id, amount);
         }
         else {
-          AlertDialog.alert('不正確的金額數字！');
+          alertDialog.alert('不正確的金額數字！');
         }
       }
     });
