@@ -11,6 +11,7 @@ import { dbProducts, productTypeList } from '../../db/dbProducts';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { regImageDataUrl } from '../utils/regexp';
+import { AlertDialog } from '../layout/alertDialog';
 import SimpleSchema from 'simpl-schema';
 
 inheritedShowLoadingOnSubscribing(Template.manageCompany);
@@ -163,7 +164,7 @@ function addNewTag(event, templatInstance) {
   const model = _.clone(templatInstance.model.get());
   const tag = $input.val().trim();
   if (! tag) {
-    window.alert('請輸入標籤名稱！');
+    AlertDialog.alert('請輸入標籤名稱！');
 
     return false;
   }
@@ -211,8 +212,10 @@ Template.companyProductManage.events({
   'click [data-retrieve]'(event) {
     const productId = $(event.currentTarget).attr('data-retrieve');
     const productData = dbProducts.findOne(productId);
-    if (productData && window.confirm('確定要刪除「' + productData.productName + '」這項待上架產品嗎？')) {
-      Meteor.call('retrieveProduct', productId);
+    if (productData) {
+      AlertDialog.confirm('確定要刪除「' + productData.productName + '」這項待上架產品嗎？', function(result) {
+        result && Meteor.call('retrieveProduct', productId);
+      });
     }
   }
 });

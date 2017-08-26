@@ -15,6 +15,7 @@ import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct } from '../utils/methods';
 import { config } from '../../config';
+import { AlertDialog } from '../layout/alertDialog';
 
 inheritedShowLoadingOnSubscribing(Template.company);
 const rDirectorOffset = new ReactiveVar(0);
@@ -168,10 +169,11 @@ Template.company.events({
     const companyData = dbCompanies.findOne(companyId);
     const companyName = companyData.companyName;
     const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + companyName + '」以表示確定。';
-    const confirmMessage = window.prompt(message);
-    if (confirmMessage === companyName) {
-      Meteor.call('resignManager', companyId);
-    }
+    AlertDialog.prompt(message, function(confirmMessage) {
+      if (confirmMessage === companyName) {
+        Meteor.call('resignManager', companyId);
+      }
+    });
   }
 });
 
@@ -565,9 +567,9 @@ Template.companyElectInfo.events({
     event.preventDefault();
     const instanceData = templateInstance.data;
     const companyName = instanceData.companyName;
-    if (window.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？')) {
-      Meteor.call('contendManager', instanceData._id);
-    }
+    AlertDialog.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？', function(result) {
+      result && Meteor.call('contendManager', instanceData._id);
+    });
   },
   'click [data-support-candidate]'(event, templateInstance) {
     event.preventDefault();
@@ -581,9 +583,9 @@ Template.companyElectInfo.events({
         id: candidate
       },
       success: (userName) => {
-        if (window.confirm('你確定要支持候選人「' + userName + '」嗎？')) {
-          Meteor.call('supportCandidate', instanceData._id, candidate);
-        }
+        AlertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
+          result && Meteor.call('supportCandidate', instanceData._id, candidate);
+        });
       }
     });
   }
