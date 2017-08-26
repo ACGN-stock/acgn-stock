@@ -481,9 +481,6 @@ Template.companyAllPrudctList.events({
   }
 });
 
-Template.companyDirectorList.onRendered(function() {
-  this.$message = this.$('[name="message"]');
-});
 Template.companyDirectorList.helpers({
   directorList() {
     const companyId = this._id;
@@ -522,8 +519,10 @@ Template.companyDirectorList.helpers({
 Template.companyDirectorList.events({
   'submit form'(event, templateInstance) {
     event.preventDefault();
-    const message = templateInstance.$message.val();
-    Meteor.call('directorMessage', templateInstance.data._id, message);
+    const message = templateInstance.$('[name="message"]').val();
+    if (Meteor.user() && message) {
+      Meteor.call('directorMessage', templateInstance.data._id, message);
+    }
   }
 });
 
