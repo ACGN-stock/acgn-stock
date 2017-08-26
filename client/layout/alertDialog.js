@@ -10,7 +10,7 @@ let strAlertDialogType = 'alert';
 let funcAlertDialogCallback = null;
 let blAlertDialogOK = false;
 
-export const AlertDialog = {
+export const alertDialog = {
   dialog: function(options) {
     strAlertDialogType = options.type;
     strAlertDialogTitle = options.title;
