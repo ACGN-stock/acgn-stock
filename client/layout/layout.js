@@ -13,7 +13,7 @@ Template.layout.helpers({
     return rShowLoginDialog.get() && ! Meteor.user();
   },
   showAlertDialog() {
-  	return rShowAlertDialog.get();
+    return rShowAlertDialog.get();
   }
 });
 

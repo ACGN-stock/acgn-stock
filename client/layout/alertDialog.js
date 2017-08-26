@@ -1,38 +1,52 @@
 'use strict';
-import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 export const rShowAlertDialog = new ReactiveVar(false);
-var strAlertDialogTitle = '';
-var strAlertDialogMessage = '';
-var strAlertDialogDefaultValue = null;
-var strAlertDialogType = 'alert';
-var funcAlertDialogCallback = null;
-var blAlertDialogOK = false;
+let strAlertDialogTitle = '';
+let strAlertDialogMessage = '';
+let strAlertDialogDefaultValue = null;
+let strAlertDialogType = 'alert';
+let funcAlertDialogCallback = null;
+let blAlertDialogOK = false;
 
 export const AlertDialog = {
-  dialog: function(type, title, message, defaultValue, callback) {
-    strAlertDialogType = type;
-    strAlertDialogTitle = title;
-    strAlertDialogMessage = message;
-    strAlertDialogDefaultValue = defaultValue;
-    funcAlertDialogCallback = callback;
+  dialog: function(options) {
+    strAlertDialogType = options.type;
+    strAlertDialogTitle = options.title;
+    strAlertDialogMessage = options.message;
+    strAlertDialogDefaultValue = options.defaultValue;
+    funcAlertDialogCallback = options.callback;
     blAlertDialogOK = false;
     rShowAlertDialog.set(true);
   },
   alert: function(message) {
-    this.dialog('alert', '', message, null, null);
+    this.dialog({
+      type: 'alert',
+      title: '',
+      message: message,
+      defaultValue: null,
+      callback: null
+    });
   },
   confirm: function(message, callback) {
-    this.dialog('confirm', '', message, null, callback);
+    this.dialog({
+      type: 'confirm',
+      title: '',
+      message: message,
+      defaultValue: null,
+      callback: callback
+    });
   },
   prompt: function(message, callback, defaultValue) {
-    this.dialog('prompt', '', message, defaultValue, callback);
-  },
-  promptWithTitle: function(title, message, callback, defaultValue) {
-    this.dialog('prompt', title, message, defaultValue, callback);
-  },
+    this.dialog({
+      type: 'prompt',
+      title: '',
+      message: message,
+      defaultValue: defaultValue,
+      callback: callback
+    });
+  }
 };
 
 Template.alertDialog.onRendered(function() {
@@ -41,14 +55,14 @@ Template.alertDialog.onRendered(function() {
 Template.alertDialog.onDestroyed(function() {
   const callback = funcAlertDialogCallback;
   const ok = blAlertDialogOK;
-  
   if (strAlertDialogType === 'prompt') {
     const value = this.$('input').val();
-    this.$('input').val("");
+    this.$('input').val('');
     if (callback) {
       callback(ok && value);
     }
-  } else if (callback) {
+  }
+  else if (callback) {
     callback(ok);
   }
 });
@@ -73,11 +87,12 @@ Template.alertDialog.helpers({
   }
 });
 Template.alertDialog.events({
-  reset(event, templateInstance) {
+  reset(event) {
+    event.preventDefault();
     blAlertDialogOK = false;
     rShowAlertDialog.set(false);
   },
-  submit(event, templateInstance) {
+  submit(event) {
     event.preventDefault();
     blAlertDialogOK = true;
     rShowAlertDialog.set(false);

@@ -72,34 +72,44 @@ export function createBuyOrder(user, companyData) {
     return false;
   }
 
-  AlertDialog.promptWithTitle('股份購入', `請輸入您期望購入的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`, function(result) {
-    const unitPrice = parseInt(result, 10);
-    if (! unitPrice) {
-      return false;
-    }
-    if (unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
-      AlertDialog.alert('不正確的價格設定！');
-
-      return false;
-    }
-    const maximumAmount = Math.floor(userMoney / unitPrice);
-    if (maximumAmount < 1) {
-      AlertDialog.alert('您的金錢不足以購買此公司的股票！');
-
-      return false;
-    }
-    AlertDialog.promptWithTitle('股份購入', `請輸入總購入數量：(1~${maximumAmount})`, function(result) {
-      const amount = parseInt(result, 10);
-      if (! amount) {
+  AlertDialog.dialog({
+    type: 'prompt',
+    title: '股份購入',
+    message: `請輸入您期望購入的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`,
+    callback: function(result) {
+      const unitPrice = parseInt(result, 10);
+      if (! unitPrice) {
         return false;
       }
-      if (amount < 1 || amount > maximumAmount) {
-        AlertDialog.alert('不正確的數量設定！');
+      if (unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
+        AlertDialog.alert('不正確的價格設定！');
 
         return false;
       }
-      Meteor.call('createBuyOrder', {companyId, unitPrice, amount});
-    });
+      const maximumAmount = Math.floor(userMoney / unitPrice);
+      if (maximumAmount < 1) {
+        AlertDialog.alert('您的金錢不足以購買此公司的股票！');
+
+        return false;
+      }
+      AlertDialog.dialog({
+        type: 'prompt',
+        title: '股份購入',
+        message: `請輸入總購入數量：(1~${maximumAmount})`,
+        callback: function(result) {
+          const amount = parseInt(result, 10);
+          if (! amount) {
+            return false;
+          }
+          if (amount < 1 || amount > maximumAmount) {
+            AlertDialog.alert('不正確的數量設定！');
+
+            return false;
+          }
+          Meteor.call('createBuyOrder', {companyId, unitPrice, amount});
+        }
+      });
+    }
   });
 }
 
@@ -118,30 +128,40 @@ export function createSellOrder(user, companyData) {
   }
   const minimumUnitPrice = Math.max(Math.ceil(companyData.listPrice / 2), 1);
   const maximumUnitPrice = companyData.listPrice * 2;
-  AlertDialog.promptWithTitle('股份賣出', `請輸入您期望賣出的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`, function(result) {
-    const unitPrice = parseInt(result, 10);
-    if (! unitPrice) {
-      return false;
-    }
-    if (unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
-      AlertDialog.alert('不正確的價格設定！');
-
-      return false;
-    }
-    const directorData = dbDirectors.findOne({userId, companyId});
-    const maximumAmount = directorData.stocks;
-    AlertDialog.promptWithTitle('股份賣出', `請輸入總賣出數量：(1~${maximumAmount})`, function(result) {
-      const amount = parseInt(result, 10);
-      if (! amount) {
+  AlertDialog.dialog({
+    type: 'prompt',
+    title: '股份賣出',
+    message: `請輸入您期望賣出的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`,
+    callback: function(result) {
+      const unitPrice = parseInt(result, 10);
+      if (! unitPrice) {
         return false;
       }
-      if (amount < 1 || amount > maximumAmount) {
-        AlertDialog.alert('不正確的數量設定！');
+      if (unitPrice < minimumUnitPrice || unitPrice > maximumUnitPrice) {
+        AlertDialog.alert('不正確的價格設定！');
 
         return false;
       }
-      Meteor.call('createSellOrder', {companyId, unitPrice, amount});
-    });
+      const directorData = dbDirectors.findOne({userId, companyId});
+      const maximumAmount = directorData.stocks;
+      AlertDialog.dialog({
+        type: 'prompt',
+        title: '股份賣出',
+        message: `請輸入總賣出數量：(1~${maximumAmount})`,
+        callback: function(result) {
+          const amount = parseInt(result, 10);
+          if (! amount) {
+            return false;
+          }
+          if (amount < 1 || amount > maximumAmount) {
+            AlertDialog.alert('不正確的數量設定！');
+
+            return false;
+          }
+          Meteor.call('createSellOrder', {companyId, unitPrice, amount});
+        }
+      });
+    }
   });
 }
 
@@ -153,7 +173,9 @@ export function retrieveOrder(orderData) {
       '單價' + orderData.orderType + '數量' + orderData.amount + '的「' +
       companyData.companyName + '」公司股份」這筆訂單嗎？（將付出手續費$1）';
     AlertDialog.confirm(message, function(result) {
-      result && Meteor.call('retrieveOrder', orderData._id);
+      if (result) {
+        Meteor.call('retrieveOrder', orderData._id);
+      }
     });
   }
 }
@@ -182,7 +204,9 @@ export function voteProduct(productId) {
     return false;
   }
   AlertDialog.confirm('您的推薦票剩餘' + user.profile.vote + '張，確定要向產品投出推薦票嗎？', function(result) {
-    result && Meteor.call('voteProduct', productId);
+    if (result) {
+      Meteor.call('voteProduct', productId);
+    }
   });
 }
 
@@ -202,7 +226,9 @@ export function likeProduct(productId, companyId) {
   }
   if (dbProductLike.find({productId, userId}).count() > 0) {
     AlertDialog.confirm('您已經對此產品做出過正面評價，要收回評價嗎？', function(result) {
-      result && Meteor.call('likeProduct', productId);
+      if (result) {
+        Meteor.call('likeProduct', productId);
+      }
     });
   }
   else {

@@ -568,7 +568,9 @@ Template.companyElectInfo.events({
     const instanceData = templateInstance.data;
     const companyName = instanceData.companyName;
     AlertDialog.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？', function(result) {
-      result && Meteor.call('contendManager', instanceData._id);
+      if (result) {
+        Meteor.call('contendManager', instanceData._id);
+      }
     });
   },
   'click [data-support-candidate]'(event, templateInstance) {
@@ -584,7 +586,9 @@ Template.companyElectInfo.events({
       },
       success: (userName) => {
         AlertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
-          result && Meteor.call('supportCandidate', instanceData._id, candidate);
+          if (result) {
+            Meteor.call('supportCandidate', instanceData._id, candidate);
+          }
         });
       }
     });

@@ -214,7 +214,9 @@ Template.companyProductManage.events({
     const productData = dbProducts.findOne(productId);
     if (productData) {
       AlertDialog.confirm('確定要刪除「' + productData.productName + '」這項待上架產品嗎？', function(result) {
-        result && Meteor.call('retrieveProduct', productId);
+        if (result) {
+          Meteor.call('retrieveProduct', productId);
+        }
       });
     }
   }

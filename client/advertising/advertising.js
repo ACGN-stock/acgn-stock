@@ -70,10 +70,16 @@ Template.advertising.events({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     const confirmHandler = function(confirmResult) {
       if (confirmResult) {
-        AlertDialog.promptWithTitle('追加廣告金額', '請輸入要額外追加的廣告金額：', function(result) {
-          const addPay = parseInt(result, 10);
-          if (addPay) {
-            Meteor.call('addAdvertisingPay', advertisingId, addPay);
+        AlertDialog.dialog({
+          type: 'prompt',
+          title: '追加廣告金額',
+          message: '請輸入要額外追加的廣告金額：',
+          defaultValue: null,
+          callback: function(result) {
+            const addPay = parseInt(result, 10);
+            if (addPay) {
+              Meteor.call('addAdvertisingPay', advertisingId, addPay);
+            }
           }
         });
       }
@@ -81,7 +87,8 @@ Template.advertising.events({
     if (advertisingData) {
       if (advertisingData.userId !== Meteor.user._id) {
         AlertDialog.confirm('您並非該廣告的初始購買人，確定要在這個廣告上追加廣告金額嗎？', confirmHandler);
-      } else {
+      }
+      else {
         confirmHandler(true);
       }
     }

@@ -126,16 +126,22 @@ Template.foundationPlanInfo.events({
       return false;
     }
 
-    AlertDialog.promptWithTitle('投資', `要投資多少金額？(${minimumInvest}~${maximumInvest})`, function(result) {
-      const amount = parseInt(result);
-      if (! amount) {
-        return false;
-      }
-      if (amount >= minimumInvest && amount <= maximumInvest) {
-        Meteor.call('investFoundCompany', templaceInstance.data._id, amount);
-      }
-      else {
-        AlertDialog.alert('不正確的金額數字！');
+    AlertDialog.dialog({
+      type: 'prompt',
+      title: '投資',
+      message: `要投資多少金額？(${minimumInvest}~${maximumInvest})`,
+      defaultValue: null,
+      callback: function(result) {
+        const amount = parseInt(result, 10);
+        if (! amount) {
+          return false;
+        }
+        if (amount >= minimumInvest && amount <= maximumInvest) {
+          Meteor.call('investFoundCompany', templaceInstance.data._id, amount);
+        }
+        else {
+          AlertDialog.alert('不正確的金額數字！');
+        }
       }
     });
   }
