@@ -15,7 +15,7 @@ import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct } from '../utils/methods';
 import { config } from '../../config';
-import { AlertDialog } from '../layout/alertDialog';
+import { alertDialog } from '../layout/alertDialog';
 
 inheritedShowLoadingOnSubscribing(Template.company);
 const rDirectorOffset = new ReactiveVar(0);
@@ -169,7 +169,7 @@ Template.company.events({
     const companyData = dbCompanies.findOne(companyId);
     const companyName = companyData.companyName;
     const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + companyName + '」以表示確定。';
-    AlertDialog.prompt(message, function(confirmMessage) {
+    alertDialog.prompt(message, function(confirmMessage) {
       if (confirmMessage === companyName) {
         Meteor.call('resignManager', companyId);
       }
@@ -567,7 +567,7 @@ Template.companyElectInfo.events({
     event.preventDefault();
     const instanceData = templateInstance.data;
     const companyName = instanceData.companyName;
-    AlertDialog.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？', function(result) {
+    alertDialog.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？', function(result) {
       if (result) {
         Meteor.call('contendManager', instanceData._id);
       }
@@ -585,7 +585,7 @@ Template.companyElectInfo.events({
         id: candidate
       },
       success: (userName) => {
-        AlertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
+        alertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
           if (result) {
             Meteor.call('supportCandidate', instanceData._id, candidate);
           }
