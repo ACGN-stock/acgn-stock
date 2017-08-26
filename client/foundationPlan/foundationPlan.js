@@ -10,6 +10,7 @@ import { dbResourceLock } from '../../db/dbResourceLock';
 import { formatDateText } from '../utils/helpers';
 import { config } from '../../config';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
+import { AlertDialog } from '../layout/alertDialog';
 
 inheritedShowLoadingOnSubscribing(Template.foundationPlan);
 const rKeyword = new ReactiveVar('');
@@ -120,19 +121,22 @@ Template.foundationPlanInfo.events({
     const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
     const maximumInvest = Meteor.user().profile.money;
     if (minimumInvest > maximumInvest) {
-      window.alert('您的金錢不足以進行投資！');
+      AlertDialog.alert('您的金錢不足以進行投資！');
 
       return false;
     }
-    const amount = parseInt(window.prompt(`要投資多少金額？(${minimumInvest}~${maximumInvest})`), 10);
-    if (! amount) {
-      return false;
-    }
-    if (amount >= minimumInvest && amount <= maximumInvest) {
-      Meteor.call('investFoundCompany', templaceInstance.data._id, amount);
-    }
-    else {
-      window.alert('不正確的金額數字！');
-    }
+
+    AlertDialog.promptWithTitle('投資', `要投資多少金額？(${minimumInvest}~${maximumInvest})`, function(result) {
+      const amount = parseInt(result);
+      if (! amount) {
+        return false;
+      }
+      if (amount >= minimumInvest && amount <= maximumInvest) {
+        Meteor.call('investFoundCompany', templaceInstance.data._id, amount);
+      }
+      else {
+        AlertDialog.alert('不正確的金額數字！');
+      }
+    });
   }
 });

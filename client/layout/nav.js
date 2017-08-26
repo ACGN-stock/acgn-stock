@@ -47,6 +47,15 @@ function updateTheme() {
         .table-success a {
           color: #000000;
         }
+        .modal-content {
+          border: 1px solid #dddddd;
+        }
+        .modal-header {
+          border-bottom: 1px solid #dddddd;
+        }
+        .modal-footer {
+          border-top: 1px solid #dddddd;
+        }
       `;
       if (style.styleSheet) {
         style.styleSheet.cssText = customDarkStyleCSS;
