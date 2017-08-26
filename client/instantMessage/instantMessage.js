@@ -65,12 +65,12 @@ const alwaysDisplayLogTypeList = [
   '廣告追加'
 ];
 //不能篩掉但只顯示userId中包含自己的紀錄類別
-const forSelfLogTypeList = [
-  '創立得股',
-  '創立退款',
-  '訂單完成',
-  '營利分紅'
-];
+// const forSelfLogTypeList = [
+//   '創立得股',
+//   '創立退款',
+//   '訂單完成',
+//   '營利分紅'
+// ];
 //篩選器可以選擇的紀錄類別
 const messageTypeGroupHash = {
   '聊天發言': [
@@ -149,8 +149,7 @@ Template.instantMessageList.helpers({
         (
           userId &&
           logData.userId &&
-          _.contains(logData.userId, userId) &&
-          _.contains(forSelfLogTypeList, logData.logType)
+          _.contains(logData.userId, userId)
         )
       );
     });
