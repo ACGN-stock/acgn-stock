@@ -265,7 +265,7 @@ Template.companyDetail.onRendered(function() {
               ticks: {
                 beginAtZero: true,
                 callback: function(value) {
-                  return '$' + value;
+                  return '$' + Math.round(value);
                 }
               }
             }
