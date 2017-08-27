@@ -50,9 +50,30 @@ export const alertDialog = {
 };
 
 Template.alertDialog.onRendered(function() {
-  this.$('input').select();
+  const $form = this.$('form');
+  if (strAlertDialogType === 'prompt') {
+    $form
+      .find('input:first')
+      .trigger('focus');
+  }
+  else {
+    $form
+      .find('button:last')
+      .trigger('focus');
+  }
+
+  $(document).on('keydown.alertDialog', (e) => {
+    if (e.which === 13) {
+      $form.trigger('submit');
+    }
+    else if (e.which === 27) {
+      $form.trigger('reset');
+    }
+  });
 });
 Template.alertDialog.onDestroyed(function() {
+  $(document).off('keydown.alertDialog');
+
   const callback = funcAlertDialogCallback;
   const ok = blAlertDialogOK;
   if (strAlertDialogType === 'prompt') {
