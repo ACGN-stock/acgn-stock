@@ -6,6 +6,7 @@ import { threadId } from './thread';
 
 export const resourceManager = {
   request(task, resourceList, callback) {
+    let requestTime = 0;
     const resourceLock = this.getResourceLock(resourceList);
     if (resourceLock) {
       // const message = '' +
@@ -13,6 +14,10 @@ export const resourceManager = {
       //   ' for task [' + task + '] but need to wait for lock' + JSON.stringify(resourceLock) + '.';
       // console.info(new Date(), message);
       Meteor.setTimeout(() => {
+        requestTime += 1;
+        if (requestTime >= 10) {
+          console.error(task, resourceList);
+        }
         this.request(task, resourceList, callback);
       }, randomTime());
     }
@@ -69,5 +74,5 @@ export const resourceManager = {
 export default resourceManager;
 
 function randomTime() {
-  return Math.floor(Math.random() * 1000);
+  return Math.floor(Math.random() * 3000);
 }
