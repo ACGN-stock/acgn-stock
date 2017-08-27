@@ -8,20 +8,22 @@ Template.displayLog.onRendered(function() {
   if (this.data.userId) {
     const $link = this.$('[data-user-link]');
     _.each(this.data.userId, (userId) => {
-      $.ajax({
-        url: '/userName',
-        data: {
-          id: userId
-        },
-        success: (userName) => {
-          const path = FlowRouter.path('accountInfo', {userId});
-          $link
-            .filter('[data-user-link="' + userId + '"]')
-            .html(`
-              <a href="${path}">${userName}</a>
-            `);
-        }
-      });
+      if (userId !== '!system') {
+        $.ajax({
+          url: '/userName',
+          data: {
+            id: userId
+          },
+          success: (userName) => {
+            const path = FlowRouter.path('accountInfo', {userId});
+            $link
+              .filter('[data-user-link="' + userId + '"]')
+              .html(`
+                <a href="${path}">${userName}</a>
+              `);
+          }
+        });
+      }
     });
   }
   const companyId = this.data.companyId;
@@ -153,11 +155,20 @@ Template.displayLog.helpers({
         );
       }
       case '訂單完成': {
-        return (
-          '【訂單完成】' + getUserLink(logData.userId[0]) +
-          '以每股$' + logData.price + '的單價' + logData.message + logData.amount +
-          '數量的「' + getCompanyLink(logData.companyId) + '」公司股票的訂單已經全數交易完畢！'
-        );
+        if (logData.userId[0] === '!system') {
+          return (
+            '【訂單完成】' + getCompanyLink(logData.companyId) +
+            '以每股$' + logData.price + '的單價釋出' + logData.amount +
+            '數量股票的訂單已經全數交易完畢！'
+          );
+        }
+        else {
+          return (
+            '【訂單完成】' + getUserLink(logData.userId[0]) +
+            '以每股$' + logData.price + '的單價' + logData.message + logData.amount +
+            '數量的「' + getCompanyLink(logData.companyId) + '」公司股票的訂單已經全數交易完畢！'
+          );
+        }
       }
       case '公司釋股': {
         return (
