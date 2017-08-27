@@ -194,38 +194,6 @@ Meteor.publish('accountInfo', function(userId) {
   ];
 });
 
-Meteor.publish('accountInfo', function(userId) {
-  check(this.userId, String);
-  check(userId, String);
-
-  return [
-    Meteor.users.find(userId, {
-      fields: {
-        'services.google.email': 1,
-        'status.lastLogin.date': 1,
-        'status.lastLogin.ipAddr': 1,
-        username: 1,
-        profile: 1,
-        createdAt: 1
-      },
-      disableOplog: true
-    }),
-    dbCompanies
-      .find(
-        {
-          manager: userId
-        },
-        {
-          fields: {
-            companyName: 1,
-            manager: 1
-          },
-          disableOplog: true
-        }
-      )
-  ];
-});
-
 Meteor.publish('accountOwnStocks', function(userId, offset) {
   check(userId, String);
   check(offset, Match.Integer);
