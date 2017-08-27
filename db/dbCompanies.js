@@ -52,7 +52,7 @@ const schema = new SimpleSchema({
   description: {
     type: String,
     min: 10,
-    max: 1000
+    max: 3000
   },
   //目前總釋出股份
   totalRelease: {
