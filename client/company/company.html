@@ -81,9 +81,9 @@
       {{> companySellOrderList}}
       {{> companyCurrentProductList}}
       {{> companyAllPrudctList}}
+      {{> companyDirectorList}}    
+      {{> companyElectInfo}}
     </div>
-    {{> companyDirectorList}}    
-    {{> companyElectInfo}}
   </div>
 </template>
 
@@ -209,7 +209,7 @@
 </template>
 
 <template name="companyDirectorList">
-  <div class="border-grid">
+  <div class="col-12 border-grid">
     <h4>董事會成員</h4>
     <div class="row mb-1">
       <div class="text-center" style="width: 120px;">使用者帳號</div>
@@ -275,7 +275,7 @@
 </template>
 
 <template name="companyElectInfo">
-  <div class="border-grid">
+  <div class="col-12 border-grid">
     <h4>
       選舉下個商業季度的負責經理人：
       {{#if canContendManager}}

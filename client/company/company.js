@@ -201,6 +201,7 @@ Template.companyDetail.onRendered(function() {
       .empty()
       .html('<canvas style="max-height:300px;"></canvas>');
     const ctx = this.$chart.find('canvas');
+    const color = (localStorage.getItem('theme') === 'light') ? '#000000' : '#ffffff';
     this.chart = new Chart(ctx, {
       type: 'scatter',
       data: {
@@ -208,7 +209,9 @@ Template.companyDetail.onRendered(function() {
           {
             label: '一日股價走勢',
             lineTension: 0,
-            data: rPriceList.get()
+            data: rPriceList.get(),
+            borderColor: color,
+            fill: false
           }
         ]
       },
@@ -218,7 +221,10 @@ Template.companyDetail.onRendered(function() {
           duration: 0
         },
         legend: {
-          onClick: $.noop
+          onClick: $.noop,
+          labels: {
+            fontColor: color
+          }
         },
         scales: {
           xAxes: [
@@ -236,7 +242,8 @@ Template.companyDetail.onRendered(function() {
                 autoSkipPadding: 10,
                 round: true,
                 maxRotation: 0,
-                padding: 5
+                padding: 5,
+                fontColor: color
               },
               time: {
                 parser: 'x',
@@ -263,6 +270,7 @@ Template.companyDetail.onRendered(function() {
                 drawTicks: true
               },
               ticks: {
+                fontColor: color,
                 beginAtZero: true,
                 callback: function(value) {
                   return '$' + Math.round(value);
