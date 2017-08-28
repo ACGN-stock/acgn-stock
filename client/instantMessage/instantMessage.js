@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbResourceLock } from '../../db/dbResourceLock';
+import { alertDialog } from '../layout/alertDialog';
 
 let lastQueryInstantMessageTime = Date.now() - 60000;
 const rInstantMessageList = new ReactiveVar([]);
@@ -48,7 +49,10 @@ Template.instantMessageChatForm.events({
   submit(event, templateInstance) {
     event.preventDefault();
     const message = templateInstance.$message.val();
-    if (message) {
+    if (message.length > 255) {
+      alertDialog.alert('輸入訊息過長！');
+    }
+    else if (message.length) {
       Meteor.call('instantMessageChat', message, () => {
         templateInstance.$message.val('');
       });

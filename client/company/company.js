@@ -530,7 +530,10 @@ Template.companyDirectorList.events({
   'submit form'(event, templateInstance) {
     event.preventDefault();
     const message = templateInstance.$('[name="message"]').val();
-    if (Meteor.user() && message) {
+    if (message.length > 100) {
+      alertDialog.alert('輸入訊息過長！');
+    }
+    else if (Meteor.user() && message.length) {
       Meteor.call('directorMessage', templateInstance.data._id, message);
     }
   }
