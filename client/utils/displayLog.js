@@ -8,7 +8,7 @@ Template.displayLog.onRendered(function() {
   if (this.data.userId) {
     const $link = this.$('[data-user-link]');
     _.each(this.data.userId, (userId) => {
-      if (userId !== '!system') {
+      if (userId.slice(0, 1) !== '!') {
         $.ajax({
           url: '/userName',
           data: {
@@ -62,6 +62,9 @@ Template.displayLog.onRendered(function() {
       }
     });
   }
+  if (this.data.message) {
+    this.$('[data-message]').text(this.data.message);
+  }
 });
 Template.displayLog.helpers({
   getDescriptionHtml(logData) {
@@ -73,7 +76,7 @@ Template.displayLog.helpers({
         return '【免費得石】因為「' + logData.message + '」的理由獲得了' + logData.amount + '顆聖晶石！';
       }
       case '聊天發言': {
-        return getUserLink(logData.userId[0]) + '說道：「' + logData.message + '」';
+        return getUserLink(logData.userId[0]) + '說道：「' + getPureText(logData.message) + '」';
       }
       case '發薪紀錄': {
         return '【發薪紀錄】系統向所有已驗證通過的使用者發給了$' + logData.price + '的薪水！';
@@ -82,14 +85,14 @@ Template.displayLog.helpers({
         return (
           '【創立公司】' +
           getUserLink(logData.userId[0]) +
-          '發起了「' + logData.message + '」的新公司創立計劃，誠意邀請有意者投資！'
+          '發起了「' + getPureText(logData.message) + '」的新公司創立計劃，誠意邀請有意者投資！'
         );
       }
       case '參與投資': {
         return (
           '【參與投資】' +
           getUserLink(logData.userId[0]) +
-          '向「' + logData.message + '公司創立計劃」投資了$' + logData.amount + '！'
+          '向「' + getPureText(logData.message) + '公司創立計劃」投資了$' + logData.amount + '！'
         );
       }
       case '創立失敗': {
@@ -100,13 +103,13 @@ Template.displayLog.helpers({
         return (
           '【創立失敗】' +
           userLinkList.join('、') +
-          '等人投資的「' + logData.message + '公司創立計劃」由於投資人數不足失敗了，投資金額將全數返回！'
+          '等人投資的「' + getPureText(logData.message) + '公司創立計劃」由於投資人數不足失敗了，投資金額將全數返回！'
         );
       }
       case '創立退款': {
         return (
           '【創立退款】' +
-          '從「' + logData.message +
+          '從「' + getPureText(logData.message) +
           '公司創立計劃」收回了$' + logData.amount + '的投資退款！'
         );
       }
@@ -262,14 +265,14 @@ Template.displayLog.helpers({
         return (
           '【廣告宣傳】' +
           getUserLink(logData.userId[0]) +
-          '以$ ' + logData.price + '的價格發布了一則廣告：「' + logData.message + '」！'
+          '以$ ' + logData.price + '的價格發布了一則廣告：「' + getPureText(logData.message) + '」！'
         );
       }
       case '廣告追加': {
         return (
           '【廣告競價】' +
           getUserLink(logData.userId[0]) +
-          '追加了$ ' + logData.price + '的廣告費用在廣告：「' + logData.message + '」上！'
+          '追加了$ ' + logData.price + '的廣告費用在廣告：「' + getPureText(logData.message) + '」上！'
         );
       }
     }
@@ -286,4 +289,8 @@ function getCompanyLink(companyId) {
 
 function getProductLink(productId) {
   return `<span data-product-link="${productId}"></span>`;
+}
+
+function getPureText(str) {
+  return `<span data-message></span>`;
 }
