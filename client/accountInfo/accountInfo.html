@@ -12,6 +12,47 @@
   <div class="card-block">
     <h1 class="card-title mb-1">使用者「{{this.profile.name}}」的帳號資訊：</h1>
     <hr />
+    {{#if currentUser}}
+      {{#if currentUser.profile.isAdmin}}
+        {{#if isBaned 'accuse'}}
+          <button class="btn btn-success btn-sm" type="button" data-ban="accuse">解除舉報禁令</button>
+        {{else}}
+          <button class="btn btn-warning btn-sm" type="button" data-ban="accuse">禁止舉報</button>
+        {{/if}}
+        {{#if isBaned 'deal'}}
+          <button class="btn btn-success btn-sm" type="button" data-ban="deal">解除下單禁令</button>
+        {{else}}
+          <button class="btn btn-warning btn-sm" type="button" data-ban="deal">禁止下單</button>
+        {{/if}}
+        {{#if isBaned 'chat'}}
+          <button class="btn btn-success btn-sm" type="button" data-ban="chat">解除聊天禁令</button>
+        {{else}}
+          <button class="btn btn-warning btn-sm" type="button" data-ban="chat">禁止聊天</button>
+        {{/if}}
+        {{#if isBaned 'advertise'}}
+          <button class="btn btn-success btn-sm" type="button" data-ban="advertise">解除廣告禁令</button>
+        {{else}}
+          <button class="btn btn-warning btn-sm" type="button" data-ban="advertise">禁止廣告</button>
+        {{/if}}
+        <button class="btn btn-danger btn-sm" type="button" data-action="forfeit">課以罰金</button>
+        <button class="btn btn-danger btn-sm" type="button" data-action="returnForfeit">退還罰金</button>
+      {{else}}
+        <button class="btn btn-danger btn-sm" type="button" data-action="accuse">舉報違規</button>
+        {{#if isBaned 'accuse'}}
+          <div class="text-danger">目前被禁止舉報違規。</div>
+        {{/if}}
+        {{#if isBaned 'deal'}}
+          <div class="text-danger">目前被禁止投資下單。</div>
+        {{/if}}
+        {{#if isBaned 'chat'}}
+          <div class="text-danger">目前被禁止聊天發言。</div>
+        {{/if}}
+        {{#if isBaned 'advertise'}}
+          <div class="text-danger">目前被禁止廣告宣傳。</div>
+        {{/if}}
+      {{/if}}
+      <hr />
+    {{/if}}
     <div>
       帳號驗證方式：
       {{#if this.username}}

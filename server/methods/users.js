@@ -175,8 +175,7 @@ Meteor.publish('accountInfo', function(userId) {
         username: 1,
         profile: 1,
         createdAt: 1
-      },
-      disableOplog: true
+      }
     }),
     dbCompanies
       .find(

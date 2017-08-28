@@ -34,7 +34,8 @@ export function releaseStocksForHighPrice() {
         },
         {
           fields: {
-            _id: 1
+            _id: 1,
+            isSeal: 1
           },
           disableOplog: true
         }
@@ -47,6 +48,10 @@ export function releaseStocksForHighPrice() {
         });
         //有尚存在的釋股單在市場上時不繼續釋股
         if (existsReleaseOrder) {
+          return false;
+        }
+        //被查封關停時不繼續釋股
+        if (companyData.isSeal) {
           return false;
         }
         //先鎖定資源，再重新讀取一次資料進行運算
@@ -160,11 +165,16 @@ export function releaseStocksForNoDeal() {
       .find({}, {
         fields: {
           _id: 1,
-          listPrice: 1
+          listPrice: 1,
+          isSeal: 1
         },
         disableOplog: true
       })
       .forEach((companyData) => {
+        //被查封關停時不繼續釋股
+        if (companyData.isSeal) {
+          return false;
+        }
         const companyId = companyData._id;
         const dealData = dbLog.aggregate([
           {
@@ -220,6 +230,7 @@ export function releaseStocksForNoDeal() {
         ])[0];
         const doublePriceBuyAmount = doublePriceBuyData ? doublePriceBuyData.amount : 0;
         if (doublePriceBuyAmount > (dealAmount * 10)) {
+          console.info('releaseStocksForNoDeal triggered: ' + companyId);
           //先鎖定資源，再重新讀取一次資料進行運算
           resourceManager.request('releaseStocksForNoDeal', ['companyOrder' + companyId], (release) => {
             const companyData = dbCompanies.findOne(companyId, {
@@ -352,12 +363,17 @@ export function recordListPrice() {
           fields: {
             _id: 1,
             lastPrice: 1,
-            listPrice: 1
+            listPrice: 1,
+            isSeal: 1
           },
           disableOplog: true
         }
       )
       .forEach((companyData) => {
+        //被查封關停時不再紀錄
+        if (companyData.isSeal) {
+          return false;
+        }
         if (companyData.lastPrice !== companyData.listPrice) {
           const companyId = companyData._id;
           //先鎖定資源，再重新讀取一次資料進行運算

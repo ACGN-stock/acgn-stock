@@ -1,4 +1,5 @@
 'use strict';
+import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
@@ -24,6 +25,9 @@ Meteor.methods({
   }
 });
 export function createBuyOrder(user, orderData) {
+  if (_.contains(user.profile.ban, 'deal')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
+  }
   if (orderData.unitPrice < 1) {
     throw new Meteor.Error(403, '購買單價不可小於1！');
   }
@@ -54,6 +58,9 @@ export function createBuyOrder(user, orderData) {
   });
   if (! companyData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了，無法下達訂單！');
   }
   if (orderData.unitPrice < (companyData.listPrice / 2)) {
     throw new Meteor.Error(403, '最低買入價格不可低於該股票參考價格的一半！');
@@ -221,6 +228,9 @@ Meteor.methods({
   }
 });
 export function createSellOrder(user, orderData) {
+  if (_.contains(user.profile.ban, 'deal')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
+  }
   if (orderData.unitPrice < 1) {
     throw new Meteor.Error(403, '販賣單價不可小於1！');
   }
@@ -248,12 +258,16 @@ export function createSellOrder(user, orderData) {
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       _id: 1,
+      companyName: 1,
       listPrice: 1,
       lastPrice: 1
     }
   });
   if (! companyData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了，無法下達訂單！');
   }
   if (orderData.unitPrice < (companyData.listPrice / 2)) {
     throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的一半！');

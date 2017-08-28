@@ -1,4 +1,5 @@
 'use strict';
+import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { resourceManager } from '../resourceManager';
 import { check, Match } from 'meteor/check';
@@ -20,6 +21,9 @@ Meteor.methods({
   }
 });
 function buyAdvertising(user, advertisingData) {
+  if (_.contains(user.profile.ban, 'advertise')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有廣告宣傳行為！');
+  }
   if (advertisingData.paid < 1) {
     throw new Meteor.Error(403, '廣告費用額度錯誤！');
   }
@@ -80,6 +84,9 @@ Meteor.methods({
   }
 });
 function addAdvertisingPay(user, advertisingId, addPay) {
+  if (_.contains(user.profile.ban, 'advertise')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有廣告宣傳行為！');
+  }
   if (addPay < 1) {
     throw new Meteor.Error(403, '追加費用額度錯誤！');
   }

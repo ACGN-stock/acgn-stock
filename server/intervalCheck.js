@@ -112,9 +112,13 @@ function doSeasonWorks(lastSeasonData) {
     giveBonusByStocksFromProfit();
     //為所有公司與使用者進行排名結算
     generateRankData(lastSeasonData);
-    //所有公司當季營利額歸零
+    //所有公司當季正營利額歸零
     dbCompanies.update(
-      {},
+      {
+        profit: {
+          $gt: 0
+        }
+      },
       {
         $set: {
           profit: 0

@@ -275,6 +275,130 @@ Template.displayLog.helpers({
           '追加了$ ' + logData.price + '的廣告費用在廣告：「' + getPureText(logData.message) + '」上！'
         );
       }
+      case '舉報違規': {
+        let extraDescription = '';
+        if (logData.userId[1]) {
+          extraDescription = getUserLink(logData.userId[1]) + '的違規行為';
+        }
+        else if (logData.productId) {
+          extraDescription = getProductLink(logData.productId) + '的違例事項';
+        }
+        else {
+          extraDescription = getCompanyLink(logData.companyId) + '的違例事項';
+        }
+
+        return (
+          '【舉報違規】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由向金融管理會舉報' + extraDescription + '。'
+        );
+      }
+      case '禁止舉報': {
+        return (
+          '【禁止舉報】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由禁止' +
+          getUserLink(logData.userId[1]) + '今後的所有舉報違規行為。'
+        );
+      }
+      case '禁止下單': {
+        return (
+          '【禁止交易】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由禁止' +
+          getUserLink(logData.userId[1]) + '今後的所有投資下單行為。'
+        );
+      }
+      case '禁止聊天': {
+        return (
+          '【禁止聊天】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由禁止' +
+          getUserLink(logData.userId[1]) + '今後的所有聊天發言行為。'
+        );
+      }
+      case '禁止廣告': {
+        return (
+          '【禁止廣告】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由禁止' +
+          getUserLink(logData.userId[1]) + '今後的所有廣告宣傳行為。'
+        );
+      }
+      case '課以罰款': {
+        return (
+          '【課以罰款】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由向' +
+          getUserLink(logData.userId[1]) + '課以總數為$' + logData.amount + '的罰金。'
+        );
+      }
+      case '解除舉報': {
+        return (
+          '【解除舉報】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由中止了' +
+          getUserLink(logData.userId[1]) + '的舉報違規禁令。'
+        );
+      }
+      case '解除下單': {
+        return (
+          '【解除交易】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由中止了' +
+          getUserLink(logData.userId[1]) + '的投資下單禁令。'
+        );
+      }
+      case '解除聊天': {
+        return (
+          '【解除聊天】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由中止了' +
+          getUserLink(logData.userId[1]) + '的聊天發言禁令。'
+        );
+      }
+      case '解除廣告': {
+        return (
+          '【解除廣告】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由中止了' +
+          getUserLink(logData.userId[1]) + '的廣告宣傳禁令。'
+        );
+      }
+      case '退還罰款': {
+        return (
+          '【退還罰款】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由向' +
+          getUserLink(logData.userId[1]) + '退還總數為$' + logData.amount + '的罰金。'
+        );
+      }
+      case '查封關停': {
+        return (
+          '【查封關停】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由查封關停了「' +
+          getCompanyLink(logData.companyId) + '」公司。'
+        );
+      }
+      case '解除查封': {
+        return (
+          '【解除查封】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由解除了「' +
+          getCompanyLink(logData.companyId) + '」公司的查封關停狀態。'
+        );
+      }
+      case '產品下架': {
+        return (
+          '【產品下架】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureText(logData.message) + '」的理由將「' +
+          getCompanyLink(logData.companyId) + '」公司的產品「' +
+          getProductLink(logData.productId) + '」給下架了，' +
+          '並追回了因該產品所產生的營利$' + logData.price + '。'
+        );
+      }
     }
   }
 });

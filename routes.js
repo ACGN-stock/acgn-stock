@@ -23,7 +23,7 @@ export const pageNameHash = {
   productCenterByCompany: '產品中心',
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
-  accuseRecord: '舉報紀錄'
+  accuseRecord: '舉報違規紀錄'
 };
 
 FlowRouter.route('/instantMessage', {
@@ -174,5 +174,12 @@ accountInfoRoute.route('/:userId', {
     else {
       DocHead.setTitle(config.websiteName + ' - 帳號資訊');
     }
+  }
+});
+
+FlowRouter.route('/accuseRecord', {
+  name: 'accuseRecord',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 舉報違規紀錄');
   }
 });

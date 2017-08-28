@@ -92,6 +92,11 @@ const schema = new SimpleSchema({
     type: Array
   },
   'voteList.$': [String],
+  //是否被金管會查封關停
+  isSeal: {
+    type: Boolean,
+    defaultValue: false
+  },
   //公司上市日期
   createdAt: {
     type: Date

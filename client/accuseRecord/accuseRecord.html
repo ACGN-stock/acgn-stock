@@ -1,0 +1,18 @@
+<template name="accuseRecord">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">舉報違規紀錄</h1>
+      <hr />
+      <div>
+        {{#each logData in accuseList}}
+          {{>displayLog logData}}
+        {{else}}
+          查無資料！
+        {{/each}}
+        {{#with paginationData}}
+          {{> pagination}}
+        {{/with}}
+      </div>
+    </div>
+  </div>
+</template>

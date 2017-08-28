@@ -1,6 +1,14 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
+import { Match } from 'meteor/check';
 import SimpleSchema from 'simpl-schema';
+
+export const banTypeList = [
+  'accuse', //所有舉報違規行為
+  'deal', //所有下達訂單行為
+  'chat', //所有聊天發言行為
+  'advertise' //所有廣告宣傳行為
+];
 
 const schema = new SimpleSchema({
   //使用者PTT帳號名稱
@@ -27,7 +35,6 @@ const schema = new SimpleSchema({
       //金錢數量
       money: {
         type: SimpleSchema.Integer,
-        min: 0,
         defaultValue: 0
       },
       //推薦票數量
@@ -53,7 +60,7 @@ const schema = new SimpleSchema({
         defaultValue: []
       },
       'ban.$': {
-        type: String
+        type: new Match.OneOf(...banTypeList)
       }
     })
   },

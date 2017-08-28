@@ -1,4 +1,5 @@
 'use strict';
+import { _ } from 'meteor/underscore';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import { dbLog } from '../../db/dbLog';
@@ -7,6 +8,14 @@ Meteor.methods({
   instantMessageChat(message) {
     check(this.userId, String);
     check(message, String);
+    const user = Meteor.users.findOne(this.userId, {
+      fields: {
+        profile: 1
+      }
+    });
+    if (_.contains(user.profile.ban, 'chat')) {
+      throw new Meteor.Error(403, '您現在被金融管理會禁止了所有聊天發言行為！');
+    }
     dbLog.insert({
       logType: '聊天發言',
       userId: [this.userId],

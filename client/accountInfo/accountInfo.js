@@ -1,4 +1,6 @@
 'use strict';
+import { _ } from 'meteor/underscore';
+import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
@@ -10,6 +12,7 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { config } from '../../config';
+import { alertDialog } from '../layout/alertDialog';
 
 export const ownStocksOffset = new ReactiveVar(0);
 export const logOffset = new ReactiveVar(0);
@@ -75,6 +78,112 @@ Template.accountInfoBasic.helpers({
   },
   getCompanyHref(companyId) {
     return FlowRouter.path('company', {companyId});
+  },
+  isBaned(type) {
+    return _.contains(this.profile.ban, type);
+  }
+});
+Template.accountInfoBasic.events({
+  'click [data-action="accuse"]'(event, templateInstance) {
+    event.preventDefault();
+    const accuseUser = templateInstance.data;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '舉報違規 - ' + accuseUser.profile.name,
+      message: `請輸入您要舉報的內容：`,
+      callback: function(message) {
+        if (message) {
+          const userId = accuseUser._id;
+          Meteor.call('accuseUser', userId, message);
+        }
+      }
+    });
+  },
+  'click [data-ban]'(event, templateInstance) {
+    event.preventDefault();
+    const banType = $(event.currentTarget).attr('data-ban');
+    let banActionText;
+    switch (banType) {
+      case 'accuse': {
+        banActionText = '禁止舉報違規';
+        break;
+      }
+      case 'deal': {
+        banActionText = '禁止投資下單';
+        break;
+      }
+      case 'chat': {
+        banActionText = '禁止聊天發言';
+        break;
+      }
+      case 'advertise': {
+        banActionText = '禁止廣告宣傳';
+        break;
+      }
+    }
+    const accuseUserData = templateInstance.data;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '違規處理 - ' + accuseUserData.profile.name + ' - ' + banActionText,
+      message: `請輸入處理事由：`,
+      callback: function(message) {
+        if (message) {
+          const userId = accuseUserData._id;
+          Meteor.call('banUser', {userId, message, banType});
+        }
+      }
+    });
+  },
+  'click [data-action="forfeit"]'(event, templateInstance) {
+    event.preventDefault();
+    const accuseUserData = templateInstance.data;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '課以罰金 - ' + accuseUserData.profile.name,
+      message: `請輸入處理事由：`,
+      callback: function(message) {
+        if (message) {
+          alertDialog.dialog({
+            type: 'prompt',
+            title: '課以罰金 - ' + accuseUserData.profile.name,
+            message: `請輸入罰金數額：`,
+            callback: function(amount) {
+              amount = parseInt(amount, 10);
+              if (amount && amount > 0) {
+                const userId = accuseUserData._id;
+                Meteor.call('forfeit', {userId, message, amount});
+              }
+            }
+          });
+        }
+      }
+    });
+  },
+  'click [data-action="returnForfeit"]'(event, templateInstance) {
+    event.preventDefault();
+    const accuseUserData = templateInstance.data;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '退還罰金 - ' + accuseUserData.profile.name,
+      message: `請輸入處理事由：`,
+      callback: function(message) {
+        if (message) {
+          alertDialog.dialog({
+            type: 'prompt',
+            title: '退還罰金 - ' + accuseUserData.profile.name,
+            message: `請輸入退還金額：`,
+            callback: function(amount) {
+              amount = parseInt(amount, 10);
+              if (amount && amount > 0) {
+                const userId = accuseUserData._id;
+                amount *= -1;
+                Meteor.call('forfeit', {userId, message, amount});
+              }
+            }
+          });
+        }
+      }
+    });
   }
 });
 

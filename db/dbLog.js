@@ -34,7 +34,38 @@ export const logTypeList = [
   '公司營利', //「companyId」公司本商業季度一共獲利$amount！
   '營利分紅', //userId0得到了「companyId」公司的分紅$amount！
   '廣告宣傳', //userId0以$price的價格發布了一則廣告：「message」。
-  '廣告追加' //userId0追加了$price的廣告費用在廣告：「message」上。
+  '廣告追加', //userId0追加了$price的廣告費用在廣告：「message」上。
+  '舉報違規', //userId0以「message」的理由向金融管理會舉報(userId1的違規行為 || productId產品的違例事項 || companyId公司的違例事項)。
+  '禁止舉報', //userId0以「message」的理由禁止userId1今後的所有舉報違規行為。
+  '禁止下單', //userId0以「message」的理由禁止userId1今後的所有投資下單行為。
+  '禁止聊天', //userId0以「message」的理由禁止userId1今後的所有聊天發言行為。
+  '禁止廣告', //userId0以「message」的理由禁止userId1今後的所有廣告宣傳行為。
+  '課以罰款', //userId0以「message」的理由向userId1課以總數為$amount的罰金。
+  '解除舉報', //userId0以「message」的理由中止了userId1的舉報違規禁令。
+  '解除下單', //userId0以「message」的理由中止了userId1的投資下單禁令。
+  '解除聊天', //userId0以「message」的理由中止了userId1的聊天發言禁令。
+  '解除廣告', //userId0以「message」的理由中止了userId1的廣告宣傳禁令。
+  '退還罰款', //userId0以「message」的理由向userId1退還總數為$amount的罰金。
+  '查封關停', //userId0以「message」的理由查封關停了「companyId」公司。
+  '解除查封', //userId0以「message」的理由解除了「companyId」公司的查封關停狀態。
+  '產品下架' //userId0以「message」的理由將「companyId」公司的產品「productId」給下架了，並追回了因該產品所產生的營利$price。
+];
+
+export const accuseLogTypeList = [
+  '舉報違規',
+  '禁止舉報',
+  '禁止下單',
+  '禁止聊天',
+  '禁止廣告',
+  '課以罰款',
+  '解除舉報',
+  '解除下單',
+  '解除聊天',
+  '解除廣告',
+  '退還罰款',
+  '查封關停',
+  '解除查封',
+  '產品下架'
 ];
 
 //schema

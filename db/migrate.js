@@ -188,6 +188,50 @@ if (Meteor.isServer) {
       });
     }
   });
+  Migrations.add({
+    version: 2,
+    name: 'Accuse indexes.',
+    up() {
+      dbLog.rawCollection().createIndex(
+        {
+          createdAt: -1
+        },
+        {
+          partialFilterExpression: {
+            logType: {
+              $in: [
+                '舉報違規',
+                '禁止舉報',
+                '禁止下單',
+                '禁止聊天',
+                '禁止廣告',
+                '課以罰款',
+                '解除舉報',
+                '解除下單',
+                '解除聊天',
+                '解除廣告',
+                '退還罰款',
+                '查封關停',
+                '解除查封',
+                '產品下架'
+              ]
+            }
+          }
+        }
+      );
+      Meteor.users.update(
+        {},
+        {
+          $set: {
+            'profile.ban': []
+          }
+        },
+        {
+          multi: true
+        }
+      );
+    }
+  });
 
   Meteor.startup(() => {
     Migrations.migrateTo('latest');

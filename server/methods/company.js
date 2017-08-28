@@ -681,6 +681,7 @@ Meteor.publish('companyDataForEdit', function(companyId) {
 
 Meteor.publish('companyDirector', function(companyId, offset) {
   check(companyId, String);
+  check(offset, Match.Integer);
 
   let initialized = false;
   let total = dbDirectors.find({companyId}).count();
@@ -729,6 +730,7 @@ Meteor.publish('companyDirector', function(companyId, offset) {
 
 Meteor.publish('companyLog', function(companyId, offset) {
   check(companyId, String);
+  check(offset, Match.Integer);
 
   let initialized = false;
   let total = dbLog.find({companyId}).count();
@@ -778,6 +780,7 @@ Meteor.publish('companyLog', function(companyId, offset) {
 Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
   check(companyId, String);
   check(type, new Match.OneOf('購入', '賣出'));
+  check(offset, Match.Integer);
 
   const filter = {
     companyId: companyId,

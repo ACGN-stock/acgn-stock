@@ -108,6 +108,9 @@ Meteor.methods({
   }
 });
 export function investFoundCompany(user, companyId, amount) {
+  if (_.contains(user.profile.ban, 'deal')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
+  }
   const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
   if (amount < minimumInvest) {
     throw new Meteor.Error(403, '最低投資金額為' + minimumInvest + '！');
