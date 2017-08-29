@@ -191,96 +191,11 @@ Template.companyDetail.onCreated(function() {
   });
 });
 Template.companyDetail.onRendered(function() {
+  this.strChartType = 'trend';
   this.$chart = this.$('.chart');
   this.chart = null;
   this.autorun(() => {
-    if (this.chart) {
-      this.chart.destroy();
-    }
-    this.$chart
-      .empty()
-      .html('<canvas style="max-height:300px;"></canvas>');
-    const ctx = this.$chart.find('canvas');
-    const color = (localStorage.getItem('theme') === 'light') ? '#000000' : '#ffffff';
-    this.chart = new Chart(ctx, {
-      type: 'scatter',
-      data: {
-        datasets: [
-          {
-            label: '一日股價走勢',
-            lineTension: 0,
-            data: rPriceList.get(),
-            borderColor: color,
-            fill: false
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        animation: {
-          duration: 0
-        },
-        legend: {
-          onClick: $.noop,
-          labels: {
-            fontColor: color
-          }
-        },
-        scales: {
-          xAxes: [
-            {
-              type: 'time',
-              position: 'bottom',
-              gridLines: {
-                drawTicks: true
-              },
-              scaleLabel: {
-                display: false
-              },
-              ticks: {
-                autoSkip: true,
-                autoSkipPadding: 10,
-                round: true,
-                maxRotation: 0,
-                padding: 5,
-                fontColor: color
-              },
-              time: {
-                parser: 'x',
-                tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
-                displayFormats: {
-                  year: 'YYYY',
-                  quarter: 'YYYY Qo',
-                  month: 'YYYY/MM',
-                  week: 'YYYY/MM/DD',
-                  day: 'YYYY/MM/DD',
-                  hour: 'MM/DD HH:mm',
-                  minute: 'MM/DD HH:mm',
-                  second: 'HH:mm:ss',
-                  millisecond: 'mm:ss.SSS'
-                }
-              }
-            }
-          ],
-          yAxes: [
-            {
-              type: 'linear',
-              position: 'left',
-              gridLines: {
-                drawTicks: true
-              },
-              ticks: {
-                fontColor: color,
-                beginAtZero: true,
-                callback: function(value) {
-                  return '$' + Math.round(value);
-                }
-              }
-            }
-          ]
-        }
-      }
-    });
+    drawChart.apply(this);
   });
 });
 Template.companyDetail.helpers({
@@ -301,6 +216,187 @@ Template.companyDetail.helpers({
     return rTodayDealAmount.get();
   }
 });
+Template.companyDetail.events({
+  'click [data-chart-type]'(event) {
+    event.preventDefault();
+    $(event.currentTarget).blur();
+    $('.company-detail .btn-group-vertical > .active').removeClass('active');
+    $(event.currentTarget).addClass('active');
+    const template = Template.instance();
+    template.strChartType = $(event.currentTarget).attr('data-chart-type');
+    drawChart.apply(template);
+  }
+});
+function drawChart() {
+  if (this.strChartType === 'trend') {
+    drawLineChart.apply(this);
+  }
+  else {
+    drawCandleStickChart.apply(this);
+  }
+}
+function drawLineChart() {
+  if (this.chart) {
+    this.chart.destroy();
+  }
+  this.$chart
+    .empty()
+    .html('<canvas style="max-height:300px;"></canvas>');
+  const ctx = this.$chart.find('canvas');
+  const color = (localStorage.getItem('theme') === 'light') ? '#000000' : '#ffffff';
+  this.chart = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: '一日股價走勢',
+          lineTension: 0,
+          data: rPriceList.get(),
+          borderColor: color,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: {
+        duration: 0
+      },
+      legend: {
+        onClick: $.noop,
+        labels: {
+          fontColor: color
+        }
+      },
+      scales: {
+        xAxes: [
+          {
+            type: 'time',
+            position: 'bottom',
+            gridLines: {
+              drawTicks: true
+            },
+            scaleLabel: {
+              display: false
+            },
+            ticks: {
+              autoSkip: true,
+              autoSkipPadding: 10,
+              round: true,
+              maxRotation: 0,
+              padding: 5,
+              fontColor: color
+            },
+            time: {
+              parser: 'x',
+              tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
+              displayFormats: {
+                year: 'YYYY',
+                quarter: 'YYYY Qo',
+                month: 'YYYY/MM',
+                week: 'YYYY/MM/DD',
+                day: 'YYYY/MM/DD',
+                hour: 'MM/DD HH:mm',
+                minute: 'MM/DD HH:mm',
+                second: 'HH:mm:ss',
+                millisecond: 'mm:ss.SSS'
+              }
+            }
+          }
+        ],
+        yAxes: [
+          {
+            type: 'linear',
+            position: 'left',
+            gridLines: {
+              drawTicks: true
+            },
+            ticks: {
+              fontColor: color,
+              beginAtZero: true,
+              callback: function(value) {
+                return '$' + Math.round(value);
+              }
+            }
+          }
+        ]
+      }
+    }
+  });
+}
+function drawCandleStickChart() {
+  this.$chart.empty();
+  this.$chart.find('text').css('fill');
+
+  const margin = { top: 10, right: 10, bottom: 30, left: 50 };
+  const width = this.$chart.width() - margin.right - margin.left;
+  const height = 300 - margin.top - margin.bottom;
+  const color = localStorage.theme === 'light' ? '#000' : '#fff';
+
+  const svg = d3.select(this.$chart.get(0)).append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+  const x = techan.scale.financetime().range([0, width]);
+  const y = d3.scaleLinear().range([height, 0]);
+  const candlestick = techan.plot.candlestick().xScale(x)
+    .yScale(y);
+  const xAxis = d3.axisBottom().scale(x);
+  const yAxis = d3.axisLeft().scale(y);
+
+  const count = 80;
+  const unitTime = (this.strChartType === '5min' ? 300
+    : this.strChartType === '10min' ? 600
+      : this.strChartType === '30min' ? 1800
+        : this.strChartType === '60min' ? 3600 : 86400) * 1000;
+  const toTime = Math.floor(Date.now() / unitTime) * unitTime;
+
+  const companyId = FlowRouter.getParam('companyId');
+  Meteor.nativeCall('queryStocksCandlestick', companyId, { lastTime: toTime, unitTime: unitTime, count: count }, (error, result) => {
+    const data = result.map(function(x) {
+      return {
+        date: new Date(x.time),
+        open: x.open,
+        close: x.close,
+        high: x.high,
+        low: x.low
+      };
+    });
+    const accessor = candlestick.accessor();
+
+    svg.append('g')
+      .attr('class', 'candlestick');
+
+    svg.append('g')
+      .attr('class', 'x axis')
+      .attr('transform', 'translate(0,' + height + ')');
+
+    svg.append('g')
+      .attr('class', 'y axis')
+      .append('text')
+      .attr('transform', 'rotate(-90)')
+      .attr('y', 6)
+      .attr('dy', '.71em')
+      .style('text-anchor', 'end')
+      .text('價格 ($)');
+
+    x.domain(Array.from(new Array(count), (v, i) => {
+      return new Date(toTime - unitTime * (count - i));
+    }));
+    y.domain(techan.scale.plot.ohlc(data, accessor).domain());
+
+    svg.selectAll('g.candlestick').datum(data)
+      .call(candlestick);
+    svg.selectAll('g.x.axis').call(xAxis);
+    svg.selectAll('g.y.axis').call(yAxis);
+    svg.selectAll('line').style('stroke', color);
+    svg.selectAll('path').style('stroke', color);
+    svg.selectAll('text').style('fill', color);
+    svg.selectAll('path.candle').style('stroke', color);
+  });
+}
 
 Template.companyBuyOrderList.helpers({
   myOrderList() {

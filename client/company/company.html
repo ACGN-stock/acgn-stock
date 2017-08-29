@@ -50,6 +50,14 @@
         {{/if}}
       </div>
       <div class="media-body hidden-sm-down chart" style="overflow: hidden;"></div>
+      <div class="btn-group-vertical d-sm-flex hidden-sm-down" role="group">
+        <button type="button" class="btn btn-secondary btn-sm active" data-chart-type="trend">走勢</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="day">日K</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="60min">60分</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="30min">30分</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="10min">10分</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="5min">5分</button>
+      </div>
     </div>
     <div class="row border-grid-body">
       <div class="col-12 border-grid" style="white-space: pre-wrap;padding: 5px 15px;"><h4>角色簡介</h4>{{this.description}}</div>
