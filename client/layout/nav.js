@@ -130,14 +130,6 @@ Template.nav.events({
     if (loginType === 'PTT') {
       rShowLoginDialog.set(true);
     }
-    else if (loginType === 'Facebook') {
-      if (location.protocol === 'https:') {
-        Meteor.loginWithFacebook();
-      }
-      else {
-        location.href = 'https://' + location.hostname + location.pathname;
-      }
-    }
     else {
       Meteor['loginWith' + loginType]();
     }
