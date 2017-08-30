@@ -217,14 +217,13 @@ Template.companyDetail.helpers({
   }
 });
 Template.companyDetail.events({
-  'click [data-chart-type]'(event) {
+  'click [data-chart-type]'(event, templateInstance) {
     event.preventDefault();
     $(event.currentTarget).blur();
     $('.company-detail .btn-group-vertical > .active').removeClass('active');
     $(event.currentTarget).addClass('active');
-    const template = Template.instance();
-    template.strChartType = $(event.currentTarget).attr('data-chart-type');
-    drawChart.apply(template);
+    templateInstance.strChartType = $(event.currentTarget).attr('data-chart-type');
+    drawChart.apply(templateInstance);
   }
 });
 function drawChart() {
