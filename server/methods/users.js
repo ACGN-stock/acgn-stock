@@ -340,19 +340,23 @@ Meteor.publish('validateUser', function(username) {
 
 Meteor.publish('onlinePeopleNumber', function() {
   let initialized = false;
-  let total = Meteor.users
+  let total = UserStatus.connections
     .find({
-      'status.online': true
+      idle: {
+        $exists: 0
+      }
     })
     .count();
   this.added('variables', 'onlinePeopleNumber', {
     value: total
   });
 
-  const observer = Meteor.users
+  const observer = UserStatus.connections
     .find(
       {
-        'status.online': true
+        idle: {
+          $exists: 0
+        }
       },
       {
         disableOplog: true
