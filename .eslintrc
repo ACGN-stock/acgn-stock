@@ -13,6 +13,10 @@
     "es6": true,
     "node": true
   },
+  "globals": {
+    "d3": true,
+    "techan": true
+  },
   "plugins": [],
   "rules": {
     "no-console": "error",

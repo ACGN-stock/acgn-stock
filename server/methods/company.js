@@ -370,6 +370,59 @@ function queryTodayDealAmount(companyId, lastTime) {
 }
 
 Meteor.methods({
+  queryStocksCandlestick(companyId, options) {
+    check(companyId, String);
+    check(options.lastTime, Number);
+    check(options.unitTime, Number);
+    check(options.count, Number);
+    return queryStocksCandlestick(companyId, options);
+  }
+})
+function queryStocksCandlestick(companyId, options) {
+  const list = dbPrice
+    .find(
+      {
+        companyId: companyId,
+        createdAt: {
+          $gt: new Date(options.lastTime - options.unitTime * options.count)
+        }
+      },
+      {
+        fields: {
+          createdAt: 1,
+          price: 1
+        },
+        disableOplog: true
+      }
+    )
+    .fetch();
+  const candlestickList = _.map(_.range(options.count), function(index) {
+    const startTime = options.lastTime - options.unitTime * (options.count - index);
+    const priceList = _.filter(list, function(order) {
+      return startTime <= order.createdAt && order.createdAt < startTime + options.unitTime;
+    });
+    return {
+      time: startTime,
+      open: _.min(priceList, function(order) {
+        return order.createdAt;
+      }).price || 0,
+      close: _.max(priceList, function(order) {
+        return order.createdAt;
+      }).price || 0,
+      high: _.max(priceList, function(order) {
+        return order.price;
+      }).price || 0,
+      low: _.min(priceList, function(order) {
+        return order.price;
+      }).price || 0,
+    };
+  });
+  return _.filter(candlestickList, function(candlestick) {
+    return candlestick.open > 0;
+  });
+}
+
+Meteor.methods({
   queryStocksPrice(companyId, lastTime) {
     check(companyId, String);
     check(lastTime, Number);
