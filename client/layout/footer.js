@@ -39,6 +39,28 @@ Template.footer.helpers({
   }
 });
 
+const rIsDisplayAnnouncement = new ReactiveVar(true);
+Template.displayAnnouncement.onCreated(function() {
+  this.autorun(() => {
+    dbVariables.get('announcement');
+    rIsDisplayAnnouncement.set(true);
+  });
+});
+Template.displayAnnouncement.helpers({
+  isDisplay() {
+    return rIsDisplayAnnouncement.get() && dbVariables.get('announcement');
+  },
+  announcement() {
+    return dbVariables.get('announcement');
+  }
+});
+Template.displayAnnouncement.events({
+  'click .btn'(event) {
+    event.preventDefault();
+    rIsDisplayAnnouncement.set(false);
+  }
+});
+
 Template.displayAdvertising.events({
   'click .btn'(event, templateInstance) {
     event.preventDefault();
