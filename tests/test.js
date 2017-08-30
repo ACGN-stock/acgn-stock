@@ -48,7 +48,7 @@ function doSomething(userId) {
   // console.log(username + ' is doing something...');
   const foundationNumber = dbFoundations.find().count();
   const companyNumber = dbCompanies.find().count();
-  if ((companyNumber + foundationNumber) < 3 && probability(25)) {
+  if ((companyNumber + foundationNumber) < 10 && probability(25)) {
     console.log(username + ' want to found a company!');
     foundCompany(user, {
       companyName: 'company' + Date.now(),
@@ -68,7 +68,7 @@ function doSomething(userId) {
     }
   }
   const orderList = dbOrders.find({userId}).fetch();
-  if (probability(orderList * 2)) {
+  if (orderList.length > 0 && probability(50)) {
     console.log(username + ' want to cancel a order!');
     const orderData = _.sample(orderList);
     retrieveOrder(user, orderData._id);
@@ -96,7 +96,7 @@ function doSomething(userId) {
       }
     )
     .fetch();
-  if (canBuyStockCompanyList.length > 0 && probability(50)) {
+  if (canBuyStockCompanyList.length > 0 && probability(25)) {
     const companyData = _.sample(canBuyStockCompanyList);
     const minPrice = Math.ceil(companyData.listPrice / 2);
     if (user.profile.money > minPrice) {
