@@ -15,11 +15,11 @@ import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
 
 Meteor.methods({
-  loginOrRegister(username, password) {
+  loginOrRegister(username, password, reset = false) {
     check(username, String);
     check(password, String);
 
-    if (Meteor.users.find({username}).count() > 0) {
+    if (Meteor.users.find({username}).count() > 0 && reset === false) {
       return true;
     }
     else {
