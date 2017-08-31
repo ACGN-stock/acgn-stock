@@ -6,6 +6,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { WebApp } from 'meteor/webapp';
+import { UserStatus } from 'meteor/mizzao:user-status';
 import { resourceManager } from '../resourceManager';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbCompanies } from '../../db/dbCompanies';
@@ -131,6 +132,11 @@ Accounts.onCreateUser((options, user) => {
     price: config.beginMoney,
     createdAt: new Date()
   });
+  if (user.services && user.services.google) {
+    const email = user.services.google.email;
+    const gmailAccountNameEndIndex = email.indexOf('@');
+    user.profile.name = email.slice(0, gmailAccountNameEndIndex);
+  }
 
   return user;
 });
