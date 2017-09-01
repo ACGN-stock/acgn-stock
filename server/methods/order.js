@@ -62,11 +62,11 @@ export function createBuyOrder(user, orderData) {
   if (companyData.isSeal) {
     throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了，無法下達訂單！');
   }
-  if (orderData.unitPrice < (companyData.listPrice / 2)) {
-    throw new Meteor.Error(403, '最低買入價格不可低於該股票參考價格的一半！');
+  if (orderData.unitPrice < Math.max(companyData.listPrice * 0.85, 1)) {
+    throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的百分之八十五！');
   }
-  if (orderData.unitPrice > (companyData.listPrice * 2)) {
-    throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的兩倍！');
+  if (orderData.unitPrice > (companyData.listPrice * 1.15)) {
+    throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的一點一五倍！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
@@ -98,11 +98,11 @@ export function createBuyOrder(user, orderData) {
     if (! companyData) {
       throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
     }
-    if (orderData.unitPrice < (companyData.listPrice / 2)) {
-      throw new Meteor.Error(403, '最低買入價格不可低於該股票參考價格的一半！');
+    if (orderData.unitPrice < Math.max(companyData.listPrice * 0.85, 1)) {
+      throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的百分之八十五！');
     }
-    if (orderData.unitPrice > (companyData.listPrice * 2)) {
-      throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的兩倍！');
+    if (orderData.unitPrice > (companyData.listPrice * 1.15)) {
+      throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的一點一五倍！');
     }
     orderData.userId = userId;
     orderData.orderType = '購入';
@@ -269,11 +269,11 @@ export function createSellOrder(user, orderData) {
   if (companyData.isSeal) {
     throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了，無法下達訂單！');
   }
-  if (orderData.unitPrice < (companyData.listPrice / 2)) {
-    throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的一半！');
+  if (orderData.unitPrice < Math.max(companyData.listPrice * 0.85, 1)) {
+    throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的百分之八十五！');
   }
-  if (orderData.unitPrice > (companyData.listPrice * 2)) {
-    throw new Meteor.Error(403, '最高售出價格不可高於該股票參考價格的兩倍！');
+  if (orderData.unitPrice > (companyData.listPrice * 1.15)) {
+    throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的一點一五倍！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
@@ -305,11 +305,11 @@ export function createSellOrder(user, orderData) {
     if (! companyData) {
       throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
     }
-    if (orderData.unitPrice < (companyData.listPrice / 2)) {
-      throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的一半！');
+    if (orderData.unitPrice < Math.max(companyData.listPrice * 0.85, 1)) {
+      throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的百分之八十五！');
     }
-    if (orderData.unitPrice > (companyData.listPrice * 2)) {
-      throw new Meteor.Error(403, '最高售出價格不可高於該股票參考價格的兩倍！');
+    if (orderData.unitPrice > (companyData.listPrice * 1.15)) {
+      throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的一點一五倍！');
     }
     orderData.userId = userId;
     orderData.orderType = '賣出';

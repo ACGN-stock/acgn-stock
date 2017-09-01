@@ -201,7 +201,7 @@ export function releaseStocksForNoDeal() {
             $match: {
               orderType: '購入',
               companyId: companyId,
-              unitPrice: (companyData.listPrice * 2)
+              unitPrice: Math.floor(companyData.listPrice * 1.15)
             }
           },
           {
@@ -242,7 +242,7 @@ export function releaseStocksForNoDeal() {
                 totalValue: 1
               }
             });
-            const releasePrice = companyData.listPrice * 2;
+            const releasePrice = Math.floor(companyData.listPrice * 1.15);
             const doublePriceBuyData = dbOrders.aggregate([
               {
                 $match: {

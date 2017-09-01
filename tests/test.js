@@ -98,10 +98,10 @@ function doSomething(userId) {
     .fetch();
   if (canBuyStockCompanyList.length > 0 && probability(25)) {
     const companyData = _.sample(canBuyStockCompanyList);
-    const minPrice = Math.ceil(companyData.listPrice / 2);
+    const minPrice = Math.ceil(companyData.listPrice * 0.85);
     if (user.profile.money > minPrice) {
       const useMoney = randomNumber(user.profile.money);
-      const maxPrice = Math.min(useMoney, companyData.listPrice * 2);
+      const maxPrice = Math.min(useMoney, Math.floor(companyData.listPrice * 1.15));
       const unitPrice = randomNumber(maxPrice, minPrice);
       const amount = Math.floor(useMoney / unitPrice);
       if (amount > 0) {
@@ -158,7 +158,7 @@ function doSomething(userId) {
 
       createSellOrder(user, {
         companyId: companyId,
-        unitPrice: randomNumber(companyData.listPrice * 2, Math.ceil(companyData.listPrice / 2)),
+        unitPrice: randomNumber(Math.floor(companyData.listPrice * 1.15), Math.ceil(companyData.listPrice * 0.85)),
         amount: probability(10) ? directorData.stocks : randomNumber(directorData.stocks)
       });
     }
