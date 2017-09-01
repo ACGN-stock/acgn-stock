@@ -15,7 +15,7 @@ function queryInstantMessage() {
   }
   Meteor.nativeCall('queryInstantMessage', lastQueryInstantMessageTime, (error, result) => {
     if (! error) {
-      lastQueryInstantMessageTime = result.lastTime;
+      lastQueryInstantMessageTime = result.lastTime || (Date.now() - 60000);
       const oldMessageList = rInstantMessageList.get();
       const oldMessageIdList = _.pluck(oldMessageList, '_id');
       const listResult = _.chain(result.list)
