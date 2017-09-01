@@ -7,11 +7,11 @@
 }
 
 .chart path.candle.up {
-    fill: #00AA00;
-    stroke: #00AA00;
+    fill: #FF0000;
+    stroke: #FF0000;
 }
 
 .chart path.candle.down {
-    fill: #FF0000;
-    stroke: #FF0000;
+    fill: #00AA00;
+    stroke: #00AA00;
 }
