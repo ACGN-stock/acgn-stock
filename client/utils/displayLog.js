@@ -278,7 +278,11 @@ Template.displayLog.helpers({
       case '舉報違規': {
         let extraDescription = '';
         if (logData.userId[1]) {
-          extraDescription = getUserLink(logData.userId[1]) + '的違規行為';
+          extraDescription = (
+            getUserLink(logData.userId[1]) +
+            logData.userId[2] ? '(' + logData.userId[2] + ')' : '' +
+            '的違規行為'
+          );
         }
         else if (logData.productId) {
           extraDescription = getProductLink(logData.productId) + '的違例事項';

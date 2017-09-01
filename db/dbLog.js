@@ -35,7 +35,7 @@ export const logTypeList = [
   '營利分紅', //userId0得到了「companyId」公司的分紅$amount！
   '廣告宣傳', //userId0以$price的價格發布了一則廣告：「message」。
   '廣告追加', //userId0追加了$price的廣告費用在廣告：「message」上。
-  '舉報違規', //userId0以「message」的理由向金融管理會舉報(userId1的違規行為 || productId產品的違例事項 || companyId公司的違例事項)。
+  '舉報違規', //userId0以「message」的理由向金融管理會舉報(userId1(ipAddr=userId2)的違規行為 || productId產品的違例事項 || companyId公司的違例事項)。
   '禁止舉報', //userId0以「message」的理由禁止userId1今後的所有舉報違規行為。
   '禁止下單', //userId0以「message」的理由禁止userId1今後的所有投資下單行為。
   '禁止聊天', //userId0以「message」的理由禁止userId1今後的所有聊天發言行為。
