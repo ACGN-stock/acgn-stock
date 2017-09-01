@@ -196,12 +196,12 @@ export function releaseStocksForNoDeal() {
           }
         ])[0];
         const dealAmount = dealData ? dealData.amount : 0;
-        const doublePriceBuyData = dbOrders.aggregate([
+        const highPriceBuyData = dbOrders.aggregate([
           {
             $match: {
               orderType: '購入',
               companyId: companyId,
-              unitPrice: Math.floor(companyData.listPrice * 1.15)
+              unitPrice: Math.max(Math.floor(companyData.listPrice * 1.15), companyData.listPrice + 1)
             }
           },
           {
@@ -228,8 +228,8 @@ export function releaseStocksForNoDeal() {
             }
           }
         ])[0];
-        const doublePriceBuyAmount = doublePriceBuyData ? doublePriceBuyData.amount : 0;
-        if (doublePriceBuyAmount > (dealAmount * 10)) {
+        const highPriceBuyAmount = highPriceBuyData ? highPriceBuyData.amount : 0;
+        if (highPriceBuyAmount > (dealAmount * 10)) {
           console.info('releaseStocksForNoDeal triggered: ' + companyId);
           //先鎖定資源，再重新讀取一次資料進行運算
           resourceManager.request('releaseStocksForNoDeal', ['companyOrder' + companyId], (release) => {
@@ -242,8 +242,8 @@ export function releaseStocksForNoDeal() {
                 totalValue: 1
               }
             });
-            const releasePrice = Math.floor(companyData.listPrice * 1.15);
-            const doublePriceBuyData = dbOrders.aggregate([
+            const releasePrice = Math.max(Math.floor(companyData.listPrice * 1.15), companyData.listPrice + 1);
+            const highPriceBuyData = dbOrders.aggregate([
               {
                 $match: {
                   orderType: '購入',
@@ -275,9 +275,9 @@ export function releaseStocksForNoDeal() {
                 }
               }
             ])[0];
-            const doublePriceBuyAmount = doublePriceBuyData ? doublePriceBuyData.amount : 0;
-            if (doublePriceBuyAmount > 0) {
-              const releaseStocks = 1 + Math.floor(Math.random() * doublePriceBuyAmount / 2);
+            const highPriceBuyAmount = highPriceBuyAmount ? highPriceBuyAmount.amount : 0;
+            if (highPriceBuyAmount > 0) {
+              const releaseStocks = 1 + Math.floor(Math.random() * highPriceBuyAmount / 2);
               dbLog.insert({
                 logType: '公司釋股',
                 companyId: companyId,

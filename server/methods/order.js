@@ -63,7 +63,7 @@ export function createBuyOrder(user, orderData) {
   if (orderData.unitPrice < Math.max(companyData.listPrice * 0.85, 1)) {
     throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的百分之八十五！');
   }
-  if (orderData.unitPrice > (companyData.listPrice * 1.15)) {
+  if (orderData.unitPrice > Math.max(Math.floor(companyData.listPrice * 1.15), companyData.listPrice + 1)) {
     throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的一點一五倍！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
@@ -99,7 +99,7 @@ export function createBuyOrder(user, orderData) {
     if (orderData.unitPrice < Math.max(companyData.listPrice * 0.85, 1)) {
       throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的百分之八十五！');
     }
-    if (orderData.unitPrice > (companyData.listPrice * 1.15)) {
+    if (orderData.unitPrice > Math.max(Math.floor(companyData.listPrice * 1.15), companyData.listPrice + 1)) {
       throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的一點一五倍！');
     }
     orderData.userId = userId;
@@ -270,7 +270,7 @@ export function createSellOrder(user, orderData) {
   if (orderData.unitPrice < Math.max(companyData.listPrice * 0.85, 1)) {
     throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的百分之八十五！');
   }
-  if (orderData.unitPrice > (companyData.listPrice * 1.15)) {
+  if (orderData.unitPrice > Math.max(Math.floor(companyData.listPrice * 1.15), companyData.listPrice + 1)) {
     throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的一點一五倍！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
@@ -306,7 +306,7 @@ export function createSellOrder(user, orderData) {
     if (orderData.unitPrice < Math.max(companyData.listPrice * 0.85, 1)) {
       throw new Meteor.Error(403, '最低售出價格不可低於該股票參考價格的百分之八十五！');
     }
-    if (orderData.unitPrice > (companyData.listPrice * 1.15)) {
+    if (orderData.unitPrice > Math.max(Math.floor(companyData.listPrice * 1.15), companyData.listPrice + 1)) {
       throw new Meteor.Error(403, '最高買入價格不可高於該股票參考價格的一點一五倍！');
     }
     orderData.userId = userId;
