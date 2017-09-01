@@ -201,7 +201,7 @@ export function releaseStocksForNoDeal() {
             $match: {
               orderType: '購入',
               companyId: companyId,
-              unitPrice: Math.max(Math.floor(companyData.listPrice * 1.15), companyData.listPrice + 1)
+              unitPrice: Math.ceil(companyData.listPrice * 1.15)
             }
           },
           {
@@ -242,7 +242,7 @@ export function releaseStocksForNoDeal() {
                 totalValue: 1
               }
             });
-            const releasePrice = Math.max(Math.floor(companyData.listPrice * 1.15), companyData.listPrice + 1);
+            const releasePrice = Math.ceil(companyData.listPrice * 1.15);
             const highPriceBuyData = dbOrders.aggregate([
               {
                 $match: {
