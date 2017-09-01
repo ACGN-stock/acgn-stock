@@ -115,7 +115,7 @@ Template.company.onCreated(function() {
     rTodayDealAmount.set(0);
     lastQueryTodayDealAmountTime = new Date().setHours(0, 0, 0, 0) - 1;
     rPriceList.set([]);
-    lastQueryStocksPriceTime = new Date().setHours(0, 0, 0, 0) - 1;
+    lastQueryStocksPriceTime = Date.now() - 604800000;
   });
   queryDealAmountAndPrice();
   this.queryDealAmountAndPriceIntervalId = Meteor.setInterval(queryDealAmountAndPrice, 30000);
@@ -553,10 +553,11 @@ Template.companyCurrentProductList.helpers({
   }
 });
 Template.companyCurrentProductList.events({
-  'click [data-vote-product]'(event) {
+  'click [data-vote-product]'(event, templateInstance) {
     event.preventDefault();
     const productId = $(event.currentTarget).attr('data-vote-product');
-    voteProduct(productId);
+    const companyId = templateInstance.data._id;
+    voteProduct(productId, companyId);
   }
 });
 
@@ -581,8 +582,7 @@ Template.companyAllPrudctList.events({
   'click [data-like-product]'(event) {
     event.preventDefault();
     const productId = $(event.currentTarget).attr('data-like-product');
-    const companyId = FlowRouter.getParam('companyId');
-    likeProduct(productId, companyId);
+    likeProduct(productId);
   }
 });
 

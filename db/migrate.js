@@ -16,6 +16,7 @@ import { dbRankCompanyValue } from './dbRankCompanyValue';
 import { dbRankUserWealth } from './dbRankUserWealth';
 import { dbSeason } from './dbSeason';
 import { dbValidatingUsers } from './dbValidatingUsers';
+import { dbVoteRecord } from './dbVoteRecord';
 
 if (Meteor.isServer) {
   Migrations.add({
@@ -228,6 +229,21 @@ if (Meteor.isServer) {
         },
         {
           multi: true
+        }
+      );
+    }
+  });
+  Migrations.add({
+    version: 2,
+    name: 'voteRecord indexes.',
+    up() {
+      dbVoteRecord.rawCollection().createIndex(
+        {
+          companyId: 1,
+          userId: 1
+        },
+        {
+          unique: true
         }
       );
     }

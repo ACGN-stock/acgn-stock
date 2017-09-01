@@ -5,12 +5,12 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { WebApp } from 'meteor/webapp';
 import { resourceManager } from '../resourceManager';
-import { dbDirectors } from '../../db/dbDirectors';
 import { dbProducts } from '../../db/dbProducts';
 import { dbProductLike } from '../../db/dbProductLike';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbSeason } from '../../db/dbSeason';
 import { dbLog } from '../../db/dbLog';
+import { dbVoteRecord } from '../../db/dbVoteRecord';
 
 Meteor.methods({
   createProduct(productData) {
@@ -94,6 +94,9 @@ export function voteProduct(user, productId) {
   if (user.profile.vote < 1) {
     throw new Meteor.Error(403, '使用者已經沒有多餘的推薦票可以推薦！');
   }
+  if (dbVoteRecord.find({companyId, userId}).count() > 0) {
+    throw new Meteor.Error(403, '使用者已在本季度對該公司的產品投過推薦票，無法繼續對同一家公司的產品投推薦票！');
+  }
   const productData = dbProducts.findOne(productId, {
     fields: {
       companyId: 1,
@@ -128,6 +131,9 @@ export function voteProduct(user, productId) {
     if (user.profile.vote < 1) {
       throw new Meteor.Error(403, '使用者已經沒有多餘的推薦票可以推薦！');
     }
+    if (dbVoteRecord.find({companyId, userId}).count() > 0) {
+      throw new Meteor.Error(403, '使用者已在本季度對該公司的產品投過推薦票，無法繼續對同一家公司的產品投推薦票！');
+    }
     dbLog.insert({
       logType: '推薦產品',
       userId: [userId],
@@ -136,6 +142,7 @@ export function voteProduct(user, productId) {
       price: votePrice,
       createdAt: new Date()
     });
+    dbVoteRecord.insert({companyId, userId});
     Meteor.users.update(userId, {
       $inc: {
         'profile.vote': -1
@@ -148,9 +155,11 @@ export function voteProduct(user, productId) {
     });
     dbProducts.update(productId, {
       $inc: {
-        votes: 1
+        votes: 1,
+        likeCount: 1
       }
     });
+    dbProductLike.insert({productId, companyId, userId});
     release();
   });
 }
@@ -171,9 +180,6 @@ export function likeProduct(user, productId) {
   }
   const companyId = productData.companyId;
   const userId = user._id;
-  if (dbDirectors.find({companyId, userId}).count() < 1) {
-    throw new Meteor.Error(401, '至少需要擁有一張的股票才可做出股東評價！');
-  }
   const existsLikeData = dbProductLike.findOne({productId, userId});
   if (existsLikeData) {
     dbProductLike.remove(existsLikeData._id);
@@ -365,13 +371,17 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
 Meteor.publish('queryMyLikeProduct', function(companyId) {
   check(companyId, String);
   const userId = this.userId;
+
   if (userId) {
-    return dbProductLike.find({companyId, userId}, {
-      fields: {
-        productName: 0,
-        url: 0
-      }
-    });
+    return [
+      dbProductLike.find({companyId, userId}, {
+        fields: {
+          productName: 0,
+          url: 0
+        }
+      }),
+      dbVoteRecord.find({companyId, userId})
+    ];
   }
   else {
     return [];

@@ -14,6 +14,7 @@ import { dbRankCompanyValue } from '../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../db/dbRankUserWealth';
 import { dbResourceLock } from '../db/dbResourceLock';
 import { dbSeason } from '../db/dbSeason';
+import { dbVoteRecord } from '../db/dbVoteRecord';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
 import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal } from './company';
@@ -132,12 +133,14 @@ function doSeasonWorks(lastSeasonData) {
     electManager(lastSeasonData);
     //產生新的商業季度
     generateNewSeason();
-    //移除所有一天前的股價紀錄
+    //移除所有七天前的股價紀錄
     dbPrice.remove({
       createdAt: {
-        $lt: new Date( Date.now() - 86400000 )
+        $lt: new Date( Date.now() - 604800000 )
       }
     });
+    //移除所有推薦票投票紀錄
+    dbVoteRecord.remove();
     release();
   });
 }

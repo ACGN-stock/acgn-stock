@@ -431,7 +431,7 @@ Meteor.methods({
   }
 })
 function queryStocksPrice(companyId, lastTime) {
-  lastTime = Math.max(lastTime, new Date().setHours(0, 0, 0, 0) - 1);
+  lastTime = Math.max(lastTime, Date.now() - 604800000);
   const list = dbPrice
     .find(
       {

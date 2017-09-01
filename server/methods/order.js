@@ -7,8 +7,6 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbPrice } from '../../db/dbPrice';
-import { dbProducts } from '../../db/dbProducts';
-import { dbProductLike } from '../../db/dbProductLike';
 import { dbLog } from '../../db/dbLog';
 
 Meteor.methods({
@@ -421,14 +419,6 @@ export function changeStocksAmount(userId, companyId, amount) {
       }
       else if (existDirectorData.stocks === amount) {
         dbDirectors.remove(existDirectorData._id);
-        dbProductLike.find({companyId, userId}).forEach((likeData) => {
-          dbProducts.update(likeData.productId, {
-            $inc: {
-              likeCount: -1
-            }
-          });
-          dbProductLike.remove(likeData._id);
-        });
       }
       else {
         throw new Meteor.Error(500, '試圖扣除使用者[' + userId + ']股票[' + companyId + ']數量[' + amount + ']但數量不足！');

@@ -95,7 +95,6 @@ Template.productListByCompanyTable.events({
   'click [data-like-product]'(event) {
     event.preventDefault();
     const productId = $(event.currentTarget).attr('data-like-product');
-    const companyId = FlowRouter.getParam('companyId');
-    likeProduct(productId, companyId);
+    likeProduct(productId);
   }
 });

@@ -6,6 +6,7 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbProductLike } from '../../db/dbProductLike';
+import { dbVoteRecord } from '../../db/dbVoteRecord';
 import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
 import { alertDialog } from '../layout/alertDialog';
@@ -191,7 +192,7 @@ export function changeChairmanTitle(companyData) {
   }, companyData.chairmanTitle);
 }
 
-export function voteProduct(productId) {
+export function voteProduct(productId, companyId) {
   const user = Meteor.user();
   if (! user) {
     alertDialog.alert('您尚未登入，無法向產品投推薦票！');
@@ -203,6 +204,12 @@ export function voteProduct(productId) {
 
     return false;
   }
+  const userId = user._id;
+  if (dbVoteRecord.find({companyId, userId}).count() > 0) {
+    alertDialog.alert('您已在本季度對該公司的產品投過推薦票，無法繼續對同一家公司的產品投推薦票！');
+
+    return false;
+  }
   alertDialog.confirm('您的推薦票剩餘' + user.profile.vote + '張，確定要向產品投出推薦票嗎？', function(result) {
     if (result) {
       Meteor.call('voteProduct', productId);
@@ -210,20 +217,14 @@ export function voteProduct(productId) {
   });
 }
 
-export function likeProduct(productId, companyId) {
+export function likeProduct(productId) {
   const user = Meteor.user();
   if (! user) {
-    alertDialog.alert('您尚未登入，無法向產品進行董事推薦！');
+    alertDialog.alert('您尚未登入，無法對產品進行推薦！');
 
     return false;
   }
-  const companyData = dbCompanies.findOne(companyId);
   const userId = user._id;
-  if (dbDirectors.find({companyId, userId}).count() < 1) {
-    alertDialog.alert('您至少需要擁有一張「' + companyData.companyName + '」的股票才可對公司產品進行董事推薦！');
-
-    return false;
-  }
   if (dbProductLike.find({productId, userId}).count() > 0) {
     alertDialog.confirm('您已經對此產品做出過正面評價，要收回評價嗎？', function(result) {
       if (result) {
