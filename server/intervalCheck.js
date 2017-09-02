@@ -103,6 +103,17 @@ function doIntervalWork() {
       $lt: new Date( Date.now() - config.advertisingExpireTime)
     }
   });
+  //移除5分鐘以上的resource lock
+  dbResourceLock
+    .find({
+      time: {
+        $lt: new Date( Date.now() - 300000)
+      }
+    })
+    .forEach((lockData) => {
+      console.log(JSON.stringify(lockData) + ' locked time over 5 min...automatic release!');
+      dbResourceLock.remove(dbResourceLock._id);
+    });
 }
 
 //商業季度結束檢查
