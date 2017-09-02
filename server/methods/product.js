@@ -91,6 +91,9 @@ Meteor.methods({
   }
 });
 export function voteProduct(user, productId) {
+  if (_.contains(user.profile.ban, 'deal')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
+  }
   if (user.profile.vote < 1) {
     throw new Meteor.Error(403, '使用者已經沒有多餘的推薦票可以推薦！');
   }
@@ -174,6 +177,9 @@ Meteor.methods({
   }
 });
 export function likeProduct(user, productId) {
+  if (_.contains(user.profile.ban, 'deal')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
+  }
   const productData = dbProducts.findOne(productId);
   if (! productData) {
     throw new Meteor.Error(404, '不存在的產品！');
