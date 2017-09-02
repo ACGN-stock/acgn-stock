@@ -115,7 +115,7 @@ Template.company.onCreated(function() {
     rTodayDealAmount.set(0);
     lastQueryTodayDealAmountTime = new Date().setHours(0, 0, 0, 0) - 1;
     rPriceList.set([]);
-    lastQueryStocksPriceTime = Date.now() - 604800000;
+    lastQueryStocksPriceTime = Date.now() - 86400000;
   });
   queryDealAmountAndPrice();
   this.queryDealAmountAndPriceIntervalId = Meteor.setInterval(queryDealAmountAndPrice, 30000);
