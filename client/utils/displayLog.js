@@ -280,7 +280,7 @@ Template.displayLog.helpers({
         if (logData.userId[1]) {
           extraDescription = (
             getUserLink(logData.userId[1]) +
-            logData.userId[2] ? '(' + logData.userId[2] + ')' : '' +
+            (logData.userId[2] ? '(' + logData.userId[2] + ')' : '') +
             '的違規行為'
           );
         }
