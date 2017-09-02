@@ -27,6 +27,7 @@
 .company-summary .picture img {
   width: 100px;
   height: 100px;
+  object-fit: cover;
 }
 
 .company-detail .picture {
@@ -38,4 +39,5 @@
 .company-detail .picture img {
   width: 300px;
   height: 300px;
+  object-fit: scale-down;
 }
