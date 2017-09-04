@@ -138,7 +138,13 @@ function queryDealAmountAndPrice() {
     Meteor.nativeCall('queryStocksPrice', companyId, lastQueryStocksPriceTime, (error, result) => {
       if (! error) {
         if (result.list.length > 0) {
-          rPriceList.set(rPriceList.get().concat(result.list));
+          const newPriceList = _.chain(rPriceList.get().concat(result.list))
+            .unique((priceData) => {
+              return priceData.x;
+            })
+            .sortBy('x')
+            .value();
+          rPriceList.set(newPriceList);
         }
         lastQueryStocksPriceTime = result.lastTime;
       }
