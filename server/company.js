@@ -4,10 +4,11 @@ import { changeStocksAmount, resolveOrder, updateCompanyLastPrice } from './meth
 import { dbCompanies } from '../db/dbCompanies';
 import { dbOrders } from '../db/dbOrders';
 import { dbLog } from '../db/dbLog';
+import { dbVariables } from '../db/dbVariables';
 import { config } from '../config';
 
-let releaseStocksForHighPriceCounter = generateReleaseStocksForHighPriceConter();
 export function releaseStocksForHighPrice() {
+  let releaseStocksForHighPriceCounter = dbVariables.get('releaseStocksForHighPriceCounter') || 0;
   releaseStocksForHighPriceCounter -= 1;
   if (releaseStocksForHighPriceCounter <= 0) {
     releaseStocksForHighPriceCounter = generateReleaseStocksForHighPriceConter();
@@ -146,6 +147,7 @@ export function releaseStocksForHighPrice() {
         });
       });
   }
+  dbVariables.set('releaseStocksForHighPriceCounter', releaseStocksForHighPriceCounter);
 }
 function generateReleaseStocksForHighPriceConter() {
   const min = config.releaseStocksForHighPriceMinCounter;
@@ -154,9 +156,8 @@ function generateReleaseStocksForHighPriceConter() {
   return min + Math.floor(Math.random() * max);
 }
 
-let releaseStocksForNoDealCounter = generateReleaseStocksForNoDealConter();
 export function releaseStocksForNoDeal() {
-  releaseStocksForNoDealCounter -= 1;
+  let releaseStocksForNoDealCounter = dbVariables.get('releaseStocksForNoDealCounter') || 0;
   if (releaseStocksForNoDealCounter <= 0) {
     releaseStocksForNoDealCounter = generateReleaseStocksForNoDealConter();
     console.info(new Date().toLocaleString() + ': releaseStocksForNoDeal');
@@ -342,6 +343,7 @@ export function releaseStocksForNoDeal() {
         }
       });
   }
+  dbVariables.set('releaseStocksForNoDealCounter', releaseStocksForNoDealCounter);
 }
 function generateReleaseStocksForNoDealConter() {
   const min = config.releaseStocksForNoDealMinCounter;
@@ -350,8 +352,8 @@ function generateReleaseStocksForNoDealConter() {
   return min + Math.floor(Math.random() * max);
 }
 
-let recordListPriceConter = generateRecordListPriceConter();
 export function recordListPrice() {
+  let recordListPriceConter = dbVariables.get('recordListPriceConter') || 0;
   recordListPriceConter -= 1;
   if (recordListPriceConter <= 0) {
     recordListPriceConter = generateRecordListPriceConter();
@@ -395,6 +397,7 @@ export function recordListPrice() {
         }
       });
   }
+  dbVariables.set('recordListPriceConter', recordListPriceConter);
 }
 function generateRecordListPriceConter() {
   const min = config.recordListPriceMinCounter;
