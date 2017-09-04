@@ -12,7 +12,6 @@
     "bcrypt": "^1.0.2",
     "cheerio": "1.0.0-rc.2",
     "meteor-node-stubs": "~0.2.4",
-    "request": "2.81.0",
     "simpl-schema": "0.3.1"
   },
   "devDependencies": {

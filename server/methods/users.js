@@ -1,11 +1,13 @@
 'use strict';
 import url from 'url';
 import querystring from 'querystring';
+import cheerio from 'cheerio';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { WebApp } from 'meteor/webapp';
+import { HTTP } from 'meteor/http'
 import { UserStatus } from 'meteor/mizzao:user-status';
 import { resourceManager } from '../resourceManager';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
@@ -65,24 +67,13 @@ Meteor.methods({
     }
   }
 });
-const getValidateUserUrlBodySync = Meteor.wrapAsync((callback) => {
-  const request = require('request');
-  const cheerio = require('cheerio');
-  request(dbVariables.get('validateUserUrl'), (error, response, body) => {
-    if (error) {
-      callback(error);
-    }
-    else {
-      const $pushList = cheerio.load(body)('div.push');
-      callback(null, $pushList);
-    }
-  });
-});
 function validateUsers(checkUsername) {
   let checkResult = false;
   const validatingUserList = dbValidatingUsers.find({}, {disableOplog: true}).fetch();
   if (validatingUserList.length > 0) {
-    const $pushList = getValidateUserUrlBodySync();
+    const url = dbVariables.get('validateUserUrl');
+    const ajaxCallResult = HTTP.get(url);
+    const $pushList = cheerio.load(ajaxCallResult.content)('div.push');
     validatingUserList.forEach((validatingUser) => {
       const username = validatingUser.username;
       const $userPushList = $pushList.find('.push-userid:contains(' + username + ')').closest('.push');
@@ -118,6 +109,7 @@ function validateUsers(checkUsername) {
 
   return checkResult;
 }
+
 Accounts.onCreateUser((options, user) => {
   user.profile = _.defaults({}, options.profile, {
     money: config.beginMoney,
@@ -149,12 +141,29 @@ WebApp.connectHandlers.use(function(req, res, next) {
     const userId = query.id;
     const userData = Meteor.users.findOne(userId, {
       fields: {
+        'services.google.accessToken': 1,
         'profile.name': 1
       }
     });
     if (userData) {
       res.setHeader('Cache-Control', 'public, max-age=604800');
-      res.end(userData.profile.name);
+      if (userData.services.google) {
+        const accessToken = userData.services.google.accessToken;
+        try {
+          const response = HTTP.get('https://www.googleapis.com/oauth2/v1/userinfo', {
+            params: {
+              access_token: accessToken
+            }
+          });
+          res.end(response.data.name);
+        }
+        catch (e) {
+          res.end(userData.profile.name);
+        }
+      }
+      else {
+        res.end(userData.profile.name);
+      }
     }
     else {
       res.writeHead(404, {
