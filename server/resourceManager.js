@@ -16,6 +16,7 @@ export const resourceManager = {
       Meteor.setTimeout(() => {
         requestTime += 1;
         if (requestTime >= 10) {
+          console.error('repeat same request warning!');
           console.error(task, resourceList);
         }
         this.request(task, resourceList, callback);
@@ -41,8 +42,8 @@ export const resourceManager = {
       catch(e) {
         release();
         console.error('error happens while requesting resources, automatic release resources lock' + JSON.stringify({resourceList, task, threadId, time}) + '!');
-        // const message = 'error happens because of ' + e.stack + ', automatic release resources lock' + JSON.stringify({resourceList, task, threadId, time}) + '!';
-        // console.info(new Date(), message);
+        console.error('error: ' + JSON.stringify(e));
+
         throw e;
       }
     }
