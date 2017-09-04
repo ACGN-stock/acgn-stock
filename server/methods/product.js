@@ -1,6 +1,7 @@
 'use strict';
 import url from 'url';
 import querystring from 'querystring';
+import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { WebApp } from 'meteor/webapp';
