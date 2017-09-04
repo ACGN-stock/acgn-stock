@@ -275,7 +275,7 @@ export function releaseStocksForNoDeal() {
                 }
               }
             ])[0];
-            const highPriceBuyAmount = highPriceBuyAmount ? highPriceBuyAmount.amount : 0;
+            const highPriceBuyAmount = highPriceBuyData ? highPriceBuyData.amount : 0;
             if (highPriceBuyAmount > 0) {
               const releaseStocks = 1 + Math.floor(Math.random() * highPriceBuyAmount / 2);
               dbLog.insert({
