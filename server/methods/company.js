@@ -32,11 +32,16 @@ Meteor.methods({
 function editCompany(user, companyId, newCompanyData) {
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      manager: 1
+      companyName: 1,
+      manager: 1,
+      isSeal: 1
     }
   });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
   const userId = user._id;
   if (userId !== companyData.manager) {
@@ -65,11 +70,16 @@ Meteor.methods({
 export function resignManager(user, companyId) {
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      manager: 1
+      companyName: 1,
+      manager: 1,
+      isSeal: 1
     }
   });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
   const userId = user._id;
   if (userId !== companyData.manager) {
@@ -123,12 +133,17 @@ Meteor.methods({
 export function contendManager(user, companyId) {
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
+      companyName: 1,
       manager: 1,
-      candidateList: 1
+      candidateList: 1,
+      isSeal: 1
     }
   });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
   const userId = user._id;
   if (userId === companyData.manager) {
@@ -190,11 +205,15 @@ export function supportCandidate(user, companyId, supportUserId) {
       companyName: 1,
       manager: 1,
       candidateList: 1,
-      voteList: 1
+      voteList: 1,
+      isSeal: 1
     }
   });
   if (! companyData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
   const userId = user._id;
   const directorDataCount = dbDirectors
@@ -510,7 +529,9 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
   check(isOnlyShowMine, Boolean);
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
   check(offset, Match.Integer);
-  const filter = {};
+  const filter = {
+    isSeal: false
+  };
   if (keyword) {
     keyword = keyword.replace(/\\/g, '\\\\');
     const reg = new RegExp(keyword, 'i');

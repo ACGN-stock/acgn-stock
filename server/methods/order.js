@@ -51,14 +51,15 @@ export function createBuyOrder(user, orderData) {
       _id: 1,
       companyName: 1,
       listPrice: 1,
-      lastPrice: 1
+      lastPrice: 1,
+      isSeal: 1
     }
   });
   if (! companyData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
   }
   if (companyData.isSeal) {
-    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了，無法下達訂單！');
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
   if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
@@ -258,14 +259,15 @@ export function createSellOrder(user, orderData) {
       _id: 1,
       companyName: 1,
       listPrice: 1,
-      lastPrice: 1
+      lastPrice: 1,
+      isSeal: 1
     }
   });
   if (! companyData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
   }
   if (companyData.isSeal) {
-    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了，無法下達訂單！');
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
   if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');

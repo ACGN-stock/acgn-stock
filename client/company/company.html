@@ -1,35 +1,53 @@
 <template name="company">
   <div class="card">
     {{#with companyData}}
-      <div class="card-block">
-        <h1 class="card-title text-truncate">{{this.companyName}}</h1>
-        <hr />
-        <h2 class="card-subtitle mb-2 text-muted">
-          {{this.chairmanTitle}}：
-          {{#with getChairmanId this._id}}
-            {{>userLink}}
-          {{/with}}
-          {{#if isChairman this._id}}
-            <a class="btn btn-primary btn-sm" href="#" data-action="changeChairmanTitle">
-              修改頭銜
+      {{#if companyData.isSeal}}
+        <div class="card-block">
+          該公司已被金融管理委員會查封！
+          {{#if currentUser.profile.isAdmin}}
+            <a class="btn btn-danger float-right" href="#" data-action="seal">
+              解除查封
             </a>
           {{/if}}
-        </h2>
-        <h3>
-          經理人：
-          {{>userLink this.manager}}
-          {{#if isUserId this.manager}}
-            <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
-              經營管理
-            </a>
-            <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
-              辭去職務
-            </a>
-          {{/if}}
-        </h3>
-        <hr />
-        {{> companyDetail}}
-      </div>
+        </div> 
+      {{else}}       
+        <div class="card-block">
+          <h1 class="card-title text-truncate">
+            {{this.companyName}}
+            {{#if currentUser.profile.isAdmin}}
+              <a class="btn btn-danger float-right" href="#" data-action="seal">
+                查封關停
+              </a>
+            {{/if}}
+          </h1>
+          <hr />
+          <h2 class="card-subtitle mb-2 text-muted">
+            {{this.chairmanTitle}}：
+            {{#with getChairmanId this._id}}
+              {{>userLink}}
+            {{/with}}
+            {{#if isChairman this._id}}
+              <a class="btn btn-primary btn-sm" href="#" data-action="changeChairmanTitle">
+                修改頭銜
+              </a>
+            {{/if}}
+          </h2>
+          <h3>
+            經理人：
+            {{>userLink this.manager}}
+            {{#if isUserId this.manager}}
+              <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
+                經營管理
+              </a>
+              <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
+                辭去職務
+              </a>
+            {{/if}}
+          </h3>
+          <hr />
+          {{> companyDetail}}
+        </div>
+      {{/if}}
     {{else}}
       <div class="card-block">
         Loading...

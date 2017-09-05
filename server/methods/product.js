@@ -31,11 +31,16 @@ export function createProduct(user, productData) {
   const companyId = productData.companyId;
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      manager: 1
+      companyName: 1,
+      manager: 1,
+      isSeal: 1
     }
   });
   if (companyData.manager !== user._id) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
   const url = productData.url;
   if (dbProducts.find({companyId, url}).count() > 0) {
@@ -72,11 +77,16 @@ export function retrieveProduct(user, productId) {
   const companyId = productData.companyId;
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      manager: 1
+      companyName: 1,
+      manager: 1,
+      isSeal: 1
     }
   });
   if (companyData.manager !== user._id) {
     throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season']);
   dbProducts.remove(productId);
@@ -98,9 +108,6 @@ export function voteProduct(user, productId) {
   if (user.profile.vote < 1) {
     throw new Meteor.Error(403, '使用者已經沒有多餘的推薦票可以推薦！');
   }
-  if (dbVoteRecord.find({companyId, userId}).count() > 0) {
-    throw new Meteor.Error(403, '使用者已在本季度對該公司的產品投過推薦票，無法繼續對同一家公司的產品投推薦票！');
-  }
   const productData = dbProducts.findOne(productId, {
     fields: {
       companyId: 1,
@@ -113,6 +120,23 @@ export function voteProduct(user, productId) {
   if (productData.overdue !== 1) {
     throw new Meteor.Error(401, '該產品的投票截止日期已經超過了！');
   }
+  const companyId = productData.companyId;
+  const companyData = dbCompanies.findOne(companyId, {
+    fields: {
+      companyName: 1,
+      isSeal: 1
+    }
+  });
+  if (! companyData) {
+    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
+  }
+  const userId = user._id;
+  if (dbVoteRecord.find({companyId, userId}).count() > 0) {
+    throw new Meteor.Error(403, '使用者已在本季度對該公司的產品投過推薦票，無法繼續對同一家公司的產品投推薦票！');
+  }
   const seasonData = dbSeason.findOne({}, {
     sort: {
       beginDate: -1
@@ -121,9 +145,7 @@ export function voteProduct(user, productId) {
   if (! seasonData) {
     throw new Meteor.Error(500, '商業季度尚未開始！');
   }
-  const companyId = productData.companyId;
   const votePrice = seasonData.votePrice;
-  const userId = user._id;
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyProfit' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('voteProduct', ['companyProfit' + companyId, 'user' + userId], (release) => {
@@ -186,6 +208,18 @@ export function likeProduct(user, productId) {
     throw new Meteor.Error(404, '不存在的產品！');
   }
   const companyId = productData.companyId;
+  const companyData = dbCompanies.findOne(companyId, {
+    fields: {
+      companyName: 1,
+      isSeal: 1
+    }
+  });
+  if (! companyData) {
+    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
+  }
+  if (companyData.isSeal) {
+    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
+  }
   const userId = user._id;
   const existsLikeData = dbProductLike.findOne({productId, userId});
   if (existsLikeData) {

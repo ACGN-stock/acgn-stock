@@ -248,6 +248,88 @@ if (Meteor.isServer) {
       );
     }
   });
+  Migrations.add({
+    version: 1,
+    name: 'companies re indexes.',
+    up() {
+      dbCompanies.rawCollection().dropIndex({
+        lastPrice: -1
+      });
+      dbCompanies.rawCollection().dropIndex({
+        totalValue: -1
+      });
+      dbCompanies.rawCollection().dropIndex({
+        profit: -1
+      });
+      dbCompanies.rawCollection().dropIndex({
+        createdAt: -1
+      });
+      dbCompanies.rawCollection().dropIndex({
+        manager: 1
+      });
+      dbCompanies.update(
+        {},
+        {
+          $set: {
+            isSeal: false
+          }
+        },
+        {
+          multi: true
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          lastPrice: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          totalValue: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          profit: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          createdAt: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          manager: 1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+    }
+  });
 
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
