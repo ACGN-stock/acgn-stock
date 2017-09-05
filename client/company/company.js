@@ -103,6 +103,30 @@ Template.company.onCreated(function() {
     }
   });
 });
+Template.company.events({
+  'click [data-action="seal"]'() {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1,
+        isSeal: 1
+      }
+    });
+    const companyName = companyData.companyName;
+    const title = (companyData.isSeal ? '解除查封 - ' : '查封關停 - ') + companyName;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: title,
+      message: `請輸入處理事由：`,
+      callback: function(message) {
+        if (message) {
+          Meteor.call('sealCompany', {companyId, message});
+        }
+      }
+    });
+  }
+});
 
 //定時呼叫取得今日交易量與股價走勢資料
 const rTodayDealAmount = new ReactiveVar(0);

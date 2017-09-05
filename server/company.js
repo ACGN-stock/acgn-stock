@@ -12,15 +12,20 @@ export function releaseStocksForHighPrice() {
   releaseStocksForHighPriceCounter -= 1;
   if (releaseStocksForHighPriceCounter <= 0) {
     releaseStocksForHighPriceCounter = generateReleaseStocksForHighPriceConter();
-    console.info(new Date().toLocaleString() + ': releaseStocksForHighPrice');
-    const maxPriceCompany = dbCompanies.findOne({}, {
-      sort: {
-        lastPrice: -1
+    console.info('releaseStocksForHighPrice!');
+    const maxPriceCompany = dbCompanies.findOne(
+      {
+        isSeal: false
       },
-      fields: {
-        lastPrice: 1
+      {
+        sort: {
+          lastPrice: -1
+        },
+        fields: {
+          lastPrice: 1
+        }
       }
-    });
+    );
     if (! maxPriceCompany) {
       return false;
     }
@@ -31,12 +36,12 @@ export function releaseStocksForHighPrice() {
         {
           lastPrice: {
             $gt: thresholdPrice
-          }
+          },
+          isSeal: false
         },
         {
           fields: {
-            _id: 1,
-            isSeal: 1
+            _id: 1
           },
           disableOplog: true
         }
@@ -49,10 +54,6 @@ export function releaseStocksForHighPrice() {
         });
         //有尚存在的釋股單在市場上時不繼續釋股
         if (existsReleaseOrder) {
-          return false;
-        }
-        //被查封關停時不繼續釋股
-        if (companyData.isSeal) {
           return false;
         }
         //先鎖定資源，再重新讀取一次資料進行運算
@@ -160,22 +161,22 @@ export function releaseStocksForNoDeal() {
   let releaseStocksForNoDealCounter = dbVariables.get('releaseStocksForNoDealCounter') || 0;
   if (releaseStocksForNoDealCounter <= 0) {
     releaseStocksForNoDealCounter = generateReleaseStocksForNoDealConter();
-    console.info(new Date().toLocaleString() + ': releaseStocksForNoDeal');
+    console.info('releaseStocksForNoDeal!');
     const checkLogTime = new Date(Date.now() - (config.releaseStocksForNoDealMinCounter * config.intervalTimer));
     dbCompanies
-      .find({}, {
-        fields: {
-          _id: 1,
-          listPrice: 1,
-          isSeal: 1
+      .find(
+        {
+          isSeal: false
         },
-        disableOplog: true
-      })
-      .forEach((companyData) => {
-        //被查封關停時不繼續釋股
-        if (companyData.isSeal) {
-          return false;
+        {
+          fields: {
+            _id: 1,
+            listPrice: 1
+          },
+          disableOplog: true
         }
+      )
+      .forEach((companyData) => {
         const companyId = companyData._id;
         const dealData = dbLog.aggregate([
           {
@@ -357,25 +358,22 @@ export function recordListPrice() {
   recordListPriceConter -= 1;
   if (recordListPriceConter <= 0) {
     recordListPriceConter = generateRecordListPriceConter();
-    console.info(new Date().toLocaleString() + ': recordListPriceConter');
+    console.info('recordListPriceConter!');
     dbCompanies
       .find(
-        {},
+        {
+          isSeal: false
+        },
         {
           fields: {
             _id: 1,
             lastPrice: 1,
             listPrice: 1,
-            isSeal: 1
           },
           disableOplog: true
         }
       )
       .forEach((companyData) => {
-        //被查封關停時不再紀錄
-        if (companyData.isSeal) {
-          return false;
-        }
         if (companyData.lastPrice !== companyData.listPrice) {
           const companyId = companyData._id;
           //先鎖定資源，再重新讀取一次資料進行運算

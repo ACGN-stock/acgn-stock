@@ -45,31 +45,7 @@
     </thead>
     <tbody>
       {{#each product in productList}}
-        <tr>
-          <td class="text-left text-truncate px-2">
-            {{>productLink product._id}}
-          </td>
-          <td class="text-left text-truncate px-2">
-            {{>companyLink product.companyId}}
-          </td>
-          <td class="text-center text-truncate">
-            {{product.type}}
-          </td>
-          <td class="text-center text-truncate px-2">
-            {{#if canVote product}}
-              <button
-                class="btn btn-primary btn-sm"
-                type="button"
-                data-vote-product="{{product._id}}"
-              >
-                {{product.votes}}
-                <i class="fa fa-money" aria-hidden="true"></i>
-              </button>
-            {{else}}
-              {{product.votes}}
-            {{/if}}
-          </td>
-        </tr>
+        {{> productInfoBySeasonTable}}
       {{else}}
         <tr>
           <td class="text-center" colspan="4">當季度沒有任何產品上架！</td>
@@ -80,4 +56,32 @@
   {{#with paginationData}}
     {{> pagination}}
   {{/with}}
+</template>
+
+<template name="productInfoBySeasonTable">
+  <tr>
+    <td class="text-left text-truncate px-2">
+      {{>productLink this._id}}
+    </td>
+    <td class="text-left text-truncate px-2">
+      {{>companyLink this.companyId}}
+    </td>
+    <td class="text-center text-truncate">
+      {{this.type}}
+    </td>
+    <td class="text-center text-truncate px-2">
+      {{#if canVote}}
+        <button
+          class="btn btn-primary btn-sm"
+          type="button"
+          data-vote-product="{{this._id}}"
+        >
+          {{this.votes}}
+          <i class="fa fa-money" aria-hidden="true"></i>
+        </button>
+      {{else}}
+        {{this.votes}}
+      {{/if}}
+    </td>
+  </tr>
 </template>

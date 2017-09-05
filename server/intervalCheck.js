@@ -212,61 +212,76 @@ function generateRankData(seasonData) {
   // console.log('begining generate rank data...');
   // console.log('begining rank company price...');
   const rankCompanyPriceList = dbCompanies
-    .find({}, {
-      fields: {
-        _id: 1,
-        lastPrice: 1,
-        listPrice: 1,
-        totalRelease: 1,
-        totalValue: 1,
-        profit: 1
+    .find(
+      {
+        isSeal: false
       },
-      sort: {
-        lastPrice: -1
-      },
-      limit: 100,
-      disableOplog: true
-    })
+      {
+        fields: {
+          _id: 1,
+          lastPrice: 1,
+          listPrice: 1,
+          totalRelease: 1,
+          totalValue: 1,
+          profit: 1
+        },
+        sort: {
+          lastPrice: -1
+        },
+        limit: 100,
+        disableOplog: true
+      }
+    )
     .fetch();
   // console.log('done rank company price...');
 
   // console.log('begining rank company value...');
   const rankCompanyValueList = dbCompanies
-    .find({}, {
-      fields: {
-        _id: 1,
-        lastPrice: 1,
-        listPrice: 1,
-        totalRelease: 1,
-        totalValue: 1,
-        profit: 1
+    .find(
+      {
+        isSeal: false
       },
-      sort: {
-        totalValue: -1
-      },
-      limit: 100,
-      disableOplog: true
-    })
+        {
+        fields: {
+          _id: 1,
+          lastPrice: 1,
+          listPrice: 1,
+          totalRelease: 1,
+          totalValue: 1,
+          profit: 1
+        },
+        sort: {
+          totalValue: -1
+        },
+        limit: 100,
+        disableOplog: true
+      }
+    )
     .fetch();
   // console.log('done rank company value...');
 
   // console.log('begining rank company profit...');
   const rankCompanyProfitList = dbCompanies
-    .find({}, {
-      fields: {
-        _id: 1,
-        lastPrice: 1,
-        listPrice: 1,
-        totalRelease: 1,
-        totalValue: 1,
-        profit: 1
+    .find(
+      {
+        isSeal: false
       },
-      sort: {
-        profit: -1
-      },
-      limit: 100,
-      disableOplog: true
-    })
+      {
+        fields: {
+          _id: 1,
+          lastPrice: 1,
+          listPrice: 1,
+          totalRelease: 1,
+          totalValue: 1,
+          profit: 1
+        },
+        sort: {
+          profit: -1
+        },
+        limit: 100,
+        disableOplog: true
+      }
+    )
     .fetch();
   // console.log('done rank company profit...');
 
@@ -285,9 +300,17 @@ function generateRankData(seasonData) {
         userId: 1,
         companyId: 1,
         stocks: 1,
+        isSeal: {
+          $arrayElemAt: ['$companyData.isSeal', 0]
+        },
         listPrice: {
           $arrayElemAt: ['$companyData.listPrice', 0]
         }
+      }
+    },
+    {
+      $match: {
+        isSeal: false
       }
     },
     {
@@ -417,7 +440,8 @@ function giveBonusByStocksFromProfit() {
       {
         profit: {
           $gt: 0
-        }
+        },
+        isSeal: false
       },
       {
         fields: {
@@ -535,7 +559,8 @@ function electManager(seasonData) {
             //當前沒有負責的經理人
             manager: '!none'
           }
-        ]
+        ],
+        isSeal: false
       },
       {
         fields: {

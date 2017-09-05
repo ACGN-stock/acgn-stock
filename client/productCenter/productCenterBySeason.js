@@ -154,9 +154,6 @@ Template.productListBySeasonTable.helpers({
 
     return '';
   },
-  canVote(product) {
-    return product.overdue === 1;
-  },
   paginationData() {
     return {
       useVariableForTotalCount: 'totalCountOfProductList',
@@ -175,10 +172,21 @@ Template.productListBySeasonTable.events({
       rProductSortBy.set(sortBy);
       rProductSortDir.set(-1);
     }
-  },
-  'click [data-vote-product]'(event) {
+  }
+});
+
+Template.productInfoBySeasonTable.onCreated(function() {
+  this.subscribe('queryMyLikeProduct', this.data.companyId);
+});
+Template.productInfoBySeasonTable.helpers({
+  canVote() {
+    return this.overdue === 1;
+  }
+});
+Template.productInfoBySeasonTable.events({
+  'click [data-vote-product]'(event, templatInstance) {
     event.preventDefault();
-    const productId = $(event.currentTarget).attr('data-vote-product');
-    voteProduct(productId);
+    const productData = templatInstance.data;
+    voteProduct(productData._id, productData.companyId);
   }
 });
