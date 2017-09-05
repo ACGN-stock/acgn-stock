@@ -234,7 +234,7 @@ if (Meteor.isServer) {
     }
   });
   Migrations.add({
-    version: 2,
+    version: 3,
     name: 'voteRecord indexes.',
     up() {
       dbVoteRecord.rawCollection().createIndex(
@@ -249,7 +249,7 @@ if (Meteor.isServer) {
     }
   });
   Migrations.add({
-    version: 1,
+    version: 4,
     name: 'companies re indexes.',
     up() {
       dbCompanies.rawCollection().dropIndex({
