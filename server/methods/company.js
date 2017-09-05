@@ -42,19 +42,6 @@ function editCompany(user, companyId, newCompanyData) {
   if (userId !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
-  // const companyName = newCompanyData.companyName;
-  // if (dbFoundations.find({companyName}).count() > 0) {
-  //   throw new Meteor.Error(403, '已有相同名稱的公司創立中，無法修改公司名稱！');
-  // }
-  // const sameCompanyNameCompaniesCursor = dbCompanies.find({
-  //   _id: {
-  //     $ne: companyId
-  //   },
-  //   companyName: companyName
-  // });
-  // if (sameCompanyNameCompaniesCursor.count() > 0) {
-  //   throw new Meteor.Error(403, '已有相同名稱的公司上市中，無法修改公司名稱！');
-  // }
   dbLog.insert({
     logType: '經理管理',
     userId: [userId],
