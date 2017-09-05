@@ -10,6 +10,7 @@
         {{> reportTableSelectButton type='companyProfitRankTable'}}
         {{> reportTableSelectButton type='companyValueRankTable'}}
         {{> reportTableSelectButton type='companyPriceRankTable'}}
+        {{> switchViewTypeButton}}
       </form>
       <hr />
       <h3 class="card-title mb-1">{{displayTableTitle}}</h3>
@@ -41,6 +42,10 @@
   >
     {{btnText}}
   </button>
+</template>
+
+<template name="switchViewTypeButton">
+  <button class="btn btn-secondary float-right">{{btnText}}</button>
 </template>
 
 <template name="userRankTable">

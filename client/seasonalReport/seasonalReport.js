@@ -40,6 +40,7 @@ Template.seasonalReport.onCreated(function() {
   });
 });
 const rShowTableType = new ReactiveVar('userRankTable');
+const rShowChart = new ReactiveVar(false);
 const btnHash = {
   userRankTable: '使用者財富排行榜',
   companyProfitRankTable: '公司營利排行榜',
@@ -152,6 +153,21 @@ Template.reportTableSelectButton.events({
   click(event, templateInstance) {
     event.preventDefault();
     rShowTableType.set(templateInstance.data.type);
+  }
+});
+
+Template.switchViewTypeButton.helpers({
+  btnText() {
+    if (rShowChart.get()) {
+      return '圖表模式';
+    }
+    return '表格模式';
+  }
+});
+Template.switchViewTypeButton.events({
+  click(event, templateInstance) {
+    event.preventDefault();
+    rShowChart.set(!rShowChart.get());
   }
 });
 
