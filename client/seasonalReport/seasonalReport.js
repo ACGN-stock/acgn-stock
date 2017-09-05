@@ -1,4 +1,5 @@
 'use strict';
+import { $ } from 'meteor/jquery';
 import { _ } from 'meteor/underscore';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -49,6 +50,10 @@ const btnHash = {
 };
 Template.seasonalReport.helpers({
   showTableType() {
+    if (rShowChart.get()) {
+      return 'rankChart';
+    }
+
     return rShowTableType.get();
   },
   displayTableTitle() {
@@ -161,13 +166,14 @@ Template.switchViewTypeButton.helpers({
     if (rShowChart.get()) {
       return '圖表模式';
     }
+
     return '表格模式';
   }
 });
 Template.switchViewTypeButton.events({
-  click(event, templateInstance) {
+  click(event) {
     event.preventDefault();
-    rShowChart.set(!rShowChart.get());
+    rShowChart.set(! rShowChart.get());
   }
 });
 
@@ -212,3 +218,228 @@ Template.companyPriceRankTable.helpers({
     return sortedRankList.reverse();
   }
 });
+
+Template.rankChart.onRendered(function() {
+  this.chart = null;
+  this.ctx = this.$('canvas')[0].getContext('2d');
+  this.autorun(() => {
+    drawChart.apply(this);
+  });
+});
+function drawChart() {
+  if (this.chart) {
+    this.chart.destroy();
+  }
+  if (! rShowChart.get()) {
+    return;
+  }
+  if (rShowTableType.get() === 'userRankTable') {
+    drawUserRankChart.apply(this);
+  }
+  else {
+    drawCompanyRankChart.apply(this);
+  }
+}
+function drawUserRankChart() {
+  const seasonId = FlowRouter.getParam('seasonId');
+  const rankList = dbRankUserWealth.find({seasonId}).fetch();
+  const sortedRankList = _.sortBy(rankList, (rankData) => {
+    return (rankData.money + rankData.stocksValue);
+  }).reverse();
+  this.ctx.canvas.height = 8 * sortedRankList.length;
+
+  const userNames = {};
+  const promises = sortedRankList.map(function(x) {
+    return $.ajax({
+      url: '/userName',
+      data: {
+        id: x.userId
+      },
+      success: (userName) => {
+        userNames[x.userId] = userName;
+      }
+    });
+  });
+
+  const templateInstance = this;
+  $.when(...promises).then(function() {
+    const data = {
+      labels: sortedRankList.map(function(x) {
+        return userNames[x.userId];
+      }),
+      datasets: [ {
+        label: '持有現金',
+        backgroundColor: '#ff8800',
+        borderColor: '#aaa',
+        data: sortedRankList.map(function(x) {
+          return x.money;
+        })
+      }, {
+        label: '持股總值',
+        backgroundColor: '#77b300',
+        borderColor: '#aaa',
+        data: sortedRankList.map(function(x) {
+          return x.stocksValue;
+        })
+      } ]
+    };
+
+    templateInstance.chart = new Chart(templateInstance.ctx, {
+      type: 'horizontalBar',
+      data: data,
+      options: {
+        responsive: true,
+        tooltips: {
+          mode: 'y',
+          intersect: false
+        },
+        scales: {
+          xAxes: [ {
+            position: 'top',
+            stacked: true,
+            gridLines: {
+              color: '#aaa'
+            }
+          } ],
+          yAxes: [ {
+            stacked: true,
+            gridLines: {
+              color: '#aaa'
+            },
+            barPercentage: 0.6
+          } ]
+        }
+      }
+    });
+  });
+}
+function drawCompanyRankChart() {
+  const dataSource = {
+    companyProfitRankTable: {
+      key: 'profit',
+      db: dbRankCompanyProfit,
+      profitColor: 'rgba(255, 136, 0, 1)',
+      totalValueColor: 'rgba(119, 179, 0, 0.2)',
+      lastPriceColor: 'rgba(42, 159, 214, 0.2)'
+    },
+    companyValueRankTable: {
+      key: 'totalValue',
+      db: dbRankCompanyValue,
+      profitColor: 'rgba(255, 136, 0, 0.2)',
+      totalValueColor: 'rgba(119, 179, 0, 1)',
+      lastPriceColor: 'rgba(42, 159, 214, 0.2)'
+    },
+    companyPriceRankTable: {
+      key: 'lastPrice',
+      db: dbRankCompanyPrice,
+      profitColor: 'rgba(255, 136, 0, 0.2)',
+      totalValueColor: 'rgba(119, 179, 0, 0.2)',
+      lastPriceColor: 'rgba(42, 159, 214, 1)'
+    }
+  };
+  const type = rShowTableType.get();
+  const seasonId = FlowRouter.getParam('seasonId');
+  const rankList = dataSource[type].db.find({seasonId}).fetch();
+  const sortedRankList = _.sortBy(rankList, dataSource[type].key).reverse();
+  this.ctx.canvas.height = 14 * sortedRankList.length;
+
+  const companyNames = {};
+  const promises = sortedRankList.map(function(x) {
+    return $.ajax({
+      url: '/companyName',
+      data: {
+        id: x.companyId
+      },
+      success: (companyName) => {
+        companyNames[x.companyId] = companyName;
+      }
+    });
+  });
+
+  const templateInstance = this;
+  $.when(...promises).then(function() {
+    const chartData = {
+      labels: sortedRankList.map(function(x) {
+        return companyNames[x.companyId];
+      }),
+      datasets: [ {
+        label: '當季營利',
+        backgroundColor: dataSource[type].profitColor,
+        borderColor: '#aaa',
+        xAxisID: 'x-axis-profit',
+        data: sortedRankList.map(function(x) {
+          return x.profit;
+        })
+      }, {
+        label: '總市值',
+        backgroundColor: dataSource[type].totalValueColor,
+        borderColor: '#aaa',
+        xAxisID: 'x-axis-value',
+        data: sortedRankList.map(function(x) {
+          return x.totalValue;
+        })
+      }, {
+        label: '收盤股價',
+        backgroundColor: dataSource[type].lastPriceColor,
+        borderColor: '#aaa',
+        xAxisID: 'x-axis-price',
+        data: sortedRankList.map(function(x) {
+          return x.lastPrice;
+        })
+      } ]
+    };
+
+    const options = {
+      responsive: true,
+      scales: {
+        xAxes: [ {
+          id: 'x-axis-profit',
+          type: 'linear',
+          display: type === 'companyProfitRankTable',
+          position: 'top',
+          ticks: {
+            beginAtZero: true
+          },
+          gridLines: {
+            color: '#aaa'
+          }
+        },
+        {
+          id: 'x-axis-value',
+          type: 'linear',
+          display: type === 'companyValueRankTable',
+          position: 'top',
+          ticks: {
+            beginAtZero: true
+          },
+          gridLines: {
+            color: '#aaa'
+          }
+        },
+        {
+          id: 'x-axis-price',
+          display: type === 'companyPriceRankTable',
+          type: 'linear',
+          position: 'top',
+          ticks: {
+            beginAtZero: true
+          },
+          gridLines: {
+            color: '#aaa'
+          }
+        } ],
+        yAxes: [ {
+          gridLines: {
+            color: '#aaa'
+          }
+        } ]
+      }
+    };
+
+    templateInstance.chart = new Chart(templateInstance.ctx, {
+      type: 'horizontalBar',
+      data: chartData,
+      options: options
+    });
+  });
+}
