@@ -26,6 +26,7 @@
     "accessor-pairs": "error",
     "array-callback-return": "error",
     "complexity": "off",
+    "camelcase": "error",
     "dot-location": ["error", "property"],
     "eqeqeq": "error",
     "no-caller": "error",
