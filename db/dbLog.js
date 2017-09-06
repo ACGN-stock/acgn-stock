@@ -21,7 +21,8 @@ export const logTypeList = [
   '創立得股', //(userId0)對「companyId」的投資為你帶來了amount數量的公司股票！
   '購買下單', //userId0想要用每股$price的單價購買amount數量的「companyId」公司股票！
   '販賣下單', //userId0想要用每股$price的單價販賣amount數量的「companyId」公司股票！
-  '取消下單', //userId0取消了以每股$price單價message(購入/賣出)amount數量的companyId股票的訂單！
+  '取消下單', //userId0取消了以每股$price的單價message(購入/賣出)amount數量的companyId股票的訂單！
+  '系統撤單', //因商業季度結束，系統自動取消了userId0以每股$price的單價message(購入/賣出)amount數量的companyId股票的訂單！
   '訂單完成', //userId0以每股$price的單價message(購入/賣出)amount數量的「companyId」公司股票的訂單已經全數交易完畢！
   '公司釋股', //「companyId」公司以$price的價格釋出amount數量的股票到市場上套取利潤！
   '交易紀錄', //userId0以$price的單價向(userId1 || companyId)購買了amount數量的「companyId」公司股票！

@@ -157,6 +157,14 @@ Template.displayLog.helpers({
           '數量的「' + getCompanyLink(logData.companyId) + '」公司股票的訂單！'
         );
       }
+      case '系統撤單': {
+        return (
+          '【系統撤單】因商業季度結束，系統自動取消了' +
+          getUserLink(logData.userId[0]) +
+          '以每股＄' + logData.price + '的單價' + logData.message + logData.amount +
+          '數量的「' + getCompanyLink(logData.companyId) + '」公司股票的訂單！'
+        );
+      }
       case '訂單完成': {
         if (logData.userId[0] === '!system') {
           return (
