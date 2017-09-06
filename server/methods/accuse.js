@@ -142,6 +142,10 @@ function banUser(user, {userId, message, banType}) {
         logType = '解除廣告';
         break;
       }
+      case 'manager': {
+        logType = '解除禁任';
+        break;
+      }
     }
   }
   else {
@@ -161,6 +165,55 @@ function banUser(user, {userId, message, banType}) {
       }
       case 'advertise': {
         logType = '禁止廣告';
+        break;
+      }
+      case 'manager': {
+        logType = '禁任經理';
+        dbCompanies
+          .find(
+            {
+              $or: [
+                {
+                  manager: userId
+                },
+                {
+                  candidateList: userId
+                }
+              ]
+            },
+            {
+              fields: {
+                _id: 1,
+                manager: 1,
+                candidateList: 1,
+                voteList: 1
+              }
+            }
+          )
+          .forEach((companyData) => {
+            dbLog.insert({
+              logType: '撤職紀錄',
+              userId: [user._id, userId],
+              companyId: companyData._id,
+              createdAt: new Date()
+            });
+            const manager = (companyData.manager === userId ? '!none' : companyData.manager);
+            const candidateList = companyData.candidateList;
+            const voteList = companyData.voteList;
+            const candidateIndex = _.indexOf(candidateList, userId);
+            if (candidateIndex !== -1) {
+              candidateList.splice(candidateIndex, 1);
+              voteList.splice(candidateIndex, 1);
+            }
+            dbCompanies.update(companyData._id, {
+              $set: {
+                manager: manager,
+                candidateList: candidateList,
+                voteList: voteList
+              }
+            });
+          });
+
         break;
       }
     }

@@ -34,8 +34,13 @@
         {{else}}
           <button class="btn btn-warning btn-sm" type="button" data-ban="advertise">禁止廣告</button>
         {{/if}}
-        <button class="btn btn-danger btn-sm" type="button" data-action="forfeit">課以罰金</button>
-        <button class="btn btn-danger btn-sm" type="button" data-action="returnForfeit">退還罰金</button>
+        <button class="btn btn-warning btn-sm" type="button" data-action="forfeit">課以罰金</button>
+        <button class="btn btn-warning btn-sm" type="button" data-action="returnForfeit">退還罰金</button>
+        {{#if isBaned 'manager'}}
+          <button class="btn btn-success btn-sm" type="button" data-ban="manager">解除禁任經理</button>
+        {{else}}
+          <button class="btn btn-danger btn-sm" type="button" data-ban="manager">禁任經理</button>
+        {{/if}}
       {{else}}
         <button class="btn btn-danger btn-sm" type="button" data-action="accuse">舉報違規</button>
         {{#if isBaned 'accuse'}}

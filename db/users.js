@@ -7,7 +7,8 @@ export const banTypeList = [
   'accuse', //所有舉報違規行為
   'deal', //所有下達訂單行為
   'chat', //所有聊天發言行為
-  'advertise' //所有廣告宣傳行為
+  'advertise', //所有廣告宣傳行為
+  'manager' //擔任經理資格
 ];
 
 const schema = new SimpleSchema({

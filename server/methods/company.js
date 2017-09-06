@@ -131,6 +131,9 @@ Meteor.methods({
   }
 });
 export function contendManager(user, companyId) {
+  if (_.contains(user.profile.ban, 'manager')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了擔任經理人的資格！');
+  }
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,

@@ -204,6 +204,13 @@ Template.displayLog.helpers({
           '辭去了「' + getCompanyLink(logData.companyId) + '」公司的經理人職務！'
         );
       }
+      case '撤職紀錄': {
+        return (
+          '【撤職紀錄】' +
+          getUserLink(logData.userId[0]) +
+          '被金融管理委員會撤除了「' + getCompanyLink(logData.companyId) + '」公司的經理人職務與候選資格！'
+        );
+      }
       case '參選紀錄': {
         return (
           '【參選紀錄】' +
@@ -307,7 +314,7 @@ Template.displayLog.helpers({
       }
       case '禁止舉報': {
         return (
-          '【禁止舉報】' +
+          '【違規處理】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由禁止' +
           getUserLink(logData.userId[1]) + '今後的所有舉報違規行為。'
@@ -315,7 +322,7 @@ Template.displayLog.helpers({
       }
       case '禁止下單': {
         return (
-          '【禁止交易】' +
+          '【違規處理】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由禁止' +
           getUserLink(logData.userId[1]) + '今後的所有投資下單行為。'
@@ -323,7 +330,7 @@ Template.displayLog.helpers({
       }
       case '禁止聊天': {
         return (
-          '【禁止聊天】' +
+          '【違規處理】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由禁止' +
           getUserLink(logData.userId[1]) + '今後的所有聊天發言行為。'
@@ -331,7 +338,7 @@ Template.displayLog.helpers({
       }
       case '禁止廣告': {
         return (
-          '【禁止廣告】' +
+          '【違規處理】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由禁止' +
           getUserLink(logData.userId[1]) + '今後的所有廣告宣傳行為。'
@@ -339,15 +346,23 @@ Template.displayLog.helpers({
       }
       case '課以罰款': {
         return (
-          '【課以罰款】' +
+          '【違規處理】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由向' +
           getUserLink(logData.userId[1]) + '課以總數為$' + logData.amount + '的罰金。'
         );
       }
+      case '禁任經理': {
+        return (
+          '【違規處理】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureMessage() + '」的理由禁止' +
+          getUserLink(logData.userId[1]) + '今後擔任經理人的資格。'
+        );
+      }
       case '解除舉報': {
         return (
-          '【解除舉報】' +
+          '【解除禁令】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由中止了' +
           getUserLink(logData.userId[1]) + '的舉報違規禁令。'
@@ -355,7 +370,7 @@ Template.displayLog.helpers({
       }
       case '解除下單': {
         return (
-          '【解除交易】' +
+          '【解除禁令】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由中止了' +
           getUserLink(logData.userId[1]) + '的投資下單禁令。'
@@ -363,7 +378,7 @@ Template.displayLog.helpers({
       }
       case '解除聊天': {
         return (
-          '【解除聊天】' +
+          '【解除禁令】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由中止了' +
           getUserLink(logData.userId[1]) + '的聊天發言禁令。'
@@ -371,7 +386,7 @@ Template.displayLog.helpers({
       }
       case '解除廣告': {
         return (
-          '【解除廣告】' +
+          '【解除禁令】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由中止了' +
           getUserLink(logData.userId[1]) + '的廣告宣傳禁令。'
@@ -383,6 +398,14 @@ Template.displayLog.helpers({
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由向' +
           getUserLink(logData.userId[1]) + '退還總數為$' + logData.amount + '的罰金。'
+        );
+      }
+      case '解除禁任': {
+        return (
+          '【解除禁令】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureMessage() + '」的理由中止了' +
+          getUserLink(logData.userId[1]) + '今後禁任經理人的處置。'
         );
       }
       case '查封關停': {

@@ -120,6 +120,10 @@ Template.accountInfoBasic.events({
         banActionText = '禁止廣告宣傳';
         break;
       }
+      case 'manager': {
+        banActionText = '禁止擔任經理';
+        break;
+      }
     }
     const accuseUserData = templateInstance.data;
     alertDialog.dialog({

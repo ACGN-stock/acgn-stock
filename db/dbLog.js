@@ -27,6 +27,7 @@ export const logTypeList = [
   '公司釋股', //「companyId」公司以$price的價格釋出amount數量的股票到市場上套取利潤！
   '交易紀錄', //userId0以$price的單價向(userId1 || companyId)購買了amount數量的「companyId」公司股票！
   '辭職紀錄', //userId0辭去了「companyId」公司的經理人職務！
+  '撤職紀錄', //userId0被金融管理委員會撤除了「companyId」公司的經理人職務與候選資格！
   '參選紀錄', //userId0開始競選「companyId」公司的經理人職務！
   '支持紀錄', //userId0支持userId1擔任「companyId」公司的經理人！
   '就任經理', //userId0在message商業季度(以amount數量的支持股份)擊敗了所有競爭對手，取代userId1成為「companyId」公司的經理人！
@@ -42,11 +43,13 @@ export const logTypeList = [
   '禁止聊天', //userId0以「message」的理由禁止userId1今後的所有聊天發言行為。
   '禁止廣告', //userId0以「message」的理由禁止userId1今後的所有廣告宣傳行為。
   '課以罰款', //userId0以「message」的理由向userId1課以總數為$amount的罰金。
+  '禁任經理', //userId0以「message」的理由禁止userId1今後擔任經理人的資格。
   '解除舉報', //userId0以「message」的理由中止了userId1的舉報違規禁令。
   '解除下單', //userId0以「message」的理由中止了userId1的投資下單禁令。
   '解除聊天', //userId0以「message」的理由中止了userId1的聊天發言禁令。
   '解除廣告', //userId0以「message」的理由中止了userId1的廣告宣傳禁令。
   '退還罰款', //userId0以「message」的理由向userId1退還總數為$amount的罰金。
+  '解除禁任', //userId0以「message」的理由中止了userId1今後禁任經理人的處置。
   '查封關停', //userId0以「message」的理由查封關停了「companyId」公司。
   '解除查封', //userId0以「message」的理由解除了「companyId」公司的查封關停狀態。
   '產品下架' //userId0以「message」的理由將「companyId」公司的產品「productId」給下架了，並追回了因該產品所產生的營利$price。
@@ -58,12 +61,15 @@ export const accuseLogTypeList = [
   '禁止下單',
   '禁止聊天',
   '禁止廣告',
+  '禁任經理',
   '課以罰款',
   '解除舉報',
   '解除下單',
   '解除聊天',
   '解除廣告',
+  '解除禁任',
   '退還罰款',
+  '撤職紀錄',
   '查封關停',
   '解除查封',
   '產品下架'
