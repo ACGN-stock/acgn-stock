@@ -208,7 +208,7 @@ Template.company.events({
 });
 
 Template.companyDetail.onCreated(function() {
-  this.rPicture = new ReactiveVar('');
+  this.rPicture = new ReactiveVar('/loading.gif');
   $.ajax({
     url: '/companyPicture',
     data: {
