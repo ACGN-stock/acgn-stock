@@ -6,6 +6,7 @@ import { dbAdvertising } from '../db/dbAdvertising';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbLog } from '../db/dbLog';
+import { dbOrders } from '../db/dbOrders';
 import { dbPrice } from '../db/dbPrice';
 import { dbProducts } from '../db/dbProducts';
 import { dbRankCompanyPrice } from '../db/dbRankCompanyPrice';
@@ -15,6 +16,7 @@ import { dbRankUserWealth } from '../db/dbRankUserWealth';
 import { dbResourceLock } from '../db/dbResourceLock';
 import { dbSeason } from '../db/dbSeason';
 import { dbVoteRecord } from '../db/dbVoteRecord';
+import { changeStocksAmount } from './methods/order';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
 import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal } from './company';
@@ -120,6 +122,8 @@ function doIntervalWork() {
 function doSeasonWorks(lastSeasonData) {
   console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
+    //當商業季度結束時，取消所有尚未交易完畢的訂單
+    cancelAllOrder();
     //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
     //為所有公司與使用者進行排名結算
@@ -154,6 +158,37 @@ function doSeasonWorks(lastSeasonData) {
     dbVoteRecord.remove();
     release();
   });
+}
+
+//取消所有尚未交易完畢的訂單
+function cancelAllOrder() {
+  dbOrders.find().forEach((orderData) => {
+    const orderType = orderData.orderType;
+    const userId = orderData.userId;
+    const companyId = orderData.companyId;
+    const leftAmount = orderData.amount - orderData.done;
+    if (orderType === '購入') {
+      Meteor.users.update(userId, {
+        $inc: {
+          'profile.money': (orderData.unitPrice * leftAmount)
+        }
+      });
+    }
+    else {
+      changeStocksAmount(userId, companyId, leftAmount);
+    }
+
+    dbLog.insert({
+      logType: '系統撤單',
+      userId: [userId],
+      companyId: companyId,
+      price: orderData.unitPrice,
+      amount: leftAmount,
+      message: orderType,
+      createdAt: new Date()
+    });
+  });
+  dbOrders.remove({});
 }
 
 //產生新的商業季度
@@ -296,30 +331,26 @@ function generateRankData(seasonData) {
       }
     },
     {
-      $project: {
-        userId: 1,
-        companyId: 1,
-        stocks: 1,
-        isSeal: {
-          $arrayElemAt: ['$companyData.isSeal', 0]
-        },
-        listPrice: {
-          $arrayElemAt: ['$companyData.listPrice', 0]
-        }
-      }
+      $unwind: '$companyData'
     },
     {
       $match: {
-        isSeal: false
+        'companyData.isSeal': false
+      }
+    },
+    {
+      $project: {
+        userId: 1,
+        stockValue: {
+          $multiply: ['$stocks', '$companyData.listPrice']
+        }
       }
     },
     {
       $group: {
         _id: '$userId',
         stocksValue: {
-          $sum: {
-            $multiply: ['$stocks', '$listPrice']
-          }
+          $sum: '$stockValue'
         }
       }
     },
@@ -333,7 +364,7 @@ function generateRankData(seasonData) {
     },
     {
       $project: {
-        companyId: 1,
+        _id: 1,
         stocksValue: 1,
         money: {
           $arrayElemAt: ['$userData.profile.money', 0]
@@ -342,9 +373,9 @@ function generateRankData(seasonData) {
     },
     {
       $project: {
-        companyId: 1,
-        money: 1,
+        _id: 1,
         stocksValue: 1,
+        money: 1,
         wealth: {
           $add: ['$money', '$stocksValue']
         }
