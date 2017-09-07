@@ -155,7 +155,7 @@ function doSeasonWorks(lastSeasonData) {
       }
     });
     //移除所有推薦票投票紀錄
-    dbVoteRecord.remove();
+    dbVoteRecord.remove({});
     release();
   });
 }
