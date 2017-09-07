@@ -167,15 +167,17 @@ function cancelAllOrder() {
     const userId = orderData.userId;
     const companyId = orderData.companyId;
     const leftAmount = orderData.amount - orderData.done;
-    if (orderType === '購入') {
-      Meteor.users.update(userId, {
-        $inc: {
-          'profile.money': (orderData.unitPrice * leftAmount)
-        }
-      });
-    }
-    else {
-      changeStocksAmount(userId, companyId, leftAmount);
+    if (userId !== '!system') {
+      if (orderType === '購入') {
+        Meteor.users.update(userId, {
+          $inc: {
+            'profile.money': (orderData.unitPrice * leftAmount)
+          }
+        });
+      }
+      else {
+        changeStocksAmount(userId, companyId, leftAmount);
+      }
     }
 
     dbLog.insert({
