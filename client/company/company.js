@@ -187,7 +187,7 @@ Template.company.helpers({
   }
 });
 Template.company.events({
-  'click [data-action="changeChairmanTitle"]'() {
+  'click [data-action="changeChairmanTitle"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
     const companyData = dbCompanies.findOne(companyId);
