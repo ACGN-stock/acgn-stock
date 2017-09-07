@@ -74,6 +74,9 @@ export function retrieveProduct(user, productId) {
   if (! productData) {
     throw new Meteor.Error(404, '不存在的產品！');
   }
+  if (productData.overdue !== 0) {
+    throw new Meteor.Error(401, '該產品的已經上架了，無法收回！');
+  }
   const companyId = productData.companyId;
   const companyData = dbCompanies.findOne(companyId, {
     fields: {

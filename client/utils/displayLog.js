@@ -430,8 +430,8 @@ Template.displayLog.helpers({
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由將「' +
           getCompanyLink(logData.companyId) + '」公司的產品「' +
-          getProductLink(logData.productId) + '」給下架了，' +
-          '並追回了因該產品所產生的營利$' + logData.price + '。'
+          getProductLink(logData.productId) + '」給下架了' +
+          (logData.price ? '，並追回了因該產品所產生的營利$' + logData.price + '。' : '。')
         );
       }
     }
