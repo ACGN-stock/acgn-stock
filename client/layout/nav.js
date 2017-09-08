@@ -94,6 +94,11 @@ Template.nav.helpers({
       return 'collapse navbar-collapse show';
     }
   },
+  stockParams() {
+    return {
+      page: 1
+    };
+  },
   seasonParams() {
     const seasonList = dbSeason
       .find({}, {

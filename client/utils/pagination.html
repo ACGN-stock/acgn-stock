@@ -3,18 +3,18 @@
     <nav class="text-center">
       <ul class="pagination pagination-sm justify-content-center mt-1">
         <li class="page-item">
-          <a class="page-link" href="1" title="第一頁" aria-label="第一頁">
+          <a class="page-link" href="{{pageLinkHref 1}}" title="第一頁" aria-label="第一頁">
             <span aria-hidden="true">&laquo;</span>
             <span class="sr-only">第一頁</span>
           </a>
         </li>
         {{#each page in pages}}
           <li class="{{pageItemClass page}}">
-            <a class="page-link" href="{{page}}">{{page}}</a>
+            <a class="page-link" href="{{pageLinkHref page}}">{{page}}</a>
           </li>
         {{/each}}
         <li class="page-item">
-          <a class="page-link" href="end" title="最末頁" aria-label="最末頁">
+          <a class="page-link" href="{{pageLinkHref 'end'}}" title="最末頁" aria-label="最末頁">
             <span aria-hidden="true">&raquo;</span>
             <span class="sr-only">最末頁</span>
           </a>

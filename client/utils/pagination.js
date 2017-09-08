@@ -35,21 +35,28 @@ Template.pagination.helpers({
     const currentPage = (offset / this.dataNumberPerPage) + 1;
 
     return (page === currentPage) ? 'page-item active' : 'page-item';
+  },
+  pageLinkHref(page) {
+    if (page === 'end') {
+      const templateInstance = Template.instance();
+      const data = templateInstance.data;
+      const totalCount = dbVariables.get(data.useVariableForTotalCount);
+      const totalPages = Math.ceil(totalCount / data.dataNumberPerPage);
+
+      return './' + totalPages;
+    }
+    else {
+      return './' + page;
+    }
   }
 });
 Template.pagination.events({
   'click a[href]'(event, templateInstance) {
-    event.preventDefault();
     const data = templateInstance.data;
-    const href = $(event.currentTarget).attr('href');
-    if (href === 'end') {
-      const totalCount = dbVariables.get(data.useVariableForTotalCount);
-      const totalPages = Math.ceil(totalCount / data.dataNumberPerPage);
-      const newOffset = (totalPages - 1) * data.dataNumberPerPage;
-      data.offset.set(newOffset);
-    }
-    else {
-      const toPage = parseInt(href, 10);
+    if (! data.useHrefRoute) {
+      event.preventDefault();
+      const href = $(event.currentTarget).attr('href');
+      const toPage = parseInt(href.slice(2), 10);
       const newOffset = (toPage - 1) * data.dataNumberPerPage;
       data.offset.set(newOffset);
     }

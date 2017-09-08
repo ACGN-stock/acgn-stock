@@ -15,9 +15,8 @@ inheritedShowLoadingOnSubscribing(Template.stockSummary);
 const rKeyword = new ReactiveVar('');
 const rIsOnlyShowMine = new ReactiveVar(false);
 const rSortBy = new ReactiveVar('lastPrice');
-const rStockOffset = new ReactiveVar(0);
+export const rStockOffset = new ReactiveVar(0);
 Template.stockSummary.onCreated(function() {
-  rStockOffset.set(0);
   this.autorun(() => {
     if (dbResourceLock.find('season').count()) {
       return false;
@@ -65,7 +64,8 @@ Template.stockSummary.helpers({
     return {
       useVariableForTotalCount: 'totalCountOfStockSummary',
       dataNumberPerPage: 10,
-      offset: rStockOffset
+      offset: rStockOffset,
+      useHrefRoute: true
     };
   }
 });

@@ -32,12 +32,32 @@ FlowRouter.route('/instantMessage', {
     DocHead.setTitle(config.websiteName + ' - 即時訊息');
   }
 });
-FlowRouter.route('/stockSummary', {
+
+const stockSummaryRoute = FlowRouter.group({
+  prefix: '/stockSummary',
+  name: 'stockSummaryRoute'
+});
+stockSummaryRoute.route('/', {
+  name: 'stockSummaryRedirect',
+  triggersEnter: [
+    (context, redirect) => {
+      redirect('/stockSummary/1');
+    }
+  ]
+});
+stockSummaryRoute.route('/:page', {
   name: 'stockSummary',
-  action() {
+  action(params) {
     DocHead.setTitle(config.websiteName + ' - 股市總覽');
+    if (Meteor.isClient) {
+      const { rStockOffset } = require('./client/company/stockSummary');
+      const page = window.parseInt(params.page, 10);
+      const offset = (page - 1) * 10;
+      rStockOffset.set(offset);
+    }
   }
 });
+
 FlowRouter.route('/company/:companyId', {
   name: 'company',
   action(params) {
@@ -71,14 +91,12 @@ const foundCompanyRoute = FlowRouter.group({
   prefix: '/foundCompany',
   name: 'foundCompanyRoute'
 });
-
 foundCompanyRoute.route('/', {
   name: 'createFoundationPlan',
   action() {
     DocHead.setTitle(config.websiteName + ' - 發起新創計劃');
   }
 });
-
 foundCompanyRoute.route('/:foundationId', {
   name: 'editFoundationPlan',
   action() {
@@ -92,7 +110,6 @@ const productCenterRoute = FlowRouter.group({
   prefix: '/productCenter',
   name: 'productCenterRoute'
 });
-
 productCenterRoute.route('/season/:seasonId', {
   name: 'productCenterBySeason',
   action() {
@@ -127,7 +144,6 @@ const seasonalReportRoute = FlowRouter.group({
   prefix: '/seasonalReport',
   name: 'seasonalReportRoute'
 });
-
 seasonalReportRoute.route('/', {
   name: 'seasonalReportRedirect',
   action() {
@@ -145,7 +161,6 @@ const accountInfoRoute = FlowRouter.group({
   prefix: '/accountInfo',
   name: 'accountInfoRoute'
 });
-
 accountInfoRoute.route('/', {
   name: 'accountInfo',
   triggersEnter: [
@@ -159,7 +174,6 @@ accountInfoRoute.route('/', {
     }
   ]
 });
-
 accountInfoRoute.route('/:userId', {
   name: 'accountInfo',
   action(params) {
