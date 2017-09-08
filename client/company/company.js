@@ -394,15 +394,17 @@ function drawCandleStickChart() {
       };
     });
     const accessor = candlestick.accessor();
+    const grid = svg.append("g").attr("class", "grid");
+    const content = svg.append("g").attr("class", "content");
 
-    svg.append('g')
+    content.append('g')
       .attr('class', 'candlestick');
 
-    svg.append('g')
+    content.append('g')
       .attr('class', 'x axis')
       .attr('transform', 'translate(0,' + height + ')');
 
-    svg.append('g')
+    content.append('g')
       .attr('class', 'y axis')
       .append('text')
       .attr('transform', 'rotate(-90)')
@@ -416,12 +418,14 @@ function drawCandleStickChart() {
     }));
     y.domain(techan.scale.plot.ohlc(data, accessor).domain());
 
+    grid.call(d3.axisLeft().scale(y).tickSize(-width).tickFormat(""));
+
     svg.selectAll('g.candlestick').datum(data)
       .call(candlestick);
     svg.selectAll('g.x.axis').call(xAxis);
     svg.selectAll('g.y.axis').call(yAxis);
-    svg.selectAll('line').style('stroke', color);
-    svg.selectAll('path').style('stroke', color);
+    svg.select('.content').selectAll('line').style('stroke', color);
+    svg.select('.content').selectAll('path').style('stroke', color);
     svg.selectAll('text').style('fill', color);
     svg.selectAll('path.candle').style('stroke', color);
   });

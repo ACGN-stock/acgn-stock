@@ -15,3 +15,13 @@
     fill: #00AA00;
     stroke: #00AA00;
 }
+
+.chart .grid line {
+	stroke: lightgrey;
+	stroke-opacity: 0.7;
+	shape-rendering: crispEdges;
+}
+
+.chart .grid path {
+	stroke-width: 0;
+}
