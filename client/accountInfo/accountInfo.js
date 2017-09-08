@@ -13,6 +13,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { getAveragePrice } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
@@ -208,6 +209,11 @@ Template.accountInfoOwnStockList.helpers({
     const userId = FlowRouter.getParam('userId');
 
     return dbDirectors.find({userId});
+  },
+  averagePrice(companyId) {
+    const userId = FlowRouter.getParam('userId');
+
+    return (getAveragePrice(companyId, userId) || 0).toFixed(4);
   },
   paginationData() {
     return {
