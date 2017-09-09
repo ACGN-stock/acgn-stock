@@ -24,7 +24,8 @@ const schema = new SimpleSchema({
   },
   //廣告連結
   url: {
-    type: SimpleSchema.RegEx.Url,
+    type: String,
+    regEx: SimpleSchema.RegEx.Url,
     optional: true
   },
   //申請廣告日期

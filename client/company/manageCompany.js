@@ -10,7 +10,6 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbProducts, productTypeList } from '../../db/dbProducts';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { regImageDataUrl } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import SimpleSchema from 'simpl-schema';
 
@@ -57,22 +56,6 @@ function validateCompanyModel(model) {
       }
     });
   }
-  if (model.pictureSmall) {
-    if (model.pictureSmall.length > 262144) {
-      error.pictureSmall = '檔案Size過大！';
-    }
-    else if (! regImageDataUrl.test(model.pictureSmall)) {
-      error.pictureSmall = '檔案格式不符！';
-    }
-  }
-  if (model.pictureBig) {
-    if (model.pictureBig.length > 1048576) {
-      error.pictureBig = '檔案Size過大！';
-    }
-    else if (! regImageDataUrl.test(model.pictureBig)) {
-      error.pictureBig = '檔案格式不符！';
-    }
-  }
   if (model.description.length < 10) {
     error.description = '介紹文字過少！';
   }
@@ -89,26 +72,6 @@ function handleCompanyInputChange(event) {
     case 'tags': {
       break;
     }
-    case 'pictureSmall':
-    case 'pictureBig': {
-      const fieldName = event.currentTarget.name;
-      const model = _.clone(this.model.get());
-      const reader = new FileReader();
-      const file = event.currentTarget.files[0];
-      if (! file) {
-        delete model[fieldName];
-        this.model.set(model);
-
-        return false;
-      }
-      reader.readAsDataURL(file, 'utf8');
-      $(reader).on('load', () => {
-        const dataUrl = reader.result;
-        model[fieldName] = dataUrl;
-        this.model.set(model);
-      });
-      break;
-    }
     default: {
       inheritedHandleInputChange.call(this, event);
       break;
@@ -118,9 +81,11 @@ function handleCompanyInputChange(event) {
 function saveCompanyModel(model) {
   const companyId = model._id;
   const submitData = _.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description');
-  Meteor.call('editCompany', companyId, submitData, () => {
-    const path = FlowRouter.path('company', {companyId});
-    FlowRouter.go(path);
+  Meteor.call('editCompany', companyId, submitData, (error) => {
+    if (! error) {
+      const path = FlowRouter.path('company', {companyId});
+      FlowRouter.go(path);
+    }
   });
 }
 

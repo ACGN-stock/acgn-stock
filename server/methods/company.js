@@ -13,6 +13,7 @@ import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
+import { checkImageUrl } from './checkImageUrl';
 
 Meteor.methods({
   editCompany(companyId, newCompanyData) {
@@ -34,6 +35,8 @@ function editCompany(user, companyId, newCompanyData) {
     fields: {
       companyName: 1,
       manager: 1,
+      pictureBig: 1,
+      pictureSmall: 1,
       isSeal: 1
     }
   });
@@ -42,6 +45,12 @@ function editCompany(user, companyId, newCompanyData) {
   }
   if (companyData.isSeal) {
     throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
+  }
+  if (newCompanyData.pictureBig && companyData.pictureBig !== newCompanyData.pictureBig) {
+    checkImageUrl(newCompanyData.pictureBig);
+  }
+  if (newCompanyData.pictureSmall && companyData.pictureSmall !== newCompanyData.pictureSmall) {
+    checkImageUrl(newCompanyData.pictureSmall);
   }
   const userId = user._id;
   if (userId !== companyData.manager) {

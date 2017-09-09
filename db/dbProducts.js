@@ -44,7 +44,8 @@ const schema = new SimpleSchema({
   },
   //產品url
   url: {
-    type: SimpleSchema.RegEx.Url
+    type: String,
+    regEx: SimpleSchema.RegEx.Url
   },
   //總票數
   votes: {

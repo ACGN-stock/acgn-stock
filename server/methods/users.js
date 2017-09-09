@@ -72,8 +72,8 @@ function validateUsers(checkUsername) {
   const validatingUserList = dbValidatingUsers.find({}, {disableOplog: true}).fetch();
   if (validatingUserList.length > 0) {
     const url = dbVariables.get('validateUserUrl');
-    const ajaxCallResult = HTTP.get(url);
-    const $pushList = cheerio.load(ajaxCallResult.content)('div.push');
+    const httpCallResult = HTTP.get(url);
+    const $pushList = cheerio.load(httpCallResult.content)('div.push');
     validatingUserList.forEach((validatingUser) => {
       const username = validatingUser.username;
       const $userPushList = $pushList.find('.push-userid:contains(' + username + ')').closest('.push');

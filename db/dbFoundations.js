@@ -31,15 +31,15 @@ const schema = new SimpleSchema({
   //小圖
   pictureSmall: {
     type: String,
-    regEx: /^data:image\/[a-z0-9-+.]+;base64,([A-Za-z0-9!$&',()*+;=\-._~:@/?%\s]*)$/,
-    max: 262144,
+    regEx: SimpleSchema.RegEx.Url,
+    max: 255,
     optional: true
   },
   //大圖
   pictureBig: {
     type: String,
-    regEx: /^data:image\/[a-z0-9-+.]+;base64,([A-Za-z0-9!$&',()*+;=\-._~:@/?%\s]*)$/,
-    max: 1048576,
+    regEx: SimpleSchema.RegEx.Url,
+    max: 255,
     optional: true
   },
   //介紹描述
