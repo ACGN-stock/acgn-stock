@@ -330,6 +330,22 @@ if (Meteor.isServer) {
       );
     }
   });
+  Migrations.add({
+    version: 5,
+    name: 'companies listPrice indexes.',
+    up() {
+      dbCompanies.rawCollection().createIndex(
+        {
+          listPrice: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+    }
+  });
 
   Meteor.startup(() => {
     Migrations.migrateTo('latest');

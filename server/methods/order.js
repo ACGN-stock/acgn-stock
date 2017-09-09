@@ -8,6 +8,7 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbPrice } from '../../db/dbPrice';
 import { dbLog } from '../../db/dbLog';
+import { dbVariables } from '../../db/dbVariables';
 
 Meteor.methods({
   createBuyOrder(orderData) {
@@ -64,7 +65,12 @@ export function createBuyOrder(user, orderData) {
   if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
   }
-  if (orderData.unitPrice > Math.ceil(companyData.listPrice * 1.15)) {
+  if (companyData.listPrice < dbVariables.get('lowPriceThreshold')) {
+    if (orderData.unitPrice > Math.ceil(companyData.listPrice * 1.3)) {
+      throw new Meteor.Error(403, '每股單價不可高於該股票參考價格的百分之三十！');
+    }
+  }
+  else if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
@@ -100,7 +106,12 @@ export function createBuyOrder(user, orderData) {
     if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
       throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
     }
-    if (orderData.unitPrice > Math.ceil(companyData.listPrice * 1.15)) {
+    if (companyData.listPrice < dbVariables.get('lowPriceThreshold')) {
+      if (orderData.unitPrice > Math.ceil(companyData.listPrice * 1.3)) {
+        throw new Meteor.Error(403, '每股單價不可高於該股票參考價格的百分之三十！');
+      }
+    }
+    else if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
       throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
     }
     orderData.userId = userId;
@@ -272,7 +283,12 @@ export function createSellOrder(user, orderData) {
   if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
   }
-  if (orderData.unitPrice > Math.ceil(companyData.listPrice * 1.15)) {
+  if (companyData.listPrice < dbVariables.get('lowPriceThreshold')) {
+    if (orderData.unitPrice > Math.ceil(companyData.listPrice * 1.3)) {
+      throw new Meteor.Error(403, '每股單價不可高於該股票參考價格的百分之三十！');
+    }
+  }
+  else if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
@@ -308,7 +324,12 @@ export function createSellOrder(user, orderData) {
     if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
       throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
     }
-    if (orderData.unitPrice > Math.ceil(companyData.listPrice * 1.15)) {
+    if (companyData.listPrice < dbVariables.get('lowPriceThreshold')) {
+      if (orderData.unitPrice > Math.ceil(companyData.listPrice * 1.3)) {
+        throw new Meteor.Error(403, '每股單價不可高於該股票參考價格的百分之三十！');
+      }
+    }
+    else if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
       throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
     }
     orderData.userId = userId;

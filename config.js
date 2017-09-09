@@ -2,10 +2,11 @@
 export const config = {
   websiteName: 'ACGN股票交易市場', //網站名稱
   intervalTimer: 60000, //每隔多少微秒進行一次工作檢查
-  releaseStocksForHighPriceMinCounter: 60, //公司檢查是否要釋出股票的最小隨機工作檢查次數
-  releaseStocksForHighPriceMaxCounter: 180, //公司檢查是否要釋出股票的最大隨機工作檢查次數
-  releaseStocksForNoDealMinCounter: 1440, //公司檢查是否要釋出股票的最小隨機工作檢查次數
-  releaseStocksForNoDealMaxCounter: 2880, //公司檢查是否要釋出股票的最大隨機工作檢查次數
+  releaseStocksForHighPriceMinCounter: 60, //公司檢查是否要因高股價而釋出股票的最小隨機工作檢查次數
+  releaseStocksForHighPriceMaxCounter: 180, //公司檢查是否要因高股價而釋出股票的最大隨機工作檢查次數
+  releaseStocksForNoDealMinCounter: 1440, //公司檢查是否要因無成交而釋出股票的最小隨機工作檢查次數
+  releaseStocksForNoDealMaxCounter: 2880, //公司檢查是否要因無成交而釋出股票的最大隨機工作檢查次數
+  releaseStocksForLowPriceCounter: 720, //公司檢查是否要因低股價而釋出股票的工作檢查次數
   recordListPriceMinCounter: 180, //為所有公司紀錄參考價格的最小隨機工作檢查次數
   recordListPriceMaxCounter: 360, //為所有公司紀錄參考價格的最大隨機工作檢查次數
   foundExpireTime: 3600000, //創立公司的投資時間期限，單位為微秒

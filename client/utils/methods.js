@@ -6,6 +6,7 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbProductLike } from '../../db/dbProductLike';
+import { dbVariables } from '../../db/dbVariables';
 import { dbVoteRecord } from '../../db/dbVoteRecord';
 import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
@@ -66,7 +67,13 @@ export function createBuyOrder(user, companyData) {
   }
   const userMoney = user.profile.money;
   const minimumUnitPrice = Math.max(Math.floor(companyData.listPrice * 0.85), 1);
-  const maximumUnitPrice = Math.min(userMoney, Math.ceil(companyData.listPrice * 1.15));
+  let maximumUnitPrice;
+  if (companyData.listPrice < dbVariables.get('lowPriceThreshold')) {
+    maximumUnitPrice = Math.min(userMoney, Math.ceil(companyData.listPrice * 1.3));
+  }
+  else {
+    maximumUnitPrice = Math.min(userMoney, Math.ceil(companyData.listPrice * 1.15));
+  }
   if (minimumUnitPrice > maximumUnitPrice) {
     alertDialog.alert('您的金錢不足以購買此公司的股票！');
 
@@ -128,7 +135,13 @@ export function createSellOrder(user, companyData) {
     return false;
   }
   const minimumUnitPrice = Math.max(Math.floor(companyData.listPrice * 0.85), 1);
-  const maximumUnitPrice = Math.ceil(companyData.listPrice * 1.15);
+  let maximumUnitPrice;
+  if (companyData.listPrice < dbVariables.get('lowPriceThreshold')) {
+    maximumUnitPrice = Math.ceil(companyData.listPrice * 1.3);
+  }
+  else {
+    maximumUnitPrice = Math.ceil(companyData.listPrice * 1.15);
+  }
   alertDialog.dialog({
     type: 'prompt',
     title: '股份賣出',

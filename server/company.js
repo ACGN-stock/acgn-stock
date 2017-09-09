@@ -159,6 +159,7 @@ function generateReleaseStocksForHighPriceConter() {
 
 export function releaseStocksForNoDeal() {
   let releaseStocksForNoDealCounter = dbVariables.get('releaseStocksForNoDealCounter') || 0;
+  releaseStocksForNoDealCounter -= 1;
   if (releaseStocksForNoDealCounter <= 0) {
     releaseStocksForNoDealCounter = generateReleaseStocksForNoDealConter();
     console.info('releaseStocksForNoDeal!');
@@ -351,6 +352,183 @@ function generateReleaseStocksForNoDealConter() {
   const max = (config.releaseStocksForNoDealMaxCounter - min);
 
   return min + Math.floor(Math.random() * max);
+}
+
+export function releaseStocksForLowPrice() {
+  let releaseStocksForLowPriceCounter = dbVariables.get('releaseStocksForLowPriceCounter') || 0;
+  releaseStocksForLowPriceCounter -= 1;
+  if (releaseStocksForLowPriceCounter <= 0) {
+    releaseStocksForLowPriceCounter = config.releaseStocksForLowPriceCounter;
+    const lowPriceThreshold = dbVariables.get('lowPriceThreshold');
+    console.info('releaseStocksForLowPrice!', lowPriceThreshold);
+    dbCompanies
+      .find(
+        {
+          isSeal: false,
+          listPrice: {
+            $lt: lowPriceThreshold
+          }
+        },
+        {
+          fields: {
+            _id: 1,
+            listPrice: 1,
+            totalRelease: 1
+          },
+          disableOplog: true
+        }
+      )
+      .forEach((companyData) => {
+        const companyId = companyData._id;
+        const maxBuyPrice = Math.ceil(companyData.listPrice * 1.3);
+        const highPriceBuyData = dbOrders.aggregate([
+          {
+            $match: {
+              orderType: '購入',
+              companyId: companyId,
+              unitPrice: maxBuyPrice
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              amount: {
+                $sum: '$amount'
+              },
+              done: {
+                $sum: '$done'
+              }
+            }
+          },
+          {
+            $project: {
+              amount: {
+                $add: [
+                  '$amount',
+                  {
+                    $multiply: ['$done', -1]
+                  }
+                ]
+              }
+            }
+          }
+        ])[0];
+        const highPriceBuyAmount = highPriceBuyData ? highPriceBuyData.amount : 0;
+        if (highPriceBuyAmount > Math.floor(companyData.totalRelease * 0.01)) {
+          console.info('releaseStocksForLowPrice triggered: ' + companyId);
+          //先鎖定資源，再重新讀取一次資料進行運算
+          resourceManager.request('releaseStocksForLowPrice', ['companyOrder' + companyId], (release) => {
+            const companyData = dbCompanies.findOne(companyId, {
+              fields: {
+                lastPrice: 1,
+                listPrice: 1,
+                totalRelease: 1,
+                profit: 1,
+                totalValue: 1
+              }
+            });
+            const releasePrice = Math.ceil(companyData.listPrice * 1.3);
+            const highPriceBuyData = dbOrders.aggregate([
+              {
+                $match: {
+                  orderType: '購入',
+                  companyId: companyId,
+                  unitPrice: releasePrice
+                }
+              },
+              {
+                $group: {
+                  _id: null,
+                  amount: {
+                    $sum: '$amount'
+                  },
+                  done: {
+                    $sum: '$done'
+                  }
+                }
+              },
+              {
+                $project: {
+                  amount: {
+                    $add: [
+                      '$amount',
+                      {
+                        $multiply: ['$done', -1]
+                      }
+                    ]
+                  }
+                }
+              }
+            ])[0];
+            const highPriceBuyAmount = highPriceBuyData ? highPriceBuyData.amount : 0;
+            const minReleaseAmount = Math.floor(companyData.totalRelease * 0.01);
+            if (highPriceBuyAmount > minReleaseAmount) {
+              const releaseStocks = Math.min(highPriceBuyAmount, Math.floor(companyData.totalRelease * 0.05));
+              dbLog.insert({
+                logType: '公司釋股',
+                companyId: companyId,
+                amount: releaseStocks,
+                price: releasePrice,
+                resolve: false,
+                createdAt: new Date()
+              });
+              dbCompanies.update(companyId, {
+                $inc: {
+                  totalRelease: releaseStocks
+                }
+              });
+              let alreadyRelease = 0;
+              let anyTradeDone = false;
+              dbOrders
+                .find(
+                  {
+                    companyId: companyId,
+                    orderType: '購入',
+                    unitPrice: releasePrice
+                  },
+                  {
+                    sort: {
+                      unitPrice: -1,
+                      createdAt: 1
+                    },
+                    disableOplog: true
+                  }
+                )
+                .forEach((buyOrderData) => {
+                  if (alreadyRelease >= releaseStocks) {
+                    return true;
+                  }
+                  const tradeNumber = Math.min(buyOrderData.amount - buyOrderData.done, releaseStocks - alreadyRelease);
+                  if (tradeNumber > 0) {
+                    anyTradeDone = true;
+                    alreadyRelease += tradeNumber;
+                    dbLog.insert({
+                      logType: '交易紀錄',
+                      userId: [buyOrderData.userId],
+                      companyId: companyId,
+                      price: releasePrice,
+                      amount: tradeNumber,
+                      createdAt: new Date()
+                    });
+                    changeStocksAmount(buyOrderData.userId, companyId, tradeNumber);
+                    dbCompanies.update(companyId, {
+                      $inc: {
+                        profit: releasePrice * tradeNumber
+                      }
+                    });
+                  }
+                  resolveOrder(buyOrderData, tradeNumber);
+                });
+              if (anyTradeDone) {
+                updateCompanyLastPrice(companyData, releasePrice);
+              }
+            }
+            release();
+          });
+        }
+      });
+  }
+  dbVariables.set('releaseStocksForLowPriceCounter', releaseStocksForLowPriceCounter);
 }
 
 export function recordListPrice() {

@@ -19,7 +19,8 @@ import { dbVoteRecord } from '../db/dbVoteRecord';
 import { changeStocksAmount } from './methods/order';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
-import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal } from './company';
+import { setLowPriceThreshold } from './lowPriceThreshold';
+import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice } from './company';
 import { threadId, shouldReplaceThread } from './thread';
 import { config } from '../config';
 
@@ -82,6 +83,8 @@ function doIntervalWork() {
     doSeasonWorks(lastSeasonData);
   }
   else {
+    //設定低價位股價門檻
+    setLowPriceThreshold();
     //檢查所有創立中且投資時間截止的公司是否成功創立
     checkFoundCompany();
     //當發薪時間到時，發給所有驗證通過的使用者薪水
@@ -89,6 +92,7 @@ function doIntervalWork() {
     //隨機時間讓符合條件的公司釋出股票
     releaseStocksForHighPrice();
     releaseStocksForNoDeal();
+    releaseStocksForLowPrice();
     //隨機時間紀錄公司的參考價格
     recordListPrice();
   }

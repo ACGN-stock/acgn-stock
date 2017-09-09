@@ -6,11 +6,11 @@ Meteor.publish('variables', function () {
   return dbVariables.find(
     {
       _id: {
-        $nin: [
-          'lastPayTime',
-          'releaseStocksForHighPriceCounter',
-          'releaseStocksForNoDealCounter',
-          'recordListPriceConter'
+        $in: [
+          'validateUserUrl',
+          'validateUserBoardName',
+          'validateUserAID',
+          'lowPriceThreshold'
         ]
       }
     },
