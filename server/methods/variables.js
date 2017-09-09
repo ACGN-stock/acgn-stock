@@ -7,6 +7,7 @@ Meteor.publish('variables', function () {
     {
       _id: {
         $in: [
+          'announcement',
           'validateUserUrl',
           'validateUserBoardName',
           'validateUserAID',
