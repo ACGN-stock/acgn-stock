@@ -1,4 +1,5 @@
 'use strict';
+import SimpleSchema from 'simpl-schema';
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';

@@ -1,4 +1,5 @@
 'use strict';
+import SimpleSchema from 'simpl-schema';
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
@@ -11,7 +12,6 @@ import { dbProducts, productTypeList } from '../../db/dbProducts';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
-import SimpleSchema from 'simpl-schema';
 
 inheritedShowLoadingOnSubscribing(Template.manageCompany);
 Template.manageCompany.onCreated(function() {
