@@ -9,7 +9,6 @@ import { dbFoundations } from '../../db/dbFoundations';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { regImageDataUrl } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 
 Template.createFoundationPlan.helpers({
@@ -66,22 +65,6 @@ function validateModel(model) {
       }
     });
   }
-  if (model.pictureSmall) {
-    if (model.pictureSmall.length > 262144) {
-      error.pictureSmall = '檔案Size過大！';
-    }
-    else if (! regImageDataUrl.test(model.pictureSmall)) {
-      error.pictureSmall = '檔案格式不符！';
-    }
-  }
-  if (model.pictureBig) {
-    if (model.pictureBig.length > 1048576) {
-      error.pictureBig = '檔案Size過大！';
-    }
-    else if (! regImageDataUrl.test(model.pictureBig)) {
-      error.pictureBig = '檔案格式不符！';
-    }
-  }
   if (model.description.length < 10) {
     error.description = '介紹文字過少！';
   }
@@ -97,26 +80,6 @@ function validateModel(model) {
 function handleInputChange(event) {
   switch (event.currentTarget.name) {
     case 'tags': {
-      break;
-    }
-    case 'pictureSmall':
-    case 'pictureBig': {
-      const fieldName = event.currentTarget.name;
-      const model = _.clone(this.model.get());
-      const reader = new FileReader();
-      const file = event.currentTarget.files[0];
-      if (! file) {
-        delete model[fieldName];
-        this.model.set(model);
-
-        return false;
-      }
-      reader.readAsDataURL(file, 'utf8');
-      $(reader).on('load', () => {
-        const dataUrl = reader.result;
-        model[fieldName] = dataUrl;
-        this.model.set(model);
-      });
       break;
     }
     default: {

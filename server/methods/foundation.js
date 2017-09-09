@@ -9,6 +9,7 @@ import { resourceManager } from '../resourceManager';
 import { dbFoundations } from '../../db/dbFoundations';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
+import { checkImageUrl } from './checkImageUrl';
 import { config } from '../../config';
 
 Meteor.methods({
@@ -33,6 +34,12 @@ export function foundCompany(user, foundCompanyData) {
   const companyName = foundCompanyData.companyName;
   if (dbFoundations.find({companyName}).count() > 0 || dbCompanies.find({companyName}).count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
+  }
+  if (foundCompanyData.pictureBig) {
+    checkImageUrl(foundCompanyData.pictureBig);
+  }
+  if (foundCompanyData.pictureSmall) {
+    checkImageUrl(foundCompanyData.pictureSmall);
   }
   const userId = user._id;
   foundCompanyData.manager = userId;
@@ -67,7 +74,9 @@ export function editFoundCompany(user, foundCompanyData) {
   const oldFoundCompanyData = dbFoundations.findOne(companyId, {
     fields: {
       _id: 1,
-      manager: 1
+      manager: 1,
+      pictureBig: 1,
+      pictureSmall: 1
     }
   });
   if (! oldFoundCompanyData) {
@@ -89,6 +98,12 @@ export function editFoundCompany(user, foundCompanyData) {
     });
   if (sameCompanyNameCompaniesCursor.count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司正在創立中，無法創立同名公司！');
+  }
+  if (oldFoundCompanyData.pictureBig && oldFoundCompanyData.pictureBig !== foundCompanyData.pictureBig) {
+    checkImageUrl(foundCompanyData.pictureBig);
+  }
+  if (oldFoundCompanyData.pictureSmall && oldFoundCompanyData.pictureSmall !== foundCompanyData.pictureSmall) {
+    checkImageUrl(foundCompanyData.pictureSmall);
   }
   resourceManager.throwErrorIsResourceIsLock(['foundation' + companyId]);
   //先鎖定資源，再更新
@@ -275,10 +290,5 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
 Meteor.publish('foundationDataForEdit', function(foundationId) {
   check(foundationId, String);
 
-  return dbFoundations.find(foundationId, {
-    fields: {
-      pictureSmall: 0,
-      pictureBig: 0
-    }
-  });
+  return dbFoundations.find(foundationId);
 });

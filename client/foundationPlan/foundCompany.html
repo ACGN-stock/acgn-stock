@@ -72,8 +72,10 @@
       <div class="input-group" style="position: relative;">
         <input
           class="form-control"
-          type="file"
+          type="text"
+          value="{{valueOf 'pictureSmall'}}"
           name="pictureSmall"
+          placeholder="http://"
         />
         {{#if valueOf 'pictureSmall'}}
           <span class="input-group-btn">
@@ -99,8 +101,10 @@
       <div class="input-group" style="position: relative;">
         <input
           class="form-control"
-          type="file"
+          type="text"
+          value="{{valueOf 'pictureBig'}}"
           name="pictureBig"
+          placeholder="http://"
         />
         {{#if valueOf 'pictureBig'}}
           <span class="input-group-btn">

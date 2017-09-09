@@ -38,14 +38,14 @@ const schema = new SimpleSchema({
   pictureSmall: {
     type: String,
     regEx: SimpleSchema.RegEx.Url,
-    max: 255,
+    max: 500,
     optional: true
   },
   //大圖
   pictureBig: {
     type: String,
     regEx: SimpleSchema.RegEx.Url,
-    max: 255,
+    max: 500,
     optional: true
   },
   //介紹描述
