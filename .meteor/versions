@@ -70,7 +70,6 @@ npm-mongo@2.2.30
 oauth@1.1.13
 oauth2@1.1.11
 observe-sequence@1.0.16
-ongoworks:spiderable@1.0.7
 ordered-dict@1.0.9
 percolate:migrations@1.0.2
 promise@0.9.0
