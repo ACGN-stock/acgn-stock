@@ -27,6 +27,9 @@ Meteor.methods({
   }
 });
 export function foundCompany(user, foundCompanyData) {
+  if (_.contains(user.profile.ban, 'manager')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了擔任經理人的資格！');
+  }
   const companyName = foundCompanyData.companyName;
   if (dbFoundations.find({companyName}).count() > 0 || dbCompanies.find({companyName}).count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');

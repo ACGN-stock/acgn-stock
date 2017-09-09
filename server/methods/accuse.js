@@ -3,6 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbFoundations } from '../../db/dbFoundations';
 import { dbProducts } from '../../db/dbProducts';
 import { dbProductLike } from '../../db/dbProductLike';
 import { dbLog, accuseLogTypeList } from '../../db/dbLog';
@@ -215,6 +216,16 @@ function banUser(user, {userId, message, banType}) {
               }
             });
           });
+        dbFoundations.update(
+          {
+            manager: userId
+          },
+          {
+            $set: {
+              manager: '!none'
+            }
+          }
+        );
 
         break;
       }
