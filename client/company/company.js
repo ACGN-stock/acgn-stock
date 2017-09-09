@@ -394,8 +394,8 @@ function drawCandleStickChart() {
       };
     });
     const accessor = candlestick.accessor();
-    const grid = svg.append("g").attr("class", "grid");
-    const content = svg.append("g").attr("class", "content");
+    const grid = svg.append('g').attr('class', 'grid');
+    const content = svg.append('g').attr('class', 'content');
 
     content.append('g')
       .attr('class', 'candlestick');
@@ -418,14 +418,18 @@ function drawCandleStickChart() {
     }));
     y.domain(techan.scale.plot.ohlc(data, accessor).domain());
 
-    grid.call(d3.axisLeft().scale(y).tickSize(-width).tickFormat(""));
+    grid.call(d3.axisLeft().scale(y)
+      .tickSize(-width)
+      .tickFormat(''));
 
     svg.selectAll('g.candlestick').datum(data)
       .call(candlestick);
     svg.selectAll('g.x.axis').call(xAxis);
     svg.selectAll('g.y.axis').call(yAxis);
-    svg.select('.content').selectAll('line').style('stroke', color);
-    svg.select('.content').selectAll('path').style('stroke', color);
+    svg.select('.content').selectAll('line')
+      .style('stroke', color);
+    svg.select('.content').selectAll('path')
+      .style('stroke', color);
     svg.selectAll('text').style('fill', color);
     svg.selectAll('path.candle').style('stroke', color);
   });
