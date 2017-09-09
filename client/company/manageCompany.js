@@ -56,6 +56,22 @@ function validateCompanyModel(model) {
       }
     });
   }
+  if (model.pictureSmall) {
+    if (! SimpleSchema.RegEx.Url.test(model.pictureSmall)) {
+      error.url = '連結格式錯誤！';
+    }
+    else if (model.pictureSmall.slice(0, 8) === 'https://') {
+      error.url = '請使用http://開頭的網址，勿用https://！';
+    }
+  }
+  if (model.pictureBig) {
+    if (! SimpleSchema.RegEx.Url.test(model.pictureBig)) {
+      error.url = '連結格式錯誤！';
+    }
+    else if (model.pictureBig.slice(0, 8) === 'https://') {
+      error.url = '請使用http://開頭的網址，勿用https://！';
+    }
+  }
   if (model.description.length < 10) {
     error.description = '介紹文字過少！';
   }
