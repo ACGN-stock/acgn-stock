@@ -53,7 +53,9 @@ function doSomething(userId) {
     foundCompany(user, {
       companyName: 'company' + Date.now(),
       tags: ['forTest'],
-      description: 'for test test test test'
+      description: 'for test test test test',
+      pictureSmall: 'http://i.imgur.com/R8uBw0k.jpg',
+      pictureBig: 'http://i.imgur.com/R8uBw0k.jpg'
     });
   }
   else if (foundationNumber > 0) {
