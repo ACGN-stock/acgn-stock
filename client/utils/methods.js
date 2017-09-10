@@ -18,7 +18,7 @@ Meteor.nativeCall = Meteor.call;
 Meteor.call = (function(_super) {
   function call(...args) {
     if (dbResourceLock.find('season').count()) {
-      alertDialog.alert('伺服器正忙於商業季度的切換，請稍等一下吧！[503]');
+      alertDialog.alert('伺服器即將停機維修或者忙於商業季度的切換，請稍等一下吧！[503]');
 
       return false;
     }
