@@ -11,6 +11,7 @@ function checkImageUrlAsync(url, callback) {
   if (! SimpleSchema.RegEx.Url.test(url)) {
     callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
   }
+  url = url.replace('https://', 'http://');
   http.get(url, (res) => {
     let checkResult;
     res.once('data', (chunk) => {
