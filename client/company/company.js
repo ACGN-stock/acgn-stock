@@ -207,19 +207,6 @@ Template.company.events({
   }
 });
 
-Template.companyDetail.onCreated(function() {
-  this.rPicture = new ReactiveVar('/loading.gif');
-  $.ajax({
-    url: '/companyPicture',
-    data: {
-      id: this.data._id,
-      type: 'big'
-    },
-    success: (response) => {
-      this.rPicture.set(response);
-    }
-  });
-});
 Template.companyDetail.onRendered(function() {
   this.strChartType = 'trend';
   this.$chart = this.$('.chart');
@@ -229,11 +216,6 @@ Template.companyDetail.onRendered(function() {
   });
 });
 Template.companyDetail.helpers({
-  getPicture() {
-    const templateInstance = Template.instance();
-
-    return templateInstance.rPicture.get();
-  },
   priceDisplayClass(lastPrice, listPrice) {
     if (lastPrice > listPrice) {
       return 'text-danger';

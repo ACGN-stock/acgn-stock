@@ -507,35 +507,6 @@ WebApp.connectHandlers.use(function(req, res, next) {
   }
 });
 
-//以Ajax方式發布圖片
-WebApp.connectHandlers.use(function(req, res, next) {
-  const parsedUrl = url.parse(req.url);
-  if (parsedUrl.pathname === '/companyPicture') {
-    const query = querystring.parse(parsedUrl.query);
-    const companyId = query.id;
-    const fieldName = query.type === 'small' ? 'pictureSmall' : 'pictureBig';
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        [fieldName]: 1
-      }
-    });
-    if (companyData) {
-      res.setHeader('Cache-Control', 'public, max-age=86400');
-      res.end(companyData[fieldName] || '');
-    }
-    else {
-      res.writeHead(404, {
-        'Content-Type': 'text/plain'
-      });
-      res.write('404 Not Found\n');
-      res.end();
-    }
-  }
-  else {
-    next();
-  }
-});
-
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
   check(keyword, String);
   check(isOnlyShowMine, Boolean);
@@ -593,6 +564,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     companyName: 1,
     manager: 1,
     chairmanTitle: 1,
+    pictureSmall: 1,
     totalRelease: 1,
     lastPrice: 1,
     listPrice: 1,
@@ -697,7 +669,6 @@ Meteor.publish('companyDetail', function(companyId) {
   const observer = dbCompanies
     .find(companyId, {
       fields: {
-        pictureBig: 0,
         pictureSmall: 0
       },
       disableOplog: true

@@ -50,8 +50,8 @@
 <template name="companySummary">
   <div class="media company-summary">
     <div class="d-sm-flex picture">
-      {{#if getPicture}}
-        <img src="{{getPicture}}" />
+      {{#if this.pictureSmall}}
+        <img src="{{this.pictureSmall}}" />
       {{else}}
         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
       {{/if}}
