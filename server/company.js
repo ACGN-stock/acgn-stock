@@ -12,7 +12,8 @@ export function releaseStocksForHighPrice() {
   releaseStocksForHighPriceCounter -= 1;
   if (releaseStocksForHighPriceCounter <= 0) {
     releaseStocksForHighPriceCounter = generateReleaseStocksForHighPriceConter();
-    console.info('releaseStocksForHighPrice!');
+    dbVariables.set('releaseStocksForHighPriceCounter', releaseStocksForHighPriceCounter);
+    console.info('releaseStocksForHighPrice triggered! next counter: ', releaseStocksForHighPriceCounter);
     const maxPriceCompany = dbCompanies.findOne(
       {
         isSeal: false
@@ -148,7 +149,9 @@ export function releaseStocksForHighPrice() {
         });
       });
   }
-  dbVariables.set('releaseStocksForHighPriceCounter', releaseStocksForHighPriceCounter);
+  else {
+    dbVariables.set('releaseStocksForHighPriceCounter', releaseStocksForHighPriceCounter);
+  }
 }
 function generateReleaseStocksForHighPriceConter() {
   const min = config.releaseStocksForHighPriceMinCounter;
@@ -162,7 +165,8 @@ export function releaseStocksForNoDeal() {
   releaseStocksForNoDealCounter -= 1;
   if (releaseStocksForNoDealCounter <= 0) {
     releaseStocksForNoDealCounter = generateReleaseStocksForNoDealConter();
-    console.info('releaseStocksForNoDeal!');
+    dbVariables.set('releaseStocksForNoDealCounter', releaseStocksForNoDealCounter);
+    console.info('releaseStocksForNoDeal triggered! next counter: ', releaseStocksForNoDealCounter);
     const checkLogTime = new Date(Date.now() - (config.releaseStocksForNoDealMinCounter * config.intervalTimer));
     dbCompanies
       .find(
@@ -345,7 +349,9 @@ export function releaseStocksForNoDeal() {
         }
       });
   }
-  dbVariables.set('releaseStocksForNoDealCounter', releaseStocksForNoDealCounter);
+  else {
+    dbVariables.set('releaseStocksForNoDealCounter', releaseStocksForNoDealCounter);
+  }
 }
 function generateReleaseStocksForNoDealConter() {
   const min = config.releaseStocksForNoDealMinCounter;
@@ -359,8 +365,9 @@ export function releaseStocksForLowPrice() {
   releaseStocksForLowPriceCounter -= 1;
   if (releaseStocksForLowPriceCounter <= 0) {
     releaseStocksForLowPriceCounter = config.releaseStocksForLowPriceCounter;
+    dbVariables.set('releaseStocksForLowPriceCounter', releaseStocksForLowPriceCounter);
+    console.info('releaseStocksForLowPrice triggered! next counter: ', releaseStocksForLowPriceCounter);
     const lowPriceThreshold = dbVariables.get('lowPriceThreshold');
-    console.info('releaseStocksForLowPrice!', lowPriceThreshold);
     dbCompanies
       .find(
         {
@@ -528,7 +535,9 @@ export function releaseStocksForLowPrice() {
         }
       });
   }
-  dbVariables.set('releaseStocksForLowPriceCounter', releaseStocksForLowPriceCounter);
+  else {
+    dbVariables.set('releaseStocksForLowPriceCounter', releaseStocksForLowPriceCounter);
+  }
 }
 
 export function recordListPrice() {
@@ -536,7 +545,8 @@ export function recordListPrice() {
   recordListPriceConter -= 1;
   if (recordListPriceConter <= 0) {
     recordListPriceConter = generateRecordListPriceConter();
-    console.info('recordListPriceConter!');
+    dbVariables.set('recordListPriceConter', recordListPriceConter);
+    console.info('recordListPrice triggered! next counter: ', recordListPriceConter);
     dbCompanies
       .find(
         {
@@ -573,7 +583,9 @@ export function recordListPrice() {
         }
       });
   }
-  dbVariables.set('recordListPriceConter', recordListPriceConter);
+  else {
+    dbVariables.set('recordListPriceConter', recordListPriceConter);
+  }
 }
 function generateRecordListPriceConter() {
   const min = config.recordListPriceMinCounter;
