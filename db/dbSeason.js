@@ -16,6 +16,11 @@ const schema = new SimpleSchema({
   endDate: {
     type: Date
   },
+  //經理人選舉時間(micro time stamp)
+  electTime: {
+    type: Number,
+    optional: true
+  },
   //當季有多少驗證通過的使用者
   userCount: {
     type: SimpleSchema.Integer

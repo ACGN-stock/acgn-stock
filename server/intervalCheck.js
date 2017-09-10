@@ -69,6 +69,7 @@ function intervalCheck() {
 
 //週期檢查工作內容
 function doIntervalWork() {
+  const now = Date.now();
   const lastSeasonData = dbSeason.findOne({}, {
     sort: {
       beginDate: -1
@@ -78,7 +79,11 @@ function doIntervalWork() {
     //產生新的商業季度
     generateNewSeason();    
   }
-  else if (Date.now() >= lastSeasonData.endDate.getTime()) {
+  else if (now >= lastSeasonData.electTime) {
+    //若有正在競選經理人的公司，則計算出選舉結果。
+    electManager(lastSeasonData);
+  }
+  else if (now >= lastSeasonData.endDate.getTime()) {
     //商業季度結束檢查
     doSeasonWorks(lastSeasonData);
   }
@@ -148,8 +153,6 @@ function doSeasonWorks(lastSeasonData) {
         multi: true
       }
     );
-    //若有正在競選經理人的公司，則計算出選舉結果。
-    electManager(lastSeasonData);
     //產生新的商業季度
     generateNewSeason();
     //移除所有七天前的股價紀錄
@@ -201,6 +204,7 @@ function cancelAllOrder() {
 function generateNewSeason() {
   const beginDate = new Date();
   const endDate = new Date(beginDate.getTime() + config.seasonTime);
+  const electTime = endDate.getTime() - 86400000;
   const userCount = Meteor.users.find().count();
   const productCount = dbProducts.find({overdue: 0}).count();
   //本季度每個使用者可以得到多少推薦票
@@ -243,7 +247,7 @@ function generateNewSeason() {
       multi: true
     }
   );
-  const seasonId = dbSeason.insert({beginDate, endDate, userCount, productCount, votePrice});
+  const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, productCount, votePrice});
 
   return seasonId;
 }
@@ -704,6 +708,11 @@ function electManager(seasonData) {
         companiesBulk.execute();
       });
     });
+  dbSeason.update(seasonData._id, {
+    $unset: {
+      electTime: ''
+    }
+  });
 }
 function convertDateToText(date) {
   const dateInTimeZone = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 * -1);
