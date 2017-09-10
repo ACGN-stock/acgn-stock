@@ -618,7 +618,7 @@ Meteor.publish('queryChairmanAsVariable', function(companyId) {
 
   const variableId = 'chairmanIdOf' + companyId;
   this.added('variables', variableId, {
-    value: '???'
+    value: '!none'
   });
   const observer = dbDirectors
     .find({companyId}, {
