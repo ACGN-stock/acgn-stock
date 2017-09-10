@@ -29,21 +29,66 @@ if (Meteor.isServer) {
       dbCompanies.rawCollection().createIndex({
         companyName: 1
       });
-      dbCompanies.rawCollection().createIndex({
-        lastPrice: -1
-      });
-      dbCompanies.rawCollection().createIndex({
-        totalValue: -1
-      });
-      dbCompanies.rawCollection().createIndex({
-        profit: -1
-      });
-      dbCompanies.rawCollection().createIndex({
-        createdAt: -1
-      });
-      dbCompanies.rawCollection().createIndex({
-        manager: 1
-      });
+      dbCompanies.rawCollection().createIndex(
+        {
+          lastPrice: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          listPrice: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          totalValue: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          profit: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          createdAt: -1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
+      dbCompanies.rawCollection().createIndex(
+        {
+          manager: 1
+        },
+        {
+          partialFilterExpression: {
+            isSeal: false
+          }
+        }
+      );
       dbDirectors.rawCollection().createIndex({
         companyId: 1,
         stocks: -1,
@@ -94,6 +139,36 @@ if (Meteor.isServer) {
         userId: 1,
         createdAt: -1
       });
+      dbLog.rawCollection().createIndex(
+        {
+          createdAt: -1
+        },
+        {
+          partialFilterExpression: {
+            logType: {
+              $in: [
+                '舉報違規',
+                '禁止舉報',
+                '禁止下單',
+                '禁止聊天',
+                '禁止廣告',
+                '禁任經理',
+                '課以罰款',
+                '解除舉報',
+                '解除下單',
+                '解除聊天',
+                '解除廣告',
+                '解除禁任',
+                '退還罰款',
+                '撤職紀錄',
+                '查封關停',
+                '解除查封',
+                '產品下架'
+              ]
+            }
+          }
+        }
+      );
       dbOrders.rawCollection().createIndex({
         companyId: 1,
         userId: 1
@@ -187,56 +262,6 @@ if (Meteor.isServer) {
       dbValidatingUsers.rawCollection().createIndex({
         username: 1
       });
-    }
-  });
-  Migrations.add({
-    version: 2,
-    name: 'Accuse indexes.',
-    up() {
-      dbLog.rawCollection().createIndex(
-        {
-          createdAt: -1
-        },
-        {
-          partialFilterExpression: {
-            logType: {
-              $in: [
-                '舉報違規',
-                '禁止舉報',
-                '禁止下單',
-                '禁止聊天',
-                '禁止廣告',
-                '課以罰款',
-                '解除舉報',
-                '解除下單',
-                '解除聊天',
-                '解除廣告',
-                '退還罰款',
-                '查封關停',
-                '解除查封',
-                '產品下架'
-              ]
-            }
-          }
-        }
-      );
-      Meteor.users.update(
-        {},
-        {
-          $set: {
-            'profile.ban': []
-          }
-        },
-        {
-          multi: true
-        }
-      );
-    }
-  });
-  Migrations.add({
-    version: 3,
-    name: 'voteRecord indexes.',
-    up() {
       dbVoteRecord.rawCollection().createIndex(
         {
           companyId: 1,
@@ -244,104 +269,6 @@ if (Meteor.isServer) {
         },
         {
           unique: true
-        }
-      );
-    }
-  });
-  Migrations.add({
-    version: 4,
-    name: 'companies re indexes.',
-    up() {
-      dbCompanies.rawCollection().dropIndex({
-        lastPrice: -1
-      });
-      dbCompanies.rawCollection().dropIndex({
-        totalValue: -1
-      });
-      dbCompanies.rawCollection().dropIndex({
-        profit: -1
-      });
-      dbCompanies.rawCollection().dropIndex({
-        createdAt: -1
-      });
-      dbCompanies.rawCollection().dropIndex({
-        manager: 1
-      });
-      dbCompanies.update(
-        {},
-        {
-          $set: {
-            isSeal: false
-          }
-        },
-        {
-          multi: true
-        }
-      );
-      dbCompanies.rawCollection().createIndex(
-        {
-          lastPrice: -1
-        },
-        {
-          partialFilterExpression: {
-            isSeal: false
-          }
-        }
-      );
-      dbCompanies.rawCollection().createIndex(
-        {
-          totalValue: -1
-        },
-        {
-          partialFilterExpression: {
-            isSeal: false
-          }
-        }
-      );
-      dbCompanies.rawCollection().createIndex(
-        {
-          profit: -1
-        },
-        {
-          partialFilterExpression: {
-            isSeal: false
-          }
-        }
-      );
-      dbCompanies.rawCollection().createIndex(
-        {
-          createdAt: -1
-        },
-        {
-          partialFilterExpression: {
-            isSeal: false
-          }
-        }
-      );
-      dbCompanies.rawCollection().createIndex(
-        {
-          manager: 1
-        },
-        {
-          partialFilterExpression: {
-            isSeal: false
-          }
-        }
-      );
-    }
-  });
-  Migrations.add({
-    version: 5,
-    name: 'companies listPrice indexes.',
-    up() {
-      dbCompanies.rawCollection().createIndex(
-        {
-          listPrice: -1
-        },
-        {
-          partialFilterExpression: {
-            isSeal: false
-          }
         }
       );
     }
