@@ -233,6 +233,9 @@ Meteor.methods({
   }
 });
 export function supportCandidate(user, companyId, supportUserId) {
+  if (_.contains(user.profile.ban, 'deal')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
+  }
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,
