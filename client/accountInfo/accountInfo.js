@@ -210,10 +210,8 @@ Template.accountInfoOwnStockList.helpers({
 
     return dbDirectors.find({userId});
   },
-  averagePrice(companyId) {
-    const userId = FlowRouter.getParam('userId');
-
-    return (getAveragePrice(companyId, userId) || 0).toFixed(4);
+  averagePrice(director) {
+    return (director.carryingCost / director.realStocks).toFixed(4);
   },
   paginationData() {
     return {

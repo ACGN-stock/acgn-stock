@@ -133,11 +133,12 @@
 </template>
 
 <template name="accountInfoOwnStockList">
+  <div class="col-12 border-grid">
     <table class="table table-sm table-bordered table-responsive">
-      <thead>
+      <thead class="thead-default">
         <tr>
           <th>公司名稱</th>
-          <th>持有股數</th>
+          <th>擁有股票數量</th>
           <th>平均購入股價</th>
         </tr>
       </thead>
@@ -146,7 +147,7 @@
         <tr>
           <th>{{>companyLink directorData.companyId}}</th>
           <th style="text-align: right;">{{directorData.stocks}}</th>
-          <th style="text-align: right;">{{averagePrice directorData.companyId}}</th>
+          <th style="text-align: right;">{{averagePrice directorData}}</th>
         </tr>
       {{/each}}
       </tbody>

@@ -240,10 +240,10 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
   debug.log('resolveInstantTradeList', {companyId, tradeList});
   const basicCreatedAtTime = tradeTools.createdAt.getTime();
 
-  //紀錄整個交易過程裡股份有增加的userId及增加量
-  const increaseStocksHash = {};
-  //紀錄整個交易過程裡金錢有增加的userId及增加量
-  const increaseMoneyHash = {};
+  //紀錄整個交易過程裡買方的持有成本與股份變動量
+  const buyersHash = {};
+  //紀錄整個交易過程裡賣方的金錢與股份變動量
+  const sellersHash = {};
   //生成交易紀錄並寫入unordered bulk op中
   _.each(tradeList, (tradeData, index) => {
     //計算交易紀錄中的userId欄位
@@ -262,16 +262,24 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
       amount: tradeData.amount,
       createdAt: new Date(basicCreatedAtTime + (index * 2))
     });
-    //記錄誰的股份有增加
-    if (increaseStocksHash[buyerId] === undefined) {
-      increaseStocksHash[buyerId] = 0;
+    //記錄買方股份與持有成本變動
+    if (buyersHash[buyerId] === undefined) {
+      buyersHash[buyerId] = {
+        amount: 0,
+        cost: 0
+      };
     }
-    increaseStocksHash[buyerId] += tradeData.amount;
-    //記錄誰的金錢有增加
-    if (increaseMoneyHash[sellerId] === undefined) {
-      increaseMoneyHash[sellerId] = 0;
+    buyersHash[buyerId].amount += tradeData.amount;
+    buyersHash[buyerId].cost += (tradeData.amount * tradeData.price);
+    //記錄賣方股份與金錢變動
+    if (sellersHash[sellerId] === undefined) {
+      sellersHash[sellerId] = {
+        amount: 0,
+        money: 0
+      };
     }
-    increaseMoneyHash[sellerId] += (tradeData.amount * tradeData.price);
+    sellersHash[sellerId].amount -= tradeData.amount;
+    sellersHash[sellerId].money += (tradeData.amount * tradeData.price);
     //刪除或修改訂單
     if (tradeData.removeOrder) {
       const removeOrderData = dbOrders.findOne(tradeData.resolveOrderId);
@@ -302,16 +310,18 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
         });
     }
   });
-  //依increaseStocksHash，將股份的變動寫入unordered bulk op中
+  //依buyersHash，將變動寫入unordered bulk op中
   let index = 0;
-  _.each(increaseStocksHash, (amount, userId) => {
+  _.each(buyersHash, (buyerChange, userId) => {
     if (dbDirectors.find({companyId, userId}).count() > 0) {
       //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
       tradeTools.directorsBulk
         .find({companyId, userId})
         .updateOne({
           $inc: {
-            stocks: amount
+            stocks: buyerChange.amount,
+            realStocks: buyerChange.amount,
+            carryingCost: buyerChange.cost
           }
         });
     }
@@ -319,14 +329,16 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
       tradeTools.directorsBulk.insert({
         companyId: companyId,
         userId: userId,
-        stocks: amount,
+        stocks: buyerChange.amount,
+        realStocks: buyerChange.amount,
+        carryingCost: buyerChange.cost,
         createdAt: new Date(basicCreatedAtTime + index)
       });
       index += 1;
     }
   });
-  //依increaseMoneyHash，將金錢的變動寫入unordered bulk op中
-  _.each(increaseMoneyHash, (money, userId) => {
+  //依sellersHash，將變動寫入unordered bulk op中
+  _.each(sellersHash, (sellerChange, userId) => {
     if (userId === '!system') {
       tradeTools.companiesBulk
         .find({
@@ -334,7 +346,7 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
         })
         .updateOne({
           $inc: {
-            profit: money
+            profit: sellerChange.money
           }
         });
     }
@@ -345,7 +357,17 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
         })
         .updateOne({
           $inc: {
-            'profile.money': money
+            'profile.money': sellerChange.money
+          }
+        });
+      const seller = dbDirectors.findOne({companyId, userId});
+      //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
+      tradeTools.directorsBulk
+        .find({companyId, userId})
+        .updateOne({
+          $inc: {
+            realStocks: sellerChange.amount,
+            carryingCost: (seller.carryingCost / seller.realStocks * sellerChange.amount)
           }
         });
     }
@@ -374,11 +396,15 @@ function decreaseUserStocks(orderData, tradeTools) {
   const existDirectorData = dbDirectors.findOne({companyId, userId}, {
     fields: {
       _id: 1,
-      stocks: 1
+      stocks: 1,
+      realStocks: 1
     }
   });
   if (existDirectorData) {
-    if (existDirectorData.stocks > amount) {
+    if (existDirectorData.stocks < amount) {
+      throw new Meteor.Error(500, '試圖扣除使用者[' + userId + ']股票[' + companyId + ']數量[' + amount + ']但數量不足！');
+    }
+    if (existDirectorData.realStocks > 0) {
       //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
       tradeTools.directorsBulk
         .find({companyId, userId})
@@ -388,14 +414,11 @@ function decreaseUserStocks(orderData, tradeTools) {
           }
         });
     }
-    else if (existDirectorData.stocks === amount) {
+    else if (existDirectorData.realStocks === 0) {
       //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
       tradeTools.directorsBulk
         .find({companyId, userId})
         .removeOne();
-    }
-    else {
-      throw new Meteor.Error(500, '試圖扣除使用者[' + userId + ']股票[' + companyId + ']數量[' + amount + ']但數量不足！');
     }
   }
   else {

@@ -110,54 +110,6 @@ function validateUsers(checkUsername) {
   return checkResult;
 }
 
-Meteor.methods({
-  getAveragePrice(companyId, userId) {
-    let cost = 0;
-    let amount = 0;
-    const foundLog = dbLog.findOne({
-      logType: '創立得股',
-      companyId: companyId,
-      userId: {
-        $in: [userId, '!all']
-      }
-    });
-    if (foundLog) {
-      cost = foundLog.price * foundLog.amount;
-      amount = foundLog.amount;
-    }
-
-    dbLog.find({
-      logType: '交易紀錄',
-      companyId: companyId,
-      userId: {
-        $in: [userId, '!all']
-      }
-    }, {
-      fields: {
-        userId: 1,
-        price: 1,
-        amount: 1
-      },
-      sort: {
-        createdAt: 1
-      },
-      disableOplog: true
-    }).forEach(log => {
-      if (log.userId[0] === userId) {
-        //買入股票: 增加購入價格
-        amount += log.amount;
-        cost += log.price * log.amount;
-      }
-      else {
-        //賣出股票: 扣除當前均價
-        cost -= (cost / amount) * log.amount;
-        amount -= log.amount;
-      }
-    });
-    return cost / amount;    
-  }
-});
-
 Accounts.onCreateUser((options, user) => {
   debug.log('onCreateUser', options);
   user.profile = _.defaults({}, options.profile, {
@@ -221,17 +173,29 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
   check(offset, Match.Integer);
 
   let initialized = false;
-  let total = dbDirectors.find({userId}).count();
+  let total = dbDirectors.find({
+    userId: userId,
+    stocks: {
+      $gt: 0
+    }
+  }).count();
   this.added('variables', 'totalCountOfAccountOwnStocks', {
     value: total
   });
 
   const observer = dbDirectors
-    .find({userId}, {
+    .find({
+      userId: userId,
+      stocks: {
+        $gt: 0
+      }
+    }, {
       fields: {
         userId: 1,
         companyId: 1,
-        stocks: 1
+        stocks: 1,
+        realStocks: 1,
+        carryingCost: 1
       },
       skip: offset,
       limit: 10,

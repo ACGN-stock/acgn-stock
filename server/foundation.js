@@ -112,13 +112,13 @@ export function checkFoundCompany() {
                 logType: '創立得股',
                 userId: [userId],
                 companyId: companyId,
-                price: (stockUnitPrice * stocks) + amount,
+                price: carryingCost + amount,
                 amount: stocks,
                 resolve: false,
                 createdAt: createdAt
               });
               needExecuteDirectorsBulk = true;
-              directorsBulk.insert({companyId, userId, stocks, createdAt});
+              directorsBulk.insert({companyId, userId, stocks, realStocks, carryingCost, createdAt});
             }
             if (amount > 0) {
               logBulk.insert({

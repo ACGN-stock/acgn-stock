@@ -1,7 +1,6 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { ReactiveMethod } from 'meteor/simple:reactive-method';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
@@ -245,8 +244,4 @@ export function likeProduct(productId) {
   else {
     Meteor.customCall('likeProduct', productId);
   }
-}
-
-export function getAveragePrice(companyId, userId) {
-  return ReactiveMethod.call('getAveragePrice', companyId, userId);
 }
