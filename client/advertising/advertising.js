@@ -159,12 +159,29 @@ function handleAdvertisingInputChange(event) {
 }
 function saveAdvertisingModel(model) {
   const submitData = _.pick(model, 'paid', 'message');
+  submitData.paid += parseInt(model.extraPaid, 10);
+  let totalPaid = submitData.paid;
+  let advertisingSample = submitData.message;
   if (model.url.length > 0) {
     submitData.url = model.url;
+    totalPaid += 100;
+    advertisingSample = `
+      <a href="${submitData.url}" target="_blank">
+        ${advertisingSample}
+      </a>
+    `;
   }
-  submitData.paid += parseInt(model.extraPaid, 10);
-  Meteor.call('buyAdvertising', submitData, () => {
-    rInBuyAdvertisingMode.set(false);
+  const message = `
+    <div>廣告總支出：$${totalPaid}</div>
+    <div>廣告內容：${advertisingSample}</div>
+    <div>確定發出廣告嗎？</div>
+  `;
+  alertDialog.confirm(message, (result) => {
+    if (result) {
+      Meteor.call('buyAdvertising', submitData, () => {
+        rInBuyAdvertisingMode.set(false);
+      });
+    }
   });
 }
 

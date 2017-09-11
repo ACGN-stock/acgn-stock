@@ -11,10 +11,10 @@
           <div>
             <div class="form-group">
               {{#if showTextInput}}
-                <label for="input-text" class="form-control-label">{{alertDialogMessage}}</label>
+                <label for="input-text" class="form-control-label">{{{alertDialogMessage}}}</label>
                 <input id="input-text" class="form-control" type="text" value="{{alertDialogDefaultValue}}" />
               {{else}}
-                <p>{{alertDialogMessage}}</p>
+                <p>{{{alertDialogMessage}}}</p>
               {{/if}}
             </div>
           </div>
