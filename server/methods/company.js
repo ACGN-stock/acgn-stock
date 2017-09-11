@@ -68,6 +68,27 @@ function editCompany(user, companyId, newCompanyData) {
 }
 
 Meteor.methods({
+  changeCompanyName(companyId, companyName) {
+    check(this.userId, String);
+    check(companyId, String);
+    check(companyName, String);
+    changeCompanyName(Meteor.user(), companyId, companyName);
+
+    return true;
+  }
+});
+function changeCompanyName(user, companyId, companyName) {
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  }
+  dbCompanies.update(companyId, {
+    $set: {
+      companyName: companyName
+    }
+  });
+}
+
+Meteor.methods({
   resignManager(companyId) {
     check(this.userId, String);
     check(companyId, String);

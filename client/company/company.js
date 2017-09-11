@@ -104,7 +104,27 @@ Template.company.onCreated(function() {
   });
 });
 Template.company.events({
-  'click [data-action="seal"]'() {
+  'click [data-action="changeCompanyName"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1
+      }
+    });
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '公司更名',
+      message: `請輸入新的公司名稱：`,
+      defaultValue: companyData.companyName,
+      callback: function(companyName) {
+        if (companyName) {
+          Meteor.call('changeCompanyName', companyId, companyName);
+        }
+      }
+    });
+  },
+  'click [data-action="seal"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
     const companyData = dbCompanies.findOne(companyId, {
