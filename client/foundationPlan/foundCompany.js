@@ -102,7 +102,7 @@ function handleInputChange(event) {
 
 function saveModel(model) {
   if (model._id) {
-    const submitData = _.pick(model, '_id', 'companyName', 'tags', 'pictureSmall', 'pictureBig', 'description');
+    const submitData = _.pick(model, '_id', 'tags', 'pictureSmall', 'pictureBig', 'description');
     Meteor.call('editFoundCompany', submitData, (error) => {
       if (! error) {
         const path = FlowRouter.path('foundationPlan');
@@ -122,6 +122,11 @@ function saveModel(model) {
 
 const previewPictureType = new ReactiveVar('');
 Template.foundCompanyForm.helpers({
+  isCompanyNameDisabled() {
+    const templateInstance = Template.instance();
+
+    return !! templateInstance.model.get()._id;
+  },
   isPreview(pictureType) {
     return previewPictureType.get() === pictureType;
   },

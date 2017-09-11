@@ -58,7 +58,6 @@ Meteor.methods({
     check(this.userId, String);
     check(foundCompanyData, {
       _id: String,
-      companyName: String,
       tags: [String],
       pictureSmall: new Match.Maybe(String),
       pictureBig: new Match.Maybe(String),
@@ -192,34 +191,6 @@ export function investFoundCompany(user, companyId, amount) {
   });
 }
 
-//以Ajax方式發布圖片
-WebApp.connectHandlers.use(function(req, res, next) {
-  const parsedUrl = url.parse(req.url);
-  if (parsedUrl.pathname === '/foundationPicture') {
-    const query = querystring.parse(parsedUrl.query);
-    const companyId = query.id;
-    const foundationData = dbFoundations.findOne(companyId, {
-      fields: {
-        pictureSmall: 1
-      }
-    });
-    if (foundationData) {
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-      res.end(foundationData.pictureSmall || '');
-    }
-    else {
-      res.writeHead(404, {
-        'Content-Type': 'text/plain'
-      });
-      res.write('404 Not Found\n');
-      res.end();
-    }
-  }
-  else {
-    next();
-  }
-});
-
 Meteor.publish('foundationPlan', function(keyword, offset) {
   check(keyword, String);
   check(offset, Match.Integer);
@@ -245,11 +216,6 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
 
   const observer = dbFoundations
     .find(filter, {
-      fields: {
-        tags: 0,
-        pictureSmall: 0,
-        pictureBig: 0
-      },
       sort: {
         createdAt: 1
       },

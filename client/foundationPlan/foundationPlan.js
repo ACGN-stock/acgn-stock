@@ -61,24 +61,7 @@ Template.foundationFilterForm.events({
   }
 });
 
-Template.foundationPlanInfo.onCreated(function() {
-  this.rPicture = new ReactiveVar('');
-  $.ajax({
-    url: '/foundationPicture',
-    data: {
-      id: this.data._id
-    },
-    success: (response) => {
-      this.rPicture.set(response);
-    }
-  });
-});
 Template.foundationPlanInfo.helpers({
-  getPicture() {
-    const templateInstance = Template.instance();
-
-    return templateInstance.rPicture.get();
-  },
   displayTagList(tagList) {
     return tagList.join('、');
   },
