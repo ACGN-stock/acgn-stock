@@ -434,6 +434,14 @@ Template.displayLog.helpers({
           (logData.price ? '，並追回了因該產品所產生的營利$' + logData.price + '。' : '。')
         );
       }
+      case '撤銷廣告': {
+        return (
+          '【撤銷廣告】' +
+          getUserLink(logData.userId[0]) +
+          '將' + getUserLink(logData.userId[1]) +
+          '發布的廣告「「' + getPureMessage() + 'message」給撤銷了。'
+        );
+      }
     }
   }
 });

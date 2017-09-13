@@ -2,6 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
+import { dbAdvertising } from '../../db/dbAdvertising';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbFoundations } from '../../db/dbFoundations';
 import { dbProducts } from '../../db/dbProducts';
@@ -397,6 +398,32 @@ function takeDownProduct(user, {productId, message}) {
   }
   dbProducts.remove(productId);
   dbProductLike.remove({productId});
+}
+
+Meteor.methods({
+  takeDownAdvertising(advertisingId) {
+    check(this.userId, String);
+    check(advertisingId, String);
+    takeDownAdvertising(Meteor.user(), advertisingId);
+
+    return true;
+  }
+});
+function takeDownAdvertising(user, advertisingId) {
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  }
+  const advertisingData = dbAdvertising.findOne(advertisingId);
+  if (! advertisingData) {
+    throw new Meteor.Error(404, '找不到識別碼為「' + advertisingId + '」的廣告！');
+  }
+  dbLog.insert({
+    logType: '撤銷廣告',
+    userId: [user._id, advertisingData.userId],
+    message: advertisingData.message,
+    createdAt: new Date()
+  });
+  dbAdvertising.remove(advertisingId);
 }
 
 Meteor.publish('accuseRecord', function(offset) {

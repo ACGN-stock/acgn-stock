@@ -80,6 +80,16 @@ Template.advertising.events({
         showAskAddPayDialog(advertisingId);
       }
     }
+  },
+  'click [data-take-down]'(event) {
+    event.preventDefault();
+    const advertisingId = $(event.currentTarget).attr('data-take-down');
+    const advertisingData = dbAdvertising.findOne(advertisingId);
+    alertDialog.confirm('確定要撤銷廣告「' + advertisingData.message + '」？', (result) => {
+      if (result) {
+        Meteor.call('takeDownAdvertising', advertisingId);
+      }
+    });
   }
 });
 function showAskAddPayDialog(advertisingId) {
