@@ -133,17 +133,6 @@ Accounts.onCreateUser((options, user) => {
   return user;
 });
 
-Accounts.onLogin(function({connection, user}) {
-  UserStatus.events.emit('connectionLogin', {
-    userId: user._id,
-    connectionId: connection.id,
-    ipAddr: connection.httpHeaders['x-real-ip'],
-    userAgent: connection.httpHeaders['user-agent'],
-    loginTime: new Date()
-  });
-});
-
-
 //以Ajax方式發布使用者名稱
 WebApp.connectHandlers.use(function(req, res, next) {
   const parsedUrl = url.parse(req.url);
