@@ -7,6 +7,7 @@ import { dbRankCompanyValue } from '../../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../../db/dbRankUserWealth';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbSeason } from '../../db/dbSeason';
+import { limitSubscription } from './rateLimit';
 
 Meteor.publish('isChangingSeason', function() {
   return dbResourceLock.find(
@@ -20,6 +21,8 @@ Meteor.publish('isChangingSeason', function() {
     }
   );
 });
+//一分鐘最多重複訂閱5次
+limitSubscription('isChangingSeason', 5);
 
 Meteor.publish('currentSeason', function() {
   const observer1 = dbSeason
@@ -63,6 +66,8 @@ Meteor.publish('currentSeason', function() {
   });
   this.ready();
 });
+//一分鐘最多重複訂閱5次
+limitSubscription('currentSeason', 5);
 
 Meteor.publish('adjacentSeason', function(seasonId) {
   check(seasonId, String);
@@ -124,6 +129,8 @@ Meteor.publish('adjacentSeason', function(seasonId) {
   }
   this.ready();
 });
+//一分鐘最多重複訂閱20次
+limitSubscription('adjacentSeason');
 
 Meteor.publish('rankListBySeasonId', function(seasonId) {
   return [
@@ -133,3 +140,5 @@ Meteor.publish('rankListBySeasonId', function(seasonId) {
     dbRankUserWealth.find({seasonId})
   ];
 });
+//一分鐘最多重複訂閱30次
+limitSubscription('rankListBySeasonId', 30);

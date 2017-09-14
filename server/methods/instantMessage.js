@@ -3,6 +3,7 @@ import { _ } from 'meteor/underscore';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import { dbLog } from '../../db/dbLog';
+import { limitMethod } from './rateLimit';
 
 Meteor.methods({
   instantMessageChat(message) {
@@ -59,3 +60,7 @@ Meteor.methods({
     return {lastTime, list};
   }
 });
+//5秒鐘最多2次
+limitMethod('instantMessageChat', 2, 5000);
+//一分鐘最多24次
+limitMethod('queryInstantMessage', 24);

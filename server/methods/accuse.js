@@ -10,6 +10,7 @@ import { dbProductLike } from '../../db/dbProductLike';
 import { dbLog, accuseLogTypeList } from '../../db/dbLog';
 import { dbSeason } from '../../db/dbSeason';
 import { banTypeList } from '../../db/users';
+import { limitSubscription } from './rateLimit';
 
 Meteor.methods({
   accuseUser(userId, message) {
@@ -483,3 +484,4 @@ Meteor.publish('accuseRecord', function(offset) {
     observer.stop();
   });
 });
+limitSubscription('accuseRecord');

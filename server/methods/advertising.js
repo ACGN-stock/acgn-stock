@@ -6,6 +6,7 @@ import { check, Match } from 'meteor/check';
 import { dbAdvertising } from '../../db/dbAdvertising';
 import { dbLog } from '../../db/dbLog';
 import { config } from '../../config';
+import { limitSubscription } from './rateLimit';
 
 Meteor.methods({
   buyAdvertising(advertisingData) {
@@ -140,6 +141,8 @@ Meteor.publish('allAdvertising', function() {
     disableOplog: true
   });
 });
+//一分鐘最多重複訂閱10次
+limitSubscription('allAdvertising', 10);
 
 Meteor.publish('displayAdvertising', function() {
   return dbAdvertising.find({}, {
@@ -150,3 +153,5 @@ Meteor.publish('displayAdvertising', function() {
     disableOplog: true
   });
 });
+//一分鐘最多重複訂閱5次
+limitSubscription('displayAdvertising', 5);

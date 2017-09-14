@@ -8,6 +8,7 @@ import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { checkImageUrl } from './checkImageUrl';
 import { config } from '../../config';
+import { limitSubscription } from './rateLimit';
 
 Meteor.methods({
   foundCompany(foundCompanyData) {
@@ -261,9 +262,13 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
+limitSubscription('foundationPlan');
 
 Meteor.publish('foundationDataForEdit', function(foundationId) {
   check(foundationId, String);
 
   return dbFoundations.find(foundationId);
 });
+//一分鐘最多10次
+limitSubscription('foundationDataForEdit', 10);

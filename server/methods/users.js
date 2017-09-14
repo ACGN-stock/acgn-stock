@@ -1,13 +1,10 @@
 'use strict';
-import url from 'url';
-import querystring from 'querystring';
 import cheerio from 'cheerio';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
+import { HTTP } from 'meteor/http'
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
-import { WebApp } from 'meteor/webapp';
-import { HTTP } from 'meteor/http'
 import { UserStatus } from 'meteor/mizzao:user-status';
 import { resourceManager } from '../resourceManager';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
@@ -16,6 +13,7 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbLog } from '../../db/dbLog';
 import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
+import { limitSubscription, limitGlobalMethod } from './rateLimit';
 
 Meteor.methods({
   loginOrRegister(username, password, reset = false) {
@@ -51,11 +49,7 @@ Meteor.methods({
     check(username, String);
     resourceManager.throwErrorIsResourceIsLock(['validateAccount']);
     //先鎖定資源，再重新讀取一次資料進行運算
-    let result;
-    resourceManager.request('validateAccount', ['validateAccount'], (release) => {
-      result = validateUsers(username);
-      release();
-    });
+    const result = validateUsers(username);
     if (result) {
       return true;
     }
@@ -67,6 +61,7 @@ Meteor.methods({
     }
   }
 });
+limitGlobalMethod('validateAccount');
 function validateUsers(checkUsername) {
   let checkResult = false;
   const validatingUserList = dbValidatingUsers.find({}, {disableOplog: true}).fetch();
@@ -133,51 +128,6 @@ Accounts.onCreateUser((options, user) => {
   return user;
 });
 
-//以Ajax方式發布使用者名稱
-WebApp.connectHandlers.use(function(req, res, next) {
-  const parsedUrl = url.parse(req.url);
-  if (parsedUrl.pathname === '/userName') {
-    const query = querystring.parse(parsedUrl.query);
-    const userId = query.id;
-    const userData = Meteor.users.findOne(userId, {
-      fields: {
-        'services.google.accessToken': 1,
-        'profile.name': 1
-      }
-    });
-    if (userData) {
-      res.setHeader('Cache-Control', 'public, max-age=604800');
-      if (userData.services.google) {
-        const accessToken = userData.services.google.accessToken;
-        try {
-          const response = HTTP.get('https://www.googleapis.com/oauth2/v1/userinfo', {
-            params: {
-              access_token: accessToken
-            }
-          });
-          res.end(response.data.name);
-        }
-        catch (e) {
-          res.end(userData.profile.name);
-        }
-      }
-      else {
-        res.end(userData.profile.name);
-      }
-    }
-    else {
-      res.writeHead(404, {
-        'Content-Type': 'text/plain'
-      });
-      res.write('404 Not Found\n');
-      res.end();
-    }
-  }
-  else {
-    next();
-  }
-});
-
 Meteor.publish('accountInfo', function(userId) {
   check(userId, String);
 
@@ -207,6 +157,8 @@ Meteor.publish('accountInfo', function(userId) {
       )
   ];
 });
+//一分鐘最多20次
+limitSubscription('accountInfo');
 
 Meteor.publish('accountOwnStocks', function(userId, offset) {
   check(userId, String);
@@ -258,6 +210,8 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
+limitSubscription('accountOwnStocks');
 
 Meteor.publish('accountInfoLog', function(userId, offset) {
   check(userId, String);
@@ -332,6 +286,8 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
+limitSubscription('accountInfoLog');
 
 Meteor.publish('validateUser', function(username) {
   check(username, String);
@@ -352,10 +308,11 @@ Meteor.publish('validateUser', function(username) {
 
   this.ready();
 });
+//一分鐘最多20次
+limitSubscription('validateUser');
 
 Meteor.publish('onlinePeopleNumber', function() {
-  let initialized = false;
-  let total = UserStatus.connections
+  const onlinePeopleNumber = UserStatus.connections
     .find({
       idle: {
         $exists: 0
@@ -363,41 +320,28 @@ Meteor.publish('onlinePeopleNumber', function() {
     })
     .count();
   this.added('variables', 'onlinePeopleNumber', {
-    value: total
+    value: onlinePeopleNumber
   });
+  const intervalId = Meteor.setInterval(() => {
+    countAndPublishOnlinePeopleNumber(this);
+  }, 10000)
 
-  const observer = UserStatus.connections
-    .find(
-      {
-        idle: {
-          $exists: 0
-        }
-      },
-      {
-        disableOplog: true
-      }
-    )
-    .observeChanges({
-      added: () => {
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'onlinePeopleNumber', {
-            value: total
-          });
-        }
-      },
-      removed: () => {
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'onlinePeopleNumber', {
-            value: total
-          });
-        }
-      }
-    });
-  initialized = true;
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    Meteor.clearInterval(intervalId);
   });
 });
+//一分鐘最多重複訂閱5次
+limitSubscription('onlinePeopleNumber', 5);
+function countAndPublishOnlinePeopleNumber(publisher) {
+  const onlinePeopleNumber = UserStatus.connections
+    .find({
+      idle: {
+        $exists: 0
+      }
+    })
+    .count();
+  publisher.changed('variables', 'onlinePeopleNumber', {
+    value: onlinePeopleNumber
+  });
+}
