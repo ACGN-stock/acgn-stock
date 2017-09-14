@@ -31,7 +31,7 @@
 </body>
 
 <template name="layout">
-  <div id="main" class="container">
+  <div id="main" class={{containerClass}}>
     {{> nav}}
     {{> Template.dynamic template=currentPage}}
   </div>

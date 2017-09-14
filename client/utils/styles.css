@@ -41,3 +41,23 @@
   height: 300px;
   object-fit: scale-down;
 }
+
+/* 暗色主題 */
+.container-dark .bg-info .media-body {
+  color: #ffffff;
+}
+.container-dark .bg-info .media-body a {
+  color: #000000;
+}
+.container-dark .table-success a {
+  color: #000000;
+}
+.container-dark .modal-content {
+  border: 1px solid #dddddd;
+}
+.container-dark .modal-header {
+  border-bottom: 1px solid #dddddd;
+}
+.container-dark .modal-footer {
+  border-top: 1px solid #dddddd;
+}
