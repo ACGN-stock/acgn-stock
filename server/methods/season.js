@@ -7,6 +7,7 @@ import { dbRankCompanyValue } from '../../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../../db/dbRankUserWealth';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbSeason } from '../../db/dbSeason';
+import { limitSubscription } from './rateLimit';
 
 Meteor.publish('isChangingSeason', function() {
   return dbResourceLock.find(
@@ -20,6 +21,7 @@ Meteor.publish('isChangingSeason', function() {
     }
   );
 });
+limitSubscription('isChangingSeason');
 
 Meteor.publish('currentSeason', function() {
   const observer1 = dbSeason
@@ -63,6 +65,7 @@ Meteor.publish('currentSeason', function() {
   });
   this.ready();
 });
+limitSubscription('currentSeason');
 
 Meteor.publish('adjacentSeason', function(seasonId) {
   check(seasonId, String);
@@ -124,6 +127,7 @@ Meteor.publish('adjacentSeason', function(seasonId) {
   }
   this.ready();
 });
+limitSubscription('adjacentSeason');
 
 Meteor.publish('rankListBySeasonId', function(seasonId) {
   return [
@@ -133,3 +137,4 @@ Meteor.publish('rankListBySeasonId', function(seasonId) {
     dbRankUserWealth.find({seasonId})
   ];
 });
+limitSubscription('rankListBySeasonId');

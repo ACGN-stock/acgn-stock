@@ -100,10 +100,18 @@ Template.foundationPlanInfo.helpers({
 Template.foundationPlanInfo.events({
   'click [data-action="invest"]'(event, templaceInstance) {
     event.preventDefault();
+    const user = Meteor.user();
+    if (! user) {
+      return false;
+    }
+    const userId = user._id;
     const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
-    const maximumInvest = Meteor.user().profile.money;
+    const foundationData = templaceInstance.data;
+    const alreadyInvest = _.findWhere(foundationData.invest, {userId});
+    const alreadyInvestAmount = alreadyInvest ? alreadyInvest.amount : 0;
+    const maximumInvest = Math.min(Meteor.user().profile.money, config.maximumInvest - alreadyInvestAmount);
     if (minimumInvest > maximumInvest) {
-      alertDialog.alert('您的金錢不足以進行投資！');
+      alertDialog.alert('您的投資已達上限或剩餘金錢不足以進行投資！');
 
       return false;
     }

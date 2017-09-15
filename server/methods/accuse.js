@@ -10,6 +10,7 @@ import { dbProductLike } from '../../db/dbProductLike';
 import { dbLog, accuseLogTypeList } from '../../db/dbLog';
 import { dbSeason } from '../../db/dbSeason';
 import { banTypeList } from '../../db/users';
+import { limitMethod, limitSubscription } from './rateLimit';
 
 Meteor.methods({
   accuseUser(userId, message) {
@@ -40,6 +41,7 @@ function accuseUser(user, userId, message) {
     createdAt: new Date()
   });
 }
+limitMethod('accuseUser');
 
 Meteor.methods({
   accuseCompany(companyId, message) {
@@ -66,6 +68,7 @@ function accuseCompany(user, companyId, message) {
     createdAt: new Date()
   });
 }
+limitMethod('accuseCompany');
 
 Meteor.methods({
   accuseProduct(productId, message) {
@@ -99,6 +102,7 @@ function accuseProduct(user, productId, message) {
     createdAt: new Date()
   });
 }
+limitMethod('accuseProduct');
 
 Meteor.methods({
   banUser({userId, message, banType}) {
@@ -246,6 +250,7 @@ function banUser(user, {userId, message, banType}) {
     });
   }
 }
+limitMethod('banUser', 5000);
 
 Meteor.methods({
   forfeit({userId, message, amount}) {
@@ -290,6 +295,7 @@ function forfeit(user, {userId, message, amount}) {
     }
   });
 }
+limitMethod('forfeit', 5000);
 
 Meteor.methods({
   sealCompany({companyId, message}) {
@@ -343,6 +349,7 @@ function sealCompany(user, {companyId, message}) {
     });
   }
 }
+limitMethod('sealCompany', 5000);
 
 Meteor.methods({
   takeDownProduct({productId, message}) {
@@ -399,6 +406,7 @@ function takeDownProduct(user, {productId, message}) {
   dbProducts.remove(productId);
   dbProductLike.remove({productId});
 }
+limitMethod('takeDownProduct', 5000);
 
 Meteor.methods({
   takeDownAdvertising(advertisingId) {
@@ -425,6 +433,7 @@ function takeDownAdvertising(user, advertisingId) {
   });
   dbAdvertising.remove(advertisingId);
 }
+limitMethod('takeDownAdvertising', 5000);
 
 Meteor.publish('accuseRecord', function(offset) {
   check(offset, Match.Integer);
@@ -483,3 +492,4 @@ Meteor.publish('accuseRecord', function(offset) {
     observer.stop();
   });
 });
+limitSubscription('accuseRecord');

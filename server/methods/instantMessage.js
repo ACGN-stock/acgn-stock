@@ -3,6 +3,7 @@ import { _ } from 'meteor/underscore';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import { dbLog } from '../../db/dbLog';
+import { limitMethod } from './rateLimit';
 
 Meteor.methods({
   instantMessageChat(message) {
@@ -59,3 +60,5 @@ Meteor.methods({
     return {lastTime, list};
   }
 });
+limitMethod('instantMessageChat', 3000, 1);
+limitMethod('queryInstantMessage');

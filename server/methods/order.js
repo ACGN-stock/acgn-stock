@@ -9,6 +9,7 @@ import { dbOrders } from '../../db/dbOrders';
 import { dbPrice } from '../../db/dbPrice';
 import { dbLog } from '../../db/dbLog';
 import { dbVariables } from '../../db/dbVariables';
+import { limitMethod, limitSubscription } from './rateLimit';
 
 Meteor.methods({
   createBuyOrder(orderData) {
@@ -223,6 +224,7 @@ export function createBuyOrder(user, orderData) {
     release();
   });
 }
+limitMethod('createBuyOrder');
 
 Meteor.methods({
   createSellOrder(orderData) {
@@ -410,6 +412,7 @@ export function createSellOrder(user, orderData) {
     release();
   });
 }
+limitMethod('createSellOrder');
 
 export function changeStocksAmount(userId, companyId, amount) {
   const existDirectorData = dbDirectors.findOne({companyId, userId});
@@ -561,3 +564,76 @@ export function retrieveOrder(user, orderId) {
     release();
   });
 }
+limitMethod('retrieveOrder');
+
+Meteor.publish('queryMyOrder', function() {
+  const userId = this.userId;
+  if (userId) {
+    return dbOrders.find({userId});
+  }
+
+  return [];
+});
+limitSubscription('queryMyOrder');
+
+Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
+  check(companyId, String);
+  check(type, new Match.OneOf('購入', '賣出'));
+  check(offset, Match.Integer);
+
+  const filter = {
+    companyId: companyId,
+    orderType: type
+  };
+  const userId = this.userId;
+  if (userId) {
+    filter.userId = {
+      $ne: userId
+    };
+  }
+
+  const variableId = 'totalCountOfCompanyOrder' + type;
+  let initialized = false;
+  let total = dbOrders.find(filter).count();
+  this.added('variables', variableId, {
+    value: total
+  });
+
+  const observer = dbOrders.find(filter, {
+      sort: {
+        unitPrice: type === '賣出' ? 1 : -1
+      },
+      skip: offset,
+      limit: 10,
+      disableOplog: true
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('orders', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('variables', variableId, {
+            value: total
+          });
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('orders', id, fields);
+      },
+      removed: (id) => {
+        this.removed('orders', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('variables', variableId, {
+            value: total
+          });
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
+});
+limitSubscription('companyOrderExcludeMe');

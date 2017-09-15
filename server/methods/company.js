@@ -1,19 +1,16 @@
 'use strict';
-import url from 'url';
-import querystring from 'querystring';
 import { _ } from 'meteor/underscore';
 import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
-import { WebApp } from 'meteor/webapp';
 import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
-// import { dbFoundations } from '../../db/dbFoundations';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
 import { checkImageUrl } from './checkImageUrl';
+import { limitMethod, limitSubscription } from './rateLimit';
 
 Meteor.methods({
   editCompany(companyId, newCompanyData) {
@@ -66,6 +63,7 @@ function editCompany(user, companyId, newCompanyData) {
     $set: newCompanyData
   });
 }
+limitMethod('editCompany');
 
 Meteor.methods({
   changeCompanyName(companyId, companyName) {
@@ -87,6 +85,7 @@ function changeCompanyName(user, companyId, companyName) {
     }
   });
 }
+limitMethod('changeCompanyName');
 
 Meteor.methods({
   resignManager(companyId) {
@@ -150,6 +149,7 @@ export function resignManager(user, companyId) {
     release();
   });
 }
+limitMethod('resignManager');
 
 Meteor.methods({
   contendManager(companyId) {
@@ -221,6 +221,7 @@ export function contendManager(user, companyId) {
     release();
   });
 }
+limitMethod('contendManager');
 
 Meteor.methods({
   supportCandidate(companyId, supportUserId) {
@@ -316,6 +317,7 @@ export function supportCandidate(user, companyId, supportUserId) {
     release();
   });
 }
+limitMethod('supportCandidate');
 
 Meteor.methods({
   changeChairmanTitle(companyId, chairmanTitle) {
@@ -347,6 +349,7 @@ function changeChairmanTitle(user, companyId, chairmanTitle) {
     }
   });
 }
+limitMethod('changeChairmanTitle');
 
 Meteor.methods({
   directorMessage(companyId, message) {
@@ -410,6 +413,7 @@ function queryTodayDealAmount(companyId, lastTime) {
 
   return {data, lastTime};
 }
+limitMethod('queryTodayDealAmount', 30000, 1);
 
 Meteor.methods({
   queryStocksCandlestick(companyId, options) {
@@ -463,6 +467,7 @@ function queryStocksCandlestick(companyId, options) {
     return candlestick.open > 0;
   });
 }
+limitMethod('queryStocksCandlestick');
 
 Meteor.methods({
   queryStocksPrice(companyId, lastTime) {
@@ -502,34 +507,7 @@ function queryStocksPrice(companyId, lastTime) {
 
   return {list, lastTime};
 }
-
-//以Ajax方式發布公司名稱
-WebApp.connectHandlers.use(function(req, res, next) {
-  const parsedUrl = url.parse(req.url);
-  if (parsedUrl.pathname === '/companyName') {
-    const query = querystring.parse(parsedUrl.query);
-    const companyId = query.id;
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1
-      }
-    });
-    if (companyData) {
-      res.setHeader('Cache-Control', 'public, max-age=604800');
-      res.end(companyData.companyName);
-    }
-    else {
-      res.writeHead(404, {
-        'Content-Type': 'text/plain'
-      });
-      res.write('404 Not Found\n');
-      res.end();
-    }
-  }
-  else {
-    next();
-  }
-});
+limitMethod('queryStocksPrice', 30000, 1);
 
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
   check(keyword, String);
@@ -636,6 +614,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     observer.stop();
   });
 });
+limitSubscription('stockSummary');
 
 Meteor.publish('queryChairmanAsVariable', function(companyId) {
   check(companyId, String);
@@ -668,6 +647,7 @@ Meteor.publish('queryChairmanAsVariable', function(companyId) {
     observer.stop();
   });
 });
+limitSubscription('queryChairmanAsVariable', 10000, 90);
 
 Meteor.publish('queryOwnStocks', function() {
   const userId = this.userId;
@@ -677,15 +657,7 @@ Meteor.publish('queryOwnStocks', function() {
 
   return [];
 });
-
-Meteor.publish('queryMyOrder', function() {
-  const userId = this.userId;
-  if (userId) {
-    return dbOrders.find({userId});
-  }
-
-  return [];
-});
+limitSubscription('queryOwnStocks');
 
 Meteor.publish('companyDetail', function(companyId) {
   check(companyId, String);
@@ -712,6 +684,7 @@ Meteor.publish('companyDetail', function(companyId) {
     observer.stop();
   });
 });
+limitSubscription('companyDetail');
 function addSupportStocksListField(companyId, fields = {}) {
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
@@ -746,6 +719,7 @@ Meteor.publish('companyDataForEdit', function(companyId) {
     dbProducts.find({companyId, overdue})
   ];
 });
+limitSubscription('companyDataForEdit');
 
 Meteor.publish('companyDirector', function(companyId, offset) {
   check(companyId, String);
@@ -795,6 +769,7 @@ Meteor.publish('companyDirector', function(companyId, offset) {
     observer.stop();
   });
 });
+limitSubscription('companyDirector');
 
 Meteor.publish('companyLog', function(companyId, offset) {
   check(companyId, String);
@@ -844,73 +819,4 @@ Meteor.publish('companyLog', function(companyId, offset) {
     observer.stop();
   });
 });
-
-Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
-  check(companyId, String);
-  check(type, new Match.OneOf('購入', '賣出'));
-  check(offset, Match.Integer);
-
-  const filter = {
-    companyId: companyId,
-    orderType: type
-  };
-  const userId = this.userId;
-  if (userId) {
-    filter.userId = {
-      $ne: userId
-    };
-  }
-
-  const variableId = 'totalCountOfCompanyOrder' + type;
-  let initialized = false;
-  let total = dbOrders.find(filter).count();
-  this.added('variables', variableId, {
-    value: total
-  });
-
-  const observer = dbOrders.find(filter, {
-      sort: {
-        unitPrice: type === '賣出' ? 1 : -1
-      },
-      skip: offset,
-      limit: 10,
-      disableOplog: true
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('orders', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', variableId, {
-            value: total
-          });
-        }
-      },
-      changed: (id, fields) => {
-        this.changed('orders', id, fields);
-      },
-      removed: (id) => {
-        this.removed('orders', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', variableId, {
-            value: total
-          });
-        }
-      }
-    });
-  initialized = true;
-  this.ready();
-  this.onStop(() => {
-    observer.stop();
-  });
-});
-
-Meteor.publish('companyCurrentProduct', function(companyId) {
-  check(companyId, String);
-  const overdue = 1;
-  const disableOplog = true;
-
-  return dbProducts.find({companyId, overdue}, {disableOplog});
-});
-
+limitSubscription('companyLog');

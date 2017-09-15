@@ -6,6 +6,7 @@ import { check, Match } from 'meteor/check';
 import { dbAdvertising } from '../../db/dbAdvertising';
 import { dbLog } from '../../db/dbLog';
 import { config } from '../../config';
+import { limitMethod, limitSubscription } from './rateLimit';
 
 Meteor.methods({
   buyAdvertising(advertisingData) {
@@ -72,6 +73,7 @@ function buyAdvertising(user, advertisingData) {
     release();
   });
 }
+limitMethod('buyAdvertising');
 
 Meteor.methods({
   addAdvertisingPay(advertisingId, addPay) {
@@ -134,12 +136,14 @@ function addAdvertisingPay(user, advertisingId, addPay) {
     release();
   });
 }
+limitMethod('addAdvertisingPay');
 
 Meteor.publish('allAdvertising', function() {
   return dbAdvertising.find({}, {
     disableOplog: true
   });
 });
+limitSubscription('allAdvertising');
 
 Meteor.publish('displayAdvertising', function() {
   return dbAdvertising.find({}, {
@@ -150,3 +154,4 @@ Meteor.publish('displayAdvertising', function() {
     disableOplog: true
   });
 });
+limitSubscription('displayAdvertising');
