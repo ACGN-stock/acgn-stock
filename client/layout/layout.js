@@ -4,7 +4,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { rShowLoginDialog } from './validateDialog';
 import { rShowAlertDialog } from './alertDialog';
-
+import { ReactiveVar } from 'meteor/reactive-var';
 export const rMainTheme = new ReactiveVar('light');
 
 //每次開啟網頁時只確認一次預設theme
@@ -28,6 +28,7 @@ Template.layout.helpers({
     if (rMainTheme.get() === 'light') {
       return 'container container-light';
     }
+
     return 'container container-dark';
   }
 });
