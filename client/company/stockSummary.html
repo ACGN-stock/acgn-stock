@@ -116,20 +116,22 @@
           <p>持有股份</p>
           <p>{{getStockAmount this._id}} ({{getStockPercentage this._id this.totalRelease}}%)</p>
         </div>
-        <hr style="margin: 0px;" />
-        <div class="row">
-          <button class="btn btn-tab accordion dropdown-toggle" data-expand-order="1">顯示未完成訂單</button>
-          <div class="order-panel">
-            {{#each ownOrderList this._id}}
-              <div class="mb-1">
-                {{orderType}}{{done}}/{{amount}} (${{unitPrice}}) 
-                <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{_id}}">
-                  取消
-                </button>
-              </div>
-            {{/each}}
+        {{#if existOwnOrder this._id}}
+          <hr style="margin: 0px;" />
+          <div class="row">
+            <button class="btn btn-tab accordion dropdown-toggle" data-expand-order="1">顯示未完成訂單</button>
+            <div class="order-panel">
+              {{#each ownOrderList this._id}}
+                <div class="mb-1">
+                  {{orderType}}{{done}}/{{amount}} (${{unitPrice}}) 
+                  <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{_id}}">
+                    取消
+                  </button>
+                </div>
+              {{/each}}
+            </div>
           </div>
-        </div>
+        {{/if}}
         <hr style="margin: 0px;" />
         <div class="row btn-group">
           {{#if isUserId this.manager}}

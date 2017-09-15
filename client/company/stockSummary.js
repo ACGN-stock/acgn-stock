@@ -176,6 +176,11 @@ const companySummaryHelpers = {
 
     return 0;
   },
+  existOwnOrder(companyId) {
+    const userId = Meteor.user()._id;
+
+    return ! ! dbOrders.findOne({companyId, userId});
+  },
   ownOrderList(companyId) {
     const userId = Meteor.user()._id;
 
