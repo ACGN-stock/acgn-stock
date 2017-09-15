@@ -198,14 +198,15 @@ const companySummaryEvents = {
     event.preventDefault();
     createSellOrder(Meteor.user(), templateInstance.data);
   },
-  'click [data-expand-order]'(event) {
+  'click [data-expand-order]'(event, templateInstance) {
     event.preventDefault();
-    const maxHeight = $('.order-panel').css('max-height');
+    const panel = templateInstance.$('.order-panel');
+    const maxHeight = panel.css('max-height');
     if (maxHeight === '0px') {
-      $('.order-panel').css('max-height', $('.order-panel').prop('scrollHeight'));
+      panel.css('max-height', panel.prop('scrollHeight'));
     }
     else {
-      $('.order-panel').css('max-height', 0);
+      panel.css('max-height', 0);
     }
   },
   'click [data-cancel-order]'(event) {

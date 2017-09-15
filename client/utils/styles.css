@@ -71,6 +71,9 @@
   color: #fff;
   margin-left: 5%;
   margin-right: 5%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .company-card .row {
   color: #000;
