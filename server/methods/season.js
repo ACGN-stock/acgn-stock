@@ -21,7 +21,8 @@ Meteor.publish('isChangingSeason', function() {
     }
   );
 });
-limitSubscription('isChangingSeason');
+//一分鐘最多重複訂閱5次
+limitSubscription('isChangingSeason', 5);
 
 Meteor.publish('currentSeason', function() {
   const observer1 = dbSeason
@@ -65,7 +66,8 @@ Meteor.publish('currentSeason', function() {
   });
   this.ready();
 });
-limitSubscription('currentSeason');
+//一分鐘最多重複訂閱5次
+limitSubscription('currentSeason', 5);
 
 Meteor.publish('adjacentSeason', function(seasonId) {
   check(seasonId, String);
@@ -127,6 +129,7 @@ Meteor.publish('adjacentSeason', function(seasonId) {
   }
   this.ready();
 });
+//一分鐘最多重複訂閱20次
 limitSubscription('adjacentSeason');
 
 Meteor.publish('rankListBySeasonId', function(seasonId) {
@@ -137,4 +140,5 @@ Meteor.publish('rankListBySeasonId', function(seasonId) {
     dbRankUserWealth.find({seasonId})
   ];
 });
-limitSubscription('rankListBySeasonId');
+//一分鐘最多重複訂閱30次
+limitSubscription('rankListBySeasonId', 30);

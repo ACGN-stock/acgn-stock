@@ -19,12 +19,6 @@ Template.seasonalReport.onCreated(function() {
     if (dbResourceLock.find('season').count()) {
       return false;
     }
-    this.subscribe('currentSeason');
-  });
-  this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
-      return false;
-    }
     const seasonId = FlowRouter.getParam('seasonId');
     if (seasonId) {
       this.subscribe('adjacentSeason', seasonId);

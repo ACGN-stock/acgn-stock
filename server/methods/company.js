@@ -413,7 +413,8 @@ function queryTodayDealAmount(companyId, lastTime) {
 
   return {data, lastTime};
 }
-limitMethod('queryTodayDealAmount', 30000, 1);
+//一分鐘最多20次
+limitMethod('queryTodayDealAmount');
 
 Meteor.methods({
   queryStocksCandlestick(companyId, options) {
@@ -467,6 +468,7 @@ function queryStocksCandlestick(companyId, options) {
     return candlestick.open > 0;
   });
 }
+//一分鐘最多20次
 limitMethod('queryStocksCandlestick');
 
 Meteor.methods({
@@ -507,7 +509,8 @@ function queryStocksPrice(companyId, lastTime) {
 
   return {list, lastTime};
 }
-limitMethod('queryStocksPrice', 30000, 1);
+//一分鐘最多20次
+limitMethod('queryStocksPrice');
 
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
   check(keyword, String);
@@ -614,6 +617,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     observer.stop();
   });
 });
+//一分鐘最多20次
 limitSubscription('stockSummary');
 
 Meteor.publish('queryChairmanAsVariable', function(companyId) {
@@ -647,7 +651,8 @@ Meteor.publish('queryChairmanAsVariable', function(companyId) {
     observer.stop();
   });
 });
-limitSubscription('queryChairmanAsVariable', 10000, 90);
+//十秒鐘最多90次
+limitSubscription('queryChairmanAsVariable', 90, 10000);
 
 Meteor.publish('queryOwnStocks', function() {
   const userId = this.userId;
@@ -657,6 +662,7 @@ Meteor.publish('queryOwnStocks', function() {
 
   return [];
 });
+//一分鐘最多20次
 limitSubscription('queryOwnStocks');
 
 Meteor.publish('companyDetail', function(companyId) {
@@ -684,6 +690,7 @@ Meteor.publish('companyDetail', function(companyId) {
     observer.stop();
   });
 });
+//一分鐘最多20次
 limitSubscription('companyDetail');
 function addSupportStocksListField(companyId, fields = {}) {
   const companyData = dbCompanies.findOne(companyId, {
@@ -719,7 +726,8 @@ Meteor.publish('companyDataForEdit', function(companyId) {
     dbProducts.find({companyId, overdue})
   ];
 });
-limitSubscription('companyDataForEdit');
+//一分鐘最多10次
+limitSubscription('companyDataForEdit', 10);
 
 Meteor.publish('companyDirector', function(companyId, offset) {
   check(companyId, String);
@@ -769,6 +777,7 @@ Meteor.publish('companyDirector', function(companyId, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
 limitSubscription('companyDirector');
 
 Meteor.publish('companyLog', function(companyId, offset) {
@@ -819,4 +828,5 @@ Meteor.publish('companyLog', function(companyId, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
 limitSubscription('companyLog');

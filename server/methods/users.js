@@ -39,7 +39,8 @@ Meteor.methods({
     }
   }
 });
-limitMethod('loginOrRegister');
+//一分鐘最多五次
+limitMethod('loginOrRegister', 5);
 const randomStringList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 function generateValidateCode() {
   return _.sample(randomStringList, 10).join('');
@@ -158,6 +159,7 @@ Meteor.publish('accountInfo', function(userId) {
       )
   ];
 });
+//一分鐘最多20次
 limitSubscription('accountInfo');
 
 Meteor.publish('accountOwnStocks', function(userId, offset) {
@@ -210,6 +212,7 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
 limitSubscription('accountOwnStocks');
 
 Meteor.publish('accountInfoLog', function(userId, offset) {
@@ -285,6 +288,7 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
 limitSubscription('accountInfoLog');
 
 Meteor.publish('validateUser', function(username) {
@@ -306,6 +310,7 @@ Meteor.publish('validateUser', function(username) {
 
   this.ready();
 });
+//一分鐘最多20次
 limitSubscription('validateUser');
 
 Meteor.publish('onlinePeopleNumber', function() {
@@ -328,9 +333,9 @@ Meteor.publish('onlinePeopleNumber', function() {
     Meteor.clearInterval(intervalId);
   });
 });
-limitSubscription('validateUser');
+//一分鐘最多重複訂閱5次
+limitSubscription('onlinePeopleNumber', 5);
 function countAndPublishOnlinePeopleNumber(publisher) {
-  console.log('countAndPublishOnlinePeopleNumber!');
   const onlinePeopleNumber = UserStatus.connections
     .find({
       idle: {

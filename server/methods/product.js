@@ -9,7 +9,7 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbSeason } from '../../db/dbSeason';
 import { dbLog } from '../../db/dbLog';
 import { dbVoteRecord } from '../../db/dbVoteRecord';
-import { limitMethod, limitSubscription } from './rateLimit';
+import { limitSubscription } from './rateLimit';
 
 Meteor.methods({
   createProduct(productData) {
@@ -57,7 +57,6 @@ export function createProduct(user, productData) {
   productData.createdAt = new Date();
   dbProducts.insert(productData);
 }
-limitMethod('createProduct');
 
 Meteor.methods({
   retrieveProduct(productId) {
@@ -93,7 +92,6 @@ export function retrieveProduct(user, productId) {
   resourceManager.throwErrorIsResourceIsLock(['season']);
   dbProducts.remove(productId);
 }
-limitMethod('retrieveProduct');
 
 Meteor.methods({
   voteProduct(productId) {
@@ -192,7 +190,6 @@ export function voteProduct(user, productId) {
     release();
   });
 }
-limitMethod('voteProduct');
 
 Meteor.methods({
   likeProduct(productId) {
@@ -243,7 +240,6 @@ export function likeProduct(user, productId) {
     });
   }
 }
-limitMethod('likeProduct');
 
 Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, offset}) {
   check(seasonId, String);
@@ -314,7 +310,8 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
     observer.stop();
   });
 });
-limitSubscription('productListBySeasonId', 5000, 5);
+//一分鐘最多重複訂閱10次
+limitSubscription('allAdvertising', 10);
 
 Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, offset}) {
   check(companyId, String);
@@ -385,7 +382,8 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
     observer.stop();
   });
 });
-limitSubscription('productListByCompany', 5000, 5);
+//一分鐘最多20次
+limitSubscription('productListByCompany');
 
 Meteor.publish('queryMyLikeProduct', function(companyId) {
   check(companyId, String);
@@ -406,7 +404,8 @@ Meteor.publish('queryMyLikeProduct', function(companyId) {
     return [];
   }
 });
-limitSubscription('queryMyLikeProduct', 1000, 30);
+//一分鐘最多20次
+limitSubscription('queryMyLikeProduct');
 
 Meteor.publish('companyCurrentProduct', function(companyId) {
   check(companyId, String);
@@ -415,4 +414,5 @@ Meteor.publish('companyCurrentProduct', function(companyId) {
 
   return dbProducts.find({companyId, overdue}, {disableOplog});
 });
+//一分鐘最多20次
 limitSubscription('companyCurrentProduct');

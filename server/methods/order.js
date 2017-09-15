@@ -9,7 +9,7 @@ import { dbOrders } from '../../db/dbOrders';
 import { dbPrice } from '../../db/dbPrice';
 import { dbLog } from '../../db/dbLog';
 import { dbVariables } from '../../db/dbVariables';
-import { limitMethod, limitSubscription } from './rateLimit';
+import { limitSubscription } from './rateLimit';
 
 Meteor.methods({
   createBuyOrder(orderData) {
@@ -224,7 +224,6 @@ export function createBuyOrder(user, orderData) {
     release();
   });
 }
-limitMethod('createBuyOrder');
 
 Meteor.methods({
   createSellOrder(orderData) {
@@ -412,7 +411,6 @@ export function createSellOrder(user, orderData) {
     release();
   });
 }
-limitMethod('createSellOrder');
 
 export function changeStocksAmount(userId, companyId, amount) {
   const existDirectorData = dbDirectors.findOne({companyId, userId});
@@ -564,7 +562,6 @@ export function retrieveOrder(user, orderId) {
     release();
   });
 }
-limitMethod('retrieveOrder');
 
 Meteor.publish('queryMyOrder', function() {
   const userId = this.userId;
@@ -574,7 +571,8 @@ Meteor.publish('queryMyOrder', function() {
 
   return [];
 });
-limitSubscription('queryMyOrder');
+//一分鐘最多30次
+limitSubscription('queryMyOrder', 30);
 
 Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
   check(companyId, String);
@@ -636,4 +634,5 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
 limitSubscription('companyOrderExcludeMe');

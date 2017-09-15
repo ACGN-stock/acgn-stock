@@ -50,7 +50,8 @@ export function foundCompany(user, foundCompanyData) {
   });
   dbFoundations.insert(foundCompanyData);
 }
-limitMethod('foundCompany');
+//一分鐘最多一次
+limitMethod('foundCompany', 1);
 
 Meteor.methods({
   editFoundCompany(foundCompanyData) {
@@ -112,7 +113,8 @@ export function editFoundCompany(user, foundCompanyData) {
     release();
   });
 }
-limitMethod('editFoundCompany');
+//一分鐘最多一次
+limitMethod('editFoundCompany', 1);
 
 Meteor.methods({
   investFoundCompany(companyId, amount) {
@@ -202,7 +204,6 @@ export function investFoundCompany(user, companyId, amount) {
     release();
   });
 }
-limitMethod('investFoundCompany');
 
 Meteor.publish('foundationPlan', function(keyword, offset) {
   check(keyword, String);
@@ -265,6 +266,7 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
     observer.stop();
   });
 });
+//一分鐘最多20次
 limitSubscription('foundationPlan');
 
 Meteor.publish('foundationDataForEdit', function(foundationId) {
@@ -272,4 +274,5 @@ Meteor.publish('foundationDataForEdit', function(foundationId) {
 
   return dbFoundations.find(foundationId);
 });
-limitSubscription('foundationDataForEdit');
+//一分鐘最多10次
+limitSubscription('foundationDataForEdit', 10);

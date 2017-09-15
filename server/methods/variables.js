@@ -21,4 +21,5 @@ Meteor.publish('variables', function () {
     }
   );
 });
-limitSubscription('validateUser');
+//一分鐘最多重複訂閱5次
+limitSubscription('variables', 5);

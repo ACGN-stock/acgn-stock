@@ -60,5 +60,7 @@ Meteor.methods({
     return {lastTime, list};
   }
 });
-limitMethod('instantMessageChat', 3000, 1);
-limitMethod('queryInstantMessage');
+//5秒鐘最多2次
+limitMethod('instantMessageChat', 2, 5000);
+//一分鐘最多24次
+limitMethod('queryInstantMessage', 24);
