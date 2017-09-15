@@ -23,7 +23,7 @@
 
 .company-card {
   padding: 0px;
-  max-width: 300px;
+  max-width: 270px;
 }
 .company-card-default {
   background: #fff;
@@ -93,6 +93,7 @@
 .company-card .btn-tab {
   color: #000;
   background: transparent;
+  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 .company-card .btn-tab:focus {
   -webkit-box-shadow: none;
@@ -111,7 +112,7 @@
   transition: max-height 0.2s ease-out;
 }
 .company-card div.member-panel {
-  max-width: 180px;
+  max-width: 135px;
 }
 .compant-card .text-danger {
   color: #f00;
