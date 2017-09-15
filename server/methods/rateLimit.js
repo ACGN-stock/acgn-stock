@@ -48,16 +48,22 @@ export function limitGlobalMethod(name, number = 1, interval = 60000) {
 const connectionIpHash = {};
 Meteor.onConnection(function(connection) {
   const ip = connection.clientAddress;
-  if (connectionIpHash[ip] > 1) {
+  if (connectionIpHash[ip] >= 2) {
     connection.close();
+
+    return false;
   }
-  else if (connectionIpHash[ip] === 1) {
+
+  if (connectionIpHash[ip]) {
     connectionIpHash[ip] = 2;
   }
   else {
     connectionIpHash[ip] = 1;
   }
   connection.onClose(function() {
-    connectionIpHash[ip] = 0;
+    connectionIpHash[ip] -= 1;
   });
+  if (connectionIpHash[ip] > 2) {
+    connection.close();
+  }
 });
