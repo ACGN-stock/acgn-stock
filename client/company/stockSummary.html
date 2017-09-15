@@ -5,9 +5,19 @@
       <hr />
       {{> stockFilterForm}}
       <hr />
-      {{#each companyList}}
-        {{> companySummary}}
-      {{/each}}
+      {{#if viewModeIsCard}}
+        <div class="media">
+          <div class="media-body row">
+            {{#each companyList}}
+              {{> companySummaryCard}}
+            {{/each}}
+          </div>
+        </div>
+      {{else}}
+        {{#each companyList}}
+          {{> companySummaryList}}
+        {{/each}}
+      {{/if}}
       {{#with paginationData}}
         {{> pagination}}
       {{/with}}
@@ -17,6 +27,9 @@
 
 <template name="stockFilterForm">
   <form class="form-inline">
+    <button class="btn btn-secondary mr-1" type="button" data-action="toggleViewMode">
+      <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
+    </button>
     <button class="{{isOnlyShowMineBtnClass}}" type="button" data-action="toggleIsOnlyShowMine">
       只列出我所持有的股票
     </button>
@@ -47,8 +60,101 @@
   </form>
 </template>
 
-<template name="companySummary">
-  <div class="media company-summary">
+<template name="companySummaryCard">
+  <div class="col-12 col-md-6 col-lg-4 col-xl-3" style="margin-bottom: 25px;">
+    <div class="company-card {{cardDisplayClass this}}">
+      <div class="row row-info">
+        <small>{{formatDateText this.createdAt}} 創立</small>
+      </div>
+      <hr style="margin: 0px;" />
+      <div class="row row-cover d-flex justify-content-around">
+        <div class="d-flex flex-column align-self-center">
+          <div class="picture">
+          {{#if this.pictureSmall}}
+            <img src="{{this.pictureSmall}}" />
+          {{else}}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
+          {{/if}}
+        </div>
+        </div>
+        <div class="d-flex flex-column align-self-center">
+          <div class="d-flex flex-row-reverse">
+            <div class="member-panel">
+              <div class="d-flex flex-row-reverse">
+                <small>{{this.chairmanTitle}}</small>
+              </div>
+              <div class="d-flex flex-row-reverse">
+                {{#with getChairmanId this._id}}
+                  <h4>{{>userLink}}</h4>
+                {{/with}}
+              </div>
+              <div class="d-flex flex-row-reverse" style="margin-top: 0.5rem;">
+                <small>經理人</small>
+              </div>
+              <div class="d-flex flex-row-reverse">
+                <h4>{{>userLink this.manager}}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row title">
+        {{>companyLink this._id}}
+      </div>
+      <div class="row row-info d-flex justify-content-between">
+        <p>股票價格</p>
+        <p class="{{priceDisplayClass this.lastPrice this.listPrice}}">
+          $ {{this.lastPrice}}({{this.listPrice}})
+        </p>
+      </div>
+      <div class="row row-info d-flex justify-content-between">
+        <p>總市值</p>
+        <p>$ {{this.totalValue}}</p>
+      </div>
+      {{#if currentUser}}
+        <div class="row row-info d-flex justify-content-between">
+          <p>持有股份</p>
+          <p>{{getStockAmount this._id}} ({{getStockPercentage this._id this.totalRelease}}%)</p>
+        </div>
+        {{#if existOwnOrder this._id}}
+          <hr style="margin: 0px;" />
+          <div class="row">
+            <button class="btn btn-tab accordion dropdown-toggle" data-expand-order="1">顯示未完成訂單</button>
+            <div class="order-panel">
+              {{#each ownOrderList this._id}}
+                <div class="mb-1">
+                  {{orderType}}{{done}}/{{amount}} (${{unitPrice}}) 
+                  <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{_id}}">
+                    取消
+                  </button>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+        <hr style="margin: 0px;" />
+        <div class="row btn-group">
+          {{#if isUserId this.manager}}
+            <a class="btn btn-tab" href="{{getManageHref this._id}}">
+              經營管理
+            </a>
+          {{/if}}
+          <button class="btn btn-tab" type="button" data-action="createBuyOrder">
+            購入
+          </button>
+          {{#if getStockAmount this._id}}
+            <button class="btn btn-tab" type="button" data-action="createSellOrder">
+              賣出
+            </button>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="companySummaryList">
+  <div class="media company-summary-item">
     <div class="d-sm-flex picture">
       {{#if this.pictureSmall}}
         <img src="{{this.pictureSmall}}" />

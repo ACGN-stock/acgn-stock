@@ -8,6 +8,7 @@ import { dbSeason } from '../../db/dbSeason';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { pageNameHash } from '../../routes';
 import { rShowLoginDialog } from './validateDialog';
+import { rMainTheme } from './layout';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 
@@ -20,52 +21,12 @@ function updateTheme() {
     $nav
       .removeClass('navbar-inverse')
       .addClass('navbar-light');
-    const style = document.getElementById('custom-style-dark');
-    if (style) {
-      style.remove();
-    }
   }
   else {
     $('#boostrap-theme').attr('href', 'https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.0.0-alpha.6/solar/bootstrap.min.css');
     $nav
       .removeClass('navbar-light')
       .addClass('navbar-inverse');
-
-    const style = document.getElementById('custom-style-dark');
-    if (! style) {
-      const style = document.createElement('style');
-      style.id = 'custom-style-dark';
-      style.type = 'text/css';
-
-      const customDarkStyleCSS = `
-        .bg-info .media-body {
-          color: #ffffff;
-        }
-        .bg-info .media-body a {
-          color: #000000;
-        }
-        .table-success a {
-          color: #000000;
-        }
-        .modal-content {
-          border: 1px solid #dddddd;
-        }
-        .modal-header {
-          border-bottom: 1px solid #dddddd;
-        }
-        .modal-footer {
-          border-top: 1px solid #dddddd;
-        }
-      `;
-      if (style.styleSheet) {
-        style.styleSheet.cssText = customDarkStyleCSS;
-      }
-      else {
-        style.appendChild(document.createTextNode(customDarkStyleCSS));
-      }
-
-      document.getElementsByTagName('head')[0].appendChild(style);
-    }
   }
 }
 
@@ -78,10 +39,6 @@ Template.nav.onCreated(function() {
   });
 });
 
-//每次開啟網頁時只確認一次預設theme
-if (! localStorage.getItem('theme')) {
-  localStorage.setItem('theme', 'light');
-}
 Template.nav.onRendered(function() {
   updateTheme();
 });
@@ -161,6 +118,7 @@ Template.nav.events({
     const $switcher = $(event.currentTarget);
     const theme = $switcher.attr('data-theme');
     localStorage.setItem('theme', theme);
+    rMainTheme.set(theme);
     updateTheme();
   },
   'click [data-action="logout"]'(event) {

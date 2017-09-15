@@ -15,16 +15,122 @@
   border-right: 1px solid #dddddd;
 }
 
-.company-summary {
+.container-light .company-card {
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+  box-shadow: 6px 6px 6px rgba(0,0,0,0.23);
+}
+
+.company-card {
+  padding: 0px;
+  max-width: 270px;
+}
+.company-card-default {
+  background: #fff;
+}
+.company-card-chairman {
+  background: #f8b500;
+  background: -webkit-linear-gradient(135deg, #fceabb, #f8b500);
+  background: -o-linear-gradient(135deg, #fceabb, #f8b500);
+  background: -moz-linear-gradient(135deg, #fceabb, #f8b500);
+  background: linear-gradient(135deg, #fceabb, #f8b500);
+}
+.company-card-manager {
+  background: #fffbd5;
+  background: -webkit-linear-gradient(135deg, #b20a2c, #fffbd5);
+  background: linear-gradient(135deg, #b20a2c, #fffbd5);
+}
+.company-card-holder {
+  background: #8e9eab;
+  background: -webkit-linear-gradient(135deg, #eef2f3, #8e9eab);
+  background: -o-linear-gradient(135deg, #eef2f3, #8e9eab);
+  background: -moz-linear-gradient(135deg, #eef2f3, #8e9eab);
+  background: linear-gradient(135deg, #eef2f3, #8e9eab);
+}
+.company-card .picture img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+.company-card .title {
+  background: #000; /* For browsers that do not support gradients */
+  background: -webkit-linear-gradient(left, transparent, #000 5%, #000 95%, transparent); /* Safari */
+  background: -o-linear-gradient(left, transparent, #000 5%, #000 95%, transparent); /* Opera 11.6 to 12.0 */
+  background: -moz-linear-gradient(left, transparent, #000 5%, #000 95%, transparent); /* Firefox 3.6 to 15 */
+  background: linear-gradient(left, transparent, #000 5%, #000 95%, transparent); /* Standard syntax */
+  font-size: 1.5rem;
+}
+.company-card .title a {
+  color: #fff;
+  margin-left: 5%;
+  margin-right: 5%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.company-card .row {
+  color: #000;
+  vertical-align: middle;
+  margin: 0px;
+}
+.company-card .row-info p {
+  color: #000;
+  margin: 0.1rem 1rem;
+}
+.company-card .row-info small {
+  color: #000;
+  margin: 0px 1rem;
+}
+.company-card .row-cover {
+  height: 120px;
+}
+.company-card .row-cover a, .company-card .row-cover h4, .company-card .row-cover small {
+  margin: 0rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.company-card .btn-tab {
+  color: #000;
+  background: transparent;
+  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.company-card .btn-tab:focus {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.company-card button.accordion {
+  width: 100%;
+  text-align: left;
+  transition: 0.4s;
+}
+.company-card div.order-panel {
+  padding: 0 1rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+.company-card div.member-panel {
+  max-width: 135px;
+}
+.compant-card .text-danger {
+  color: #f00;
+}
+.compant-card .text-success {
+  color: #0f0;
+}
+
+.company-summary-item {
   margin-top: 15px;
 }
 
-.company-summary .picture {
+.company-summary-item .picture {
   width: 115px;
   padding-right: 15px;
   text-align: center;
 }
-.company-summary .picture img {
+.company-summary-item .picture img {
   width: 100px;
   height: 100px;
   object-fit: cover;
@@ -40,4 +146,28 @@
   width: 300px;
   height: 300px;
   object-fit: scale-down;
+}
+
+/* 暗色主題 */
+.container-dark .bg-info .media-body {
+  color: #ffffff;
+}
+.container-dark .bg-info .media-body a {
+  color: #000000;
+}
+.container-dark .table-success a {
+  color: #000000;
+}
+.container-dark .modal-content {
+  border: 1px solid #dddddd;
+}
+.container-dark .modal-header {
+  border-bottom: 1px solid #dddddd;
+}
+.container-dark .modal-footer {
+  border-top: 1px solid #dddddd;
+}
+.container-dark .company-card {
+  border-radius: 5px;
+  box-shadow: 6px 6px 6px rgba(0,0,0,1);
 }

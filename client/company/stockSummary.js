@@ -10,9 +10,11 @@ import { dbOrders } from '../../db/dbOrders';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle } from '../utils/methods';
+import { isUserId, isChairman } from '../utils/helpers';
 
 inheritedShowLoadingOnSubscribing(Template.stockSummary);
 const rKeyword = new ReactiveVar('');
+const rViewModeCard = new ReactiveVar(false);
 const rIsOnlyShowMine = new ReactiveVar(false);
 const rSortBy = new ReactiveVar('lastPrice');
 export const rStockOffset = new ReactiveVar(0);
@@ -52,6 +54,9 @@ Template.stockSummary.onDestroyed(function() {
   this.observer.stop();
 });
 Template.stockSummary.helpers({
+  viewModeIsCard() {
+    return rViewModeCard.get();
+  },
   companyList() {
     return dbCompanies.find({}, {
       sort: {
@@ -74,6 +79,13 @@ Template.stockFilterForm.onRendered(function() {
   this.$keyword = this.$('[name="keyword"]');
 });
 Template.stockFilterForm.helpers({
+  viewModeBtnClass() {
+    if (rViewModeCard.get()) {
+      return 'fa-th';
+    }
+
+    return 'fa-th-list';
+  },
   isOnlyShowMineBtnClass() {
     if (rIsOnlyShowMine.get()) {
       return 'btn btn-secondary active mr-1';
@@ -95,6 +107,10 @@ Template.stockFilterForm.helpers({
   }
 });
 Template.stockFilterForm.events({
+  'click [data-action="toggleViewMode"]'() {
+    const newValue = ! rViewModeCard.get();
+    rViewModeCard.set(newValue);
+  },
   'click [data-action="toggleIsOnlyShowMine"]'() {
     const newValue = ! rIsOnlyShowMine.get();
     rStockOffset.set(0);
@@ -112,9 +128,26 @@ Template.stockFilterForm.events({
   }
 });
 
-Template.companySummary.helpers({
+const companySummaryHelpers = {
   displayTagList(tagList) {
     return tagList.join('、');
+  },
+  cardDisplayClass(companyData) {
+    if (! Meteor.user()) {
+      return 'company-card-default';
+    }
+    if (isChairman(companyData._id)) {
+      return 'company-card-chairman';
+    }
+    if (isUserId(companyData.manager)) {
+      return 'company-card-manager';
+    }
+    const percentage = companySummaryHelpers.getStockPercentage(companyData._id, companyData.totalRelease);
+    if (percentage > 0) {
+      return 'company-card-holder';
+    }
+
+    return 'company-card-default';
   },
   priceDisplayClass(lastPrice, listPrice) {
     if (lastPrice > listPrice) {
@@ -143,13 +176,18 @@ Template.companySummary.helpers({
 
     return 0;
   },
+  existOwnOrder(companyId) {
+    const userId = Meteor.user()._id;
+
+    return ! ! dbOrders.findOne({companyId, userId});
+  },
   ownOrderList(companyId) {
     const userId = Meteor.user()._id;
 
     return dbOrders.find({companyId, userId});
   }
-});
-Template.companySummary.events({
+};
+const companySummaryEvents = {
   'click [data-action="changeChairmanTitle"]'(event, templateInstance) {
     const companyData = templateInstance.data;
     changeChairmanTitle(companyData);
@@ -162,10 +200,25 @@ Template.companySummary.events({
     event.preventDefault();
     createSellOrder(Meteor.user(), templateInstance.data);
   },
+  'click [data-expand-order]'(event, templateInstance) {
+    event.preventDefault();
+    const panel = templateInstance.$('.order-panel');
+    const maxHeight = panel.css('max-height');
+    if (maxHeight === '0px') {
+      panel.css('max-height', panel.prop('scrollHeight'));
+    }
+    else {
+      panel.css('max-height', 0);
+    }
+  },
   'click [data-cancel-order]'(event) {
     event.preventDefault();
     const orderId = $(event.currentTarget).attr('data-cancel-order');
     const orderData = dbOrders.findOne(orderId);
     retrieveOrder(orderData);
   }
-});
+};
+Template.companySummaryList.helpers(companySummaryHelpers);
+Template.companySummaryList.events(companySummaryEvents);
+Template.companySummaryCard.helpers(companySummaryHelpers);
+Template.companySummaryCard.events(companySummaryEvents);
