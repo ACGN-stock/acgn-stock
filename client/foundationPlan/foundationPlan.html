@@ -82,7 +82,7 @@
       <div class="col-8 col-lg-3 text-right text-right border-grid" title="{{getTotalInvest this.invest}}">
         $ {{getTotalInvest this.invest}}
       </div>
-      <div class="col-12 border-grid" style="white-space: pre-wrap;"><h4>角色簡介：</h4>{{this.description}}</div>
+      <div class="col-12 border-grid" style="white-space: pre-wrap; word-break: break-all;"><h4>角色簡介：</h4>{{this.description}}</div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
           {{#if isUserId this.manager}}
