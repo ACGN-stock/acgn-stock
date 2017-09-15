@@ -14,7 +14,7 @@ import { isUserId, isChairman } from '../utils/helpers';
 
 inheritedShowLoadingOnSubscribing(Template.stockSummary);
 const rKeyword = new ReactiveVar('');
-const rViewModeCard = new ReactiveVar(true);
+const rViewModeCard = new ReactiveVar(false);
 const rIsOnlyShowMine = new ReactiveVar(false);
 const rSortBy = new ReactiveVar('lastPrice');
 export const rStockOffset = new ReactiveVar(0);
