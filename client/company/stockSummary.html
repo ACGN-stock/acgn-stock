@@ -129,9 +129,9 @@
             <hr style="margin: 0px;" />
             <div class="row btn-group">
               {{#if isUserId this.manager}}
-                  <button class="btn btn-tab" href="{{getManageHref this._id}}">
-                    經營管理
-                  </button>
+                <a class="btn btn-tab" href="{{getManageHref this._id}}">
+                  經營管理
+                </a>
               {{/if}}
               <button class="btn btn-tab" type="button" data-action="createBuyOrder">
                 購入

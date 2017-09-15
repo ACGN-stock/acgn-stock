@@ -98,6 +98,8 @@
   text-overflow: ellipsis;
 }
 .company-card .btn-tab {
+  color: #000;
+  text-decoration: underline;
   background: transparent;
 }
 .company-card .btn-tab:focus {
