@@ -52,7 +52,7 @@ stockSummaryRoute.route('/:page', {
     if (Meteor.isClient) {
       const { rStockOffset } = require('./client/company/stockSummary');
       const page = window.parseInt(params.page, 10);
-      const offset = (page - 1) * 10;
+      const offset = (page - 1) * 12;
       rStockOffset.set(offset);
     }
   }

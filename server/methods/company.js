@@ -563,7 +563,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     [sortBy]: -1
   };
   const skip = offset;
-  const limit = 10;
+  const limit = 12;
   const fields = {
     _id: 1,
     companyName: 1,

@@ -14,7 +14,7 @@ import { isUserId, isChairman } from '../utils/helpers';
 
 inheritedShowLoadingOnSubscribing(Template.stockSummary);
 const rKeyword = new ReactiveVar('');
-const rViewModeCard = new ReactiveVar(false);
+const rViewModeCard = new ReactiveVar(true);
 const rIsOnlyShowMine = new ReactiveVar(false);
 const rSortBy = new ReactiveVar('lastPrice');
 export const rStockOffset = new ReactiveVar(0);
@@ -62,13 +62,13 @@ Template.stockSummary.helpers({
       sort: {
         [rSortBy.get()]: -1
       },
-      limit: rStockOffset.get() + 10
+      limit: rStockOffset.get() + 12
     });
   },
   paginationData() {
     return {
       useVariableForTotalCount: 'totalCountOfStockSummary',
-      dataNumberPerPage: 10,
+      dataNumberPerPage: 12,
       offset: rStockOffset,
       useHrefRoute: true
     };
