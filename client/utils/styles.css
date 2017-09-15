@@ -40,19 +40,12 @@
   background: -webkit-linear-gradient(135deg, #b20a2c, #fffbd5);
   background: linear-gradient(135deg, #b20a2c, #fffbd5);
 }
-.company-card-major {
-  background: #ede574;
-  background: -webkit-linear-gradient(135deg, #e1f5c4, #ede574);
-  background: -o-linear-gradient(135deg, #e1f5c4, #ede574);
-  background: -moz-linear-gradient(135deg, #e1f5c4, #ede574);
-  background: linear-gradient(135deg, #e1f5c4, #ede574);
-}
 .company-card-holder {
-  background: #1c92d2;
-  background: -webkit-linear-gradient(135deg, #f2fcfe, #1c92d2);
-  background: -o-linear-gradient(135deg, #f2fcfe, #1c92d2);
-  background: -moz-linear-gradient(135deg, #f2fcfe, #1c92d2);
-  background: linear-gradient(135deg, #f2fcfe, #1c92d2);
+  background: #8e9eab;
+  background: -webkit-linear-gradient(135deg, #eef2f3, #8e9eab);
+  background: -o-linear-gradient(135deg, #eef2f3, #8e9eab);
+  background: -moz-linear-gradient(135deg, #eef2f3, #8e9eab);
+  background: linear-gradient(135deg, #eef2f3, #8e9eab);
 }
 .company-card .picture img {
   width: 100px;
@@ -65,7 +58,7 @@
   background: -o-linear-gradient(left, transparent, #000 5%, #000 95%, transparent); /* Opera 11.6 to 12.0 */
   background: -moz-linear-gradient(left, transparent, #000 5%, #000 95%, transparent); /* Firefox 3.6 to 15 */
   background: linear-gradient(left, transparent, #000 5%, #000 95%, transparent); /* Standard syntax */
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 .company-card .title a {
   color: #fff;
@@ -80,19 +73,16 @@
   vertical-align: middle;
   margin: 0px;
 }
-.company-card .row a {
-  margin: 0px 1rem;
-}
 .company-card .row-info p {
   color: #000;
-  margin: 0.5rem 1rem;
+  margin: 0.1rem 1rem;
 }
 .company-card .row-info small {
   color: #000;
   margin: 0px 1rem;
 }
 .company-card .row-cover {
-  height: 150px;
+  height: 120px;
 }
 .company-card .row-cover a, .company-card .row-cover h4, .company-card .row-cover small {
   margin: 0rem;
@@ -102,7 +92,6 @@
 }
 .company-card .btn-tab {
   color: #000;
-  text-decoration: underline;
   background: transparent;
 }
 .company-card .btn-tab:focus {

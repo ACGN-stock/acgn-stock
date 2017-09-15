@@ -143,9 +143,6 @@ const companySummaryHelpers = {
       return 'company-card-manager';
     }
     const percentage = companySummaryHelpers.getStockPercentage(companyData._id, companyData.totalRelease);
-    if (percentage > 10) {
-      return 'company-card-major';
-    }
     if (percentage > 0) {
       return 'company-card-holder';
     }
