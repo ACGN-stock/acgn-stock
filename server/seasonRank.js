@@ -2,40 +2,126 @@
 import { _ } from 'meteor/underscore';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
+import { dbLog } from '../db/dbLog';
 import { dbRankCompanyPrice } from '../db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '../db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../db/dbRankUserWealth';
+import { config } from '../config';
 
 //為所有公司與使用者進行排名結算
 export function generateRankData(seasonData) {
-  // console.log('begining generate rank data...');
-  // console.log('begining rank company price...');
-  const rankCompanyPriceList = dbCompanies
-    .find(
-      {
-        isSeal: false
-      },
-      {
-        fields: {
-          _id: 1,
-          lastPrice: 1,
-          listPrice: 1,
-          totalRelease: 1,
-          totalValue: 1,
-          profit: 1
-        },
-        sort: {
-          lastPrice: -1
-        },
-        limit: 100,
-        disableOplog: true
+  console.log('begining generate rank data...');
+  console.log('begining rank company price...');
+  const rankCompanyPriceList = dbLog.aggregate([
+    {
+      $match: {
+        logType: '交易紀錄',
+        createdAt: {
+          $gt: seasonData.beginDate
+        }
       }
-    )
-    .fetch();
-  // console.log('done rank company price...');
+    },
+    {
+      $project: {
+        companyId: 1,
+        dealAmount: '$amount',
+        dealMoney: {
+          $multiply: ['$amount', '$price']
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$companyId',
+        totalDealAmount: {
+          $sum: '$dealAmount'
+        },
+        totalDealMoney: {
+          $sum: '$dealMoney'
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: 'companies',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'companyData'
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        totalDealAmount: 1,
+        totalDealMoney: 1,
+        isSeal: {
+          $arrayElemAt: ['$companyData.isSeal', 0]
+        }
+      }
+    },
+    {
+      $match: {
+        isSeal: false
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        totalDealAmount: 1,
+        totalDealMoney: 1
+      }
+    },
+    {
+      $lookup: {
+        from: 'voteRecord',
+        localField: '_id',
+        foreignField: 'companyId',
+        as: 'voteData'
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        totalDealAmount: 1,
+        totalDealMoney: 1,
+        productProfit: {
+          $multiply: [
+            {
+              $size: '$voteData'
+            },
+            seasonData.votePrice
+          ]
+        }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        totalDealAmount: 1,
+        totalDealMoney: 1,
+        productProfit: 1,
+        totalMoney: {
+          $add: [
+            '$totalDealMoney',
+            '$productProfit'
+          ]
+        }
+      }
+    },
+    {
+      $sort: {
+        totalMoney: -1,
+        totalDealMoney: -1
+      }
+    },
+    {
+      $limit : 100
+    }
+  ]);
+  console.log('done rank company hot...');
 
-  // console.log('begining rank company value...');
+  console.log('begining rank company value...');
   const rankCompanyValueList = dbCompanies
     .find(
       {
@@ -45,7 +131,6 @@ export function generateRankData(seasonData) {
         fields: {
           _id: 1,
           lastPrice: 1,
-          listPrice: 1,
           totalRelease: 1,
           totalValue: 1,
           profit: 1
@@ -58,34 +143,108 @@ export function generateRankData(seasonData) {
       }
     )
     .fetch();
-  // console.log('done rank company value...');
+  console.log('done rank company value...');
 
-  // console.log('begining rank company profit...');
-  const rankCompanyProfitList = dbCompanies
-    .find(
-      {
-        isSeal: false
-      },
-      {
-        fields: {
-          _id: 1,
-          lastPrice: 1,
-          listPrice: 1,
-          totalRelease: 1,
-          totalValue: 1,
-          profit: 1
-        },
-        sort: {
-          profit: -1
-        },
-        limit: 100,
-        disableOplog: true
+  console.log('begining rank company profit...');
+  const rankCompanyProfitList = dbLog.aggregate([
+    {
+      $match: {
+        logType: '交易紀錄',
+        createdAt: {
+          $gt: seasonData.beginDate
+        }
       }
-    )
-    .fetch();
-  // console.log('done rank company profit...');
+    },
+    {
+      $project: {
+        companyId: 1,
+        dealAmount: '$amount',
+        dealMoney: {
+          $multiply: ['$amount', '$price']
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$companyId',
+        totalDealAmount: {
+          $sum: '$dealAmount'
+        },
+        totalDealMoney: {
+          $sum: '$dealMoney'
+        }
+      }
+    },
+    {
+      $lookup: {
+        from: 'companies',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'companyData'
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        avgPrice: {
+          $divide: ['$totalDealMoney', '$totalDealAmount']
+        },
+        isSeal: {
+          $arrayElemAt: ['$companyData.isSeal', 0]
+        },
+        totalRelease: {
+          $arrayElemAt: ['$companyData.totalRelease', 0]
+        },
+        profit: {
+          $arrayElemAt: ['$companyData.profit', 0]
+        }
+      }
+    },
+    {
+      $match: {
+        isSeal: false,
+        profit: {
+          $gt: 0
+        }
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        profit: 1,
+        avgPrice: 1,
+        totalRelease: 1,
+        priceToEarn: {
+          $divide: [
+            {
+              $multiply: [
+                {
+                  $divide: [
+                    '$profit',
+                    '$totalRelease'
+                  ]
+                },
+                0.8
+              ]
+            },
+            '$avgPrice'
+          ]
+        }
+      }
+    },
+    {
+      $sort: {
+        priceToEarn: -1,
+        avgPrice: 1
+      }
+    },
+    {
+      $limit : 100
+    }
+  ]);
+  console.log('done rank company profit...');
 
-  // console.log('begining rank user...');
+  console.log('begining rank user...');
   const rankUserList = dbDirectors.aggregate([
     {
       $lookup: {
@@ -141,36 +300,33 @@ export function generateRankData(seasonData) {
         _id: 1,
         stocksValue: 1,
         money: 1,
-        wealth: {
+        totalWealth: {
           $add: ['$money', '$stocksValue']
         }
       }
     },
     {
       $sort: {
-        wealth: -1
+        totalWealth: -1
       }
     },
     {
       $limit : 100
     }
   ]);
-  // console.log('done rank user...');
+  console.log('done rank user...');
 
   const seasonId = seasonData._id;
-
-  if (rankCompanyPriceList.length > 0) {
+  if (rankCompanyValueList.length > 0) {
     // console.log('start insert company\'s price rank data...');
     const rankCompanyPriceBulk = dbRankCompanyPrice.rawCollection().initializeUnorderedBulkOp();
     _.each(rankCompanyPriceList, (rankData) => {
       rankCompanyPriceBulk.insert({
         seasonId: seasonId,
         companyId: rankData._id,
-        lastPrice: rankData.lastPrice,
-        listPrice: rankData.listPrice,
-        totalRelease: rankData.totalRelease,
-        totalValue: rankData.totalValue,
-        profit: rankData.profit
+        totalDealAmount: rankData.totalDealAmount,
+        totalDealMoney: rankData.totalDealMoney,
+        productProfit: rankData.productProfit
       });
     });
     rankCompanyPriceBulk.execute();
@@ -183,10 +339,7 @@ export function generateRankData(seasonData) {
         seasonId: seasonId,
         companyId: rankData._id,
         lastPrice: rankData.lastPrice,
-        listPrice: rankData.listPrice,
-        totalRelease: rankData.totalRelease,
-        totalValue: rankData.totalValue,
-        profit: rankData.profit
+        totalRelease: rankData.totalRelease
       });
     });
     rankCompanyValueBulk.execute();
@@ -198,11 +351,10 @@ export function generateRankData(seasonData) {
       rankCompanyProfitBulk.insert({
         seasonId: seasonId,
         companyId: rankData._id,
-        lastPrice: rankData.lastPrice,
-        listPrice: rankData.listPrice,
+        profit: rankData.profit,
         totalRelease: rankData.totalRelease,
-        totalValue: rankData.totalValue,
-        profit: rankData.profit
+        avgPrice: Math.round(rankData.avgPrice * 100) / 100,
+        priceToEarn: Math.round(rankData.priceToEarn * 1000) / 1000
       });
     });
     rankCompanyProfitBulk.execute();
