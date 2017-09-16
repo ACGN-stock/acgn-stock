@@ -6,6 +6,7 @@ import { dbAdvertising } from '../../db/dbAdvertising';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
+import { rMainTheme } from './layout';
 
 Template.footer.onCreated(function() {
   this.autorun(() => {
@@ -36,6 +37,13 @@ Template.footer.helpers({
   },
   onlinePeopleNumber() {
     return dbVariables.get('onlinePeopleNumber') || 0;
+  },
+  containerClass() {
+    if (rMainTheme.get() === 'light') {
+      return 'container container-light';
+    }
+
+    return 'container container-dark';
   }
 });
 
