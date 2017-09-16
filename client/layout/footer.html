@@ -1,6 +1,6 @@
 <template name="footer">
   <div class="fixed-bottom">
-    <div class="container">
+    <div class={{containerClass}}>
       {{> displayAnnouncement}}
       {{#each advertisingList}}
         {{> displayAdvertising}}
