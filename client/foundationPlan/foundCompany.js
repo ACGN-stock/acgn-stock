@@ -7,10 +7,10 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '../../db/dbFoundations';
-import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
+import { shouldStopSubscribe } from '../utils/idle';
 
 Template.createFoundationPlan.helpers({
   defaultData() {
@@ -24,7 +24,7 @@ Template.createFoundationPlan.helpers({
 inheritedShowLoadingOnSubscribing(Template.editFoundationPlan);
 Template.editFoundationPlan.onCreated(function() {
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const foundationId = FlowRouter.getParam('foundationId');

@@ -11,11 +11,11 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbLog } from '../../db/dbLog';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
-import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct } from '../utils/methods';
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
+import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.company);
 const rDirectorOffset = new ReactiveVar(0);
@@ -24,7 +24,7 @@ const rSellOrderOffset = new ReactiveVar(0);
 const rLogOffset = new ReactiveVar(0);
 Template.company.onCreated(function() {
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     if (Meteor.user()) {
@@ -37,7 +37,7 @@ Template.company.onCreated(function() {
     }
   });
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const companyId = FlowRouter.getParam('companyId');
@@ -64,7 +64,7 @@ Template.company.onCreated(function() {
   });
   rDirectorOffset.set(0);
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const companyId = FlowRouter.getParam('companyId');
@@ -74,7 +74,7 @@ Template.company.onCreated(function() {
   });
   rBuyOrderOffset.set(0);
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const companyId = FlowRouter.getParam('companyId');
@@ -84,7 +84,7 @@ Template.company.onCreated(function() {
   });
   rSellOrderOffset.set(0);
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const companyId = FlowRouter.getParam('companyId');
@@ -94,7 +94,7 @@ Template.company.onCreated(function() {
   });
   rLogOffset.set(0);
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const companyId = FlowRouter.getParam('companyId');
@@ -151,24 +151,20 @@ Template.company.events({
 //定時呼叫取得今日交易量與股價走勢資料
 const rTodayDealAmount = new ReactiveVar(0);
 let lastQueryTodayDealAmountTime;
-const rPriceList = new ReactiveVar([]);
-let lastQueryStocksPriceTime;
 Template.company.onCreated(function() {
   this.autorun(() => {
     FlowRouter.getParam('companyId');
     rTodayDealAmount.set(0);
     lastQueryTodayDealAmountTime = new Date().setHours(0, 0, 0, 0) - 1;
-    rPriceList.set([]);
-    lastQueryStocksPriceTime = Date.now() - 86400000;
   });
-  queryDealAmountAndPrice();
-  this.queryDealAmountAndPriceIntervalId = Meteor.setInterval(queryDealAmountAndPrice, 30000);
+  queryDealAmount();
+  this.queryDealAmountIntervalId = Meteor.setInterval(queryDealAmount, 30000);
 });
 Template.company.onDestroyed(function() {
-  Meteor.clearInterval(this.queryDealAmountAndPriceIntervalId);
+  Meteor.clearInterval(this.queryDealAmountIntervalId);
 });
-function queryDealAmountAndPrice() {
-  if (dbResourceLock.find('season').count()) {
+function queryDealAmount() {
+  if (shouldStopSubscribe()) {
     return false;
   }
   const companyId = FlowRouter.getParam('companyId');
@@ -177,20 +173,6 @@ function queryDealAmountAndPrice() {
       if (! error) {
         rTodayDealAmount.set(rTodayDealAmount.get() + result.data);
         lastQueryTodayDealAmountTime = result.lastTime;
-      }
-    });
-    Meteor.nativeCall('queryStocksPrice', companyId, lastQueryStocksPriceTime, (error, result) => {
-      if (! error) {
-        if (result.list.length > 0) {
-          const newPriceList = _.chain(rPriceList.get().concat(result.list))
-            .unique((priceData) => {
-              return priceData.x;
-            })
-            .sortBy('x')
-            .value();
-          rPriceList.set(newPriceList);
-        }
-        lastQueryStocksPriceTime = result.lastTime;
       }
     });
   }
@@ -232,7 +214,7 @@ Template.companyDetail.onRendered(function() {
   this.$chart = this.$('.chart');
   this.chart = null;
   this.autorun(() => {
-    drawChart.apply(this);
+    drawChart(this);
   });
 });
 Template.companyDetail.helpers({
@@ -255,116 +237,128 @@ Template.companyDetail.events({
     $('.company-detail .btn-group-vertical > .active').removeClass('active');
     $(event.currentTarget).addClass('active');
     templateInstance.strChartType = $(event.currentTarget).attr('data-chart-type');
-    drawChart.apply(templateInstance);
+    drawChart(templateInstance);
   }
 });
-function drawChart() {
-  if (this.strChartType === 'trend') {
-    drawLineChart.apply(this);
+function drawChart(templateInstance) {
+  if (templateInstance.strChartType === 'trend') {
+    drawLineChart(templateInstance);
   }
   else {
-    drawCandleStickChart.apply(this);
+    drawCandleStickChart(templateInstance);
   }
 }
-function drawLineChart() {
-  if (this.chart) {
-    this.chart.destroy();
+function drawLineChart(templateInstance) {
+  if (templateInstance.chart) {
+    templateInstance.chart.destroy();
   }
-  this.$chart
-    .empty()
-    .html('<canvas style="max-height:300px;"></canvas>');
-  const ctx = this.$chart.find('canvas');
-  const color = (localStorage.getItem('theme') === 'light') ? '#000000' : '#ffffff';
-  this.chart = new Chart(ctx, {
-    type: 'scatter',
-    data: {
-      datasets: [
-        {
-          label: '一日股價走勢',
-          lineTension: 0,
-          data: rPriceList.get(),
-          borderColor: color,
-          fill: false
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      animation: {
-        duration: 0
-      },
-      legend: {
-        onClick: $.noop,
-        labels: {
-          fontColor: color
-        }
-      },
-      scales: {
-        xAxes: [
+  const companyId = FlowRouter.getParam('companyId');
+  Meteor.nativeCall('queryStocksPrice', companyId, (error, result) => {
+    if (error) {
+      return false;
+    }
+    if (! result.length) {
+      return false;
+    }
+    templateInstance.$chart
+      .empty()
+      .html('<canvas style="max-height:300px;"></canvas>');
+    const ctx = templateInstance.$chart.find('canvas');
+    const color = (localStorage.getItem('theme') === 'light') ? '#000000' : '#ffffff';
+    templateInstance.chart = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [
           {
-            type: 'time',
-            position: 'bottom',
-            gridLines: {
-              drawTicks: true
-            },
-            scaleLabel: {
-              display: false
-            },
-            ticks: {
-              autoSkip: true,
-              autoSkipPadding: 10,
-              round: true,
-              maxRotation: 0,
-              padding: 5,
-              fontColor: color
-            },
-            time: {
-              parser: 'x',
-              tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
-              displayFormats: {
-                year: 'YYYY',
-                quarter: 'YYYY Qo',
-                month: 'YYYY/MM',
-                week: 'YYYY/MM/DD',
-                day: 'YYYY/MM/DD',
-                hour: 'MM/DD HH:mm',
-                minute: 'MM/DD HH:mm',
-                second: 'HH:mm:ss',
-                millisecond: 'mm:ss.SSS'
-              }
-            }
-          }
-        ],
-        yAxes: [
-          {
-            type: 'linear',
-            position: 'left',
-            gridLines: {
-              drawTicks: true
-            },
-            ticks: {
-              fontColor: color,
-              beginAtZero: true,
-              callback: function(value) {
-                return '$' + Math.round(value);
-              }
-            }
+            label: '一日股價走勢',
+            lineTension: 0,
+            data: _.sortBy(result, 'x'),
+            borderColor: color,
+            fill: false
           }
         ]
+      },
+      options: {
+        responsive: true,
+        animation: {
+          duration: 0
+        },
+        legend: {
+          onClick: $.noop,
+          labels: {
+            fontColor: color
+          }
+        },
+        scales: {
+          xAxes: [
+            {
+              type: 'time',
+              position: 'bottom',
+              gridLines: {
+                drawTicks: true
+              },
+              scaleLabel: {
+                display: false
+              },
+              ticks: {
+                autoSkip: true,
+                autoSkipPadding: 10,
+                round: true,
+                maxRotation: 0,
+                padding: 5,
+                fontColor: color
+              },
+              time: {
+                parser: 'x',
+                tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
+                displayFormats: {
+                  year: 'YYYY',
+                  quarter: 'YYYY Qo',
+                  month: 'YYYY/MM',
+                  week: 'YYYY/MM/DD',
+                  day: 'YYYY/MM/DD',
+                  hour: 'MM/DD HH:mm',
+                  minute: 'MM/DD HH:mm',
+                  second: 'HH:mm:ss',
+                  millisecond: 'mm:ss.SSS'
+                }
+              }
+            }
+          ],
+          yAxes: [
+            {
+              type: 'linear',
+              position: 'left',
+              gridLines: {
+                drawTicks: true
+              },
+              ticks: {
+                fontColor: color,
+                beginAtZero: true,
+                callback: function(value) {
+                  return '$' + Math.round(value);
+                }
+              }
+            }
+          ]
+        }
       }
-    }
+    });
   });
 }
-function drawCandleStickChart() {
-  this.$chart.empty();
-  this.$chart.find('text').css('fill');
+function drawCandleStickChart(templateInstance) {
+  if (templateInstance.chart) {
+    templateInstance.chart.destroy();
+  }
+  templateInstance.$chart.empty();
+  templateInstance.$chart.find('text').css('fill');
 
   const margin = { top: 10, right: 10, bottom: 30, left: 50 };
-  const width = this.$chart.width() - margin.right - margin.left;
+  const width = templateInstance.$chart.width() - margin.right - margin.left;
   const height = 300 - margin.top - margin.bottom;
   const color = localStorage.theme === 'light' ? '#000' : '#fff';
 
-  const svg = d3.select(this.$chart.get(0)).append('svg')
+  const svg = d3.select(templateInstance.$chart.get(0)).append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
@@ -378,14 +372,17 @@ function drawCandleStickChart() {
   const yAxis = d3.axisLeft().scale(y);
 
   const count = 80;
-  const unitTime = (this.strChartType === '5min' ? 300
-    : this.strChartType === '10min' ? 600
-      : this.strChartType === '30min' ? 1800
-        : this.strChartType === '60min' ? 3600 : 86400) * 1000;
+  const unitTime = (templateInstance.strChartType === '5min' ? 300
+    : templateInstance.strChartType === '10min' ? 600
+      : templateInstance.strChartType === '30min' ? 1800
+        : templateInstance.strChartType === '60min' ? 3600 : 86400) * 1000;
   const toTime = Math.floor(Date.now() / unitTime) * unitTime;
 
   const companyId = FlowRouter.getParam('companyId');
   Meteor.nativeCall('queryStocksCandlestick', companyId, { lastTime: toTime, unitTime: unitTime, count: count }, (error, result) => {
+    if (error) {
+      return false;
+    }
     const data = result.map(function(x) {
       return {
         date: new Date(x.time),

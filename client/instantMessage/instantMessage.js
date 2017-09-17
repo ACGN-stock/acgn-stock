@@ -3,14 +3,14 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { dbResourceLock } from '../../db/dbResourceLock';
 import { alertDialog } from '../layout/alertDialog';
+import { shouldStopSubscribe } from '../utils/idle';
 
 let lastQueryInstantMessageTime = Date.now() - 60000;
 const rInstantMessageList = new ReactiveVar([]);
 Meteor.setInterval(queryInstantMessage, 5000);
 function queryInstantMessage() {
-  if (dbResourceLock.find('season').count()) {
+  if (shouldStopSubscribe()) {
     return false;
   }
   Meteor.nativeCall('queryInstantMessage', lastQueryInstantMessageTime, (error, result) => {

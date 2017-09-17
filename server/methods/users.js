@@ -315,11 +315,7 @@ limitSubscription('validateUser');
 
 Meteor.publish('onlinePeopleNumber', function() {
   const onlinePeopleNumber = UserStatus.connections
-    .find({
-      idle: {
-        $exists: 0
-      }
-    })
+    .find()
     .count();
   this.added('variables', 'onlinePeopleNumber', {
     value: onlinePeopleNumber
@@ -337,11 +333,7 @@ Meteor.publish('onlinePeopleNumber', function() {
 limitSubscription('onlinePeopleNumber', 5);
 function countAndPublishOnlinePeopleNumber(publisher) {
   const onlinePeopleNumber = UserStatus.connections
-    .find({
-      idle: {
-        $exists: 0
-      }
-    })
+    .find()
     .count();
   publisher.changed('variables', 'onlinePeopleNumber', {
     value: onlinePeopleNumber

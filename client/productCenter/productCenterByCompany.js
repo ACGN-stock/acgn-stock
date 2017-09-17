@@ -5,9 +5,9 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbProducts } from '../../db/dbProducts';
-import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { likeProduct } from '../utils/methods';
+import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.productCenterByCompany);
 const rProductSortBy = new ReactiveVar('likeCount');
@@ -15,7 +15,7 @@ const rProductSortDir = new ReactiveVar(-1);
 const rProductOffset = new ReactiveVar(0);
 Template.productCenterByCompany.onCreated(function() {
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     if (Meteor.user()) {
@@ -23,7 +23,7 @@ Template.productCenterByCompany.onCreated(function() {
     }
   });
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const companyId = FlowRouter.getParam('companyId');

@@ -5,10 +5,10 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbSeason } from '../../db/dbSeason';
-import { dbResourceLock } from '../../db/dbResourceLock';
 import { pageNameHash } from '../../routes';
 import { rShowLoginDialog } from './validateDialog';
 import { rMainTheme } from './layout';
+import { shouldStopSubscribe } from '../utils/idle';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 
@@ -32,7 +32,7 @@ function updateTheme() {
 
 Template.nav.onCreated(function() {
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     this.subscribe('currentSeason');

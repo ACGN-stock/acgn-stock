@@ -3,14 +3,14 @@ import { _ } from 'meteor/underscore';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbAdvertising } from '../../db/dbAdvertising';
-import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
 import { rMainTheme } from './layout';
+import { shouldStopSubscribe } from '../utils/idle';
 
 Template.footer.onCreated(function() {
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     this.subscribe('onlinePeopleNumber');

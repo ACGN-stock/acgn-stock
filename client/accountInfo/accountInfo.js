@@ -9,17 +9,17 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
-import { dbResourceLock } from '../../db/dbResourceLock';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
+import { shouldStopSubscribe } from '../utils/idle';
 
 export const ownStocksOffset = new ReactiveVar(0);
 export const logOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const userId = FlowRouter.getParam('userId');
@@ -38,7 +38,7 @@ Template.accountInfo.onCreated(function() {
   });
   ownStocksOffset.set(0);
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const userId = FlowRouter.getParam('userId');
@@ -48,7 +48,7 @@ Template.accountInfo.onCreated(function() {
   });
   logOffset.set(0);
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const userId = FlowRouter.getParam('userId');

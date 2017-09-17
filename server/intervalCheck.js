@@ -120,7 +120,7 @@ function doIntervalWork() {
     })
     .forEach((lockData) => {
       console.log(JSON.stringify(lockData) + ' locked time over 5 min...automatic release!');
-      dbResourceLock.remove(dbResourceLock._id);
+      dbResourceLock.remove(lockData._id);
     });
 }
 

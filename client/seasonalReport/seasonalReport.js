@@ -8,15 +8,15 @@ import { dbRankCompanyPrice } from '../../db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '../../db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '../../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../../db/dbRankUserWealth';
-import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbSeason } from '../../db/dbSeason';
 import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
+import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.seasonalReport);
 Template.seasonalReport.onCreated(function() {
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const seasonId = FlowRouter.getParam('seasonId');
@@ -25,7 +25,7 @@ Template.seasonalReport.onCreated(function() {
     }
   });
   this.autorun(() => {
-    if (dbResourceLock.find('season').count()) {
+    if (shouldStopSubscribe()) {
       return false;
     }
     const seasonId = FlowRouter.getParam('seasonId');
