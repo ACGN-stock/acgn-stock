@@ -472,44 +472,36 @@ function queryStocksCandlestick(companyId, options) {
 limitMethod('queryStocksCandlestick');
 
 Meteor.methods({
-  queryStocksPrice(companyId, lastTime) {
+  queryStocksPrice(companyId) {
     check(companyId, String);
-    check(lastTime, Number);
 
-    return queryStocksPrice(companyId, lastTime);
+    return queryStocksPrice(companyId);
   }
 })
-function queryStocksPrice(companyId, lastTime) {
-  lastTime = Math.max(lastTime, Date.now() - 86400000);
-  const list = dbPrice
+function queryStocksPrice(companyId) {
+  return dbPrice
     .find(
       {
         companyId: companyId,
         createdAt: {
-          $gt: new Date(lastTime)
+          $gt: new Date(Date.now() - 86400000)
         }
       },
       {
         fields: {
           createdAt: 1,
           price: 1
-        },
-        disableOplog: true
+        }
       }
     )
     .map((priceData) => {
-      const x = priceData.createdAt.getTime();
-      lastTime = Math.max(lastTime, x);
-
       return {
-        x: x,
+        x: priceData.createdAt.getTime(),
         y: priceData.price
       };
     });
-
-  return {list, lastTime};
 }
-//一分鐘最多20次
+//一分鐘最多10次
 limitMethod('queryStocksPrice');
 
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
