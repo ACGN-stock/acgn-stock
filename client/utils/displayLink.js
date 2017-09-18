@@ -22,7 +22,7 @@ Template.userLink.onRendered(function() {
         const path = FlowRouter.path('accountInfo', {userId});
         $link
           .attr('href', path)
-          .text(userName);
+          .text(('' + userName).trim() || '???');
       }
     });
   }
