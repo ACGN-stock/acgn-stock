@@ -52,7 +52,7 @@ Template.validateDialog.events({
   submit(event, templateInstance) {
     event.preventDefault();
     if (rValidateCode.get()) {
-      Meteor.call('validateAccount', rValidateUserName.get());
+      Meteor.customCall('validateAccount', rValidateUserName.get());
     }
     else {
       const username = templateInstance.$('#loginUserName').val();
@@ -64,14 +64,14 @@ Template.validateDialog.events({
       }
       rValidateUserName.set(username);
 
-      Meteor.call('loginOrRegister', username, password, false, (error, result) => {
+      Meteor.customCall('loginOrRegister', username, password, false, (error, result) => {
         if (result === true) {
           Meteor.loginWithPassword(username, password, (error) => {
             if (error) {
               if (error.message === 'Incorrect password [403]') {
                 alertDialog.confirm('密碼錯誤，是否嘗試設定新密碼並重新驗證？', (result) => {
                   if (result) {
-                    Meteor.call('loginOrRegister', username, password, true, (error, result) => {
+                    Meteor.customCall('loginOrRegister', username, password, true, (error, result) => {
                       if (error) {
                         handleError(error);
                       }

@@ -127,7 +127,7 @@ Template.foundationPlanInfo.events({
           return false;
         }
         if (amount >= minimumInvest && amount <= maximumInvest) {
-          Meteor.call('investFoundCompany', templaceInstance.data._id, amount);
+          Meteor.customCall('investFoundCompany', templaceInstance.data._id, amount);
         }
         else {
           alertDialog.alert('不正確的金額數字！');

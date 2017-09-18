@@ -87,7 +87,7 @@ Template.advertising.events({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     alertDialog.confirm('確定要撤銷廣告「' + advertisingData.message + '」？', (result) => {
       if (result) {
-        Meteor.call('takeDownAdvertising', advertisingId);
+        Meteor.customCall('takeDownAdvertising', advertisingId);
       }
     });
   }
@@ -101,7 +101,7 @@ function showAskAddPayDialog(advertisingId) {
     callback: function(result) {
       const addPay = parseInt(result, 10);
       if (addPay) {
-        Meteor.call('addAdvertisingPay', advertisingId, addPay);
+        Meteor.customCall('addAdvertisingPay', advertisingId, addPay);
       }
     }
   });
@@ -188,7 +188,7 @@ function saveAdvertisingModel(model) {
   `;
   alertDialog.confirm(message, (result) => {
     if (result) {
-      Meteor.call('buyAdvertising', submitData, () => {
+      Meteor.customCall('buyAdvertising', submitData, () => {
         rInBuyAdvertisingMode.set(false);
       });
     }

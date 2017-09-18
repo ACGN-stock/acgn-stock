@@ -204,7 +204,7 @@ Template.productInfoBySeasonTable.events({
       callback: function(message) {
         if (message) {
           const productId = productData._id;
-          Meteor.call('takeDownProduct', {productId, message});
+          Meteor.customCall('takeDownProduct', {productId, message});
         }
       }
     });

@@ -119,7 +119,7 @@ Template.company.events({
       defaultValue: companyData.companyName,
       callback: function(companyName) {
         if (companyName) {
-          Meteor.call('changeCompanyName', companyId, companyName);
+          Meteor.customCall('changeCompanyName', companyId, companyName);
         }
       }
     });
@@ -141,7 +141,7 @@ Template.company.events({
       message: `請輸入處理事由：`,
       callback: function(message) {
         if (message) {
-          Meteor.call('sealCompany', {companyId, message});
+          Meteor.customCall('sealCompany', {companyId, message});
         }
       }
     });
@@ -169,7 +169,7 @@ function queryDealAmount() {
   }
   const companyId = FlowRouter.getParam('companyId');
   if (companyId) {
-    Meteor.nativeCall('queryTodayDealAmount', companyId, lastQueryTodayDealAmountTime, (error, result) => {
+    Meteor.call('queryTodayDealAmount', companyId, lastQueryTodayDealAmountTime, (error, result) => {
       if (! error) {
         rTodayDealAmount.set(rTodayDealAmount.get() + result.data);
         lastQueryTodayDealAmountTime = result.lastTime;
@@ -203,7 +203,7 @@ Template.company.events({
     const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + companyName + '」以表示確定。';
     alertDialog.prompt(message, function(confirmMessage) {
       if (confirmMessage === companyName) {
-        Meteor.call('resignManager', companyId);
+        Meteor.customCall('resignManager', companyId);
       }
     });
   }
@@ -253,7 +253,7 @@ function drawLineChart(templateInstance) {
     templateInstance.chart.destroy();
   }
   const companyId = FlowRouter.getParam('companyId');
-  Meteor.nativeCall('queryStocksPrice', companyId, (error, result) => {
+  Meteor.call('queryStocksPrice', companyId, (error, result) => {
     if (error) {
       return false;
     }
@@ -666,7 +666,7 @@ Template.companyDirectorList.events({
       alertDialog.alert('輸入訊息過長！');
     }
     else if (Meteor.user() && message.length) {
-      Meteor.call('directorMessage', templateInstance.data._id, message);
+      Meteor.customCall('directorMessage', templateInstance.data._id, message);
     }
   }
 });
@@ -711,7 +711,7 @@ Template.companyElectInfo.events({
     const companyName = instanceData.companyName;
     alertDialog.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？', function(result) {
       if (result) {
-        Meteor.call('contendManager', instanceData._id);
+        Meteor.customCall('contendManager', instanceData._id);
       }
     });
   },
@@ -729,7 +729,7 @@ Template.companyElectInfo.events({
       success: (userName) => {
         alertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
           if (result) {
-            Meteor.call('supportCandidate', instanceData._id, candidate);
+            Meteor.customCall('supportCandidate', instanceData._id, candidate);
           }
         });
       }

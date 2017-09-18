@@ -14,44 +14,40 @@ import { alertDialog } from '../layout/alertDialog';
 
 Meteor.subscribe('isChangingSeason');
 
-Meteor.nativeCall = Meteor.call;
-Meteor.call = (function(_super) {
-  function call(...args) {
-    if (dbResourceLock.find('season').count()) {
-      alertDialog.alert('伺服器即將停機維修或者忙於商業季度的切換，請稍等一下吧！[503]');
+function customCall(...args) {
+  if (dbResourceLock.find('season').count()) {
+    alertDialog.alert('伺服器即將停機維修或者忙於商業季度的切換，請稍等一下吧！[503]');
 
-      return false;
-    }
-    if (! Meteor.status().connected) {
-      alertDialog.alert('糟了，伺服器好像掛了！等一下再試試吧！[503]');
+    return false;
+  }
+  if (! Meteor.status().connected) {
+    alertDialog.alert('糟了，伺服器好像掛了！等一下再試試吧！[503]');
 
-      return false;
-    }
-    addTask();
-    const lastArg = _.last(args);
-    if (typeof lastArg === 'function') {
-      args[args.length - 1] = function(error, result) {
-        if (error) {
-          handleError(error);
-        }
-        resolveTask();
-        lastArg(error, result);
-      };
-    }
-    else {
-      args.push(function(error) {
-        if (error) {
-          handleError(error);
-        }
-        resolveTask();
-      });
-    }
-
-    _super(...args);
+    return false;
+  }
+  addTask();
+  const lastArg = _.last(args);
+  if (typeof lastArg === 'function') {
+    args[args.length - 1] = function(error, result) {
+      if (error) {
+        handleError(error);
+      }
+      resolveTask();
+      lastArg(error, result);
+    };
+  }
+  else {
+    args.push(function(error) {
+      if (error) {
+        handleError(error);
+      }
+      resolveTask();
+    });
   }
 
-  return call;
-}(Meteor.call));
+  Meteor.call(...args);
+}
+Meteor.customCall = customCall;
 
 export function createBuyOrder(user, companyData) {
   const companyId = companyData._id;
@@ -114,7 +110,7 @@ export function createBuyOrder(user, companyData) {
 
             return false;
           }
-          Meteor.call('createBuyOrder', {companyId, unitPrice, amount});
+          Meteor.customCall('createBuyOrder', {companyId, unitPrice, amount});
         }
       });
     }
@@ -172,7 +168,7 @@ export function createSellOrder(user, companyData) {
 
             return false;
           }
-          Meteor.call('createSellOrder', {companyId, unitPrice, amount});
+          Meteor.customCall('createSellOrder', {companyId, unitPrice, amount});
         }
       });
     }
@@ -188,7 +184,7 @@ export function retrieveOrder(orderData) {
       companyData.companyName + '」公司股份」這筆訂單嗎？（將付出手續費$1）';
     alertDialog.confirm(message, function(result) {
       if (result) {
-        Meteor.call('retrieveOrder', orderData._id);
+        Meteor.customCall('retrieveOrder', orderData._id);
       }
     });
   }
@@ -225,7 +221,7 @@ export function voteProduct(productId, companyId) {
   }
   alertDialog.confirm('您的推薦票剩餘' + user.profile.vote + '張，確定要向產品投出推薦票嗎？', function(result) {
     if (result) {
-      Meteor.call('voteProduct', productId);
+      Meteor.customCall('voteProduct', productId);
     }
   });
 }
@@ -241,11 +237,11 @@ export function likeProduct(productId) {
   if (dbProductLike.find({productId, userId}).count() > 0) {
     alertDialog.confirm('您已經對此產品做出過正面評價，要收回評價嗎？', function(result) {
       if (result) {
-        Meteor.call('likeProduct', productId);
+        Meteor.customCall('likeProduct', productId);
       }
     });
   }
   else {
-    Meteor.call('likeProduct', productId);
+    Meteor.customCall('likeProduct', productId);
   }
 }

@@ -91,7 +91,7 @@ function handleCompanyInputChange(event) {
 function saveCompanyModel(model) {
   const companyId = model._id;
   const submitData = _.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description');
-  Meteor.call('editCompany', companyId, submitData, (error) => {
+  Meteor.customCall('editCompany', companyId, submitData, (error) => {
     if (! error) {
       const path = FlowRouter.path('company', {companyId});
       FlowRouter.go(path);
@@ -190,7 +190,7 @@ Template.companyProductManage.events({
     if (productData) {
       alertDialog.confirm('確定要刪除「' + productData.productName + '」這項待上架產品嗎？', function(result) {
         if (result) {
-          Meteor.call('retrieveProduct', productId);
+          Meteor.customCall('retrieveProduct', productId);
         }
       });
     }

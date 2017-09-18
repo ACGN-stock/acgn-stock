@@ -13,7 +13,7 @@ function queryInstantMessage() {
   if (shouldStopSubscribe()) {
     return false;
   }
-  Meteor.nativeCall('queryInstantMessage', lastQueryInstantMessageTime, (error, result) => {
+  Meteor.call('queryInstantMessage', lastQueryInstantMessageTime, (error, result) => {
     if (! error) {
       lastQueryInstantMessageTime = result.lastTime || (Date.now() - 60000);
       const oldMessageList = rInstantMessageList.get();
@@ -53,7 +53,7 @@ Template.instantMessageChatForm.events({
       alertDialog.alert('輸入訊息過長！');
     }
     else if (message.length) {
-      Meteor.call('instantMessageChat', message, () => {
+      Meteor.customCall('instantMessageChat', message, () => {
         templateInstance.$message.val('');
       });
     }

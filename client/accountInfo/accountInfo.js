@@ -94,7 +94,7 @@ Template.accountInfoBasic.events({
       callback: function(message) {
         if (message) {
           const userId = accuseUser._id;
-          Meteor.call('accuseUser', userId, message);
+          Meteor.customCall('accuseUser', userId, message);
         }
       }
     });
@@ -133,7 +133,7 @@ Template.accountInfoBasic.events({
       callback: function(message) {
         if (message) {
           const userId = accuseUserData._id;
-          Meteor.call('banUser', {userId, message, banType});
+          Meteor.customCall('banUser', {userId, message, banType});
         }
       }
     });
@@ -155,7 +155,7 @@ Template.accountInfoBasic.events({
               amount = parseInt(amount, 10);
               if (amount && amount > 0) {
                 const userId = accuseUserData._id;
-                Meteor.call('forfeit', {userId, message, amount});
+                Meteor.customCall('forfeit', {userId, message, amount});
               }
             }
           });
@@ -181,7 +181,7 @@ Template.accountInfoBasic.events({
               if (amount && amount > 0) {
                 const userId = accuseUserData._id;
                 amount *= -1;
-                Meteor.call('forfeit', {userId, message, amount});
+                Meteor.customCall('forfeit', {userId, message, amount});
               }
             }
           });
