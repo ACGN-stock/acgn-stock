@@ -1,5 +1,5 @@
 {
-  "name": "cchat-stock",
+  "name": "acgn-stock",
   "private": true,
   "scripts": {
     "start": "meteor run",
