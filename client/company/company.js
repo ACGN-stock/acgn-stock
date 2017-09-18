@@ -449,7 +449,8 @@ Template.companyBuyOrderList.helpers({
         },
         {
           sort: {
-            createdAt: -1
+            unitPrice: -1,
+            createdAt: 1
           }
         }
       );
@@ -515,7 +516,8 @@ Template.companySellOrderList.helpers({
         },
         {
           sort: {
-            createdAt: -1
+            unitPrice: 1,
+            createdAt: 1
           },
           limit: rSellOrderOffset.get() + 10
         }
