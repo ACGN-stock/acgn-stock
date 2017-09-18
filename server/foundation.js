@@ -63,17 +63,21 @@ export function checkFoundCompany() {
             }
           }
           while (totalRelease < minReleaseStock);
-          const createdAt = new Date();
+          const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
+          const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+          const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
+          const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
 
-          dbLog.insert({
+          const basicCreatedAt = new Date();
+          logBulk.insert({
             logType: '創立成功',
             userId: _.union([foundationData.manager], _.pluck(invest, 'userId')),
             companyId: companyId,
             price: stockUnitPrice,
             resolve: false,
-            createdAt: createdAt
+            createdAt: basicCreatedAt
           });
-          dbCompanies.insert({
+          companiesBulk.insert({
             _id: companyId,
             companyName: foundationData.companyName,
             manager: foundationData.manager,
@@ -89,18 +93,20 @@ export function checkFoundCompany() {
             profit: 0,
             candidateList: [foundationData.manager],
             voteList: [ [] ],
-            createdAt: createdAt
+            isSeal: false,
+            createdAt: basicCreatedAt
           });
           dbPrice.insert({
             companyId: companyId,
             price: stockUnitPrice,
-            createdAt: createdAt
+            createdAt: basicCreatedAt
           });
-          dbFoundations.remove(companyId);
+          let needExecuteDirectorsBulk = false;
+          let needExecuteUserBulk = false;
           _.each(directors, ({userId, stocks, amount}, index) => {
-            const createdAt = new Date(Date.now() + index + 1);
+            const createdAt = new Date(basicCreatedAt.getTime() + index + 1);
             if (stocks > 0) {
-              dbLog.insert({
+              logBulk.insert({
                 logType: '創立得股',
                 userId: [userId],
                 companyId: companyId,
@@ -109,50 +115,74 @@ export function checkFoundCompany() {
                 resolve: false,
                 createdAt: createdAt
               });
-              dbDirectors.insert({companyId, userId, stocks, createdAt});
+              needExecuteDirectorsBulk = true;
+              directorsBulk.insert({companyId, userId, stocks, createdAt});
             }
             if (amount > 0) {
-              dbLog.insert({
+              logBulk.insert({
                 logType: '創立退款',
                 userId: [userId],
                 message: foundationData.companyName,
                 amount: amount,
                 resolve: false,
-                createdAt: new Date(createdAt.getTime() + 1)
+                createdAt: createdAt
               });
-              Meteor.users.update(userId, {
+              needExecuteUserBulk = true;
+              usersBulk.find({_id: userId}).updateOne({
                 $inc: {
                   'profile.money': amount
                 }
               });
             }
           });
+          companiesBulk.execute = Meteor.wrapAsync(companiesBulk.execute);
+          companiesBulk.execute();
+          logBulk.execute = Meteor.wrapAsync(logBulk.execute);
+          logBulk.execute();
+          if (needExecuteDirectorsBulk) {
+            directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
+            directorsBulk.execute();
+          }
+          if (needExecuteUserBulk) {
+            usersBulk.execute = Meteor.wrapAsync(usersBulk.execute);
+            usersBulk.execute();
+          }
+          dbFoundations.remove(companyId);
         }
         else {
-          dbLog.insert({
+          const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+          const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+
+          const createdAt = new Date();
+          logBulk.insert({
             logType: '創立失敗',
             userId: _.union([foundationData.manager], _.pluck(invest, 'userId')),
             message: foundationData.companyName,
             resolve: false,
-            createdAt: new Date()
+            createdAt: createdAt
           });
-          dbFoundations.remove(companyId);
           _.each(foundationData.invest, ({userId, amount}, index) => {
-            const createdAt = new Date(Date.now() + index + 1);
-            dbLog.insert({
+            logBulk.insert({
               logType: '創立退款',
               userId: [userId],
               message: foundationData.companyName,
               amount: amount,
               resolve: false,
-              createdAt: createdAt
+              createdAt: new Date(createdAt.getTime() + index + 1)
             });
-            Meteor.users.update(userId, {
+            usersBulk.find({_id: userId}).updateOne({
               $inc: {
                 'profile.money': amount
               }
             });
           });
+          logBulk.execute = Meteor.wrapAsync(logBulk.execute);
+          logBulk.execute();
+          if (foundationData.invest.length > 0) {
+            usersBulk.execute = Meteor.wrapAsync(usersBulk.execute);
+            usersBulk.execute();
+          }
+          dbFoundations.remove(companyId);
         }
         release();
       });
