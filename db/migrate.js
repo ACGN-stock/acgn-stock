@@ -94,10 +94,15 @@ if (Meteor.isServer) {
         stocks: -1,
         createdAt: 1
       });
-      dbDirectors.rawCollection().createIndex({
-        companyId: 1,
-        userId: 1
-      });
+      dbDirectors.rawCollection().createIndex(
+        {
+          companyId: 1,
+          userId: 1
+        },
+        {
+          unique: true
+        }
+      );
       dbDirectors.rawCollection().createIndex({
         userId: 1
       });
