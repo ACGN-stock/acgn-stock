@@ -1,11 +1,11 @@
 'use strict';
 import { resourceManager } from './resourceManager';
-import { changeStocksAmount, resolveOrder, updateCompanyLastPrice } from './methods/order';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbOrders } from '../db/dbOrders';
 import { dbLog } from '../db/dbLog';
 import { dbVariables } from '../db/dbVariables';
 import { config } from '../config';
+import { createOrder } from './transaction';
 
 export function releaseStocksForHighPrice() {
   let releaseStocksForHighPriceCounter = dbVariables.get('releaseStocksForHighPriceCounter') || 0;
@@ -72,79 +72,13 @@ export function releaseStocksForHighPrice() {
           });
           const maxReleaseStocks = Math.floor(companyData.totalRelease * 0.05);
           const releaseStocks = 1 + Math.floor(Math.random() * Math.min(companyData.lastPrice - thresholdPrice, maxReleaseStocks) / 2);
-          dbLog.insert({
-            logType: '公司釋股',
+          createOrder({
+            userId: '!system',
             companyId: companyId,
-            amount: releaseStocks,
-            price: companyData.listPrice,
-            resolve: false,
-            createdAt: new Date()
+            orderType: '賣出',
+            unitPrice: companyData.listPrice,
+            amount: releaseStocks
           });
-          dbCompanies.update(companyId, {
-            $inc: {
-              totalRelease: releaseStocks
-            }
-          });
-          let alreadyRelease = 0;
-          let lastPrice = companyData.lastPrice;
-          let anyTradeDone = false;
-          dbOrders
-            .find(
-              {
-                companyId: companyId,
-                orderType: '購入',
-                unitPrice: {
-                  $gte: companyData.listPrice
-                }
-              },
-              {
-                sort: {
-                  unitPrice: -1,
-                  createdAt: 1
-                },
-                disableOplog: true
-              }
-            )
-            .forEach((buyOrderData) => {
-              if (alreadyRelease >= releaseStocks) {
-                return true;
-              }
-              const tradeNumber = Math.min(buyOrderData.amount - buyOrderData.done, releaseStocks - alreadyRelease);
-              if (tradeNumber > 0) {
-                anyTradeDone = true;
-                alreadyRelease += tradeNumber;
-                lastPrice = buyOrderData.unitPrice;
-                dbLog.insert({
-                  logType: '交易紀錄',
-                  userId: [buyOrderData.userId],
-                  companyId: companyId,
-                  price: lastPrice,
-                  amount: tradeNumber,
-                  createdAt: new Date()
-                });
-                changeStocksAmount(buyOrderData.userId, companyId, tradeNumber);
-                dbCompanies.update(companyId, {
-                  $inc: {
-                    profit: lastPrice * tradeNumber
-                  }
-                });
-              }
-              resolveOrder(buyOrderData, tradeNumber);
-            });
-          if (anyTradeDone) {
-            updateCompanyLastPrice(companyData, lastPrice);
-          }
-          if (alreadyRelease < releaseStocks) {
-            dbOrders.insert({
-              companyId: companyId,
-              userId: '!system',
-              orderType: '賣出',
-              unitPrice: companyData.listPrice,
-              amount: releaseStocks,
-              done: alreadyRelease,
-              createdAt: new Date()
-            });
-          }
           release();
         });
       });
@@ -285,64 +219,13 @@ export function releaseStocksForNoDeal() {
             const highPriceBuyAmount = highPriceBuyData ? highPriceBuyData.amount : 0;
             if (highPriceBuyAmount > 0) {
               const releaseStocks = 1 + Math.floor(Math.random() * highPriceBuyAmount / 2);
-              dbLog.insert({
-                logType: '公司釋股',
+              createOrder({
+                userId: '!system',
                 companyId: companyId,
-                amount: releaseStocks,
-                price: releasePrice,
-                resolve: false,
-                createdAt: new Date()
+                orderType: '賣出',
+                unitPrice: releasePrice,
+                amount: releaseStocks
               });
-              dbCompanies.update(companyId, {
-                $inc: {
-                  totalRelease: releaseStocks
-                }
-              });
-              let alreadyRelease = 0;
-              let anyTradeDone = false;
-              dbOrders
-                .find(
-                  {
-                    companyId: companyId,
-                    orderType: '購入',
-                    unitPrice: releasePrice
-                  },
-                  {
-                    sort: {
-                      unitPrice: -1,
-                      createdAt: 1
-                    },
-                    disableOplog: true
-                  }
-                )
-                .forEach((buyOrderData) => {
-                  if (alreadyRelease >= releaseStocks) {
-                    return true;
-                  }
-                  const tradeNumber = Math.min(buyOrderData.amount - buyOrderData.done, releaseStocks - alreadyRelease);
-                  if (tradeNumber > 0) {
-                    anyTradeDone = true;
-                    alreadyRelease += tradeNumber;
-                    dbLog.insert({
-                      logType: '交易紀錄',
-                      userId: [buyOrderData.userId],
-                      companyId: companyId,
-                      price: releasePrice,
-                      amount: tradeNumber,
-                      createdAt: new Date()
-                    });
-                    changeStocksAmount(buyOrderData.userId, companyId, tradeNumber);
-                    dbCompanies.update(companyId, {
-                      $inc: {
-                        profit: releasePrice * tradeNumber
-                      }
-                    });
-                  }
-                  resolveOrder(buyOrderData, tradeNumber);
-                });
-              if (anyTradeDone) {
-                updateCompanyLastPrice(companyData, releasePrice);
-              }
             }
             release();
           });
@@ -471,64 +354,13 @@ export function releaseStocksForLowPrice() {
             const minReleaseAmount = Math.floor(companyData.totalRelease * 0.01);
             if (highPriceBuyAmount > minReleaseAmount) {
               const releaseStocks = Math.min(highPriceBuyAmount, Math.floor(companyData.totalRelease * 0.05));
-              dbLog.insert({
-                logType: '公司釋股',
+              createOrder({
+                userId: '!system',
                 companyId: companyId,
-                amount: releaseStocks,
-                price: releasePrice,
-                resolve: false,
-                createdAt: new Date()
+                orderType: '賣出',
+                unitPrice: releasePrice,
+                amount: releaseStocks
               });
-              dbCompanies.update(companyId, {
-                $inc: {
-                  totalRelease: releaseStocks
-                }
-              });
-              let alreadyRelease = 0;
-              let anyTradeDone = false;
-              dbOrders
-                .find(
-                  {
-                    companyId: companyId,
-                    orderType: '購入',
-                    unitPrice: releasePrice
-                  },
-                  {
-                    sort: {
-                      unitPrice: -1,
-                      createdAt: 1
-                    },
-                    disableOplog: true
-                  }
-                )
-                .forEach((buyOrderData) => {
-                  if (alreadyRelease >= releaseStocks) {
-                    return true;
-                  }
-                  const tradeNumber = Math.min(buyOrderData.amount - buyOrderData.done, releaseStocks - alreadyRelease);
-                  if (tradeNumber > 0) {
-                    anyTradeDone = true;
-                    alreadyRelease += tradeNumber;
-                    dbLog.insert({
-                      logType: '交易紀錄',
-                      userId: [buyOrderData.userId],
-                      companyId: companyId,
-                      price: releasePrice,
-                      amount: tradeNumber,
-                      createdAt: new Date()
-                    });
-                    changeStocksAmount(buyOrderData.userId, companyId, tradeNumber);
-                    dbCompanies.update(companyId, {
-                      $inc: {
-                        profit: releasePrice * tradeNumber
-                      }
-                    });
-                  }
-                  resolveOrder(buyOrderData, tradeNumber);
-                });
-              if (anyTradeDone) {
-                updateCompanyLastPrice(companyData, releasePrice);
-              }
             }
             release();
           });
