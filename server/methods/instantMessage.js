@@ -4,9 +4,11 @@ import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import { dbLog } from '../../db/dbLog';
 import { limitMethod } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.methods({
   instantMessageChat(message) {
+    debug.log('instantMessageChat');
     check(this.userId, String);
     check(message, String);
     const user = Meteor.users.findOne(this.userId, {
@@ -26,6 +28,7 @@ Meteor.methods({
     });
   },
   queryInstantMessage(lastTime) {
+    debug.log('queryInstantMessage', lastTime);
     check(lastTime, Number);
     lastTime = Math.max(Date.now() - 60000, lastTime);
     const list = dbLog

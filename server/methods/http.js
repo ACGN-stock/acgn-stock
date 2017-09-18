@@ -6,9 +6,11 @@ import { WebApp } from 'meteor/webapp';
 import { HTTP } from 'meteor/http'
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbProducts } from '../../db/dbProducts';
+import { debug } from '../debug';
 
 //以Ajax方式發布公司名稱
 WebApp.connectHandlers.use(function(req, res, next) {
+  debug.log('connectHandlers companyName');
   const parsedUrl = url.parse(req.url);
   if (parsedUrl.pathname === '/companyName') {
     const query = querystring.parse(parsedUrl.query);
@@ -37,6 +39,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
 
 //以Ajax方式發布產品名稱、連結
 WebApp.connectHandlers.use(function(req, res, next) {
+  debug.log('connectHandlers productName');
   const parsedUrl = url.parse(req.url);
   if (parsedUrl.pathname === '/productName') {
     const query = querystring.parse(parsedUrl.query);
@@ -66,6 +69,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
 
 //以Ajax方式發布使用者名稱
 WebApp.connectHandlers.use(function(req, res, next) {
+  debug.log('connectHandlers userName');
   const parsedUrl = url.parse(req.url);
   if (parsedUrl.pathname === '/userName') {
     const query = querystring.parse(parsedUrl.query);

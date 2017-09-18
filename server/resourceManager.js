@@ -3,9 +3,11 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbResourceLock } from '../db/dbResourceLock';
 import { threadId } from './thread';
+import { debug } from './debug';
 
 export const resourceManager = {
   request(task, resourceList, callback) {
+    debug.log('request resource', {task, resourceList});
     // let requestTime = 0;
     const resourceLock = this.getResourceLock(resourceList);
     if (resourceLock) {

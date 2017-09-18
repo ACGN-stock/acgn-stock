@@ -2,8 +2,11 @@
 import { Meteor } from 'meteor/meteor';
 import { dbVariables } from '../../db/dbVariables';
 import { limitSubscription } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.publish('variables', function () {
+  debug.log('publish variables');
+
   return dbVariables.find(
     {
       _id: {

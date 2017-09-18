@@ -11,6 +11,7 @@ import { dbLog, accuseLogTypeList } from '../../db/dbLog';
 import { dbSeason } from '../../db/dbSeason';
 import { banTypeList } from '../../db/users';
 import { limitSubscription } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.methods({
   accuseUser(userId, message) {
@@ -23,6 +24,7 @@ Meteor.methods({
   }
 });
 function accuseUser(user, userId, message) {
+  debug.log('accuseUser', {user, userId, message});
   if (_.contains(user.profile.ban, 'accuse')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有舉報違規行為！');
   }
@@ -53,6 +55,7 @@ Meteor.methods({
   }
 });
 function accuseCompany(user, companyId, message) {
+  debug.log('accuseCompany', {user, companyId, message});
   if (_.contains(user.profile.ban, 'accuse')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有舉報違規行為！');
   }
@@ -79,6 +82,7 @@ Meteor.methods({
   }
 });
 function accuseProduct(user, productId, message) {
+  debug.log('accuseProduct', {user, productId, message});
   if (_.contains(user.profile.ban, 'accuse')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有舉報違規行為！');
   }
@@ -113,6 +117,7 @@ Meteor.methods({
   }
 });
 function banUser(user, {userId, message, banType}) {
+  debug.log('banUser', {user, userId, message, banType});
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
@@ -260,6 +265,7 @@ Meteor.methods({
   }
 });
 function forfeit(user, {userId, message, amount}) {
+  debug.log('forfeit', {user, userId, message, amount});
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
@@ -303,6 +309,7 @@ Meteor.methods({
   }
 });
 function sealCompany(user, {companyId, message}) {
+  debug.log('sealCompany', {user, companyId, message});
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
@@ -356,6 +363,7 @@ Meteor.methods({
   }
 });
 function takeDownProduct(user, {productId, message}) {
+  debug.log('takeDownProduct', {user, productId, message});
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
@@ -411,6 +419,7 @@ Meteor.methods({
   }
 });
 function takeDownAdvertising(user, advertisingId) {
+  debug.log('takeDownAdvertising', {user, advertisingId});
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
@@ -428,6 +437,7 @@ function takeDownAdvertising(user, advertisingId) {
 }
 
 Meteor.publish('accuseRecord', function(offset) {
+  debug.log('publish accuseRecord', offset);
   check(offset, Match.Integer);
 
   let initialized = false;

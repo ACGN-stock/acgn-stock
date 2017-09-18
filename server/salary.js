@@ -3,9 +3,11 @@ import { Meteor } from 'meteor/meteor';
 import { config } from '../config';
 import { dbLog } from '../db/dbLog';
 import { dbVariables } from '../db/dbVariables';
+import { debug } from './debug';
 
 const {salaryPerPay} = config;
 export function paySalary() {
+  debug.log('paySalary');
   const todayBeginTime = new Date().setHours(0, 0, 0, 0);
   const lastPayTime = dbVariables.get('lastPayTime');
   if (! lastPayTime || lastPayTime.setHours(0, 0, 0, 0) !== todayBeginTime) {

@@ -10,6 +10,7 @@ import { dbLog } from '../../db/dbLog';
 import { dbVariables } from '../../db/dbVariables';
 import { limitSubscription } from './rateLimit';
 import { createOrder } from '../transaction';
+import { debug } from '../debug';
 
 Meteor.methods({
   createBuyOrder(orderData) {
@@ -25,6 +26,7 @@ Meteor.methods({
   }
 });
 export function createBuyOrder(user, orderData) {
+  debug.log('createBuyOrder', {user, orderData});
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -140,6 +142,7 @@ Meteor.methods({
   }
 });
 export function createSellOrder(user, orderData) {
+  debug.log('createSellOrder', {user, orderData});
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -255,6 +258,7 @@ Meteor.methods({
   }
 });
 export function retrieveOrder(user, orderId) {
+  debug.log('retrieveOrder', {user, orderId});
   if (user.profile.money < 1) {
     throw new Meteor.Error(403, '無法支付手續費1元，撤回訂單失敗！');
   }
@@ -330,6 +334,7 @@ export function retrieveOrder(user, orderId) {
 }
 
 Meteor.publish('queryMyOrder', function() {
+  debug.log('publish queryMyOrder');
   const userId = this.userId;
   if (userId) {
     return dbOrders.find({userId});
@@ -341,6 +346,7 @@ Meteor.publish('queryMyOrder', function() {
 limitSubscription('queryMyOrder', 30);
 
 Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
+  debug.log('publish companyOrderExcludeMe', {companyId, type, offset});
   check(companyId, String);
   check(type, new Match.OneOf('購入', '賣出'));
   check(offset, Match.Integer);

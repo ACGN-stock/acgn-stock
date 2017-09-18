@@ -8,9 +8,11 @@ import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbPrice } from '../db/dbPrice';
 import { config } from '../config';
+import { debug } from './debug';
 
 const {foundExpireTime, foundationNeedUsers, minReleaseStock} = config;
 export function checkFoundCompany() {
+  debug.log('checkFoundCompany');
   const foundExpireDate = new Date(Date.now() - foundExpireTime);
   dbFoundations
     .find(

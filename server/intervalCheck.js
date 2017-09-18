@@ -19,6 +19,7 @@ import { setLowPriceThreshold } from './lowPriceThreshold';
 import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice } from './company';
 import { generateRankData } from './seasonRank';
 import { threadId, shouldReplaceThread } from './thread';
+import { debug } from './debug';
 import { config } from '../config';
 
 Meteor.startup(function() {
@@ -66,6 +67,7 @@ function intervalCheck() {
 
 //週期檢查工作內容
 function doIntervalWork() {
+  debug.log('doIntervalWork');
   const now = Date.now();
   const lastSeasonData = dbSeason.findOne({}, {
     sort: {
@@ -122,10 +124,13 @@ function doIntervalWork() {
       console.log(JSON.stringify(lockData) + ' locked time over 5 min...automatic release!');
       dbResourceLock.remove(lockData._id);
     });
+  //移除所有debug紀錄
+  debug.clean();
 }
 
 //商業季度結束檢查
 function doSeasonWorks(lastSeasonData) {
+  debug.log('doSeasonWorks', lastSeasonData);
   console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
     //當商業季度結束時，取消所有尚未交易完畢的訂單
@@ -166,6 +171,7 @@ function doSeasonWorks(lastSeasonData) {
 
 //取消所有尚未交易完畢的訂單
 function cancelAllOrder() {
+  debug.log('cancelAllOrder');
   dbOrders.find().forEach((orderData) => {
     const orderType = orderData.orderType;
     const userId = orderData.userId;
@@ -199,6 +205,7 @@ function cancelAllOrder() {
 
 //產生新的商業季度
 function generateNewSeason() {
+  debug.log('generateNewSeason');
   const beginDate = new Date();
   const endDate = new Date(beginDate.getTime() + config.seasonTime);
   const electTime = endDate.getTime() - 86400000;
@@ -251,6 +258,7 @@ function generateNewSeason() {
 
 //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
 function giveBonusByStocksFromProfit() {
+  debug.log('giveBonusByStocksFromProfit');
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   let needExecuteLogBulk = false;
   const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
@@ -360,6 +368,7 @@ function giveBonusByStocksFromProfit() {
 
 //選舉新的經理人
 function electManager(seasonData) {
+  debug.log('electManager');
   const electMessage = (
     convertDateToText(seasonData.beginDate) +
     '～' +

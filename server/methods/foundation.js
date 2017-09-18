@@ -9,6 +9,7 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { checkImageUrl } from './checkImageUrl';
 import { config } from '../../config';
 import { limitMethod, limitSubscription } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.methods({
   foundCompany(foundCompanyData) {
@@ -26,6 +27,7 @@ Meteor.methods({
   }
 });
 export function foundCompany(user, foundCompanyData) {
+  debug.log('foundCompany', {user, foundCompanyData});
   if (_.contains(user.profile.ban, 'manager')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了擔任經理人的資格！');
   }
@@ -69,6 +71,7 @@ Meteor.methods({
   }
 });
 export function editFoundCompany(user, foundCompanyData) {
+  debug.log('foundCompany', {user, foundCompanyData});
   const companyId = foundCompanyData._id;
   const oldFoundCompanyData = dbFoundations.findOne(companyId, {
     fields: {
@@ -127,6 +130,7 @@ Meteor.methods({
   }
 });
 export function investFoundCompany(user, companyId, amount) {
+  debug.log('foundCompany', {user, companyId, amount});
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -206,6 +210,7 @@ export function investFoundCompany(user, companyId, amount) {
 }
 
 Meteor.publish('foundationPlan', function(keyword, offset) {
+  debug.log('publish foundationPlan', {keyword, offset});
   check(keyword, String);
   check(offset, Match.Integer);
   const filter = {};
@@ -270,6 +275,7 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
 limitSubscription('foundationPlan');
 
 Meteor.publish('foundationDataForEdit', function(foundationId) {
+  debug.log('publish foundationDataForEdit', {foundationId});
   check(foundationId, String);
 
   return dbFoundations.find(foundationId);

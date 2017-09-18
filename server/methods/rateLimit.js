@@ -1,6 +1,7 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
+import { debug } from '../debug';
 
 //廣域限制: 一分鐘最多執行60個method
 DDPRateLimiter.addRule(
@@ -47,6 +48,7 @@ export function limitGlobalMethod(name, number = 1, interval = 60000) {
 //同一ip最多兩個connection
 const connectionIpHash = {};
 Meteor.onConnection(function(connection) {
+  debug.log('onConnection', connection.clientAddress);
   const ip = connection.clientAddress;
   if (connectionIpHash[ip] >= 2) {
     connection.close();

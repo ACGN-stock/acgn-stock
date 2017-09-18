@@ -6,8 +6,10 @@ import { dbDirectors } from '../db/dbDirectors';
 import { dbLog } from '../db/dbLog';
 import { dbOrders } from '../db/dbOrders';
 import { dbPrice } from '../db/dbPrice';
+import { debug } from './debug';
 
 export function createOrder(orderData) {
+  debug.log('createOrder', orderData);
   orderData.done = 0;
   orderData.createdAt = new Date();
 
@@ -131,6 +133,7 @@ export function createOrder(orderData) {
 }
 
 function generateTradeTools(orderData) {
+  debug.log('generateTradeTools', orderData);
   const result = {
     companiesBulk: dbCompanies.rawCollection().initializeUnorderedBulkOp(),
     directorsBulk: dbDirectors.rawCollection().initializeUnorderedBulkOp(),
@@ -148,6 +151,7 @@ function generateTradeTools(orderData) {
 }
 
 function generateInstantTradeList(orderData) {
+  debug.log('generateInstantTradeList', orderData);
   const tradeList = [];
   if (orderData.orderType === '購入') {
     dbOrders
@@ -233,6 +237,7 @@ function generateInstantTradeList(orderData) {
 }
 
 function resolveInstantTradeList(companyId, tradeList, tradeTools) {
+  debug.log('resolveInstantTradeList', {companyId, tradeList});
   const basicCreatedAtTime = tradeTools.createdAt.getTime();
 
   //紀錄整個交易過程裡股份有增加的userId及增加量
@@ -348,6 +353,7 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
 }
 
 function decreaseUserMoneyByTradeList(userId, tradeList, tradeTools) {
+  debug.log('decreaseUserMoneyByTradeList', {userId, tradeList});
   const totalCost = _.reduce(tradeList, (totalCost, tradeData) => {
     return totalCost + (tradeData.amount * tradeData.price);
   }, 0);
@@ -363,6 +369,7 @@ function decreaseUserMoneyByTradeList(userId, tradeList, tradeTools) {
 }
 
 function decreaseUserStocks(orderData, tradeTools) {
+  debug.log('decreaseUserStocks', orderData);
   const {companyId, userId, amount} = orderData;
   const existDirectorData = dbDirectors.findOne({companyId, userId}, {
     fields: {

@@ -14,9 +14,11 @@ import { dbLog } from '../../db/dbLog';
 import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
 import { limitMethod, limitSubscription, limitGlobalMethod } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.methods({
   loginOrRegister(username, password, reset = false) {
+    debug.log('loginOrRegister', {username, password, reset});
     check(username, String);
     check(password, String);
 
@@ -65,6 +67,7 @@ Meteor.methods({
 });
 limitGlobalMethod('validateAccount');
 function validateUsers(checkUsername) {
+  debug.log('validateUsers', checkUsername);
   let checkResult = false;
   const validatingUserList = dbValidatingUsers.find({}, {disableOplog: true}).fetch();
   if (validatingUserList.length > 0) {
@@ -108,6 +111,7 @@ function validateUsers(checkUsername) {
 }
 
 Accounts.onCreateUser((options, user) => {
+  debug.log('onCreateUser', options);
   user.profile = _.defaults({}, options.profile, {
     money: config.beginMoney,
     vote: 0,
@@ -131,6 +135,7 @@ Accounts.onCreateUser((options, user) => {
 });
 
 Meteor.publish('accountInfo', function(userId) {
+  debug.log('publish accountInfo', userId);
   check(userId, String);
 
   return [
@@ -163,6 +168,7 @@ Meteor.publish('accountInfo', function(userId) {
 limitSubscription('accountInfo');
 
 Meteor.publish('accountOwnStocks', function(userId, offset) {
+  debug.log('publish accountOwnStocks', {userId, offset});
   check(userId, String);
   check(offset, Match.Integer);
 
@@ -216,6 +222,7 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
 limitSubscription('accountOwnStocks');
 
 Meteor.publish('accountInfoLog', function(userId, offset) {
+  debug.log('publish accountInfoLog', {userId, offset});
   check(userId, String);
   check(offset, Match.Integer);
 
@@ -292,6 +299,7 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
 limitSubscription('accountInfoLog');
 
 Meteor.publish('validateUser', function(username) {
+  debug.log('publish validateUser', username);
   check(username, String);
 
   dbValidatingUsers
@@ -314,6 +322,7 @@ Meteor.publish('validateUser', function(username) {
 limitSubscription('validateUser');
 
 Meteor.publish('onlinePeopleNumber', function() {
+  debug.log('publish onlinePeopleNumber');
   const onlinePeopleNumber = UserStatus.connections
     .find()
     .count();
@@ -332,6 +341,7 @@ Meteor.publish('onlinePeopleNumber', function() {
 //一分鐘最多重複訂閱5次
 limitSubscription('onlinePeopleNumber', 5);
 function countAndPublishOnlinePeopleNumber(publisher) {
+  debug.log('countAndPublishOnlinePeopleNumber');
   const onlinePeopleNumber = UserStatus.connections
     .find()
     .count();

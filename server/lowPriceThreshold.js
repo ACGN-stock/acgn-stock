@@ -1,9 +1,11 @@
 'use strict';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbVariables } from '../db/dbVariables';
+import { debug } from './debug';
 
 //計算所謂「低價股」的價格門檻
 export function setLowPriceThreshold() {
+  debug.log('setLowPriceThreshold');
   const companiesNumber = dbCompanies
     .find({
       isSeal: false

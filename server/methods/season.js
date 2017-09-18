@@ -8,8 +8,11 @@ import { dbRankUserWealth } from '../../db/dbRankUserWealth';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbSeason } from '../../db/dbSeason';
 import { limitSubscription } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.publish('isChangingSeason', function() {
+  debug.log('publish isChangingSeason');
+
   return dbResourceLock.find(
     {
       _id: 'season'
@@ -25,6 +28,7 @@ Meteor.publish('isChangingSeason', function() {
 limitSubscription('isChangingSeason', 5);
 
 Meteor.publish('currentSeason', function() {
+  debug.log('publish currentSeason');
   const observer1 = dbSeason
     .find({}, {
       sort: {
@@ -70,6 +74,7 @@ Meteor.publish('currentSeason', function() {
 limitSubscription('currentSeason', 5);
 
 Meteor.publish('adjacentSeason', function(seasonId) {
+  debug.log('publish adjacentSeason', seasonId);
   check(seasonId, String);
 
   const specificSeasonData = dbSeason.findOne(seasonId);
@@ -133,6 +138,8 @@ Meteor.publish('adjacentSeason', function(seasonId) {
 limitSubscription('adjacentSeason');
 
 Meteor.publish('rankListBySeasonId', function(seasonId) {
+  debug.log('publish rankListBySeasonId', seasonId);
+
   return [
     dbRankCompanyPrice.find({seasonId}),
     dbRankCompanyProfit.find({seasonId}),

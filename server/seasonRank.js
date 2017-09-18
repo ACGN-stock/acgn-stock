@@ -7,9 +7,11 @@ import { dbRankCompanyPrice } from '../db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '../db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../db/dbRankUserWealth';
+import { debug } from './debug';
 
 //為所有公司與使用者進行排名結算
 export function generateRankData(seasonData) {
+  debug.log('generateRankData', seasonData);
   console.log('begining generate rank data...');
   console.log('begining rank company price...');
   const rankCompanyPriceList = dbLog.aggregate([

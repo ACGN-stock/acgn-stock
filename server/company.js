@@ -6,8 +6,10 @@ import { dbLog } from '../db/dbLog';
 import { dbVariables } from '../db/dbVariables';
 import { config } from '../config';
 import { createOrder } from './transaction';
+import { debug } from './debug';
 
 export function releaseStocksForHighPrice() {
+  debug.log('releaseStocksForHighPrice');
   let releaseStocksForHighPriceCounter = dbVariables.get('releaseStocksForHighPriceCounter') || 0;
   releaseStocksForHighPriceCounter -= 1;
   if (releaseStocksForHighPriceCounter <= 0) {
@@ -95,6 +97,7 @@ function generateReleaseStocksForHighPriceConter() {
 }
 
 export function releaseStocksForNoDeal() {
+  debug.log('releaseStocksForNoDeal');
   let releaseStocksForNoDealCounter = dbVariables.get('releaseStocksForNoDealCounter') || 0;
   releaseStocksForNoDealCounter -= 1;
   if (releaseStocksForNoDealCounter <= 0) {
@@ -244,6 +247,7 @@ function generateReleaseStocksForNoDealConter() {
 }
 
 export function releaseStocksForLowPrice() {
+  debug.log('releaseStocksForLowPrice');
   let releaseStocksForLowPriceCounter = dbVariables.get('releaseStocksForLowPriceCounter') || 0;
   releaseStocksForLowPriceCounter -= 1;
   if (releaseStocksForLowPriceCounter <= 0) {
@@ -373,6 +377,7 @@ export function releaseStocksForLowPrice() {
 }
 
 export function recordListPrice() {
+  debug.log('recordListPrice');
   let recordListPriceConter = dbVariables.get('recordListPriceConter') || 0;
   recordListPriceConter -= 1;
   if (recordListPriceConter <= 0) {

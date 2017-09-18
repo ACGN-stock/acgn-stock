@@ -10,6 +10,7 @@ import { dbSeason } from '../../db/dbSeason';
 import { dbLog } from '../../db/dbLog';
 import { dbVoteRecord } from '../../db/dbVoteRecord';
 import { limitSubscription } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.methods({
   createProduct(productData) {
@@ -26,6 +27,7 @@ Meteor.methods({
   }
 });
 export function createProduct(user, productData) {
+  debug.log('createProduct', {user, productData});
   const companyId = productData.companyId;
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
@@ -68,6 +70,7 @@ Meteor.methods({
   }
 });
 export function retrieveProduct(user, productId) {
+  debug.log('retrieveProduct', {user, productId});
   const productData = dbProducts.findOne(productId);
   if (! productData) {
     throw new Meteor.Error(404, '不存在的產品！');
@@ -103,6 +106,7 @@ Meteor.methods({
   }
 });
 export function voteProduct(user, productId) {
+  debug.log('voteProduct', {user, productId});
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -201,6 +205,7 @@ Meteor.methods({
   }
 });
 export function likeProduct(user, productId) {
+  debug.log('likeProduct', {user, productId});
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -242,6 +247,7 @@ export function likeProduct(user, productId) {
 }
 
 Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, offset}) {
+  debug.log('publish productListBySeasonId', {seasonId, sortBy, sortDir, offset});
   check(seasonId, String);
   check(sortBy, new Match.OneOf('votes', 'type', 'companyName'));
   check(sortDir, new Match.OneOf(1, -1));
@@ -314,6 +320,7 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
 limitSubscription('allAdvertising', 10);
 
 Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, offset}) {
+  debug.log('publish productListByCompany', {companyId, sortBy, sortDir, offset});
   check(companyId, String);
   check(sortBy, new Match.OneOf('likeCount', 'votes', 'type'));
   check(sortDir, new Match.OneOf(1, -1));
@@ -386,6 +393,7 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
 limitSubscription('productListByCompany');
 
 Meteor.publish('queryMyLikeProduct', function(companyId) {
+  debug.log('publish queryMyLikeProduct', companyId);
   check(companyId, String);
   const userId = this.userId;
 
@@ -408,6 +416,7 @@ Meteor.publish('queryMyLikeProduct', function(companyId) {
 limitSubscription('queryMyLikeProduct');
 
 Meteor.publish('companyCurrentProduct', function(companyId) {
+  debug.log('publish companyCurrentProduct', companyId);
   check(companyId, String);
   const overdue = 1;
   const disableOplog = true;

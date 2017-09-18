@@ -11,6 +11,7 @@ import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
 import { checkImageUrl } from './checkImageUrl';
 import { limitMethod, limitSubscription } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.methods({
   editCompany(companyId, newCompanyData) {
@@ -28,6 +29,7 @@ Meteor.methods({
   }
 });
 function editCompany(user, companyId, newCompanyData) {
+  debug.log('editCompany', {user, companyId, newCompanyData});
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,
@@ -76,6 +78,7 @@ Meteor.methods({
   }
 });
 function changeCompanyName(user, companyId, companyName) {
+  debug.log('changeCompanyName', {user, companyId, companyName});
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
@@ -97,6 +100,7 @@ Meteor.methods({
   }
 });
 export function resignManager(user, companyId) {
+  debug.log('resignManager', {user, companyId});
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,
@@ -161,6 +165,7 @@ Meteor.methods({
   }
 });
 export function contendManager(user, companyId) {
+  debug.log('contendManager', {user, companyId});
   if (_.contains(user.profile.ban, 'manager')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了擔任經理人的資格！');
   }
@@ -234,6 +239,7 @@ Meteor.methods({
   }
 });
 export function supportCandidate(user, companyId, supportUserId) {
+  debug.log('supportCandidate', {user, companyId, supportUserId});
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -330,6 +336,7 @@ Meteor.methods({
   }
 });
 function changeChairmanTitle(user, companyId, chairmanTitle) {
+  debug.log('changeChairmanTitle', {user, companyId, chairmanTitle});
   const userId = user._id;
   const chairmanData = dbDirectors.findOne({companyId}, {
     sort: {
@@ -362,6 +369,7 @@ Meteor.methods({
   }
 });
 function directorMessage(user, companyId, message) {
+  debug.log('directorMessage', {user, companyId, message});
   const userId = user._id;
   const directorData = dbDirectors.findOne({companyId, userId}, {
     fields: {
@@ -387,6 +395,7 @@ Meteor.methods({
   }
 });
 function queryTodayDealAmount(companyId, lastTime) {
+  debug.log('queryTodayDealAmount', {companyId, lastTime});
   lastTime = Math.max(lastTime, new Date().setHours(0, 0, 0, 0) - 1);
   let data = 0;
   dbLog
@@ -426,6 +435,7 @@ Meteor.methods({
   }
 })
 function queryStocksCandlestick(companyId, options) {
+  debug.log('queryStocksCandlestick', {companyId, options});
   const list = dbPrice
     .find(
       {
@@ -479,6 +489,8 @@ Meteor.methods({
   }
 })
 function queryStocksPrice(companyId) {
+  debug.log('queryStocksPrice', companyId);
+
   return dbPrice
     .find(
       {
@@ -505,6 +517,7 @@ function queryStocksPrice(companyId) {
 limitMethod('queryStocksPrice');
 
 Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
+  debug.log('publish stockSummary', {keyword, isOnlyShowMine, sortBy, offset});
   check(keyword, String);
   check(isOnlyShowMine, Boolean);
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
@@ -613,6 +626,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
 limitSubscription('stockSummary');
 
 Meteor.publish('queryChairmanAsVariable', function(companyId) {
+  debug.log('publish stoqueryChairmanAsVariableckSummary', companyId);
   check(companyId, String);
 
   const variableId = 'chairmanIdOf' + companyId;
@@ -647,6 +661,7 @@ Meteor.publish('queryChairmanAsVariable', function(companyId) {
 limitSubscription('queryChairmanAsVariable', 90, 10000);
 
 Meteor.publish('queryOwnStocks', function() {
+  debug.log('publish queryOwnStocks');
   const userId = this.userId;
   if (userId) {
     return dbDirectors.find({userId});
@@ -658,6 +673,7 @@ Meteor.publish('queryOwnStocks', function() {
 limitSubscription('queryOwnStocks');
 
 Meteor.publish('companyDetail', function(companyId) {
+  debug.log('publish companyDetail', companyId);
   check(companyId, String);
 
   const observer = dbCompanies
@@ -685,6 +701,7 @@ Meteor.publish('companyDetail', function(companyId) {
 //一分鐘最多20次
 limitSubscription('companyDetail');
 function addSupportStocksListField(companyId, fields = {}) {
+  debug.log('addSupportStocksListField', companyId, fields);
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       voteList: 1
@@ -711,6 +728,7 @@ function addSupportStocksListField(companyId, fields = {}) {
 }
 
 Meteor.publish('companyDataForEdit', function(companyId) {
+  debug.log('publish companyDataForEdit', companyId);
   const overdue = 0;
 
   return [
@@ -722,6 +740,7 @@ Meteor.publish('companyDataForEdit', function(companyId) {
 limitSubscription('companyDataForEdit', 10);
 
 Meteor.publish('companyDirector', function(companyId, offset) {
+  debug.log('publish companyDirector', {companyId, offset});
   check(companyId, String);
   check(offset, Match.Integer);
 
@@ -773,6 +792,7 @@ Meteor.publish('companyDirector', function(companyId, offset) {
 limitSubscription('companyDirector');
 
 Meteor.publish('companyLog', function(companyId, offset) {
+  debug.log('publish companyLog', {companyId, offset});
   check(companyId, String);
   check(offset, Match.Integer);
 

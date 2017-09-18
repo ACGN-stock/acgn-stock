@@ -7,6 +7,7 @@ import { dbAdvertising } from '../../db/dbAdvertising';
 import { dbLog } from '../../db/dbLog';
 import { config } from '../../config';
 import { limitSubscription } from './rateLimit';
+import { debug } from '../debug';
 
 Meteor.methods({
   buyAdvertising(advertisingData) {
@@ -22,6 +23,7 @@ Meteor.methods({
   }
 });
 function buyAdvertising(user, advertisingData) {
+  debug.log('buyAdvertising', {user, advertisingData});
   if (_.contains(user.profile.ban, 'advertise')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有廣告宣傳行為！');
   }
@@ -85,6 +87,7 @@ Meteor.methods({
   }
 });
 function addAdvertisingPay(user, advertisingId, addPay) {
+  debug.log('addAdvertisingPay', {user, advertisingId, addPay});
   if (_.contains(user.profile.ban, 'advertise')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有廣告宣傳行為！');
   }
@@ -137,6 +140,8 @@ function addAdvertisingPay(user, advertisingId, addPay) {
 }
 
 Meteor.publish('allAdvertising', function() {
+  debug.log('publish allAdvertising');
+
   return dbAdvertising.find({}, {
     disableOplog: true
   });
@@ -145,6 +150,8 @@ Meteor.publish('allAdvertising', function() {
 limitSubscription('allAdvertising', 10);
 
 Meteor.publish('displayAdvertising', function() {
+  debug.log('publish displayAdvertising');
+
   return dbAdvertising.find({}, {
     sort: {
       paid: -1
