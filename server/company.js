@@ -434,7 +434,6 @@ function generateRecordListPriceConter() {
 
 let checkChairmanCounter = config.checkChairmanCounter;
 export function checkChairman() {
-  console.log('check chairman...');
   debug.log('checkChairman');
   checkChairmanCounter -= 1;
   if (checkChairmanCounter <= 0) {
