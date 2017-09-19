@@ -9,6 +9,7 @@ export const config = {
   releaseStocksForLowPriceCounter: 720, //公司檢查是否要因低股價而釋出股票的工作檢查次數
   recordListPriceMinCounter: 180, //為所有公司紀錄參考價格的最小隨機工作檢查次數
   recordListPriceMaxCounter: 360, //為所有公司紀錄參考價格的最大隨機工作檢查次數
+  checkChairmanCounter: 10, //每隔多少次工作檢查，就重新檢查、設定一次各公司的董事長
   foundExpireTime: 43200000, //創立公司的投資時間期限，單位為微秒
   maximumInvest: 4096, //每個人對單一新創計劃的最大投資上限
   foundationNeedUsers: 10, //創立公司所需要的投資人數量

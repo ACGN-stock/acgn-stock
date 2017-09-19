@@ -24,6 +24,10 @@ const schema = new SimpleSchema({
     max: 20,
     defaultValue: '董事長'
   },
+  //董事長userId
+  chairman: {
+    type: String
+  },
   //相關搜索用Tag
   tags: {
     type: Array,

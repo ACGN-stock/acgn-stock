@@ -1,6 +1,7 @@
 'use strict';
 import { resourceManager } from './resourceManager';
 import { dbCompanies } from '../db/dbCompanies';
+import { dbDirectors } from '../db/dbDirectors';
 import { dbOrders } from '../db/dbOrders';
 import { dbLog } from '../db/dbLog';
 import { dbVariables } from '../db/dbVariables';
@@ -429,4 +430,55 @@ function generateRecordListPriceConter() {
   const max = (config.recordListPriceMaxCounter - min);
 
   return min + Math.floor(Math.random() * max);
+}
+
+let checkChairmanCounter = config.checkChairmanCounter;
+export function checkChairman() {
+  console.log('check chairman...');
+  debug.log('checkChairman');
+  checkChairmanCounter -= 1;
+  if (checkChairmanCounter <= 0) {
+    const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
+    let needExecuteBulk = false;
+    checkChairmanCounter = config.checkChairmanCounter;
+    dbCompanies
+      .find(
+        {
+          isSeal: false
+        },
+        {
+          fields: {
+            _id: 1,
+            chairman: 1
+          }
+        }
+      )
+      .forEach((companyData) => {
+        const companyId = companyData._id;
+        const chairmanData = dbDirectors.findOne({companyId}, {
+          sort: {
+            stocks: -1,
+            createdAt: 1
+          },
+          fields: {
+            userId: 1
+          }
+        });
+        if (chairmanData.userId !== companyData.chairman) {
+          needExecuteBulk = true;
+          companiesBulk
+            .find({
+              _id: companyId
+            })
+            .updateOne({
+              $set: {
+                chairman: chairmanData.userId
+              }
+            });
+        }
+      });
+    if (needExecuteBulk) {
+      companiesBulk.execute();
+    }
+  }
 }

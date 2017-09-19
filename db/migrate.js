@@ -144,36 +144,6 @@ if (Meteor.isServer) {
         userId: 1,
         createdAt: -1
       });
-      dbLog.rawCollection().createIndex(
-        {
-          createdAt: -1
-        },
-        {
-          partialFilterExpression: {
-            logType: {
-              $in: [
-                '舉報違規',
-                '禁止舉報',
-                '禁止下單',
-                '禁止聊天',
-                '禁止廣告',
-                '禁任經理',
-                '課以罰款',
-                '解除舉報',
-                '解除下單',
-                '解除聊天',
-                '解除廣告',
-                '解除禁任',
-                '退還罰款',
-                '撤職紀錄',
-                '查封關停',
-                '解除查封',
-                '產品下架'
-              ]
-            }
-          }
-        }
-      );
       dbOrders.rawCollection().createIndex({
         companyId: 1,
         userId: 1
@@ -281,69 +251,37 @@ if (Meteor.isServer) {
 
   Migrations.add({
     version: 2,
-    name: 're index accuse log.',
+    name: 'add chairman/chairmanStocks into companies.',
     up() {
-      dbLog.rawCollection().dropIndex(
-        {
-          createdAt: -1
-        },
-        {
-          partialFilterExpression: {
-            logType: {
-              $in: [
-                '舉報違規',
-                '禁止舉報',
-                '禁止下單',
-                '禁止聊天',
-                '禁止廣告',
-                '禁任經理',
-                '課以罰款',
-                '解除舉報',
-                '解除下單',
-                '解除聊天',
-                '解除廣告',
-                '解除禁任',
-                '退還罰款',
-                '撤職紀錄',
-                '查封關停',
-                '解除查封',
-                '產品下架'
-              ]
+      dbCompanies
+        .find(
+          {},
+          {
+            fields: {
+              _id: 1
             }
           }
-        }
-      );
-      dbLog.rawCollection().createIndex(
-        {
-          createdAt: -1
-        },
-        {
-          partialFilterExpression: {
-            logType: {
-              $in: [
-                '舉報違規',
-                '禁止舉報',
-                '禁止下單',
-                '禁止聊天',
-                '禁止廣告',
-                '禁任經理',
-                '課以罰款',
-                '解除舉報',
-                '解除下單',
-                '解除聊天',
-                '解除廣告',
-                '解除禁任',
-                '退還罰款',
-                '撤職紀錄',
-                '查封關停',
-                '解除查封',
-                '產品下架',
-                '撤銷廣告'
-              ]
+        ).forEach((companyData) => {
+          const chairmanData = dbDirectors.findOne(
+            {
+              companyId: companyData._id
+            },
+            {
+              sort: {
+                stocks: -1,
+                createdAt: 1
+              },
+              fields: {
+                userId: 1
+              }
             }
-          }
-        }
-      );
+          );
+          dbCompanies.update(companyData._id, {
+            $set: {
+              chairman: chairmanData.userId
+            }
+          });
+        });
     }
   });
 

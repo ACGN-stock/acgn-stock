@@ -26,9 +26,7 @@
           <hr />
           <h2 class="card-subtitle mb-2 text-muted">
             {{this.chairmanTitle}}：
-            {{#with getChairmanId this._id}}
-              {{>userLink}}
-            {{/with}}
+            {{>userLink this.chairman}}
             {{#if isChairman this._id}}
               <a class="btn btn-primary btn-sm" href="#" data-action="changeChairmanTitle">
                 修改頭銜

@@ -16,7 +16,7 @@ import { changeStocksAmount } from './methods/order';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
 import { setLowPriceThreshold } from './lowPriceThreshold';
-import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice } from './company';
+import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
 import { generateRankData } from './seasonRank';
 import { threadId, shouldReplaceThread } from './thread';
 import { debug } from './debug';
@@ -99,6 +99,8 @@ function doIntervalWork() {
     releaseStocksForLowPrice();
     //隨機時間紀錄公司的參考價格
     recordListPrice();
+    //檢查並更新各公司的董事長位置
+    checkChairman();
   }
   //移除所有一分鐘以前的聊天發言紀錄
   dbLog.remove({

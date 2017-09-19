@@ -84,9 +84,7 @@
                 <small>{{this.chairmanTitle}}</small>
               </div>
               <div class="d-flex flex-row-reverse">
-                {{#with getChairmanId this._id}}
-                  <h4>{{>userLink}}</h4>
-                {{/with}}
+                <h4>{{>userLink this.chairman}}</h4>
               </div>
               <div class="d-flex flex-row-reverse" style="margin-top: 0.5rem;">
                 <small>經理人</small>
@@ -185,9 +183,7 @@
         {{/if}}
       </div>
       <div class="col-8 col-lg-3 text-truncate border-grid">
-        {{#with getChairmanId this._id}}
-          {{>userLink}}
-        {{/with}}
+        {{>userLink this.chairman}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">總市值：</div>
       <div class="col-8 col-lg-3 text-right border-grid" title="{{this.totalValue}}">

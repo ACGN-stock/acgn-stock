@@ -574,6 +574,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
     companyName: 1,
     manager: 1,
     chairmanTitle: 1,
+    chairman: 1,
     pictureSmall: 1,
     totalRelease: 1,
     lastPrice: 1,
@@ -624,41 +625,6 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
 });
 //一分鐘最多20次
 limitSubscription('stockSummary');
-
-Meteor.publish('queryChairmanAsVariable', function(companyId) {
-  debug.log('publish stoqueryChairmanAsVariableckSummary', companyId);
-  check(companyId, String);
-
-  const variableId = 'chairmanIdOf' + companyId;
-  this.added('variables', variableId, {
-    value: '!none'
-  });
-  const observer = dbDirectors
-    .find({companyId}, {
-      sort: {
-        stocks: -1,
-        createdAt: 1
-      },
-      fields: {
-        userId: 1
-      },
-      limit: 1,
-      disableOplog: true
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.changed('variables', variableId, {
-          value: fields.userId
-        });
-      }
-    });
-  this.ready();
-  this.onStop(() => {
-    observer.stop();
-  });
-});
-//十秒鐘最多90次
-limitSubscription('queryChairmanAsVariable', 90, 10000);
 
 Meteor.publish('queryOwnStocks', function() {
   debug.log('publish queryOwnStocks');

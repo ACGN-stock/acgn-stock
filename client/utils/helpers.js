@@ -1,6 +1,7 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
+import { dbCompanies } from '../../db/dbCompanies';
 import { dbVariables } from '../../db/dbVariables';
 
 Meteor.subscribe('variables');
@@ -38,15 +39,12 @@ function padZero(n) {
 }
 Template.registerHelper('formatDateText', formatDateText);
 
-export function getChairmanId(companyId) {
-  return dbVariables.get('chairmanIdOf' + companyId);
-}
-Template.registerHelper('getChairmanId', getChairmanId);
-
 export function isChairman(companyId) {
   const user = Meteor.user();
   if (user) {
-    return user._id === dbVariables.get('chairmanIdOf' + companyId);
+    const companyData = dbCompanies.findOne(companyId);
+
+    return user._id === companyData.chairman;
   }
   else {
     return false;

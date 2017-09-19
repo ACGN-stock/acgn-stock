@@ -38,20 +38,6 @@ Template.stockSummary.onCreated(function() {
       this.subscribe('queryMyOrder');
     }
   });
-  this.observer = dbCompanies
-    .find({}, {
-      fields: {
-        _id: 1
-      }
-    })
-    .observeChanges({
-      added: (id) => {
-        this.subscribe('queryChairmanAsVariable', id);
-      }
-    });
-});
-Template.stockSummary.onDestroyed(function() {
-  this.observer.stop();
 });
 Template.stockSummary.helpers({
   viewModeIsCard() {

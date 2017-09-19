@@ -44,7 +44,6 @@ Template.company.onCreated(function() {
     if (companyId) {
       this.subscribe('companyDetail', companyId);
       this.subscribe('companyCurrentProduct', companyId);
-      this.subscribe('queryChairmanAsVariable', companyId);
       this.subscribe('productListByCompany', {
         companyId: companyId,
         sortBy: 'likeCount',
