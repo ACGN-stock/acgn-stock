@@ -378,7 +378,7 @@ function drawCandleStickChart(templateInstance) {
   const toTime = Math.floor(Date.now() / unitTime) * unitTime;
 
   const companyId = FlowRouter.getParam('companyId');
-  Meteor.nativeCall('queryStocksCandlestick', companyId, { lastTime: toTime, unitTime: unitTime, count: count }, (error, result) => {
+  Meteor.call('queryStocksCandlestick', companyId, { lastTime: toTime, unitTime: unitTime, count: count }, (error, result) => {
     if (error) {
       return false;
     }
