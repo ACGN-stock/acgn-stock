@@ -412,8 +412,8 @@ Meteor.publish('queryMyLikeProduct', function(companyId) {
     return [];
   }
 });
-//一分鐘最多20次
-limitSubscription('queryMyLikeProduct');
+//十秒中最多30次(產品中心)
+limitSubscription('queryMyLikeProduct', 30, 10000);
 
 Meteor.publish('companyCurrentProduct', function(companyId) {
   debug.log('publish companyCurrentProduct', companyId);
