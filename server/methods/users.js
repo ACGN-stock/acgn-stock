@@ -331,7 +331,7 @@ Meteor.publish('onlinePeopleNumber', function() {
   });
   const intervalId = Meteor.setInterval(() => {
     countAndPublishOnlinePeopleNumber(this);
-  }, 10000)
+  }, 10000);
 
   this.ready();
   this.onStop(() => {
