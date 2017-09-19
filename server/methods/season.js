@@ -140,12 +140,19 @@ limitSubscription('adjacentSeason');
 Meteor.publish('rankListBySeasonId', function(seasonId) {
   debug.log('publish rankListBySeasonId', seasonId);
 
-  return [
-    dbRankCompanyPrice.find({seasonId}),
-    dbRankCompanyProfit.find({seasonId}),
-    dbRankCompanyValue.find({seasonId}),
-    dbRankUserWealth.find({seasonId})
-  ];
+  dbRankCompanyPrice.find({seasonId}).forEach((doc) => {
+    this.added('rankCompanyPrice', doc._id, doc);
+  });
+  dbRankCompanyProfit.find({seasonId}).forEach((doc) => {
+    this.added('rankCompanyProfit', doc._id, doc);
+  });
+  dbRankCompanyValue.find({seasonId}).forEach((doc) => {
+    this.added('rankCompanyValue', doc._id, doc);
+  });
+  dbRankUserWealth.find({seasonId}).forEach((doc) => {
+    this.added('rankUserWealth', doc._id, doc);
+  });
+  this.ready();
 });
 //一分鐘最多重複訂閱30次
 limitSubscription('rankListBySeasonId', 30);
