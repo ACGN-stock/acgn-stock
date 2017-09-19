@@ -50,7 +50,7 @@ const connectionIpHash = {};
 Meteor.onConnection(function(connection) {
   debug.log('onConnection', connection.clientAddress);
   const ip = connection.clientAddress;
-  if (connectionIpHash[ip] >= 2) {
+  if (! ip || connectionIpHash[ip] >= 2) {
     connection.close();
 
     return false;
