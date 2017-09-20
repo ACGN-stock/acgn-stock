@@ -207,7 +207,7 @@ Template.displayLog.helpers({
       case '撤職紀錄': {
         return (
           '【撤職紀錄】' +
-          getUserLink(logData.userId[0]) +
+          getUserLink(logData.userId[1]) +
           '被金融管理委員會撤除了「' + getCompanyLink(logData.companyId) + '」公司的經理人職務與候選資格！'
         );
       }
