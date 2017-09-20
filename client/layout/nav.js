@@ -7,13 +7,13 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbSeason } from '../../db/dbSeason';
 import { pageNameHash } from '../../routes';
 import { rShowLoginDialog } from './validateDialog';
-import { rMainTheme } from './layout';
+import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 
 function updateTheme() {
-  const theme = localStorage.getItem('theme');
+  const theme = rMainTheme.get();
   const $nav = $('#nav');
 
   if (theme === 'light') {
@@ -117,7 +117,6 @@ Template.nav.events({
     event.preventDefault();
     const $switcher = $(event.currentTarget);
     const theme = $switcher.attr('data-theme');
-    localStorage.setItem('theme', theme);
     rMainTheme.set(theme);
     updateTheme();
   },

@@ -4,16 +4,8 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { rShowLoginDialog } from './validateDialog';
 import { rShowAlertDialog } from './alertDialog';
-import { ReactiveVar } from 'meteor/reactive-var';
-export const rMainTheme = new ReactiveVar('light');
+import { rMainTheme } from '../utils/styles';
 
-//每次開啟網頁時只確認一次預設theme
-if (! localStorage.getItem('theme')) {
-  localStorage.setItem('theme', 'light');
-}
-Template.layout.onCreated(function() {
-  rMainTheme.set(localStorage.getItem('theme'));
-});
 Template.layout.helpers({
   currentPage() {
     return FlowRouter.getRouteName();

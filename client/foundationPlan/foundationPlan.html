@@ -15,9 +15,19 @@
       <hr />
       {{> foundationFilterForm}}
       <hr />
-      {{#each foundationList}}
-        {{> foundationPlanInfo}}
-      {{/each}}
+      {{#if viewModeIsCard}}
+        <div class="media">
+          <div class="media-body row">
+            {{#each foundationList}}
+              {{> foundationPlanCard}}
+            {{/each}}
+          </div>
+        </div>
+      {{else}}
+        {{#each foundationList}}
+          {{> foundationPlanInfo}}
+        {{/each}} 
+      {{/if}}
       {{#with paginationData}}
         {{> pagination}}
       {{/with}}
@@ -27,6 +37,9 @@
 
 <template name="foundationFilterForm">
   <form class="form-inline">
+    <button class="btn btn-secondary mr-1" type="button" data-action="toggleViewMode">
+      <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
+    </button>
     <div class="input-group">
       <input
         class="form-control"
@@ -110,6 +123,85 @@
           {{/if}}
         </div>
       {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="foundationPlanCard">
+  <div class="col-12 col-md-6 col-lg-4 col-xl-3" style="margin-bottom: 25px;">
+    <div class="company-card {{cardDisplayClass this}}">
+      <div class="company-card-mask">
+        <div class="row row-info">
+          <small>{{getExpireDateText this.createdAt}} 截止</small>
+        </div>
+        <hr style="margin: 0px;" />
+        <div class="row row-cover d-flex justify-content-around">
+          <div class="d-flex flex-column align-self-center">
+            <div class="picture">
+            {{#if this.pictureSmall}}
+              <img src="{{this.pictureSmall}}" />
+            {{else}}
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
+            {{/if}}
+          </div>
+          </div>
+          <div class="d-flex flex-column align-self-center">
+            <div class="d-flex flex-row-reverse">
+              <div class="member-panel">
+                <div class="d-flex flex-row-reverse" style="margin-top: 0.5rem;">
+                  <small>經理人</small>
+                </div>
+                <div class="d-flex flex-row-reverse">
+                  <h4>{{>userLink this.manager}}</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row title-starter">
+          <p>{{this.companyName}}</p>
+        </div>
+        <div class="row row-info d-flex justify-content-between">
+          <p>投資人數</p>
+          <p class="{{investPplsNumberClass this.invest.length}}">
+            {{this.invest.length}} / {{foundationNeedUsers}}
+          </p>
+        </div>
+        <div class="row row-info d-flex justify-content-between">
+          <p>總投資額</p>
+          <p>$ {{getTotalInvest this.invest}}</p>
+        </div>
+        {{#if currentUser}}
+          <div class="row row-info d-flex justify-content-between">
+            <p>個人投資額</p>
+            {{#if alreadyInvest}}
+              <p>$ {{alreadyInvest this.invest}}</p>
+            {{else}}
+              <p>$ 0</p>
+            {{/if}}
+          </div>
+        {{/if}}
+        <hr style="margin: 0px;" />
+        <div class="row">
+          <button class="btn btn-tab accordion dropdown-toggle" data-expand-order="1">角色資訊</button>
+          <div class="order-panel">
+            <div class="description">{{this.description}}</div>
+          </div>
+        </div>
+        {{#if currentUser}}
+          <hr style="margin: 0px;" />
+          <div class="row btn-group">
+            {{#if isUserId this.manager}}
+              <a class="btn btn-tab" href="{{getEditHref this._id}}">
+                修改計劃
+              </a>
+            {{/if}}
+            <button class="btn btn-tab" type="button" data-action="invest">
+              投資
+            </button>
+          </div>
+        {{/if}}
+      </div>
     </div>
   </div>
 </template>

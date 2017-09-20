@@ -5,11 +5,12 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '../../db/dbFoundations';
-import { formatDateText } from '../utils/helpers';
+import { formatDateText, isUserId } from '../utils/helpers';
 import { config } from '../../config';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { rCompanyListViewMode } from '../utils/styles';
 
 inheritedShowLoadingOnSubscribing(Template.foundationPlan);
 const rKeyword = new ReactiveVar('');
@@ -24,6 +25,9 @@ Template.foundationPlan.onCreated(function() {
   });
 });
 Template.foundationPlan.helpers({
+  viewModeIsCard() {
+    return rCompanyListViewMode.get() === 'card';
+  },
   getFoundCompanyHref() {
     return FlowRouter.path('foundCompany');
   },
@@ -48,11 +52,26 @@ Template.foundationFilterForm.onRendered(function() {
   this.$keyword = this.$('[name="keyword"]');
 });
 Template.foundationFilterForm.helpers({
+  viewModeBtnClass() {
+    if (rCompanyListViewMode.get() === 'card') {
+      return 'fa-th';
+    }
+
+    return 'fa-th-list';
+  },
   keyword() {
     return rKeyword.get();
   }
 });
 Template.foundationFilterForm.events({
+  'click [data-action="toggleViewMode"]'(event) {
+    event.preventDefault();
+    let mode = 'card';
+    if (rCompanyListViewMode.get() === mode) {
+      mode = 'form';
+    }
+    rCompanyListViewMode.set(mode);
+  },
   submit(event, templateInstance) {
     event.preventDefault();
     rKeyword.set(templateInstance.$keyword.val());
@@ -60,7 +79,7 @@ Template.foundationFilterForm.events({
   }
 });
 
-Template.foundationPlanInfo.helpers({
+const foundationPlanHelpers = {
   displayTagList(tagList) {
     return tagList.join('、');
   },
@@ -95,9 +114,36 @@ Template.foundationPlanInfo.helpers({
     }
 
     return 0;
+  },
+  cardDisplayClass() {
+    if (! Meteor.user()) {
+      return 'company-card-default';
+    }
+    if (isUserId(this.manager)) {
+      return 'company-card-manager';
+    }
+    const invest = this.invest;
+    const userId = Meteor.user()._id;
+    const investData = _.findWhere(invest, {userId});
+    if (investData) {
+      return 'company-card-holder';
+    }
+
+    return 'company-card-default';
   }
-});
-Template.foundationPlanInfo.events({
+};
+const foundationPlanEvents = {
+  'click [data-expand-order]'(event, templateInstance) {
+    event.preventDefault();
+    const panel = templateInstance.$('.order-panel');
+    const maxHeight = panel.css('max-height');
+    if (maxHeight === '0px') {
+      panel.css('max-height', panel.prop('scrollHeight'));
+    }
+    else {
+      panel.css('max-height', 0);
+    }
+  },
   'click [data-action="invest"]'(event, templaceInstance) {
     event.preventDefault();
     const user = Meteor.user();
@@ -135,4 +181,8 @@ Template.foundationPlanInfo.events({
       }
     });
   }
-});
+};
+Template.foundationPlanInfo.helpers(foundationPlanHelpers);
+Template.foundationPlanInfo.events(foundationPlanEvents);
+Template.foundationPlanCard.helpers(foundationPlanHelpers);
+Template.foundationPlanCard.events(foundationPlanEvents);

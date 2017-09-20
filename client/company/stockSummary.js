@@ -11,10 +11,10 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle } from '../utils/methods';
 import { isUserId, isChairman } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
+import { rCompanyListViewMode } from '../utils/styles';
 
 inheritedShowLoadingOnSubscribing(Template.stockSummary);
 const rKeyword = new ReactiveVar('');
-const rViewModeCard = new ReactiveVar(true);
 const rIsOnlyShowMine = new ReactiveVar(false);
 const rSortBy = new ReactiveVar('lastPrice');
 export const rStockOffset = new ReactiveVar(0);
@@ -41,7 +41,7 @@ Template.stockSummary.onCreated(function() {
 });
 Template.stockSummary.helpers({
   viewModeIsCard() {
-    return rViewModeCard.get();
+    return rCompanyListViewMode.get() === 'card';
   },
   companyList() {
     return dbCompanies.find({}, {
@@ -66,7 +66,7 @@ Template.stockFilterForm.onRendered(function() {
 });
 Template.stockFilterForm.helpers({
   viewModeBtnClass() {
-    if (rViewModeCard.get()) {
+    if (rCompanyListViewMode.get() === 'card') {
       return 'fa-th';
     }
 
@@ -93,9 +93,13 @@ Template.stockFilterForm.helpers({
   }
 });
 Template.stockFilterForm.events({
-  'click [data-action="toggleViewMode"]'() {
-    const newValue = ! rViewModeCard.get();
-    rViewModeCard.set(newValue);
+  'click [data-action="toggleViewMode"]'(event) {
+    event.preventDefault();
+    let mode = 'card';
+    if (rCompanyListViewMode.get() === mode) {
+      mode = 'form';
+    }
+    rCompanyListViewMode.set(mode);
   },
   'click [data-action="toggleIsOnlyShowMine"]'() {
     const newValue = ! rIsOnlyShowMine.get();
