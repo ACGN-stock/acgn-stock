@@ -1,6 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
+import { UserStatus } from 'meteor/mizzao:user-status';
 import { resourceManager } from './resourceManager';
 import { dbAdvertising } from '../db/dbAdvertising';
 import { dbCompanies } from '../db/dbCompanies';
@@ -128,6 +129,12 @@ function doIntervalWork() {
     });
   //移除所有debug紀錄
   debug.clean();
+  //移除沒有IP地址的user connections
+  UserStatus.connections.remove({
+    ipAddr: {
+      $exists: false
+    }
+  });
 }
 
 //商業季度結束檢查
