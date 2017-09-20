@@ -402,6 +402,7 @@ Template.companyBuyOrderList.onCreated(function() {
     }
     if (Meteor.user()) {
       this.subscribe('queryMyOrder');
+      this.subscribe('queryOwnStocks');
     }
   });
   rBuyOrderOffset.set(0);
