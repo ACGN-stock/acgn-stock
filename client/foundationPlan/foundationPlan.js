@@ -36,13 +36,13 @@ Template.foundationPlan.helpers({
       sort: {
         createdAt: 1
       },
-      limit: rFoundationOffset.get() + 10
+      limit: 12
     });
   },
   paginationData() {
     return {
       useVariableForTotalCount: 'totalCountOfFoundationPlan',
-      dataNumberPerPage: 10,
+      dataNumberPerPage: 12,
       offset: rFoundationOffset
     };
   }

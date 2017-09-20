@@ -239,7 +239,7 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
         createdAt: 1
       },
       skip: offset,
-      limit: 10,
+      limit: 12,
       disableOplog: true
     })
     .observeChanges({

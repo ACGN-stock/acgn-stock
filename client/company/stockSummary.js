@@ -48,7 +48,7 @@ Template.stockSummary.helpers({
       sort: {
         [rSortBy.get()]: -1
       },
-      limit: rStockOffset.get() + 12
+      limit: 12
     });
   },
   paginationData() {
