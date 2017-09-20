@@ -62,8 +62,22 @@
 }
 .company-card .title a {
   color: #fff;
-  margin-left: 5%;
-  margin-right: 5%;
+  margin: 0 5%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.company-card .title-starter {
+  background: #f8b500;
+  background: -webkit-linear-gradient(left, transparent, #f8b500 5%, #f8b500 95%, transparent);
+  background: -o-linear-gradient(left, transparent, #f8b500 5%, #f8b500 95%, transparent);
+  background: -moz-linear-gradient(left, transparent, #f8b500 5%, #f8b500 95%, transparent);
+  background: -linear-gradient(left, transparent, #f8b500 5%, #f8b500 95%, transparent);
+  font-size: 1.5rem;
+}
+.company-card .title-starter p {
+  color: #000;
+  margin: 0 5%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -114,11 +128,10 @@
 .company-card div.member-panel {
   max-width: 135px;
 }
-.compant-card .text-danger {
-  color: #f00;
-}
-.compant-card .text-success {
-  color: #0f0;
+.company-card div.description {
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-all;  
 }
 
 .company-summary-item {
