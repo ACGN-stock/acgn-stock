@@ -5,7 +5,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { dbAdvertising } from '../../db/dbAdvertising';
 import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
-import { rMainTheme } from './layout';
+import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 
 Template.footer.onCreated(function() {
