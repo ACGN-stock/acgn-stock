@@ -25,11 +25,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
       res.end(companyData.companyName);
     }
     else {
-      res.writeHead(404, {
-        'Content-Type': 'text/plain'
-      });
-      res.write('404 Not Found\n');
-      res.end();
+      res.end('');
     }
   }
   else {
@@ -55,11 +51,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
       res.end(JSON.stringify(productData));
     }
     else {
-      res.writeHead(404, {
-        'Content-Type': 'text/plain'
-      });
-      res.write('404 Not Found\n');
-      res.end();
+      res.end('');
     }
   }
   else {
@@ -101,11 +93,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
       }
     }
     else {
-      res.writeHead(404, {
-        'Content-Type': 'text/plain'
-      });
-      res.write('404 Not Found\n');
-      res.end();
+      res.end('');
     }
   }
   else {

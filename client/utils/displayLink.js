@@ -23,6 +23,9 @@ Template.userLink.onRendered(function() {
         $link
           .attr('href', path)
           .text(('' + userName).trim() || '???');
+      },
+      error: () => {
+        $link.text('???');
       }
     });
   }
@@ -42,6 +45,9 @@ Template.companyLink.onRendered(function() {
         $link
           .attr('href', path)
           .text(companyName);
+      },
+      error: () => {
+        $link.text('???');
       }
     });
   }
@@ -61,6 +67,9 @@ Template.productLink.onRendered(function() {
         $link
           .attr('href', productData.url)
           .text(productData.productName);
+      },
+      error: () => {
+        $link.text('???');
       }
     });
   }
