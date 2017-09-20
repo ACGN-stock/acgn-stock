@@ -54,7 +54,6 @@
         Loading...
       </div>
     {{/with}}
-    {{> companyLogList}}
   </div>
 </template>
 
@@ -68,8 +67,123 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
         {{/if}}
       </div>
-      <div class="media-body hidden-sm-down chart" style="overflow: hidden;"></div>
-      <div class="btn-group-vertical d-sm-flex hidden-sm-down" role="group">
+      <div class="media-body hidden-sm-down company-description"><h4>角色簡介</h4>{{this.description}}</div>
+    </div>
+    <div class="row border-grid-body" style="margin-top: 15px;">
+      <div class="col-12 border-grid hidden-md-up company-description"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="chart">
+          股價趨勢
+          {{#if isDisplayPanel 'chart'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'chart'}}
+        <div class="col-12 border-grid">
+          {{> companyChart}}
+        </div>
+      {{/if}}
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="numbers">
+          數據資訊
+          {{#if isDisplayPanel 'numbers'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'numbers'}}
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">股票參考價格：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid" title="{{this.listPrice}}">
+          $ {{this.listPrice}}
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">最後成交價格：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">$ {{this.lastPrice}}</span>
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">參考市值：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          $ {{this.totalValue}}
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本季營利額：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          $ {{this.profit}}
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總釋出股票：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          {{this.totalRelease}}股
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">今日成交量：</div>
+        {{> companyTodayDealAmount}}
+      {{/if}}
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="order">
+          交易訂單
+          {{#if isDisplayPanel 'order'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'order'}}
+        {{> companyBuyOrderList}}
+        {{> companySellOrderList}}
+      {{/if}}
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="product">
+          產品中心
+          {{#if isDisplayPanel 'product'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'product'}}
+        {{> companyCurrentProductList}}
+        {{> companyAllPrudctList}}
+      {{/if}}
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="director">
+          董事會
+          {{#if isDisplayPanel 'director'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'director'}}
+        {{> companyDirectorList}}
+        {{> companyElectInfo}}
+      {{/if}}
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="log">
+          所有紀錄
+          {{#if isDisplayPanel 'log'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'log'}}
+        {{> companyLogList}}
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="companyChart">
+  <div class="row" style="padding-top: 10px;">
+    <div class="col chart" style="overflow: hidden;"></div>
+    <div class="col" style="max-width: 80px;">
+      <div class="btn-group-vertical d-flex" role="group">
         <button type="button" class="btn btn-secondary btn-sm active" data-chart-type="trend">走勢</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="day">日K</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="60min">60分</button>
@@ -78,39 +192,12 @@
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="5min">5分</button>
       </div>
     </div>
-    <div class="row border-grid-body">
-      <div class="col-12 border-grid" style="white-space: pre-wrap; word-break: break-all; padding: 5px 15px;"><h4>角色簡介</h4>{{this.description}}</div>
-      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">股票參考價格：</div>
-      <div class="col-8 col-md-4 col-lg-2 text-right border-grid" title="{{this.listPrice}}">
-        $ {{this.listPrice}}
-      </div>
-      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">最後成交價格：</div>
-      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-        <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">$ {{this.lastPrice}}</span>
-      </div>
-      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">參考市值：</div>
-      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-        $ {{this.totalValue}}
-      </div>
-      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本季營利額：</div>
-      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-        $ {{this.profit}}
-      </div>
-      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總釋出股票：</div>
-      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-        {{this.totalRelease}}股
-      </div>
-      <div class="col-4 col-md-2 col-lg-2 text-right border-grid">今日成交量：</div>
-      <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-        {{getTodayDealAmount}} 股
-      </div>
-      {{> companyBuyOrderList}}
-      {{> companySellOrderList}}
-      {{> companyCurrentProductList}}
-      {{> companyAllPrudctList}}
-      {{> companyDirectorList}}    
-      {{> companyElectInfo}}
-    </div>
+  </div>
+</template>
+
+<template name="companyTodayDealAmount">
+  <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+    {{getTodayDealAmount}} 股
   </div>
 </template>
 
@@ -237,7 +324,6 @@
 
 <template name="companyDirectorList">
   <div class="col-12 border-grid">
-    <h4>董事會成員</h4>
     <div class="row mb-1">
       <div class="text-center" style="width: 120px;">使用者帳號</div>
       <div class="text-center" style="width: 80px;">股份數</div>
@@ -350,9 +436,7 @@
 </template>
 
 <template name="companyLogList">
-  <div class="card-block">
-    <h2 class="card-title mb-1">所有相關紀錄：</h2>
-    <hr />
+  <div class="col-12 border-grid">
     {{#each logData in logList}}
       {{>displayLog logData}}
     {{else}}

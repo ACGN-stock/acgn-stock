@@ -18,21 +18,13 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.company);
-const rDirectorOffset = new ReactiveVar(0);
-const rBuyOrderOffset = new ReactiveVar(0);
-const rSellOrderOffset = new ReactiveVar(0);
-const rLogOffset = new ReactiveVar(0);
 Template.company.onCreated(function() {
   this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    if (Meteor.user()) {
-      this.subscribe('queryMyOrder');
-      this.subscribe('queryOwnStocks');
-      const companyId = FlowRouter.getParam('companyId');
-      if (companyId) {
-        this.subscribe('queryMyLikeProduct', companyId);
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      const companyData = dbCompanies.findOne(companyId);
+      if (companyData) {
+        DocHead.setTitle(config.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
       }
     }
   });
@@ -43,62 +35,6 @@ Template.company.onCreated(function() {
     const companyId = FlowRouter.getParam('companyId');
     if (companyId) {
       this.subscribe('companyDetail', companyId);
-      this.subscribe('companyCurrentProduct', companyId);
-      this.subscribe('productListByCompany', {
-        companyId: companyId,
-        sortBy: 'likeCount',
-        sortDir: -1,
-        offset: 0
-      });
-    }
-  });
-  this.autorun(() => {
-    const companyId = FlowRouter.getParam('companyId');
-    if (companyId) {
-      const companyData = dbCompanies.findOne(companyId);
-      if (companyData) {
-        DocHead.setTitle(config.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
-      }
-    }
-  });
-  rDirectorOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const companyId = FlowRouter.getParam('companyId');
-    if (companyId) {
-      this.subscribe('companyDirector', companyId, rDirectorOffset.get());
-    }
-  });
-  rBuyOrderOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const companyId = FlowRouter.getParam('companyId');
-    if (companyId) {
-      this.subscribe('companyOrderExcludeMe', companyId, '購入', rBuyOrderOffset.get());
-    }
-  });
-  rSellOrderOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const companyId = FlowRouter.getParam('companyId');
-    if (companyId) {
-      this.subscribe('companyOrderExcludeMe', companyId, '賣出', rSellOrderOffset.get());
-    }
-  });
-  rLogOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const companyId = FlowRouter.getParam('companyId');
-    if (companyId) {
-      this.subscribe('companyLog', companyId, rLogOffset.get());
     }
   });
 });
@@ -147,36 +83,6 @@ Template.company.events({
   }
 });
 
-//定時呼叫取得今日交易量與股價走勢資料
-const rTodayDealAmount = new ReactiveVar(0);
-let lastQueryTodayDealAmountTime;
-Template.company.onCreated(function() {
-  this.autorun(() => {
-    FlowRouter.getParam('companyId');
-    rTodayDealAmount.set(0);
-    lastQueryTodayDealAmountTime = new Date().setHours(0, 0, 0, 0) - 1;
-  });
-  queryDealAmount();
-  this.queryDealAmountIntervalId = Meteor.setInterval(queryDealAmount, 30000);
-});
-Template.company.onDestroyed(function() {
-  Meteor.clearInterval(this.queryDealAmountIntervalId);
-});
-function queryDealAmount() {
-  if (shouldStopSubscribe()) {
-    return false;
-  }
-  const companyId = FlowRouter.getParam('companyId');
-  if (companyId) {
-    Meteor.call('queryTodayDealAmount', companyId, lastQueryTodayDealAmountTime, (error, result) => {
-      if (! error) {
-        rTodayDealAmount.set(rTodayDealAmount.get() + result.data);
-        lastQueryTodayDealAmountTime = result.lastTime;
-      }
-    });
-  }
-}
-
 Template.company.helpers({
   companyData() {
     const companyId = FlowRouter.getParam('companyId');
@@ -208,15 +114,12 @@ Template.company.events({
   }
 });
 
-Template.companyDetail.onRendered(function() {
-  this.strChartType = 'trend';
-  this.$chart = this.$('.chart');
-  this.chart = null;
-  this.autorun(() => {
-    drawChart(this);
-  });
-});
+//是否展開面板
+const rDisplayPanelList = new ReactiveVar([]);
 Template.companyDetail.helpers({
+  isDisplayPanel(panelType) {
+    return _.contains(rDisplayPanelList.get(), panelType);
+  },
   priceDisplayClass(lastPrice, listPrice) {
     if (lastPrice > listPrice) {
       return 'text-danger';
@@ -224,12 +127,33 @@ Template.companyDetail.helpers({
     else if (listPrice > lastPrice) {
       return 'text-success';
     }
-  },
-  getTodayDealAmount() {
-    return rTodayDealAmount.get();
   }
 });
 Template.companyDetail.events({
+  'click [data-toggle-panel]'(event) {
+    event.preventDefault();
+    const $emitter = $(event.currentTarget);
+    const panelType = $emitter.attr('data-toggle-panel');
+    const displayPanelList = rDisplayPanelList.get();
+    if (_.contains(displayPanelList, panelType)) {
+      rDisplayPanelList.set(_.without(displayPanelList, panelType));
+    }
+    else {
+      displayPanelList.push(panelType);
+      rDisplayPanelList.set(displayPanelList);
+    }
+  }
+});
+
+Template.companyChart.onRendered(function() {
+  this.strChartType = 'trend';
+  this.$chart = this.$('.chart');
+  this.chart = null;
+  this.autorun(() => {
+    drawChart(this);
+  });
+});
+Template.companyChart.events({
   'click [data-chart-type]'(event, templateInstance) {
     event.preventDefault();
     $(event.currentTarget).blur();
@@ -433,6 +357,66 @@ function drawCandleStickChart(templateInstance) {
   });
 }
 
+//定時呼叫取得今日交易量資料
+const rTodayDealAmount = new ReactiveVar(0);
+let lastQueryTodayDealAmountTime;
+Template.companyTodayDealAmount.onCreated(function() {
+  this.autorun(() => {
+    FlowRouter.getParam('companyId');
+    rTodayDealAmount.set(0);
+    lastQueryTodayDealAmountTime = new Date().setHours(0, 0, 0, 0) - 1;
+  });
+  queryDealAmount();
+  this.queryDealAmountIntervalId = Meteor.setInterval(queryDealAmount, 30000);
+});
+Template.companyTodayDealAmount.onDestroyed(function() {
+  Meteor.clearInterval(this.queryDealAmountIntervalId);
+});
+function queryDealAmount() {
+  if (shouldStopSubscribe()) {
+    return false;
+  }
+  const companyId = FlowRouter.getParam('companyId');
+  if (companyId) {
+    Meteor.call('queryTodayDealAmount', companyId, lastQueryTodayDealAmountTime, (error, result) => {
+      if (! error) {
+        rTodayDealAmount.set(rTodayDealAmount.get() + result.data);
+        lastQueryTodayDealAmountTime = result.lastTime;
+      }
+    });
+  }
+}
+Template.companyTodayDealAmount.helpers({
+  getTodayDealAmount() {
+    return rTodayDealAmount.get();
+  }
+});
+
+const rBuyOrderOffset = new ReactiveVar(0);
+const rSellOrderOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.companyBuyOrderList);
+Template.companyBuyOrderList.onCreated(function() {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    if (Meteor.user()) {
+      this.subscribe('queryMyOrder');
+    }
+  });
+  rBuyOrderOffset.set(0);
+  rSellOrderOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyOrderExcludeMe', companyId, '購入', rBuyOrderOffset.get());
+      this.subscribe('companyOrderExcludeMe', companyId, '賣出', rSellOrderOffset.get());
+    }
+  });
+});
 Template.companyBuyOrderList.helpers({
   myOrderList() {
     const companyId = this._id;
@@ -496,7 +480,6 @@ Template.companyBuyOrderList.events({
     retrieveOrder(orderData);
   }
 });
-
 Template.companySellOrderList.helpers({
   getStockAmount() {
     return getStockAmount(this._id);
@@ -565,19 +548,35 @@ Template.companySellOrderList.events({
   }
 });
 
-function getStockAmount(companyId) {
-  const user = Meteor.user();
-  if (user) {
-    const userId = user._id;
-    const ownStockData = dbDirectors.findOne({companyId, userId});
-
-    return ownStockData ? ownStockData.stocks : 0;
-  }
-  else {
-    return 0;
-  }
-}
-
+inheritedShowLoadingOnSubscribing(Template.companyCurrentProductList);
+Template.companyCurrentProductList.onCreated(function() {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    if (Meteor.user()) {
+      const companyId = FlowRouter.getParam('companyId');
+      if (companyId) {
+        this.subscribe('queryMyLikeProduct', companyId);
+      }
+    }
+  });
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyCurrentProduct', companyId);
+      this.subscribe('productListByCompany', {
+        companyId: companyId,
+        sortBy: 'likeCount',
+        sortDir: -1,
+        offset: 0
+      });
+    }
+  });
+});
 Template.companyCurrentProductList.helpers({
   productList() {
     const companyId = this._id;
@@ -624,6 +623,28 @@ Template.companyAllPrudctList.events({
   }
 });
 
+const rDirectorOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.companyDirectorList);
+Template.companyDirectorList.onCreated(function() {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    if (Meteor.user()) {
+      this.subscribe('queryOwnStocks');
+    }
+  });
+  rDirectorOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyDirector', companyId, rDirectorOffset.get());
+    }
+  });
+});
 Template.companyDirectorList.helpers({
   directorList() {
     const companyId = this._id;
@@ -738,6 +759,34 @@ Template.companyElectInfo.events({
   }
 });
 
+//取得當前使用者持有指定公司的股份數量
+function getStockAmount(companyId) {
+  const user = Meteor.user();
+  if (user) {
+    const userId = user._id;
+    const ownStockData = dbDirectors.findOne({companyId, userId});
+
+    return ownStockData ? ownStockData.stocks : 0;
+  }
+  else {
+    return 0;
+  }
+}
+
+const rLogOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.companyLogList);
+Template.companyLogList.onCreated(function() {
+  rLogOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyLog', companyId, rLogOffset.get());
+    }
+  });
+});
 Template.companyLogList.helpers({
   logList() {
     const companyId = FlowRouter.getParam('companyId');
