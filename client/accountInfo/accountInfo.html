@@ -2,8 +2,36 @@
   <div class="card">
     {{#with lookUser}}
       {{> accountInfoBasic}}
-      {{> accountInfoOwnStockList}}
-      {{> accountInfoLogList}}
+      <div class="card-block">
+        <div class="row border-grid-body" style="margin-top: 15px;">
+          <div class="col-12 border-grid">
+            <a class="d-block h4" href="#" data-toggle-panel="stock">
+              持股資訊
+              {{#if isDisplayPanel 'stock'}}
+                <i class="fa fa-folder-open" aria-hidden="true"></i>
+              {{else}}
+                <i class="fa fa-folder" aria-hidden="true"></i>
+              {{/if}}
+            </a>
+          </div>
+          {{#if isDisplayPanel 'stock'}}
+            {{> accountInfoOwnStockList}}
+          {{/if}}
+          <div class="col-12 border-grid">
+            <a class="d-block h4" href="#" data-toggle-panel="log">
+              所有紀錄
+              {{#if isDisplayPanel 'log'}}
+                <i class="fa fa-folder-open" aria-hidden="true"></i>
+              {{else}}
+                <i class="fa fa-folder" aria-hidden="true"></i>
+              {{/if}}
+            </a>
+          </div>
+          {{#if isDisplayPanel 'log'}}
+            {{> accountInfoLogList}}
+          {{/if}}
+        </div>
+      </div>
     {{/with}}
   </div>
 </template>
@@ -105,9 +133,7 @@
 </template>
 
 <template name="accountInfoOwnStockList">
-  <div class="card-block">
-    <h2 class="card-title mb-1">擁有公司股票：</h2>
-    <hr />
+  <div class="col-12 border-grid">
     {{#each directorData in directorList}}
       <div>
         擁有 「{{>companyLink directorData.companyId}}」公司的{{directorData.stocks}}股股票。
@@ -122,9 +148,7 @@
 </template>
 
 <template name="accountInfoLogList">
-  <div class="card-block">
-    <h2 class="card-title mb-1">所有相關紀錄：</h2>
-    <hr />
+  <div class="col-12 border-grid">
     {{#each logList}}
       {{> displayLog}}
     {{else}}

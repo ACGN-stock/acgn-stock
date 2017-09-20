@@ -14,8 +14,6 @@ import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
-export const ownStocksOffset = new ReactiveVar(0);
-export const logOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
   this.autorun(() => {
@@ -36,27 +34,9 @@ Template.accountInfo.onCreated(function() {
       }
     }
   });
-  ownStocksOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountOwnStocks', userId, ownStocksOffset.get());
-    }
-  });
-  logOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountInfoLog', userId, logOffset.get());
-    }
-  });
 });
+//是否展開面板
+const rDisplayPanelList = new ReactiveVar([]);
 Template.accountInfo.helpers({
   lookUser() {
     const userId = FlowRouter.getParam('userId');
@@ -65,6 +45,24 @@ Template.accountInfo.helpers({
     }
     else {
       return null;
+    }
+  },
+  isDisplayPanel(panelType) {
+    return _.contains(rDisplayPanelList.get(), panelType);
+  }
+});
+Template.accountInfo.events({
+  'click [data-toggle-panel]'(event) {
+    event.preventDefault();
+    const $emitter = $(event.currentTarget);
+    const panelType = $emitter.attr('data-toggle-panel');
+    const displayPanelList = rDisplayPanelList.get();
+    if (_.contains(displayPanelList, panelType)) {
+      rDisplayPanelList.set(_.without(displayPanelList, panelType));
+    }
+    else {
+      displayPanelList.push(panelType);
+      rDisplayPanelList.set(displayPanelList);
     }
   }
 });
@@ -191,6 +189,20 @@ Template.accountInfoBasic.events({
   }
 });
 
+export const ownStocksOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.accountInfoOwnStockList);
+Template.accountInfoOwnStockList.onCreated(function() {
+  ownStocksOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('accountOwnStocks', userId, ownStocksOffset.get());
+    }
+  });
+});
 Template.accountInfoOwnStockList.helpers({
   directorList() {
     const userId = FlowRouter.getParam('userId');
@@ -206,6 +218,20 @@ Template.accountInfoOwnStockList.helpers({
   }
 });
 
+export const logOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.accountInfoLogList);
+Template.accountInfoLogList.onCreated(function() {
+  logOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('accountInfoLog', userId, logOffset.get());
+    }
+  });
+});
 Template.accountInfoLogList.helpers({
   logList() {
     const userId = FlowRouter.getParam('userId');
