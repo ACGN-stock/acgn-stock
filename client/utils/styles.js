@@ -22,6 +22,12 @@ export const rCompanyListViewMode = new ReactiveVar('card', function(oldValue, n
 if (! localStorage.getItem('theme')) {
   localStorage.setItem('theme', 'light');
 }
+else {
+  rMainTheme.set(localStorage.getItem('theme'));
+}
 if (! localStorage.getItem('company-list-view-mode')) {
   localStorage.setItem('company-list-view-mode', 'card');
+}
+else {
+  rCompanyListViewMode.set(localStorage.getItem('company-list-view-mode'));
 }
