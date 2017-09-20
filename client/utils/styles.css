@@ -74,6 +74,7 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  display: block;
 }
 .company-card .title-starter {
   background: #f8b500;
@@ -89,7 +90,6 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  display: block;
 }
 .company-card .row {
   color: #000;
