@@ -4,8 +4,14 @@
       <ul class="pagination pagination-sm justify-content-center mt-1">
         <li class="page-item">
           <a class="page-link" href="{{pageLinkHref 1}}" title="第一頁" aria-label="第一頁">
-            <span aria-hidden="true">&laquo;</span>
+            <i class="fa fa-fast-backward" aria-hidden="true"></i>
             <span class="sr-only">第一頁</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="{{pageLinkHref 'prev'}}" title="上一頁" aria-label="上一頁">
+            <i class="fa fa-backward" aria-hidden="true"></i>
+            <span class="sr-only">上一頁</span>
           </a>
         </li>
         {{#each page in pages}}
@@ -14,8 +20,14 @@
           </li>
         {{/each}}
         <li class="page-item">
+          <a class="page-link" href="{{pageLinkHref 'next'}}" title="下一頁" aria-label="下一頁">
+            <i class="fa fa-forward" aria-hidden="true"></i>
+            <span class="sr-only">下一頁</span>
+          </a>
+        </li>
+        <li class="page-item">
           <a class="page-link" href="{{pageLinkHref 'end'}}" title="最末頁" aria-label="最末頁">
-            <span aria-hidden="true">&raquo;</span>
+            <i class="fa fa-fast-forward" aria-hidden="true"></i>
             <span class="sr-only">最末頁</span>
           </a>
         </li>

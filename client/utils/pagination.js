@@ -37,17 +37,25 @@ Template.pagination.helpers({
     return (page === currentPage) ? 'page-item active' : 'page-item';
   },
   pageLinkHref(page) {
-    if (page === 'end') {
-      const templateInstance = Template.instance();
-      const data = templateInstance.data;
-      const totalCount = dbVariables.get(data.useVariableForTotalCount);
-      const totalPages = Math.ceil(totalCount / data.dataNumberPerPage);
+    const templateInstance = Template.instance();
+    const data = templateInstance.data;
+    const totalCount = dbVariables.get(data.useVariableForTotalCount);
+    const totalPages = Math.ceil(totalCount / data.dataNumberPerPage);
 
+    if (page === 'end') {
       return './' + totalPages;
     }
-    else {
-      return './' + page;
+
+    const offset = this.offset.get();
+    const currentPage = (offset / this.dataNumberPerPage) + 1;
+    if (page === 'prev') {
+      return './' + Math.max(1, currentPage-1);
     }
+    if (page === 'next') {
+      return './' + Math.min(totalPages, currentPage+1);
+    }
+
+    return './' + page;
   }
 });
 Template.pagination.events({
