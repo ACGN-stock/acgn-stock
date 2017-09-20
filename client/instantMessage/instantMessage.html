@@ -20,6 +20,7 @@
             清除舊訊息
           </button>
         </div>
+        {{> instantMessageFilterById}}
       </form>
       {{> instantMessageList}}
     </div>
@@ -48,6 +49,62 @@
   <button class="{{btnClass}}" type="button">
     {{btnText}}
   </button>
+</template>
+
+<template name="instantMessageFilterById">
+  <div class="form-group row">
+    <div class="col" style="max-width: 322px;">
+      <div class="btn-group">
+        <div class="input-group-btn">
+          {{> instantMessageFilterButton type='只看指定使用者或公司'}}
+        </div>
+        <div class="input-group-btn">
+          <button class="btn btn-sm btn-success" data-action="filterUserId">
+            <i class="fa fa-filter" aria-hidden="true"></i>
+            使用者
+          </button>
+        </div>
+        <div class="input-group-btn">
+          <button class="btn btn-sm btn-info" data-action="filterCompanyId">
+            <i class="fa fa-filter" aria-hidden="true"></i>
+            公司
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      {{#each filterUserId}}
+        {{> instantMessageFilterByUserId}}
+      {{/each}}
+      {{#each filterCompanyId}}
+        {{> instantMessageFilterByCompanyId}}
+      {{/each}}
+    </div>
+  </div>
+</template>
+
+<template name="instantMessageFilterByUserId">
+  <small class="badge badge-success">
+    {{> userLink this}}
+    <i
+      class="fa fa-times"
+      style="cursor: pointer;"
+      data-action="remove"
+    >
+    </i>
+  </small>
+</template>
+
+<template name="instantMessageFilterByCompanyId">
+  <small class="badge badge-info">
+    {{> companyLink this}}
+    <i
+      class="fa fa-times"
+      style="cursor: pointer;"
+      data-action="remove"
+    >
+    </i>
+  </small>
 </template>
 
 <template name="instantMessageList">

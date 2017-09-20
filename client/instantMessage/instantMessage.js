@@ -63,18 +63,24 @@ Template.instantMessageChatForm.events({
 //不能篩掉、永遠顯示的紀錄類別
 const alwaysDisplayLogTypeList = [
   '發薪紀錄',
-  '公司撤銷',
-  '取消資格',
-  '廣告宣傳',
-  '廣告追加'
+  '舉報違規',
+  '禁止舉報',
+  '禁止下單',
+  '禁止聊天',
+  '禁止廣告',
+  '課以罰款',
+  '禁任經理',
+  '解除舉報',
+  '解除下單',
+  '解除聊天',
+  '解除廣告',
+  '退還罰款',
+  '解除禁任',
+  '查封關停',
+  '解除查封',
+  '產品下架',
+  '撤銷廣告'
 ];
-//不能篩掉但只顯示userId中包含自己的紀錄類別
-// const forSelfLogTypeList = [
-//   '創立得股',
-//   '創立退款',
-//   '訂單完成',
-//   '營利分紅'
-// ];
 //篩選器可以選擇的紀錄類別
 const messageTypeGroupHash = {
   '聊天發言': [
@@ -97,6 +103,7 @@ const messageTypeGroupHash = {
     '參選紀錄',
     '就任經理',
     '辭職紀錄',
+    '撤職紀錄',
     '支持紀錄'
   ],
   '經理管理': [
@@ -142,20 +149,102 @@ Template.instantMessageFilterButton.events({
   }
 });
 
+const rFilterUserId = new ReactiveVar([]);
+const rFilterCompanyId = new ReactiveVar([]);
+Template.instantMessageFilterById.helpers({
+  filterUserId() {
+    return rFilterUserId.get();
+  },
+  filterCompanyId() {
+    return rFilterCompanyId.get();
+  }
+});
+Template.instantMessageFilterById.events({
+  'click [data-action="filterUserId"]'(event) {
+    event.preventDefault();
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '篩選使用者',
+      message: `
+        <div>請輸入使用者識別碼：</div>
+        <div><small class="text-info">使用者識別碼可以在帳號資訊頁面的網址列中取得。</small></div>
+        <div><small>http://acgn-stock.com/accountInfo/<span class="text-danger">識別碼</span></small></div>
+      `,
+      defaultValue: '',
+      callback: function(userId) {
+        if (userId) {
+          const newFilterUserId = _.union(rFilterUserId.get(), userId);
+          rFilterUserId.set(newFilterUserId);
+          const newFilterTypeList = _.union(rFilterTypeList.get(), ['只看指定使用者或公司']);
+          rFilterTypeList.set(newFilterTypeList);
+        }
+      }
+    });
+  },
+  'click [data-action="filterCompanyId"]'(event) {
+    event.preventDefault();
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '篩選公司',
+      message: `
+        <div>請輸入公司識別碼：</div>
+        <div><small class="text-info">使用者識別碼可以在公司細節頁面的網址列中取得。</small></div>
+        <div><small>http://acgn-stock.com/company/<span class="text-danger">識別碼</span></small></div>
+      `,
+      defaultValue: '',
+      callback: function(companyId) {
+        if (companyId) {
+          const newFilterCompanyId = _.union(rFilterCompanyId.get(), companyId);
+          rFilterCompanyId.set(newFilterCompanyId);
+          const newFilterTypeList = _.union(rFilterTypeList.get(), ['只看指定使用者或公司']);
+          rFilterTypeList.set(newFilterTypeList);
+        }
+      }
+    });
+  }
+});
+
+Template.instantMessageFilterByUserId.events({
+  'click [data-action="remove"]'(event, templateInstance) {
+    const newFilterUserId = _.without(rFilterUserId.get(), templateInstance.data);
+    rFilterUserId.set(newFilterUserId);
+  }
+});
+Template.instantMessageFilterByCompanyId.events({
+  'click [data-action="remove"]'(event, templateInstance) {
+    const newFilterCompanyId = _.without(rFilterCompanyId.get(), templateInstance.data);
+    rFilterCompanyId.set(newFilterCompanyId);
+  }
+});
+
 Template.instantMessageList.helpers({
   logList() {
     const user = Meteor.user();
     const userId = user ? user._id : '';
     const filterTypeList = rFilterTypeList.get();
     const displayLogList = _.filter(rInstantMessageList.get(), (logData) => {
-      return (
-        _.contains(filterTypeList, logData.logType) ||
-        (
-          userId &&
-          logData.userId &&
-          _.contains(logData.userId, userId)
-        )
-      );
+      //發布給所有使用者的紀錄一定要顯示
+      if (logData.userId === '!all') {
+        return true;
+      }
+      //登入使用者自身有關的紀錄一定要顯示
+      if (userId && logData.userId && _.contains(logData.userId, userId)) {
+        return true;
+      }
+      //如果有點擊「只看指定使用者或公司」篩選按鈕
+      if (_.contains(filterTypeList, '只看指定使用者或公司')) {
+        const filterUserId = rFilterUserId.get();
+        const filterCompanyId = rFilterCompanyId.get();
+
+        //只顯示按鈕篩選器有啟動的訊息且有相符使用者識別碼或公司識別碼的紀錄
+        return _.contains(filterTypeList, logData.logType) && (
+          (logData.userId && _.intersection(filterUserId, logData.userId).length > 0) ||
+          logData.companyId && _.contains(filterCompanyId, logData.companyId)
+        );
+      }
+
+      //只顯示按鈕篩選器有啟動的紀錄
+      return _.contains(filterTypeList, logData.logType);
     });
 
     return displayLogList;

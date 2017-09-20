@@ -44,7 +44,7 @@ Template.companyLink.onRendered(function() {
         const path = FlowRouter.path('company', {companyId});
         $link
           .attr('href', path)
-          .text(companyName);
+          .text(companyName || '???');
       },
       error: () => {
         $link.text('???');
@@ -66,7 +66,7 @@ Template.productLink.onRendered(function() {
       success: (productData) => {
         $link
           .attr('href', productData.url)
-          .text(productData.productName);
+          .text(productData.productName || '???');
       },
       error: () => {
         $link.text('???');
