@@ -165,7 +165,13 @@ const foundationPlanEvents = {
     alertDialog.dialog({
       type: 'prompt',
       title: '投資',
-      message: `要投資多少金額？(${minimumInvest}~${maximumInvest})`,
+      message: `
+        要投資多少金額？(${minimumInvest}~${maximumInvest})
+        <div class="text-danger">
+          投資理財有賺有賠，請先確認您要投資的公司是否符合
+          <a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit?usp=sharing" target="_blank">金管會的規定</a>。
+        </div>
+      `,
       defaultValue: null,
       callback: function(result) {
         const amount = parseInt(result, 10);
