@@ -103,17 +103,23 @@ Template.stockFilterForm.events({
   },
   'click [data-action="toggleIsOnlyShowMine"]'() {
     const newValue = ! rIsOnlyShowMine.get();
-    rStockOffset.set(0);
+    FlowRouter.go('stockSummary', {
+      page: 1
+    });
     rIsOnlyShowMine.set(newValue);
   },
   'click [data-action="sortBy"]'(event) {
     const newValue = $(event.currentTarget).val();
-    rStockOffset.set(0);
+    FlowRouter.go('stockSummary', {
+      page: 1
+    });
     rSortBy.set(newValue);
   },
   'submit'(event, templateInstance) {
     event.preventDefault();
-    rStockOffset.set(0);
+    FlowRouter.go('stockSummary', {
+      page: 1
+    });
     rKeyword.set(templateInstance.$keyword.val());
   }
 });
