@@ -205,9 +205,11 @@
   <div class="col-12 col-md-6 border-grid">
     <h4>
       市場買單
-      <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
-        下單
-      </button>
+      {{#if currentUser}}
+        <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
+          下單
+        </button>
+      {{/if}}
     </h4>
     {{#each order in myOrderList}}
       <div>
