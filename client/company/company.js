@@ -740,21 +740,31 @@ Template.companyElectInfo.events({
   },
   'click [data-support-candidate]'(event, templateInstance) {
     event.preventDefault();
+    const user = Meteor.user();
+    if (! user) {
+      return false;
+    }
     const instanceData = templateInstance.data;
     const candidateList = instanceData.candidateList;
     const candidateIndex = parseInt($(event.currentTarget).attr('data-support-candidate'), 10);
     const candidate = candidateList[candidateIndex];
+    const supportList = instanceData.voteList[candidateIndex];
     $.ajax({
       url: '/userName',
       data: {
         id: candidate
       },
       success: (userName) => {
-        alertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
-          if (result) {
-            Meteor.customCall('supportCandidate', instanceData._id, candidate);
-          }
-        });
+        if (_.contains(supportList, user._id)) {
+          alertDialog.alert('你已經正在支持使用者' + userName + '了，無法再次進行支持！');
+        }
+        else {
+          alertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
+            if (result) {
+              Meteor.customCall('supportCandidate', instanceData._id, candidate);
+            }
+          });
+        }
       }
     });
   }
