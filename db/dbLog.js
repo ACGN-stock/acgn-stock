@@ -10,6 +10,7 @@ export default dbLog;
 
 export const logTypeList = [
   '驗證通過', //帳號驗證通過，領取起始資金$price！
+  '登入紀錄', //userId0從message登入了系統！
   '免費得石', //因為「message」的理由獲得了amount顆聖晶石！
   '聊天發言', //userId0說道：「message」
   '發薪紀錄', //系統向所有已驗證通過的使用者發給了$price的薪水！

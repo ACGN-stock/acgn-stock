@@ -72,6 +72,9 @@ Template.displayLog.helpers({
       case '驗證通過': {
         return '帳號驗證通過，領取起始資金$' + logData.price + '！';
       }
+      case '登入紀錄': {
+        return getUserLink(logData.userId[0]) + '從' + logData.message + '登入了系統！';
+      }
       case '免費得石': {
         return '【免費得石】因為「' + logData.message + '」的理由獲得了' + logData.amount + '顆聖晶石！';
       }
