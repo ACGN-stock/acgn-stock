@@ -15,12 +15,6 @@
   border-right: 1px solid #dddddd;
 }
 
-.container-light .company-card {
-  border: 1px solid #dddddd;
-  border-radius: 5px;
-  box-shadow: 6px 6px 6px rgba(0,0,0,0.23);
-}
-
 .company-description {
   white-space: pre-wrap;
   word-break: break-all;
@@ -32,6 +26,9 @@
 .company-card {
   padding: 0px;
   max-width: 270px;
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+  box-shadow: 6px 6px 6px rgba(0,0,0,0.23);
 }
 .company-card-default {
   background: #fff;
@@ -190,6 +187,21 @@
   border-top: 1px solid #dddddd;
 }
 .container-dark .company-card {
-  border-radius: 5px;
+  border: 1px solid #000;
   box-shadow: 6px 6px 6px rgba(0,0,0,1);
+}
+.container-dark .company-card-default {
+  background: rgb(0, 43, 54);
+}
+.container-dark .company-card-default .row {
+  color: #839496;
+}
+.container-dark .company-card-default .row-info p {
+  color: #839496;
+}
+.container-dark .company-card-default .row-info small {
+  color: #839496;
+}
+.container-dark .company-card-default .btn-tab {
+  color: #839496;
 }
