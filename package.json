@@ -5,7 +5,8 @@
     "start": "meteor run",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "pretest": "npm run lint --silent",
-    "deploy": "DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com meteor deploy acgn-stock.au.meteorapp.com --settings ./settings.json"
+    "deploy": "DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com meteor deploy acgn-stock.au.meteorapp.com --settings ./settings.json",
+    "postinstall": "opencollective postinstall"
   },
   "dependencies": {
     "babel-runtime": "^6.20.0",
@@ -13,6 +14,7 @@
     "cheerio": "1.0.0-rc.2",
     "image-type": "3.0.0",
     "meteor-node-stubs": "~0.2.4",
+    "opencollective": "^1.0.3",
     "simpl-schema": "0.3.1"
   },
   "devDependencies": {
@@ -25,5 +27,10 @@
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-meteor": "^4.0.1",
     "eslint-plugin-react": "^7.1.0"
+  },
+  "collective": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/acgn-stock",
+    "logo": "https://opencollective.com/opencollective/logo.txt"
   }
 }
