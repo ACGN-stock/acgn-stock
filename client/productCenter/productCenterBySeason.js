@@ -177,12 +177,12 @@ Template.productInfoBySeasonTable.onCreated(function() {
   this.subscribe('queryMyLikeProduct', this.data.companyId);
 });
 Template.productInfoBySeasonTable.helpers({
-  canVote() {
+  cannotVote() {
     const companyId = this.companyId;
     const user = Meteor.user();
     const userId = user ? user._id : false;
 
-    return (
+    return ! (
       this.overdue === 1 &&
       userId &&
       dbVoteRecord.find({companyId, userId}).count() < 1

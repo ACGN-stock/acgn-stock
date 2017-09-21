@@ -79,18 +79,15 @@
       {{this.type}}
     </td>
     <td class="text-center text-truncate px-2">
-      {{#if canVote}}
-        <button
-          class="btn btn-primary btn-sm"
-          type="button"
-          data-vote-product="{{this._id}}"
-        >
-          {{this.votes}}
-          <i class="fa fa-money" aria-hidden="true"></i>
-        </button>
-      {{else}}
+      <button
+        class="btn btn-primary btn-sm"
+        type="button"
+        data-vote-product="{{this._id}}"
+        disabled={{cannotVote}}
+      >
         {{this.votes}}
-      {{/if}}
+        <i class="fa fa-money" aria-hidden="true"></i>
+      </button>
     </td>
     {{#if currentUser.profile.isAdmin}}
       <td class="text-center px-2">
