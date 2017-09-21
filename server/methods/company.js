@@ -630,7 +630,12 @@ Meteor.publish('queryOwnStocks', function() {
   debug.log('publish queryOwnStocks');
   const userId = this.userId;
   if (userId) {
-    return dbDirectors.find({userId});
+    return dbDirectors.find({
+      userId: userId,
+      stocks: {
+        $gt: 0
+      }
+    });
   }
 
   return [];
@@ -711,13 +716,23 @@ Meteor.publish('companyDirector', function(companyId, offset) {
   check(offset, Match.Integer);
 
   let initialized = false;
-  let total = dbDirectors.find({companyId}).count();
+  let total = dbDirectors.find({
+    companyId: companyId,
+    stocks: {
+      $gt: 0
+    }
+  }).count();
   this.added('variables', 'totalCountOfCompanyDirector', {
     value: total
   });
 
   const observer = dbDirectors
-    .find({companyId}, {
+    .find({
+      companyId: companyId,
+      stocks: {
+        $gt: 0
+      }
+    }, {
       sort: {
         stocks: -1
       },

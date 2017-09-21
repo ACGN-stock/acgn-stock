@@ -173,17 +173,29 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
   check(offset, Match.Integer);
 
   let initialized = false;
-  let total = dbDirectors.find({userId}).count();
+  let total = dbDirectors.find({
+    userId: userId,
+    stocks: {
+      $gt: 0
+    }
+  }).count();
   this.added('variables', 'totalCountOfAccountOwnStocks', {
     value: total
   });
 
   const observer = dbDirectors
-    .find({userId}, {
+    .find({
+      userId: userId,
+      stocks: {
+        $gt: 0
+      }
+    }, {
       fields: {
         userId: 1,
         companyId: 1,
-        stocks: 1
+        stocks: 1,
+        realStocks: 1,
+        carryingCost: 1
       },
       skip: offset,
       limit: 10,

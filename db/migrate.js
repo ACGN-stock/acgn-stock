@@ -285,6 +285,84 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 3,
+    name: 'directors add carryingCost.',
+    up() {
+      dbDirectors.update({}, {
+        $set: {
+          realStocks: 0,
+          carryingCost: 0
+        }
+      }, {
+        multi: true
+      });
+
+      dbLog.find({
+        logType: '創立得股'
+      }).forEach((log) => {
+        const founder = dbDirectors.findOne({
+          companyId: log.companyId,
+          userId: log.userId[0]
+        });
+        if (founder) {
+          dbDirectors.update(founder._id, {
+            $set: {
+              realStocks: log.amount,
+              carryingCost: log.amount * Math.floor(log.price / log.amount)
+            }
+          });
+        }
+      });
+
+      dbLog.find({
+        logType: '交易紀錄'
+      }, {
+        sort: {
+          createdAt: 1
+        }
+      }).forEach((log) => {
+        const buyer = dbDirectors.findOne({
+          companyId: log.companyId,
+          userId: log.userId[0]
+        });
+        if (buyer) {
+          dbDirectors.update(buyer._id, {
+            $inc: {
+              realStocks: log.amount,
+              carryingCost: log.price * log.amount
+            }
+          });
+        }
+
+        if (log.userId.length > 1) {
+          const seller = dbDirectors.findOne({
+            companyId: log.companyId,
+            userId: log.userId[1]
+          });
+          if (seller) {
+            dbDirectors.update(seller._id, {
+              $inc: {
+                realStocks: -log.amount,
+                carryingCost: -log.amount * (seller.carryingCost / seller.realStocks)
+              }
+            });
+          }
+        }
+      });
+    },
+    down() {
+      dbDirectors.update({}, {
+        $unset: {
+          realStocks: 1,
+          carryingCost: 1
+        }
+      }, {
+        multi: true
+      });
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });

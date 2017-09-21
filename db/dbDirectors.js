@@ -23,6 +23,16 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 1
   },
+  //含未售出之擁有股份
+  realStocks: {
+    type: Number,
+    defaultValue: 0
+  },
+  //持股成本
+  carryingCost: {
+    type: Number,
+    defaultValue: 0
+  },
   createdAt: {
     type: Date
   },
