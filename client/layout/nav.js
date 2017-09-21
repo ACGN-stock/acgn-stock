@@ -6,7 +6,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbSeason } from '../../db/dbSeason';
 import { pageNameHash } from '../../routes';
-import { rShowLoginDialog } from './validateDialog';
+import { rAccountDialogMode } from './accountDialog';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 
@@ -89,11 +89,19 @@ Template.nav.events({
   'click [data-login]'(event) {
     event.preventDefault();
     const loginType = $(event.currentTarget).attr('data-login');
-    if (loginType === 'PTT') {
-      rShowLoginDialog.set(true);
-    }
-    else {
-      Meteor['loginWith' + loginType]();
+    switch (loginType) {
+      case 'PTT': {
+        rAccountDialogMode.set('loginPTT');
+        break;
+      }
+      case 'Bahamut': {
+        rAccountDialogMode.set('loginBahamut');
+        break;
+      }
+      default: {
+        Meteor['loginWith' + loginType]();
+        break;
+      }
     }
   },
   'click .dropdown .dropdown-toggle'(event) {

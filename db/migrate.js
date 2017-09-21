@@ -285,6 +285,43 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 3,
+    name: 'users add profile.validateType field.',
+    up() {
+      Meteor.users.update(
+        {
+          'services.google': {
+            $exists: true
+          }
+        },
+        {
+          $set: {
+            'profile.validateType': 'Google'
+          }
+        },
+        {
+          multi: true
+        }
+      );
+      Meteor.users.update(
+        {
+          'username': {
+            $exists: true
+          }
+        },
+        {
+          $set: {
+            'profile.validateType': 'PTT'
+          }
+        },
+        {
+          multi: true
+        }
+      );
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });

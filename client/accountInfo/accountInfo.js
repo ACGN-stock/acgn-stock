@@ -68,6 +68,19 @@ Template.accountInfo.events({
 });
 
 Template.accountInfoBasic.helpers({
+  showValidateType() {
+    switch (this.profile.validateType) {
+      case 'Google': {
+        return '【Google帳號】' + this.services.google.email;
+      }
+      case 'PTT': {
+        return '【PTT帳號】' + this.username;
+      }
+      case 'Bahamut': {
+        return '【巴哈姆特帳號】' + this.username.replace('?', '');
+      }
+    }
+  },
   manageCompanies() {
     return dbCompanies
       .find({
@@ -207,7 +220,9 @@ Template.accountInfoOwnStockList.helpers({
   directorList() {
     const userId = FlowRouter.getParam('userId');
 
-    return dbDirectors.find({userId});
+    return dbDirectors.find({userId}, {
+      limit: 10
+    });
   },
   paginationData() {
     return {
@@ -248,7 +263,8 @@ Template.accountInfoLogList.helpers({
       {
         sort: {
           createdAt: -1
-        }
+        },
+        limit: 30
       }
     );
   },

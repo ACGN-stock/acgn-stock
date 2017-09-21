@@ -29,6 +29,11 @@ const schema = new SimpleSchema({
   },
   profile: {
     type: new SimpleSchema({
+      //驗證類別
+      validateType: {
+        type: String,
+        allowedValues: ['Google', 'PTT', 'Bahamut']
+      },
       //使用者名稱
       name: {
         type: String

@@ -8,10 +8,9 @@ export default dbValidatingUsers;
 
 //schema
 const schema = new SimpleSchema({
-  //使用者PTT帳號
+  //使用者PTT帳號或巴哈姆特帳號(巴哈姆特帳號會前綴以?)
   username: {
-    type: String,
-    regEx: /^[0-9a-zA-Z]{2,20}$/
+    type: String
   },
   //使用者登入密碼
   password: {

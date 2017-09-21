@@ -2,7 +2,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { rShowLoginDialog } from './validateDialog';
+import { rAccountDialogMode } from './accountDialog';
 import { rShowAlertDialog } from './alertDialog';
 import { rMainTheme } from '../utils/styles';
 
@@ -10,8 +10,8 @@ Template.layout.helpers({
   currentPage() {
     return FlowRouter.getRouteName();
   },
-  showLoginDialog() {
-    return rShowLoginDialog.get() && ! Meteor.user();
+  showAccountDialog() {
+    return rAccountDialogMode.get() && ! Meteor.user();
   },
   showAlertDialog() {
     return rShowAlertDialog.get();

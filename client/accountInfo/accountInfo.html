@@ -88,11 +88,7 @@
     {{/if}}
     <div>
       帳號驗證方式：
-      {{#if this.username}}
-        【PTT帳號】{{this.username}}
-      {{else}}
-        【Google帳號】{{this.services.google.email}}
-      {{/if}}
+      {{showValidateType}}
     </div>
     <div>
       帳號啟動日期：{{formatDateText this.createdAt}}

@@ -6,7 +6,6 @@ import { HTTP } from 'meteor/http'
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { UserStatus } from 'meteor/mizzao:user-status';
-import { resourceManager } from '../resourceManager';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
@@ -17,27 +16,37 @@ import { limitMethod, limitSubscription, limitGlobalMethod } from './rateLimit';
 import { debug } from '../debug';
 
 Meteor.methods({
-  loginOrRegister(username, password, reset = false) {
-    debug.log('loginOrRegister', {username, password, reset});
+  loginOrRegister({username, password, type, reset}) {
+    debug.log('loginOrRegister', {username, password, type, reset});
     check(username, String);
     check(password, String);
+    check(type, new Match.OneOf('PTT', 'Bahamut'));
+    check(reset, Boolean);
 
-    if (Meteor.users.find({username}).count() > 0 && reset === false) {
+    const checkUsername = (type === 'Bahamut') ? ('?' + username) : username;
+    if (Meteor.users.find({username: checkUsername}).count() > 0 && ! reset) {
       return true;
     }
     else {
-      const existValidatingUser = dbValidatingUsers.findOne({username, password});
-      let validateCode;
+      const existValidatingUser = dbValidatingUsers.findOne({
+        username: checkUsername,
+        password
+      });
       if (existValidatingUser) {
-        validateCode = existValidatingUser.validateCode;
+        return existValidatingUser.validateCode;
       }
       else {
-        validateCode = generateValidateCode();
+        const validateCode = generateValidateCode();
         const createdAt = new Date();
-        dbValidatingUsers.insert({username, password, validateCode, createdAt});
-      }
+        dbValidatingUsers.insert({
+          username: checkUsername,
+          password,
+          validateCode,
+          createdAt
+        });
 
-      return validateCode;
+        return validateCode;
+      }
     }
   }
 });
@@ -49,11 +58,10 @@ function generateValidateCode() {
 }
 
 Meteor.methods({
-  validateAccount(username) {
+  validatePTTAccount(username) {
     check(username, String);
-    resourceManager.throwErrorIsResourceIsLock(['validateAccount']);
-    //先鎖定資源，再重新讀取一次資料進行運算
-    const result = validateUsers(username);
+    const result = validatePTTAccount(username);
+
     if (result) {
       return true;
     }
@@ -61,15 +69,15 @@ Meteor.methods({
       return true;
     }
     else {
-      throw new Meteor.Error('[403] Forbidden', '驗證未能通過，請確定推文位置、推文文章、推文方式與推文驗證碼是否正確！');
+      throw new Meteor.Error(403, '驗證未能通過，請確定推文位置、推文文章、推文方式與推文驗證碼是否正確！');
     }
   }
 });
-limitGlobalMethod('validateAccount');
-function validateUsers(checkUsername) {
-  debug.log('validateUsers', checkUsername);
+limitGlobalMethod('validatePTTAccount');
+function validatePTTAccount(checkUsername) {
+  debug.log('validatePTTAccount', checkUsername);
   let checkResult = false;
-  const validatingUserList = dbValidatingUsers.find({}, {disableOplog: true}).fetch();
+  const validatingUserList = dbValidatingUsers.find({}).fetch();
   if (validatingUserList.length > 0) {
     const url = dbVariables.get('validateUserUrl');
     const httpCallResult = HTTP.get(url);
@@ -97,6 +105,7 @@ function validateUsers(checkUsername) {
           }
           else {
             const profile = {
+              validateType: 'PTT',
               name: username
             };
             Accounts.createUser({username, password, profile});
@@ -108,6 +117,64 @@ function validateUsers(checkUsername) {
   }
 
   return checkResult;
+}
+
+Meteor.methods({
+  validateBahamutAccount(username) {
+    check(username, String);
+    validateBahamutAccount(username);
+  }
+});
+//一分鐘最多1次
+limitMethod('validateBahamutAccount', 1);
+function validateBahamutAccount(username) {
+  debug.log('validateBahamutAccount', username);
+  const checkUsername = '?' + username;
+  const validatingUser = dbValidatingUsers.findOne({username: checkUsername});
+  if (validatingUser) {
+    let url = 'https://home.gamer.com.tw/homeindex.php?owner=' + username;
+    let urlContent = HTTP.get(url).content;
+    let checkCannotPass = true;
+    cheerio.load(urlContent)('li').each((index, li) => {
+      if (li.children.length === 1 && li.children[0].data === '手機認證：有') {
+        checkCannotPass = false;
+      }
+    });
+    if (checkCannotPass) {
+      throw new Meteor.Error(403, '您的巴哈姆特帳號尚未通過手機認證，請先通過手機認證之後再進行驗證！');
+    }
+    url = 'https://home.gamer.com.tw/homeReplyList.php?owner=' + username;
+    urlContent = HTTP.get(url).content;
+    const userSayText = cheerio.load(urlContent)('a[href="home.php?owner=' + username + '"]')
+      .parent()
+      .text();
+    const validateCode = validatingUser.validateCode;
+    if (userSayText.indexOf('：' + validateCode) === -1) {
+      throw new Meteor.Error(403, '無法查詢到驗證碼，請確定驗證碼[' + validateCode + ']是否輸入正確，且有出現在您的訪客留言頁面上！');
+    }
+    const password = validatingUser.password;
+    const existUser = Meteor.users.findOne({username: checkUsername}, {
+      fields: {
+        _id: 1
+      }
+    });
+    if (existUser) {
+      Accounts.setPassword(existUser._id, password, {
+        logout: true
+      });
+      dbValidatingUsers.remove(validatingUser._id);
+    }
+    else {
+      const profile = {
+        validateType: 'Bahamut',
+        name: username
+      };
+      Accounts.createUser({username: checkUsername, password, profile});
+      dbValidatingUsers.remove(validatingUser._id);
+    }
+  }
+
+  return true;
 }
 
 Accounts.onCreateUser((options, user) => {
@@ -128,10 +195,22 @@ Accounts.onCreateUser((options, user) => {
   if (user.services && user.services.google) {
     const email = user.services.google.email;
     const gmailAccountNameEndIndex = email.indexOf('@');
+    user.profile.validateType = 'Google';
     user.profile.name = email.slice(0, gmailAccountNameEndIndex);
   }
 
   return user;
+});
+
+UserStatus.events.on('connectionLogin', function(fields) {
+  if (fields.userId) {
+    dbLog.insert({
+      logType: '登入紀錄',
+      userId: [fields.userId],
+      message: fields.ipAddr,
+      createdAt: fields.loginTime
+    });
+  }
 });
 
 Meteor.publish('accountInfo', function(userId) {
@@ -303,9 +382,19 @@ Meteor.publish('validateUser', function(username) {
   check(username, String);
 
   dbValidatingUsers
-    .find({username}, {
-      disableOplog: true
-    })
+    .find(
+      {
+        username: {
+          $in: [
+            username,
+            '?' + username
+          ]
+        }
+      },
+      {
+        disableOplog: true
+      }
+    )
     .observeChanges({
       added: (id, fields) => {
         this.added('validatingUsers', id, fields);
