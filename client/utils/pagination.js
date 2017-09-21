@@ -49,10 +49,10 @@ Template.pagination.helpers({
     const offset = this.offset.get();
     const currentPage = (offset / this.dataNumberPerPage) + 1;
     if (page === 'prev') {
-      return './' + Math.max(1, currentPage-1);
+      return './' + Math.max(1, currentPage - 1);
     }
     if (page === 'next') {
-      return './' + Math.min(totalPages, currentPage+1);
+      return './' + Math.min(totalPages, currentPage + 1);
     }
 
     return './' + page;
