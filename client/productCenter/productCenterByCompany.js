@@ -57,7 +57,8 @@ Template.productListByCompanyTable.helpers({
       {
         sort: {
           [rProductSortBy.get()]: rProductSortDir.get()
-        }
+        },
+        limit: 30
       }
     );
   },

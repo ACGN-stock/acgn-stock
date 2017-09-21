@@ -796,7 +796,7 @@ Template.companyLogList.helpers({
       sort: {
         createdAt: -1
       },
-      limit: rLogOffset.get() + 50
+      limit: 30
     });
   },
   paginationData() {

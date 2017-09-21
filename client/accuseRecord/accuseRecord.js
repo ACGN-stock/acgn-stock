@@ -28,7 +28,8 @@ Template.accuseRecord.helpers({
       {
         sort: {
           createdAt: -1
-        }
+        },
+        limit: 30
       }
     );
   },

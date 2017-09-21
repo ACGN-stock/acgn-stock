@@ -135,7 +135,8 @@ Template.productListBySeasonTable.helpers({
       {
         sort: {
           [rProductSortBy.get()]: rProductSortDir.get()
-        }
+        },
+        limit: 30
       }
     );
   },
