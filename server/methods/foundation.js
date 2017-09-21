@@ -52,8 +52,8 @@ export function foundCompany(user, foundCompanyData) {
   });
   dbFoundations.insert(foundCompanyData);
 }
-//一分鐘最多一次
-limitMethod('foundCompany', 1);
+//一分鐘最多三次
+limitMethod('foundCompany', 3);
 
 Meteor.methods({
   editFoundCompany(foundCompanyData) {
@@ -116,8 +116,8 @@ export function editFoundCompany(user, foundCompanyData) {
     release();
   });
 }
-//一分鐘最多一次
-limitMethod('editFoundCompany', 1);
+//一分鐘最多三次
+limitMethod('editFoundCompany', 3);
 
 Meteor.methods({
   investFoundCompany(companyId, amount) {

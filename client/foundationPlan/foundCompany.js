@@ -103,7 +103,7 @@ function handleInputChange(event) {
 function saveModel(model) {
   if (model._id) {
     const submitData = _.pick(model, '_id', 'tags', 'pictureSmall', 'pictureBig', 'description');
-    Meteor.call('editFoundCompany', submitData, (error) => {
+    Meteor.customCall('editFoundCompany', submitData, (error) => {
       if (! error) {
         const path = FlowRouter.path('foundationPlan');
         FlowRouter.go(path);
@@ -111,7 +111,7 @@ function saveModel(model) {
     });
   }
   else {
-    Meteor.call('foundCompany', model, (error) => {
+    Meteor.customCall('foundCompany', model, (error) => {
       if (! error) {
         const path = FlowRouter.path('foundationPlan');
         FlowRouter.go(path);
