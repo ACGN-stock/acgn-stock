@@ -16,9 +16,11 @@ import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, vo
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+const rShowAllTags = new ReactiveVar(false);
 
 inheritedShowLoadingOnSubscribing(Template.company);
 Template.company.onCreated(function() {
+  rShowAllTags.set(false);
   this.autorun(() => {
     const companyId = FlowRouter.getParam('companyId');
     if (companyId) {
@@ -80,6 +82,10 @@ Template.company.events({
         }
       }
     });
+  },
+  'click [data-action="showAllTags"]'(event) {
+    event.preventDefault();
+    rShowAllTags.set(true);
   }
 });
 
@@ -91,6 +97,16 @@ Template.company.helpers({
   },
   getManageHref(companyId) {
     return FlowRouter.path('manageCompany', {companyId});
+  },
+  showAllTags(tags) {
+    if (tags.length <= 4) {
+      return true;
+    }
+
+    return rShowAllTags.get();
+  },
+  firstFewTags(tags) {
+    return tags.slice(0, 3);
   }
 });
 Template.company.events({

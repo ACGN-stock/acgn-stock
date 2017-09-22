@@ -23,6 +23,16 @@
               </a>
             {{/if}}
           </h1>
+          {{#if showAllTags this.tags}}
+            {{#each tag in this.tags}}
+              <span class="badge badge-default">{{tag}}</span>
+            {{/each}}
+          {{else}}
+            {{#each tag in firstFewTags this.tags}}
+              <span class="badge badge-default">{{tag}}</span>
+            {{/each}}
+            <span class="badge badge-primary" style="cursor: pointer;" data-action="showAllTags">顯示全部標籤</span>
+          {{/if}}
           <hr />
           <h2 class="card-subtitle mb-2 text-muted">
             {{this.chairmanTitle}}：
