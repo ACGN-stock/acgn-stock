@@ -101,11 +101,12 @@ function handleInputChange(event) {
 }
 
 function saveModel(model) {
-  if (model._id) {
+  const foundationId = model._id;
+  if (foundationId) {
     const submitData = _.pick(model, '_id', 'tags', 'pictureSmall', 'pictureBig', 'description');
     Meteor.customCall('editFoundCompany', submitData, (error) => {
       if (! error) {
-        const path = FlowRouter.path('foundationPlan');
+        const path = FlowRouter.path('foundation', {foundationId});
         FlowRouter.go(path);
       }
     });
@@ -131,6 +132,12 @@ Template.foundCompanyForm.helpers({
     return previewPictureType.get() === pictureType;
   },
   getFoundationPlanHref() {
+    const templateInstance = Template.instance();
+    const foundationId = templateInstance.model.get()._id;
+    if (foundationId) {
+      return FlowRouter.path('foundation', {foundationId});
+    }
+
     return FlowRouter.path('foundationPlan');
   }
 });

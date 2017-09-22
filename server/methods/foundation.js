@@ -120,6 +120,29 @@ export function editFoundCompany(user, foundCompanyData) {
 limitMethod('editFoundCompany', 3);
 
 Meteor.methods({
+  changeFoundCompanyName(foundationId, companyName) {
+    check(this.userId, String);
+    check(foundationId, String);
+    check(companyName, String);
+    changeFoundCompanyName(Meteor.user(), foundationId, companyName);
+
+    return true;
+  }
+});
+function changeFoundCompanyName(user, foundationId, companyName) {
+  debug.log('changeFoundCompanyName', {user, foundationId, companyName});
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  }
+  dbFoundations.update(foundationId, {
+    $set: {
+      companyName: companyName
+    }
+  });
+}
+limitMethod('changeFoundCompanyName');
+
+Meteor.methods({
   investFoundCompany(companyId, amount) {
     check(this.userId, String);
     check(companyId, String);
@@ -282,3 +305,84 @@ Meteor.publish('foundationDataForEdit', function(foundationId) {
 });
 //一分鐘最多10次
 limitSubscription('foundationDataForEdit', 10);
+
+Meteor.publish('foundationDetail', function(foundationId) {
+  debug.log('publish foundationDetail', {foundationId});
+  check(foundationId, String);
+
+  const foundation = dbFoundations.findOne(foundationId);
+  if (foundation) {
+    let total = foundation.invest.length;
+    this.added('variables', 'totalCountOfFounder', {
+      value: total
+    });
+  }
+
+  return dbFoundations.find(foundationId);
+});
+//一分鐘最多10次
+limitSubscription('foundationDetail', 10);
+
+Meteor.publish('foundationLog', function(foundationId, offset) {
+  debug.log('publish foundationLog', {foundationId, offset});
+  check(foundationId, String);
+  check(offset, Match.Integer);
+
+  const foundation = dbFoundations.findOne(foundationId);
+  console.log('foundation', foundation);
+  let initialized = false;
+  let total = dbLog.find({
+    logType: {
+      $in: ['創立公司', '參與投資']
+    },
+    message: foundation.companyName
+  }).count();
+  this.added('variables', 'totalCountOfFoundationLog', {
+    value: total
+  });
+
+  const observer = dbLog
+    .find({
+      logType: {
+        $in: ['創立公司', '參與投資']
+      },
+      message: foundation.companyName
+    }, {
+      sort: {
+        createdAt: -1
+      },
+      skip: offset,
+      limit: 30,
+      disableOplog: true
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('log', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('variables', 'totalCountOfFoundationLog', {
+            value: total
+          });
+        }
+      },
+      changed: (id, fields) => {
+        this.changed('log', id, fields);
+      },
+      removed: (id) => {
+        this.removed('log', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('variables', 'totalCountOfFoundationLog', {
+            value: total
+          });
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
+});
+//一分鐘最多10次
+limitSubscription('foundationLog', 10);

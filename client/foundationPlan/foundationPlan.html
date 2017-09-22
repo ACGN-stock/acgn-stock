@@ -71,7 +71,7 @@
     <div class="media-body row border-grid-body">
       <div class="col-4 col-lg-3 text-right border-grid">角色名稱：</div>
       <div class="col-8 col-lg-3 text-truncate border-grid" title="{{this.companyName}}">
-        {{this.companyName}}
+        {{>foundationLink this._id}}
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">經理人：</div>
       <div class="col-8 col-lg-3 text-truncate border-grid">
@@ -159,7 +159,7 @@
           </div>
         </div>
         <div class="row title-starter">
-          <p>{{this.companyName}}</p>
+          {{>foundationLink this._id}}
         </div>
         <div class="row row-info d-flex justify-content-between">
           <p>投資人數</p>

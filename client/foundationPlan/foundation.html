@@ -1,0 +1,168 @@
+<template name="foundation">
+  <div class="card">
+    {{#with foundationData}}
+      <div class="card-block">
+        <h1 class="card-title text-truncate">
+          {{this.companyName}}
+          {{#if currentUser.profile.isAdmin}}
+            <a class="btn btn-warning float-right" href="#" data-action="changeCompanyName">
+              更名
+            </a>
+          {{/if}}
+        </h1>
+        {{#if showAllTags this.tags}}
+          {{#each tag in this.tags}}
+            <span class="badge badge-default">{{tag}}</span>
+          {{/each}}
+        {{else}}
+          {{#each tag in firstFewTags this.tags}}
+            <span class="badge badge-default">{{tag}}</span>
+          {{/each}}
+          <span class="badge badge-primary" style="cursor: pointer;" data-action="showAllTags">顯示全部標籤</span>
+        {{/if}}
+        <hr />
+        <h3>
+          經理人：
+          {{>userLink this.manager}}
+          {{#if isUserId this.manager}}
+            <a class="btn btn-primary btn-sm" href="{{getEditHref this._id}}">
+              修改計劃
+            </a>
+          {{/if}}
+        </h3>
+        <hr />
+        {{> foundationDetail}}
+      </div>
+    {{else}}
+      <div class="card-block">
+        Loading...
+      </div>
+    {{/with}}
+  </div>
+</template>
+
+<template name="foundationDetail">
+  <div class="company-detail">
+    <div class="media">
+      <div class="d-sm-flex picture">
+        {{#if this.pictureBig}}
+          <img src="{{this.pictureBig}}" />
+        {{else}}
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
+        {{/if}}
+      </div>
+      <div class="media-body hidden-sm-down company-description"><h4>角色簡介</h4>{{this.description}}</div>
+    </div>
+    <div class="row border-grid-body" style="margin-top: 15px;">
+      <div class="col-12 border-grid hidden-md-up company-description"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="numbers">
+          數據資訊
+          {{#if isDisplayPanel 'numbers'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'numbers'}}
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總投資額：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid" title="{{getTotalInvest this.invest}}">
+          $ {{getTotalInvest this.invest}}
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">股票參考價格：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          $ {{getStockPrice this.invest}}
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">預計釋出股票：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          {{getStockRelease this.invest}}股
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">投資人數：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          <span class="{{investPplsNumberClass this.invest.length}}">
+            {{this.invest.length}} / {{foundationNeedUsers}}
+          </span>
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">計劃日期：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          {{formatDateText this.createdAt}}
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">截止日期：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+          {{getExpireDateText this.createdAt}}
+        </div>
+      {{/if}}
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="founder">
+          新創投資團隊
+          {{#if isDisplayPanel 'founder'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'founder'}}
+        {{> founderList}}
+      {{/if}}
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="log">
+          所有紀錄
+          {{#if isDisplayPanel 'log'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'log'}}
+        {{> foundationLogList}}
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="founderList">
+  <div class="col-12 border-grid">
+    <div class="row" style="max-height: 300px; overflow-y: auto;">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="row mb-1">
+          <div class="col-6 text-left">使用者帳號</div>
+          <div class="col-3 text-right">投資額</div>
+          <div class="col-3 text-right">比例</div>
+        </div>
+        {{#each invest in orderedInvestList}}
+          <div class="row mb-1">
+            <div class="col-6 text-left text-truncate">
+              {{>userLink invest.userId}}
+            </div>
+            <div class="col-3 text-right" title="{{invest.amount}}">
+              {{invest.amount}}
+            </div>
+            <div class="col-3 text-right" title="{{getPercentage invest.amount this.invest}} %">
+              {{getPercentage invest.amount}} %
+            </div>
+          </div>
+        {{else}}
+          <div class="text-center">
+            沒有任何投資人！
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="foundationLogList">
+  <div class="col-12 border-grid">
+    {{#each logData in logList}}
+      {{>displayLog logData}}
+    {{else}}
+      查無資料！
+    {{/each}}
+    {{#with paginationData}}
+      {{> pagination}}
+    {{/with}}
+  </div>
+</template>

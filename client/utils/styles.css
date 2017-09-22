@@ -81,12 +81,13 @@
   background: -linear-gradient(left, transparent, #f8b500 5%, #f8b500 95%, transparent);
   font-size: 1.5rem;
 }
-.company-card .title-starter p {
+.company-card .title-starter a {
   color: #000;
   margin: 0 5%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  display: block;
 }
 .company-card .row {
   color: #000;
