@@ -13,7 +13,6 @@ import { dbProducts } from '../db/dbProducts';
 import { dbResourceLock } from '../db/dbResourceLock';
 import { dbSeason } from '../db/dbSeason';
 import { dbVoteRecord } from '../db/dbVoteRecord';
-import { changeStocksAmount } from './methods/order';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
 import { setLowPriceThreshold } from './lowPriceThreshold';
@@ -181,6 +180,15 @@ function doSeasonWorks(lastSeasonData) {
 //取消所有尚未交易完畢的訂單
 function cancelAllOrder() {
   debug.log('cancelAllOrder');
+  const now = new Date();
+  const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
+  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+
+  //紀錄整個取消過程裡金錢有增加的userId及增加量
+  const increaseMoneyHash = {};
+  //紀錄整個取消過程裡股份有增加的userId及增加公司及增加量
+  const increaseStocksHash = {};
   dbOrders.find().forEach((orderData) => {
     const orderType = orderData.orderType;
     const userId = orderData.userId;
@@ -188,27 +196,79 @@ function cancelAllOrder() {
     const leftAmount = orderData.amount - orderData.done;
     if (userId !== '!system') {
       if (orderType === '購入') {
-        Meteor.users.update(userId, {
-          $inc: {
-            'profile.money': (orderData.unitPrice * leftAmount)
-          }
-        });
+        if (increaseMoneyHash[userId] === undefined) {
+          increaseMoneyHash[userId] = 0;
+        }
+        increaseMoneyHash[userId] += (orderData.unitPrice * leftAmount);
       }
       else {
-        changeStocksAmount(userId, companyId, leftAmount);
+        if (increaseStocksHash[userId] === undefined) {
+          increaseStocksHash[userId] = {};
+        }
+        if (increaseStocksHash[userId][companyId] === undefined) {
+          increaseStocksHash[userId][companyId] = 0;
+        }
+        increaseStocksHash[userId][companyId] += leftAmount;
       }
     }
-
-    dbLog.insert({
+    logBulk.insert({
       logType: '系統撤單',
       userId: [userId],
       companyId: companyId,
       price: orderData.unitPrice,
       amount: leftAmount,
       message: orderType,
-      createdAt: new Date()
+      createdAt: now
     });
   });
+  _.each(increaseMoneyHash, (money, userId) => {
+    usersBulk
+      .find({
+        _id: userId
+      })
+      .updateOne({
+        $inc: {
+          'profile.money': money
+        }
+      });
+  });
+  let index = 0;
+  _.each(increaseStocksHash, (stocksHash, userId) => {
+    const createdAt = new Date(now.getTime() + index);
+    index += 1;
+    _.each(stocksHash, (stocks, companyId) => {
+      if (dbDirectors.find({companyId, userId}).count() > 0) {
+        //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
+        directorsBulk
+          .find({companyId, userId})
+          .updateOne({
+            $inc: {
+              stocks: stocks
+            }
+          });
+      }
+      else {
+        directorsBulk.insert({
+          companyId: companyId,
+          userId: userId,
+          stocks: stocks,
+          createdAt: createdAt
+        });
+      }
+    });
+  });
+  if (_.size(increaseMoneyHash) > 0) {
+    usersBulk.execute = Meteor.wrapAsync(usersBulk.execute);
+    usersBulk.execute();
+  }
+  if (_.size(increaseStocksHash) > 0) {
+    directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
+    directorsBulk.execute();
+  }
+  if (_.size(increaseMoneyHash) > 0 || _.size(increaseStocksHash) > 0) {
+    logBulk.execute = Meteor.wrapAsync(logBulk.execute);
+    logBulk.execute();
+  }
   dbOrders.remove({});
 }
 
