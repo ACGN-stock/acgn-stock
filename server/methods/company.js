@@ -338,16 +338,15 @@ Meteor.methods({
 function changeChairmanTitle(user, companyId, chairmanTitle) {
   debug.log('changeChairmanTitle', {user, companyId, chairmanTitle});
   const userId = user._id;
-  const chairmanData = dbDirectors.findOne({companyId}, {
-    sort: {
-      stocks: -1,
-      createdAt: 1
-    },
+  const companyData = dbCompanies.findOne(companyId, {
     fields: {
-      userId: 1
+      chairman: 1
     }
   });
-  if (chairmanData.userId !== userId) {
+  if (! companyData) {
+    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
+  }
+  if (companyData.chairman !== userId) {
     throw new Meteor.Error(401, '使用者並非該公司的董事長，無法修改董事長頭銜！');
   }
   dbCompanies.update(companyId, {

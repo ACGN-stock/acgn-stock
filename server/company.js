@@ -454,15 +454,23 @@ export function checkChairman() {
       )
       .forEach((companyData) => {
         const companyId = companyData._id;
-        const chairmanData = dbDirectors.findOne({companyId}, {
-          sort: {
-            stocks: -1,
-            createdAt: 1
+        const chairmanData = dbDirectors.findOne(
+          {
+            companyId: companyId,
+            userId: {
+              $ne: '!system'
+            }
           },
-          fields: {
-            userId: 1
+          {
+            sort: {
+              stocks: -1,
+              createdAt: 1
+            },
+            fields: {
+              userId: 1
+            }
           }
-        });
+        );
         if (chairmanData.userId !== companyData.chairman) {
           needExecuteBulk = true;
           companiesBulk
