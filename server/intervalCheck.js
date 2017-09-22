@@ -386,8 +386,9 @@ function giveBonusByStocksFromProfit() {
       //剩餘收益先扣去公司營運成本
       leftProfit -= Math.ceil(companyData.profit * config.costFromProfit);
       const forDirectorProfit = leftProfit;
-      const totalReleaseStocks = companyData.totalRelease;
-      //發放營利給所有董事
+      //取得所有能夠領取紅利的董事userId與股份比例
+      let canReceiveProfitStocks = 0;
+      const canReceiveProfitDirectorList = [];
       dbDirectors
         .find({companyId}, {
           sort: {
@@ -400,20 +401,37 @@ function giveBonusByStocksFromProfit() {
           },
           disableOplog: true
         })
-        .forEach((director, index) => {
-          const directorProfit = Math.min(Math.ceil(forDirectorProfit * director.stocks / totalReleaseStocks), leftProfit);
+        .forEach((directorData) => {
+          if (directorData.userId === '!system') {
+            return true;
+          }
+          const userData = Meteor.users.findOne(directorData.userId, {
+            fields: {
+              'status.lastActivity': 1
+            }
+          });
+          //七天未動作者不分紅
+          if (userData.status && now - userData.status.lastActivity <= 604800000) {
+            canReceiveProfitStocks += directorData.stocks;
+            canReceiveProfitDirectorList.push({
+              userId: directorData.userId,
+              stocks: directorData.stocks
+            });
+          }
+        });
+        _.each(canReceiveProfitDirectorList, (directorData, index) => {
+          const directorProfit = Math.min(Math.ceil(forDirectorProfit * directorData.stocks / canReceiveProfitStocks), leftProfit);
           if (directorProfit > 0) {
             logBulk.insert({
               logType: '營利分紅',
-              userId: [director.userId],
+              userId: [directorData.userId],
               companyId: companyId,
               amount: directorProfit,
-              resolve: false,
-              createdAt: new Date( now + 2 + index)
+              createdAt: new Date(now + 2 + index)
             });
             usersBulk
               .find({
-                _id: director.userId
+                _id: directorData.userId
               })
               .updateOne({
                 $inc: {
