@@ -94,6 +94,7 @@ export function checkFoundCompany() {
             profit: 0,
             candidateList: [foundationData.manager],
             voteList: [ [] ],
+            isSeal: false,
             createdAt: basicCreatedAt
           });
           dbPrice.insert({
