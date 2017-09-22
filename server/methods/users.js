@@ -202,17 +202,6 @@ Accounts.onCreateUser((options, user) => {
   return user;
 });
 
-UserStatus.events.on('connectionLogin', function(fields) {
-  if (fields.userId) {
-    dbLog.insert({
-      logType: '登入紀錄',
-      userId: [fields.userId],
-      message: fields.ipAddr,
-      createdAt: fields.loginTime
-    });
-  }
-});
-
 Meteor.publish('accountInfo', function(userId) {
   debug.log('publish accountInfo', userId);
   check(userId, String);
@@ -438,3 +427,28 @@ function countAndPublishOnlinePeopleNumber(publisher) {
     value: onlinePeopleNumber
   });
 }
+
+//登入紀錄
+Meteor.startup(function() {
+  Meteor.users
+    .find(
+      {},
+      {
+        fields: {
+          _id: 1,
+          'status.ipAddr': 1
+        },
+        disableOplog: true
+      }
+    )
+    .observeChanges({
+      changed: (userId, fields) => {
+        dbLog.insert({
+          logType: '登入紀錄',
+          userId: [userId],
+          message: fields.status.ipAddr,
+          createdAt: new Date()
+        });
+      }
+    });
+});
