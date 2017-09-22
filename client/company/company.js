@@ -106,7 +106,7 @@ Template.company.helpers({
     return rShowAllTags.get();
   },
   firstFewTags(tags) {
-    return tags.slice(0, 3);
+    return tags && tags.slice(0, 3);
   }
 });
 Template.company.events({
