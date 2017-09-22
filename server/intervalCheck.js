@@ -398,8 +398,7 @@ function giveBonusByStocksFromProfit() {
           fields: {
             userId: 1,
             stocks: 1
-          },
-          disableOplog: true
+          }
         })
         .forEach((directorData) => {
           if (directorData.userId === '!system') {
@@ -407,11 +406,11 @@ function giveBonusByStocksFromProfit() {
           }
           const userData = Meteor.users.findOne(directorData.userId, {
             fields: {
-              'status.lastActivity': 1
+              'status.lastLogin.date': 1
             }
           });
           //七天未動作者不分紅
-          if (userData.status && now - userData.status.lastActivity <= 604800000) {
+          if (userData.status && now - userData.status.lastLogin.date.getTime() <= 604800000) {
             canReceiveProfitStocks += directorData.stocks;
             canReceiveProfitDirectorList.push({
               userId: directorData.userId,
