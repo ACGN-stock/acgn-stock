@@ -192,7 +192,6 @@ export function investFoundCompany(user, companyId, amount) {
       userId: [userId],
       message: foundCompanyData.companyName,
       amount: amount,
-      resolve: false,
       createdAt: new Date()
     });
     Meteor.users.update(userId, {

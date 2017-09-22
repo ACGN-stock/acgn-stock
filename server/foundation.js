@@ -76,7 +76,6 @@ export function checkFoundCompany() {
             userId: _.union([foundationData.manager], _.pluck(invest, 'userId')),
             companyId: companyId,
             price: stockUnitPrice,
-            resolve: false,
             createdAt: basicCreatedAt
           });
           companiesBulk.insert({
@@ -95,7 +94,6 @@ export function checkFoundCompany() {
             profit: 0,
             candidateList: [foundationData.manager],
             voteList: [ [] ],
-            isSeal: false,
             createdAt: basicCreatedAt
           });
           dbPrice.insert({
@@ -114,7 +112,6 @@ export function checkFoundCompany() {
                 companyId: companyId,
                 price: (stockUnitPrice * stocks) + amount,
                 amount: stocks,
-                resolve: false,
                 createdAt: createdAt
               });
               needExecuteDirectorsBulk = true;
@@ -126,7 +123,6 @@ export function checkFoundCompany() {
                 userId: [userId],
                 message: foundationData.companyName,
                 amount: amount,
-                resolve: false,
                 createdAt: createdAt
               });
               needExecuteUserBulk = true;
@@ -160,7 +156,6 @@ export function checkFoundCompany() {
             logType: '創立失敗',
             userId: _.union([foundationData.manager], _.pluck(invest, 'userId')),
             message: foundationData.companyName,
-            resolve: false,
             createdAt: createdAt
           });
           _.each(foundationData.invest, ({userId, amount}, index) => {
@@ -169,7 +164,6 @@ export function checkFoundCompany() {
               userId: [userId],
               message: foundationData.companyName,
               amount: amount,
-              resolve: false,
               createdAt: new Date(createdAt.getTime() + index + 1)
             });
             usersBulk.find({_id: userId}).updateOne({

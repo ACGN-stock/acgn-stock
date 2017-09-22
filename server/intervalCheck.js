@@ -298,7 +298,6 @@ function giveBonusByStocksFromProfit() {
         logType: '公司營利',
         companyId: companyId,
         amount: leftProfit,
-        resolve: false,
         createdAt: new Date(now)
       });
       needExecuteLogBulk = true;
@@ -310,7 +309,6 @@ function giveBonusByStocksFromProfit() {
           userId: [companyData.manager],
           companyId: companyId,
           amount: managerProfit,
-          resolve: false,
           createdAt: new Date(now + 1)
         });
         usersBulk
@@ -434,7 +432,6 @@ function electManager(seasonData) {
             userId: companyData.candidateList,
             companyId: companyId,
             message: electMessage,
-            resolve: false,
             createdAt: new Date()
           });
           companiesBulk
@@ -485,7 +482,6 @@ function electManager(seasonData) {
             companyId: companyId,
             message: electMessage,
             amount: winnerData.stocks,
-            resolve: false,
             createdAt: new Date()
           });
           companiesBulk

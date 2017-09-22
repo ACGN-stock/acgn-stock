@@ -23,7 +23,6 @@ Meteor.methods({
       logType: '聊天發言',
       userId: [this.userId],
       message: message,
-      resolve: false,
       createdAt: new Date()
     });
   },
