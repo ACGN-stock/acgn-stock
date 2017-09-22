@@ -99,7 +99,7 @@ Template.company.helpers({
     return FlowRouter.path('manageCompany', {companyId});
   },
   showAllTags(tags) {
-    if (tags.length <= 4) {
+    if (tags && tags.length <= 4) {
       return true;
     }
 
