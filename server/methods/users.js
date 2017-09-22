@@ -436,19 +436,21 @@ Meteor.startup(function() {
       {
         fields: {
           _id: 1,
-          'status.ipAddr': 1
+          'status.lastLogin.ipAddr': 1
         },
         disableOplog: true
       }
     )
     .observeChanges({
       changed: (userId, fields) => {
-        dbLog.insert({
-          logType: '登入紀錄',
-          userId: [userId],
-          message: fields.status.ipAddr,
-          createdAt: new Date()
-        });
+        if (fields.status && fields.status.lastLogin && fields.status.lastLogin.ipAddr) {
+          dbLog.insert({
+            logType: '登入紀錄',
+            userId: [userId],
+            message: fields.status.lastLogin.ipAddr,
+            createdAt: new Date()
+          });
+        }
       }
     });
 });
