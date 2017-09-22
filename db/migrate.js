@@ -112,27 +112,6 @@ if (Meteor.isServer) {
       dbFoundations.rawCollection().createIndex({
         createdAt: 1
       });
-      dbLog.rawCollection().createIndex(
-        {
-          companyId: 1,
-          createdAt: -1
-        },
-        {
-          partialFilterExpression: {
-            logType: '交易紀錄'
-          }
-        }
-      );
-      dbLog.rawCollection().createIndex(
-        {
-          createdAt: 1
-        },
-        {
-          partialFilterExpression: {
-            logType: '聊天發言'
-          }
-        }
-      );
       dbLog.rawCollection().createIndex({
         createdAt: -1
       });
