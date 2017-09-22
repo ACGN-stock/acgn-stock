@@ -111,12 +111,12 @@ const schema = new SimpleSchema({
   //紀錄相關金額
   price: {
     type: SimpleSchema.Integer,
-    defaultValue: 0
+    optional: true
   },
   //紀錄相關數據
   amount: {
     type: Number,
-    defaultValue: 0
+    optional: true
   },
   //紀錄相關文字
   message: {
