@@ -355,6 +355,15 @@ Template.displayLog.helpers({
           getUserLink(logData.userId[1]) + '課以總數為$' + logData.amount + '的罰金。'
         );
       }
+      case '沒收股份': {
+        return (
+          '【違規處理】' +
+          getUserLink(logData.userId[0]) +
+          '以「' + getPureMessage() + '」的理由將' +
+          getUserLink(logData.userId[1]) + '持有的「' +
+          getCompanyLink(logData.companyId) + '」公司股份數量' + logData.amount + '給沒收了。'
+        );
+      }
       case '禁任經理': {
         return (
           '【違規處理】' +

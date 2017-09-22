@@ -69,6 +69,7 @@ const alwaysDisplayLogTypeList = [
   '禁止聊天',
   '禁止廣告',
   '課以罰款',
+  '沒收股份',
   '禁任經理',
   '解除舉報',
   '解除下單',

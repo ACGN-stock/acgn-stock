@@ -199,6 +199,21 @@ Template.accountInfoBasic.events({
         }
       }
     });
+  },
+  'click [data-action="confiscateStocks"]'(event, templateInstance) {
+    event.preventDefault();
+    const accuseUserData = templateInstance.data;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '沒收股份 - ' + accuseUserData.profile.name,
+      message: `請輸入處理事由：`,
+      callback: function(message) {
+        if (message) {
+          const userId = accuseUserData._id;
+          Meteor.customCall('confiscateStocks', {userId, message});
+        }
+      }
+    });
   }
 });
 

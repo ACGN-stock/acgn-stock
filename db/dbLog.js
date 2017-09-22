@@ -44,6 +44,7 @@ export const logTypeList = [
   '禁止聊天', //userId0以「message」的理由禁止userId1今後的所有聊天發言行為。
   '禁止廣告', //userId0以「message」的理由禁止userId1今後的所有廣告宣傳行為。
   '課以罰款', //userId0以「message」的理由向userId1課以總數為$amount的罰金。
+  '沒收股份', //userId0以「message」的理由將userId1持有的「companyId」公司股份數量amount給沒收了。
   '禁任經理', //userId0以「message」的理由禁止userId1今後擔任經理人的資格。
   '解除舉報', //userId0以「message」的理由中止了userId1的舉報違規禁令。
   '解除下單', //userId0以「message」的理由中止了userId1的投資下單禁令。
@@ -65,6 +66,7 @@ export const accuseLogTypeList = [
   '禁止廣告',
   '禁任經理',
   '課以罰款',
+  '沒收股份',
   '解除舉報',
   '解除下單',
   '解除聊天',
