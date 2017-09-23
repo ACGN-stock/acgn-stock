@@ -386,16 +386,14 @@ function directorMessage(user, companyId, message) {
 }
 
 Meteor.methods({
-  queryTodayDealAmount(companyId, lastTime) {
+  queryTodayDealAmount(companyId) {
     check(companyId, String);
-    check(lastTime, Number);
 
-    return queryTodayDealAmount(companyId, lastTime);
+    return queryTodayDealAmount(companyId);
   }
 });
-function queryTodayDealAmount(companyId, lastTime) {
-  debug.log('queryTodayDealAmount', {companyId, lastTime});
-  lastTime = Math.max(lastTime, new Date().setHours(0, 0, 0, 0) - 1);
+function queryTodayDealAmount(companyId) {
+  debug.log('queryTodayDealAmount', companyId);
   let data = 0;
   dbLog
     .find(
@@ -403,23 +401,21 @@ function queryTodayDealAmount(companyId, lastTime) {
         logType: '交易紀錄',
         companyId: companyId,
         createdAt: {
-          $gt: new Date(lastTime)
+          $gt: new Date(new Date().setHours(0, 0, 0, 0))
         }
       },
       {
         fields: {
           amount: 1,
           createdAt: 1
-        },
-        disableOplog: true
+        }
       }
     )
     .forEach((logData) => {
-      lastTime = Math.max(lastTime, logData.createdAt.getTime());
       data += logData.amount;
     });
 
-  return {data, lastTime};
+  return data;
 }
 //一分鐘最多20次
 limitMethod('queryTodayDealAmount');

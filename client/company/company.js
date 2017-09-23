@@ -375,33 +375,16 @@ function drawCandleStickChart(templateInstance) {
 
 //定時呼叫取得今日交易量資料
 const rTodayDealAmount = new ReactiveVar(0);
-let lastQueryTodayDealAmountTime;
 Template.companyTodayDealAmount.onCreated(function() {
-  this.autorun(() => {
-    FlowRouter.getParam('companyId');
-    rTodayDealAmount.set(0);
-    lastQueryTodayDealAmountTime = new Date().setHours(0, 0, 0, 0) - 1;
-  });
-  queryDealAmount();
-  this.queryDealAmountIntervalId = Meteor.setInterval(queryDealAmount, 30000);
-});
-Template.companyTodayDealAmount.onDestroyed(function() {
-  Meteor.clearInterval(this.queryDealAmountIntervalId);
-});
-function queryDealAmount() {
-  if (shouldStopSubscribe()) {
-    return false;
-  }
   const companyId = FlowRouter.getParam('companyId');
   if (companyId) {
-    Meteor.call('queryTodayDealAmount', companyId, lastQueryTodayDealAmountTime, (error, result) => {
+    Meteor.call('queryTodayDealAmount', companyId, (error, result) => {
       if (! error) {
-        rTodayDealAmount.set(rTodayDealAmount.get() + result.data);
-        lastQueryTodayDealAmountTime = result.lastTime;
+        rTodayDealAmount.set(result);
       }
     });
   }
-}
+});
 Template.companyTodayDealAmount.helpers({
   getTodayDealAmount() {
     return rTodayDealAmount.get();
