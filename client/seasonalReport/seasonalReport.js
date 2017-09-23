@@ -379,7 +379,7 @@ function drawCompanyProfitRankTable(templateInstance) {
       }),
       datasets: [
         {
-          label: '本益比',
+          label: '益本比',
           xAxisID: 'x-axis-ratio',
           backgroundColor: 'rgba(255, 136, 0, 1)',
           borderColor: '#aaa',
