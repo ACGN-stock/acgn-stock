@@ -153,7 +153,7 @@
     <table class="table table-bordered mt-3" style="width: 100%; table-layout: fixed;">
       <thead>
         <tr>
-          <th class="text-center text-truncate" style="width: 160px">稅金產生日期</th>
+          <th class="text-center text-truncate" style="width: 160px">繳稅期限</th>
           <th class="text-center text-truncate">財稅額</th>
           <th class="text-center text-truncate">殭屍稅</th>
           <th class="text-center text-truncate">逾期罰金</th>
@@ -166,7 +166,7 @@
       <tbody>
         {{#each taxes in taxesList}}
           <tr>
-            <td class="text-center">{{formatDateText taxes.createdAt}}</td>
+            <td class="text-center">{{formatDateText taxes.expireDate}}</td>
             <td class="text-right">$ {{taxes.tax}}</td>
             <td class="text-right">$ {{taxes.zombie}}</td>
             <td class="text-right">$ {{taxes.fine}}</td>

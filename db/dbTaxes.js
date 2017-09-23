@@ -34,8 +34,8 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     defaultValue: 0
   },
-  //稅金產生日期
-  createdAt: {
+  //繳稅期限
+  expireDate: {
     type: Date
   }
 });

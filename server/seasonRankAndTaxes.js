@@ -552,6 +552,7 @@ const taxConfigList = [
 
 function generateUserTaxes(userWealthList) {
   const createdAt = new Date();
+  const expireDate = new Date(new Date().setHours(0, 0, 0, 0) + 259200000);
   const taxesBulk = dbTaxes.rawCollection().initializeUnorderedBulkOp();
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   _.each(userWealthList, (wealthData) => {
@@ -572,7 +573,7 @@ function generateUserTaxes(userWealthList) {
         zombie: zombie,
         fine: 0,
         paid: 0,
-        createdAt: createdAt
+        expireDate: expireDate
       });
       logBulk.insert({
         logType: '季度賦稅',
@@ -589,7 +590,7 @@ function generateUserTaxes(userWealthList) {
         zombie: zombie,
         fine: 0,
         paid: 0,
-        createdAt: createdAt
+        expireDate: expireDate
       });
       logBulk.insert({
         logType: '季度賦稅',

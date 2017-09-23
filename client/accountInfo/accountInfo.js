@@ -246,7 +246,10 @@ Template.accountInfoTaxList.helpers({
     const userId = FlowRouter.getParam('userId');
 
     return dbTaxes.find({userId}, {
-      limit: 10
+      limit: 10,
+      sort: {
+        expireDate: 1
+      }
     });
   },
   paginationData() {
