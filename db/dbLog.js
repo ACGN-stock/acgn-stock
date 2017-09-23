@@ -36,6 +36,8 @@ export const logTypeList = [
   '推薦產品', //userId0推薦了#productId產品，使「companyId」公司獲得了$price的營利額！
   '公司營利', //「companyId」公司本商業季度一共獲利$amount！
   '營利分紅', //userId0得到了「companyId」公司的分紅$amount！
+  '季度賦稅', //userId0在此次商業季度中產生了$amount的財富稅與$price的殭屍稅！
+  '繳納稅金', //userId0向系統繳納了$amount的稅金！
   '廣告宣傳', //userId0以$price的價格發布了一則廣告：「message」。
   '廣告追加', //userId0追加了$price的廣告費用在廣告：「message」上。
   '舉報違規', //userId0以「message」的理由向金融管理會舉報(userId1(ipAddr=userId2)的違規行為 || productId產品的違例事項 || companyId公司的違例事項)。

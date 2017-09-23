@@ -5,6 +5,19 @@
       <div class="card-block">
         <div class="row border-grid-body" style="margin-top: 15px;">
           <div class="col-12 border-grid">
+            <a class="d-block h4" href="#" data-toggle-panel="tax">
+              稅務資訊
+              {{#if isDisplayPanel 'tax'}}
+                <i class="fa fa-folder-open" aria-hidden="true"></i>
+              {{else}}
+                <i class="fa fa-folder" aria-hidden="true"></i>
+              {{/if}}
+            </a>
+          </div>
+          {{#if isDisplayPanel 'tax'}}
+            {{> accountInfoTaxList}}
+          {{/if}}
+          <div class="col-12 border-grid">
             <a class="d-block h4" href="#" data-toggle-panel="stock">
               持股資訊
               {{#if isDisplayPanel 'stock'}}
@@ -101,6 +114,12 @@
       上次登入IP：{{this.status.lastLogin.ipAddr}}
     </div>
     <div>
+      本季度未登入天數：{{this.profile.noLoginDayCount}}
+    </div>
+    <div>
+      上季度財富統計：{{this.profile.lastSeasonTotalWealth}}
+    </div>
+    <div>
       帳號當前餘額：{{this.profile.money}}
     </div>
     <div>
@@ -126,6 +145,51 @@
         」公司的總經理。
       </div>
     {{/each}}
+  </div>
+</template>
+
+<template name="accountInfoTaxList">
+  <div class="col-12 border-grid">
+    <table class="table table-bordered mt-3" style="width: 100%; table-layout: fixed;">
+      <thead>
+        <tr>
+          <th class="text-center text-truncate" style="width: 160px">稅金產生日期</th>
+          <th class="text-center text-truncate">財稅額</th>
+          <th class="text-center text-truncate">殭屍稅</th>
+          <th class="text-center text-truncate">逾期罰金</th>
+          <th class="text-center text-truncate">已繳納</th>
+          {{#if isCurrentUser}}
+            <th class="text-center text-truncate">繳納稅金</th>
+          {{/if}}
+        </tr>
+      </thead>
+      <tbody>
+        {{#each taxes in taxesList}}
+          <tr>
+            <td class="text-center">{{formatDateText taxes.createdAt}}</td>
+            <td class="text-right">$ {{taxes.tax}}</td>
+            <td class="text-right">$ {{taxes.zombie}}</td>
+            <td class="text-right">$ {{taxes.fine}}</td>
+            <td class="text-right">$ {{taxes.paid}}</td>
+            {{#if isCurrentUser}}
+              <td class="text-center">
+                <button class="btn btn-success btn-sm" type="button" data-pay="{{taxes._id._str}}">
+                  繳納稅金
+                </button>
+              </td>
+            {{/if}}
+          </tr>
+        {{else}}
+          <tr>
+            {{#if isCurrentUser}}
+              <td class="text-center text-truncate" colspan="6">目前沒有任何需要繳納的稅金！</td>
+            {{else}}
+              <td class="text-center text-truncate" colspan="5">目前沒有任何需要繳納的稅金！</td>
+            {{/if}}
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
   </div>
 </template>
 

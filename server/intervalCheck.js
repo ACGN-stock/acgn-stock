@@ -17,7 +17,7 @@ import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
 import { setLowPriceThreshold } from './lowPriceThreshold';
 import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
-import { generateRankData } from './seasonRank';
+import { generateRankAndTaxesData } from './seasonRankAndTaxes';
 import { threadId, shouldReplaceThread } from './thread';
 import { debug } from './debug';
 import { config } from '../config';
@@ -146,7 +146,7 @@ function doSeasonWorks(lastSeasonData) {
     //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
     //為所有公司與使用者進行排名結算
-    generateRankData(lastSeasonData);
+    generateRankAndTaxesData(lastSeasonData);
     //所有公司當季正營利額歸零
     dbCompanies.update(
       {

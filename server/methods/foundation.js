@@ -6,6 +6,7 @@ import { resourceManager } from '../resourceManager';
 import { dbFoundations } from '../../db/dbFoundations';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbSeason } from '../../db/dbSeason';
 import { checkImageUrl } from './checkImageUrl';
 import { config } from '../../config';
 import { limitMethod, limitSubscription } from './rateLimit';
@@ -30,6 +31,15 @@ export function foundCompany(user, foundCompanyData) {
   debug.log('foundCompany', {user, foundCompanyData});
   if (_.contains(user.profile.ban, 'manager')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了擔任經理人的資格！');
+  }
+  const lastSeasonData = dbSeason.findOne({}, {
+    sort: {
+      beginDate: -1
+    }
+  });
+  if (Date.now() >= (lastSeasonData.endDate.getTime() - config.foundExpireTime - 600000)) {
+    const hours = (config.foundExpireTime / 3600000);
+    throw new Meteor.Error(403, '商業季度即將結束前' + hours + '小時，禁止新創計劃！');
   }
   const companyName = foundCompanyData.companyName;
   if (dbFoundations.find({companyName}).count() > 0 || dbCompanies.find({companyName}).count() > 0) {

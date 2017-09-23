@@ -2,6 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -9,6 +10,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbTaxes } from '../../db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
@@ -214,6 +216,70 @@ Template.accountInfoBasic.events({
         }
       }
     });
+  }
+});
+
+export const taxesOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.accountInfoTaxList);
+Template.accountInfoTaxList.onCreated(function() {
+  taxesOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('accountInfoTax', userId, taxesOffset.get());
+    }
+  });
+});
+Template.accountInfoTaxList.helpers({
+  isCurrentUser() {
+    const user = Meteor.user();
+    if (user && user._id === FlowRouter.getParam('userId')) {
+      return true;
+    }
+
+    return false;
+  },
+  taxesList() {
+    const userId = FlowRouter.getParam('userId');
+
+    return dbTaxes.find({userId}, {
+      limit: 10
+    });
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfAccountInfoTax',
+      dataNumberPerPage: 10,
+      offset: taxesOffset
+    };
+  }
+});
+Template.accountInfoTaxList.events({
+  'click [data-pay]'(event) {
+    const taxId = new Mongo.ObjectID($(event.currentTarget).attr('data-pay'));
+    const taxData = dbTaxes.findOne(taxId);
+    if (taxData) {
+      const user = Meteor.user();
+      const totalNeedPay = taxData.tax + taxData.zombie + taxData.fine - taxData.paid;
+      const maxPayMoney = Math.max(user.profile.money, totalNeedPay);
+      if (maxPayMoney < 1) {
+        alertDialog.alert('您的金錢不足以繳納稅金！');
+      }
+      alertDialog.dialog({
+        type: 'prompt',
+        title: '繳納稅金',
+        message: `請輸入您要繳納的金額：(1~${maxPayMoney})`,
+        callback: function(amount) {
+          amount = parseInt(amount, 10);
+          if (amount) {
+            Meteor.customCall('payTax', taxId, amount);
+          }
+        }
+      });
+    }
   }
 });
 

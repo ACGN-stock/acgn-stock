@@ -15,6 +15,7 @@ import { dbRankCompanyProfit } from './dbRankCompanyProfit';
 import { dbRankCompanyValue } from './dbRankCompanyValue';
 import { dbRankUserWealth } from './dbRankUserWealth';
 import { dbSeason } from './dbSeason';
+import { dbTaxes } from './dbTaxes';
 import { dbValidatingUsers } from './dbValidatingUsers';
 import { dbVoteRecord } from './dbVoteRecord';
 
@@ -292,6 +293,28 @@ if (Meteor.isServer) {
         {
           $set: {
             'profile.validateType': 'PTT'
+          }
+        },
+        {
+          multi: true
+        }
+      );
+    }
+  });
+
+  Migrations.add({
+    version: 4,
+    name: 'taxes index, users add lastSeasonTotalWealth and noLoginDayCount field.',
+    up() {
+      dbTaxes.rawCollection().createIndex({
+        userId: 1
+      });
+      Meteor.users.update(
+        {},
+        {
+          $set: {
+            'profile.lastSeasonTotalWealth': 0,
+            'profile.noLoginDayCount': 0
           }
         },
         {

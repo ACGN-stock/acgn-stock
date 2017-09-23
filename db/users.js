@@ -43,6 +43,10 @@ const schema = new SimpleSchema({
         type: SimpleSchema.Integer,
         defaultValue: 0
       },
+      lastSeasonTotalWealth: {
+        type: SimpleSchema.Integer,
+        defaultValue: 0
+      },
       //推薦票數量
       vote: {
         type: SimpleSchema.Integer,
@@ -67,6 +71,11 @@ const schema = new SimpleSchema({
       },
       'ban.$': {
         type: new Match.OneOf(...banTypeList)
+      },
+      //未登入天數次數紀錄
+      noLoginDayCount: {
+        type: SimpleSchema.Integer,
+        defaultValue: 0
       }
     })
   },

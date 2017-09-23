@@ -7,8 +7,6 @@ import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { UserStatus } from 'meteor/mizzao:user-status';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
-import { dbCompanies } from '../../db/dbCompanies';
-import { dbDirectors } from '../../db/dbDirectors';
 import { dbLog } from '../../db/dbLog';
 import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
@@ -181,10 +179,12 @@ Accounts.onCreateUser((options, user) => {
   debug.log('onCreateUser', options);
   user.profile = _.defaults({}, options.profile, {
     money: config.beginMoney,
+    lastSeasonTotalWealth: 0,
     vote: 0,
     stone: 0,
     isAdmin: false,
-    ban: []
+    ban: [],
+    noLoginDayCount: 0
   });
   dbLog.insert({
     logType: '驗證通過',
@@ -201,170 +201,6 @@ Accounts.onCreateUser((options, user) => {
 
   return user;
 });
-
-Meteor.publish('accountInfo', function(userId) {
-  debug.log('publish accountInfo', userId);
-  check(userId, String);
-
-  return [
-    Meteor.users.find(userId, {
-      fields: {
-        'services.google.email': 1,
-        'status.lastLogin.date': 1,
-        'status.lastLogin.ipAddr': 1,
-        username: 1,
-        profile: 1,
-        createdAt: 1
-      }
-    }),
-    dbCompanies
-      .find(
-        {
-          manager: userId
-        },
-        {
-          fields: {
-            companyName: 1,
-            manager: 1
-          },
-          disableOplog: true
-        }
-      )
-  ];
-});
-//一分鐘最多20次
-limitSubscription('accountInfo');
-
-Meteor.publish('accountOwnStocks', function(userId, offset) {
-  debug.log('publish accountOwnStocks', {userId, offset});
-  check(userId, String);
-  check(offset, Match.Integer);
-
-  let initialized = false;
-  let total = dbDirectors.find({userId}).count();
-  this.added('variables', 'totalCountOfAccountOwnStocks', {
-    value: total
-  });
-
-  const observer = dbDirectors
-    .find({userId}, {
-      fields: {
-        userId: 1,
-        companyId: 1,
-        stocks: 1
-      },
-      skip: offset,
-      limit: 10,
-      disableOplog: true
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('directors', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfAccountOwnStocks', {
-            value: total
-          });
-        }
-      },
-      changed: (id, fields) => {
-        this.changed('directors', id, fields);
-      },
-      removed: (id) => {
-        this.removed('directors', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfAccountOwnStocks', {
-            value: total
-          });
-        }
-      }
-    });
-  initialized = true;
-  this.ready();
-  this.onStop(() => {
-    observer.stop();
-  });
-});
-//一分鐘最多20次
-limitSubscription('accountOwnStocks');
-
-Meteor.publish('accountInfoLog', function(userId, offset) {
-  debug.log('publish accountInfoLog', {userId, offset});
-  check(userId, String);
-  check(offset, Match.Integer);
-
-  const firstLogData = dbLog.findOne({userId}, {
-    sort: {
-      createdAt: 1
-    } 
-  });
-  const firstLogDate = firstLogData ? firstLogData.createdAt : new Date();
-
-  let initialized = false;
-  let total = dbLog
-    .find(
-      {
-        userId: {
-          $in: [userId, '!all']
-        },
-        createdAt: {
-          $gte: firstLogDate
-        }
-      }
-    )
-    .count();
-  this.added('variables', 'totalCountOfAccountInfoLog', {
-    value: total
-  });
-
-  const observer = dbLog
-    .find(
-      {
-        userId: {
-          $in: [userId, '!all']
-        },
-        createdAt: {
-          $gte: firstLogDate
-        }
-      },
-      {
-        sort: {
-          createdAt: -1
-        },
-        skip: offset,
-        limit: 30,
-        disableOplog: true
-      }
-    )
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('log', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfAccountInfoLog', {
-            value: total
-          });
-        }
-      },
-      removed: (id) => {
-        this.removed('log', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfAccountInfoLog', {
-            value: total
-          });
-        }
-      }
-    });
-  initialized = true;
-  this.ready();
-  this.onStop(() => {
-    observer.stop();
-  });
-});
-//一分鐘最多20次
-limitSubscription('accountInfoLog');
 
 Meteor.publish('validateUser', function(username) {
   debug.log('publish validateUser', username);
@@ -428,27 +264,52 @@ function countAndPublishOnlinePeopleNumber(publisher) {
   });
 }
 
-//登入紀錄
+//登入紀錄與未登入天數紀錄
 Meteor.startup(function() {
+  //登出、離線時更新最後上線日期
+  UserStatus.events.on('connectionLogout', function(logoutData) {
+    if (logoutData.userId) {
+      Meteor.users.update(logoutData.userId, {
+        $set: {
+          'statue.lastLogin.date': logoutData.logoutTime
+        }
+      });
+    }
+  });
   Meteor.users
     .find(
       {},
       {
         fields: {
           _id: 1,
+          'status.lastLogin.date': 1,
           'status.lastLogin.ipAddr': 1
         },
         disableOplog: true
       }
     )
-    .observeChanges({
-      changed: (userId, fields) => {
-        if (fields.status && fields.status.lastLogin && fields.status.lastLogin.ipAddr) {
+    .observe({
+      changed: (newUserData, oldUserData) => {
+        const previousLoginData = (oldUserData.status && oldUserData.status.lastLogin) || {
+          date: new Date()
+        };
+        const nextLoginData = (newUserData.status && newUserData.status.lastLogin) || {
+          date: new Date()
+        };
+        if (nextLoginData.ipAddr && nextLoginData.ipAddr !== previousLoginData.ipAddr) {
           dbLog.insert({
             logType: '登入紀錄',
-            userId: [userId],
-            message: fields.status.lastLogin.ipAddr,
+            userId: [newUserData._id],
+            message: nextLoginData.ipAddr,
             createdAt: new Date()
+          });
+        }
+        const noLoginDay = Math.floor((nextLoginData.date.getTime() - previousLoginData.date.getTime()) / 86400000);
+        if (noLoginDay > 0) {
+          Meteor.users.update(newUserData._id, {
+            $inc: {
+              'profile.noLoginDayCount': noLoginDay
+            }
           });
         }
       }

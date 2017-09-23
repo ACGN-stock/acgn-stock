@@ -279,6 +279,19 @@ Template.displayLog.helpers({
           '」公司的分紅$' + logData.amount + '！'
         );
       }
+      case '季度賦稅': {
+        return (
+          '【季度賦稅】' + getUserLink(logData.userId[0]) +
+          '在此次商業季度中產生了$' + logData.amount + '的財富稅與$' +
+          logData.price + '的殭屍稅！'
+        );
+      }
+      case '繳納稅金': {
+        return (
+          '【繳納稅金】' + getUserLink(logData.userId[0]) +
+          '向系統繳納了$' + logData.amount + '的稅金！'
+        );
+      }
       case '廣告宣傳': {
         return (
           '【廣告宣傳】' +
