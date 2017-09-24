@@ -1,15 +1,28 @@
 'use strict';
 import { _ } from 'meteor/underscore';
-// import { dbDebugger } from '../db/dbDebugger';
+import { Meteor } from 'meteor/meteor';
+import { UserStatus } from 'meteor/mizzao:user-status';
+import { dbThreads } from '../db/dbThreads';
 
 export const threadId = (process.env.GALAXY_CONTAINER_ID || '') + '!' + process.pid;
-console.log('a thread is start as unique id:' + threadId + '.');
-// dbDebugger.insert({
-//   time: new Date(),
-//   message: 'a thread is start as unique id:' + threadId + '.'
-// });
 
-export const shouldReplaceThread = _.memoize(function(anotherThreadId) {
-  return threadId > anotherThreadId;
+Meteor.startup(function() {
+  dbThreads.insert({
+    _id: threadId,
+    doIntervalWork: false,
+    refreshTime: new Date(),
+    connections: 0
+  });
+  //定期更新thread回報時間與當前連線數量
+  Meteor.setInterval(refreshThread, 15000);
 });
 
+function refreshThread() {
+  //定期更新thread回報時間與當前連線數量
+  dbThreads.update(threadId, {
+    $set: {
+      connections: UserStatus.connections.find().count(),
+      refreshTime: new Date()
+    }
+  });
+}

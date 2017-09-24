@@ -12,13 +12,14 @@ import { dbPrice } from '../db/dbPrice';
 import { dbProducts } from '../db/dbProducts';
 import { dbResourceLock } from '../db/dbResourceLock';
 import { dbSeason } from '../db/dbSeason';
+import { dbThreads } from '../db/dbThreads';
 import { dbVoteRecord } from '../db/dbVoteRecord';
 import { checkFoundCompany } from './foundation';
 import { paySalary } from './salary';
 import { setLowPriceThreshold } from './lowPriceThreshold';
 import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
-import { threadId, shouldReplaceThread } from './thread';
+import { threadId } from './thread';
 import { debug } from './debug';
 import { config } from '../config';
 
@@ -27,45 +28,26 @@ Meteor.startup(function() {
 });
 
 function intervalCheck() {
-  const inrervalCheckLock = dbResourceLock.findOne('intervalCheck');
-  if (! inrervalCheckLock) {
-    dbResourceLock.insert({
-      _id: 'intervalCheck',
-      task: 'intervalCheck',
-      threadId: threadId,
-      time: new Date()
-    });
-    doIntervalWork();
-    doLoginObserver();
-  }
-  else if ((Date.now() - inrervalCheckLock.time.getTime()) > (config.intervalTimer * 3)) {
-    dbResourceLock.update('intervalCheck', {
+  //先移除所有一分鐘未更新的thread資料
+  dbThreads.remove({
+    refreshTime: {
+      $lt: new Date(Date.now() - 60000)
+    }
+  });
+  //如果現在沒有負責intervalWork的thread
+  if (dbThreads.find({doIntervalWork: true}).count() < 1) {
+    //將第一個thread指派為負責intervalWork工作
+    dbThreads.update({}, {
       $set: {
-        threadId: threadId,
-        time: new Date()
+        doIntervalWork: true
       }
     });
-    doIntervalWork();
-    doLoginObserver();
   }
-  else if (inrervalCheckLock.threadId === threadId) {
-    dbResourceLock.update('intervalCheck', {
-      $set: {
-        time: new Date()
-      }
-    });
-    doIntervalWork();
+  //取出負責intervalWork的thread資料
+  const threadData = dbThreads.findOne({doIntervalWork: true});
+  if (threadData._id === threadId) {
     doLoginObserver();
-  }
-  else if (shouldReplaceThread(inrervalCheckLock.threadId)) {
-    dbResourceLock.update('intervalCheck', {
-      $set: {
-        threadId: threadId,
-        time: new Date()
-      }
-    });
     doIntervalWork();
-    doLoginObserver();
   }
   else {
     stopLoginObserver();
@@ -200,6 +182,7 @@ function doIntervalWork() {
 //商業季度結束檢查
 function doSeasonWorks(lastSeasonData) {
   debug.log('doSeasonWorks', lastSeasonData);
+  //避免執行時間過長導致重複進行季節結算
   if (dbResourceLock.findOne('season')) {
     return false;
   }

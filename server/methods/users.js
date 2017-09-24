@@ -7,8 +7,10 @@ import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { UserStatus } from 'meteor/mizzao:user-status';
 import { dbLog } from '../../db/dbLog';
+import { dbThreads } from '../../db/dbThreads';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbVariables } from '../../db/dbVariables';
+import { threadId } from '../thread';
 import { config } from '../../config';
 import { limitMethod, limitSubscription, limitGlobalMethod } from './rateLimit';
 import { debug } from '../debug';
@@ -259,9 +261,10 @@ Meteor.publish('onlinePeopleNumber', function() {
 limitSubscription('onlinePeopleNumber', 5);
 function countAndPublishOnlinePeopleNumber(publisher) {
   debug.log('countAndPublishOnlinePeopleNumber');
-  const onlinePeopleNumber = UserStatus.connections
-    .find()
-    .count();
+  let onlinePeopleNumber = 0;
+  dbThreads.find().forEach((threadData) => {
+    onlinePeopleNumber += threadData.connections;
+  });
   publisher.changed('variables', 'onlinePeopleNumber', {
     value: onlinePeopleNumber
   });
