@@ -106,19 +106,6 @@
       {{#if isDisplayPanel 'founder'}}
         {{> founderList}}
       {{/if}}
-      <div class="col-12 border-grid">
-        <a class="d-block h4" href="#" data-toggle-panel="log">
-          所有紀錄
-          {{#if isDisplayPanel 'log'}}
-            <i class="fa fa-folder-open" aria-hidden="true"></i>
-          {{else}}
-            <i class="fa fa-folder" aria-hidden="true"></i>
-          {{/if}}
-        </a>
-      </div>
-      {{#if isDisplayPanel 'log'}}
-        {{> foundationLogList}}
-      {{/if}}
     </div>
   </div>
 </template>
@@ -151,18 +138,5 @@
         {{/each}}
       </div>
     </div>
-  </div>
-</template>
-
-<template name="foundationLogList">
-  <div class="col-12 border-grid">
-    {{#each logData in logList}}
-      {{>displayLog logData}}
-    {{else}}
-      查無資料！
-    {{/each}}
-    {{#with paginationData}}
-      {{> pagination}}
-    {{/with}}
   </div>
 </template>

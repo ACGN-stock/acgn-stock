@@ -7,7 +7,6 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbFoundations } from '../../db/dbFoundations';
-import { dbLog } from '../../db/dbLog';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { formatDateText } from '../utils/helpers';
 import { config } from '../../config';
@@ -184,37 +183,5 @@ Template.founderList.helpers({
     const foundation = dbFoundations.findOne(foundationId);
 
     return (100 * amount / getTotalInvest(foundation.invest)).toFixed(2);
-  }
-});
-
-const rLogOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.foundationLogList);
-Template.foundationLogList.onCreated(function() {
-  rLogOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const foundationId = FlowRouter.getParam('foundationId');
-    if (foundationId) {
-      this.subscribe('foundationLog', foundationId, rLogOffset.get());
-    }
-  });
-});
-Template.foundationLogList.helpers({
-  logList() {
-    return dbLog.find({}, {
-      sort: {
-        createdAt: -1
-      },
-      limit: 30
-    });
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfFoundationLog',
-      dataNumberPerPage: 30,
-      offset: rLogOffset
-    };
   }
 });
