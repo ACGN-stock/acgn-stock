@@ -36,6 +36,7 @@ function intervalCheck() {
       time: new Date()
     });
     doIntervalWork();
+    doLoginObserver();
   }
   else if ((Date.now() - inrervalCheckLock.time.getTime()) > (config.intervalTimer * 3)) {
     dbResourceLock.update('intervalCheck', {
@@ -45,6 +46,7 @@ function intervalCheck() {
       }
     });
     doIntervalWork();
+    doLoginObserver();
   }
   else if (inrervalCheckLock.threadId === threadId) {
     dbResourceLock.update('intervalCheck', {
@@ -53,6 +55,7 @@ function intervalCheck() {
       }
     });
     doIntervalWork();
+    doLoginObserver();
   }
   else if (shouldReplaceThread(inrervalCheckLock.threadId)) {
     dbResourceLock.update('intervalCheck', {
@@ -62,6 +65,64 @@ function intervalCheck() {
       }
     });
     doIntervalWork();
+    doLoginObserver();
+  }
+  else {
+    stopLoginObserver();
+  }
+}
+
+//開始觀察以處理登入IP紀錄、未登入天數
+let loginObserver;
+function doLoginObserver() {
+  if (! loginObserver) {
+    console.log('start ovserver at ' + threadId + ' ' + Date.now());
+    loginObserver = Meteor.users
+      .find(
+        {},
+        {
+          fields: {
+            _id: 1,
+            'status.lastLogin.date': 1,
+            'status.lastLogin.ipAddr': 1
+          },
+          disableOplog: true
+        }
+      )
+      .observe({
+        changed: (newUserData, oldUserData) => {
+          const previousLoginData = (oldUserData.status && oldUserData.status.lastLogin) || {
+            date: new Date()
+          };
+          const nextLoginData = (newUserData.status && newUserData.status.lastLogin) || {
+            date: new Date()
+          };
+          if (nextLoginData.ipAddr && nextLoginData.ipAddr !== previousLoginData.ipAddr) {
+            dbLog.insert({
+              logType: '登入紀錄',
+              userId: [newUserData._id],
+              message: nextLoginData.ipAddr,
+              createdAt: new Date()
+            });
+          }
+          const noLoginDay = Math.floor((nextLoginData.date.getTime() - previousLoginData.date.getTime()) / 86400000);
+          if (noLoginDay > 0) {
+            Meteor.users.update(newUserData._id, {
+              $inc: {
+                'profile.noLoginDayCount': noLoginDay
+              }
+            });
+          }
+        }
+      });
+  }
+}
+//停止觀察處理登入IP紀錄、未登入天數
+function stopLoginObserver() {
+  if (loginObserver) {
+    console.log('stop ovserver at ' + threadId + ' ' + Date.now());
+    loginObserver.stop();
+    loginObserver = null;
   }
 }
 
@@ -139,6 +200,9 @@ function doIntervalWork() {
 //商業季度結束檢查
 function doSeasonWorks(lastSeasonData) {
   debug.log('doSeasonWorks', lastSeasonData);
+  if (dbResourceLock.findOne('season')) {
+    return false;
+  }
   console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
     //當商業季度結束時，取消所有尚未交易完畢的訂單

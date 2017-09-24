@@ -6,8 +6,8 @@ import { HTTP } from 'meteor/http'
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { UserStatus } from 'meteor/mizzao:user-status';
-import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbLog } from '../../db/dbLog';
+import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
 import { limitMethod, limitSubscription, limitGlobalMethod } from './rateLimit';
@@ -206,7 +206,7 @@ Meteor.publish('validateUser', function(username) {
   debug.log('publish validateUser', username);
   check(username, String);
 
-  dbValidatingUsers
+  const observer = dbValidatingUsers
     .find(
       {
         username: {
@@ -230,6 +230,9 @@ Meteor.publish('validateUser', function(username) {
       }
     });
 
+  this.onStop(() => {
+    observer.stop();
+  });
   this.ready();
 });
 //一分鐘最多20次
@@ -264,7 +267,6 @@ function countAndPublishOnlinePeopleNumber(publisher) {
   });
 }
 
-//登入紀錄與未登入天數紀錄
 Meteor.startup(function() {
   //登出、離線時更新最後上線日期
   UserStatus.events.on('connectionLogout', function(logoutData) {
@@ -276,42 +278,4 @@ Meteor.startup(function() {
       });
     }
   });
-  Meteor.users
-    .find(
-      {},
-      {
-        fields: {
-          _id: 1,
-          'status.lastLogin.date': 1,
-          'status.lastLogin.ipAddr': 1
-        },
-        disableOplog: true
-      }
-    )
-    .observe({
-      changed: (newUserData, oldUserData) => {
-        const previousLoginData = (oldUserData.status && oldUserData.status.lastLogin) || {
-          date: new Date()
-        };
-        const nextLoginData = (newUserData.status && newUserData.status.lastLogin) || {
-          date: new Date()
-        };
-        if (nextLoginData.ipAddr && nextLoginData.ipAddr !== previousLoginData.ipAddr) {
-          dbLog.insert({
-            logType: '登入紀錄',
-            userId: [newUserData._id],
-            message: nextLoginData.ipAddr,
-            createdAt: new Date()
-          });
-        }
-        const noLoginDay = Math.floor((nextLoginData.date.getTime() - previousLoginData.date.getTime()) / 86400000);
-        if (noLoginDay > 0) {
-          Meteor.users.update(newUserData._id, {
-            $inc: {
-              'profile.noLoginDayCount': noLoginDay
-            }
-          });
-        }
-      }
-    });
 });
