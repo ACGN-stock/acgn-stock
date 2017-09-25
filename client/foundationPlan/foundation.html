@@ -112,31 +112,27 @@
 
 <template name="founderList">
   <div class="col-12 border-grid">
-    <div class="row" style="max-height: 300px; overflow-y: auto;">
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="row mb-1">
-          <div class="col-6 text-left">使用者帳號</div>
-          <div class="col-3 text-right">投資額</div>
-          <div class="col-3 text-right">比例</div>
-        </div>
-        {{#each invest in orderedInvestList}}
-          <div class="row mb-1">
-            <div class="col-6 text-left text-truncate">
-              {{>userLink invest.userId}}
-            </div>
-            <div class="col-3 text-right" title="{{invest.amount}}">
-              {{invest.amount}}
-            </div>
-            <div class="col-3 text-right" title="{{getPercentage invest.amount this.invest}} %">
-              {{getPercentage invest.amount}} %
-            </div>
-          </div>
-        {{else}}
-          <div class="text-center">
-            沒有任何投資人！
-          </div>
-        {{/each}}
-      </div>
+    <div class="row mb-1">
+      <div class="col-6 text-left">使用者帳號</div>
+      <div class="col-3 text-right">投資額</div>
+      <div class="col-3 text-right">比例</div>
     </div>
+    {{#each invest in orderedInvestList}}
+      <div class="row mb-1">
+        <div class="col-6 text-left text-truncate">
+          {{>userLink invest.userId}}
+        </div>
+        <div class="col-3 text-right" title="{{invest.amount}}">
+          {{invest.amount}}
+        </div>
+        <div class="col-3 text-right" title="{{getPercentage invest.amount this.invest}} %">
+          {{getPercentage invest.amount}} %
+        </div>
+      </div>
+    {{else}}
+      <div class="text-center">
+        沒有任何投資人！
+      </div>
+    {{/each}}
   </div>
 </template>
