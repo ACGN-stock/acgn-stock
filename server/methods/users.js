@@ -10,7 +10,6 @@ import { dbLog } from '../../db/dbLog';
 import { dbThreads } from '../../db/dbThreads';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbVariables } from '../../db/dbVariables';
-import { threadId } from '../thread';
 import { config } from '../../config';
 import { limitMethod, limitSubscription, limitGlobalMethod } from './rateLimit';
 import { debug } from '../debug';

@@ -1,5 +1,4 @@
 'use strict';
-import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { UserStatus } from 'meteor/mizzao:user-status';
 import { dbThreads } from '../db/dbThreads';
