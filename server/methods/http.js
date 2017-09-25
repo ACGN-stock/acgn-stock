@@ -5,6 +5,7 @@ import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
 import { HTTP } from 'meteor/http'
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbFoundations } from '../../db/dbFoundations';
 import { dbProducts } from '../../db/dbProducts';
 import { debug } from '../debug';
 
@@ -23,6 +24,30 @@ WebApp.connectHandlers.use(function(req, res, next) {
     if (companyData) {
       res.setHeader('Cache-Control', 'public, max-age=604800');
       res.end(companyData.companyName);
+    }
+    else {
+      res.end('');
+    }
+  }
+  else {
+    next();
+  }
+});
+WebApp.connectHandlers.use(function(req, res, next) {
+  debug.log('connectHandlers foundationName');
+  const parsedUrl = url.parse(req.url);
+  if (parsedUrl.pathname === '/foundationName') {
+    const query = querystring.parse(parsedUrl.query);
+    const foundationId = query.id;
+    console.log("foundationId", foundationId);
+    const foundationData = dbFoundations.findOne(foundationId, {
+      fields: {
+        companyName: 1
+      }
+    });
+    if (foundationData) {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+      res.end(foundationData.companyName);
     }
     else {
       res.end('');

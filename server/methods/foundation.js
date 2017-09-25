@@ -130,6 +130,29 @@ export function editFoundCompany(user, foundCompanyData) {
 limitMethod('editFoundCompany', 3);
 
 Meteor.methods({
+  changeFoundCompanyName(foundationId, companyName) {
+    check(this.userId, String);
+    check(foundationId, String);
+    check(companyName, String);
+    changeFoundCompanyName(Meteor.user(), foundationId, companyName);
+
+    return true;
+  }
+});
+function changeFoundCompanyName(user, foundationId, companyName) {
+  debug.log('changeFoundCompanyName', {user, foundationId, companyName});
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  }
+  dbFoundations.update(foundationId, {
+    $set: {
+      companyName: companyName
+    }
+  });
+}
+limitMethod('changeFoundCompanyName');
+
+Meteor.methods({
   investFoundCompany(companyId, amount) {
     check(this.userId, String);
     check(companyId, String);
@@ -291,3 +314,20 @@ Meteor.publish('foundationDataForEdit', function(foundationId) {
 });
 //一分鐘最多10次
 limitSubscription('foundationDataForEdit', 10);
+
+Meteor.publish('foundationDetail', function(foundationId) {
+  debug.log('publish foundationDetail', {foundationId});
+  check(foundationId, String);
+
+  const foundation = dbFoundations.findOne(foundationId);
+  if (foundation) {
+    let total = foundation.invest.length;
+    this.added('variables', 'totalCountOfFounder', {
+      value: total
+    });
+  }
+
+  return dbFoundations.find(foundationId);
+});
+//一分鐘最多10次
+limitSubscription('foundationDetail', 10);

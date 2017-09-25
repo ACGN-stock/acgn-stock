@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
 import { dbCompanies } from './db/dbCompanies';
+import { dbFoundations } from './db/dbFoundations';
 import { config } from './config';
 
 //default route
@@ -84,6 +85,22 @@ FlowRouter.route('/foundationPlan', {
   name: 'foundationPlan',
   action() {
     DocHead.setTitle(config.websiteName + ' - 新創計劃');
+  }
+});
+FlowRouter.route('/foundation/:foundationId', {
+  name: 'foundation',
+  action(params) {
+    if (Meteor.isServer) {
+      const foundationData = dbFoundations.findOne(params.foundationId, {
+        fields: {
+          companyName: 1
+        }
+      });
+      DocHead.setTitle(config.websiteName + ' - 「' + foundationData.companyName + '」公司資訊');
+    }
+    else {
+      DocHead.setTitle(config.websiteName + ' - 新創計劃資訊');
+    }
   }
 });
 

@@ -53,6 +53,28 @@ Template.companyLink.onRendered(function() {
   }
 });
 
+Template.foundationLink.onRendered(function() {
+  const foundationId = this.data;
+  if (foundationId) {
+    const $link = this.$('a');
+    $.ajax({
+      url: '/foundationName',
+      data: {
+        id: foundationId
+      },
+      success: (foundationName) => {
+        const path = FlowRouter.path('foundation', {foundationId});
+        $link
+          .attr('href', path)
+          .text(foundationName || '???');
+      },
+      error: () => {
+        $link.text('???');
+      }
+    });
+  }
+});
+
 Template.productLink.onRendered(function() {
   const productId = this.data;
   if (productId) {
