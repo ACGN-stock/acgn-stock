@@ -39,6 +39,25 @@ function padZero(n) {
 }
 Template.registerHelper('formatDateText', formatDateText);
 
+export function formatDateTimeText(date) {
+  if (! date) {
+    return '????/??/?? ??:??:??';
+  }
+
+  return (
+    padZero(date.getMonth() + 1) +
+    '/' +
+    padZero(date.getDate()) +
+    ' ' +
+    padZero(date.getHours()) +
+    ':' +
+    padZero(date.getMinutes()) +
+    ':' +
+    padZero(date.getSeconds())
+  );
+}
+Template.registerHelper('formatDateTimeText', formatDateTimeText);
+
 export function isChairman(companyId) {
   const user = Meteor.user();
   if (user) {

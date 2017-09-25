@@ -8,7 +8,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbFoundations } from '../../db/dbFoundations';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateText } from '../utils/helpers';
+import { formatDateTimeText } from '../utils/helpers';
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -131,7 +131,7 @@ Template.foundationDetail.helpers({
   getExpireDateText(createdAt) {
     const expireDate = new Date(createdAt.getTime() + config.foundExpireTime);
 
-    return formatDateText(expireDate);
+    return formatDateTimeText(expireDate);
   },
   getStockPrice(investList) {
     if (investList.length < config.foundationNeedUsers) {
