@@ -260,7 +260,7 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
       companyId: companyId,
       price: tradeData.price,
       amount: tradeData.amount,
-      createdAt: new Date(basicCreatedAtTime + (index * 2))
+      createdAt: new Date(basicCreatedAtTime + (index * 2) + 1)
     });
     //記錄誰的股份有增加
     if (increaseStocksHash[buyerId] === undefined) {
@@ -287,7 +287,7 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
         price: removeOrderData.unitPrice,
         amount: removeOrderData.amount,
         message: removeOrderData.orderType,
-        createdAt: new Date(basicCreatedAtTime + (index * 2) + 1)
+        createdAt: new Date(basicCreatedAtTime + (index * 2) + 2)
       });
     }
     else {
