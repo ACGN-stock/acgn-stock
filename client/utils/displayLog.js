@@ -292,6 +292,26 @@ Template.displayLog.helpers({
           '向系統繳納了$' + logData.amount + '的稅金！'
         );
       }
+      case '繳稅逾期': {
+        return (
+          '【繳稅逾期】' + getUserLink(logData.userId[0]) +
+          '由於繳稅逾期，被系統追加了$' + logData.amount + '的稅金！'
+        );
+      }
+      case '繳稅撤單': {
+        return (
+          '【繳稅撤單】' + getUserLink(logData.userId[0]) +
+          '由於繳稅逾期，被系統撤銷了所有買入訂單！'
+        );
+      }
+      case '繳稅沒收': {
+        return (
+          '【繳稅沒收】' + getUserLink(logData.userId[0]) +
+          '由於繳稅逾期，被系統以參考價格$' + logData.price + '沒收了「' +
+          getCompanyLink(logData.companyId) +
+          '」公司的股份數量' + logData.amount + '！'
+        );
+      }
       case '廣告宣傳': {
         return (
           '【廣告宣傳】' +

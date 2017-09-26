@@ -166,6 +166,9 @@ Meteor.methods({
 });
 export function contendManager(user, companyId) {
   debug.log('contendManager', {user, companyId});
+  if (user.profile.notPayTax) {
+    throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
+  }
   if (_.contains(user.profile.ban, 'manager')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了擔任經理人的資格！');
   }
@@ -240,6 +243,9 @@ Meteor.methods({
 });
 export function supportCandidate(user, companyId, supportUserId) {
   debug.log('supportCandidate', {user, companyId, supportUserId});
+  if (user.profile.notPayTax) {
+    throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
+  }
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }

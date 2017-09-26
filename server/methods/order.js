@@ -27,6 +27,9 @@ Meteor.methods({
 });
 export function createBuyOrder(user, orderData) {
   debug.log('createBuyOrder', {user, orderData});
+  if (user.profile.notPayTax) {
+    throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
+  }
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -143,6 +146,9 @@ Meteor.methods({
 });
 export function createSellOrder(user, orderData) {
   debug.log('createSellOrder', {user, orderData});
+  if (user.profile.notPayTax) {
+    throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
+  }
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }

@@ -63,11 +63,6 @@ function payTax(user, taxId, amount) {
       amount: amount,
       createdAt: createdAt
     });
-    Meteor.users.update(userId, {
-      $inc: {
-        'profile.money': amount * -1
-      }
-    });
     if (amount === totalNeedPay) {
       dbTaxes.remove(taxId);
     }
@@ -75,6 +70,33 @@ function payTax(user, taxId, amount) {
       dbTaxes.update(taxId, {
         $inc: {
           paid: amount
+        }
+      });
+    }
+    const expiredTaxesCount = dbTaxes
+      .find({
+        userId: userId,
+        expireDate: {
+          $lte: new Date()
+        }
+      })
+      .count();
+    //如果還有逾期未繳的稅單，扣錢就好
+    if (expiredTaxesCount > 0) {
+      Meteor.users.update(userId, {
+        $inc: {
+          'profile.money': amount * -1
+        }
+      });
+    }
+    //所有逾期未繳的稅單都繳納完畢後，取消繳稅逾期狀態
+    else {
+      Meteor.users.update(userId, {
+        $inc: {
+          'profile.money': amount * -1
+        },
+        $set: {
+          'profile.notPayTax': false
         }
       });
     }

@@ -64,6 +64,11 @@ const schema = new SimpleSchema({
         type: Boolean,
         defaultValue: false
       },
+      //是否處於繳稅逾期的狀態
+      notPayTax: {
+        type: Boolean,
+        defaultValue: false
+      },
       //被禁止的權限
       ban: {
         type: Array,

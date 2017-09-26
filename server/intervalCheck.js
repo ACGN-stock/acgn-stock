@@ -15,7 +15,7 @@ import { dbSeason } from '../db/dbSeason';
 import { dbThreads } from '../db/dbThreads';
 import { dbVoteRecord } from '../db/dbVoteRecord';
 import { checkFoundCompany } from './foundation';
-import { paySalary } from './salary';
+import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { setLowPriceThreshold } from './lowPriceThreshold';
 import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
@@ -58,7 +58,7 @@ function intervalCheck() {
 let loginObserver;
 function doLoginObserver() {
   if (! loginObserver) {
-    console.log('start ovserver at ' + threadId + ' ' + Date.now());
+    console.log('start observer login info at ' + threadId + ' ' + Date.now());
     loginObserver = Meteor.users
       .find(
         {},
@@ -91,7 +91,7 @@ function doLoginObserver() {
           if (noLoginDay > 0) {
             Meteor.users.update(newUserData._id, {
               $inc: {
-                'profile.noLoginDayCount': noLoginDay
+                'profile.noLoginDayCount': Math.min(noLoginDay, 6)
               }
             });
           }
@@ -102,7 +102,7 @@ function doLoginObserver() {
 //停止觀察處理登入IP紀錄、未登入天數
 function stopLoginObserver() {
   if (loginObserver) {
-    console.log('stop ovserver at ' + threadId + ' ' + Date.now());
+    console.log('stop observer login info at ' + threadId + ' ' + Date.now());
     loginObserver.stop();
     loginObserver = null;
   }
@@ -134,8 +134,8 @@ function doIntervalWork() {
     setLowPriceThreshold();
     //檢查所有創立中且投資時間截止的公司是否成功創立
     checkFoundCompany();
-    //當發薪時間到時，發給所有驗證通過的使用者薪水
-    paySalary();
+    //當發薪時間到時，發給所有驗證通過的使用者薪水，並檢查賦稅、增加滯納罰金與強制繳稅
+    paySalaryAndCheckTax();
     //隨機時間讓符合條件的公司釋出股票
     releaseStocksForHighPrice();
     releaseStocksForNoDeal();
