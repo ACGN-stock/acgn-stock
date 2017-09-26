@@ -11,10 +11,10 @@ export function setLowPriceThreshold() {
       isSeal: false
     })
     .count();
-  //中位數次序
-  const midSequence = Math.round(companiesNumber / 2);
-  //取得價格排序為中位的公司
-  const midCompanyData = dbCompanies.findOne(
+  //四分位數次序
+  const quartileSequence = Math.round(companiesNumber * 3 / 4);
+  //取得價格排序為第一四分位的公司
+  const quartileCompanyData = dbCompanies.findOne(
     {
       isSeal: false
     },
@@ -25,14 +25,14 @@ export function setLowPriceThreshold() {
       sort: {
         lastPrice: -1
       },
-      skip: midSequence
+      skip: quartileSequence
     }
   );
-  if (midCompanyData) {
-    //取得最後成交價格的中位數
-    const midPrice = midCompanyData.lastPrice;
+  if (quartileCompanyData) {
+    //取得最後成交價格的第一四分位數
+    const quartilePrice = quartileCompanyData.lastPrice;
     //設定低價股價格門檻
-    dbVariables.set('lowPriceThreshold', Math.ceil(midPrice / 4));
+    dbVariables.set('lowPriceThreshold', quartilePrice);
   }
 }
 setLowPriceThreshold();
