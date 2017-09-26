@@ -107,11 +107,11 @@
         </a>
       </div>
       {{#if isDisplayPanel 'numbers'}}
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">股票參考價格：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">參考價格：</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid" title="{{this.listPrice}}">
           $ {{this.listPrice}}
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">最後成交價格：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">最後價格：</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">$ {{this.lastPrice}}</span>
         </div>
@@ -119,15 +119,15 @@
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           $ {{this.totalValue}}
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本季營利額：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本季營利：</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           $ {{this.profit}}
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總釋出股票：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總釋股量：</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           {{this.totalRelease}}股
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">今日成交量：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">日成交量：</div>
         {{> companyTodayDealAmount}}
       {{/if}}
       <div class="col-12 border-grid">

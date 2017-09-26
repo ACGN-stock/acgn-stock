@@ -407,7 +407,7 @@ function queryTodayDealAmount(companyId) {
         logType: '交易紀錄',
         companyId: companyId,
         createdAt: {
-          $gt: new Date(new Date().setHours(0, 0, 0, 0))
+          $gte: new Date(Date.now() - 86400000)
         }
       },
       {
