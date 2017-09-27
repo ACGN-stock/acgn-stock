@@ -381,7 +381,7 @@ export function releaseStocksForLowPrice() {
   }
 }
 
-export function recordListPrice() {
+export function recordListPriceAndSellFSCStocks() {
   debug.log('recordListPrice');
   let recordListPriceConter = dbVariables.get('recordListPriceConter') || 0;
   recordListPriceConter -= 1;
@@ -424,6 +424,33 @@ export function recordListPrice() {
           });
         }
       });
+    dbDirectors
+      .find({
+        userId: '!FSC'
+      })
+      .forEach((directoryData) => {
+        const companyId = directoryData.companyId;
+        resourceManager.request('sellFSCStocks', ['companyOrder' + companyId], (release) => {
+          const companyData = dbCompanies.findOne(companyId, {
+            fields: {
+              _id: 1,
+              listPrice: 1,
+              isSeal: 1
+            }
+          });
+          if (companyData && companyData.isSeal === false) {
+            const amount = directoryData.stocks > 100 ? Math.ceil(directoryData.stocks * 0.1) : Math.max(directoryData.stocks, 10);
+            createOrder({
+              userId: '!FSC',
+              companyId: companyId,
+              orderType: '賣出',
+              unitPrice: companyData.listPrice,
+              amount: amount
+            });
+          }
+          release();
+        });
+      });
   }
   else {
     dbVariables.set('recordListPriceConter', recordListPriceConter);
@@ -462,7 +489,7 @@ export function checkChairman() {
           {
             companyId: companyId,
             userId: {
-              $ne: '!system'
+              $ne: '!FSC'
             }
           },
           {

@@ -113,8 +113,8 @@ export function createOrder(orderData) {
     tradeTools.directorsBulk.execute();
     tradeTools.ordersBulk.execute();
     tradeTools.priceBulk.execute();
-    //系統釋股時，沒有使用者的金錢資料需要寫入資料庫
-    if (orderData.userId !== '!system') {
+    //系統或金管會釋股時，沒有使用者的金錢資料需要寫入資料庫
+    if (orderData.userId !== '!system' && orderData.userId !== '!FSC') {
       tradeTools.usersBulk.execute();
     }
   }
@@ -122,7 +122,7 @@ export function createOrder(orderData) {
   else if (orderData.orderType === '購入') {
     tradeTools.usersBulk.execute();
   }
-  //否則為系統釋股單，將companiesBulk unordered bulk op的資料寫入資料庫
+  //否則若為系統釋股單，將companiesBulk unordered bulk op的資料寫入資料庫
   else if (orderData.userId === '!system') {
     tradeTools.companiesBulk.execute();
   }

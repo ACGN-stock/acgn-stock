@@ -334,10 +334,10 @@ function confiscateStocks(user, {userId, message}) {
       message: message,
       createdAt: createdAt
     });
-    if (dbDirectors.find({companyId, userId: '!system'}).count() > 0) {
+    if (dbDirectors.find({companyId, userId: '!FSC'}).count() > 0) {
       //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
       directorsBulk
-        .find({companyId, userId: '!system'})
+        .find({companyId, userId: '!FSC'})
         .updateOne({
           $inc: {
             stocks: stocks
@@ -347,7 +347,7 @@ function confiscateStocks(user, {userId, message}) {
     else {
       directorsBulk.insert({
         companyId: companyId,
-        userId: '!system',
+        userId: '!FSC',
         stocks: stocks,
         createdAt: createdAt
       });

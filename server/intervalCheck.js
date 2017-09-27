@@ -17,7 +17,7 @@ import { dbVoteRecord } from '../db/dbVoteRecord';
 import { checkFoundCompany } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { setLowPriceThreshold } from './lowPriceThreshold';
-import { recordListPrice, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
+import { recordListPriceAndSellFSCStocks, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
 import { threadId } from './thread';
 import { debug } from './debug';
@@ -140,8 +140,8 @@ function doIntervalWork() {
     releaseStocksForHighPrice();
     releaseStocksForNoDeal();
     releaseStocksForLowPrice();
-    //隨機時間紀錄公司的參考價格
-    recordListPrice();
+    //隨機時間售出金管會股票並紀錄公司的參考價格
+    recordListPriceAndSellFSCStocks();
     //檢查並更新各公司的董事長位置
     checkChairman();
   }
@@ -228,20 +228,22 @@ function doSeasonWorks(lastSeasonData) {
 function cancelAllOrder() {
   debug.log('cancelAllOrder');
   const now = new Date();
+  const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
   const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
 
-  //紀錄整個取消過程裡金錢有增加的userId及增加量
-  const increaseMoneyHash = {};
-  //紀錄整個取消過程裡股份有增加的userId及增加公司及增加量
-  const increaseStocksHash = {};
-  dbOrders.find().forEach((orderData) => {
-    const orderType = orderData.orderType;
-    const userId = orderData.userId;
-    const companyId = orderData.companyId;
-    const leftAmount = orderData.amount - orderData.done;
-    if (userId !== '!system') {
+  const userOrdersCursor = dbOrders.find({});
+  if (userOrdersCursor.count() > 0) {
+    //紀錄整個取消過程裡金錢有增加的userId及增加量
+    const increaseMoneyHash = {};
+    //紀錄整個取消過程裡股份有增加的userId及增加公司及增加量
+    const increaseStocksHash = {};
+    userOrdersCursor.forEach((orderData) => {
+      const orderType = orderData.orderType;
+      const userId = orderData.userId;
+      const companyId = orderData.companyId;
+      const leftAmount = orderData.amount - orderData.done;
       if (orderType === '購入') {
         if (increaseMoneyHash[userId] === undefined) {
           increaseMoneyHash[userId] = 0;
@@ -257,66 +259,84 @@ function cancelAllOrder() {
         }
         increaseStocksHash[userId][companyId] += leftAmount;
       }
-    }
-    logBulk.insert({
-      logType: '系統撤單',
-      userId: [userId],
-      companyId: companyId,
-      price: orderData.unitPrice,
-      amount: leftAmount,
-      message: orderType,
-      createdAt: now
-    });
-  });
-  _.each(increaseMoneyHash, (money, userId) => {
-    usersBulk
-      .find({
-        _id: userId
-      })
-      .updateOne({
-        $inc: {
-          'profile.money': money
-        }
+      logBulk.insert({
+        logType: '系統撤單',
+        userId: [userId],
+        companyId: companyId,
+        price: orderData.unitPrice,
+        amount: leftAmount,
+        message: orderType,
+        createdAt: now
       });
-  });
-  let index = 0;
-  _.each(increaseStocksHash, (stocksHash, userId) => {
-    const createdAt = new Date(now.getTime() + index);
-    index += 1;
-    _.each(stocksHash, (stocks, companyId) => {
-      if (dbDirectors.find({companyId, userId}).count() > 0) {
-        //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
-        directorsBulk
-          .find({companyId, userId})
-          .updateOne({
-            $inc: {
-              stocks: stocks
-            }
-          });
+    });
+    _.each(increaseMoneyHash, (money, userId) => {
+      usersBulk
+        .find({
+          _id: userId
+        })
+        .updateOne({
+          $inc: {
+            'profile.money': money
+          }
+        });
+    });
+    let index = 0;
+    _.each(increaseStocksHash, (stocksHash, userId) => {
+      //若撤銷的是系統賣單，則降低該公司的總釋股量
+      if (userId === '!system') {
+        _.each(stocksHash, (stocks, companyId) => {
+          companiesBulk
+            .find({
+              _id: companyId
+            })
+            .updateOne({
+              $inc: {
+                totalRelease: stocks * -1
+              }
+            });
+        });
       }
       else {
-        directorsBulk.insert({
-          companyId: companyId,
-          userId: userId,
-          stocks: stocks,
-          createdAt: createdAt
+        const createdAt = new Date(now.getTime() + index);
+        index += 1;
+        _.each(stocksHash, (stocks, companyId) => {
+          if (dbDirectors.find({companyId, userId}).count() > 0) {
+            //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
+            directorsBulk
+              .find({companyId, userId})
+              .updateOne({
+                $inc: {
+                  stocks: stocks
+                }
+              });
+          }
+          else {
+            directorsBulk.insert({
+              companyId: companyId,
+              userId: userId,
+              stocks: stocks,
+              createdAt: createdAt
+            });
+          }
         });
       }
     });
-  });
-  if (_.size(increaseMoneyHash) > 0) {
-    usersBulk.execute = Meteor.wrapAsync(usersBulk.execute);
-    usersBulk.execute();
-  }
-  if (_.size(increaseStocksHash) > 0) {
-    directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
-    directorsBulk.execute();
-  }
-  if (_.size(increaseMoneyHash) > 0 || _.size(increaseStocksHash) > 0) {
+    if (_.size(increaseMoneyHash) > 0) {
+      usersBulk.execute = Meteor.wrapAsync(usersBulk.execute);
+      usersBulk.execute();
+    }
+    if (_.size(increaseStocksHash) > 0) {
+      if (_.size(increaseStocksHash['!system']) > 0) {
+        companiesBulk.execute = Meteor.wrapAsync(companiesBulk.execute);
+        companiesBulk.execute();
+      }
+      directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
+      directorsBulk.execute();
+    }
     logBulk.execute = Meteor.wrapAsync(logBulk.execute);
     logBulk.execute();
+    dbOrders.remove({});
   }
-  dbOrders.remove({});
 }
 
 //產生新的商業季度
@@ -448,7 +468,7 @@ function giveBonusByStocksFromProfit() {
           }
         })
         .forEach((directorData) => {
-          if (directorData.userId === '!system') {
+          if (directorData.userId === '!system' || directorData.userId === '!FSC') {
             return true;
           }
           const userData = Meteor.users.findOne(directorData.userId, {

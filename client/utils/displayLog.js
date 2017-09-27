@@ -8,7 +8,13 @@ Template.displayLog.onRendered(function() {
   if (this.data.userId) {
     const $link = this.$('[data-user-link]');
     _.each(this.data.userId, (userId) => {
-      if (userId.slice(0, 1) !== '!') {
+      if (userId === '!system') {
+        $link.text('系統');
+      }
+      else if (userId === '!FSC') {
+        $link.text('金管會');
+      }
+      else {
         $.ajax({
           url: '/userName',
           data: {

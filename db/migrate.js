@@ -324,6 +324,26 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 5,
+    name: 'change !system director data to !FSC director data.',
+    up() {
+      dbDirectors.update(
+        {
+          userId: '!system'
+        },
+        {
+          $set: {
+            userId: '!FSC'
+          }
+        },
+        {
+          multi: true
+        }
+      );
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });

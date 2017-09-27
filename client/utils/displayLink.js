@@ -11,6 +11,9 @@ Template.userLink.onRendered(function() {
   else if (userId === '!system') {
     this.$('a').text('系統');
   }
+  else if (userId === '!FSC') {
+    this.$('a').text('金管會');
+  }
   else if (userId) {
     const $link = this.$('a');
     $.ajax({

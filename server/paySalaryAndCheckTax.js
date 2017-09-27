@@ -67,6 +67,8 @@ function checkTax(todayBeginTime) {
     const taxesBulk = dbTaxes.rawCollection().initializeUnorderedBulkOp();
     //逾期繳稅狀態可能在過程裡變來變去，因此需要有序的Bulk op
     const usersBulk = Meteor.users.rawCollection().initializeOrderedBulkOp();
+    //紀錄各公司徵收到的股票
+    const imposedStocksHash = {};
     expireTaxesCursor.forEach((taxData) => {
       const taxId = ObjectID(taxData._id._str);
       const userId = taxData.userId;
@@ -81,6 +83,7 @@ function checkTax(todayBeginTime) {
             'profile.notPayTax': true
           }
         });
+      const createdAtBasicTime = Date.now();
       //增加稅單罰金
       if (overdueDay <= 7) {
         const amount = Math.ceil((taxData.tax + taxData.zombie - taxData.paid) * 0.1);
@@ -97,7 +100,7 @@ function checkTax(todayBeginTime) {
           logType: '繳稅逾期',
           userId: [userId],
           amount: amount,
-          createdAt: new Date()
+          createdAt: new Date(createdAtBasicTime)
         });
       }
       //開始強制徵收
@@ -127,7 +130,7 @@ function checkTax(todayBeginTime) {
           logBulk.insert({
             logType: '繳稅撤單',
             userId: [userId],
-            createdAt: new Date()
+            createdAt: new Date(createdAtBasicTime)
           });
           buyOrderCursor.forEach((orderData) => {
             imposedMoney += orderData.unitPrice * (orderData.amount - orderData.done);
@@ -180,7 +183,10 @@ function checkTax(todayBeginTime) {
           if (ownStockList.length > 0) {
             needExecuteDirectorBulk = true;
           }
-          _.every(ownStockList, (stockData) => {
+          _.every(ownStockList, (stockData, index) => {
+            if (! imposedStocksHash[stockData.companyId]) {
+              imposedStocksHash[stockData.companyId] = 0;
+            }
             //需要徵收多少股票才足以支付餘下稅金
             const imposedStocks = Math.ceil((needPay - imposedMoney) / stockData.listPrice);
             //全部徵收
@@ -191,7 +197,7 @@ function checkTax(todayBeginTime) {
                 companyId: stockData.companyId,
                 price: stockData.listPrice,
                 amount: stockData.stocks,
-                createdAt: new Date()
+                createdAt: new Date(createdAtBasicTime + index + 1)
               });
               //因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
               directorsBulk
@@ -200,6 +206,7 @@ function checkTax(todayBeginTime) {
                 })
                 .removeOne();
               imposedMoney += stockData.stocks * stockData.listPrice;
+              imposedStocksHash[stockData.companyId] += stockData.stocks;
             }
             //部份徵收
             else {
@@ -209,7 +216,7 @@ function checkTax(todayBeginTime) {
                 companyId: stockData.companyId,
                 price: stockData.listPrice,
                 amount: imposedStocks,
-                createdAt: new Date()
+                createdAt: new Date(createdAtBasicTime + index + 1)
               });
               //因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
               directorsBulk
@@ -222,6 +229,7 @@ function checkTax(todayBeginTime) {
                   }
                 });
               imposedMoney += imposedStocks * stockData.listPrice;
+              imposedStocksHash[stockData.companyId] += imposedStocks;
             }
 
             return imposedMoney < needPay;
@@ -258,6 +266,30 @@ function checkTax(todayBeginTime) {
       }
     });
     if (needExecuteDirectorBulk) {
+      const createdAt = new Date();
+      _.each(imposedStocksHash, (stocks, companyId) => {
+        if (dbDirectors.find({companyId, userId: '!FSC'}).count() > 0) {
+          directorsBulk
+            .find({
+              companyId: companyId,
+              userId: '!FSC'
+            })
+            .updateOne({
+              $inc: {
+                stocks: stocks
+              }
+            });
+        }
+        else {
+          directorsBulk.insert({
+            companyId: companyId,
+            userId: '!FSC',
+            stocks: stocks,
+            createdAt: createdAt,
+            message: ''
+          });
+        }
+      });
       directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
       directorsBulk.execute();
     }
