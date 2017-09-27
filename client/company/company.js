@@ -188,6 +188,9 @@ function drawChart(templateInstance) {
   }
 }
 function drawLineChart(templateInstance) {
+  if (! Meteor.status().connected) {
+    return false;
+  }
   if (templateInstance.chart) {
     templateInstance.chart.destroy();
   }
@@ -286,6 +289,9 @@ function drawLineChart(templateInstance) {
   });
 }
 function drawCandleStickChart(templateInstance) {
+  if (! Meteor.status().connected) {
+    return false;
+  }
   if (templateInstance.chart) {
     templateInstance.chart.destroy();
   }
@@ -376,6 +382,9 @@ function drawCandleStickChart(templateInstance) {
 //定時呼叫取得今日交易量資料
 const rTodayDealAmount = new ReactiveVar(0);
 Template.companyTodayDealAmount.onCreated(function() {
+  if (! Meteor.status().connected) {
+    return false;
+  }
   const companyId = FlowRouter.getParam('companyId');
   if (companyId) {
     Meteor.call('queryTodayDealAmount', companyId, (error, result) => {

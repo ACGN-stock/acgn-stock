@@ -229,7 +229,9 @@ function validateProductModel(model) {
   }
 }
 function saveProductModel(model) {
-  Meteor.call('createProduct', model, () => {
-    rInAddProductMode.set(false);
+  Meteor.customCall('createProduct', model, (error) => {
+    if (! error) {
+      rInAddProductMode.set(false);
+    }
   });
 }

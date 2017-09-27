@@ -15,13 +15,11 @@ import { alertDialog } from '../layout/alertDialog';
 Meteor.subscribe('isChangingSeason');
 
 function customCall(...args) {
-  if (dbResourceLock.find('season').count()) {
-    alertDialog.alert('伺服器即將停機維修或者忙於商業季度的切換，請稍等一下吧！[503]');
-
+  if (! Meteor.status().connected) {
     return false;
   }
-  if (! Meteor.status().connected) {
-    alertDialog.alert('糟了，伺服器好像掛了！等一下再試試吧！[503]');
+  if (dbResourceLock.find('season').count()) {
+    alertDialog.alert('伺服器正在忙碌中，請稍等一下吧！[503]');
 
     return false;
   }
@@ -193,7 +191,7 @@ export function retrieveOrder(orderData) {
 export function changeChairmanTitle(companyData) {
   alertDialog.prompt('要修改董事長的頭銜嗎？', function(chairmanTitle) {
     if (chairmanTitle && chairmanTitle.length > 0 && chairmanTitle.length <= 20) {
-      Meteor.call('changeChairmanTitle', companyData._id, chairmanTitle);
+      Meteor.customCall('changeChairmanTitle', companyData._id, chairmanTitle);
     }
     else if (chairmanTitle) {
       alertDialog.alert('無效的頭銜名稱！');
