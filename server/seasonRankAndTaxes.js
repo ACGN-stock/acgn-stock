@@ -567,21 +567,23 @@ function generateUserTaxes(userWealthList) {
     });
     if (matchTaxConfig) {
       const tax = Math.ceil(wealthData.totalWealth * matchTaxConfig.ratio / 100) - matchTaxConfig.balance;
-      taxesBulk.insert({
-        userId: wealthData._id,
-        tax: tax,
-        zombie: zombie,
-        fine: 0,
-        paid: 0,
-        expireDate: expireDate
-      });
-      logBulk.insert({
-        logType: '季度賦稅',
-        userId: [wealthData._id],
-        amount: tax,
-        price: zombie,
-        createdAt: createdAt
-      });
+      if (tax > 0) {
+        taxesBulk.insert({
+          userId: wealthData._id,
+          tax: tax,
+          zombie: zombie,
+          fine: 0,
+          paid: 0,
+          expireDate: expireDate
+        });
+        logBulk.insert({
+          logType: '季度賦稅',
+          userId: [wealthData._id],
+          amount: tax,
+          price: zombie,
+          createdAt: createdAt
+        });
+      }
     }
     else if (zombie > 0) {
       taxesBulk.insert({
