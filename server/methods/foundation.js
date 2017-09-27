@@ -65,8 +65,8 @@ export function foundCompany(user, foundCompanyData) {
   });
   dbFoundations.insert(foundCompanyData);
 }
-//一分鐘最多三次
-limitMethod('foundCompany', 3);
+//二十秒鐘最多一次
+limitMethod('foundCompany', 1, 20000);
 
 Meteor.methods({
   editFoundCompany(foundCompanyData) {
