@@ -146,7 +146,9 @@ export function releaseStocksForNoDeal() {
             $match: {
               orderType: '購入',
               companyId: companyId,
-              unitPrice: Math.ceil(companyData.listPrice * 1.15)
+              unitPrice: {
+                $gte: Math.ceil(companyData.listPrice * 1.15)
+              }
             }
           },
           {
@@ -193,7 +195,9 @@ export function releaseStocksForNoDeal() {
                 $match: {
                   orderType: '購入',
                   companyId: companyId,
-                  unitPrice: releasePrice
+                  unitPrice:  {
+                    $gte: releasePrice
+                  }
                 }
               },
               {
