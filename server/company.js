@@ -73,8 +73,8 @@ export function releaseStocksForHighPrice() {
               totalValue: 1
             }
           });
-          const maxReleaseStocks = Math.floor(companyData.totalRelease * 0.05);
-          const releaseStocks = 1 + Math.floor(Math.random() * Math.min(companyData.lastPrice - thresholdPrice, maxReleaseStocks) / 2);
+          const maxReleaseStocks = Math.min((companyData.lastPrice - thresholdPrice) / 2, companyData.totalRelease * 0.05);
+          const releaseStocks = 1 + Math.floor(Math.random() * maxReleaseStocks);
           createOrder({
             userId: '!system',
             companyId: companyId,
