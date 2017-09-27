@@ -52,6 +52,13 @@
     </button>
     <div class="{{getNavLinkListClassList}}">
       <ul class="navbar-nav">
+        {{#if hasFavorite}}
+          {{#navLinkGroup text='我的最愛'}}
+            {{#each favorite in favoriteCompanies}}
+              {{> navCompanyLink favorite.companyId}}
+            {{/each}}
+          {{/navLinkGroup}}
+        {{/if}}
         {{#navLinkGroup text='交易大廳'}}
           {{> navLink page='instantMessage'}}
           {{> navLink page='stockSummary' params=stockParams}}
@@ -101,5 +108,11 @@
     <a class="nav-link" href="{{getHref}}">
       {{getLinkText}}
     </a>
+  </li>
+</template>
+
+<template name="navCompanyLink">
+  <li class="nav-item">
+    <a class="nav-link"></a>
   </li>
 </template>

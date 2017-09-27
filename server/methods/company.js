@@ -9,8 +9,10 @@ import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
+import { dbFavorite } from '../../db/dbFavorite';
 import { checkImageUrl } from './checkImageUrl';
 import { limitMethod, limitSubscription } from './rateLimit';
+import { config } from '../../config';
 import { debug } from '../debug';
 
 Meteor.methods({
@@ -517,8 +519,8 @@ function queryStocksPrice(companyId) {
 //一分鐘最多10次
 limitMethod('queryStocksPrice');
 
-Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
-  debug.log('publish stockSummary', {keyword, isOnlyShowMine, sortBy, offset});
+Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, isOnlyFavorite, sortBy, offset) {
+  debug.log('publish stockSummary', {keyword, isOnlyShowMine, isOnlyFavorite, sortBy, offset});
   check(keyword, String);
   check(isOnlyShowMine, Boolean);
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
@@ -561,6 +563,21 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
       });
 
 
+    filter._id = {
+      $in: [...seeCompanyIdSet]
+    };
+  }
+  else if (userId && isOnlyFavorite) {
+    const seeCompanyIdList = dbFavorite
+      .find({userId}, {
+        fields: {
+          companyId: 1
+        }
+      })
+      .map((favoriteData) => {
+        return favoriteData.companyId;
+      });
+    const seeCompanyIdSet = new Set(seeCompanyIdList);
     filter._id = {
       $in: [...seeCompanyIdSet]
     };
@@ -809,3 +826,49 @@ Meteor.publish('companyLog', function(companyId, offset) {
 });
 //一分鐘最多20次
 limitSubscription('companyLog');
+
+Meteor.methods({
+  addFavoriteCompany(companyId) {
+    check(this.userId, String);
+    check(companyId, String);
+    addFavoriteCompany(Meteor.user(), companyId);
+
+    return true;
+  }
+});
+function addFavoriteCompany(user, companyId) {
+  debug.log('addFavoriteCompany', {user, companyId});
+  const userId = user._id;
+  if (dbFavorite.find({userId}).count() > config.maximumFavorite) {
+    throw new Meteor.Error(403, '您的最愛數量已達上限！');
+  }
+  if (!dbFavorite.findOne({ userId, companyId })) {
+    dbFavorite.insert({ userId, companyId });
+  }
+}
+limitMethod('addFavoriteCompany');
+
+Meteor.methods({
+  removeFavoriteCompany(companyId) {
+    check(this.userId, String);
+    check(companyId, String);
+    removeFavoriteCompany(Meteor.user(), companyId);
+
+    return true;
+  }
+});
+function removeFavoriteCompany(user, companyId) {
+  debug.log('removeFavoriteCompany', {user, companyId});
+  const userId = user._id;
+  dbFavorite.remove({ userId, companyId });
+}
+limitMethod('removeFavoriteCompany');
+
+Meteor.publish('favoriteCompanies', function(userId) {
+  debug.log('favoriteCompanies');
+  check(userId, String);
+
+  return dbFavorite.find({userId});
+});
+//一分鐘最多20次
+limitSubscription('favoriteCompanies');

@@ -10,6 +10,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbFavorite } from '../../db/dbFavorite';
 import { dbTaxes } from '../../db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { config } from '../../config';
@@ -34,6 +35,15 @@ Template.accountInfo.onCreated(function() {
       if (user) {
         DocHead.setTitle(config.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
       }
+    }
+  });
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('favoriteCompanies', userId);
     }
   });
 });
@@ -94,6 +104,16 @@ Template.accountInfoBasic.helpers({
   },
   isBaned(type) {
     return _.contains(this.profile.ban, type);
+  },
+  hasFavorite() {
+    const userId = this._id;
+
+    return dbFavorite.find({userId}).count() > 0;
+  },
+  favoriteCompanies() {
+    const userId = this._id;
+
+    return dbFavorite.find({userId});
   }
 });
 Template.accountInfoBasic.events({

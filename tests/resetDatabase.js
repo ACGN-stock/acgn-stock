@@ -2,6 +2,7 @@
 import { dbAdvertising } from '../db/dbAdvertising';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
+import { dbFavorite } from '../db/dbFavorite';
 import { dbFoundations } from '../db/dbFoundations';
 import { dbLog } from '../db/dbLog';
 import { dbOrders } from '../db/dbOrders';
@@ -22,6 +23,7 @@ Meteor.startup(function() {
   dbAdvertising.remove({});
   dbCompanies.remove({});
   dbDirectors.remove({});
+  dbFavorite.remove({});
   dbFoundations.remove({});
   dbLog.remove({});
   dbOrders.remove({});

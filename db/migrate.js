@@ -4,6 +4,7 @@ import { Migrations } from 'meteor/percolate:migrations';
 import { dbAdvertising } from './dbAdvertising';
 import { dbCompanies } from './dbCompanies';
 import { dbDirectors } from './dbDirectors';
+import { dbFavorite } from './dbFavorite';
 import { dbFoundations } from './dbFoundations';
 import { dbLog } from './dbLog';
 import { dbOrders } from './dbOrders';
@@ -339,6 +340,18 @@ if (Meteor.isServer) {
         },
         {
           multi: true
+        }
+      );
+    }
+  });
+
+  Migrations.add({
+    version: 5,
+    name: 'Create dbFavorite index.',
+    up() {
+      dbFavorite.rawCollection().createIndex(
+        {
+          userId: 1
         }
       );
     }

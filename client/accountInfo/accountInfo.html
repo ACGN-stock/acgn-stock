@@ -128,6 +128,11 @@
     <div>
       帳號擁有聖晶石：{{this.profile.stone}}
     </div>
+    {{#if hasFavorite}}
+      <div>
+        最愛：{{#each favorite in favoriteCompanies}}「{{>companyLink favorite.companyId}}」{{/each}}
+      </div>
+    {{/if}}
     {{#if this.profile.isAdmin}}
       <div class="text-warning">
         是金融管理會委員。

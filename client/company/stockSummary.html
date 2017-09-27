@@ -30,9 +30,18 @@
     <button class="btn btn-secondary mr-1" type="button" data-action="toggleViewMode">
       <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
     </button>
-    <button class="{{isOnlyShowMineBtnClass}}" type="button" data-action="toggleIsOnlyShowMine">
-      只列出我所持有的股票
-    </button>
+    <div class="dropdown">
+      <button class="btn btn-secondary mr-1 dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{filterModeText}}
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="#" value="none" data-action="filterBy">全部顯示</a>
+        {{#if currentUser}}
+          <a class="dropdown-item" href="#" value="favorite" data-action="filterBy">只顯示最愛</a>
+          <a class="dropdown-item" href="#" value="mine" data-action="filterBy">只顯示持有</a>
+        {{/if}}
+      </div>
+    </div>
     <button class="{{sortByBtnClass 'lastPrice'}}" value="lastPrice" type="button" data-action="sortBy">
       依股價排序
     </button>
@@ -65,6 +74,13 @@
     <div class="company-card {{cardDisplayClass this}}">
       <div class="row row-info">
         <small>{{formatDateText this.createdAt}} 創立</small>
+        {{#if currentUser}}
+          {{#if isFavorite this._id}}
+            <i class="fa fa-heart btn-favorite" aria-hidden="true" data-toggle-favorite="{{this._id}}"></i>
+          {{else}}
+            <i class="fa fa-heart-o btn-favorite" aria-hidden="true" data-toggle-favorite="{{this._id}}"></i>
+          {{/if}}
+        {{/if}}
       </div>
       <hr style="margin: 0px;" />
       <div class="row row-cover d-flex justify-content-around">
@@ -205,6 +221,21 @@
               </a>
             </div>
           {{/if}}
+
+          <div class="mb-1">
+            {{#if isFavorite this._id}}
+              您已將此公司加入最愛。
+              <a class="btn btn-primary btn-sm" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
+                移除最愛
+              </a>
+            {{else}}
+              您未將此公司加入最愛。
+              <a class="btn btn-primary btn-sm" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
+                加入最愛
+              </a>
+            {{/if}}
+          </div>
+
           <div class="mb-1">
             您在該公司持有{{getStockAmount this._id}}數量的股份，股權比例為{{getStockPercentage this._id this.totalRelease}}%。
             <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">

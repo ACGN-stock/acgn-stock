@@ -22,6 +22,7 @@ export const config = {
   managerProfitPercent: 0.05, //經理人獲得公司營利分紅的比例
   costFromProfit: 0.15, //系統將扣除多少公司的營利做為公司營運成本
   displayAdvertisingNumber: 5, //同時最多顯示的廣告筆數
-  advertisingExpireTime: 259200000 //廣告持續時間，單位為微秒
+  advertisingExpireTime: 259200000, //廣告持續時間，單位為微秒
+  maximumFavorite: 60 //每個人的最愛公司數量上限
 };
 export default config;
