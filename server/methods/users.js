@@ -241,9 +241,10 @@ limitSubscription('validateUser');
 
 Meteor.publish('onlinePeopleNumber', function() {
   debug.log('publish onlinePeopleNumber');
-  const onlinePeopleNumber = UserStatus.connections
-    .find()
-    .count();
+  let onlinePeopleNumber = 0;
+  dbThreads.find().forEach((threadData) => {
+    onlinePeopleNumber += threadData.connections;
+  });
   this.added('variables', 'onlinePeopleNumber', {
     value: onlinePeopleNumber
   });
