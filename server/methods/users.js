@@ -271,6 +271,19 @@ function countAndPublishOnlinePeopleNumber(publisher) {
 }
 
 Meteor.startup(function() {
+  //登入時會自動在其他瀏覽器上清空
+  UserStatus.events.on('connectionLogin', function(logoutData) {
+    if (logoutData.userId) {
+      Meteor.users.update(logoutData.userId, {
+        $push: {
+          'services.resume.loginTokens': {
+            $each: [],
+            $slice: -1
+          }
+        }
+      });
+    }
+  });
   //登出、離線時更新最後上線日期
   UserStatus.events.on('connectionLogout', function(logoutData) {
     if (logoutData.userId) {
