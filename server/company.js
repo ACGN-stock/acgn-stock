@@ -285,7 +285,9 @@ export function releaseStocksForLowPrice() {
             $match: {
               orderType: '購入',
               companyId: companyId,
-              unitPrice: maxBuyPrice
+              unitPrice: {
+                $gte: maxBuyPrice
+              }
             }
           },
           {
@@ -332,7 +334,9 @@ export function releaseStocksForLowPrice() {
                 $match: {
                   orderType: '購入',
                   companyId: companyId,
-                  unitPrice: releasePrice
+                  unitPrice: {
+                    $gte: releasePrice
+                  }
                 }
               },
               {
