@@ -269,6 +269,16 @@ function countAndPublishOnlinePeopleNumber(publisher) {
   });
 }
 
+Meteor.publish('userFavorite', function() {
+  debug.log('publish userFavorite');
+  check(this.userId, String);
+
+  return Meteor.users.find(this.userId, {
+    favorite: 1
+  });
+});
+limitSubscription('userFavorite');
+
 Meteor.startup(function() {
   //登出、離線時更新最後上線日期
   UserStatus.events.on('connectionLogout', function(logoutData) {

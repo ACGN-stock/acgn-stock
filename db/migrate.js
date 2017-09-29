@@ -4,7 +4,6 @@ import { Migrations } from 'meteor/percolate:migrations';
 import { dbAdvertising } from './dbAdvertising';
 import { dbCompanies } from './dbCompanies';
 import { dbDirectors } from './dbDirectors';
-import { dbFavorite } from './dbFavorite';
 import { dbFoundations } from './dbFoundations';
 import { dbLog } from './dbLog';
 import { dbOrders } from './dbOrders';
@@ -346,12 +345,18 @@ if (Meteor.isServer) {
   });
 
   Migrations.add({
-    version: 5,
-    name: 'Create dbFavorite index.',
+    version: 6,
+    name: 'users add favorite',
     up() {
-      dbFavorite.rawCollection().createIndex(
+      Meteor.users.update(
+        {},
         {
-          userId: 1
+          $set: {
+            favorite: []
+          }
+        },
+        {
+          multi: true
         }
       );
     }

@@ -54,8 +54,8 @@
       <ul class="navbar-nav">
         {{#if hasFavorite}}
           {{#navLinkGroup text='我的最愛'}}
-            {{#each favorite in favoriteCompanies}}
-              {{> navCompanyLink favorite.companyId}}
+            {{#each companyId in currentUser.favorite}}
+              {{> navCompanyLink companyId}}
             {{/each}}
           {{/navLinkGroup}}
         {{/if}}

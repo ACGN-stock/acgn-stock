@@ -3,7 +3,6 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
-import { dbFavorite } from '../../db/dbFavorite';
 import { dbOrders } from '../../db/dbOrders';
 import { dbResourceLock } from '../../db/dbResourceLock';
 import { dbProductLike } from '../../db/dbProductLike';
@@ -252,9 +251,7 @@ export function toggleFavorite(companyId) {
 
     return false;
   }
-  const userId = user._id;
-
-  if (dbFavorite.find({userId, companyId}).count() > 0) {
+  if (user.favorite.indexOf(companyId) >= 0) {
     Meteor.customCall('removeFavoriteCompany', companyId);
   }
   else {

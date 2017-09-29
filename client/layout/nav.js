@@ -5,7 +5,6 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbSeason } from '../../db/dbSeason';
-import { dbFavorite } from '../../db/dbFavorite';
 import { pageNameHash } from '../../routes';
 import { rAccountDialogMode } from './accountDialog';
 import { rMainTheme } from '../utils/styles';
@@ -43,7 +42,7 @@ Template.nav.onCreated(function() {
       return false;
     }
     if (Meteor.user()) {
-      this.subscribe('favoriteCompanies', Meteor.user()._id);
+      this.subscribe('userFavorite');
     }
   });
 });
@@ -61,17 +60,11 @@ Template.nav.helpers({
     }
   },
   hasFavorite() {
-    if (! Meteor.user()) {
+    if (! Meteor.user() || ! Meteor.user().favorite) {
       return false;
     }
-    const userId = Meteor.user()._id;
 
-    return !! dbFavorite.findOne({userId});
-  },
-  favoriteCompanies() {
-    const userId = Meteor.user()._id;
-
-    return dbFavorite.find({userId});
+    return Meteor.user().favorite.length > 0;
   },
   stockParams() {
     return {

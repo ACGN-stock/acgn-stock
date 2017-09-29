@@ -3,7 +3,6 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbVariables } from '../../db/dbVariables';
-import { dbFavorite } from '../../db/dbFavorite';
 
 Meteor.subscribe('variables');
 
@@ -85,12 +84,11 @@ Template.registerHelper('isUserId', isUserId);
 
 export function isFavorite(companyId) {
   const user = Meteor.user();
-  if (! user) {
+  if (! user || ! user.favorite) {
     return false;
   }
-  const userId = user._id;
 
-  return dbFavorite.find({userId, companyId}).count() > 0;
+  return user.favorite.indexOf(companyId) >= 0;
 }
 Template.registerHelper('isFavorite', isFavorite);
 

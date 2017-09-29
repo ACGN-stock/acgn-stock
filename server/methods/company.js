@@ -9,7 +9,6 @@ import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
-import { dbFavorite } from '../../db/dbFavorite';
 import { checkImageUrl } from './checkImageUrl';
 import { limitMethod, limitSubscription } from './rateLimit';
 import { config } from '../../config';
@@ -568,15 +567,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, isOnlyFavorite,
     };
   }
   else if (userId && isOnlyFavorite) {
-    const seeCompanyIdList = dbFavorite
-      .find({userId}, {
-        fields: {
-          companyId: 1
-        }
-      })
-      .map((favoriteData) => {
-        return favoriteData.companyId;
-      });
+    const seeCompanyIdList = Meteor.user().favorite;
     const seeCompanyIdSet = new Set(seeCompanyIdList);
     filter._id = {
       $in: [...seeCompanyIdSet]
@@ -838,13 +829,14 @@ Meteor.methods({
 });
 function addFavoriteCompany(user, companyId) {
   debug.log('addFavoriteCompany', {user, companyId});
-  const userId = user._id;
-  if (dbFavorite.find({userId}).count() > config.maximumFavorite) {
-    throw new Meteor.Error(403, '您的最愛數量已達上限！');
+  if (user.favorite.length >= config.maximumFavorite) {
+    throw new Meteor.Error(403, '您的最愛已達上限!');
   }
-  if (!dbFavorite.findOne({ userId, companyId })) {
-    dbFavorite.insert({ userId, companyId });
-  }
+  Meteor.users.update(user._id, {
+    $addToSet: {
+      favorite: companyId
+    }
+  });
 }
 limitMethod('addFavoriteCompany');
 
@@ -858,17 +850,16 @@ Meteor.methods({
   }
 });
 function removeFavoriteCompany(user, companyId) {
-  debug.log('removeFavoriteCompany', {user, companyId});
-  const userId = user._id;
-  dbFavorite.remove({ userId, companyId });
+  debug.log('removeFavoriteCompany', {user, companyId}); 
+  const index = user.favorite.indexOf(companyId);
+  if (index >= 0) {
+    const newFavorite = user.favorite.slice();
+    newFavorite.splice(index, 1);
+    Meteor.users.update(user._id, {
+      $set: {
+        favorite: newFavorite
+      }
+    });
+  }
 }
 limitMethod('removeFavoriteCompany');
-
-Meteor.publish('favoriteCompanies', function(userId) {
-  debug.log('favoriteCompanies');
-  check(userId, String);
-
-  return dbFavorite.find({userId});
-});
-//一分鐘最多20次
-limitSubscription('favoriteCompanies');
