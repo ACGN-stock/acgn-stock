@@ -439,7 +439,7 @@ export function recordListPriceAndSellFSCStocks() {
             }
           });
           if (companyData && companyData.isSeal === false) {
-            const amount = directoryData.stocks > 100 ? Math.ceil(directoryData.stocks * 0.1) : Math.max(directoryData.stocks, 10);
+            const amount = directoryData.stocks > 100 ? Math.ceil(directoryData.stocks * 0.1) : Math.min(directoryData.stocks, 10);
             createOrder({
               userId: '!FSC',
               companyId: companyId,
