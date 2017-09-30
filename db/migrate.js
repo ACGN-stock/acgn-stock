@@ -344,6 +344,24 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 6,
+    name: 'users add favorite',
+    up() {
+      Meteor.users.update(
+        {},
+        {
+          $set: {
+            favorite: []
+          }
+        },
+        {
+          multi: true
+        }
+      );
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });

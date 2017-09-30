@@ -8,14 +8,14 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle } from '../utils/methods';
+import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, toggleFavorite } from '../utils/methods';
 import { isUserId, isChairman } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 import { rCompanyListViewMode } from '../utils/styles';
 
 inheritedShowLoadingOnSubscribing(Template.stockSummary);
 const rKeyword = new ReactiveVar('');
-const rIsOnlyShowMine = new ReactiveVar(false);
+const rFilterBy = new ReactiveVar('none');
 const rSortBy = new ReactiveVar('lastPrice');
 export const rStockOffset = new ReactiveVar(0);
 Template.stockSummary.onCreated(function() {
@@ -24,10 +24,11 @@ Template.stockSummary.onCreated(function() {
       return false;
     }
     const keyword = rKeyword.get();
-    const isOnlyShowMine = rIsOnlyShowMine.get();
+    const isOnlyShowMine = (rFilterBy.get() === 'mine');
+    const isOnlyFavorite = (rFilterBy.get() === 'favorite');
     const sort = rSortBy.get();
     const offset = rStockOffset.get();
-    this.subscribe('stockSummary', keyword, isOnlyShowMine, sort, offset);
+    this.subscribe('stockSummary', keyword, isOnlyShowMine, isOnlyFavorite, sort, offset);
   });
   this.autorun(() => {
     if (shouldStopSubscribe()) {
@@ -72,13 +73,20 @@ Template.stockFilterForm.helpers({
 
     return 'fa-th-list';
   },
-  isOnlyShowMineBtnClass() {
-    if (rIsOnlyShowMine.get()) {
-      return 'btn btn-secondary active mr-1';
+  filterModeText() {
+    if (! Meteor.user()) {
+      return '全部顯示';
     }
-    else {
-      return 'btn btn-secondary mr-1';
+
+    const filterBy = rFilterBy.get();
+    if (filterBy === 'mine') {
+      return '只顯示持有';
     }
+    if (filterBy === 'favorite') {
+      return '只顯示最愛';
+    }
+
+    return '全部顯示';
   },
   sortByBtnClass(sortByField) {
     if (sortByField === rSortBy.get()) {
@@ -101,19 +109,28 @@ Template.stockFilterForm.events({
     }
     rCompanyListViewMode.set(mode);
   },
-  'click [data-action="toggleIsOnlyShowMine"]'() {
-    const newValue = ! rIsOnlyShowMine.get();
-    FlowRouter.go('stockSummary', {
-      page: 1
-    });
-    rIsOnlyShowMine.set(newValue);
-  },
   'click [data-action="sortBy"]'(event) {
     const newValue = $(event.currentTarget).val();
     FlowRouter.go('stockSummary', {
       page: 1
     });
     rSortBy.set(newValue);
+  },
+  'click [data-action="filterBy"]'(event) {
+    const newValue = $(event.currentTarget).attr('value');
+    const dropdown = $(event.currentTarget)
+      .parent()
+      .parent();
+    dropdown.toggleClass('show');
+    FlowRouter.go('stockSummary', {
+      page: 1
+    });
+    rFilterBy.set(newValue);
+  },
+  'click [data-toggle="dropdown"]'(event) {
+    $(event.currentTarget)
+      .parent()
+      .toggleClass('show');
   },
   'submit'(event, templateInstance) {
     event.preventDefault();
@@ -195,6 +212,11 @@ const companySummaryEvents = {
   'click [data-action="createSellOrder"]'(event, templateInstance) {
     event.preventDefault();
     createSellOrder(Meteor.user(), templateInstance.data);
+  },
+  'click [data-toggle-favorite]'(event) {
+    event.preventDefault();
+    const companyId = $(event.currentTarget).attr('data-toggle-favorite');
+    toggleFavorite(companyId);
   },
   'click [data-expand-order]'(event, templateInstance) {
     event.preventDefault();

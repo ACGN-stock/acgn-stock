@@ -27,6 +27,13 @@ const schema = new SimpleSchema({
     optional: true,
     blackbox: true
   },
+  favorite: {
+    type: Array,
+    defaultValue: []
+  },
+  'favorite.$': {
+    type: String
+  },
   profile: {
     type: new SimpleSchema({
       //驗證類別

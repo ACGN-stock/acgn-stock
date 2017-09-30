@@ -11,6 +11,7 @@ import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
 import { checkImageUrl } from './checkImageUrl';
 import { limitMethod, limitSubscription } from './rateLimit';
+import { config } from '../../config';
 import { debug } from '../debug';
 
 Meteor.methods({
@@ -517,8 +518,8 @@ function queryStocksPrice(companyId) {
 //一分鐘最多10次
 limitMethod('queryStocksPrice');
 
-Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset) {
-  debug.log('publish stockSummary', {keyword, isOnlyShowMine, sortBy, offset});
+Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, isOnlyFavorite, sortBy, offset) {
+  debug.log('publish stockSummary', {keyword, isOnlyShowMine, isOnlyFavorite, sortBy, offset});
   check(keyword, String);
   check(isOnlyShowMine, Boolean);
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
@@ -561,6 +562,13 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, sortBy, offset)
       });
 
 
+    filter._id = {
+      $in: [...seeCompanyIdSet]
+    };
+  }
+  else if (userId && isOnlyFavorite) {
+    const seeCompanyIdList = Meteor.user().favorite;
+    const seeCompanyIdSet = new Set(seeCompanyIdList);
     filter._id = {
       $in: [...seeCompanyIdSet]
     };
@@ -809,3 +817,49 @@ Meteor.publish('companyLog', function(companyId, offset) {
 });
 //一分鐘最多20次
 limitSubscription('companyLog');
+
+Meteor.methods({
+  addFavoriteCompany(companyId) {
+    check(this.userId, String);
+    check(companyId, String);
+    addFavoriteCompany(Meteor.user(), companyId);
+
+    return true;
+  }
+});
+function addFavoriteCompany(user, companyId) {
+  debug.log('addFavoriteCompany', {user, companyId});
+  if (user.favorite.length >= config.maximumFavorite) {
+    throw new Meteor.Error(403, '您的最愛已達上限!');
+  }
+  Meteor.users.update(user._id, {
+    $addToSet: {
+      favorite: companyId
+    }
+  });
+}
+limitMethod('addFavoriteCompany');
+
+Meteor.methods({
+  removeFavoriteCompany(companyId) {
+    check(this.userId, String);
+    check(companyId, String);
+    removeFavoriteCompany(Meteor.user(), companyId);
+
+    return true;
+  }
+});
+function removeFavoriteCompany(user, companyId) {
+  debug.log('removeFavoriteCompany', {user, companyId}); 
+  const index = user.favorite.indexOf(companyId);
+  if (index >= 0) {
+    const newFavorite = user.favorite.slice();
+    newFavorite.splice(index, 1);
+    Meteor.users.update(user._id, {
+      $set: {
+        favorite: newFavorite
+      }
+    });
+  }
+}
+limitMethod('removeFavoriteCompany');

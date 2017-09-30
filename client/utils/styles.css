@@ -6,6 +6,12 @@
   cursor: pointer;
 }
 
+.btn-favorite {
+  color: #f00;
+  margin-left: auto;
+  margin-right: 1rem;  
+}
+
 .border-grid-body {
   border-top: 1px solid #dddddd;
   border-left: 1px solid #dddddd;
@@ -41,9 +47,11 @@
   background: linear-gradient(135deg, #fceabb, #f8b500);
 }
 .company-card-manager {
-  background: #fffbd5;
-  background: -webkit-linear-gradient(135deg, #b20a2c, #fffbd5);
-  background: linear-gradient(135deg, #b20a2c, #fffbd5);
+  background: #b20a2c;
+  background: -webkit-linear-gradient(135deg, #fffbd5, #b20a2c);
+  background: -o-linear-gradient(135deg, #fffbd5, #b20a2c);
+  background: -moz-linear-gradient(135deg, #fffbd5, #b20a2c);
+  background: linear-gradient(135deg, #fffbd5, #b20a2c);
 }
 .company-card-holder {
   background: #8e9eab;

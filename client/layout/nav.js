@@ -37,6 +37,14 @@ Template.nav.onCreated(function() {
     }
     this.subscribe('currentSeason');
   });
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    if (Meteor.user()) {
+      this.subscribe('userFavorite');
+    }
+  });
 });
 
 Template.nav.onRendered(function() {
@@ -50,6 +58,13 @@ Template.nav.helpers({
     else {
       return 'collapse navbar-collapse show';
     }
+  },
+  hasFavorite() {
+    if (! Meteor.user() || ! Meteor.user().favorite) {
+      return false;
+    }
+
+    return Meteor.user().favorite.length > 0;
   },
   stockParams() {
     return {
@@ -143,5 +158,27 @@ Template.navLink.helpers({
   },
   getLinkText() {
     return pageNameHash[this.page];
+  }
+});
+
+Template.navCompanyLink.onRendered(function() {
+  const companyId = this.data;
+  if (companyId) {
+    const $link = this.$('a');
+    $.ajax({
+      url: '/companyName',
+      data: {
+        id: companyId
+      },
+      success: (companyName) => {
+        const path = FlowRouter.path('company', {companyId});
+        $link
+          .attr('href', path)
+          .text(companyName || '???');
+      },
+      error: () => {
+        $link.text('???');
+      }
+    });
   }
 });

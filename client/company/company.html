@@ -22,6 +22,17 @@
                 更名
               </a>
             {{/if}}
+            {{#if currentUser}}
+              {{#if isFavorite this._id}}
+                <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
+                  移除最愛
+                </a>
+              {{else}}
+                <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
+                  加入最愛
+                </a>
+              {{/if}}
+            {{/if}}
           </h1>
           {{#if showAllTags this.tags}}
             {{#each tag in this.tags}}

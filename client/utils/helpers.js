@@ -82,6 +82,16 @@ export function isUserId(userId) {
 }
 Template.registerHelper('isUserId', isUserId);
 
+export function isFavorite(companyId) {
+  const user = Meteor.user();
+  if (! user || ! user.favorite) {
+    return false;
+  }
+
+  return user.favorite.indexOf(companyId) >= 0;
+}
+Template.registerHelper('isFavorite', isFavorite);
+
 Template.registerHelper('plus', function(value1, value2) {
   return value1 + value2;
 });

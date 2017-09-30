@@ -243,3 +243,18 @@ export function likeProduct(productId) {
     Meteor.customCall('likeProduct', productId);
   }
 }
+
+export function toggleFavorite(companyId) {
+  const user = Meteor.user();
+  if (! user) {
+    alertDialog.alert('您尚未登入，無法新增我的最愛！');
+
+    return false;
+  }
+  if (user.favorite.indexOf(companyId) >= 0) {
+    Meteor.customCall('removeFavoriteCompany', companyId);
+  }
+  else {
+    Meteor.customCall('addFavoriteCompany', companyId);
+  }
+}

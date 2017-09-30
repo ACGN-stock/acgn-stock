@@ -12,7 +12,7 @@ import { dbLog } from '../../db/dbLog';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct } from '../utils/methods';
+import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct, toggleFavorite } from '../utils/methods';
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -86,6 +86,11 @@ Template.company.events({
   'click [data-action="showAllTags"]'(event) {
     event.preventDefault();
     rShowAllTags.set(true);
+  },
+  'click [data-toggle-favorite]'(event) {
+    event.preventDefault();
+    const companyId = $(event.currentTarget).attr('data-toggle-favorite');
+    toggleFavorite(companyId);
   }
 });
 
