@@ -46,28 +46,28 @@ export function limitGlobalMethod(name, number = 1, interval = 60000) {
 }
 
 //同一ip最多兩個connection
-const connectionIpHash = {};
-Meteor.onConnection(function(connection) {
-  debug.log('onConnection', connection.clientAddress);
-  const ip = connection.clientAddress;
-  if (ip !== '140.113.139.18') {
-    if (! ip || connectionIpHash[ip] >= 2) {
-      connection.close();
+// const connectionIpHash = {};
+// Meteor.onConnection(function(connection) {
+//   debug.log('onConnection', connection.clientAddress);
+//   const ip = connection.clientAddress;
+//   if (ip !== '140.113.139.18') {
+//     if (! ip || connectionIpHash[ip] >= 2) {
+//       connection.close();
 
-      return false;
-    }
-  }
+//       return false;
+//     }
+//   }
 
-  if (connectionIpHash[ip]) {
-    connectionIpHash[ip] = 2;
-  }
-  else {
-    connectionIpHash[ip] = 1;
-  }
-  connection.onClose(function() {
-    connectionIpHash[ip] -= 1;
-  });
-  if (connectionIpHash[ip] > 2) {
-    connection.close();
-  }
-});
+//   if (connectionIpHash[ip]) {
+//     connectionIpHash[ip] = 2;
+//   }
+//   else {
+//     connectionIpHash[ip] = 1;
+//   }
+//   connection.onClose(function() {
+//     connectionIpHash[ip] -= 1;
+//   });
+//   if (connectionIpHash[ip] > 2) {
+//     connection.close();
+//   }
+// });
