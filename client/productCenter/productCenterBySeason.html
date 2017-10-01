@@ -33,16 +33,16 @@
         <th class="text-center text-truncate" title="公司名稱">
           公司名稱
         </th>
-        <th class="text-center text-truncate" style="max-width: 120px; cursor: pointer;" title="類別" data-sort="type">
+        <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="類別" data-sort="type">
           類別
           {{{getSortIcon 'type'}}}
         </th>
-        <th class="text-center text-truncate" style="max-width: 120px; cursor: pointer;" title="得票數" data-sort="votes">
+        <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="得票數" data-sort="votes">
           得票數
           {{{getSortIcon 'votes'}}}
         </th>
         {{#if currentUser.profile.isAdmin}}
-          <th class="text-center" style="max-width: 60px;" title="下架">
+          <th class="text-center" style="width: 70px;" title="下架">
             得票數
           </th>
         {{/if}}
