@@ -21,7 +21,7 @@
 
 <template name="displayAnnouncement">
   {{#if isDisplay}}
-    <div class="media bg-info text px-2 py-1 my-2 rounded">
+    <div class="media bg-info text px-2 py-1 my-2 rounded" style="word-break: break-all;">
       <div class="media-body">
         【系統公告】：
         {{{announcement}}}
@@ -36,7 +36,7 @@
 </template>
 
 <template name="displayAdvertising">
-  <div class="media bg-info text px-2 py-1 my-2 rounded">
+  <div class="media bg-info text px-2 py-1 my-2 rounded" style="word-break: break-all;">
     <div class="media-body">
       來自
       {{>userLink this.userId}}
