@@ -121,7 +121,7 @@ foundationRoute.route('/view/:foundationId', {
     }
   }
 });
-foundationRoute.route('/create', {
+foundationRoute.route('/edit/new', {
   name: 'createFoundationPlan',
   action() {
     DocHead.setTitle(config.websiteName + ' - 發起新創計劃');
