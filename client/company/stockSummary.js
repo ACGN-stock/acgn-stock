@@ -24,11 +24,10 @@ Template.stockSummary.onCreated(function() {
       return false;
     }
     const keyword = rKeyword.get();
-    const isOnlyShowMine = (rFilterBy.get() === 'mine');
-    const isOnlyFavorite = (rFilterBy.get() === 'favorite');
+    const onlyShow = rFilterBy.get();
     const sort = rSortBy.get();
     const offset = rStockOffset.get();
-    this.subscribe('stockSummary', keyword, isOnlyShowMine, isOnlyFavorite, sort, offset);
+    this.subscribe('stockSummary', keyword, onlyShow, sort, offset);
   });
   this.autorun(() => {
     if (shouldStopSubscribe()) {

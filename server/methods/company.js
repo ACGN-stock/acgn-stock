@@ -518,10 +518,10 @@ function queryStocksPrice(companyId) {
 //一分鐘最多10次
 limitMethod('queryStocksPrice');
 
-Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, isOnlyFavorite, sortBy, offset) {
-  debug.log('publish stockSummary', {keyword, isOnlyShowMine, isOnlyFavorite, sortBy, offset});
+Meteor.publish('stockSummary', function(keyword, onlyShow, sortBy, offset) {
+  debug.log('publish stockSummary', {keyword, onlyShow, sortBy, offset});
   check(keyword, String);
-  check(isOnlyShowMine, Boolean);
+  check(onlyShow, new Match.OneOf('none', 'mine', 'favorite'));
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
   check(offset, Match.Integer);
   const filter = {
@@ -540,7 +540,7 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, isOnlyFavorite,
     ];
   }
   const userId = this.userId;
-  if (userId && isOnlyShowMine) {
+  if (userId && onlyShow === 'mine') {
     const seeCompanyIdList = dbDirectors
       .find({userId}, {
         fields: {
@@ -566,11 +566,9 @@ Meteor.publish('stockSummary', function(keyword, isOnlyShowMine, isOnlyFavorite,
       $in: [...seeCompanyIdSet]
     };
   }
-  else if (userId && isOnlyFavorite) {
-    const seeCompanyIdList = Meteor.user().favorite;
-    const seeCompanyIdSet = new Set(seeCompanyIdList);
+  else if (userId && onlyShow === 'favorite') {
     filter._id = {
-      $in: [...seeCompanyIdSet]
+      $in: Meteor.user().favorite
     };
   }
   const sort = {
