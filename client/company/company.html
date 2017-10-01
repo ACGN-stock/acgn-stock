@@ -66,6 +66,11 @@
               </a>
             {{/if}}
           </h3>
+          {{#if haveNextSeasonProduct}}
+            <div class="text-success">下季度待上架產品：有</div>
+          {{else}}
+            <div class="text-danger">下季度待上架產品：無</div>
+          {{/if}}
           <hr />
           {{> companyDetail}}
         </div>

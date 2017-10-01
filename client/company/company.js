@@ -112,6 +112,13 @@ Template.company.helpers({
   },
   firstFewTags(tags) {
     return tags && tags.slice(0, 3);
+  },
+  haveNextSeasonProduct() {
+    const companyId = this._id;
+    const overdue = 0;
+    window.dbProducts = dbProducts;
+
+    return dbProducts.find({companyId, overdue}).count() > 0;
   }
 });
 Template.company.events({

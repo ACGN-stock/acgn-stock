@@ -648,6 +648,24 @@ limitSubscription('queryOwnStocks');
 Meteor.publish('companyDetail', function(companyId) {
   debug.log('publish companyDetail', companyId);
   check(companyId, String);
+  const nextSeasonProductData = dbProducts.findOne(
+    {
+      companyId: companyId,
+      overdue: 0
+    },
+    {
+      fields: {
+        _id: 1,
+        overdue: 1
+      }
+    }
+  );
+  if (nextSeasonProductData) {
+    this.added('products', nextSeasonProductData._id, {
+      companyId: companyId,
+      overdue: nextSeasonProductData.overdue
+    });
+  }
 
   const observer = dbCompanies
     .find(companyId, {
@@ -702,12 +720,25 @@ function addSupportStocksListField(companyId, fields = {}) {
 
 Meteor.publish('companyDataForEdit', function(companyId) {
   debug.log('publish companyDataForEdit', companyId);
-  const overdue = 0;
+  if (typeof this.userId !== 'string') {
+    return [];
+  }
+  const companyData = dbCompanies.findOne(companyId, {
+    fields: {
+      manager: 1
+    }
+  });
+  if (companyData && this.userId === companyData.manager) {
+    const overdue = 0;
 
-  return [
-    dbCompanies.find(companyId),
-    dbProducts.find({companyId, overdue})
-  ];
+    return [
+      dbCompanies.find(companyId),
+      dbProducts.find({companyId, overdue})
+    ];
+  }
+  else {
+    return [];
+  }
 });
 //一分鐘最多10次
 limitSubscription('companyDataForEdit', 10);
