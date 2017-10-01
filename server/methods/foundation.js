@@ -247,7 +247,7 @@ export function investFoundCompany(user, companyId, amount) {
   });
 }
 
-Meteor.publish('foundationPlan', function(keyword, offset) {
+Meteor.publish('foundationList', function(keyword, offset) {
   debug.log('publish foundationPlan', {keyword, offset});
   check(keyword, String);
   check(offset, Match.Integer);
@@ -310,7 +310,7 @@ Meteor.publish('foundationPlan', function(keyword, offset) {
   });
 });
 //一分鐘最多20次
-limitSubscription('foundationPlan');
+limitSubscription('foundationList');
 
 Meteor.publish('foundationDataForEdit', function(foundationId) {
   debug.log('publish foundationDataForEdit', {foundationId});

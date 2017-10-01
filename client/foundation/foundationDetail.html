@@ -1,4 +1,4 @@
-<template name="foundation">
+<template name="foundationDetail">
   <div class="card">
     {{#with foundationData}}
       <div class="card-block">
@@ -31,7 +31,7 @@
           {{/if}}
         </h3>
         <hr />
-        {{> foundationDetail}}
+        {{> foundationDetailTable}}
       </div>
     {{else}}
       <div class="card-block">
@@ -41,7 +41,7 @@
   </div>
 </template>
 
-<template name="foundationDetail">
+<template name="foundationDetailTable">
   <div class="company-detail">
     <div class="media">
       <div class="d-sm-flex picture">
@@ -104,13 +104,13 @@
         </a>
       </div>
       {{#if isDisplayPanel 'founder'}}
-        {{> founderList}}
+        {{> foundationFounderList}}
       {{/if}}
     </div>
   </div>
 </template>
 
-<template name="founderList">
+<template name="foundationFounderList">
   <div class="col-12 border-grid">
     <div class="row mb-1">
       <div class="col-6 text-left">使用者帳號</div>

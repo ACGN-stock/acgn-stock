@@ -518,8 +518,8 @@ function queryStocksPrice(companyId) {
 //一分鐘最多10次
 limitMethod('queryStocksPrice');
 
-Meteor.publish('stockSummary', function(keyword, onlyShow, sortBy, offset) {
-  debug.log('publish stockSummary', {keyword, onlyShow, sortBy, offset});
+Meteor.publish('companyList', function(keyword, onlyShow, sortBy, offset) {
+  debug.log('publish companyList', {keyword, onlyShow, sortBy, offset});
   check(keyword, String);
   check(onlyShow, new Match.OneOf('none', 'mine', 'favorite'));
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
@@ -594,7 +594,7 @@ Meteor.publish('stockSummary', function(keyword, onlyShow, sortBy, offset) {
 
   let initialized = false;
   let total = dbCompanies.find(filter).count();
-  this.added('variables', 'totalCountOfStockSummary', {
+  this.added('variables', 'totalCountOfCompanyList', {
     value: total
   });
 
@@ -605,7 +605,7 @@ Meteor.publish('stockSummary', function(keyword, onlyShow, sortBy, offset) {
         this.added('companies', id, fields);
         if (initialized) {
           total += 1;
-          this.changed('variables', 'totalCountOfStockSummary', {
+          this.changed('variables', 'totalCountOfCompanyList', {
             value: total
           });
         }
@@ -617,7 +617,7 @@ Meteor.publish('stockSummary', function(keyword, onlyShow, sortBy, offset) {
         this.removed('companies', id);
         if (initialized) {
           total -= 1;
-          this.changed('variables', 'totalCountOfStockSummary', {
+          this.changed('variables', 'totalCountOfCompanyList', {
             value: total
           });
         }
@@ -631,7 +631,7 @@ Meteor.publish('stockSummary', function(keyword, onlyShow, sortBy, offset) {
   });
 });
 //一分鐘最多20次
-limitSubscription('stockSummary');
+limitSubscription('companyList');
 
 Meteor.publish('queryOwnStocks', function() {
   debug.log('publish queryOwnStocks');

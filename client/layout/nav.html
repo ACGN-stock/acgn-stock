@@ -55,14 +55,14 @@
         {{#if hasFavorite}}
           {{#navLinkGroup text='我的最愛'}}
             {{#each companyId in currentUser.favorite}}
-              {{> navCompanyLink companyId}}
+              {{>navCompanyLink companyId}}
             {{/each}}
           {{/navLinkGroup}}
         {{/if}}
         {{#navLinkGroup text='交易大廳'}}
           {{> navLink page='instantMessage'}}
-          {{> navLink page='stockSummary' params=stockParams}}
-          {{> navLink page='foundationPlan'}}
+          {{> navLink page='companyList' params=page1}}
+          {{> navLink page='foundationList' params=page1}}
           {{> navLink page='advertising'}}
           {{> navLink page='productCenterBySeason' params=seasonParams}}
         {{/navLinkGroup}}

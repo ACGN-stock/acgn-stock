@@ -41,7 +41,7 @@ Template.displayLog.onRendered(function() {
         id: companyId
       },
       success: (companyName) => {
-        const path = FlowRouter.path('company', {companyId});
+        const path = FlowRouter.path('companyDetail', {companyId});
         $link
           .filter('[data-company-link="' + companyId + '"]')
           .html(`

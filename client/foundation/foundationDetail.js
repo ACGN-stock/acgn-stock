@@ -14,8 +14,8 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 const rShowAllTags = new ReactiveVar(false);
 
-inheritedShowLoadingOnSubscribing(Template.foundation);
-Template.foundation.onCreated(function() {
+inheritedShowLoadingOnSubscribing(Template.foundationDetail);
+Template.foundationDetail.onCreated(function() {
   rShowAllTags.set(false);
   this.autorun(() => {
     const foundationId = FlowRouter.getParam('foundationId');
@@ -36,8 +36,7 @@ Template.foundation.onCreated(function() {
     }
   });
 });
-
-Template.foundation.helpers({
+Template.foundationDetail.helpers({
   foundationData() {
     const foundationId = FlowRouter.getParam('foundationId');
 
@@ -57,7 +56,7 @@ Template.foundation.helpers({
     return tags.slice(0, 3);
   }
 });
-Template.foundation.events({
+Template.foundationDetail.events({
   'click [data-action="changeCompanyName"]'(event) {
     event.preventDefault();
     const foundationId = FlowRouter.getParam('foundationId');
@@ -115,7 +114,7 @@ const getStockPrice = function(investList) {
 
   return stockUnitPrice;
 };
-Template.foundationDetail.helpers({
+Template.foundationDetailTable.helpers({
   isDisplayPanel(panelType) {
     return _.contains(rDisplayPanelList.get(), panelType);
   },
@@ -151,7 +150,7 @@ Template.foundationDetail.helpers({
     }, 0);
   }
 });
-Template.foundationDetail.events({
+Template.foundationDetailTable.events({
   'click [data-toggle-panel]'(event) {
     event.preventDefault();
     const $emitter = $(event.currentTarget);
@@ -167,11 +166,7 @@ Template.foundationDetail.events({
   }
 });
 
-const rFounderOffset = new ReactiveVar(0);
-Template.founderList.onCreated(function() {
-  rFounderOffset.set(0);
-});
-Template.founderList.helpers({
+Template.foundationFounderList.helpers({
   orderedInvestList() {
     const foundationId = FlowRouter.getParam('foundationId');
     const foundation = dbFoundations.findOne(foundationId);

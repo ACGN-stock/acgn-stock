@@ -13,8 +13,8 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
-inheritedShowLoadingOnSubscribing(Template.manageCompany);
-Template.manageCompany.onCreated(function() {
+inheritedShowLoadingOnSubscribing(Template.editCompany);
+Template.editCompany.onCreated(function() {
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
@@ -25,7 +25,7 @@ Template.manageCompany.onCreated(function() {
     }
   });
 });
-Template.manageCompany.helpers({
+Template.editCompany.helpers({
   companyData() {
     const companyId = FlowRouter.getParam('companyId');
 
@@ -93,7 +93,7 @@ function saveCompanyModel(model) {
   const submitData = _.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description');
   Meteor.customCall('editCompany', companyId, submitData, (error) => {
     if (! error) {
-      const path = FlowRouter.path('company', {companyId});
+      const path = FlowRouter.path('companyDetail', {companyId});
       FlowRouter.go(path);
     }
   });
@@ -105,7 +105,7 @@ Template.companyEditForm.helpers({
     return previewPictureType.get() === pictureType;
   },
   getCompanyHref(companyId) {
-    return FlowRouter.path('company', {companyId});
+    return FlowRouter.path('companyDetail', {companyId});
   }
 });
 

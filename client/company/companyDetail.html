@@ -1,4 +1,4 @@
-<template name="company">
+<template name="companyDetail">
   <div class="card">
     {{#with companyData}}
       {{#if companyData.isSeal}}
@@ -75,7 +75,7 @@
             <div class="text-danger">下季度待上架產品：無</div>
           {{/if}}
           <hr />
-          {{> companyDetail}}
+          {{> companyDetailTable}}
         </div>
       {{/if}}
     {{else}}
@@ -86,7 +86,7 @@
   </div>
 </template>
 
-<template name="companyDetail">
+<template name="companyDetailTable">
   <div class="company-detail">
     <div class="media">
       <div class="d-sm-flex picture">

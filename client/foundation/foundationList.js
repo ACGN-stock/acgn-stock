@@ -12,24 +12,24 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { rCompanyListViewMode } from '../utils/styles';
 
-inheritedShowLoadingOnSubscribing(Template.foundationPlan);
+inheritedShowLoadingOnSubscribing(Template.foundationList);
 const rKeyword = new ReactiveVar('');
-const rFoundationOffset = new ReactiveVar(0);
-Template.foundationPlan.onCreated(function() {
+export const rFoundationOffset = new ReactiveVar(0);
+Template.foundationList.onCreated(function() {
   rFoundationOffset.set(0);
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
     }
-    this.subscribe('foundationPlan', rKeyword.get(), rFoundationOffset.get());
+    this.subscribe('foundationList', rKeyword.get(), rFoundationOffset.get());
   });
 });
-Template.foundationPlan.helpers({
+Template.foundationList.helpers({
   viewModeIsCard() {
     return rCompanyListViewMode.get() === 'card';
   },
   getFoundCompanyHref() {
-    return FlowRouter.path('foundCompany');
+    return FlowRouter.path('createFoundationPlan');
   },
   foundationList() {
     return dbFoundations.find({}, {
@@ -43,15 +43,16 @@ Template.foundationPlan.helpers({
     return {
       useVariableForTotalCount: 'totalCountOfFoundationPlan',
       dataNumberPerPage: 12,
-      offset: rFoundationOffset
+      offset: rFoundationOffset,
+      useHrefRoute: true
     };
   }
 });
 
-Template.foundationFilterForm.onRendered(function() {
+Template.foundationListFilterForm.onRendered(function() {
   this.$keyword = this.$('[name="keyword"]');
 });
-Template.foundationFilterForm.helpers({
+Template.foundationListFilterForm.helpers({
   viewModeBtnClass() {
     if (rCompanyListViewMode.get() === 'card') {
       return 'fa-th';
@@ -63,7 +64,7 @@ Template.foundationFilterForm.helpers({
     return rKeyword.get();
   }
 });
-Template.foundationFilterForm.events({
+Template.foundationListFilterForm.events({
   'click [data-action="toggleViewMode"]'(event) {
     event.preventDefault();
     let mode = 'card';
@@ -79,7 +80,7 @@ Template.foundationFilterForm.events({
   }
 });
 
-const foundationPlanHelpers = {
+const foundationListHelpers = {
   displayTagList(tagList) {
     return tagList.join('、');
   },
@@ -132,7 +133,7 @@ const foundationPlanHelpers = {
     return 'company-card-default';
   }
 };
-const foundationPlanEvents = {
+const foundationListEvents = {
   'click [data-expand-order]'(event, templateInstance) {
     event.preventDefault();
     const panel = templateInstance.$('.order-panel');
@@ -188,7 +189,7 @@ const foundationPlanEvents = {
     });
   }
 };
-Template.foundationPlanInfo.helpers(foundationPlanHelpers);
-Template.foundationPlanInfo.events(foundationPlanEvents);
-Template.foundationPlanCard.helpers(foundationPlanHelpers);
-Template.foundationPlanCard.events(foundationPlanEvents);
+Template.foundationListCard.helpers(foundationListHelpers);
+Template.foundationListCard.events(foundationListEvents);
+Template.foundationListTable.helpers(foundationListHelpers);
+Template.foundationListTable.events(foundationListEvents);

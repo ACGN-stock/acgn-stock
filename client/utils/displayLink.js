@@ -44,7 +44,7 @@ Template.companyLink.onRendered(function() {
         id: companyId
       },
       success: (companyName) => {
-        const path = FlowRouter.path('company', {companyId});
+        const path = FlowRouter.path('companyDetail', {companyId});
         $link
           .attr('href', path)
           .text(companyName || '???');
@@ -66,7 +66,7 @@ Template.foundationLink.onRendered(function() {
         id: foundationId
       },
       success: (foundationName) => {
-        const path = FlowRouter.path('foundation', {foundationId});
+        const path = FlowRouter.path('foundationDetail', {foundationId});
         $link
           .attr('href', path)
           .text(foundationName || '???');

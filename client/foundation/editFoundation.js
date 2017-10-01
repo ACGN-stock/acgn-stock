@@ -106,7 +106,7 @@ function saveModel(model) {
     const submitData = _.pick(model, '_id', 'tags', 'pictureSmall', 'pictureBig', 'description');
     Meteor.customCall('editFoundCompany', submitData, (error) => {
       if (! error) {
-        const path = FlowRouter.path('foundation', {foundationId});
+        const path = FlowRouter.path('foundationDetail', {foundationId});
         FlowRouter.go(path);
       }
     });
@@ -117,7 +117,7 @@ function saveModel(model) {
       if (companyName === model.companyName) {
         Meteor.customCall('foundCompany', model, (error) => {
           if (! error) {
-            const path = FlowRouter.path('foundationPlan');
+            const path = FlowRouter.path('foundationList');
             FlowRouter.go(path);
           }
         });
@@ -140,10 +140,10 @@ Template.foundCompanyForm.helpers({
     const templateInstance = Template.instance();
     const foundationId = templateInstance.model.get()._id;
     if (foundationId) {
-      return FlowRouter.path('foundation', {foundationId});
+      return FlowRouter.path('foundationDetail', {foundationId});
     }
 
-    return FlowRouter.path('foundationPlan');
+    return FlowRouter.path('foundationList');
   }
 });
 

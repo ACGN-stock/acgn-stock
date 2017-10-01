@@ -66,7 +66,7 @@ Template.nav.helpers({
 
     return Meteor.user().favorite.length > 0;
   },
-  stockParams() {
+  page1() {
     return {
       page: 1
     };
@@ -171,7 +171,7 @@ Template.navCompanyLink.onRendered(function() {
         id: companyId
       },
       success: (companyName) => {
-        const path = FlowRouter.path('company', {companyId});
+        const path = FlowRouter.path('companyDetail', {companyId});
         $link
           .attr('href', path)
           .text(companyName || '???');

@@ -17,8 +17,8 @@ FlowRouter.route('/', {
 export const pageNameHash = {
   tutorial: '教學導覽',
   instantMessage: '即時訊息',
-  stockSummary: '股市總覽',
-  foundationPlan: '新創計劃',
+  companyList: '股市總覽',
+  foundationList: '新創計劃',
   advertising: '廣告宣傳',
   productCenterBySeason: '產品中心',
   productCenterByCompany: '產品中心',
@@ -34,33 +34,32 @@ FlowRouter.route('/instantMessage', {
   }
 });
 
-const stockSummaryRoute = FlowRouter.group({
-  prefix: '/stockSummary',
-  name: 'stockSummaryRoute'
+const companyRoute = FlowRouter.group({
+  prefix: '/company',
+  name: 'companyRoute'
 });
-stockSummaryRoute.route('/', {
-  name: 'stockSummaryRedirect',
+companyRoute.route('/', {
+  name: 'companyListRedirect',
   triggersEnter: [
     (context, redirect) => {
-      redirect('/stockSummary/1');
+      redirect('/company/1');
     }
   ]
 });
-stockSummaryRoute.route('/:page', {
-  name: 'stockSummary',
+companyRoute.route('/:page', {
+  name: 'companyList',
   action(params) {
     DocHead.setTitle(config.websiteName + ' - 股市總覽');
     if (Meteor.isClient) {
-      const { rStockOffset } = require('./client/company/stockSummary');
+      const { rCompanyOffset } = require('./client/company/companyList');
       const page = window.parseInt(params.page, 10);
       const offset = (page - 1) * 12;
-      rStockOffset.set(offset);
+      rCompanyOffset.set(offset);
     }
   }
 });
-
-FlowRouter.route('/company/:companyId', {
-  name: 'company',
+companyRoute.route('/detail/:companyId', {
+  name: 'companyDetail',
   action(params) {
     if (Meteor.isServer) {
       const companyData = dbCompanies.findOne(params.companyId, {
@@ -75,20 +74,39 @@ FlowRouter.route('/company/:companyId', {
     }
   }
 });
-FlowRouter.route('/manageCompany/:companyId', {
-  name: 'manageCompany',
+FlowRouter.route('/edit/:companyId', {
+  name: 'editCompany',
   action() {
     DocHead.setTitle(config.websiteName + ' - 經營管理');
   }
 });
-FlowRouter.route('/foundationPlan', {
-  name: 'foundationPlan',
-  action() {
+
+const foundationRoute = FlowRouter.group({
+  prefix: '/foundation',
+  name: 'foundationRoute'
+});
+foundationRoute.route('/', {
+  name: 'foundationRedirect',
+  triggersEnter: [
+    (context, redirect) => {
+      redirect('/foundation/1');
+    }
+  ]
+});
+foundationRoute.route('/:page', {
+  name: 'foundationList',
+  action(params) {
     DocHead.setTitle(config.websiteName + ' - 新創計劃');
+    if (Meteor.isClient) {
+      const { rFoundationOffset } = require('./client/foundation/foundationList');
+      const page = window.parseInt(params.page, 10);
+      const offset = (page - 1) * 12;
+      rFoundationOffset.set(offset);
+    }
   }
 });
-FlowRouter.route('/foundation/:foundationId', {
-  name: 'foundation',
+foundationRoute.route('/view/:foundationId', {
+  name: 'foundationDetail',
   action(params) {
     if (Meteor.isServer) {
       const foundationData = dbFoundations.findOne(params.foundationId, {
@@ -103,18 +121,13 @@ FlowRouter.route('/foundation/:foundationId', {
     }
   }
 });
-
-const foundCompanyRoute = FlowRouter.group({
-  prefix: '/foundCompany',
-  name: 'foundCompanyRoute'
-});
-foundCompanyRoute.route('/', {
+foundationRoute.route('/create', {
   name: 'createFoundationPlan',
   action() {
     DocHead.setTitle(config.websiteName + ' - 發起新創計劃');
   }
 });
-foundCompanyRoute.route('/:foundationId', {
+foundationRoute.route('/edit/:foundationId', {
   name: 'editFoundationPlan',
   action() {
     if (Meteor.isClient) {

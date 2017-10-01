@@ -13,12 +13,12 @@ import { isUserId, isChairman } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 import { rCompanyListViewMode } from '../utils/styles';
 
-inheritedShowLoadingOnSubscribing(Template.stockSummary);
+inheritedShowLoadingOnSubscribing(Template.companyList);
 const rKeyword = new ReactiveVar('');
 const rFilterBy = new ReactiveVar('none');
 const rSortBy = new ReactiveVar('lastPrice');
-export const rStockOffset = new ReactiveVar(0);
-Template.stockSummary.onCreated(function() {
+export const rCompanyOffset = new ReactiveVar(0);
+Template.companyList.onCreated(function() {
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
@@ -26,8 +26,8 @@ Template.stockSummary.onCreated(function() {
     const keyword = rKeyword.get();
     const onlyShow = rFilterBy.get();
     const sort = rSortBy.get();
-    const offset = rStockOffset.get();
-    this.subscribe('stockSummary', keyword, onlyShow, sort, offset);
+    const offset = rCompanyOffset.get();
+    this.subscribe('companyList', keyword, onlyShow, sort, offset);
   });
   this.autorun(() => {
     if (shouldStopSubscribe()) {
@@ -39,7 +39,7 @@ Template.stockSummary.onCreated(function() {
     }
   });
 });
-Template.stockSummary.helpers({
+Template.companyList.helpers({
   viewModeIsCard() {
     return rCompanyListViewMode.get() === 'card';
   },
@@ -53,18 +53,18 @@ Template.stockSummary.helpers({
   },
   paginationData() {
     return {
-      useVariableForTotalCount: 'totalCountOfStockSummary',
+      useVariableForTotalCount: 'totalCountOfCompanyList',
       dataNumberPerPage: 12,
-      offset: rStockOffset,
+      offset: rCompanyOffset,
       useHrefRoute: true
     };
   }
 });
 
-Template.stockFilterForm.onRendered(function() {
+Template.companyFilterForm.onRendered(function() {
   this.$keyword = this.$('[name="keyword"]');
 });
-Template.stockFilterForm.helpers({
+Template.companyFilterForm.helpers({
   viewModeBtnClass() {
     if (rCompanyListViewMode.get() === 'card') {
       return 'fa-th';
@@ -99,7 +99,7 @@ Template.stockFilterForm.helpers({
     return rKeyword.get();
   }
 });
-Template.stockFilterForm.events({
+Template.companyFilterForm.events({
   'click [data-action="toggleViewMode"]'(event) {
     event.preventDefault();
     let mode = 'card';
@@ -140,7 +140,7 @@ Template.stockFilterForm.events({
   }
 });
 
-const companySummaryHelpers = {
+const companyListHelpers = {
   displayTagList(tagList) {
     return tagList.join('、');
   },
@@ -154,7 +154,7 @@ const companySummaryHelpers = {
     if (isUserId(companyData.manager)) {
       return 'company-card-manager';
     }
-    const percentage = companySummaryHelpers.getStockPercentage(companyData._id, companyData.totalRelease);
+    const percentage = companyListHelpers.getStockPercentage(companyData._id, companyData.totalRelease);
     if (percentage > 0) {
       return 'company-card-holder';
     }
@@ -170,7 +170,7 @@ const companySummaryHelpers = {
     }
   },
   getManageHref(companyId) {
-    return FlowRouter.path('manageCompany', {companyId});
+    return FlowRouter.path('editCompany', {companyId});
   },
   getStockAmount(companyId) {
     const userId = Meteor.user()._id;
@@ -199,7 +199,7 @@ const companySummaryHelpers = {
     return dbOrders.find({companyId, userId});
   }
 };
-const companySummaryEvents = {
+const companyListEvents = {
   'click [data-action="changeChairmanTitle"]'(event, templateInstance) {
     const companyData = templateInstance.data;
     changeChairmanTitle(companyData);
@@ -235,7 +235,7 @@ const companySummaryEvents = {
     retrieveOrder(orderData);
   }
 };
-Template.companySummaryList.helpers(companySummaryHelpers);
-Template.companySummaryList.events(companySummaryEvents);
-Template.companySummaryCard.helpers(companySummaryHelpers);
-Template.companySummaryCard.events(companySummaryEvents);
+Template.companyListCard.helpers(companyListHelpers);
+Template.companyListCard.events(companyListEvents);
+Template.companyListTable.helpers(companyListHelpers);
+Template.companyListTable.events(companyListEvents);

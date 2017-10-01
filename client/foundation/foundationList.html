@@ -1,4 +1,4 @@
-<template name="foundationPlan">
+<template name="foundationList">
   <div class="card">
     <div class="card-block">
       <h1 class="card-title mb-1">新創計劃</h1>
@@ -13,19 +13,19 @@
         {{/if}}
       </h3>
       <hr />
-      {{> foundationFilterForm}}
+      {{> foundationListFilterForm}}
       <hr />
       {{#if viewModeIsCard}}
         <div class="media">
           <div class="media-body row">
             {{#each foundationList}}
-              {{> foundationPlanCard}}
+              {{> foundationListCard}}
             {{/each}}
           </div>
         </div>
       {{else}}
         {{#each foundationList}}
-          {{> foundationPlanInfo}}
+          {{> foundationListTable}}
         {{/each}} 
       {{/if}}
       {{#with paginationData}}
@@ -35,7 +35,7 @@
   </div>
 </template>
 
-<template name="foundationFilterForm">
+<template name="foundationListFilterForm">
   <form class="form-inline">
     <button class="btn btn-secondary mr-1" type="button" data-action="toggleViewMode">
       <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
@@ -59,75 +59,9 @@
   </form>
 </template>
 
-<template name="foundationPlanInfo">
-  <div class="media company-summary-item">
-    <div class="d-sm-flex picture">
-      {{#if this.pictureSmall}}
-        <img src="{{this.pictureSmall}}" />
-      {{else}}
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
-      {{/if}}
-    </div>
-    <div class="media-body row border-grid-body">
-      <div class="col-4 col-lg-3 text-right border-grid">角色名稱：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{this.companyName}}">
-        {{>foundationLink this._id}}
-      </div>
-      <div class="col-4 col-lg-3 text-right border-grid">經理人：</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid">
-        {{>userLink this.manager}}
-      </div>
-      <div class="col-4 col-lg-3 text-right border-grid">計劃日期：</div>
-      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateText this.createdAt}}">
-        {{formatDateText this.createdAt}}
-      </div>
-      <div class="col-4 col-lg-3 text-right border-grid">截止日期：</div>
-      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{getExpireDateText this.createdAt}}">
-        {{getExpireDateText this.createdAt}}
-      </div>
-      <div class="col-4 col-lg-3 text-right border-grid">投資人數：</div>
-      <div class="col-8 col-lg-3 text-right text-truncate border-grid">
-        <span class="{{investPplsNumberClass this.invest.length}}">
-          {{this.invest.length}} / {{foundationNeedUsers}}
-        </span>
-      </div>
-      <div class="col-4 col-lg-3 text-right border-grid">總投資額：</div>
-      <div class="col-8 col-lg-3 text-right text-right border-grid" title="{{getTotalInvest this.invest}}">
-        $ {{getTotalInvest this.invest}}
-      </div>
-      <div class="col-12 border-grid company-description"><h4>角色簡介：</h4>{{this.description}}</div>
-      {{#if currentUser}}
-        <div class="col-12 border-grid">
-          {{#if isUserId this.manager}}
-            <div class="mb-1">
-              您是此創立計劃的發起人。
-              <a class="btn btn-primary btn-sm" href="{{getEditHref this._id}}">
-                修改計劃
-              </a>
-            </div>
-          {{/if}}
-          {{#if alreadyInvest}}
-            <div class="mb-1">
-              您已經向此計劃投資了$ {{alreadyInvest this.invest}}。
-              <button class="btn btn-primary btn-sm" type="button" data-action="invest">
-                追加投資
-              </button>
-            </div>
-          {{else}}
-            <div class="mb-1">
-              您尚未對此計劃進行過投資。
-              <button class="btn btn-primary btn-sm" type="button" data-action="invest">
-                進行投資
-              </button>
-            </div>
-          {{/if}}
-        </div>
-      {{/if}}
-    </div>
-  </div>
-</template>
 
-<template name="foundationPlanCard">
+
+<template name="foundationListCard">
   <div class="col-12 col-md-6 col-lg-4 col-xl-3" style="margin-bottom: 25px;">
     <div class="company-card {{cardDisplayClass this}}">
       <div class="company-card-mask">
@@ -202,6 +136,74 @@
           </div>
         {{/if}}
       </div>
+    </div>
+  </div>
+</template>
+
+<template name="foundationListTable">
+  <div class="media company-summary-item">
+    <div class="d-sm-flex picture">
+      {{#if this.pictureSmall}}
+        <img src="{{this.pictureSmall}}" />
+      {{else}}
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
+      {{/if}}
+    </div>
+    <div class="media-body row border-grid-body">
+      <div class="col-4 col-lg-3 text-right border-grid">角色名稱：</div>
+      <div class="col-8 col-lg-3 text-truncate border-grid" title="{{this.companyName}}">
+        {{>foundationLink this._id}}
+      </div>
+      <div class="col-4 col-lg-3 text-right border-grid">經理人：</div>
+      <div class="col-8 col-lg-3 text-truncate border-grid">
+        {{>userLink this.manager}}
+      </div>
+      <div class="col-4 col-lg-3 text-right border-grid">計劃日期：</div>
+      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateText this.createdAt}}">
+        {{formatDateText this.createdAt}}
+      </div>
+      <div class="col-4 col-lg-3 text-right border-grid">截止日期：</div>
+      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{getExpireDateText this.createdAt}}">
+        {{getExpireDateText this.createdAt}}
+      </div>
+      <div class="col-4 col-lg-3 text-right border-grid">投資人數：</div>
+      <div class="col-8 col-lg-3 text-right text-truncate border-grid">
+        <span class="{{investPplsNumberClass this.invest.length}}">
+          {{this.invest.length}} / {{foundationNeedUsers}}
+        </span>
+      </div>
+      <div class="col-4 col-lg-3 text-right border-grid">總投資額：</div>
+      <div class="col-8 col-lg-3 text-right text-right border-grid" title="{{getTotalInvest this.invest}}">
+        $ {{getTotalInvest this.invest}}
+      </div>
+      <div class="col-12 border-grid company-description"><h4>角色簡介：</h4>{{this.description}}</div>
+      {{#if currentUser}}
+        <div class="col-12 border-grid">
+          {{#if isUserId this.manager}}
+            <div class="mb-1">
+              您是此創立計劃的發起人。
+              <a class="btn btn-primary btn-sm" href="{{getEditHref this._id}}">
+                修改計劃
+              </a>
+            </div>
+          {{/if}}
+          {{#if alreadyInvest}}
+            <div class="mb-1">
+              您已經向此計劃投資了$ {{alreadyInvest this.invest}}。
+              <button class="btn btn-primary btn-sm" type="button" data-action="invest">
+                追加投資
+              </button>
+            </div>
+          {{else}}
+            <div class="mb-1">
+              您尚未對此計劃進行過投資。
+              <button class="btn btn-primary btn-sm" type="button" data-action="invest">
+                進行投資
+              </button>
+            </div>
+          {{/if}}
+        </div>
+      {{/if}}
     </div>
   </div>
 </template>

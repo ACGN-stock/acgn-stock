@@ -1,21 +1,21 @@
-<template name="stockSummary">
+<template name="companyList">
   <div class="card">
     <div class="card-block">
       <h1 class="card-title mb-1">股市總覽</h1>
       <hr />
-      {{> stockFilterForm}}
+      {{> companyFilterForm}}
       <hr />
       {{#if viewModeIsCard}}
         <div class="media">
           <div class="media-body row">
             {{#each companyList}}
-              {{> companySummaryCard}}
+              {{> companyListCard}}
             {{/each}}
           </div>
         </div>
       {{else}}
         {{#each companyList}}
-          {{> companySummaryList}}
+          {{> companyListTable}}
         {{/each}}
       {{/if}}
       {{#with paginationData}}
@@ -25,7 +25,7 @@
   </div>
 </template>
 
-<template name="stockFilterForm">
+<template name="companyFilterForm">
   <form class="form-inline">
     <button class="btn btn-secondary mr-1" type="button" data-action="toggleViewMode">
       <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
@@ -69,7 +69,7 @@
   </form>
 </template>
 
-<template name="companySummaryCard">
+<template name="companyListCard">
   <div class="col-12 col-md-6 col-lg-4 col-xl-3" style="margin-bottom: 25px;">
     <div class="company-card {{cardDisplayClass this}}">
       <div class="row row-info">
@@ -167,7 +167,7 @@
   </div>
 </template>
 
-<template name="companySummaryList">
+<template name="companyListTable">
   <div class="media company-summary-item">
     <div class="d-sm-flex picture">
       {{#if this.pictureSmall}}

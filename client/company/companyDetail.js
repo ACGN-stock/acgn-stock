@@ -18,8 +18,8 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 const rShowAllTags = new ReactiveVar(false);
 
-inheritedShowLoadingOnSubscribing(Template.company);
-Template.company.onCreated(function() {
+inheritedShowLoadingOnSubscribing(Template.companyDetail);
+Template.companyDetail.onCreated(function() {
   rShowAllTags.set(false);
   this.autorun(() => {
     const companyId = FlowRouter.getParam('companyId');
@@ -40,7 +40,34 @@ Template.company.onCreated(function() {
     }
   });
 });
-Template.company.events({
+Template.companyDetail.helpers({
+  companyData() {
+    const companyId = FlowRouter.getParam('companyId');
+
+    return dbCompanies.findOne(companyId);
+  },
+  getManageHref(companyId) {
+    return FlowRouter.path('editCompany', {companyId});
+  },
+  showAllTags(tags) {
+    if (tags && tags.length <= 4) {
+      return true;
+    }
+
+    return rShowAllTags.get();
+  },
+  firstFewTags(tags) {
+    return tags && tags.slice(0, 3);
+  },
+  haveNextSeasonProduct() {
+    const companyId = this._id;
+    const overdue = 0;
+    window.dbProducts = dbProducts;
+
+    return dbProducts.find({companyId, overdue}).count() > 0;
+  }
+});
+Template.companyDetail.events({
   'click [data-action="changeCompanyName"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
@@ -91,37 +118,7 @@ Template.company.events({
     event.preventDefault();
     const companyId = $(event.currentTarget).attr('data-toggle-favorite');
     toggleFavorite(companyId);
-  }
-});
-
-Template.company.helpers({
-  companyData() {
-    const companyId = FlowRouter.getParam('companyId');
-
-    return dbCompanies.findOne(companyId);
   },
-  getManageHref(companyId) {
-    return FlowRouter.path('manageCompany', {companyId});
-  },
-  showAllTags(tags) {
-    if (tags && tags.length <= 4) {
-      return true;
-    }
-
-    return rShowAllTags.get();
-  },
-  firstFewTags(tags) {
-    return tags && tags.slice(0, 3);
-  },
-  haveNextSeasonProduct() {
-    const companyId = this._id;
-    const overdue = 0;
-    window.dbProducts = dbProducts;
-
-    return dbProducts.find({companyId, overdue}).count() > 0;
-  }
-});
-Template.company.events({
   'click [data-action="changeChairmanTitle"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
@@ -144,7 +141,7 @@ Template.company.events({
 
 //是否展開面板
 const rDisplayPanelList = new ReactiveVar([]);
-Template.companyDetail.helpers({
+Template.companyDetailTable.helpers({
   isDisplayPanel(panelType) {
     return _.contains(rDisplayPanelList.get(), panelType);
   },
@@ -157,7 +154,7 @@ Template.companyDetail.helpers({
     }
   }
 });
-Template.companyDetail.events({
+Template.companyDetailTable.events({
   'click [data-toggle-panel]'(event) {
     event.preventDefault();
     const $emitter = $(event.currentTarget);
