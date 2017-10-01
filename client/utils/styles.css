@@ -49,10 +49,10 @@
 }
 .company-card-manager {
   background: #b20a2c;
-  background: -webkit-linear-gradient(135deg, #fffbd5, #b20a2c);
-  background: -o-linear-gradient(135deg, #fffbd5, #b20a2c);
-  background: -moz-linear-gradient(135deg, #fffbd5, #b20a2c);
-  background: linear-gradient(135deg, #fffbd5, #b20a2c);
+  background: -webkit-linear-gradient(225deg, #fffbd5, #b20a2c);
+  background: -o-linear-gradient(225deg, #fffbd5, #b20a2c);
+  background: -moz-linear-gradient(225deg, #fffbd5, #b20a2c);
+  background: linear-gradient(225deg, #fffbd5, #b20a2c);
 }
 .company-card-holder {
   background: #8e9eab;
