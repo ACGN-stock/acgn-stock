@@ -109,6 +109,7 @@ Template.companyFilterForm.events({
     rCompanyListViewMode.set(mode);
   },
   'click [data-action="sortBy"]'(event) {
+    event.preventDefault();
     const newValue = $(event.currentTarget).val();
     FlowRouter.go('companyList', {
       page: 1
@@ -116,6 +117,7 @@ Template.companyFilterForm.events({
     rSortBy.set(newValue);
   },
   'click [data-action="filterBy"]'(event) {
+    event.preventDefault();
     const newValue = $(event.currentTarget).attr('value');
     const dropdown = $(event.currentTarget)
       .parent()
@@ -127,6 +129,7 @@ Template.companyFilterForm.events({
     rFilterBy.set(newValue);
   },
   'click [data-toggle="dropdown"]'(event) {
+    event.preventDefault();
     $(event.currentTarget)
       .parent()
       .toggleClass('show');
