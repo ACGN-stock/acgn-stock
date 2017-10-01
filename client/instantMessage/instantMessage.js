@@ -215,6 +215,17 @@ Template.instantMessageFilterById.events({
         }
       }
     });
+  },
+  'click [data-action="filterFavorite"]'(event) {
+    event.preventDefault();
+    const user = Meteor.user();
+    if (user) {
+      console.log(user.favorite);
+      const newFilterCompanyId = _.union(rFilterCompanyId.get(), user.favorite);
+      rFilterCompanyId.set(newFilterCompanyId);
+      const newFilterTypeList = _.union(rFilterTypeList.get(), ['只看指定使用者或公司']);
+      rFilterTypeList.set(newFilterTypeList);
+    }
   }
 });
 

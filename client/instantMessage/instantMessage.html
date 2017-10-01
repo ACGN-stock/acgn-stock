@@ -56,7 +56,7 @@
 
 <template name="instantMessageFilterById">
   <div class="form-group row">
-    <div class="col" style="max-width: 322px;">
+    <div class="col" style="max-width: 360px;">
       <div class="btn-group">
         <div class="input-group-btn">
           {{> instantMessageFilterButton type='只看指定使用者或公司'}}
@@ -68,11 +68,19 @@
           </button>
         </div>
         <div class="input-group-btn">
-          <button class="btn btn-sm btn-info" data-action="filterCompanyId">
+          <button class="btn btn-sm btn-info text-white" data-action="filterCompanyId">
             <i class="fa fa-filter" aria-hidden="true"></i>
             公司
           </button>
         </div>
+        {{#if currentUser}}
+          <div class="input-group-btn">
+            <button class="btn btn-sm btn-info text-white" data-action="filterFavorite">
+              <i class="fa fa-heart-o" aria-hidden="true"></i>
+              最愛
+            </button>
+          </div>
+        {{/if}}
       </div>
     </div>
     <div class="col">
@@ -99,7 +107,7 @@
 </template>
 
 <template name="instantMessageFilterByCompanyId">
-  <small class="badge badge-info">
+  <small class="badge badge-info text-white">
     {{> companyLink this}}
     <i
       class="fa fa-times"
