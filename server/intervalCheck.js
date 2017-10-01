@@ -220,6 +220,18 @@ function doSeasonWorks(lastSeasonData) {
     });
     //移除所有推薦票投票紀錄
     dbVoteRecord.remove({});
+    //本季度未登入天數歸0
+    Meteor.users.update(
+      {},
+      {
+        $set: {
+          'profile.noLoginDayCount': 0
+        }
+      },
+      {
+        multi: true
+      }
+    );
     release();
   });
 }
