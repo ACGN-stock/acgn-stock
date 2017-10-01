@@ -17,6 +17,11 @@ export function paySalaryAndCheckTax() {
   const todayBeginTime = new Date().setHours(0, 0, 0, 0);
   const lastPayTime = dbVariables.get('lastPayTime');
   if (! lastPayTime || lastPayTime.setHours(0, 0, 0, 0) !== todayBeginTime) {
+    if (Date.now() - lastPayTime <= 86400000) {
+      console.error('paySalaryAndCheckTax error!', Date.now(), todayBeginTime, lastPayTime, lastPayTime.setHours(0, 0, 0, 0));
+
+      return false;
+    }
     const thisPayTime = new Date();
     dbVariables.set('lastPayTime', thisPayTime);
     resourceManager.request('paySalaryAndCheckTax', ['season'], (release) => {
