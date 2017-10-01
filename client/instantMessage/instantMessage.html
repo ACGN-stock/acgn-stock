@@ -19,6 +19,9 @@
           <button class="btn btn-sm btn-danger float-right" type="button" data-action="clearMessage">
             清除舊訊息
           </button>
+          <button class="{{isDontInterruptButtonClass}}" type="button" data-action="dontInterrupt">
+            勿擾模式
+          </button>
         </div>
         {{> instantMessageFilterById}}
       </form>

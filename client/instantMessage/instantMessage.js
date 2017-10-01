@@ -8,8 +8,12 @@ import { shouldStopSubscribe } from '../utils/idle';
 
 let lastQueryInstantMessageTime = Date.now() - 60000;
 const rInstantMessageList = new ReactiveVar([]);
+const rDontInterrupt = new ReactiveVar(false);
 Meteor.setInterval(queryInstantMessage, 5000);
 function queryInstantMessage() {
+  if (rDontInterrupt.get()) {
+    return false;
+  }
   if (shouldStopSubscribe()) {
     return false;
   }
@@ -35,10 +39,19 @@ function queryInstantMessage() {
     }
   });
 }
+Template.instantMessage.helpers({
+  isDontInterruptButtonClass() {
+    return rDontInterrupt.get() ? 'btn btn-sm btn-warning float-right mr-1' : 'btn btn-sm btn-outline-warning float-right mr-1';
+  }
+});
 Template.instantMessage.events({
   'click [data-action="clearMessage"]'(event) {
     event.preventDefault();
     rInstantMessageList.set([]);
+  },
+  'click [data-action="dontInterrupt"]'(event) {
+    event.preventDefault();
+    rDontInterrupt.set(! rDontInterrupt.get());
   }
 });
 
