@@ -272,11 +272,14 @@ function countAndPublishOnlinePeopleNumber(publisher) {
 
 Meteor.publish('userFavorite', function() {
   debug.log('publish userFavorite');
-  check(this.userId, String);
-
-  return Meteor.users.find(this.userId, {
-    favorite: 1
-  });
+  if (typeof this.userId === 'string') {
+    return Meteor.users.find(this.userId, {
+      favorite: 1
+    });
+  }
+  else {
+    return [];
+  }
 });
 limitSubscription('userFavorite');
 
