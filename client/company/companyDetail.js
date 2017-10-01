@@ -625,12 +625,19 @@ Template.companyAllPrudctList.helpers({
   productList() {
     const companyId = this._id;
 
-    return dbProducts.find({companyId}, {
-      sort: {
-        likeCount: -1,
-        createdAt: -1
-      }
-    });
+    return dbProducts.find(
+      {
+        companyId: companyId,
+        overdue: {
+          $gt: 0
+        }
+      },
+      {
+        sort: {
+          likeCount: -1,
+          createdAt: -1
+        }
+      });
   }
 });
 Template.companyAllPrudctList.events({
