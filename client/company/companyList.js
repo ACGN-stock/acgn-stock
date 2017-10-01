@@ -110,7 +110,7 @@ Template.companyFilterForm.events({
   },
   'click [data-action="sortBy"]'(event) {
     const newValue = $(event.currentTarget).val();
-    FlowRouter.go('stockSummary', {
+    FlowRouter.go('companyList', {
       page: 1
     });
     rSortBy.set(newValue);
@@ -121,7 +121,7 @@ Template.companyFilterForm.events({
       .parent()
       .parent();
     dropdown.toggleClass('show');
-    FlowRouter.go('stockSummary', {
+    FlowRouter.go('companyList', {
       page: 1
     });
     rFilterBy.set(newValue);
@@ -133,7 +133,7 @@ Template.companyFilterForm.events({
   },
   'submit'(event, templateInstance) {
     event.preventDefault();
-    FlowRouter.go('stockSummary', {
+    FlowRouter.go('companyList', {
       page: 1
     });
     rKeyword.set(templateInstance.$keyword.val());
