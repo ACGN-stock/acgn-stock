@@ -140,9 +140,7 @@
     {{/if}}
     {{#each manageCompanies}}
       <div class="text-primary">
-        是「
-        <a href="{{getCompanyHref this._id}}">{{this.companyName}}</a>
-        」公司的總經理。
+        是「{{>companyLink this._id}}」公司的總經理。
       </div>
     {{/each}}
   </div>

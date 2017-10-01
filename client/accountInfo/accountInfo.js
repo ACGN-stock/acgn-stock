@@ -89,9 +89,6 @@ Template.accountInfoBasic.helpers({
         manager: this._id
       });
   },
-  getCompanyHref(companyId) {
-    return FlowRouter.path('company', {companyId});
-  },
   isBaned(type) {
     return _.contains(this.profile.ban, type);
   }
