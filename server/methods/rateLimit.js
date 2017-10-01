@@ -1,7 +1,7 @@
 'use strict';
-import { Meteor } from 'meteor/meteor';
+// import { Meteor } from 'meteor/meteor';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
-import { debug } from '../debug';
+// import { debug } from '../debug';
 
 //廣域限制: 一分鐘最多執行60個method
 DDPRateLimiter.addRule(
