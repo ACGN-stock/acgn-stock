@@ -72,11 +72,16 @@ Template.foundationListFilterForm.events({
       mode = 'form';
     }
     rCompanyListViewMode.set(mode);
+    FlowRouter.go('foundationList', {
+      page: 1
+    });
   },
   submit(event, templateInstance) {
     event.preventDefault();
     rKeyword.set(templateInstance.$keyword.val());
-    rFoundationOffset.set(0);
+    FlowRouter.go('foundationList', {
+      page: 1
+    });
   }
 });
 
