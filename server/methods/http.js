@@ -39,7 +39,6 @@ WebApp.connectHandlers.use(function(req, res, next) {
   if (parsedUrl.pathname === '/foundationName') {
     const query = querystring.parse(parsedUrl.query);
     const foundationId = query.id;
-    console.log("foundationId", foundationId);
     const foundationData = dbFoundations.findOne(foundationId, {
       fields: {
         companyName: 1
