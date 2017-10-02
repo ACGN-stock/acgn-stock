@@ -16,7 +16,6 @@ inheritedShowLoadingOnSubscribing(Template.foundationList);
 const rKeyword = new ReactiveVar('');
 export const rFoundationOffset = new ReactiveVar(0);
 Template.foundationList.onCreated(function() {
-  rFoundationOffset.set(0);
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
