@@ -136,7 +136,7 @@ function validateBahamutAccount(username) {
     let checkCannotPass = true;
     cheerio.load(urlContent)('li').each((index, li) => {
       const liChildren = li.children;
-      if (liChildren.length === 1 && (liChildren[0].data === '手機認證：有' || liChildren === '手機認證：永久')) {
+      if (liChildren.length === 1 && (liChildren[0].data === '手機認證：有' || liChildren[0].data === '手機認證：永久')) {
         checkCannotPass = false;
       }
     });
