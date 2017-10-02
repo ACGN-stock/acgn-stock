@@ -122,7 +122,8 @@ Meteor.publish('accountInfo', function(userId) {
     dbCompanies
       .find(
         {
-          manager: userId
+          manager: userId,
+          isSeal: false
         },
         {
           fields: {
