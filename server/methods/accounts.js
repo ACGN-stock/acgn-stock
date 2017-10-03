@@ -7,6 +7,7 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbLog } from '../../db/dbLog';
 import { dbTaxes } from '../../db/dbTaxes';
+import { dbVariables } from '../../db/dbVariables';
 import { limitSubscription } from './rateLimit';
 import { debug } from '../debug';
 
@@ -57,12 +58,32 @@ function payTax(user, taxId, amount) {
       throw new Meteor.Error(403, '繳納金額與應納金額不相符！');
     }
     const createdAt = new Date();
-    dbLog.insert({
-      logType: '繳納稅金',
-      userId: [userId],
-      amount: amount,
-      createdAt: createdAt
-    });
+    //若在上次發薪後的繳稅紀錄，則併為同一筆紀錄
+    const existsLogData = dbLog.findOne({
+      userId: userId,
+      createdAt: {
+        $gt: new Date(dbVariables.get('lastPayTime').getTime())
+      },
+      logType: '繳納稅金'
+    })
+    if (existsLogData) {
+      dbLog.update(existsLogData._id, {
+        $set: {
+          createdAt: createdAt
+        },
+        $inc: {
+          amount: amount
+        }
+      });
+    }
+    else {
+      dbLog.insert({
+        logType: '繳納稅金',
+        userId: [userId],
+        amount: amount,
+        createdAt: createdAt
+      });
+    }
     if (amount === totalNeedPay) {
       dbTaxes.remove(taxId);
     }
