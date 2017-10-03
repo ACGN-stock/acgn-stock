@@ -87,13 +87,26 @@ function doLoginObserver() {
               createdAt: new Date()
             });
           }
-          const noLoginDay = Math.floor((nextLoginData.date.getTime() - previousLoginData.date.getTime()) / 86400000);
-          if (noLoginDay > 0) {
-            Meteor.users.update(newUserData._id, {
-              $inc: {
-                'profile.noLoginDayCount': Math.min(noLoginDay, 6)
+          if (nextLoginData.date.getTime() !== previousLoginData.date.getTime()) {
+            const lastSeasonData = dbSeason.findOne({}, {
+              sort: {
+                beginDate: -1
               }
-            });
+            }) || {
+              beginDate: new Date()
+            };
+            const noLoginTime = nextLoginData.date.getTime() - Math.max(previousLoginData.date.getTime(), lastSeasonData.beginDate.getTime());
+            const noLoginDay = Math.floor(noLoginTime / 86400000);
+            if (noLoginDay > 0) {
+              Meteor.users.update(newUserData._id, {
+                $set: {
+                  'status.lastLogin.date': nextLoginData.date
+                },
+                $inc: {
+                  'profile.noLoginDayCount': Math.min(noLoginDay, 6)
+                }
+              });
+            }
           }
         }
       });

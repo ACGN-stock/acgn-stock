@@ -556,7 +556,8 @@ function generateUserTaxes(userWealthList) {
   const taxesBulk = dbTaxes.rawCollection().initializeUnorderedBulkOp();
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   _.each(userWealthList, (wealthData) => {
-    const noLoginDay = Math.floor((createdAt.getTime() - (wealthData.lastLoginDate ? wealthData.lastLoginDate.getTime() : 0)) / 86400000);
+    const noLoginTime = createdAt.getTime() - (wealthData.lastLoginDate ? wealthData.lastLoginDate.getTime() : 0);
+    const noLoginDay = Math.min(Math.floor(noLoginTime / 86400000), 7);
     const noLoginDayCount = Math.min(noLoginDay + (wealthData.noLoginDayCount || 0), Math.floor(config.seasonTime / 86400000));
     const zombie = noLoginDayCount * config.salaryPerPay;
     const matchTaxConfig = _.find(taxConfigList, (taxConfig) => {
