@@ -13,6 +13,10 @@
   cursor: pointer;
 }
 
+.pointer {
+  cursor: pointer;
+}
+
 .border-grid-body {
   border-top: 1px solid #dddddd;
   border-left: 1px solid #dddddd;

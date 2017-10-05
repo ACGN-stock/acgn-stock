@@ -3,128 +3,200 @@
     <div class="card-block">
       <h1 class="card-title">教學導覽</h1>
       <hr />
-      <h4>1.帳號系統：</h4>
-      <p>任何人都可以用Gmail帳號或PTT的帳號在股票系統上註冊帳號。若使用PTT帳號進行註冊，必須另外通過認證。認證方法請參閱下方功能說明的帳號驗證。</p>
-
-      <h4>2.股票的上市：</h4>
-      <p>任何人皆可以申請為某個ACGN作品的角色創立公司，做法是在「新創計劃」頁面底下點擊「建立新角色」。新創計劃申請之後會有十二個小時的投資期限，在期限內，任何通過驗證的使用者皆可對此新創計劃進行投資，最低投資金額為<span class="text-info">$100</span>，最高投資金額為<span class="text-info">$4096</span>。一但投資成功，金錢就會立刻從使用者帳戶中扣除。只要期限到達且最終的投資人數在<span class="text-info">10人以上</span>，公司便會創立。若投資期限到達後投資人數仍未達<span class="text-info">10人</span>，則新創失敗，投資將退款給投資人。</p>
-
-      <p>新創公司創立成功後，初始股價將定為<span class="text-info">$1</span>，投資人以當初的投資額兌換為同等價格的股份。然而若釋出的初始股份數量因此<span class="text-info">大於2000</span>，那初始股價則會乘以<span class="text-info">2</span>，直到釋出股份數量<span class="text-info">小於等於2000</span>為止。當初始股價在$1元以上時，投資額當初投資金額不足購買1股股份的額度將會退款給投資人。但這個退款動作也可能導致釋出的初始股份小於1000，此時股價則會除以2回來，在此情況下，初始釋出股份會大於2000。</p>
-
-      <h4>3.經理人與公司產品：</h4>
-      <p>當公司創立後，最初申請創立計劃的人即為該公司的經理人。經理人可以為負責的公司推出產品，為了避免儲存空間不夠的問題，系統內只存放「通往真正作品網頁」的連結，產品可以是同人圖、ANSI、同人文等等，產品的原作者不一定會是經理人，但請經理人在發布產品時務必通過原作者的同意，一但被原作者舉報，情節嚴重者將會取消經理人資格。</p>
-
-      <h4>4.經理人的更迭：</h4>
-      <p>除了申請創立公司成為經理人，使用者還競爭已存在公司的經理人位置，一但有驗證通過的使用者競爭經理人，在下個商業季度開始後，所有持有該公司股票的股東便可以對所有競爭者進行投票，各股東的票權與其持股比率相當，在下個商業季度結束時，所得票權最高的參選人便可成為經理人。除此之外，公司的經理人隨時可以辭職不幹。</p>
-
-      <h4>5.公司的收益：</h4>
-      <p>一週為一個商業季度。每個商業季度結束時，上個商業季度推出的產品將會進入投票榜，所有通過驗證的使用者將會視當季的產品數量得到相同數量的推薦票，並對自己喜愛的產品投票推薦，每張推薦票都可以令產品公司獲得一定數量的營利額。商業季度結束後，公司的收益金額將分出<span class="text-info">百分之五</span>作為經理人的薪水，之後扣除缺<span class="text-info">百分之十五</span>的營運成本，剩餘的收益金額則依照持股比例由股東均分。</p>
-
-      <h4>6.買入股票：</h4>
-      <p>當公司成立之後，所有人就可以開始對該公司的股票下達購買訂單，下單時需決定「願意購買的每股單價」與「購買數量」，但每股單價不可偏離參考股價的<span class="text-info">15%</span>。一但下單成功，金錢就會立刻從使用者帳戶中扣除。確立的買入訂單可以取消，但需要付出<span class="text-info">$1</span>的手續費用。</p>
-
-      <h4>7.賣出股票：</h4>
-      <p>當公司成立之後，持有股票者可以在任何時候下達販賣訂單，下單時需決定「願意出手的每股最低單價」與「賣出數量」，但每股單價不可偏離參考股價的<span class="text-info">15%</span>。一但下單成功，持有股份會立刻從使用者帳戶中扣除。確立的賣出訂單可以取消，但需要付出<span class="text-info">$1</span>的手續費用。</p>
-
-      <h4>8.股票的交易：</h4>
-      <p>當有任何使用者下達任何買賣訂單時，系統會先檢視是否有價格優於或等於新訂單的訂單存在，若存在任何價格相符的訂單，則自動以「已存在的訂單價格」為準進行股票交易。直到新訂單的交易數量大於所有已存在的價格符合訂單的交易數量為止。舉例而言，若該公司存在三筆以單價10、15、20購入10股股票的訂單，此時有人下達了以單價15賣出25股股票的訂單，則此訂單會先以20單價賣出10股，再15單價賣出10股，最後留下5股未交易的15單價賣出5股的訂單留在訂單列表中。在沒有任何股票成交時，股價不會有任何的變動。</p>
-      <p>每隔<span class="text-info">三到六小時</span>的隨機時間，系統會以股票的當前交易價格取代其參考價格。</p>
-
-      <h4>9.股票的釋出：</h4>
-      <p>每經過<span class="text-info">一到三小時</span>會檢查一次全股市，檢查時自動截取全股市<span class="text-info">最高股價的一半</span>為釋股門檻，若一家公司的股價超過釋股門檻價格，且市面上不存在任何由系統釋出的股票賣單，系統就會自動釋出股票到市場上套利。釋出股票數量的上限為<span class="text-info">「其股價減渠釋股門檻價格再除以2」</span>與<span class="text-info">「百分之五的總釋股數量」</span>取其低值，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。</p>
-      <p>舉例而言，若一家公司的股價是全股市最高價的$500，且已釋出股票數量大於5000（百分之五為250），那每次釋股將釋出1(最低釋股下限)到125(上限為當前股價500減去釋股門檻250再除以2)之間的隨機數字。</p>
-      <p>釋出股票時的股票單價為該股票當時的參考價格，交易過程與正常股票交易方式相同：價高者得，未立刻被購買完畢的釋股會正常的成為市場上的賣單。
-整個釋股交易流程按照正常的交易方式影響股價。釋股過程裡售賣股票獲得的金額將算入該公司商業季度的營利額中。</p>
-      <p>此外，每經過<span class="text-info">一天到兩天</span>會檢查一次全股市，若一家公司存在有「買入價格為可下單最高價格」的「高價買單」尚未完全交易完畢，且最近<span class="text-info">一天</span>的股票<span class="text-info">總成交量的十倍</span>小於<span class="text-info">「所有高價買單的未成交量」</span>，那該公司也會自動釋股，此時釋股價格為下達買單的可下單最高價格，釋股數量為<span class="text-info">1到「所有高價買單未成交量的一半」</span>之間的隨機數字。交易過程與營利的處理方式與第一種釋股方式一致。</p>
-
-      <h4>10.低價股特別設定：</h4>
-      <p>參考價格低於全市場股價的<span class="text-info">第一四分位數</span>的股票將被視為低價股。購買低價股時，最高單價可為參考股價的<span class="text-info">130%</span>，而非<span class="text-info">115%</span>。</p>
-      <p>此外，每隔<span class="text-info">十二小時</span>，若一家低價股的「高價買單」未成交數量高於其總釋股數量的<span class="text-info">百分之一</span>，則該公司會進行額外釋股以滿足買單需求。此時的釋股價格為可下單的最高價格，額外釋股的釋股數量不會超出當時總釋股數量的<span class="text-info">百分之五</span>。</p>
-
-      <h4>11.帳戶的金錢來源：</h4>
-      <p>所有使用者在通過驗證後皆可以領到<span class="text-info">一萬元</span>的起始資金，每經過<span class="text-info">二十四小時</span>，所有通過驗證的使用者都會再得到<span class="text-info">一千元</span>的薪資。除此之外，每個商業季度結束時，經理人與股東皆可獲得公司收益的分紅。</p>
-
-      <h4>12.公開透明原則：</h4>
-      <p>所有股票的買單、賣單、交易紀錄與所有帳戶的下單行為、持股量皆是公開的，任何一位已通過認證的帳戶都可以在「帳號資訊」頁面查詢得知。</p>
-    </div>
-    <div class="card-block">
-      <h1 class="card-title">功能說明</h1>
-      <hr />
-      <h4>1.帳號驗證：</h4>
-      <p>點擊畫面左上角的「未登入」連結即可註冊帳號，註冊時請填入使用者在PTT的帳號，<span class="text-danger">切記，英文大小寫需與PTT使用者在推文時顯示的大小寫相同！</span></p>
-      <p>註冊完畢後，畫面上將會提示您要去PTT哪個板、哪篇文章底下進行<span class="text-danger">推</span>文，按照提示操作即可。</p>
-      <p>當推文完畢後，不要急著點擊驗證按鈕，因為本系統是依靠截取PTT網頁板的資訊進行驗證的。建議使用者先進入驗證文章的PTT網頁板，確認驗證推文已經出現在網頁上之後再點擊驗證。</p>
-      <p>除了使用者自己點擊驗證按鈕之外，為了節省計算效能，<span class="text-danger">任何人點擊驗證按鈕之時，都會同時對所有尚未通過驗證的使用者進行驗證。</span>因此使用者很可能什麼按鈕也沒點就自行登入了。</p>
-
-      <h4>2.即時訊息：</h4>
-      <p>在即時訊息頁面中，使用者可以看到所有公司股票的成立與交易資訊，驗證通過的使用者也能在此頁面進行聊天發言。</p>
-      <p>即使離開即時訊息頁面，只要不離開整個網站或關掉瀏覽器，新的即時訊息也會持續累積，直到使用者點擊「刪除舊訊息」按鈕或重新整理網頁為止。</p>
-
-      <h4>3.股市總覽：</h4>
-      <p>在股市總覽頁面中，使用者可以檢索所有股票的當前價格與基本資訊，並即時的進行股票買賣。</p>
-      <p>除此之外，若使用者是該公司的董事長（持有股份比例最高的人），可以點擊「董事長稱謂」的資料欄位，進行頭銜的更換（比如老公或老婆）。</p>
-      <p>點擊每個角色公司的連結名稱則可以進入該角色的詳細頁面，該頁面可以看到該角色股價的走勢圖、所有董事會成員持股比例與該角色公司成立以來的所有紀錄。</p>
-
-      <h4>4.新創計劃：</h4>
-      <p>在新創計劃頁面中，使用者可以建立新角色公司或者對創建中的計劃進行投資。</p>
-      <p>建立新角色時，搜索標籤需要一次鍵入一個，每鍵入一個就需要點擊右邊的新增按鈕以新增新的標籤。</p>
-      <p>新角色的圖檔有大小的限制，且顯示比率是固定的，請對要上傳的圖檔進行適當的切割、壓縮，共同維持網站的流量效能與美觀。</p>
-
-      <h4>5.廣告宣傳：</h4>
-      <p>在廣告宣傳頁面中，使用者可以付出系統內的金錢購買廣告版面。購買的廣告能在三天內出現在所有剛進入網站的使用者眼前。</p>
-      <p>廣告的基本費用是一字$1元，加連結需要額外的$100元。然而，同一時間能夠顯示的廣告最多只有五則，若已購買的廣告超過了這個數目，那只有總費用前五的廣告能夠被顯示。要讓廣告能被優先顯示，就需要額外追加廣告費用。</p>
-      <p>追加廣告費用可以在購買廣告時就設定好，也可以在事後才追加。但無論你事後追加多少廣告費用，廣告截止的日期仍是按照最初的購買時間來算。</p>
-
-      <h4>6.產品中心：</h4>
-      <p>可以查閱當前商業季度裡可以投推薦票的產品，也可以查閱過去每個商業季度裡被推出的產品及及推薦票最終排序。</p>
-
-      <h4>7.帳號查詢：</h4>
-      <p>在帳號查詢頁面中，使用者可以查詢到自己或特定使用者帳號的所有資訊紀錄。</p>
-
-      <h4>8.季度報告：</h4>
-      <p>可以查閱查閱過去每個商業季度裡使用者的財富排行榜，與股票公司的熱門程度、營利、資本額排行榜，所有排行榜都只列出前一百位的資料。</p>
-      <p>使用者財富排行榜：將使用者的現金加上「所持有的股份乘以該公司的參考股價」以算出總財富，依總財富進行排序，取前一百名的排行榜。<span class="text-danger">注意，未持有任何股份的使用者將不會被計入此排行榜中。</span></p>
-      <p>股票熱門排行榜：將該股票公司當季度的所有交易額加上「因推薦票產生的產品營利額」以算出季度總金流，依總金流進行排序，取前一百名的排行榜</p>
-      <p>股票營利排行榜：將該股票公司當季度的總營利額，扣除經理分紅、運營成本之後，除以「該公司股票當季度的平均成交價」，再除以「該公司的總釋出股票」以算出平均的每股益本比，依益本比進行排序，取前一百名的排行榜</p>
-      <p>股票資本排行榜：將該股票公司季度結束時的收盤股價乘上其總釋出股數以算出總市值，依總市值進行排序，取前一百名的排行榜</p>
-    </div>
-    <div class="card-block">
-      <h1 class="card-title">金管會與股市規則</h1>
-      <hr />
-      <h4>1.季度報告：</h4>
-      <p>這個股票市場的規則會隨著使用者的討論及表決產生變化，目前玩家們主要在<a href="https://www.ptt.cc/bbs/C_Chat/index.html" target="_blank">批踢踢實業坊的C_Chat板</a>進行討論。如果你想要改變某些市場規則，歡迎按照<a href="https://www.ptt.cc/bbs/C_Chat/M.1503647472.A.51F.html" target="_blank">章程</a>進行提案討論。曾提案並且表決通過的玩家提案如下：</p>
-      <p>
-        <a href="https://www.ptt.cc/bbs/C_Chat/M.1503907261.A.E15.html" target="_blank">產品推薦票制度</a>
-        <br />
-        <a href="https://www.ptt.cc/bbs/C_Chat/M.1503935633.A.4E7.html" target="_blank">漲停跌停限制</a>
-        <br />
-        <a href="https://www.ptt.cc/bbs/C_Chat/M.1504530233.A.EC0.html" target="_blank">低價股特殊規則</a>
-        <br />
-        <a href="https://www.ptt.cc/bbs/C_Chat/M.1504625820.A.E58.html" target="_blank">經理人選舉日期調整</a>
-        <br />
-        <a href="https://www.ptt.cc/bbs/C_Chat/M.1504944121.A.D2A.html" target="_blank">新創計劃投資期限與投資上限</a>
-      </p>
-
-      <h4>2.金管會規則：</h4>
-      <p>要維持股市市場的正常運作，適當的人工介入是必需的，目前的金管會規則<a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit" target="_blank">在此</a>，成員如下：</p>
-      <p>
-        {{> userLink 'M3W5tgu3xX26hEhfr'}}
-        <br />
-        {{> userLink 'nNiKSN7HEYwucPC6W'}}
-        <br />
-        {{> userLink '2HFha7H4TviS3Pbra'}}
-        <br />
-        {{> userLink 'Kq6PFRE4MBoSrynNy'}}
-        <br />
-        {{> userLink 'XhF3mWuGjmkmtxb26'}}
-        <br />
-        {{> userLink '5twbaLu2q2KauA6n6'}}
-        <br />
-        {{> userLink 'bh7yDRqxmkvxWPox2'}}
-        <br />
-        {{> userLink '5yc4uqEmrauzHKGKH'}}
-      </p>
-      
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            帳號相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>任何人都可以用Gmail帳號/PTT/巴哈姆特的帳號在股票系統上註冊帳號。</li>
+              <li>點擊畫面左上角的「未登入」連結即可展開帳號選項。切記，若使用PTT/巴哈姆特帳號進行註冊，<span class="text-danger">帳號的英文大小寫需與PTT/巴哈姆特在顯示帳號時大小寫相同</span>！</li>
+              <li>使用PTT/巴哈姆特帳號進行註冊時，畫面上將會提示進一步的認證措施，按照提示操作即可。</li>
+              <li>PTT帳號的進一步認證措施需要等待PTT網頁板的更新，建議使用者在點擊驗證按鈕之前，先進入驗證文章的網頁以確認您的驗證推文已經出現在網頁上。</li>
+              <li>使用巴哈姆特帳號進行註冊者，該帳號必須先通過巴哈姆的的手機認證，請確認你的勇者小屋中有顯示<a href="/bahamut_validate.png" target="_blank">認證相關的資訊區塊</a>。</li>
+              <li>所有使用者在通過驗證後皆可以領到<span class="text-info">一萬元</span>的起始資金，每天早上<span class="text-info">八點</span>，所有通過驗證的使用者都會再得到<span class="text-info">一千元</span>的薪資。</li>
+              <li>所有使用者帳號註冊來源在本系統的<span class="text-danger">所有行為、持股資訊皆是公開的</span>，任何人都可以在該使用者的「帳號資訊」頁面查詢得知。此外，若使用Gmail帳號註冊，顯示使用者暱稱時<span class="text-danger">會顯示使用者在Gmail帳號註冊的名稱</span>。本系統現在沒有、將來也<span class="text-danger">不考慮提供帳號刪除</span>的功能，請使用者在註冊前三思而行。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            買賣相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>所有人都可以對任何一家已上市、未被查封公司股票下達買賣訂單。下單時需決定「願意購買的每股單價」與「購買數量」，但每股單價不可偏離參考股價的<span class="text-info">15%</span>（低價股的買單價格上限會放寬為參考股價的<span class="text-info">130%</span>）。</li>
+              <li>下達買單時，系統會優先選擇價格更好的訂單進行交易，此時的交易價格以「已存在的訂單價格」為主。舉例而言，若一間公司存在三筆以單價$10、$15、$20賣出10股股票的訂單，此時有使用者下達了以單價$15買入25股股票的訂單，此時系統會先替該使用者以單價$10買入10股，再以單價$15買入10股，最後留下5股未交易完成的「以$15單價買入5股」的訂單留在該公司的買單列表中。</li>
+              <li>一但買單下達成功，<span class="text-danger">無論訂單是否完全交易完畢，金錢都會立刻從使用者的帳戶中扣除</span>。以上面的例子而言，使用者會立刻從帳戶中扣去$100+$150+$75=$325的金錢。</li>
+              <li>下達賣單時，系統會優先選擇價格更好的訂單進行交易，此時的交易價格以「已存在的訂單價格」為主。舉例而言，若一間公司存在三筆以單價$10、$15、$20買入10股股票的訂單，此時有使用者下達了以單價$15賣出25股股票的訂單，此時系統會先替該使用者以單價$20賣出10股，再以單價$15賣出10股，最後留下5股未交易完成的「以$15單價賣出5股」的訂單留在該公司的賣單列表中。</li>
+              <li>一但賣單下達成功，<span class="text-danger">無論訂單是否完全交易完畢，股票都會立刻從使用者的帳戶中扣除</span>。以上面的例子而言，使用者會立刻從帳戶中扣去25張股票。若使用者售出了一家公司的全部股票，將會立刻喪失其董事資格。</li>
+              <li>未完成的買賣訂單可以取消，但需要付出<span class="text-info">$1</span>的手續費用。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            股價相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>當有任何交易成功進行時，該公司的「最後成交價格」會立刻更新。</li>
+              <li>每隔<span class="text-info">三到六小時</span>的隨機時間，系統會以股票的最後交易價格取代其參考價格。</li>
+              <li>參考價格低於全市場股價的<span class="text-info">第一四分位數</span>的股票將被視為低價股。</li>
+              <li>購買低價股時，最高單價可為參考股價的<span class="text-info">130%</span>，而非<span class="text-info">115%</span>。此外，低價股會有更多的釋股機會。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            新創相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>任何通過驗證的使用者皆可以申請為某個ACGN作品的角色創立公司，做法是在「新創計劃」頁面底下點擊「建立新角色」。新創計劃申請之後會有十二個小時的投資期限，在期限內，任何通過驗證的使用者皆可對此新創計劃進行投資，最低投資金額為<span class="text-info">$100</span>，最高投資金額為<span class="text-info">$4096</span>。一但投資成功，金錢就會立刻從使用者帳戶中扣除。只要期限到達且最終的投資人數在<span class="text-info">10人以上</span>，公司便會創立。若投資期限到達後投資人數仍未達<span class="text-info">10人</span>，則新創失敗，投資將退款給投資人。</li>
+              <li><span class="text-danger">金融管理會嚴禁任何人創立不合法的公司</span>（以重複創立為大宗）。一經發現，公司將會被查封，所有投資也無法收回。請在投資之前詳細閱讀<a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit?usp=sharing" target="_blank">金管會規定</a>以避免風險。</li>
+              <li>新創公司創立成功後，初始股價將定為<span class="text-info">$1</span>，投資人以當初的投資額兌換為同等價格的股份。然而若釋出的初始股份數量因此<span class="text-info">大於2000</span>，那初始股價則會乘以<span class="text-info">2</span>，直到釋出股份數量<span class="text-info">小於等於2000</span>為止。當初始股價在$1元以上時，投資額當初投資金額不足購買1股股份的額度將會退款給投資人。但這個退款動作也可能導致釋出的初始股份小於1000，此時股價則會除以2回來，在此情況下，初始釋出股份會大於2000。</li>
+              <li><a href="/foundation_stocks.png" target="_blank">投資額與初始股份股價對照表</a></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            釋股相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>除了公司創立時的初始釋股，尚有三種釋股機制會讓一間公司的總釋出股份增多。</li>
+              <li>因價格過高而釋股（高價釋股）：</li>
+              <ol>
+                <li>每經過<span class="text-info">一到三小時</span>，系統會檢查一次全股市，以全股市<span class="text-info">最高「最後成交價格」的一半</span>作為釋股門檻。當一家公司的「最後成交價格」超過釋股門檻價格，且市面上不存在任何由系統釋出的股票賣單時，系統就會釋出股票到市場上套利。此次釋股的數量上限為<span class="text-info">「其股價減渠釋股門檻價格再除以2」</span>與<span class="text-info">「百分之五的總釋股數量」</span>取其低值，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為當時股票的參考價格。</li>
+                <li>舉例而言，若一家公司的股價是全股市最高價的$500，且已釋出股票數量大於5000（百分之五為250），那進行高價釋股時將釋出1(最低釋股下限)到125(上限為當前股價500減去釋股門檻250再除以2)之間的隨機數字。</li>
+              </ol>
+              <li>因成交量過低而釋股（低量釋股）：</li>
+              <ol>
+                <li>每經過<span class="text-info">一天到兩天</span>，系統會檢查一次全股市。以買入價格為可下單最高價格」為「高價買單」，若任何一家公司存在尚未交易完畢的「高價買單」，且最近<span class="text-info">一天</span>交易紀錄的<span class="text-info">總成交量之十倍</span>小於<span class="text-info">尚未交易完畢的「高價買單」購買量</span>，該公司將會進行低量釋股。此次釋股的數量上限為<span class="text-info">尚未交易完畢的「高價買單」購買量的一半</span>，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為當時股票可下單的最高價格。</li>
+                <li>舉例而言，若一家公司的股價為$1000，存在以單價$1150購入1000張股票的買單尚未交易完畢，且最近24小時的成交量小於100張，那進行低量釋股時將釋出1(最低釋股下限)到500(尚未交易完畢的「高價買單」購買量的一半)之間的隨機數字。</li>
+              </ol>
+              <li>因股價過低而釋股（低價釋股）：</li>
+              <ol>
+                <li>每經過<span class="text-info">十二小時</span>，系統會檢查一次全股市，以全市場股價的<span class="text-info">第一四分位數</span>作為釋股門檻，以買入價格為可下單最高價格」為「高價買單」。當一家公司的參考股價小於釋股門檻，且<span class="text-info">尚未交易完畢的「高價買單」購買量</span>高於其總釋股數量的<span class="text-info">百分之一</span>時，該公司將會進行低價釋股。此次釋股的數量為<span class="text-info">尚未交易完畢的「高價買單」購買量</span>與<span class="text-info">總釋股數量的百分之五</span>取其低值。釋股價格則為當時股票可下單的最高價格。</li>
+                <li>舉例而言，若一家公司的股價為$10（低於當時的低價股門檻），存在以單價$13購入1000張股票的買單尚未交易完畢，且該公司的總釋股數量為1000，那進行低價釋股時將釋出50(尚未交易完畢的「高價買單」購買量1000與總釋股數量的百分之五取其低值)股。</li>
+              </ol>
+              <li>所有釋股過程與正常的股票交易過程完全相同，未立刻被購買完畢的釋股會正常的成為市場上的賣單，交易價格會更新該公司的最後成交價格。唯一的不同點在於：釋股過程裡售賣股票獲得的金額將算入該公司商業季度的營利額中。</li>
+              <li>金融管理委員會會在使用者違反規定、稅金逾期未繳時對股份進行沒收，被沒收的股份將會隨機投放到市場上。這些股份與公司釋股不同，不會增加公司的總釋股數量，也不會增加公司的營利額。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            經理人與公司營利相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>當公司創立後，最初申請創立計劃的人即為該公司的經理人。經理人可以為負責的公司推出產品，為了避免儲存空間不夠的問題，系統內只存放「通往真正作品網頁」的連結，產品可以是同人圖、ANSI、同人文等等，產品的原作者不一定會是經理人，但請經理人在發布產品時務必通過原作者的同意，一但被原作者舉報，情節嚴重者將會被金融管理會取消經理人資格。</li>
+              <li>除了申請創立公司成為經理人，使用者還競爭已存在公司的經理人位置，一但有驗證通過的使用者競爭經理人，在下個商業季度開始後，所有持有該公司股票的股東便可以對所有競爭者進行投票，各股東的票權與其持股比率相當，在下個商業季度結束時，所得票權最高的參選人便可成為經理人。</li>
+              <li>除此之外，公司的經理人隨時可以辭職不幹。</li>
+              <li>一週為一個商業季度。每個商業季度結束時，上個商業季度推出的產品將會進入投票榜，所有通過驗證的使用者將會視當季的產品數量得到相同數量的推薦票，並對自己喜愛的產品投票推薦，每張推薦票都可以令產品公司獲得一定數量的營利額。商業季度結束後，公司的收益金額將分出<span class="text-info">百分之五</span>作為經理人的薪水，之後扣除餘額的<span class="text-info">百分之十五</span>作為營運成本，剩餘的收益金額則依照持股比例由<span class="text-info">七天內有上過線的董事</span>均分。</li>
+              <li>除了產品收益，別忘了還有三種釋股機制也會為公司產生營利額。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            納稅相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>一週為一個商業季度。每個商業季度結束時，系統將會計算所有玩家總財產（其中持有的股份會依照該股票的參考價格進行換算），並依照其財產範圍進行課稅。</li>
+              <li><a href="/tax_table.png" target="_blank">財產範圍與課稅稅率、累進差額對照表</a>。舉例而言：若一名使用者的總資產為$870000，對應的稅率為9%，應繳稅額則為870000*0.09-18300=60000。</li>
+              <li>除了財產稅之外，系統還會在季度結束時計算每名使用者在該季度的未登入天數，並課以每天<span class="text-info">$1000</span>的殭屍稅。</li>
+              <li>稅額產生後，使用者便可以在帳號資訊頁面進行繳稅。</li>
+              <li>每筆稅額產生時都會有其附帶的繳稅期限（目前是<span class="text-info">三天</span>）。當繳稅逾期之時，使用者將會暫時的被禁止所有賣出股票以外的交易、投票權限，直到逾期稅單被繳納完畢為止。此外，每逾期一天，該稅單就會產生相當於應繳稅款<span class="text-info">10%</span>的逾期罰金。</li>
+              <li>在稅單逾期的第八天（逾期罰金達應繳稅款<span class="text-info">70%</span>的隔天），系統將會對使用者進行強制徵收。若使用者的現金不足以清償稅金，其未完成買單會被強制撤單，持股也會從參考股票價格最高的開始以參考價強制售給系統。若所有的股票被強制售盡後仍無法抵償稅金，使用者的剩餘金錢有可能被扣到負數。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            金管會與股市規則
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>這個股票市場的規則會隨著使用者的討論及表決產生變化，目前玩家們主要在<a href="https://www.ptt.cc/bbs/C_Chat/index.html" target="_blank">批踢踢實業坊的C_Chat板</a>進行討論。如果你想要改變某些市場規則，歡迎按照<a href="https://www.ptt.cc/bbs/C_Chat/M.1503647472.A.51F.html" target="_blank">章程</a>進行提案討論。曾提案並且表決通過的玩家提案如下：</li>
+              <ol>
+                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1503907261.A.E15.html" target="_blank">產品推薦票制度</a></li>
+                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1503935633.A.4E7.html" target="_blank">漲停跌停限制</a></li>
+                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1504530233.A.EC0.html" target="_blank">低價股特殊規則</a></li>
+                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1504625820.A.E58.html" target="_blank">經理人選舉日期調整</a></li>
+                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1504944121.A.D2A.html" target="_blank">新創計劃投資期限與投資上限</a></li>
+                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1505571902.A.0C6.html" target="_blank">課稅機制</a></li>
+                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506125935.A.1DB.html" target="_blank">低價股門檻調整</a></li>
+                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506089922.A.0FD.html" target="_blank">沒收股份處理辦法</a></li>
+              </ol>
+              <li>要維持股市市場的健康運作，適當的人工介入是必需的，目前的金管會規則<a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit" target="_blank">在此</a>，成員如下：</li>
+              <ol>
+                <li>{{> userLink 'M3W5tgu3xX26hEhfr'}}</li>
+                <li>{{> userLink 'nNiKSN7HEYwucPC6W'}}</li>
+                <li>{{> userLink '2HFha7H4TviS3Pbra'}}</li>
+                <li>{{> userLink 'Kq6PFRE4MBoSrynNy'}}</li>
+                <li>{{> userLink 'XhF3mWuGjmkmtxb26'}}</li>
+                <li>{{> userLink '5twbaLu2q2KauA6n6'}}</li>
+                <li>{{> userLink 'bh7yDRqxmkvxWPox2'}}</li>
+                <li>{{> userLink '5yc4uqEmrauzHKGKH'}}</li>
+                <li>{{> userLink '3sX643LL26tSjX77m'}}</li>
+              </ol>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            精選玩家心得
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506504651.A.F8C.html" target="_blank">淺析釋股</a></li>
+              <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506600668.A.C21.html" target="_blank">稅、公司與你</a></li>
+              <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506733828.A.887.html" target="_blank">商業與經濟概念科普</a></li>
+              <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1507000429.A.902.html" target="_blank">低價股與狙擊</a></li>
+            </ol>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
