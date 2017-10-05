@@ -346,6 +346,13 @@ function generateHasStockUserWealthList() {
       }
     },
     {
+      $match: {
+        _id: {
+          $nin: ['!system', '!FSC']
+        }
+      }
+    },
+    {
       $project: {
         _id: 1,
         stocksValue: 1,
