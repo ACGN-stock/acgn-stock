@@ -119,11 +119,15 @@ function checkTax(todayBeginTime) {
           }
         });
         if (userData.profile.money > 0) {
-          Meteor.users.update(userId, {
-            $inc: {
-              'profile.money': needPay * -1
-            }
-          });
+          usersBulk
+            .find({
+              _id: userId
+            })
+            .updateOne({
+              $inc: {
+                'profile.money': needPay * -1
+              }              
+            });
           imposedMoney += Math.min(userData.profile.money, needPay);
         }
         //撤銷所有買入訂單
