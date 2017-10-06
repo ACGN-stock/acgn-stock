@@ -83,6 +83,7 @@ export const accuseLogTypeList = [
   '撤職紀錄',
   '查封關停',
   '解除查封',
+  '公司更名',
   '產品下架',
   '撤銷廣告'
 ];
