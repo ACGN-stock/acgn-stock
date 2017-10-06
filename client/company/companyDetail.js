@@ -326,10 +326,10 @@ function drawCandleStickChart(templateInstance) {
   const yAxis = d3.axisLeft().scale(y);
 
   const count = 80;
-  const unitTime = (templateInstance.strChartType === '5min' ? 300
-    : templateInstance.strChartType === '10min' ? 600
-      : templateInstance.strChartType === '30min' ? 1800
-        : templateInstance.strChartType === '60min' ? 3600 : 86400) * 1000;
+  const unitTime = (templateInstance.strChartType === '30min' ? 1800
+    : templateInstance.strChartType === '60min' ? 3600
+      : templateInstance.strChartType === '4hr' ? 14400
+        : templateInstance.strChartType === '12hr' ? 43200 : 86400) * 1000;
   const toTime = Math.floor(Date.now() / unitTime) * unitTime;
 
   const companyId = FlowRouter.getParam('companyId');
