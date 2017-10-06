@@ -20,8 +20,8 @@ Meteor.methods({
     check(companyId, String);
     check(newCompanyData, {
       tags: [String],
-      pictureSmall: new Match.Maybe(String),
-      pictureBig: new Match.Maybe(String),
+      pictureSmall: new Match.OneOf(String, null),
+      pictureBig: new Match.OneOf(String, null),
       description: String
     });
     editCompany(Meteor.user(), companyId, newCompanyData);
