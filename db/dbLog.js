@@ -39,6 +39,7 @@ export const logTypeList = [
   '季度賦稅', //userId0在此次商業季度中產生了$amount的財富稅與$price的殭屍稅！
   '繳納稅金', //userId0向系統繳納了$amount的稅金！
   '繳稅逾期', //userId0由於繳稅逾期，被系統追加了$amount的稅金！
+  '繳稅沒金', //userId0由於繳稅逾期，被系統沒收了$amount的現金！
   '繳稅撤單', //userId0由於繳稅逾期，被系統撤銷了所有買入訂單！
   '繳稅沒收', //userId0由於繳稅逾期，被系統以參考價格$price沒收了「companyId」公司的股份數量amount！
   '廣告宣傳', //userId0以$price的價格發布了一則廣告：「message」。

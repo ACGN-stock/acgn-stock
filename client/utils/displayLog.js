@@ -304,9 +304,15 @@ Template.displayLog.helpers({
           '由於繳稅逾期，被系統追加了$' + logData.amount + '的稅金！'
         );
       }
+      case '繳稅沒金': {
+        return (
+          '【繳稅沒收】' + getUserLink(logData.userId[0]) +
+          '由於繳稅逾期，被系統被系統沒收了$' + logData.amount + '的現金！'
+        );
+      }
       case '繳稅撤單': {
         return (
-          '【繳稅撤單】' + getUserLink(logData.userId[0]) +
+          '【繳稅沒收】' + getUserLink(logData.userId[0]) +
           '由於繳稅逾期，被系統撤銷了所有買入訂單！'
         );
       }

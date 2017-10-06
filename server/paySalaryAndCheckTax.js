@@ -119,16 +119,23 @@ function checkTax(todayBeginTime) {
           }
         });
         if (userData.profile.money > 0) {
+          const directPayMoney = Math.min(userData.profile.money, needPay);
           usersBulk
             .find({
               _id: userId
             })
             .updateOne({
               $inc: {
-                'profile.money': needPay * -1
+                'profile.money': directPayMoney * -1
               }              
             });
-          imposedMoney += Math.min(userData.profile.money, needPay);
+          logBulk.insert({
+            logType: '繳稅沒金',
+            userId: [userId],
+            amount: directPayMoney,
+            createdAt: new Date(createdAtBasicTime + 1)
+          });
+          imposedMoney += directPayMoney;
         }
         //撤銷所有買入訂單
         const buyOrderCursor = dbOrders.find({
@@ -206,7 +213,7 @@ function checkTax(todayBeginTime) {
                 companyId: stockData.companyId,
                 price: stockData.listPrice,
                 amount: stockData.stocks,
-                createdAt: new Date(createdAtBasicTime + index + 1)
+                createdAt: new Date(createdAtBasicTime + index + 2)
               });
               //因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
               directorsBulk
@@ -225,7 +232,7 @@ function checkTax(todayBeginTime) {
                 companyId: stockData.companyId,
                 price: stockData.listPrice,
                 amount: imposedStocks,
-                createdAt: new Date(createdAtBasicTime + index + 1)
+                createdAt: new Date(createdAtBasicTime + index + 2)
               });
               //因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
               directorsBulk
