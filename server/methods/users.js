@@ -177,6 +177,13 @@ function validateBahamutAccount(username) {
   return true;
 }
 
+Accounts.validateNewUser((user) => {
+  if (user.services && user.services.google) {
+    throw new Meteor.Error(403, '暫時停止以Google帳號進行註冊！');
+  }
+
+  return true;
+});
 Accounts.onCreateUser((options, user) => {
   debug.log('onCreateUser', options);
   user.profile = _.defaults({}, options.profile, {
