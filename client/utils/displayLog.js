@@ -481,6 +481,13 @@ Template.displayLog.helpers({
           getCompanyLink(logData.companyId) + '」公司的查封關停狀態。'
         );
       }
+      case '公司更名': {
+        return (
+          '【公司更名】' +
+          getUserLink(logData.userId[0]) +
+          '對公司進行了更名動作，舊名：「' + logData.message + '」。'
+        );
+      }
       case '產品下架': {
         return (
           '【產品下架】' +

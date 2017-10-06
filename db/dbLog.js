@@ -60,6 +60,7 @@ export const logTypeList = [
   '解除禁任', //userId0以「message」的理由中止了userId1今後禁任經理人的處置。
   '查封關停', //userId0以「message」的理由查封關停了「companyId」公司。
   '解除查封', //userId0以「message」的理由解除了「companyId」公司的查封關停狀態。
+  '公司更名', //userId0對公司進行了更名動作，舊名：「message」。
   '產品下架', //userId0以「message」的理由將「companyId」公司的產品「productId」給下架了，並追回了因該產品所產生的營利$price。
   '撤銷廣告' //userId0將userId1發布的廣告「message」給撤銷了。
 ];

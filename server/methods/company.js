@@ -83,6 +83,20 @@ function changeCompanyName(user, companyId, companyName) {
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
+  const companyData = dbCompanies.findOne(companyId, {
+    fields: {
+      companyName: 1
+    }
+  });
+  if (! companyData) {
+    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
+  }
+  dbLog.insert({
+    logType: '公司更名',
+    userId: [user._id],
+    message: companyData.companyName,
+    createdAt: new Date()
+  });
   dbCompanies.update(companyId, {
     $set: {
       companyName: companyName
