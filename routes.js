@@ -52,7 +52,7 @@ companyRoute.route('/:page', {
     DocHead.setTitle(config.websiteName + ' - 股市總覽');
     if (Meteor.isClient) {
       const { rCompanyOffset } = require('./client/company/companyList');
-      const page = window.parseInt(params.page, 10);
+      const page = window.parseInt(params.page, 10) || 1;
       const offset = (page - 1) * 12;
       rCompanyOffset.set(offset);
     }
@@ -99,7 +99,7 @@ foundationRoute.route('/:page', {
     DocHead.setTitle(config.websiteName + ' - 新創計劃');
     if (Meteor.isClient) {
       const { rFoundationOffset } = require('./client/foundation/foundationList');
-      const page = window.parseInt(params.page, 10);
+      const page = window.parseInt(params.page, 10) || 1;
       const offset = (page - 1) * 12;
       rFoundationOffset.set(offset);
     }
