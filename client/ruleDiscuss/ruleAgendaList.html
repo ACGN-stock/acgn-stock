@@ -1,0 +1,85 @@
+<template name="ruleAgendaList">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">
+        規則討論
+      </h1>
+      <hr />
+      <h3 class="card-subtitle text-muted">
+        進行中的議程
+        {{#if currentUser}}
+          <a class="btn btn-primary float-right" href="{{getNewAgendaHref}}">
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            建立新議程
+          </a>
+        {{/if}}
+      </h3>
+      <hr />
+      <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+        <thead>
+          <tr>
+            <th class="text-center text-truncate" title="議程主題">議程主題</th>
+            <th class="text-center text-truncate" style="width: 160px;" title="結束日期">結束日期</th>
+            {{#if currentUser.profile.isAdmin}}
+              <th class="text-center" style="width: 60px;" title="撤銷">撤銷</th>
+            {{/if}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each agenda in processingAgendaList}}
+            <tr>
+              <td class="text-left text-truncate px-2">
+                <a href="{{getAgendaHref agenda._id}}" target="_blank">{{agenda.title}}</a>
+              </td>
+              <td class="text-center text-truncate">
+                {{formatExpireDate agenda}}
+              </td>
+              {{#if currentUser.profile.isAdmin}}
+                <th class="text-center">
+                  <button class="btn btn-danger btn-sm" type="button" data-take-down="{{agenda._id}}">
+                    撤銷
+                  </button>
+                </th>
+              {{/if}}
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      <hr />
+      <h3 class="card-subtitle text-muted">
+        已結束的議程
+      </h3>
+      <hr />
+      <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+        <thead>
+          <tr>
+            <th class="text-center text-truncate" title="議程主題">議程主題</th>
+            <th class="text-center text-truncate" style="width: 160px;" title="結束日期">結束日期</th>
+            {{#if currentUser.profile.isAdmin}}
+              <th class="text-center" style="width: 60px;" title="撤銷">撤銷</th>
+            {{/if}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#each agenda in finishAgendaList}}
+            <tr>
+              <td class="text-left text-truncate px-2">
+                <a href="{{getAgendaHref agenda._id}}" target="_blank">{{agenda.title}}</a>
+              </td>
+              <td class="text-center text-truncate">
+                {{formatExpireDate agenda}}
+              </td>
+              {{#if currentUser.profile.isAdmin}}
+                <th class="text-center">
+                  <button class="btn btn-danger btn-sm" type="button" data-take-down="{{agenda._id}}">
+                    撤銷
+                  </button>
+                </th>
+              {{/if}}
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
