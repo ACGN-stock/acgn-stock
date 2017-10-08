@@ -15,8 +15,10 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
+const rInEditAnnouncementMode = new ReactiveVar(false);
 const rInBuyAdvertisingMode = new ReactiveVar(false);
 Template.advertising.onCreated(function() {
+  rInEditAnnouncementMode.set(false);
   rInBuyAdvertisingMode.set(false);
   this.autorun(() => {
     if (shouldStopSubscribe()) {
@@ -26,6 +28,9 @@ Template.advertising.onCreated(function() {
   });
 });
 Template.advertising.helpers({
+  inEditAnnouncementMode() {
+    return rInEditAnnouncementMode.get() && Meteor.user();
+  },
   inBuyMode() {
     return rInBuyAdvertisingMode.get() && Meteor.user();
   },
@@ -60,6 +65,10 @@ Template.advertising.helpers({
   }
 });
 Template.advertising.events({
+  'click [data-action="editAnnouncement"]'(event) {
+    event.preventDefault();
+    rInEditAnnouncementMode.set(true);
+  },
   'click [data-action="buyAdvertising"]'(event) {
     event.preventDefault();
     rInBuyAdvertisingMode.set(true);
@@ -106,6 +115,21 @@ function showAskAddPayDialog(advertisingId) {
     }
   });
 }
+
+Template.announcementForm.onRendered(function() {
+  this.$text = this.$('textarea');
+});
+Template.announcementForm.events({
+  submit(event, templateInstance) {
+    event.preventDefault();
+    const announcement = templateInstance.$text.val();
+    Meteor.customCall('editAnnouncement', announcement);
+  },
+  reset(event) {
+    event.preventDefault();
+    rInEditAnnouncementMode.set(false);
+  }
+});
 
 inheritUtilForm(Template.buyAdvertisingForm);
 Template.buyAdvertisingForm.onCreated(function() {

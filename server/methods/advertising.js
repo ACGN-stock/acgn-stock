@@ -5,6 +5,7 @@ import { resourceManager } from '../resourceManager';
 import { check, Match } from 'meteor/check';
 import { dbAdvertising } from '../../db/dbAdvertising';
 import { dbLog } from '../../db/dbLog';
+import { dbVariables } from '../../db/dbVariables';
 import { config } from '../../config';
 import { limitSubscription } from './rateLimit';
 import { debug } from '../debug';
@@ -137,6 +138,23 @@ function addAdvertisingPay(user, advertisingId, addPay) {
     });
     release();
   });
+}
+
+Meteor.methods({
+  editAnnouncement(announcement) {
+    check(this.userId, String);
+    check(announcement, String);
+    editAnnouncement(Meteor.user(), announcement);
+
+    return true;
+  }
+})
+function editAnnouncement(user, announcement) {
+  debug.log('editAnnouncement', {user, announcement});
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  }
+  dbVariables.set('announcement', announcement);
 }
 
 Meteor.publish('allAdvertising', function() {

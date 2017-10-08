@@ -4,6 +4,11 @@
       <h1 class="card-title mb-1">
         廣告宣傳
       </h1>
+      {{#if inEditAnnouncementMode}}
+        <hr />
+        {{> announcementForm}}
+        <hr />
+      {{/if}}
       {{#if inBuyMode}}
         <hr />
         {{#with defaultAdvertisingData}}
@@ -11,9 +16,16 @@
         {{/with}}
         <hr />
       {{/if}}
+      <hr />
       <h3 class="card-subtitle text-muted">
         進行中的廣告
         {{#if currentUser}}
+          {{#if currentUser.profile.isAdmin}}
+            <button class="btn btn-warning btn-sm float-right" type="button" data-action="editAnnouncement">
+              <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+              修改系統公告
+            </button>
+          {{/if}}
           <button class="btn btn-primary btn-sm float-right" type="button" data-action="buyAdvertising">
             <i class="fa fa-plus" aria-hidden="true"></i>
             購買廣告
@@ -71,6 +83,22 @@
       </table>
     </div>
   </div>
+</template>
+
+<template name="announcementForm">
+  <form>
+    <h3 class="card-subtitle text-muted">
+      修改系統公告
+    </h3>
+    <hr />
+    <div class="form-group">
+      <textarea class="form-control" rows="4">{{getVariable 'announcement'}}</textarea>
+    </div>
+    <div class="text-right">
+      <button class="btn btn-primary" type="submit">儲存</button>
+      <button class="btn btn-secondary" type="reset">取消</button>
+    </div>
+  </form>
 </template>
 
 <template name="buyAdvertisingForm">
