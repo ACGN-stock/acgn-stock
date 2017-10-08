@@ -6,11 +6,11 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { dbFoundations } from '../../db/dbFoundations';
+import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { inheritUtilForm, utilFormHelpers, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
-import { shouldStopSubscribe } from '../utils/idle';
+import { config } from '../../config';
 
 const rIssueList = new ReactiveVar();
 const rIssueOptionList = new ReactiveVar();
@@ -46,6 +46,17 @@ Template.ruleAgendaForm.helpers({
   getIssueOptionList(issueId) {
     const optionList = rIssueOptionList.get();
     return optionList[issueId - 1];
+  },
+  showAddIssueButton() {
+    return rIssueList.get().length < config.maximumRuleIssue;
+  },
+  showAddOptionButton(issueId) {
+    const list = rIssueOptionList.get();
+    if (!list[issueId - 1]) {
+      return false;
+    }
+
+    return list[issueId - 1].length < config.maximumRuleIssueOption;
   },
   showRemoveIssueButton() {
     return rIssueList.get().length > 1;

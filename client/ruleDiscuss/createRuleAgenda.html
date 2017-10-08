@@ -62,7 +62,9 @@
             {{{errorHtmlOfIssueOptionInput issue.id option.id}}}
           </div>
         {{/each}}
-        <button class="btn btn-primary" data-add-option={{issue.id}}>新增選項</button>
+        {{#if showAddOptionButton issue.id}}
+          <button class="btn btn-primary" data-add-option={{issue.id}}>新增選項</button>
+        {{/if}}
         {{#if showRemoveOptionButton issue.id}}
           <button class="btn btn-danger" data-remove-option={{issue.id}}>刪除選項</button>
         {{/if}}
@@ -71,7 +73,9 @@
     </div>
     <hr />
     <div>
-      <button class="btn btn-primary" data-action="addIssue">新增議題</button>
+      {{#if showAddIssueButton}}
+        <button class="btn btn-primary" data-action="addIssue">新增議題</button>
+      {{/if}}
       {{#if showRemoveIssueButton}}
         <button class="btn btn-danger" data-action="removeIssue">刪除議題</button>
       {{/if}}
