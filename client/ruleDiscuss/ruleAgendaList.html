@@ -19,7 +19,7 @@
         <thead>
           <tr>
             <th class="text-center text-truncate" title="議程主題">議程主題</th>
-            <th class="text-center text-truncate" style="width: 160px;" title="結束日期">結束日期</th>
+            <th class="text-center text-truncate" style="width: 180px;" title="結束日期">結束日期</th>
             {{#if currentUser.profile.isAdmin}}
               <th class="text-center" style="width: 60px;" title="撤銷">撤銷</th>
             {{/if}}
@@ -29,7 +29,7 @@
           {{#each agenda in processingAgendaList}}
             <tr>
               <td class="text-left text-truncate px-2">
-                <a href="{{getAgendaHref agenda._id}}" target="_blank">{{agenda.title}}</a>
+                <a href="{{getAgendaHref agenda._id}}">{{agenda.title}}</a>
               </td>
               <td class="text-center text-truncate">
                 {{formatExpireDate agenda}}
@@ -54,7 +54,7 @@
         <thead>
           <tr>
             <th class="text-center text-truncate" title="議程主題">議程主題</th>
-            <th class="text-center text-truncate" style="width: 160px;" title="結束日期">結束日期</th>
+            <th class="text-center text-truncate" style="width: 180px;" title="結束日期">結束日期</th>
             {{#if currentUser.profile.isAdmin}}
               <th class="text-center" style="width: 60px;" title="撤銷">撤銷</th>
             {{/if}}
@@ -64,7 +64,7 @@
           {{#each agenda in finishAgendaList}}
             <tr>
               <td class="text-left text-truncate px-2">
-                <a href="{{getAgendaHref agenda._id}}" target="_blank">{{agenda.title}}</a>
+                <a href="{{getAgendaHref agenda._id}}">{{agenda.title}}</a>
               </td>
               <td class="text-center text-truncate">
                 {{formatExpireDate agenda}}
