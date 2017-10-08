@@ -362,6 +362,24 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 7,
+    name: 'season add companies count field.',
+    up() {
+      dbSeason.update(
+        {},
+        {
+          $set: {
+            companiesCount: 0
+          }
+        },
+        {
+          multi: true
+        }
+      );
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });

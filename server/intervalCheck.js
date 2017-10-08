@@ -368,13 +368,14 @@ function cancelAllOrder() {
 function generateNewSeason() {
   debug.log('generateNewSeason');
   const beginDate = new Date();
-  const endDate = new Date(beginDate.getTime() + config.seasonTime);
+  const endDate = new Date(beginDate.setMinutes(0, 0, 0) + config.seasonTime);
   const electTime = endDate.getTime() - 86400000;
   const userCount = Meteor.users.find().count();
   const productCount = dbProducts.find({overdue: 0}).count();
+  const companiesCount = dbCompanies.find({isSeal: false}).count();
   //本季度每個使用者可以得到多少推薦票
-  const vote = Math.max(Math.floor(productCount / 10), 1);
-  const votePrice = Math.round(config.seasonProfitPerUser / vote);
+  const vote = Math.floor(Math.log10(companiesCount) * 18);
+  const votePrice = 3000;
   Meteor.users.update(
     {},
     {
@@ -412,7 +413,7 @@ function generateNewSeason() {
       multi: true
     }
   );
-  const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, productCount, votePrice});
+  const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, companiesCount, productCount, votePrice});
 
   return seasonId;
 }

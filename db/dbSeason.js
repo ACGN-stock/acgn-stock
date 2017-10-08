@@ -25,6 +25,10 @@ const schema = new SimpleSchema({
   userCount: {
     type: SimpleSchema.Integer
   },
+  //當季起始時有多少未被查封的公司
+  companiesCount: {
+    type: SimpleSchema.Integer
+  },
   //當季有多少推出的新產品
   productCount: {
     type: SimpleSchema.Integer
