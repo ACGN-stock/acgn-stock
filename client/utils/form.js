@@ -33,7 +33,7 @@ export function handleModelError(error) {
   this.error.set(error);
 }
 
-const utilFormHelpers = {
+export const utilFormHelpers = {
   valueOf(fieldName) {
     const templateInstance = Template.instance();
 

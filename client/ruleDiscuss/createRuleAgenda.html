@@ -1,0 +1,85 @@
+<template name="createRuleAgenda">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">建立新議程</h1>
+      <hr />
+      {{#with defaultData}}
+        {{> ruleAgendaForm}}
+      {{/with}}
+    </div>
+  </div>
+</template>
+
+<template name="ruleAgendaForm">
+  <form>
+    <div class="form-group">
+      <label for="companyName">議程主題：</label>
+      <input
+        class="form-control"
+        type="text"
+        name="agendaTitle"
+        placeholder="請輸入要建立的議程主題"
+      />
+      {{{errorHtmlOf 'agendaTitle'}}}
+    </div>
+    <div class="form-group">
+      <label for="description">議程介紹：</label>
+      <textarea class="form-control" name="description" rows="5" placeholder="請輸入對這個議程的完整介紹"></textarea>
+      {{{errorHtmlOf 'description'}}}
+    </div>
+    <div class="form-group">
+      <label for="description">議程討論網址：</label>
+      <input
+        class="form-control"
+        type="text"
+        name="discussionUrl"
+        placeholder="http://"
+      />
+      {{{errorHtmlOf 'discussionUrl'}}}
+    </div>
+    <div class="rule-issue-list">
+      {{#each issue in getIssueList}}
+        <hr />
+        <div class="form-group">
+          <label for="{{getIssueInputName issue.id}}">議題{{issue.id}}名稱：</label>
+          <input
+            class="form-control"
+            type="text"
+            name="{{getIssueInputName issue.id}}"
+            placeholder="請輸入議題名稱"
+          />
+          {{{errorHtmlOfIssueInput issue.id}}}
+        </div>
+        {{#each option in getIssueOptionList issue.id}}
+          <div class="form-group">
+            <label for="{{getIssueOptionInputName issue.id option.id}}">議題{{issue.id}}選項{{option.id}}：</label>
+            <input
+              class="form-control"
+              type="text"
+              name="{{getIssueOptionInputName issue.id option.id}}"
+              placeholder="請輸入選項"
+            />
+            {{{errorHtmlOfIssueOptionInput issue.id option.id}}}
+          </div>
+        {{/each}}
+        <button class="btn btn-primary" data-add-option={{issue.id}}>新增選項</button>
+        {{#if showRemoveOptionButton issue.id}}
+          <button class="btn btn-danger" data-remove-option={{issue.id}}>刪除選項</button>
+        {{/if}}
+        <button class="btn btn-secondary" data-toggle-multiple={{issue.id}}>{{getIssueTypeText issue}}</button>
+        {{/each}}
+    </div>
+    <hr />
+    <div>
+      <button class="btn btn-primary" data-action="addIssue">新增議題</button>
+      {{#if showRemoveIssueButton}}
+        <button class="btn btn-danger" data-action="removeIssue">刪除議題</button>
+      {{/if}}
+    </div>
+    <hr />
+    <div class="text-right">
+      <button class="btn btn-primary" type="submit">送出</button>
+      <a class="btn btn-secondary" href="/ruleDiscuss">取消</a>
+    </div>
+  </form>
+</template>
