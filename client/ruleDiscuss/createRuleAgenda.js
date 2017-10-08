@@ -220,12 +220,12 @@ function saveModel(model) {
         issues: issues
       };
 
-      // Meteor.customCall('createAgenda', newModel, (error) => {
-      //   if (! error) {
-      //     const path = FlowRouter.path('ruleDiscuss');
-      //     FlowRouter.go(path);
-      //   }
-      // });
+      Meteor.customCall('createAgenda', newModel, (error) => {
+        if (! error) {
+          const path = FlowRouter.path('ruleAgendaList');
+          FlowRouter.go(path);
+        }
+      });
     }
   });
 }

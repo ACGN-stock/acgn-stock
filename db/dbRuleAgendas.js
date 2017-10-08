@@ -42,6 +42,14 @@ const schema = new SimpleSchema({
   },
   'issues.$': {
     type: String
+  },
+  //已投票使用者userId
+  votes: {
+    type: Array,
+    defaultValue: []
+  },
+  'votes.$': {
+    type: String
   }
 });
 dbRuleAgendas.attachSchema(schema);

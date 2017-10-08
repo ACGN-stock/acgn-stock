@@ -13,6 +13,10 @@ const schema = new SimpleSchema({
     type: String,
     min: 1
   },
+  //議題選項順序
+  order: {
+    type: SimpleSchema.Integer
+  },
   //支持此選項的使用者userId
   votes: {
     type: Array,

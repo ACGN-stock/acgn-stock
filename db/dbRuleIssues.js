@@ -13,6 +13,14 @@ const schema = new SimpleSchema({
     type: String,
     min: 1
   },
+  //議題允許多選
+  multiple: {
+    type: Boolean
+  },
+  //議題順序
+  order: {
+    type: SimpleSchema.Integer
+  },
   //議題列表
   options: {
     type: Array,
