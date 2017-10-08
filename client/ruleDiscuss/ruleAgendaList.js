@@ -43,7 +43,6 @@ Template.ruleAgendaList.helpers({
         agendaList.push(agenda);
       }
     });
-    console.log('processingAgendaList', dbRuleAgendas.find({}).fetch());
     return agendaList;
   },
   finishAgendaList() {
@@ -59,6 +58,7 @@ Template.ruleAgendaList.helpers({
         agendaList.push(agenda);
       }
     });
+
     return agendaList;
   },
   formatExpireDate(agenda) {

@@ -1,0 +1,124 @@
+'use strict';
+import { _ } from 'meteor/underscore';
+import { $ } from 'meteor/jquery';
+import { Meteor } from 'meteor/meteor';
+import { DocHead } from 'meteor/kadira:dochead';
+import { Template } from 'meteor/templating';
+import { ReactiveVar } from 'meteor/reactive-var';
+import { FlowRouter } from 'meteor/kadira:flow-router';
+import { dbRuleAgendas } from '../../db/dbRuleAgendas';
+import { dbRuleIssues } from '../../db/dbRuleIssues';
+import { dbRuleIssueOptions } from '../../db/dbRuleIssueOptions';
+import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
+import { formatDateTimeText } from '../utils/helpers';
+import { config } from '../../config';
+import { alertDialog } from '../layout/alertDialog';
+import { shouldStopSubscribe } from '../utils/idle';
+const rShowOptionVoteDetail = new ReactiveVar(null);
+
+inheritedShowLoadingOnSubscribing(Template.ruleAgendaDetail);
+Template.ruleAgendaDetail.onCreated(function() {
+  rShowOptionVoteDetail.set(null);
+  this.autorun(() => {
+    const agendaId = FlowRouter.getParam('agendaId');
+    if (agendaId) {
+      const agendaData = dbRuleAgendas.findOne(agendaId);
+      if (agendaData) {
+        DocHead.setTitle(config.websiteName + ' - 「' + agendaData.title + '」議程資訊');
+      }
+    }
+  });
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const agendaId = FlowRouter.getParam('agendaId');
+    if (agendaId) {
+      this.subscribe('ruleAgendaDetail', agendaId);
+    }
+  });
+});
+Template.ruleAgendaDetail.helpers({
+  agendaData() {
+    const agendaId = FlowRouter.getParam('agendaId');
+
+    return dbRuleAgendas.findOne(agendaId);
+  },
+  canVote(agendaData) {
+    const expireDate = new Date(agendaData.createdAt.getTime() + agendaData.duration * 60 * 60 * 1000);
+    if (expireDate < Date.now()) {
+      return false;
+    }
+    const userId = Meteor.userId();
+    // if (agendaData.votes.indexOf(userId) >= 0) {
+    //   return false;
+    // }
+    
+    return true;
+  },
+  getVoteHref() {
+    const agendaId = FlowRouter.getParam('agendaId');
+
+    return FlowRouter.path('ruleAgendaVote', {agendaId});
+  },
+  showVoteDetailDialog() {
+    return rShowOptionVoteDetail.get() !== null;
+  }
+});
+Template.ruleAgendaDetail.events({
+});
+
+Template.ruleAgendaTable.helpers({
+  getIssueList(issueIds) {
+    return dbRuleIssues.find({
+      _id: {
+        $in: issueIds
+      }
+    }, {
+      sort: {
+        order: 1
+      }
+    });
+  }  
+});
+
+Template.ruleIssueList.helpers({
+  getOptionText(optionId) {
+    const option = dbRuleIssueOptions.findOne(optionId);
+
+    return option ? option.title : '';
+  },
+  getOptionCount(optionId) {
+    const option = dbRuleIssueOptions.findOne(optionId);
+
+    return option ? option.votes.length : 0;
+  }
+});
+
+Template.ruleIssueList.events({
+  'click [data-show-vote]'(event) {
+    event.preventDefault();
+    const optionId = $(event.currentTarget).attr('data-show-vote');
+    const option = dbRuleIssueOptions.findOne(optionId);
+    rShowOptionVoteDetail.set(option);
+  }
+});
+
+Template.voteDetailDialog.helpers({
+  voteDetailDialogTitle() {
+    const option = rShowOptionVoteDetail.get();
+    const message = '投給「' + option.title + '」的玩家';
+
+    return message;
+  },
+  voteList() {
+    return rShowOptionVoteDetail.get().votes;
+  }
+});
+
+Template.voteDetailDialog.events({
+  'click .btn'(event) {
+    event.preventDefault();
+    rShowOptionVoteDetail.set(null);
+  }
+});

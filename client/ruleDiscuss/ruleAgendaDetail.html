@@ -1,0 +1,90 @@
+<template name="ruleAgendaDetail">
+  <div class="card">
+    {{#with agendaData}}
+      <div class="card-block">
+        <h1 class="card-title text-truncate">
+          {{this.title}}
+          {{#if currentUser}}
+            {{#if canVote this}}
+              <a class="btn btn-primary float-right" href={{getVoteHref}}>投票</a>
+            {{else}}
+              <a class="btn btn-primary disabled float-right" href='#'>投票</a>
+            {{/if}}
+          {{/if}}
+        </h1>
+        <hr />
+        <h3>
+          提案人：
+          {{>userLink this.proposer}}
+        </h3>
+        <hr />
+        {{> ruleAgendaTable}}
+      </div>
+    {{else}}
+      <div class="card-block">
+        Loading...
+      </div>
+    {{/with}}
+  </div>
+  {{#if showVoteDetailDialog}}
+    {{> voteDetailDialog}}
+  {{/if}}
+</template>
+
+<template name="ruleAgendaTable">
+  <div class="agenda-detail">
+    <div class="row border-grid-body" style="margin-top: 15px;">
+      <div class="col-12 border-grid agenda-description"><h4>議程介紹</h4>{{this.description}}</div>
+      {{#each issue in getIssueList this.issues}}
+        {{#with issue}}
+          {{> ruleIssueList}}
+        {{/with}}
+      {{/each}}
+    </div>
+  </div>
+</template>
+
+<template name="ruleIssueList">
+  <div class="col-12 border-grid" style="padding: 5px 15px;">
+    <h4>議題：{{this.title}}</h4>
+    <ul class="list-group">
+      {{#each optionId in this.options}}
+        <li class="list-group-item justify-content-between">
+          {{getOptionText optionId}}
+          <button type="button" class="btn btn-primary" data-show-vote="{{optionId}}">
+            {{getOptionCount optionId}}
+            <i class="fa fa-users" aria-hidden="true"></i>
+          </button>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<template name="voteDetailDialog">
+    <form class="modal fade show" style="display: block;" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{voteDetailDialogTitle}}</h5>
+          </div>
+          <div class="modal-body">
+            <div>
+              <div class="form-group">
+                {{#each userId in voteList}}
+                  {{> userLink userId}}
+                {{else}}
+                  <p>無</p>
+                {{/each}}
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary">
+              關閉
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </template>

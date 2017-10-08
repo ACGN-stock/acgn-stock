@@ -42,6 +42,10 @@
                 </th>
               {{/if}}
             </tr>
+          {{else}}
+            <tr>
+              <td class="text-center" colspan=2>沒有進行中的議程！</td>
+            </tr>
           {{/each}}
         </tbody>
       </table>
@@ -76,6 +80,10 @@
                   </button>
                 </th>
               {{/if}}
+            </tr>
+          {{else}}
+            <tr>
+              <td class="text-center" colspan=2>沒有已結束的議程！</td>
             </tr>
           {{/each}}
         </tbody>
