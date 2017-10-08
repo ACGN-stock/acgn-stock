@@ -24,6 +24,7 @@ export const pageNameHash = {
   productCenterByCompany: '產品中心',
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
+  ruleAgendaList: '規則討論',
   accuseRecord: '舉報違規紀錄'
 };
 
@@ -218,6 +219,43 @@ accountInfoRoute.route('/:userId', {
     else {
       DocHead.setTitle(config.websiteName + ' - 帳號資訊');
     }
+  }
+});
+
+const ruleDiscussRoute = FlowRouter.group({
+  prefix: '/ruleDiscuss',
+  name: 'ruleDiscussRoute'
+});
+ruleDiscussRoute.route('/', {
+  name: 'ruleDiscussRedirect',
+  triggersEnter: [
+    (context, redirect) => {
+      redirect('/ruleDiscuss/list');
+    }
+  ]
+});
+ruleDiscussRoute.route('/list', {
+  name: 'ruleAgendaList',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 規則討論');
+  }
+});
+ruleDiscussRoute.route('/new', {
+  name: 'createRuleAgenda',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 建立新議程');
+  }
+});
+ruleDiscussRoute.route('/view/:agendaId', {
+  name: 'ruleAgendaDetail',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 議程資訊');
+  }
+});
+ruleDiscussRoute.route('/vote/:agendaId', {
+  name: 'ruleAgendaVote',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 議程投票');
   }
 });
 
