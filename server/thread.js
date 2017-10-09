@@ -10,7 +10,7 @@ Meteor.startup(function() {
     _id: threadId,
     doIntervalWork: false,
     refreshTime: new Date(),
-    connections: 0
+    connections: UserStatus.connections.find().count()
   });
   //定期更新thread回報時間與當前連線數量
   Meteor.setInterval(refreshThread, 15000);
@@ -18,10 +18,20 @@ Meteor.startup(function() {
 
 function refreshThread() {
   //定期更新thread回報時間與當前連線數量
-  dbThreads.update(threadId, {
-    $set: {
-      connections: UserStatus.connections.find().count(),
-      refreshTime: new Date()
-    }
-  });
+  if (dbThreads.find(threadId).count() > 0) {
+    dbThreads.update(threadId, {
+      $set: {
+        connections: UserStatus.connections.find().count(),
+        refreshTime: new Date()
+      }
+    });
+  }
+  else {
+    dbThreads.insert({
+      _id: threadId,
+      doIntervalWork: false,
+      refreshTime: new Date(),
+      connections: UserStatus.connections.find().count()
+    });
+  }
 }
