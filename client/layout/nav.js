@@ -9,6 +9,7 @@ import { pageNameHash } from '../../routes';
 import { rAccountDialogMode } from './accountDialog';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
+import { handleError } from '../utils/handleError';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 
@@ -114,7 +115,11 @@ Template.nav.events({
         break;
       }
       default: {
-        Meteor['loginWith' + loginType]();
+        Meteor['loginWith' + loginType]((error) => {
+          if (error && error.reason) {
+            handleError(error);
+          }
+        });
         break;
       }
     }
