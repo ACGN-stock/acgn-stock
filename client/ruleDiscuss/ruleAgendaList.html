@@ -20,9 +20,7 @@
           <tr>
             <th class="text-center text-truncate" title="議程主題">議程主題</th>
             <th class="text-center text-truncate" style="width: 180px;" title="結束日期">結束日期</th>
-            {{#if currentUser.profile.isAdmin}}
-              <th class="text-center" style="width: 60px;" title="撤銷">撤銷</th>
-            {{/if}}
+            <th class="text-center text-truncate" style="width: 100px;" title="相關討論">相關討論</th>
           </tr>
         </thead>
         <tbody>
@@ -34,17 +32,15 @@
               <td class="text-center text-truncate">
                 {{formatExpireDate agenda}}
               </td>
-              {{#if currentUser.profile.isAdmin}}
-                <th class="text-center">
-                  <button class="btn btn-danger btn-sm" type="button" data-take-down="{{agenda._id}}">
-                    撤銷
-                  </button>
-                </th>
-              {{/if}}
+              <td class="text-center">
+                <a class="btn btn-primary btn-sm" href="{{agenda.discussionUrl}}" target="_blank">
+                  連結
+                </a>
+              </td>
             </tr>
           {{else}}
             <tr>
-              <td class="text-center" colspan=2>沒有進行中的議程！</td>
+              <td class="text-center" colspan=3>沒有進行中的議程！</td>
             </tr>
           {{/each}}
         </tbody>
@@ -59,9 +55,7 @@
           <tr>
             <th class="text-center text-truncate" title="議程主題">議程主題</th>
             <th class="text-center text-truncate" style="width: 180px;" title="結束日期">結束日期</th>
-            {{#if currentUser.profile.isAdmin}}
-              <th class="text-center" style="width: 60px;" title="撤銷">撤銷</th>
-            {{/if}}
+            <th class="text-center text-truncate" style="width: 100px;" title="相關討論">相關討論</th>
           </tr>
         </thead>
         <tbody>
@@ -73,17 +67,15 @@
               <td class="text-center text-truncate">
                 {{formatExpireDate agenda}}
               </td>
-              {{#if currentUser.profile.isAdmin}}
-                <th class="text-center">
-                  <button class="btn btn-danger btn-sm" type="button" data-take-down="{{agenda._id}}">
-                    撤銷
-                  </button>
-                </th>
-              {{/if}}
+              <td class="text-center">
+                <a class="btn btn-primary btn-sm" href="{{agenda.discussionUrl}}" target="_blank">
+                  連結
+                </a>
+              </td>
             </tr>
           {{else}}
             <tr>
-              <td class="text-center" colspan=2>沒有已結束的議程！</td>
+              <td class="text-center" colspan=3>沒有已結束的議程！</td>
             </tr>
           {{/each}}
         </tbody>

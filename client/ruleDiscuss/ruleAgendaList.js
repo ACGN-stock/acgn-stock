@@ -63,16 +63,3 @@ Template.ruleAgendaList.helpers({
     return formatDateText(expireDate);
   }
 });
-
-Template.ruleAgendaList.events({
-  'click [data-take-down]'(event) {
-    event.preventDefault();
-    const agendaId = $(event.currentTarget).attr('data-take-down');
-    const agendaData = dbRuleAgendas.findOne(agendaId);
-    alertDialog.confirm('確定要撤銷議程「' + agendaData.title + '」？', (result) => {
-      if (result) {
-        Meteor.customCall('takeDownRuleAgenda', agendaId);
-      }
-    });
-  }
-});
