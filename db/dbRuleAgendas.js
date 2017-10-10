@@ -11,16 +11,19 @@ const schema = new SimpleSchema({
   //議程標題
   title: {
     type: String,
-    min: 1
+    min: 1,
+    max: 100
   },
   //議程描述
   description: {
     type: String,
-    min: 10
+    min: 10,
+    max: 3000
   },
   //議程討論url
   discussionUrl: {
     type: String,
+    max: 1000,
     regEx: SimpleSchema.RegEx.Url
   },
   //提案人userId

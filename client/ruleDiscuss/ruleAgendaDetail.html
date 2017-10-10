@@ -33,31 +33,34 @@
 
 <template name="ruleAgendaTable">
   <div class="agenda-detail">
-    <div class="row border-grid-body" style="margin-top: 15px;">
-      <div class="col-12 border-grid agenda-description"><h4>議程介紹</h4>{{this.description}}</div>
-      {{#each issue in getIssueList this.issues}}
-        {{#with issue}}
-          {{> ruleIssueList}}
-        {{/with}}
-      {{/each}}
+    <div class="row" style="margin-top: 15px;">
+      <div class="col-12 agenda-description"><h4>議程介紹</h4>{{this.description}}</div>
     </div>
+    {{#each issue in getIssueList this.issues}}
+      {{#with issue}}
+        {{> ruleIssueList}}
+      {{/with}}
+    {{/each}}
   </div>
 </template>
 
 <template name="ruleIssueList">
-  <div class="col-12 border-grid" style="padding: 5px 15px;">
-    <h4>議題：{{this.title}}</h4>
-    <ul class="list-group">
-      {{#each optionId in this.options}}
-        <li class="list-group-item justify-content-between">
-          {{getOptionText optionId}}
-          <button type="button" class="btn btn-primary btn-sm" data-show-vote="{{optionId}}">
-            {{getOptionCount optionId}}
-            <i class="fa fa-users" aria-hidden="true"></i>
-          </button>
-        </li>
-      {{/each}}
-    </ul>
+  <hr />
+  <div class="row" style="margin-top: 15px;">
+    <div class="col-12" style="padding: 5px 15px;">
+      <h4>議題：{{this.title}}</h4>
+      <ul class="list-group">
+        {{#each optionId in this.options}}
+          <li class="list-group-item justify-content-between">
+            {{getOptionText optionId}}
+            <button type="button" class="btn btn-primary btn-sm" data-show-vote="{{optionId}}">
+              {{getOptionCount optionId}}
+              <i class="fa fa-users" aria-hidden="true"></i>
+            </button>
+          </li>
+        {{/each}}
+      </ul>
+    </div>
   </div>
 </template>
 

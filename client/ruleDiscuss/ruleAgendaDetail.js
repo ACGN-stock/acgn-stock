@@ -50,9 +50,9 @@ Template.ruleAgendaDetail.helpers({
       return false;
     }
     const userId = Meteor.userId();
-    // if (agendaData.votes.indexOf(userId) >= 0) {
-    //   return false;
-    // }
+    if (agendaData.votes.indexOf(userId) >= 0) {
+      return false;
+    }
     
     return true;
   },

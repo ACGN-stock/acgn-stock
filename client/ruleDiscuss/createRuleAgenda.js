@@ -150,7 +150,7 @@ function validateModel(model) {
     error.agendaTitle = '請輸入議程主題！';
   }
   else if (model.agendaTitle.length > 100) {
-    error.agendaTitle = '議程主題字數過長！';
+    error.agendaTitle = '議程主題字數過多！';
   }
   if (model.discussionUrl) {
     if (! SimpleSchema.RegEx.Url.test(model.discussionUrl)) {
@@ -163,6 +163,9 @@ function validateModel(model) {
   if (model.description.length < 10) {
     error.description = '介紹文字過少！';
   }
+  else if (model.description.length > 3000) {
+    error.description = '介紹文字過多！';
+  }
 
   const issueList = rIssueList.get();
   issueList.forEach((issue, index) => {
@@ -171,12 +174,18 @@ function validateModel(model) {
     if (! model[issueKey] || ! model[issueKey].length) {
       error[issueKey] = '請輸入議題名稱！';
     }
+    else if (model[issueKey].length > 100) {
+      error[issueKey] = '議題名稱字數過多！';
+    }
 
     const optionList = rIssueOptionList.get()[index];
     optionList.forEach((option, optionIndex) => {
       const optionKey = getIssueOptionInputName(index + 1, optionIndex + 1);
       if (! model[optionKey] || ! model[optionKey].length) {
         error[optionKey] = '請輸入選項！';
+      }
+      else if (model[optionKey].length > 100) {
+        error[optionKey] = '選項字數過多！';
       }
     });
   });

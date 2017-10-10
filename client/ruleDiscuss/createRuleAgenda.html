@@ -18,13 +18,13 @@
         class="form-control"
         type="text"
         name="agendaTitle"
-        placeholder="請輸入要建立的議程主題"
+        placeholder="請輸入要建立的議程主題(最多100字)"
       />
       {{{errorHtmlOf 'agendaTitle'}}}
     </div>
     <div class="form-group">
       <label for="description">議程介紹：</label>
-      <textarea class="form-control" name="description" rows="5" placeholder="請輸入對這個議程的完整介紹"></textarea>
+      <textarea class="form-control" name="description" rows="5" placeholder="請輸入對這個議程的完整介紹(最多3000字)"></textarea>
       {{{errorHtmlOf 'description'}}}
     </div>
     <div class="form-group">
@@ -46,7 +46,7 @@
             class="form-control"
             type="text"
             name="{{getIssueInputName issue.id}}"
-            placeholder="請輸入議題名稱"
+            placeholder="請輸入議題名稱(最多100字)"
           />
           {{{errorHtmlOfIssueInput issue.id}}}
         </div>
@@ -57,7 +57,7 @@
               class="form-control"
               type="text"
               name="{{getIssueOptionInputName issue.id option.id}}"
-              placeholder="請輸入選項"
+              placeholder="請輸入選項(最多100字)"
             />
             {{{errorHtmlOfIssueOptionInput issue.id option.id}}}
           </div>
