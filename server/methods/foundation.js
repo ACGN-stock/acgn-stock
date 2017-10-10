@@ -254,6 +254,8 @@ export function investFoundCompany(user, companyId, amount) {
     release();
   });
 }
+//兩秒鐘最多一次
+limitMethod('investFoundCompany', 1, 2000);
 
 Meteor.publish('foundationList', function(keyword, offset) {
   debug.log('publish foundationPlan', {keyword, offset});

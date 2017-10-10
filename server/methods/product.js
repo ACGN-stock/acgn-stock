@@ -9,7 +9,7 @@ import { dbCompanies } from '../../db/dbCompanies';
 import { dbSeason } from '../../db/dbSeason';
 import { dbLog } from '../../db/dbLog';
 import { dbVoteRecord } from '../../db/dbVoteRecord';
-import { limitSubscription } from './rateLimit';
+import { limitMethod, limitSubscription } from './rateLimit';
 import { debug } from '../debug';
 
 Meteor.methods({
@@ -197,6 +197,8 @@ export function voteProduct(user, productId) {
     release();
   });
 }
+//一秒鐘最多一次
+limitMethod('voteProduct', 1, 1000);
 
 Meteor.methods({
   likeProduct(productId) {
@@ -251,6 +253,8 @@ export function likeProduct(user, productId) {
     });
   }
 }
+//一秒鐘最多一次
+limitMethod('likeProduct', 1, 1000);
 
 Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, offset}) {
   debug.log('publish productListBySeasonId', {seasonId, sortBy, sortDir, offset});

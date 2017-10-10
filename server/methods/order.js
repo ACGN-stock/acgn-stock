@@ -8,7 +8,7 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbLog } from '../../db/dbLog';
 import { dbVariables } from '../../db/dbVariables';
-import { limitSubscription } from './rateLimit';
+import { limitMethod, limitSubscription } from './rateLimit';
 import { createOrder } from '../transaction';
 import { debug } from '../debug';
 
@@ -130,6 +130,8 @@ export function createBuyOrder(user, orderData) {
     release();
   });
 }
+//兩秒鐘最多一次
+limitMethod('createBuyOrder', 1, 2000);
 
 Meteor.methods({
   createSellOrder(orderData) {
@@ -250,6 +252,8 @@ export function createSellOrder(user, orderData) {
     release();
   });
 }
+//兩秒鐘最多一次
+limitMethod('createSellOrder', 1, 2000);
 
 Meteor.methods({
   retrieveOrder(orderId) {
