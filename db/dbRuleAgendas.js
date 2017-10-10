@@ -41,7 +41,7 @@ const schema = new SimpleSchema({
   },
   //議題列表
   issues: {
-    type: Array,
+    type: Array
   },
   'issues.$': {
     type: String

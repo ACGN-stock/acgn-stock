@@ -6,7 +6,6 @@ import { check, Match } from 'meteor/check';
 import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { dbRuleIssues } from '../../db/dbRuleIssues';
 import { dbRuleIssueOptions } from '../../db/dbRuleIssueOptions';
-import { dbLog } from '../../db/dbLog';
 import { config } from '../../config';
 import { limitSubscription, limitMethod } from './rateLimit';
 import { debug } from '../debug';

@@ -1,5 +1,4 @@
 'use strict';
-import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
 import { DocHead } from 'meteor/kadira:dochead';
@@ -10,9 +9,7 @@ import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { dbRuleIssues } from '../../db/dbRuleIssues';
 import { dbRuleIssueOptions } from '../../db/dbRuleIssueOptions';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateTimeText } from '../utils/helpers';
 import { config } from '../../config';
-import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 const rShowOptionVoteDetail = new ReactiveVar(null);
 
@@ -53,7 +50,7 @@ Template.ruleAgendaDetail.helpers({
     if (agendaData.votes.indexOf(userId) >= 0) {
       return false;
     }
-    
+
     return true;
   },
   getVoteHref() {
@@ -79,7 +76,7 @@ Template.ruleAgendaTable.helpers({
         order: 1
       }
     });
-  }  
+  }
 });
 
 Template.ruleIssueList.helpers({

@@ -12,7 +12,7 @@ const schema = new SimpleSchema({
   title: {
     type: String,
     min: 1,
-    max: 100    
+    max: 100
   },
   //議題允許多選
   multiple: {
@@ -24,7 +24,7 @@ const schema = new SimpleSchema({
   },
   //議題列表
   options: {
-    type: Array,
+    type: Array
   },
   'options.$': {
     type: String

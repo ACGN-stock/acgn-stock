@@ -1,16 +1,11 @@
 'use strict';
-import SimpleSchema from 'simpl-schema';
-import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
-import { ReactiveVar } from 'meteor/reactive-var';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { formatDateText } from '../utils/helpers';
-import { config } from '../../config';
-import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
@@ -43,6 +38,7 @@ Template.ruleAgendaList.helpers({
         agendaList.push(agenda);
       }
     });
+
     return agendaList;
   },
   finishAgendaList() {
@@ -63,7 +59,7 @@ Template.ruleAgendaList.helpers({
   },
   formatExpireDate(agenda) {
     const expireDate = new Date(agenda.createdAt.getTime() + (agenda.duration * 60 * 60 * 1000));
-    
+
     return formatDateText(expireDate);
   }
 });

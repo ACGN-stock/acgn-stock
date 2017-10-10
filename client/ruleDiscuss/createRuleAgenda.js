@@ -6,9 +6,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { inheritUtilForm, utilFormHelpers, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { config } from '../../config';
 
@@ -45,6 +43,7 @@ Template.ruleAgendaForm.helpers({
   },
   getIssueOptionList(issueId) {
     const optionList = rIssueOptionList.get();
+
     return optionList[issueId - 1];
   },
   showAddIssueButton() {
@@ -52,7 +51,7 @@ Template.ruleAgendaForm.helpers({
   },
   showAddOptionButton(issueId) {
     const list = rIssueOptionList.get();
-    if (!list[issueId - 1]) {
+    if (! list[issueId - 1]) {
       return false;
     }
 
@@ -63,7 +62,7 @@ Template.ruleAgendaForm.helpers({
   },
   showRemoveOptionButton(issueId) {
     const list = rIssueOptionList.get();
-    if (!list[issueId - 1]) {
+    if (! list[issueId - 1]) {
       return false;
     }
 
@@ -87,7 +86,7 @@ Template.ruleAgendaForm.events({
     });
     rIssueList.set(issueList);
     const optionList = rIssueOptionList.get();
-    optionList.push([{ id: 1 }, { id: 2 }]);
+    optionList.push([ { id: 1 }, { id: 2 } ]);
     rIssueOptionList.set(optionList);
   },
   'click [data-action="removeIssue"]'(event) {
@@ -125,24 +124,24 @@ Template.ruleAgendaForm.events({
 });
 
 function defaultIssueOptionList() {
-  return [[{ id: 1 }, { id: 2 }]];
-};
+  return [ [ { id: 1 }, { id: 2 } ] ];
+}
 
 function defaultIssueList() {
-  return [{ id: 1, multiple: false }];
-};
+  return [ { id: 1, multiple: false } ];
+}
 
 function getIssueInputName(issueId) {
   return 'issue-' + issueId;
-};
+}
 
 function getIssueInputMultipleName(issueId) {
   return 'issue-multiple-' + issueId;
-};
+}
 
 function getIssueOptionInputName(issueId, optionId) {
   return 'option-' + issueId + '-' + optionId;
-};
+}
 
 function validateModel(model) {
   const error = {};
@@ -169,12 +168,12 @@ function validateModel(model) {
 
   const issueList = rIssueList.get();
   issueList.forEach((issue, index) => {
-    const issueKey = getIssueInputName(index + 1)
+    const issueKey = getIssueInputName(index + 1);
     const title = model[issueKey];
-    if (! model[issueKey] || ! model[issueKey].length) {
+    if (! title || ! title.length) {
       error[issueKey] = '請輸入議題名稱！';
     }
-    else if (model[issueKey].length > 100) {
+    else if (title.length > 100) {
       error[issueKey] = '議題名稱字數過多！';
     }
 
