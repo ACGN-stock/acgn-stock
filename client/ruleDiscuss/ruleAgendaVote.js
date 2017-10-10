@@ -34,14 +34,36 @@ Template.ruleAgendaVote.helpers({
     const agendaId = FlowRouter.getParam('agendaId');
 
     return dbRuleAgendas.findOne(agendaId);
-  },
-  getBackHref() {
-    const agendaId = FlowRouter.getParam('agendaId');
-
-    return FlowRouter.path('ruleAgendaDetail', {agendaId});
   }
 });
 Template.ruleAgendaVote.events({
+  'submit .form-vote'(event){
+    event.preventDefault();
+
+    const agendaId = FlowRouter.getParam('agendaId');
+    const voteOptions = [];
+    $('input:checked').each( function() {
+      const optionId = $(this).val();
+      voteOptions.push(optionId);
+    });
+
+    const model = {
+      agendaId: agendaId,
+      options: voteOptions
+    };
+
+    const message = '投票送出後不可再修改與重新投票，確認是否送出？<br>若有未選擇的議題則視為放棄該題之投票權。';
+    alertDialog.confirm(message, function(result) {
+      if (result) {
+        Meteor.customCall('voteAgenda', model, function(error) {
+          if (! error) {
+            const path = FlowRouter.path('ruleAgendaDetail', {agendaId});
+            FlowRouter.go(path);
+          }
+        });
+      }
+    });
+  }
 });
 
 Template.ruleAgendaVoteForm.helpers({
@@ -55,6 +77,11 @@ Template.ruleAgendaVoteForm.helpers({
         order: 1
       }
     });
+  },
+  getBackHref() {
+    const agendaId = FlowRouter.getParam('agendaId');
+
+    return FlowRouter.path('ruleAgendaDetail', {agendaId});
   }  
 });
 

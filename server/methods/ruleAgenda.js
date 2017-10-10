@@ -128,3 +128,61 @@ Meteor.publish("ruleAgendaDetail", function (agendaId) {
 });
 //一分鐘最多重複訂閱5次
 limitSubscription('allRuleAgenda', 5);
+
+Meteor.methods({
+  voteAgenda(voteData) {
+    check(this.userId, String);
+    check(voteData, {
+      agendaId: String,
+      options: [String]
+    });
+    voteAgenda(Meteor.user(), voteData);
+
+    return true;
+  }
+});
+function voteAgenda(user, voteData) {
+  debug.log('voteAgenda', {user, voteData});
+  const userId = user._id;
+  resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
+  //先鎖定資源，再重新讀取一次資料進行運算
+  resourceManager.request('voteAgenda', ['user' + userId], (release) => {
+
+    const agendaId = voteData.agendaId;
+    const agenda = dbRuleAgendas.findOne(agendaId, {
+      fields: {
+        createdAt: 1,
+        duration: 1,
+        votes: 1
+      }
+    });
+    console.log('agenda', agenda);
+    console.log('voteData', voteData);
+    if (! agenda) {
+      throw new Meteor.Error(404, '議程不存在！');
+    }
+    if (agenda.votes.indexOf(userId) >= 0) {
+      throw new Meteor.Error(403, '已經投票過的議程！');
+    }
+    const expireDate = new Date(agenda.createdAt.getTime() + agenda.duration * 60 * 60 * 1000);
+    if (expireDate < Date.now()) {
+      throw new Meteor.Error(403, '議題已經結束投票！');
+    }
+
+    dbRuleAgendas.update(agendaId, {
+      $addToSet: {
+        votes: userId
+      }
+    });
+    voteData.options.forEach((optionId) => {
+      dbRuleIssueOptions.update(optionId, {
+        $addToSet: {
+          votes: userId
+        }
+      });
+    });
+    release();
+  });
+}
+//二十秒鐘最多一次
+limitMethod('voteAgenda', 1, 20000);
