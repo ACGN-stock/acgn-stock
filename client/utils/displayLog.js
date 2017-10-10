@@ -503,7 +503,7 @@ Template.displayLog.helpers({
           '【撤銷廣告】' +
           getUserLink(logData.userId[0]) +
           '將' + getUserLink(logData.userId[1]) +
-          '發布的廣告「「' + getPureMessage() + 'message」給撤銷了。'
+          '發布的廣告「' + getPureMessage() + '」給撤銷了。'
         );
       }
     }
