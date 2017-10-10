@@ -4,6 +4,9 @@
       <div class="card-block">
         <h1 class="card-title text-truncate">
           {{this.title}}
+          {{#if currentUser.profile.isAdmin}}
+            <button class="btn btn-danger float-right" data-action="takeDownRuleAgenda">撤銷</button>
+          {{/if}}
           {{#if currentUser}}
             {{#if canVote this}}
               <a class="btn btn-primary float-right" href={{getVoteHref}}>投票</a>

@@ -9,6 +9,7 @@ import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { dbRuleIssues } from '../../db/dbRuleIssues';
 import { dbRuleIssueOptions } from '../../db/dbRuleIssueOptions';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
+import { alertDialog } from '../layout/alertDialog';
 import { config } from '../../config';
 import { shouldStopSubscribe } from '../utils/idle';
 const rShowOptionVoteDetail = new ReactiveVar(null);
@@ -63,6 +64,21 @@ Template.ruleAgendaDetail.helpers({
   }
 });
 Template.ruleAgendaDetail.events({
+  'click [data-action="takeDownRuleAgenda"]'(event) {
+    event.preventDefault();
+    const agendaId = FlowRouter.getParam('agendaId');
+    const agendaData = dbRuleAgendas.findOne(agendaId);
+    alertDialog.confirm('確定要撤銷議程「' + agendaData.title + '」？', (result) => {
+      if (result) {
+        Meteor.customCall('takeDownRuleAgenda', agendaId, function(error) {
+          if (! error) {
+            const path = FlowRouter.path('ruleAgendaList');
+            FlowRouter.go(path);
+          }
+        });
+      }
+    });
+  }
 });
 
 Template.ruleAgendaTable.helpers({

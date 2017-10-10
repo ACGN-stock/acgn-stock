@@ -155,8 +155,6 @@ function voteAgenda(user, voteData) {
         votes: 1
       }
     });
-    console.log('agenda', agenda);
-    console.log('voteData', voteData);
     if (! agenda) {
       throw new Meteor.Error(404, '議程不存在！');
     }
@@ -185,3 +183,53 @@ function voteAgenda(user, voteData) {
 }
 //二十秒鐘最多一次
 limitMethod('voteAgenda', 1, 20000);
+
+Meteor.methods({
+  takeDownRuleAgenda(agendaId) {
+    check(this.userId, String);
+    check(agendaId, String);
+    takeDownRuleAgenda(Meteor.user(), agendaId);
+
+    return true;
+  }
+});
+function takeDownRuleAgenda(user, agendaId) {
+  debug.log('takeDownRuleAgenda', {user, agendaId});
+  const userId = user._id;
+  resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
+  //先鎖定資源，再重新讀取一次資料進行運算
+  resourceManager.request('takeDownRuleAgenda', ['user' + userId], (release) => {
+
+    const agenda = dbRuleAgendas.findOne(agendaId, {
+      fields: {
+        issues: 1
+      }
+    });
+    if (! agenda) {
+      throw new Meteor.Error(404, '議程不存在！');
+    }
+
+    let options = [];
+    agenda.issues.forEach((issueId) => {
+      const issue = dbRuleIssues.findOne(issueId);
+      if (issue) {
+        options = options.concat(issue.options);
+      }
+    });
+
+    dbRuleIssueOptions.remove({
+      _id: {
+        $in: options
+      }
+    });
+    dbRuleIssues.remove({
+      _id: {
+        $in: agenda.issues
+      }
+    });
+    dbRuleAgendas.remove(agendaId);
+    release();
+  });
+}
+//二十秒鐘最多一次
+limitMethod('takeDownRuleAgenda', 1, 20000);
