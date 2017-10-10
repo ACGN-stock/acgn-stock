@@ -52,12 +52,14 @@ export function releaseStocksForHighPrice() {
       )
       .forEach((companyData) => {
         const companyId = companyData._id;
-        const existsReleaseOrder = dbOrders.findOne({
-          companyId: companyId,
-          userId: '!system'
-        });
-        //有尚存在的釋股單在市場上時不繼續釋股
-        if (existsReleaseOrder) {
+        const existsReleaseOrderCount = dbOrders
+          .find({
+            companyId: companyId,
+            userId: '!system'
+          })
+          .count();
+        //有尚存在的任何釋股單在市場上時不會繼續釋股
+        if (existsReleaseOrderCount > 0) {
           return false;
         }
         //先鎖定資源，再重新讀取一次資料進行運算
@@ -73,6 +75,22 @@ export function releaseStocksForHighPrice() {
               totalValue: 1
             }
           });
+          //已經有可交易範圍內賣單存在時，不再高價釋股
+          const inRangeSellOrderCount = dbOrders
+            .find({
+              companyId: companyId,
+              orderType: '賣出',
+              unitPrice: {
+                $gte: Math.max(Math.floor(companyData.listPrice * 0.85), 1),
+                $lte: Math.max(Math.ceil(companyData.listPrice * 1.15), 1)
+              }
+            })
+            .count();
+          if (inRangeSellOrderCount > 0) {
+            release();
+
+            return false;
+          }
           const maxReleaseStocks = Math.min((companyData.lastPrice - thresholdPrice) / 2, companyData.totalRelease * 0.05);
           const releaseStocks = 1 + Math.floor(Math.random() * maxReleaseStocks);
           createOrder({
