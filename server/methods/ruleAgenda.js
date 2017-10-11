@@ -1,7 +1,6 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { resourceManager } from '../resourceManager';
 import { check, Match } from 'meteor/check';
 import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { dbRuleIssues } from '../../db/dbRuleIssues';
