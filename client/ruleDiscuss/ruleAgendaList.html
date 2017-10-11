@@ -7,7 +7,7 @@
       <hr />
       <h3 class="card-subtitle text-muted">
         進行中的議程
-        {{#if currentUser}}
+        {{#if currentUser.profile.isAdmin}}
           <a class="btn btn-primary float-right" href="{{getNewAgendaHref}}">
             <i class="fa fa-plus" aria-hidden="true"></i>
             建立新議程

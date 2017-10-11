@@ -35,58 +35,56 @@ Meteor.methods({
 function createAgenda(user, agendaData) {
   debug.log('createAgenda', {user, agendaData});
   const userId = user._id;
-  resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('createAgenda', ['user' + userId], (release) => {
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '非金管委員不得建立議程！');
+  }
 
-    const issues = agendaData.issues;
-    if (issues.length === 0) {
-      throw new Meteor.Error(403, '沒有須投票的議題！');
+  const issues = agendaData.issues;
+  if (issues.length === 0) {
+    throw new Meteor.Error(403, '沒有須投票的議題！');
+  }
+  if (issues.length > config.maximumRuleIssue) {
+    throw new Meteor.Error(403, '須投票的議題過多！');
+  }
+
+  issues.forEach((issue) => {
+    if (issue.options.length < 2) {
+      throw new Meteor.Error(403, '每個議題應有至少兩個選項！');
     }
-    if (issues.length > config.maximumRuleIssue) {
-      throw new Meteor.Error(403, '須投票的議題過多！');
+    if (issue.options.length > config.maximumRuleIssueOption) {
+      throw new Meteor.Error(403, '議題選項過多！');
     }
+  });
+    
+  const issueIds = [];
+  issues.forEach((issue, issueIndex) => {
 
-    issues.forEach((issue) => {
-      if (issue.options.length < 2) {
-        throw new Meteor.Error(403, '每個議題應有至少兩個選項！');
-      }
-      if (issue.options.length > config.maximumRuleIssueOption) {
-        throw new Meteor.Error(403, '議題選項過多！');
-      }
-    });
-      
-    const issueIds = [];
-    issues.forEach((issue, issueIndex) => {
-
-      const optionIds = [];
-      issue.options.forEach((option, optionIndex) => {
-        const optionId = dbRuleIssueOptions.insert({
-          title: option,
-          order: optionIndex
-        });
-        optionIds.push(optionId);
+    const optionIds = [];
+    issue.options.forEach((option, optionIndex) => {
+      const optionId = dbRuleIssueOptions.insert({
+        title: option,
+        order: optionIndex
       });
-
-      const issueId = dbRuleIssues.insert({
-        title: issue.title,
-        multiple: issue.multiple,
-        order: issueIndex,
-        options: optionIds
-      });
-      issueIds.push(issueId);
+      optionIds.push(optionId);
     });
 
-    const createdAt = new Date();
-    dbRuleAgendas.insert({
-      title: agendaData.title,
-      description: agendaData.description,
-      discussionUrl: agendaData.discussionUrl,
-      proposer: userId,
-      createdAt: createdAt,
-      issues: issueIds
+    const issueId = dbRuleIssues.insert({
+      title: issue.title,
+      multiple: issue.multiple,
+      order: issueIndex,
+      options: optionIds
     });
-    release();
+    issueIds.push(issueId);
+  });
+
+  const createdAt = new Date();
+  dbRuleAgendas.insert({
+    title: agendaData.title,
+    description: agendaData.description,
+    discussionUrl: agendaData.discussionUrl,
+    proposer: userId,
+    createdAt: createdAt,
+    issues: issueIds
   });
 }
 //二十秒鐘最多一次
@@ -103,7 +101,7 @@ Meteor.publish('allRuleAgenda', function() {
 limitSubscription('allRuleAgenda', 5);
 
 Meteor.publish("ruleAgendaDetail", function (agendaId) {
-  debug.log('publish allRuleAgenda');
+  debug.log('publish ruleAgendaDetail');
   check(agendaId, String);
 
   const agendaCursor = dbRuleAgendas.find(agendaId);
@@ -126,7 +124,7 @@ Meteor.publish("ruleAgendaDetail", function (agendaId) {
   return [ agendaCursor, issueCursor, optionCursor ];
 });
 //一分鐘最多重複訂閱5次
-limitSubscription('allRuleAgenda', 5);
+limitSubscription('ruleAgendaDetail', 5);
 
 Meteor.methods({
   voteAgenda(voteData) {
@@ -143,46 +141,40 @@ Meteor.methods({
 function voteAgenda(user, voteData) {
   debug.log('voteAgenda', {user, voteData});
   const userId = user._id;
-  resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('voteAgenda', ['user' + userId], (release) => {
 
-    const agendaId = voteData.agendaId;
-    const agenda = dbRuleAgendas.findOne(agendaId, {
-      fields: {
-        createdAt: 1,
-        duration: 1,
-        votes: 1
-      }
-    });
-    if (! agenda) {
-      throw new Meteor.Error(404, '議程不存在！');
+  const agendaId = voteData.agendaId;
+  const agenda = dbRuleAgendas.findOne(agendaId, {
+    fields: {
+      createdAt: 1,
+      duration: 1,
+      votes: 1
     }
-    if (agenda.votes.indexOf(userId) >= 0) {
-      throw new Meteor.Error(403, '已經投票過的議程！');
-    }
-    const expireDate = new Date(agenda.createdAt.getTime() + agenda.duration * 60 * 60 * 1000);
-    if (expireDate < Date.now()) {
-      throw new Meteor.Error(403, '議題已經結束投票！');
-    }
+  });
+  if (! agenda) {
+    throw new Meteor.Error(404, '議程不存在！');
+  }
+  if (agenda.votes.indexOf(userId) >= 0) {
+    throw new Meteor.Error(403, '已經投票過的議程！');
+  }
+  const expireDate = new Date(agenda.createdAt.getTime() + agenda.duration * 60 * 60 * 1000);
+  if (expireDate < Date.now()) {
+    throw new Meteor.Error(403, '議題已經結束投票！');
+  }
 
-    dbRuleAgendas.update(agendaId, {
+  dbRuleAgendas.update(agendaId, {
+    $addToSet: {
+      votes: userId
+    }
+  });
+  voteData.options.forEach((optionId) => {
+    dbRuleIssueOptions.update(optionId, {
       $addToSet: {
         votes: userId
       }
     });
-    voteData.options.forEach((optionId) => {
-      dbRuleIssueOptions.update(optionId, {
-        $addToSet: {
-          votes: userId
-        }
-      });
-    });
-    release();
   });
 }
-//二十秒鐘最多一次
-limitMethod('voteAgenda', 1, 20000);
+limitMethod('voteAgenda');
 
 Meteor.methods({
   takeDownRuleAgenda(agendaId) {
@@ -195,41 +187,37 @@ Meteor.methods({
 });
 function takeDownRuleAgenda(user, agendaId) {
   debug.log('takeDownRuleAgenda', {user, agendaId});
-  const userId = user._id;
-  resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('takeDownRuleAgenda', ['user' + userId], (release) => {
-
-    const agenda = dbRuleAgendas.findOne(agendaId, {
-      fields: {
-        issues: 1
-      }
-    });
-    if (! agenda) {
-      throw new Meteor.Error(404, '議程不存在！');
+  const agenda = dbRuleAgendas.findOne(agendaId, {
+    fields: {
+      issues: 1
     }
-
-    let options = [];
-    agenda.issues.forEach((issueId) => {
-      const issue = dbRuleIssues.findOne(issueId);
-      if (issue) {
-        options = options.concat(issue.options);
-      }
-    });
-
-    dbRuleIssueOptions.remove({
-      _id: {
-        $in: options
-      }
-    });
-    dbRuleIssues.remove({
-      _id: {
-        $in: agenda.issues
-      }
-    });
-    dbRuleAgendas.remove(agendaId);
-    release();
   });
+  if (! agenda) {
+    throw new Meteor.Error(404, '議程不存在！');
+  }
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '非金管委員不得撤銷議程！');
+  }
+
+  let options = [];
+  agenda.issues.forEach((issueId) => {
+    const issue = dbRuleIssues.findOne(issueId);
+    if (issue) {
+      options = options.concat(issue.options);
+    }
+  });
+
+  dbRuleIssueOptions.remove({
+    _id: {
+      $in: options
+    }
+  });
+  dbRuleIssues.remove({
+    _id: {
+      $in: agenda.issues
+    }
+  });
+  dbRuleAgendas.remove(agendaId);
 }
 //二十秒鐘最多一次
 limitMethod('takeDownRuleAgenda', 1, 20000);

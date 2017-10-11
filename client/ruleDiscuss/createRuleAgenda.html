@@ -3,9 +3,13 @@
     <div class="card-block">
       <h1 class="card-title mb-1">建立新議程</h1>
       <hr />
-      {{#with defaultData}}
-        {{> ruleAgendaForm}}
-      {{/with}}
+      {{#if currentUser.profile.isAdmin}}
+        {{#with defaultData}}
+          {{> ruleAgendaForm}}
+        {{/with}}
+      {{else}}
+        <p>請登入或聯絡金管委員以建立議程。</p>
+      {{/if}}
     </div>
   </div>
 </template>
