@@ -143,6 +143,9 @@ function voteAgenda(user, voteData) {
   if (user.profile.ban.length > 0) {
     throw new Meteor.Error(403, '你已被禁止投票！');
   }
+  if (Date.now() - user.createdAt.getTime() < config.voteUserNeedCreatedIn) {
+    throw new Meteor.Error(403, '註冊未滿七日不可投票！');
+  }
 
   const agendaId = voteData.agendaId;
   const agenda = dbRuleAgendas.findOne(agendaId, {

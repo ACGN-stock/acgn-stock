@@ -30,6 +30,9 @@ Template.ruleAgendaDetail.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
+    if (Meteor.user()) {
+      this.subscribe('userCreatedAt');
+    }
     const agendaId = FlowRouter.getParam('agendaId');
     if (agendaId) {
       this.subscribe('ruleAgendaDetail', agendaId);
@@ -49,6 +52,9 @@ Template.ruleAgendaDetail.helpers({
     }
     const userId = Meteor.userId();
     if (Meteor.user().profile.ban.length > 0) {
+      return false;
+    }
+    if (! Meteor.user().createdAt || Date.now() - Meteor.user().createdAt.getTime() < config.voteUserNeedCreatedIn) {
       return false;
     }
     if (agendaData.votes.indexOf(userId) >= 0) {

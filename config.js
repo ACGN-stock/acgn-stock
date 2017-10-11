@@ -26,6 +26,7 @@ export const config = {
   advertisingExpireTime: 259200000, //廣告持續時間，單位為微秒
   maximumFavorite: 60, //每個人的最愛公司數量上限
   maximumRuleIssue: 10, //每個議程的議題數量上限
-  maximumRuleIssueOption: 10 //每個議題的選項數量上限
+  maximumRuleIssueOption: 10, //每個議題的選項數量上限
+  voteUserNeedCreatedIn: 604800000 //投票資格所需的註冊時間，單位為微秒
 };
 export default config;

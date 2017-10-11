@@ -291,6 +291,19 @@ Meteor.publish('userFavorite', function() {
 });
 limitSubscription('userFavorite');
 
+Meteor.publish('userCreatedAt', function() {
+  debug.log('publish userCreatedAt');
+  if (typeof this.userId === 'string') {
+    return Meteor.users.find(this.userId, {
+      createdAt: 1
+    });
+  }
+  else {
+    return [];
+  }
+});
+limitSubscription('userFavorite');
+
 Meteor.startup(function() {
   //登入時會自動在其他瀏覽器上清空
   UserStatus.events.on('connectionLogin', function(logoutData) {
