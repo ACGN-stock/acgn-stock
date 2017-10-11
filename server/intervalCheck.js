@@ -456,25 +456,38 @@ function giveBonusByStocksFromProfit() {
       needExecuteLogBulk = true;
       //經理人分紅
       if (companyData.manager !== '!none') {
-        const managerProfit = Math.ceil(leftProfit * config.managerProfitPercent);
-        logBulk.insert({
-          logType: '營利分紅',
-          userId: [companyData.manager],
-          companyId: companyId,
-          amount: managerProfit,
-          createdAt: new Date(now + 1)
+        const userData = Meteor.users.findOne(companyData.manager, {
+          fields: {
+            'profile.ban': 1,
+            'status.lastLogin.date': 1
+          }
         });
-        usersBulk
-          .find({
-            _id: companyData.manager
-          })
-          .updateOne({
-            $inc: {
-              'profile.money': managerProfit
-            }
+        if (
+          //被禁止交易者不分紅
+          userData.profile && ! _.contains(userData.profile.ban, 'deal') &&
+          //七天未動作者不分紅
+          userData.status && now - userData.status.lastLogin.date.getTime() <= 604800000
+        ) {
+          const managerProfit = Math.ceil(leftProfit * config.managerProfitPercent);
+          logBulk.insert({
+            logType: '營利分紅',
+            userId: [companyData.manager],
+            companyId: companyId,
+            amount: managerProfit,
+            createdAt: new Date(now + 1)
           });
-        needExecuteUserBulk = true;
-        leftProfit -= managerProfit;
+          usersBulk
+            .find({
+              _id: companyData.manager
+            })
+            .updateOne({
+              $inc: {
+                'profile.money': managerProfit
+              }
+            });
+          needExecuteUserBulk = true;
+          leftProfit -= managerProfit;
+        }
       }
       //剩餘收益先扣去公司營運成本
       leftProfit -= Math.ceil(companyData.profit * config.costFromProfit);
@@ -494,22 +507,29 @@ function giveBonusByStocksFromProfit() {
           }
         })
         .forEach((directorData) => {
+          //系統及金管會不分紅
           if (directorData.userId === '!system' || directorData.userId === '!FSC') {
             return true;
           }
           const userData = Meteor.users.findOne(directorData.userId, {
             fields: {
+              'profile.ban': 1,
               'status.lastLogin.date': 1
             }
           });
-          //七天未動作者不分紅
-          if (userData.status && now - userData.status.lastLogin.date.getTime() <= 604800000) {
-            canReceiveProfitStocks += directorData.stocks;
-            canReceiveProfitDirectorList.push({
-              userId: directorData.userId,
-              stocks: directorData.stocks
-            });
+          //被禁止交易者不分紅
+          if (! userData.profile || _.contains(userData.profile.ban, 'deal')) {
+            return true;
           }
+          //七天未動作者不分紅
+          if (! userData.status || now - userData.status.lastLogin.date.getTime() > 604800000) {
+            return true;
+          }
+          canReceiveProfitStocks += directorData.stocks;
+          canReceiveProfitDirectorList.push({
+            userId: directorData.userId,
+            stocks: directorData.stocks
+          });
         });
         _.each(canReceiveProfitDirectorList, (directorData, index) => {
           const directorProfit = Math.min(Math.ceil(forDirectorProfit * directorData.stocks / canReceiveProfitStocks), leftProfit);
