@@ -48,6 +48,9 @@ Template.ruleAgendaDetail.helpers({
       return false;
     }
     const userId = Meteor.userId();
+    if (Meteor.user().profile.ban.length > 0) {
+      return false;
+    }
     if (agendaData.votes.indexOf(userId) >= 0) {
       return false;
     }

@@ -11,7 +11,15 @@
           {{>userLink this.proposer}}
         </h3>
         <hr />
-        {{> ruleAgendaVoteForm}}
+        {{#if currentUser}}
+          {{#if canVote this}}
+            {{> ruleAgendaVoteForm}}
+          {{else}}
+            <p>無法進行投票，此議程可能已結束投票，或者你已送出投票或已被禁止投票！</p>
+          {{/if}}
+        {{else}}
+          <p>請先登入以進行投票！</p>
+        {{/if}}
       </div>
     {{else}}
       <div class="card-block">

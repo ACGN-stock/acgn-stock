@@ -31,6 +31,21 @@ Template.ruleAgendaVote.helpers({
     const agendaId = FlowRouter.getParam('agendaId');
 
     return dbRuleAgendas.findOne(agendaId);
+  },
+  canVote(agendaData) {
+    const expireDate = new Date(agendaData.createdAt.getTime() + agendaData.duration * 60 * 60 * 1000);
+    if (expireDate < Date.now()) {
+      return false;
+    }
+    const userId = Meteor.userId();
+    if (Meteor.user().profile.ban.length > 0) {
+      return false;
+    }
+    if (agendaData.votes.indexOf(userId) >= 0) {
+      return false;
+    }
+
+    return true;
   }
 });
 Template.ruleAgendaVote.events({
