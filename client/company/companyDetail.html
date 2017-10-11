@@ -74,6 +74,14 @@
               <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
                 辭去職務
               </a>
+            {{else}}
+              {{#if currentUser}}
+                {{#if currentUser.profile.isAdmin}}
+                  <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
+                    經營管理
+                  </a>
+                {{/if}}
+              {{/if}}
             {{/if}}
           </h3>
           {{#if haveNextSeasonProduct}}

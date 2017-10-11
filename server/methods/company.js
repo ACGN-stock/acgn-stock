@@ -53,7 +53,10 @@ function editCompany(user, companyId, newCompanyData) {
     checkImageUrl(newCompanyData.pictureSmall);
   }
   const userId = user._id;
-  if (userId !== companyData.manager) {
+  if (companyData.manager === '!none' && ! user.profile.isAdmin) {
+    throw new Meteor.Error(401, '使用者並非金融管理會委員，無法進行此操作！');
+  }
+  if (companyData.manager !== '!none' && userId !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
   dbLog.insert({
@@ -737,12 +740,23 @@ Meteor.publish('companyDataForEdit', function(companyId) {
   if (typeof this.userId !== 'string') {
     return [];
   }
+  const user = Meteor.users.findOne(this.userId, {
+    fields: {
+      'profile.isAdmin': true
+    }
+  });
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       manager: 1
     }
   });
-  if (companyData && this.userId === companyData.manager) {
+  if (
+      companyData &&
+      (
+        companyData.manager === this.userId ||
+        user.profile.isAdmin
+      )
+  ) {
     const overdue = 0;
 
     return [

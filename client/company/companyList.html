@@ -97,7 +97,13 @@
           <div class="d-flex flex-row-reverse">
             <div class="member-panel">
               <div class="d-flex flex-row-reverse">
-                <small>{{this.chairmanTitle}}</small>
+                {{#if isChairman this._id}}
+                  <a class="small" href="#" data-action="changeChairmanTitle">
+                    {{this.chairmanTitle}}：
+                  </a>
+                {{else}}
+                  <small>{{this.chairmanTitle}}：</small>
+                {{/if}}
               </div>
               <div class="d-flex flex-row-reverse">
                 <h4>{{>userLink this.chairman}}</h4>
@@ -152,6 +158,12 @@
             <a class="btn btn-tab" href="{{getManageHref this._id}}">
               經營管理
             </a>
+          {{else}}
+            {{#if currentUser.profile.isAdmin}}
+              <a class="btn btn-tab" href="{{getManageHref this._id}}">
+                經營管理
+              </a>
+            {{/if}}
           {{/if}}
           <button class="btn btn-tab" type="button" data-action="createBuyOrder">
             購入
@@ -220,6 +232,14 @@
                 經營管理
               </a>
             </div>
+          {{else}}
+            {{#if currentUser.profile.isAdmin}}
+              <div class="mb-1">
+                <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
+                  經營管理
+                </a>
+              </div>
+            {{/if}}
           {{/if}}
 
           <div class="mb-1">

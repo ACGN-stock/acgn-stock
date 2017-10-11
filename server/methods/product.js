@@ -36,8 +36,11 @@ export function createProduct(user, productData) {
       isSeal: 1
     }
   });
-  if (companyData.manager !== user._id) {
-    throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
+  if (companyData.manager === '!none' && ! user.profile.isAdmin) {
+    throw new Meteor.Error(401, '使用者並非金融管理會委員，無法進行此操作！');
+  }
+  if (companyData.manager !== '!none' && user._id !== companyData.manager) {
+    throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
   if (companyData.isSeal) {
     throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
@@ -86,8 +89,8 @@ export function retrieveProduct(user, productId) {
       isSeal: 1
     }
   });
-  if (companyData.manager !== user._id) {
-    throw new Meteor.Error(401, '登入使用者並非註冊的公司經理人！');
+  if (user._id !== companyData.manager && ! user.profile.isAdmin) {
+    throw new Meteor.Error(401, '使用者並非該公司的經理人也非金管會成員！');
   }
   if (companyData.isSeal) {
     throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
