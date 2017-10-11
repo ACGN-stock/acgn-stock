@@ -4,10 +4,15 @@
       <div class="card-block">
         <h1 class="card-title text-truncate">
           {{this.companyName}}
-          {{#if currentUser.profile.isAdmin}}
-            <a class="btn btn-warning float-right" href="#" data-action="changeCompanyName">
-              更名
-            </a>
+          {{#if currentUser}}
+            {{#if currentUser.profile.isAdmin}}
+              <a class="btn btn-warning float-right" href="#" data-action="changeCompanyName">
+                更名
+              </a>
+              <a class="btn btn-warning" href="{{getEditHref this._id}}">
+                修改計劃
+              </a>
+            {{/if}}
           {{/if}}
         </h1>
         {{#if showAllTags this.tags}}
@@ -24,11 +29,6 @@
         <h3>
           經理人：
           {{>userLink this.manager}}
-          {{#if isUserId this.manager}}
-            <a class="btn btn-primary btn-sm" href="{{getEditHref this._id}}">
-              修改計劃
-            </a>
-          {{/if}}
         </h3>
         <hr />
         {{> foundationDetailTable}}

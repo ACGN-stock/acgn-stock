@@ -6,10 +6,10 @@
       <h3 class="card-subtitle mb-2 text-muted">
         募資計劃列表：
         {{#if currentUser}}
-          <a class="btn btn-primary float-right" href="{{getFoundCompanyHref}}">
+          <button class="btn btn-primary float-right" data-action="createFoundation">
             <i class="fa fa-plus-square" aria-hidden="true"></i>
             建立新角色
-          </a>
+          </button>
         {{/if}}
       </h3>
       <hr />
@@ -125,7 +125,7 @@
         {{#if currentUser}}
           <hr style="margin: 0px;" />
           <div class="row btn-group">
-            {{#if isUserId this.manager}}
+            {{#if currentUser.profile.isAdmin}}
               <a class="btn btn-tab" href="{{getEditHref this._id}}">
                 修改計劃
               </a>
@@ -179,12 +179,14 @@
       <div class="col-12 border-grid company-description"><h4>角色簡介：</h4>{{this.description}}</div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
+          {{#if currentUser.profile.isAdmin}}
+            <a class="btn btn-warning" href="{{getEditHref this._id}}">
+              修改計劃
+            </a>
+          {{/if}}
           {{#if isUserId this.manager}}
             <div class="mb-1">
               您是此創立計劃的發起人。
-              <a class="btn btn-primary btn-sm" href="{{getEditHref this._id}}">
-                修改計劃
-              </a>
             </div>
           {{/if}}
           {{#if alreadyInvest}}

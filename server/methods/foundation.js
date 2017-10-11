@@ -129,6 +129,9 @@ Meteor.methods({
 });
 export function editFoundCompany(user, foundCompanyData) {
   debug.log('foundCompany', {user, foundCompanyData});
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  }
   const companyId = foundCompanyData._id;
   const oldFoundCompanyData = dbFoundations.findOne(companyId, {
     fields: {
@@ -140,9 +143,6 @@ export function editFoundCompany(user, foundCompanyData) {
   });
   if (! oldFoundCompanyData) {
     throw new Meteor.Error(404, '找不到要編輯的新創計劃，該新創計劃可能已經創立成功或失敗！');
-  }
-  if (user._id !== oldFoundCompanyData.manager) {
-    throw new Meteor.Error(401, '並非該新創計劃的發起人，無法編輯該新創計劃！');
   }
   const companyName = foundCompanyData.companyName;
   if (dbCompanies.find({companyName}).count()) {
