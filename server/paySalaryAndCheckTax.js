@@ -206,7 +206,7 @@ function checkTax(todayBeginTime) {
             //需要徵收多少股票才足以支付餘下稅金
             const imposedStocks = Math.ceil((needPay - imposedMoney) / stockData.listPrice);
             //全部徵收
-            if (imposedStocks > stockData.stocks) {
+            if (imposedStocks >= stockData.stocks) {
               logBulk.insert({
                 logType: '繳稅沒收',
                 userId: [userId],
