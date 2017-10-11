@@ -27,9 +27,6 @@ Template.foundationList.helpers({
   viewModeIsCard() {
     return rCompanyListViewMode.get() === 'card';
   },
-  getFoundCompanyHref() {
-    return FlowRouter.path('createFoundationPlan');
-  },
   foundationList() {
     return dbFoundations.find({}, {
       sort: {
@@ -45,6 +42,18 @@ Template.foundationList.helpers({
       offset: rFoundationOffset,
       useHrefRoute: true
     };
+  }
+});
+Template.foundationList.events({
+  'click [data-action="createFoundation"]'(event) {
+    event.preventDefault();
+    const user = Meteor.user();
+    if (user.profile.money < config.founderEarnestMoney) {
+      alertDialog.alert('您的投資已達上限或剩餘金錢不足以進行投資！');
+
+      return false;
+    }
+    FlowRouter.go('createFoundationPlan');
   }
 });
 

@@ -35,6 +35,16 @@ export function foundCompany(user, foundCompanyData) {
   if (_.contains(user.profile.ban, 'manager')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了擔任經理人的資格！');
   }
+  if (_.contains(user.profile.ban, 'deal')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
+  }
+  if (user.profile.money < config.founderEarnestMoney) {
+    throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
+  }
+  const userId = user._id;
+  if (dbFoundations.find({manager: userId}).count() > 0) {
+    throw new Meteor.Error(403, '您現在已經有一家新創公司正在申請中，無法同時發起第二家新創公司！');
+  }
   const lastSeasonData = dbSeason.findOne({}, {
     sort: {
       beginDate: -1
@@ -54,16 +64,50 @@ export function foundCompany(user, foundCompanyData) {
   if (foundCompanyData.pictureSmall) {
     checkImageUrl(foundCompanyData.pictureSmall);
   }
-  const userId = user._id;
-  foundCompanyData.manager = userId;
-  foundCompanyData.createdAt = new Date();
-  dbLog.insert({
-    logType: '創立公司',
-    userId: [userId],
-    message: companyName,
-    createdAt: new Date()
+  //先鎖定資源，再重新讀取一次資料進行運算
+  resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
+  resourceManager.request('foundCompany', ['user' + userId], (release) => {
+    const user = Meteor.users.findOne(userId, {
+      fields: {
+        'profile.money': 1
+      }
+    });
+    if (user.profile.money < config.founderEarnestMoney) {
+      throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
+    }
+    if (dbFoundations.find({manager: userId}).count() > 0) {
+      throw new Meteor.Error(403, '您現在已經有一家新創公司正在籌備中，無法同時發起第二家新創公司！');
+    }
+    foundCompanyData.manager = userId;
+    const createdAt = new Date();
+    foundCompanyData.createdAt = createdAt
+    dbLog.insert({
+      logType: '創立公司',
+      userId: [userId],
+      message: companyName,
+      createdAt: createdAt
+    });
+    dbLog.insert({
+      logType: '參與投資',
+      userId: [userId],
+      message: foundCompanyData.companyName,
+      amount: config.founderEarnestMoney,
+      createdAt: new Date(createdAt.getTime() + 1)
+    });
+    Meteor.users.update(userId, {
+      $inc: {
+        'profile.money': -1 * config.founderEarnestMoney
+      }
+    });
+    foundCompanyData.invest = [
+      {
+        userId: userId,
+        amount: config.founderEarnestMoney
+      }
+    ];
+    dbFoundations.insert(foundCompanyData);
+    release();
   });
-  dbFoundations.insert(foundCompanyData);
 }
 //二十秒鐘最多一次
 limitMethod('foundCompany', 1, 20000);

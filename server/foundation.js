@@ -23,7 +23,8 @@ export function checkFoundCompany() {
       },
       {
         fields: {
-          _id: 1
+          _id: 1,
+          manager: 1
         },
         disableOplog: true
       }
@@ -160,6 +161,9 @@ export function checkFoundCompany() {
             createdAt: createdAt
           });
           _.each(foundationData.invest, ({userId, amount}, index) => {
+            if (userId === foundationData.manager) {
+              amount -= config.founderEarnestMoney;
+            }
             logBulk.insert({
               logType: '創立退款',
               userId: [userId],

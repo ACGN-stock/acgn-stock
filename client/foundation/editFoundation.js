@@ -112,7 +112,11 @@ function saveModel(model) {
     });
   }
   else {
-    const message = '請再次輸入角色名稱以表示確定。<br>創立重複、無ACG點等違反金管會規則的角色將視情節處以罰款或永久停權。';
+    const message = `
+      <div>新創計劃一經送出就不可修改，一但新創失敗，將會被沒收投資保證金<span class="text-info">$1024</span>。</div>
+      <div class="text-danger">創立重複、無ACG點等違反金管會規則的角色將視情節處以罰款或永久停權。</div>
+      <div>請再次輸入角色名稱以表示確定。</div>
+    `;
     alertDialog.prompt(message, function(companyName) {
       if (companyName === model.companyName) {
         Meteor.customCall('foundCompany', model, (error) => {
