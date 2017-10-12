@@ -57,7 +57,7 @@
           {{> navLink page='companyList' params=page1}}
           {{> navLink page='foundationList' params=page1}}
           {{> navLink page='advertising'}}
-          {{> navLink page='productCenterBySeason' params=seasonParams}}
+          {{> navLink page='productCenterBySeason' params=currentSeasonParams}}
         {{/navLinkGroup}}
         {{#if hasFavorite}}
           {{#navLinkGroup text='我的最愛'}}
@@ -68,7 +68,7 @@
         {{/if}}
         {{#navLinkGroup text='其他資訊'}}
           {{> navLink page='tutorial'}}
-          {{> navLink page='seasonalReport' params=seasonParams}}
+          {{> navLink page='seasonalReport' params=previousSeasonParams}}
           {{#if currentUser}}
             {{> navLink page='accountInfo' params=accountInfoParams}}
           {{/if}}

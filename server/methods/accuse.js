@@ -434,39 +434,23 @@ function takeDownProduct(user, {productId, message}) {
     throw new Meteor.Error(404, '找不到識別碼為「' + productId + '」的產品，該產品可能已被下架！');
   }
   const companyId = productData.companyId;
-  const seasonData = dbSeason.findOne({}, {
-    sort: {
-      beginDate: -1
+  const seasonData = dbSeason.findOne(productData.seasonId);
+  const votePrice = seasonData.votePrice;
+  const voteProfit = productData.votes * votePrice;
+  dbCompanies.update(companyId, {
+    $inc: {
+      profit: voteProfit * -1
     }
   });
-  if (productData.overdue === 1 && seasonData) {
-    const votePrice = seasonData.votePrice;
-    const voteProfit = productData.votes * votePrice;
-    dbCompanies.update(companyId, {
-      $inc: {
-        profit: voteProfit * -1
-      }
-    });
-    dbLog.insert({
-      logType: '產品下架',
-      userId: [user._id],
-      companyId: companyId,
-      productId: productId,
-      price: voteProfit,
-      message: message,
-      createdAt: new Date()
-    });
-  }
-  else {
-    dbLog.insert({
-      logType: '產品下架',
-      userId: [user._id],
-      companyId: companyId,
-      productId: productId,
-      message: message,
-      createdAt: new Date()
-    });
-  }
+  dbLog.insert({
+    logType: '產品下架',
+    userId: [user._id],
+    companyId: companyId,
+    productId: productId,
+    price: voteProfit,
+    message: message,
+    createdAt: new Date()
+  });
   dbProducts.remove(productId);
   dbProductLike.remove({productId});
 }

@@ -6,7 +6,6 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbProducts } from '../../db/dbProducts';
 import { dbSeason } from '../../db/dbSeason';
-import { dbVariables } from '../../db/dbVariables';
 import { dbVoteRecord } from '../../db/dbVoteRecord';
 import { voteProduct } from '../utils/methods';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
@@ -92,7 +91,7 @@ Template.productSeasonNav.helpers({
               }
             }
           );
-          if (navSeasonData && navSeasonData._id !== dbVariables.get('currentSeasonId')) {
+          if (navSeasonData) {
             return {
               'class': 'btn btn-info btn-sm float-right',
               'href': FlowRouter.path('productCenterBySeason', {

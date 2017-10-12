@@ -27,9 +27,11 @@ const schema = new SimpleSchema({
   companyId: {
     type: String
   },
-  //推出季度
+  //上架季度
   seasonId: {
-    type: String
+    type: String,
+    defaultValue: '',
+    optional: true
   },
   //此產品的狀態。0 => 當季推出產品，1 => 上季推出產品，待投票結算營利中，2 => 過季產品。
   overdue: {

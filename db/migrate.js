@@ -1,4 +1,5 @@
 'use strict';
+import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Migrations } from 'meteor/percolate:migrations';
 import { dbAdvertising } from './dbAdvertising';
@@ -377,6 +378,41 @@ if (Meteor.isServer) {
           multi: true
         }
       );
+    }
+  });
+
+  Migrations.add({
+    version: 8,
+    name: 're define dbProduct seasonId field.',
+    up() {
+      const seasonIdList = dbSeason
+        .find({}, {
+          sort: {
+            beginDate: -1
+          },
+          fields: {
+            _id: 1
+          }
+        })
+        .map((seasonData) => {
+          return seasonData._id;
+        });
+      _.each(seasonIdList, (seasonId, index) => {
+        const shouldBeSeasonId = index > 0 ? seasonIdList[index - 1] : '';
+        dbProducts.update(
+          {
+            seasonId: seasonId
+          },
+          {
+            $set: {
+              seasonId: shouldBeSeasonId
+            }
+          },
+          {
+            multi: true
+          }
+        );
+      });
     }
   });
 

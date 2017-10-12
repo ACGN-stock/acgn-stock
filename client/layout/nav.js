@@ -72,7 +72,24 @@ Template.nav.helpers({
       page: 1
     };
   },
-  seasonParams() {
+  currentSeasonParams() {
+    const seasonData = dbSeason
+      .findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+
+    if (seasonData) {
+      return {
+        seasonId: seasonData._id
+      };
+    }
+    else {
+      return {};
+    }
+  },
+  previousSeasonParams() {
     const seasonList = dbSeason
       .find({}, {
         sort: {

@@ -50,15 +50,6 @@ export function createProduct(user, productData) {
     throw new Meteor.Error(403, '相同的產品已經被推出過了！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season']);
-  const seasonData = dbSeason.findOne({}, {
-    sort: {
-      beginDate: -1
-    },
-    fields: {
-      _id: 1
-    }
-  });
-  productData.seasonId = seasonData._id;
   productData.createdAt = new Date();
   dbProducts.insert(productData);
 }
