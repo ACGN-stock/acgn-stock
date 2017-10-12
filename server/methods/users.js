@@ -302,7 +302,7 @@ Meteor.publish('userCreatedAt', function() {
     return [];
   }
 });
-limitSubscription('userFavorite');
+limitSubscription('userCreatedAt');
 
 Meteor.startup(function() {
   //登入時會自動在其他瀏覽器上清空
