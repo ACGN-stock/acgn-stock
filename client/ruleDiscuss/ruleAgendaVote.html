@@ -1,0 +1,71 @@
+<template name="ruleAgendaVote">
+  <div class="card">
+    {{#with agendaData}}
+      <div class="card-block">
+        <h1 class="card-title text-truncate">
+          {{this.title}}
+        </h1>
+        <hr />
+        <h3>
+          提案人：
+          {{>userLink this.proposer}}
+        </h3>
+        <hr />
+        {{#if currentUser}}
+          {{#if canVote this}}
+            {{> ruleAgendaVoteForm}}
+          {{else}}
+            <p>無法進行投票，此議程可能已結束投票，或者你已送出投票或已被禁止投票！</p>
+          {{/if}}
+        {{else}}
+          <p>請先登入以進行投票！</p>
+        {{/if}}
+      </div>
+    {{else}}
+      <div class="card-block">
+        Loading...
+      </div>
+    {{/with}}
+  </div>
+</template>
+
+<template name="ruleAgendaVoteForm">
+  <form class="form-vote">
+    <div class="row" style="margin-top: 15px;">
+      <div class="col-12 agenda-description"><h4>議程介紹</h4>{{this.description}}</div>
+    </div>
+    {{#each issue in getIssueList this.issues}}
+      {{#with issue}}
+        {{> ruleIssueVoteList}}
+      {{/with}}
+    {{/each}}
+    <hr />
+    <div class="text-right">
+      <button type="submit" class="btn btn-primary">送出</button>
+      <a class="btn btn-secondary" href={{getBackHref}}>取消</a>
+    </div>
+  </form>
+</template>
+
+<template name="ruleIssueVoteList">
+  <hr />
+  <div class="row" style="margin-top: 15px;">
+    <div class="col-12" style="padding: 5px 15px;">
+      <h4>議題：{{this.title}}</h4>
+      <div class="option-list">
+        {{#each optionId in this.options}}
+          <div class="form-check">
+            <label class="form-check-label">
+              {{#if this.multiple}}
+                <input class="form-check-input" type="checkbox" name={{this._id}} value={{optionId}}>
+              {{else}}
+                <input class="form-check-input" type="radio" name={{this._id}} value={{optionId}}>
+              {{/if}}
+              {{getOptionText optionId}}
+            </label>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</template>
