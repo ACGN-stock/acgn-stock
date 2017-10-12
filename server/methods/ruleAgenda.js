@@ -143,6 +143,12 @@ function voteAgenda(user, voteData) {
   if (user.profile.ban.length > 0) {
     throw new Meteor.Error(403, '你已被禁止投票！');
   }
+  if (user.profile.money < 0) {
+    throw new Meteor.Error(403, '現金為負數者不可投票！');
+  }
+  if (user.profile.notPayTax) {
+    throw new Meteor.Error(403, '有逾期稅單未繳納者不可投票！');
+  }
   if (Date.now() - user.createdAt.getTime() < config.voteUserNeedCreatedIn) {
     throw new Meteor.Error(403, '註冊未滿七日不可投票！');
   }
