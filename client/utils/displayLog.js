@@ -307,7 +307,7 @@ Template.displayLog.helpers({
       case '繳稅沒金': {
         return (
           '【繳稅沒收】' + getUserLink(logData.userId[0]) +
-          '由於繳稅逾期，被系統被系統沒收了$' + logData.amount + '的現金！'
+          '由於繳稅逾期，被系統沒收了$' + logData.amount + '的現金！'
         );
       }
       case '繳稅撤單': {
