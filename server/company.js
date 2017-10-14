@@ -124,6 +124,7 @@ export function releaseStocksForNoDeal() {
     dbVariables.set('releaseStocksForNoDealCounter', releaseStocksForNoDealCounter);
     console.info('releaseStocksForNoDeal triggered! next counter: ', releaseStocksForNoDealCounter);
     const checkLogTime = new Date(Date.now() - (config.releaseStocksForNoDealMinCounter * config.intervalTimer));
+    const lowPriceThreshold = dbVariables.get('lowPriceThreshold');
     dbCompanies
       .find(
         {
@@ -165,7 +166,7 @@ export function releaseStocksForNoDeal() {
               orderType: '購入',
               companyId: companyId,
               unitPrice: {
-                $gte: Math.ceil(companyData.listPrice * 1.15)
+                $gte: companyData.listPrice < lowPriceThreshold ? Math.ceil(companyData.listPrice * 1.3) : Math.ceil(companyData.listPrice * 1.15)
               }
             }
           },
