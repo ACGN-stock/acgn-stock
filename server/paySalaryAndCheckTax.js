@@ -90,7 +90,7 @@ function checkTax(todayBeginTime) {
         });
       const createdAtBasicTime = Date.now();
       //增加稅單罰金
-      if (overdueDay <= 7) {
+      if (overdueDay < 7) {
         const amount = Math.ceil((taxData.tax + taxData.zombie - taxData.paid) * 0.1);
         taxesBulk
           .find({
