@@ -55,6 +55,7 @@
     <hr />
     {{#if currentUser}}
       {{#if currentUser.profile.isAdmin}}
+        <button class="btn btn-info btn-sm" type="button" data-action="fscAnnouncement">金管會通告</button>
         {{#if isBaned 'accuse'}}
           <button class="btn btn-success btn-sm" type="button" data-ban="accuse">解除舉報禁令</button>
         {{else}}

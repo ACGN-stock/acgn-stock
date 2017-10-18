@@ -360,6 +360,26 @@ Template.displayLog.helpers({
           '以「' + getPureMessage() + '」的理由向金融管理會舉報' + extraDescription + '。'
         );
       }
+      case '金管通告': {
+        const extraDescription = (logData.userId && logData.userId.length) ? (
+          '向' +
+          _.map(logData.userId.slice(1), (userId) => {
+            return getUserLink(userId);
+          }).join('、')
+        ) : '';
+
+        return (
+          '【金管通告】' +
+          getUserLink(logData.userId[0]) +
+          '以金管會的名義' + extraDescription + '通告：「' + getPureMessage() + '」。'
+        );
+      }
+      case '通報金管': {
+        return (
+          '【通報金管】' + getUserLink(logData.userId[0]) +
+          '向金管會通報：「' + getPureMessage() + '」。'
+        );
+      }
       case '禁止舉報': {
         return (
           '【違規處理】' +

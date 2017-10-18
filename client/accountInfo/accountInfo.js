@@ -94,6 +94,21 @@ Template.accountInfoBasic.helpers({
   }
 });
 Template.accountInfoBasic.events({
+  'click [data-action="fscAnnouncement"]'(event, templateInstance) {
+    event.preventDefault();
+    const accuseUser = templateInstance.data;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '金管會通告 - 輸入通知訊息',
+      message: `請輸入要通告的訊息：`,
+      callback: function(message) {
+        if (message) {
+          const userId = [accuseUser._id];
+          Meteor.customCall('fscAnnouncement', userId, message);
+        }
+      }
+    });
+  },
   'click [data-action="accuse"]'(event, templateInstance) {
     event.preventDefault();
     const accuseUser = templateInstance.data;
