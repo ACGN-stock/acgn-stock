@@ -265,41 +265,47 @@ function rankCompany(seasonData) {
     ]);
 
     const seasonId = seasonData._id;
-    const rankCompanyPriceBulk = dbRankCompanyPrice.rawCollection().initializeUnorderedBulkOp();
-    _.each(rankCompanyPriceList, (rankData) => {
-      rankCompanyPriceBulk.insert({
-        seasonId: seasonId,
-        companyId: rankData._id,
-        totalDealAmount: rankData.totalDealAmount,
-        totalDealMoney: rankData.totalDealMoney,
-        productProfit: rankData.productProfit
+    if (rankCompanyPriceList.length > 0) {
+      const rankCompanyPriceBulk = dbRankCompanyPrice.rawCollection().initializeUnorderedBulkOp();
+      _.each(rankCompanyPriceList, (rankData) => {
+        rankCompanyPriceBulk.insert({
+          seasonId: seasonId,
+          companyId: rankData._id,
+          totalDealAmount: rankData.totalDealAmount,
+          totalDealMoney: rankData.totalDealMoney,
+          productProfit: rankData.productProfit
+        });
       });
-    });
-    rankCompanyPriceBulk.execute();
+      rankCompanyPriceBulk.execute();
+    }
 
-    const rankCompanyValueBulk = dbRankCompanyValue.rawCollection().initializeUnorderedBulkOp();
-    _.each(rankCompanyValueList, (rankData) => {
-      rankCompanyValueBulk.insert({
-        seasonId: seasonId,
-        companyId: rankData._id,
-        lastPrice: rankData.lastPrice,
-        totalRelease: rankData.totalRelease
+    if (rankCompanyValueList.length > 0) {
+      const rankCompanyValueBulk = dbRankCompanyValue.rawCollection().initializeUnorderedBulkOp();
+      _.each(rankCompanyValueList, (rankData) => {
+        rankCompanyValueBulk.insert({
+          seasonId: seasonId,
+          companyId: rankData._id,
+          lastPrice: rankData.lastPrice,
+          totalRelease: rankData.totalRelease
+        });
       });
-    });
-    rankCompanyValueBulk.execute();
+      rankCompanyValueBulk.execute();
+    }
 
-    const rankCompanyProfitBulk = dbRankCompanyProfit.rawCollection().initializeUnorderedBulkOp();
-    _.each(rankCompanyProfitList, (rankData) => {
-      rankCompanyProfitBulk.insert({
-        seasonId: seasonId,
-        companyId: rankData._id,
-        profit: rankData.profit,
-        totalRelease: rankData.totalRelease,
-        avgPrice: Math.round(rankData.avgPrice * 100) / 100,
-        priceToEarn: Math.round(rankData.priceToEarn * 1000) / 1000
+    if (rankCompanyProfitList.length > 0) {
+      const rankCompanyProfitBulk = dbRankCompanyProfit.rawCollection().initializeUnorderedBulkOp();
+      _.each(rankCompanyProfitList, (rankData) => {
+        rankCompanyProfitBulk.insert({
+          seasonId: seasonId,
+          companyId: rankData._id,
+          profit: rankData.profit,
+          totalRelease: rankData.totalRelease,
+          avgPrice: Math.round(rankData.avgPrice * 100) / 100,
+          priceToEarn: Math.round(rankData.priceToEarn * 1000) / 1000
+        });
       });
-    });
-    rankCompanyProfitBulk.execute();
+      rankCompanyProfitBulk.execute();      
+    }
   }
 }
 
