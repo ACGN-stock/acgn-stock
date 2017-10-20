@@ -15,6 +15,29 @@ import { limitSubscription } from './rateLimit';
 import { debug } from '../debug';
 
 Meteor.methods({
+  accuseSomething(message) {
+    check(this.userId, String);
+    check(message, String);
+    accuseSomething(Meteor.user(), message);
+
+    return true;
+  }
+});
+function accuseSomething(user, message) {
+  debug.log('accuseSomething', {user, message});
+  if (_.contains(user.profile.ban, 'accuse')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了所有舉報違規行為！');
+  }
+  dbLog.insert({
+    logType: '通報金管',
+    userId: [user._id],
+    message: message,
+    createdAt: new Date()
+  });
+}
+
+
+Meteor.methods({
   accuseUser(userId, message) {
     check(this.userId, String);
     check(userId, String);
@@ -480,6 +503,29 @@ function takeDownAdvertising(user, advertisingId) {
     createdAt: new Date()
   });
   dbAdvertising.remove(advertisingId);
+}
+
+Meteor.methods({
+  fscAnnouncement(userId, message) {
+    check(this.userId, String);
+    check(userId, [String]);
+    check(message, String);
+    fscAnnouncement(Meteor.user(), userId, message);
+
+    return true;
+  }
+})
+function fscAnnouncement(user, userId, message) {
+  debug.log('fscAnnouncement', {user, userId, message});
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  }
+  dbLog.insert({
+    logType: '金管通告',
+    userId: [user._id, ...userId],
+    message: message,
+    createdAt: new Date()
+  });
 }
 
 Meteor.publish('accuseRecord', function(offset) {

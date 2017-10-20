@@ -157,8 +157,8 @@ const companyListHelpers = {
     if (isUserId(companyData.manager)) {
       return 'company-card-manager';
     }
-    const percentage = companyListHelpers.getStockPercentage(companyData._id, companyData.totalRelease);
-    if (percentage > 0) {
+    const amount = companyListHelpers.getStockAmount(companyData._id);
+    if (amount > 0) {
       return 'company-card-holder';
     }
 
