@@ -15,7 +15,11 @@ Meteor.publish('variables', function () {
           'validateUserUrl',
           'validateUserBoardName',
           'validateUserAID',
-          'lowPriceThreshold'
+          'lowPriceThreshold',
+		  'lastReleaseStocksForHighPriceTime',
+		  'lastReleaseStocksForNoDealTime',
+		  'lastReleaseStocksForLowPriceTime',
+		  'lastRecordListPriceTime'
         ]
       }
     },
