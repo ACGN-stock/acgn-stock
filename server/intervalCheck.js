@@ -389,7 +389,7 @@ function generateNewSeason() {
   const companiesCount = dbCompanies.find({isSeal: false}).count();
   //本季度每個使用者可以得到多少推薦票
   const vote = Math.floor(Math.log10(companiesCount) * 18);
-  const votePrice = 3000;
+  const votePrice = config.votePricePerTicket;
   const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, companiesCount, productCount, votePrice});
   Meteor.users.update(
     {},

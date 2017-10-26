@@ -4,7 +4,9 @@ import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
 import { config } from '../config';
 import { resourceManager } from './resourceManager';
+import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
+import { dbEmployees } from '../db/dbEmployees';
 import { dbLog } from '../db/dbLog';
 import { dbOrders } from '../db/dbOrders';
 import { dbTaxes } from '../db/dbTaxes';
@@ -25,15 +27,16 @@ export function paySalaryAndCheckTax() {
     const thisPayTime = new Date();
     dbVariables.set('lastPayTime', thisPayTime);
     resourceManager.request('paySalaryAndCheckTax', ['season'], (release) => {
-      paySalary(thisPayTime);
+      paySystemSalary(thisPayTime);
+      paySalaryAndGenerateProfit(thisPayTime);
       checkTax(todayBeginTime);
       release();
     });
   }
 }
 
-function paySalary(thisPayTime) {
-  console.info(thisPayTime.toLocaleString() + ': paySalary');
+function paySystemSalary(thisPayTime) {
+  console.info(thisPayTime.toLocaleString() + ': paySystemSalary');
   Meteor.users.update(
     {
       createdAt: {
@@ -55,6 +58,72 @@ function paySalary(thisPayTime) {
     price: salaryPerPay,
     createdAt: thisPayTime
   });
+}
+
+function paySalaryAndGenerateProfit(thisPayTime) {
+  console.info(thisPayTime.toLocaleString() + ': paySalaryAndGenerateProfit');
+
+  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+  const companyBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
+
+  let needExecuteBulk = false;
+  dbCompanies.find().forEach((company) => {
+    const employees = dbEmployees.find({
+      companyId: company._id,
+      employed: true
+    }).map((employee) => {
+      return employee.userId;
+    });
+
+    if (employees.length <= 0) {
+      return;
+    }
+
+    needExecuteBulk = true;
+    usersBulk.find({
+      _id: {
+        $in: employees
+      }
+    }).update({
+      $inc: {
+        'profile.money': company.salary - salaryPerPay
+      }
+    });
+    logBulk.insert({
+      logType: '發薪紀錄',
+      userId: employees,
+      companyId: company._id,
+      price: company.salary,
+      createdAt: thisPayTime
+    });
+
+    const totalProfit = config.votePricePerTicket * employees.length;
+    const totalSalary = company.salary * employees.length;
+    companyBulk.find({
+      _id: company._id
+    }).updateOne({
+      $inc: {
+        profit: totalProfit - totalSalary
+      }
+    });
+    logBulk.insert({
+      logType: '員工營利',
+      userId: employees,
+      companyId: company._id,
+      price: totalProfit,
+      createdAt: thisPayTime
+    });
+  });
+
+  if (needExecuteBulk) {
+    logBulk.execute = Meteor.wrapAsync(logBulk.execute);
+    logBulk.execute();
+    usersBulk.execute = Meteor.wrapAsync(usersBulk.execute);
+    usersBulk.execute();
+    companyBulk.execute = Meteor.wrapAsync(companyBulk.execute);
+    companyBulk.execute();
+  }
 }
 
 const ObjectID = MongoInternals.NpmModule.ObjectID;
