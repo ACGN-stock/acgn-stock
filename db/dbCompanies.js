@@ -96,6 +96,27 @@ const schema = new SimpleSchema({
     type: Array
   },
   'voteList.$': [String],
+  //員工每日薪資
+  salary: {
+    type: SimpleSchema.Integer,
+    min: 500,
+    max: 2000,
+    defaultValue: 1000
+  },
+  //下季員工每日薪資
+  nextSeasonSalary: {
+    type: SimpleSchema.Integer,
+    min: 500,
+    max: 2000,
+    defaultValue: 1000
+  },
+  //員工季末分紅占總營收百分比
+  seasonalBonusPercent: {
+    type: SimpleSchema.Integer,
+    min: 1,
+    max: 5,
+    defaultValue: 5
+  },
   //是否被金管會查封關停
   isSeal: {
     type: Boolean,

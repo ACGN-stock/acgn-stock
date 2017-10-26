@@ -27,6 +27,8 @@ export const config = {
   maximumFavorite: 60, //每個人的最愛公司數量上限
   maximumRuleIssue: 10, //每個議程的議題數量上限
   maximumRuleIssueOption: 10, //每個議題的選項數量上限
-  voteUserNeedCreatedIn: 604800000 //投票資格所需的註冊時間，單位為微秒
+  voteUserNeedCreatedIn: 604800000, //投票資格所需的註冊時間，單位為微秒
+  defaultCompanySalaryPerDay: 1000, //公司預設員工每日薪資
+  defaultSeasonalBonusPercent: 5 //公司預設員工季度分紅百分比
 };
 export default config;
