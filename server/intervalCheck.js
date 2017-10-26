@@ -223,6 +223,19 @@ function doSeasonWorks(lastSeasonData) {
         multi: true
       }
     );
+    //遣散所有在職員工
+    dbEmployees.update(
+      {},
+      {
+        $set: {
+          employed: false,
+          resigned: true
+        }
+      },
+      {
+        multi: true
+      }
+    );
     //產生新的商業季度
     generateNewSeason();
     //移除所有七天前的股價紀錄
@@ -409,6 +422,23 @@ function generateNewSeason() {
       $set: {
         overdue: 1,
         seasonId: seasonId
+      }
+    },
+    {
+      multi: true
+    }
+  );
+  //雇用所有上季登記的使用者
+  dbEmployees.update(
+    {
+      registerAt: {
+        $lt: endDate.getTime() - config.seasonTime,
+        $gte: endDate.getTime() - config.seasonTime * 2
+      }
+    },
+    {
+      $set: {
+        employed: true
       }
     },
     {
