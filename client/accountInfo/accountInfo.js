@@ -10,6 +10,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbEmployees } from '../../db/dbEmployees';
 import { dbTaxes } from '../../db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { config } from '../../config';
@@ -25,6 +26,15 @@ Template.accountInfo.onCreated(function() {
     const userId = FlowRouter.getParam('userId');
     if (userId) {
       this.subscribe('accountInfo', userId);
+    }
+  });
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('employeeListByUser', userId);
     }
   });
   this.autorun(() => {
@@ -88,6 +98,24 @@ Template.accountInfoBasic.helpers({
       .find({
         manager: this._id
       });
+  },
+  employment() {
+    const userId = FlowRouter.getParam('userId');
+    const employed = true;
+
+    return dbEmployees.findOne({userId, employed});
+  },
+  nextSeasonEmployment() {
+    const userId = FlowRouter.getParam('userId');
+    const employed = false;
+
+    return dbEmployees.findOne({userId, employed});
+  },
+  showUnregisterEmployee() {
+    const userId = FlowRouter.getParam('userId');
+    const employed = false;
+
+    return userId === Meteor.userId() && dbEmployees.findOne({userId, employed});
   },
   isBaned(type) {
     return _.contains(this.profile.ban, type);
@@ -228,6 +256,11 @@ Template.accountInfoBasic.events({
         }
       }
     });
+  },
+  'click [data-action="unregisterEmployee"]'(event) {
+    event.preventDefault();
+    Meteor.customCall('unregisterEmployee');
+    alertDialog.alert('您已取消報名！');
   }
 });
 

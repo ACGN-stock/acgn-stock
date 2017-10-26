@@ -6,6 +6,7 @@ import { resourceManager } from './resourceManager';
 import { dbAdvertising } from '../db/dbAdvertising';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
+import { dbEmployees } from '../db/dbEmployees';
 import { dbLog } from '../db/dbLog';
 import { dbOrders } from '../db/dbOrders';
 import { dbPrice } from '../db/dbPrice';

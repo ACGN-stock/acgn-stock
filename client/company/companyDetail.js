@@ -8,6 +8,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbEmployees } from '../../db/dbEmployees';
 import { dbLog } from '../../db/dbLog';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
@@ -37,6 +38,15 @@ Template.companyDetail.onCreated(function() {
     const companyId = FlowRouter.getParam('companyId');
     if (companyId) {
       this.subscribe('companyDetail', companyId);
+    }
+  });
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('employeeListByCompany', companyId);
     }
   });
 });
@@ -113,6 +123,22 @@ Template.companyDetail.events({
   'click [data-action="showAllTags"]'(event) {
     event.preventDefault();
     rShowAllTags.set(true);
+  },
+  'click [data-toggle-employ]'(event) {
+    event.preventDefault();
+    const userId = Meteor.userId();
+    const companyId = $(event.currentTarget).attr('data-toggle-employ');
+    const employed = false;
+    const resigned = false;
+    const employData = dbEmployees.findOne({companyId, userId, employed, resigned});
+    if (employData) {
+      Meteor.customCall('unregisterEmployee');
+      alertDialog.alert('您已取消報名！');
+    }
+    else {
+      Meteor.customCall('registerEmployee', companyId);
+      alertDialog.alert('您已報名成功！');
+    }
   },
   'click [data-toggle-favorite]'(event) {
     event.preventDefault();
@@ -807,6 +833,30 @@ function getStockAmount(companyId) {
     return 0;
   }
 }
+
+inheritedShowLoadingOnSubscribing(Template.companyLogList);
+Template.companyEmployeeList.helpers({
+  employeeList() {
+    const companyId = FlowRouter.getParam('companyId');
+    const employed = true;
+
+    return dbEmployees.find({companyId, employed}, {
+      sort: {
+        registerAt: 1
+      }
+    });
+  },
+  nextSeasonEmployeeList() {
+    const companyId = FlowRouter.getParam('companyId');
+    const employed = false;
+
+    return dbEmployees.find({companyId, employed}, {
+      sort: {
+        registerAt: 1
+      }
+    });
+  }
+});
 
 const rLogOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.companyLogList);
