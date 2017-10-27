@@ -429,12 +429,12 @@ function generateNewSeason() {
       multi: true
     }
   );
-  //雇用所有上季登記的使用者
+  //雇用所有上季報名的使用者
   dbEmployees.update(
     {
+      resigned: false,
       registerAt: {
-        $lt: endDate.getTime() - config.seasonTime,
-        $gte: endDate.getTime() - config.seasonTime * 2
+        $lt: endDate.getTime() - config.seasonTime
       }
     },
     {
@@ -521,6 +521,52 @@ function giveBonusByStocksFromProfit() {
           leftProfit -= managerProfit;
         }
       }
+      //員工分紅
+      const employeeList = [];
+      dbEmployees.find({
+        companyId: companyId,
+        employed: true
+      }).forEach((employee) => {
+        const userData = Meteor.users.findOne(employee.userId, {
+          fields: {
+            'profile.ban': 1,
+            'status.lastLogin.date': 1
+          }
+        });
+        //被禁止交易者不分紅
+        if (! userData.profile || _.contains(userData.profile.ban, 'deal')) {
+          return true;
+        }
+        //七天未動作者不分紅
+        if (! userData.status || now - userData.status.lastLogin.date.getTime() > 604800000) {
+          return true;
+        }
+        employeeList.push(employee.userId);
+      });
+      if (employeeList.length > 0) {
+        const totalBonus = companyData.profit * companyData.seasonalBonusPercent * 0.01;
+        const bonus = Math.floor(totalBonus / employeeList.length);
+        _.each(employeeList, (userId, index) => {
+          logBulk.insert({
+            logType: '營利分紅',
+            userId: userId,
+            companyId: companyId,
+            amount: bonus,
+            createdAt: new Date(now + 2 + index)
+          });
+          usersBulk
+            .find({
+              _id: userId
+            })
+            .updateOne({
+              $inc: {
+                'profile.money': bonus
+              }
+            });
+        });
+        leftProfit -= bonus * employeeList.length;
+        needExecuteUserBulk = true;
+      }
       //剩餘收益先扣去公司營運成本
       leftProfit -= Math.ceil(companyData.profit * config.costFromProfit);
       const forDirectorProfit = leftProfit;
@@ -571,7 +617,7 @@ function giveBonusByStocksFromProfit() {
               userId: [directorData.userId],
               companyId: companyId,
               amount: directorProfit,
-              createdAt: new Date(now + 2 + index)
+              createdAt: new Date(now + 3 + employeeList.length + index)
             });
             usersBulk
               .find({
