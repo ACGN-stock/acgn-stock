@@ -77,7 +77,6 @@ Meteor.methods({
 });
 export function updateSeasonalBonus(user, companyId, percentage) {
   debug.log('updateSeasonalBonus', {user, companyId, percentage});
-  const userId = user._id;
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,
@@ -130,7 +129,6 @@ Meteor.methods({
 });
 export function updateNextSeasonSalary(user, companyId, salary) {
   debug.log('updateNextSeasonSalary', {user, companyId, salary});
-  const userId = user._id;
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,

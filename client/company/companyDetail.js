@@ -186,7 +186,7 @@ Template.companyDetail.events({
       config.maximumCompanySalaryPerDay + ')';
     alertDialog.prompt(message, function(salary) {
       if (salary && salary.length > 0) {
-        salary = parseInt(salary);
+        salary = parseInt(salary, 10);
         if (isNaN(salary) ||
           salary < config.minimumCompanySalaryPerDay ||
           salary > config.maximumCompanySalaryPerDay) {
@@ -207,7 +207,7 @@ Template.companyDetail.events({
       config.maximumSeasonalBonusPercent + ')';
     alertDialog.prompt(message, function(percentage) {
       if (percentage && percentage.length > 0) {
-        percentage = parseInt(percentage);
+        percentage = parseInt(percentage, 10);
         if (isNaN(percentage) ||
           percentage < config.minimumSeasonalBonusPercent ||
           percentage > config.maximumSeasonalBonusPercent) {
