@@ -29,7 +29,13 @@ export const config = {
   maximumRuleIssueOption: 10, //每個議題的選項數量上限
   votePricePerTicket: 3000, //每張推薦票能產生的營利
   voteUserNeedCreatedIn: 604800000, //投票資格所需的註冊時間，單位為微秒
+  maximumCompanySalaryPerDay: 2000, //公司員工每日薪資上限
+  minimumCompanySalaryPerDay: 500, //公司員工每日薪資下限
   defaultCompanySalaryPerDay: 1000, //公司預設員工每日薪資
-  defaultSeasonalBonusPercent: 5 //公司預設員工季度分紅百分比
+  maximumSeasonalBonusPercent: 5, //公司員工季度分紅百分比上限
+  minimumSeasonalBonusPercent: 1, //公司員工季度分紅百分比下限
+  defaultSeasonalBonusPercent: 5, //公司預設員工季度分紅百分比
+  announceSalaryTime: 259200000, //季度結束前多久開放設定薪資，單位為微秒
+  announceBonusTime: 86400000 //季度結束前多久開放設定分紅，單位為微秒
 };
 export default config;

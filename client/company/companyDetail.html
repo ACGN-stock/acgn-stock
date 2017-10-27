@@ -74,6 +74,24 @@
               <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
                 經營管理
               </a>
+              {{#if canUpdateSalary}}
+                <a class="btn btn-primary btn-sm" href="#" data-action="updateSalary">
+                  設定薪資
+                </a>
+              {{else}}
+                <a class="btn btn-primary btn-sm disabled" href="#">
+                  設定薪資
+                </a>
+              {{/if}}
+              {{#if canUpdateSeasonalBonus}}
+                <a class="btn btn-primary btn-sm" href="#" data-action="updateSeasonalBonus">
+                  設定分紅
+                </a>
+              {{else}}
+                <a class="btn btn-primary btn-sm disabled" href="#">
+                  設定分紅
+                </a>
+              {{/if}}
               <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
                 辭去職務
               </a>

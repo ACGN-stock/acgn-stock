@@ -12,6 +12,7 @@ import { dbEmployees } from '../../db/dbEmployees';
 import { dbLog } from '../../db/dbLog';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
+import { dbSeason } from '../../db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct, toggleFavorite } from '../utils/methods';
 import { config } from '../../config';
@@ -75,6 +76,32 @@ Template.companyDetail.helpers({
     window.dbProducts = dbProducts;
 
     return dbProducts.find({companyId, overdue}).count() > 0;
+  },
+  canUpdateSalary() {
+    const seasonData = dbSeason
+      .findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+    if (! seasonData) {
+      return false;
+    }
+
+    return Date.now() < seasonData.endDate.getTime() - config.announceSalaryTime;
+  },
+  canUpdateSeasonalBonus() {
+    const seasonData = dbSeason
+      .findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+    if (! seasonData) {
+      return false;
+    }
+
+    return Date.now() < seasonData.endDate.getTime() - config.announceBonusTime;
   }
 });
 Template.companyDetail.events({
@@ -150,6 +177,48 @@ Template.companyDetail.events({
     const companyId = FlowRouter.getParam('companyId');
     const companyData = dbCompanies.findOne(companyId);
     changeChairmanTitle(companyData);
+  },
+  'click [data-action="updateSalary"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const message = '請輸入下季員工薪資：(' +
+      config.minimumCompanySalaryPerDay + '~' +
+      config.maximumCompanySalaryPerDay + ')';
+    alertDialog.prompt(message, function(salary) {
+      if (salary && salary.length > 0) {
+        salary = parseInt(salary);
+        if (isNaN(salary) ||
+          salary < config.minimumCompanySalaryPerDay ||
+          salary > config.maximumCompanySalaryPerDay) {
+          alertDialog.alert('不正確的薪資設定！');
+
+          return false;
+        }
+
+        Meteor.customCall('updateNextSeasonSalary', companyId, salary);
+      }
+    });
+  },
+  'click [data-action="updateSeasonalBonus"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const message = '請輸入本季員工分紅占營收百分比：(' +
+      config.minimumSeasonalBonusPercent + '~' +
+      config.maximumSeasonalBonusPercent + ')';
+    alertDialog.prompt(message, function(percentage) {
+      if (percentage && percentage.length > 0) {
+        percentage = parseInt(percentage);
+        if (isNaN(percentage) ||
+          percentage < config.minimumSeasonalBonusPercent ||
+          percentage > config.maximumSeasonalBonusPercent) {
+          alertDialog.alert('不正確的分紅設定！');
+
+          return false;
+        }
+
+        Meteor.customCall('updateSeasonalBonus', companyId, percentage);
+      }
+    });
   },
   'click [data-action="resignManager"]'(event) {
     event.preventDefault();
