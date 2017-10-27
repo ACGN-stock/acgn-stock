@@ -108,7 +108,8 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 500,
     max: 2000,
-    defaultValue: 1000
+    defaultValue: 1000,
+    optional: true
   },
   //員工季末分紅占總營收百分比
   seasonalBonusPercent: {

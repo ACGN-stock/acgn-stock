@@ -446,6 +446,31 @@ function generateNewSeason() {
       multi: true
     }
   );
+  //更新所有公司員工薪資
+  dbCompanies.update(
+    {},
+    {
+      $rename: {
+        nextSeasonSalary: 'salary'
+      }
+    },
+    {
+      multi: true
+    }
+  );
+  //所有公司員工分紅與下季薪資改回預設值
+  dbCompanies.update(
+    {},
+    {
+      $set: {
+        nextSeasonSalary: config.defaultCompanySalaryPerDay,
+        seasonalBonusPercent: config.defaultSeasonalBonusPercent
+      }
+    },
+    {
+      multi: true
+    }
+  );
 
   return seasonId;
 }
