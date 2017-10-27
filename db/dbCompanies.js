@@ -1,6 +1,7 @@
 'use strict';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
+import { config } from '../config';
 
 //公司資料集
 export const dbCompanies = new Mongo.Collection('companies');
@@ -99,24 +100,24 @@ const schema = new SimpleSchema({
   //員工每日薪資
   salary: {
     type: SimpleSchema.Integer,
-    min: 500,
-    max: 2000,
-    defaultValue: 1000
+    min: config.minimumCompanySalaryPerDay,
+    max: config.maximumCompanySalaryPerDay,
+    defaultValue: config.defaultCompanySalaryPerDay
   },
   //下季員工每日薪資
   nextSeasonSalary: {
     type: SimpleSchema.Integer,
-    min: 500,
-    max: 2000,
-    defaultValue: 1000,
+    min: config.minimumCompanySalaryPerDay,
+    max: config.maximumCompanySalaryPerDay,
+    defaultValue: config.defaultCompanySalaryPerDay,
     optional: true
   },
   //員工季末分紅占總營收百分比
   seasonalBonusPercent: {
     type: SimpleSchema.Integer,
-    min: 1,
-    max: 5,
-    defaultValue: 5
+    min: config.minimumSeasonalBonusPercent,
+    max: config.maximumSeasonalBonusPercent,
+    defaultValue: config.defaultSeasonalBonusPercent
   },
   //是否被金管會查封關停
   isSeal: {
