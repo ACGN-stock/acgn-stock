@@ -105,11 +105,35 @@
               {{/if}}
             {{/if}}
           </h3>
-          {{#if haveNextSeasonProduct}}
-            <div class="text-success">下季度待上架產品：有</div>
-          {{else}}
-            <div class="text-danger">下季度待上架產品：無</div>
-          {{/if}}
+          <hr />
+          <div class="row">
+            <div class="col-12 col-md-6">
+              <div class="text-success">本季度員工薪資：${{companyData.salary}}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-success">
+                下季度員工薪資：${{companyData.nextSeasonSalary}}
+                {{#if canUpdateSalary}}
+                  <span class="badge badge-pill badge-warning">暫定</span>
+                {{/if}}
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-success">
+                本季度員工分紅：{{companyData.seasonalBonusPercent}}%
+                {{#if canUpdateSeasonalBonus}}
+                  <span class="badge badge-pill badge-warning">暫定</span>
+                {{/if}}
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              {{#if haveNextSeasonProduct}}
+                <div class="text-success">下季度待上架產品：有</div>
+              {{else}}
+                <div class="text-danger">下季度待上架產品：無</div>
+              {{/if}}
+            </div>
+          </div>
           <hr />
           {{> companyDetailTable}}
         </div>
