@@ -495,7 +495,8 @@ function giveBonusByStocksFromProfit() {
           _id: 1,
           manager: 1,
           totalRelease: 1,
-          profit: 1
+          profit: 1,
+          seasonalBonusPercent: 1
         },
         disableOplog: true
       }
@@ -574,7 +575,7 @@ function giveBonusByStocksFromProfit() {
         _.each(employeeList, (userId, index) => {
           logBulk.insert({
             logType: '營利分紅',
-            userId: userId,
+            userId: [userId],
             companyId: companyId,
             amount: bonus,
             createdAt: new Date(now + 2 + index)
