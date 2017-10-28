@@ -99,6 +99,9 @@
           <div class="text-danger">目前被禁止廣告宣傳。</div>
         {{/if}}
       {{/if}}
+      {{#if showUnregisterEmployee}}
+        <button class="btn btn-danger btn-sm" type="button" data-action="unregisterEmployee">取消員工報名</button>
+      {{/if}}
       <hr />
     {{/if}}
     <div>
@@ -144,6 +147,16 @@
         是「{{>companyLink this._id}}」公司的總經理。
       </div>
     {{/each}}
+    {{#with employment}}
+      <div class="text-primary">
+        是「{{>companyLink this.companyId}}」公司的員工。
+      </div>
+    {{/with}}
+    {{#with nextSeasonEmployment}}
+      <div class="text-primary">
+        是「{{>companyLink this.companyId}}」公司的儲備員工。
+      </div>
+    {{/with}}
   </div>
 </template>
 
