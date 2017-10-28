@@ -32,7 +32,7 @@
           {{/if}}
           <div class="col-12 border-grid">
             <a class="d-block h4" href="#" data-toggle-panel="log">
-              所有紀錄
+              玩家紀錄
               {{#if isDisplayPanel 'log'}}
                 <i class="fa fa-folder-open" aria-hidden="true"></i>
               {{else}}
@@ -41,7 +41,7 @@
             </a>
           </div>
           {{#if isDisplayPanel 'log'}}
-            {{> accountInfoLogList}}
+            {{> accountLogViewer}}
           {{/if}}
         </div>
       </div>
@@ -220,8 +220,31 @@
   </div>
 </template>
 
+<template name="accountLogViewer">
+  {{#if onlyViewAccuse}}
+    {{> accountAccuseLogList}}
+  {{else}}
+    {{> accountInfoLogList}}
+  {{/if}}
+</template>
+
+<template name="accountAccuseLogList">
+  <div class="col-12 border-grid">
+    <button class="btn btn-outline-info btn-sm mt-1">檢視所有紀錄</button>
+    {{#each accuseList}}
+      {{> displayLog}}
+    {{else}}
+      查無資料！
+    {{/each}}
+    {{#with paginationData}}
+      {{> pagination}}
+    {{/with}}
+  </div>
+</template>
+
 <template name="accountInfoLogList">
   <div class="col-12 border-grid">
+    <button class="btn btn-outline-info btn-sm mt-1">只檢視金管會相關紀錄</button>
     {{#each logList}}
       {{> displayLog}}
     {{else}}

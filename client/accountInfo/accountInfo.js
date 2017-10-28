@@ -7,7 +7,7 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbLog } from '../../db/dbLog';
+import { dbLog, accuseLogTypeList } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbEmployees } from '../../db/dbEmployees';
@@ -206,7 +206,7 @@ Template.accountInfoBasic.events({
             message: `請輸入罰金數額：`,
             callback: function(amount) {
               amount = parseInt(amount, 10);
-              if (amount && amount > 0) {
+              if (amount && amount >= 0) {
                 const userId = accuseUserData._id;
                 Meteor.customCall('forfeit', {userId, message, amount});
               }
@@ -362,6 +362,62 @@ Template.accountInfoOwnStockList.helpers({
   }
 });
 
+
+export const accountLogViewerMode = new ReactiveVar('accuse');
+Template.accountLogViewer.helpers({
+  onlyViewAccuse() {
+    return accountLogViewerMode.get() === 'accuse';
+  }
+});
+
+export const accuseOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.accountAccuseLogList);
+Template.accountAccuseLogList.onCreated(function() {
+  accuseOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('accountAccuseLog', userId, accuseOffset.get());
+    }
+  });
+});
+Template.accountAccuseLogList.helpers({
+  accuseList() {
+    const userId = FlowRouter.getParam('userId');
+
+    return dbLog.find(
+      {
+        userId: userId,
+        logType: {
+          $in: accuseLogTypeList
+        }
+      },
+      {
+        sort: {
+          createdAt: -1
+        },
+        limit: 10
+      }
+    );
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfAccountAccuseLog',
+      dataNumberPerPage: 10,
+      offset: accuseOffset
+    };
+  }
+});
+Template.accountAccuseLogList.events({
+  'click button'(event) {
+    event.preventDefault();
+    accountLogViewerMode.set('all');
+  }
+});
+
 export const logOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.accountInfoLogList);
 Template.accountInfoLogList.onCreated(function() {
@@ -403,5 +459,11 @@ Template.accountInfoLogList.helpers({
       dataNumberPerPage: 30,
       offset: logOffset
     };
+  }
+});
+Template.accountInfoLogList.events({
+  'click button'(event) {
+    event.preventDefault();
+    accountLogViewerMode.set('accuse');
   }
 });
