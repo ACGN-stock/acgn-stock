@@ -13,7 +13,7 @@ export const logTypeList = [
   '登入紀錄', //userId0從message登入了系統！
   '免費得石', //因為「message」的理由獲得了amount顆聖晶石！
   '聊天發言', //userId0說道：「message」
-  '發薪紀錄', //系統向所有已驗證通過的使用者發給了$price的薪水！
+  '發薪紀錄', //(系統 || 「companyId」公司)向(所有已驗證通過且未就業的使用者 || userId...)發給了$price的薪水！
   '創立公司', //userId0發起了「message」的新公司創立計劃，誠意邀請有意者投資！
   '參與投資', //userId0向「message公司創立計劃」投資了$amount！
   '創立失敗', //userId...等人投資的「message公司創立計劃」由於投資人數不足失敗了，投資金額將全數返回！
@@ -34,6 +34,7 @@ export const logTypeList = [
   '就任經理', //userId0在message商業季度(以amount數量的支持股份)擊敗了所有競爭對手，取代userId1成為「companyId」公司的經理人！
   '經理管理', //userId0修改了「companyId」公司的資訊！
   '推薦產品', //userId0推薦了#productId產品，使「companyId」公司獲得了$price的營利額！
+  '員工營利', //userId...等人努力工作，使「companyId」公司獲得了$price的營利額！
   '公司營利', //「companyId」公司本商業季度一共獲利$amount！
   '營利分紅', //userId0得到了「companyId」公司的分紅$amount！
   '季度賦稅', //userId0在此次商業季度中產生了$amount的財富稅與$price的殭屍稅！

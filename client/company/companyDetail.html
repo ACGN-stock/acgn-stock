@@ -33,6 +33,9 @@
               </a>
             {{/if}}
             {{#if currentUser}}
+              <a class="btn btn-primary float-right" href="#" data-toggle-employ="{{this._id}}">
+                員工報名
+              </a>
               {{#if isFavorite this._id}}
                 <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
                   移除最愛
@@ -71,6 +74,24 @@
               <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
                 經營管理
               </a>
+              {{#if canUpdateSalary}}
+                <a class="btn btn-primary btn-sm" href="#" data-action="updateSalary">
+                  設定薪資
+                </a>
+              {{else}}
+                <a class="btn btn-primary btn-sm disabled" href="#">
+                  設定薪資
+                </a>
+              {{/if}}
+              {{#if canUpdateSeasonalBonus}}
+                <a class="btn btn-primary btn-sm" href="#" data-action="updateSeasonalBonus">
+                  設定分紅
+                </a>
+              {{else}}
+                <a class="btn btn-primary btn-sm disabled" href="#">
+                  設定分紅
+                </a>
+              {{/if}}
               <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
                 辭去職務
               </a>
@@ -84,11 +105,35 @@
               {{/if}}
             {{/if}}
           </h3>
-          {{#if haveNextSeasonProduct}}
-            <div class="text-success">下季度待上架產品：有</div>
-          {{else}}
-            <div class="text-danger">下季度待上架產品：無</div>
-          {{/if}}
+          <hr />
+          <div class="row">
+            <div class="col-12 col-md-6">
+              <div class="text-success">本季度員工薪資：${{companyData.salary}}</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-success">
+                下季度員工薪資：${{companyData.nextSeasonSalary}}
+                {{#if canUpdateSalary}}
+                  <span class="badge badge-pill badge-warning">暫定</span>
+                {{/if}}
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="text-success">
+                本季度員工分紅：{{companyData.seasonalBonusPercent}}%
+                {{#if canUpdateSeasonalBonus}}
+                  <span class="badge badge-pill badge-warning">暫定</span>
+                {{/if}}
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              {{#if haveNextSeasonProduct}}
+                <div class="text-success">下季度待上架產品：有</div>
+              {{else}}
+                <div class="text-danger">下季度待上架產品：無</div>
+              {{/if}}
+            </div>
+          </div>
           <hr />
           {{> companyDetailTable}}
         </div>
@@ -205,6 +250,19 @@
       {{#if isDisplayPanel 'director'}}
         {{> companyDirectorList}}
         {{> companyElectInfo}}
+      {{/if}}
+      <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="employee">
+          員工名冊
+          {{#if isDisplayPanel 'employee'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'employee'}}
+        {{> companyEmployeeList}}
       {{/if}}
       <div class="col-12 border-grid">
         <a class="d-block h4" href="#" data-toggle-panel="log">
@@ -476,6 +534,55 @@
             無
           {{/each}}
         </div>
+      </div>
+    {{/each}}
+  </div>
+</template>
+
+<template name="companyEmployeeList">
+  <div class="col-12 col-md-6 border-grid">
+    <h4>
+      在職員工
+    </h4>
+    <div class="row mb-1">
+      <div class="col-6 text-center">員工名稱</div>
+      <div class="col-6 text-center">報名時間</div>
+    </div>
+    {{#each employee in employeeList}}
+      <div class="row mb-1">
+        <div class="col-6 text-truncate">
+          {{>userLink employee.userId}}
+        </div>
+        <div class="col-6 text-right">
+          {{formatDateText employee.registerAt}}
+        </div>
+      </div>
+    {{else}}
+      <div class="text-center">
+        沒有在職員工！
+      </div>
+    {{/each}}
+  </div>
+  <div class="col-12 col-md-6 border-grid">
+    <h4>
+      儲備員工
+    </h4>
+    <div class="row mb-1">
+      <div class="col-6 text-center">員工名稱</div>
+      <div class="col-6 text-center">報名時間</div>
+    </div>
+    {{#each employee in nextSeasonEmployeeList}}
+      <div class="row mb-1">
+        <div class="col-6 text-truncate">
+          {{>userLink employee.userId}}
+        </div>
+        <div class="col-6 text-right">
+          {{formatDateText employee.registerAt}}
+        </div>
+      </div>
+    {{else}}
+      <div class="text-center">
+        沒有儲備員工！
       </div>
     {{/each}}
   </div>

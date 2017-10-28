@@ -88,7 +88,15 @@ Template.displayLog.helpers({
         return getUserLink(logData.userId[0]) + '說道：「' + getPureMessage() + '」';
       }
       case '發薪紀錄': {
-        return '【發薪紀錄】系統向所有已驗證通過的使用者發給了$' + logData.price + '的薪水！';
+        if (logData.userId[0] === '!all') {
+          return '【發薪紀錄】系統向所有已驗證通過且未就業的使用者發給了$' + logData.price + '的薪水！';
+        }
+        const userLinkList = _.map(logData.userId, (userId) => {
+          return getUserLink(userId);
+        });
+
+        return '【發薪紀錄】「' + getCompanyLink(logData.companyId) +
+        '」公司向' + userLinkList.join('、') + '發給了$' + logData.price + '的薪水！';
       }
       case '創立公司': {
         return (
@@ -269,6 +277,17 @@ Template.displayLog.helpers({
           '向「' + getCompanyLink(logData.companyId) +
           '」公司的產品「' + getProductLink(logData.productId) + '」投了一張推薦票' +
           '，使其獲得了$' + logData.price + '的營利額！'
+        );
+      }
+      case '員工營利': {
+        const userLinkList = _.map(logData.userId, (userId) => {
+          return getUserLink(userId);
+        });
+
+        return (
+          '【員工營利】' + userLinkList.join('、') +
+          '等人努力工作，使「' + getCompanyLink(logData.companyId) +
+          '」公司獲得了$' + logData.price + '的營利額！'
         );
       }
       case '公司營利': {

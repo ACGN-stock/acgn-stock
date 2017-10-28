@@ -95,6 +95,9 @@ export function checkFoundCompany() {
             profit: 0,
             candidateList: [foundationData.manager],
             voteList: [ [] ],
+            salary: config.defaultCompanySalaryPerDay,
+            nextSeasonSalary: config.defaultCompanySalaryPerDay,
+            seasonalBonusPercent: config.defaultSeasonalBonusPercent,
             isSeal: false,
             createdAt: basicCreatedAt
           });

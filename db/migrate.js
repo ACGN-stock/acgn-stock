@@ -19,6 +19,7 @@ import { dbSeason } from './dbSeason';
 import { dbTaxes } from './dbTaxes';
 import { dbValidatingUsers } from './dbValidatingUsers';
 import { dbVoteRecord } from './dbVoteRecord';
+import { config } from '../config';
 
 if (Meteor.isServer) {
   Migrations.add({
@@ -413,6 +414,26 @@ if (Meteor.isServer) {
           }
         );
       });
+    }
+  });
+
+  Migrations.add({
+    version: 9,
+    name: 'company add salary, nextSeasonSalary and seasonalBonusPercent field.',
+    up() {
+      dbCompanies.update(
+        {},
+        {
+          $set: {
+            salary: config.defaultCompanySalaryPerDay,
+            nextSeasonSalary: config.defaultCompanySalaryPerDay,
+            seasonalBonusPercent: config.defaultSeasonalBonusPercent
+          }
+        },
+        {
+          multi: true
+        }
+      );
     }
   });
 
