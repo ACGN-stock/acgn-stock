@@ -5,6 +5,9 @@
       <hr />
       {{> companyFilterForm}}
       <hr />
+      {{#with paginationData}}
+        {{> pagination}}
+      {{/with}}
       {{#if viewModeIsCard}}
         <div class="media">
           <div class="media-body row">
