@@ -226,7 +226,9 @@ function doSeasonWorks(lastSeasonData) {
     );
     //遣散所有在職員工
     dbEmployees.update(
-      {},
+      {
+        employed: true
+      },
       {
         $set: {
           employed: false,
