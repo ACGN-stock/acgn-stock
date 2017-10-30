@@ -96,8 +96,11 @@ function doLoginObserver() {
             }) || {
               beginDate: new Date()
             };
-            const noLoginTime = nextLoginData.date.getTime() - Math.max(previousLoginData.date.getTime(), lastSeasonData.beginDate.getTime());
-            const noLoginDay = Math.floor(noLoginTime / 86400000);
+            const seasonBeginTime = lastSeasonData.beginDate.getTime();
+            const nextLoginTime = nextLoginData.date.getTime() - seasonBeginTime;
+            const previousLoginTime = Math.max(previousLoginData.date.getTime(), seasonBeginTime) - seasonBeginTime;
+
+            const noLoginDay = Math.ceil(nextLoginTime / 86400000) - Math.ceil(previousLoginTime / 86400000) - 1;
             if (noLoginDay > 0) {
               Meteor.users.update(newUserData._id, {
                 $set: {
@@ -226,7 +229,9 @@ function doSeasonWorks(lastSeasonData) {
     );
     //遣散所有在職員工
     dbEmployees.update(
-      {},
+      {
+        employed: true
+      },
       {
         $set: {
           employed: false,
