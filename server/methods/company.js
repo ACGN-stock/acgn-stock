@@ -538,7 +538,7 @@ limitMethod('queryStocksPrice');
 Meteor.publish('companyList', function(keyword, onlyShow, sortBy, offset) {
   debug.log('publish companyList', {keyword, onlyShow, sortBy, offset});
   check(keyword, String);
-  check(onlyShow, new Match.OneOf('none', 'mine', 'favorite'));
+  check(onlyShow, new Match.OneOf('none', 'mine', 'favorite', 'order'));
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
   check(offset, Match.Integer);
   const filter = {
@@ -557,36 +557,52 @@ Meteor.publish('companyList', function(keyword, onlyShow, sortBy, offset) {
     ];
   }
   const userId = this.userId;
-  if (userId && onlyShow === 'mine') {
-    const seeCompanyIdList = dbDirectors
-      .find({userId}, {
-        fields: {
-          companyId: 1
-        }
-      })
-      .map((directorData) => {
-        return directorData.companyId;
-      });
-    const seeCompanyIdSet = new Set(seeCompanyIdList);
-    dbOrders
-      .find({userId}, {
-        fields: {
-          companyId: 1
-        }
-      })
-      .forEach((orderData) => {
-        seeCompanyIdSet.add(orderData.companyId);
-      });
+  if (userId) {
+    if (onlyShow === 'mine') {
+      const seeCompanyIdList = dbDirectors
+        .find({userId}, {
+          fields: {
+            companyId: 1
+          }
+        })
+        .map((directorData) => {
+          return directorData.companyId;
+        });
+      const seeCompanyIdSet = new Set(seeCompanyIdList);
+      dbOrders
+        .find({userId}, {
+          fields: {
+            companyId: 1
+          }
+        })
+        .forEach((orderData) => {
+          seeCompanyIdSet.add(orderData.companyId);
+        });
 
+      filter._id = {
+        $in: [...seeCompanyIdSet]
+      };
+    }
+    else if (onlyShow === 'favorite') {
+      filter._id = {
+        $in: Meteor.user().favorite
+      };
+    }
+    else if (onlyShow === 'order') {
+      const seeCompanyIdList = dbOrders
+        .find({userId}, {
+          fields: {
+            companyId: 1
+          }
+        })
+        .map((orderData) => {
+          return orderData.companyId;
+        });
 
-    filter._id = {
-      $in: [...seeCompanyIdSet]
-    };
-  }
-  else if (userId && onlyShow === 'favorite') {
-    filter._id = {
-      $in: Meteor.user().favorite
-    };
+      filter._id = {
+        $in: seeCompanyIdList
+      };
+    }
   }
   const sort = {
     [sortBy]: -1
