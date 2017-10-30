@@ -17,36 +17,21 @@ export function releaseStocksForHighPrice() {
     releaseStocksForHighPriceCounter = generateReleaseStocksForHighPriceConter();
     dbVariables.set('releaseStocksForHighPriceCounter', releaseStocksForHighPriceCounter);
     console.info('releaseStocksForHighPrice triggered! next counter: ', releaseStocksForHighPriceCounter);
-    const maxPriceCompany = dbCompanies.findOne(
-      {
-        isSeal: false
-      },
-      {
-        sort: {
-          lastPrice: -1
-        },
-        fields: {
-          lastPrice: 1
-        }
-      }
-    );
-    if (! maxPriceCompany) {
-      return false;
-    }
-    //釋股門檻價格
-    const thresholdPrice = Math.round(maxPriceCompany.lastPrice / 2);
+    const companiesNumber = dbCompanies.find({isSeal: false}).count();
+    const highPriceCompaniesNumber = Math.floor(companiesNumber * 0.05);
     dbCompanies
       .find(
         {
-          lastPrice: {
-            $gt: thresholdPrice
-          },
           isSeal: false
         },
         {
+          sort: {
+            lastPrice: -1
+          },
           fields: {
             _id: 1
           },
+          limit: highPriceCompaniesNumber,
           disableOplog: true
         }
       )
@@ -67,37 +52,17 @@ export function releaseStocksForHighPrice() {
           const companyData = dbCompanies.findOne(companyId, {
             fields: {
               _id: 1,
-              manager: 1,
-              lastPrice: 1,
               listPrice: 1,
-              totalRelease: 1,
-              profit: 1,
-              totalValue: 1
+              totalRelease: 1
             }
           });
-          //已經有可交易範圍內賣單存在時，不再高價釋股
-          const inRangeSellOrderCount = dbOrders
-            .find({
-              companyId: companyId,
-              orderType: '賣出',
-              unitPrice: {
-                $gte: Math.max(Math.floor(companyData.listPrice * 0.85), 1),
-                $lte: Math.max(Math.ceil(companyData.listPrice * 1.15), 1)
-              }
-            })
-            .count();
-          if (inRangeSellOrderCount > 0) {
-            release();
-
-            return false;
-          }
-          const maxReleaseStocks = Math.min((companyData.lastPrice - thresholdPrice) / 2, companyData.totalRelease * 0.05);
+          const maxReleaseStocks = Math.floor(Math.sqrt(companyData.totalRelease));
           const releaseStocks = 1 + Math.floor(Math.random() * maxReleaseStocks);
           createOrder({
             userId: '!system',
             companyId: companyId,
             orderType: '賣出',
-            unitPrice: companyData.listPrice,
+            unitPrice: Math.ceil(companyData.listPrice * 1.15),
             amount: releaseStocks
           });
           release();

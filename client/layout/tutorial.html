@@ -91,8 +91,8 @@
               <li>除了公司創立時的初始釋股，尚有三種釋股機制會讓一間公司的總釋出股份增多。</li>
               <li>因價格過高而釋股（高價釋股）：</li>
               <ol>
-                <li>每經過<span class="text-info">一到三小時</span>，系統會檢查一次全股市，以全股市<span class="text-info">最高「最後成交價格」的一半</span>作為釋股門檻。當一家公司的「最後成交價格」超過釋股門檻價格，且市面上不存在任何<span class="text-info">系統釋股賣單</span>或<span class="text-info">可成交價格範圍的股票賣單</span>時，系統就會釋出股票到市場上套利。此次釋股的數量上限為<span class="text-info">「其股價減渠釋股門檻價格再除以2」</span>與<span class="text-info">「百分之五的總釋股數量」</span>取其低值，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為當時股票的參考價格。</li>
-                <li>舉例而言，若一家公司的股價是全股市最高價的$500，且已釋出股票數量大於5000（百分之五為250），那進行高價釋股時將釋出1(最低釋股下限)到125(上限為當前股價500減去釋股門檻250再除以2)之間的隨機數字。</li>
+                <li>每經過<span class="text-info">三到六小時</span>，系統會檢查一次全股市，以全股市最後成交價格作為排序，排位前百分之五的公司皆會釋出股票到市場上套利。此次釋股的數量上限為<span class="text-info">「該公司總釋股數量的平方根」</span>，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為該公司當時可下買單價格的最高上限。</li>
+                <li>舉例而言，若當前市面上有101家未被查封的公司，則所有最後成交價格排名前五的公司都會進行高價釋股。若該公司的總釋股數量為1000股，則進行高價釋股時將釋出1(最低釋股下限)到31(總釋股數量的平方根)之間的隨機數字。</li>
               </ol>
               <li>因成交量過低而釋股（低量釋股）：</li>
               <ol>
@@ -266,6 +266,8 @@
                 <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508997802.A.78E.html" target="_blank">推薦票數量與價值調整</a></li>
                 <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508997814.A.816.html" target="_blank">高價釋股調整</a></li>
                 <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508953441.A.0B4.html" target="_blank">公司管理法</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509118436.A.3FA.html" target="_blank">高價釋股再次調整</a></li>
+                <li><a href="https://acgn-stock.com/ruleDiscuss/view/SHWDBSyGEWivx2kxs" target="_blank">未登入天數計算</a></li>
                 <li><a href="/ruleDiscuss/view/u4fC8N8LinC49ScME">員工系統</a></li>
               </ol>
               <li>要維持股市市場的健康運作，適當的人工介入是必需的，目前的金管會加入<a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509025008.A.ABF.html" target="_blank">章程</a>在此，制定的規則<a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit" target="_blank">在此</a>，成員如下：</li>
