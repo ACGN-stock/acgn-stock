@@ -35,9 +35,7 @@
       <div class="col-12 agenda-description"><h4>議程介紹</h4>{{this.description}}</div>
     </div>
     {{#each issue in getIssueList this.issues}}
-      {{#with issue}}
-        {{> ruleIssueVoteList}}
-      {{/with}}
+      {{> ruleIssueVoteList index=@index issue=issue}}
     {{/each}}
     <hr />
     <div class="text-right">
@@ -51,12 +49,12 @@
   <hr />
   <div class="row" style="margin-top: 15px;">
     <div class="col-12" style="padding: 5px 15px;">
-      <h4>議題：{{this.title}}</h4>
+      <h4>議題{{plus index 1}}：{{issue.title}}</h4>
       <div class="option-list">
-        {{#each optionId in this.options}}
+        {{#each optionId in issue.options}}
           <div class="form-check">
             <label class="form-check-label">
-              {{#if this.multiple}}
+              {{#if issue.multiple}}
                 <input class="form-check-input" type="checkbox" name={{this._id}} value={{optionId}}>
               {{else}}
                 <input class="form-check-input" type="radio" name={{this._id}} value={{optionId}}>
