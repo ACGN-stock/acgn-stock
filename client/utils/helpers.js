@@ -14,7 +14,7 @@ Template.registerHelper('getVariable', function(variableName) {
 export function currencyFormat(money) {
   switch (typeof money) {
     case 'string':
-      return parseInt(money, 10).toLocaleString();
+      return parseFloat(money).toLocaleString();
     case 'number':
       return money.toLocaleString();
     default:
