@@ -598,9 +598,9 @@ Meteor.publish('companyList', function(keyword, onlyShow, sortBy, offset) {
         .map((orderData) => {
           return orderData.companyId;
         });
-
+      const seeCompanyIdSet = new Set(seeCompanyIdList);
       filter._id = {
-        $in: seeCompanyIdList
+        $in: [...seeCompanyIdSet]
       };
     }
   }
