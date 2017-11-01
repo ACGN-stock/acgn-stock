@@ -76,17 +76,17 @@
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-truncate">
-            {{rankData.totalDealAmount}}
+          <td class="text-right text-truncate company-deal-amount" title="{{rankData.totalDealAmount}}">
+            {{currencyFormat rankData.totalDealAmount}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.totalDealMoney}}
+          <td class="text-right text-truncate company-deal-money" title="{{rankData.totalDealMoney}}">
+            $ {{currencyFormat rankData.totalDealMoney}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.productProfit}}
+          <td class="text-right text-truncate company-profit" title="{{rankData.productProfit}}">
+            $ {{currencyFormat rankData.productProfit}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.totalMoney}}
+          <td class="text-right text-truncate company-total-money" title="{{rankData.totalMoney}}">
+            $ {{currencyFormat rankData.totalMoney}}
           </td>
         </tr>
       {{/each}}
@@ -118,16 +118,16 @@
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.profit}}
+          <td class="text-right text-truncate company-profit" title="{{rankData.profit}}">
+            $ {{currencyFormat rankData.profit}}
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-right text-truncate company-stock-relase" title="{{rankData.totalRelease}}">
             {{rankData.totalRelease}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.avgPrice}}
+          <td class="text-right text-truncate company-stock-avg-price" title="{{rankData.avgPrice}}">
+            $ {{currencyFormat rankData.avgPrice}}
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-right text-truncate company-stock-PERatio" title="{{rankData.priceToEarn}}">
             {{rankData.priceToEarn}}
           </td>
         </tr>
@@ -159,14 +159,14 @@
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.lastPrice}}
+          <td class="text-right text-truncate company-stock-last-price" title="{{rankData.lastPrice}}">
+            $ {{currencyFormat rankData.lastPrice}}
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-right text-truncate company-stock-relase" title="{{rankData.totalRelease}}">
             {{rankData.totalRelease}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.totalValue}}
+          <td class="text-right text-truncate company-asset" title="{{rankData.totalValue}}">
+            $ {{currencyFormat rankData.totalValue}}
           </td>
         </tr>
       {{/each}}
@@ -197,13 +197,13 @@
           <td class="text-left text-truncate">
             {{>userLink rankData.userId}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.money}}
+          <td class="text-right text-truncate user-money" title="{{rankData.money}}">
+            $ {{currencyFormat rankData.money}}
           </td>
-          <td class="text-right text-truncate">
-            $ {{rankData.stocksValue}}
+          <td class="text-right text-truncate user-stock-value" title="{{rankData.stocksValue}}">
+            $ {{currencyFormat rankData.stocksValue}}
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-right text-truncate user-wealth" title="{{rankData.totalWealth}}">
             $ {{rankData.totalWealth}}
           </td>
         </tr>

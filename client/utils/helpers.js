@@ -10,6 +10,32 @@ Template.registerHelper('getVariable', function(variableName) {
   return dbVariables.get(variableName);
 });
 
+export function currencyFormat(money) {
+  if (typeof money === 'string') {
+    return parseInt(money, 10).toLocaleString();
+  }
+  else {
+    return money.toLocaleString();
+  }
+}
+Template.registerHelper('currencyFormat', currencyFormat);
+
+export function getCompanyEPS(companyData) {
+  return (0.8705 * companyData.profit / companyData.totalRelease).toFixed(2);
+}
+
+export function getCompanyPERatio(companyData) {
+  return (companyData.profit === 0) ? '∞' : (companyData.listPrice / getCompanyEPS(companyData)).toFixed(2);
+}
+
+export function getCompanyEPRatio(companyData) {
+  return (getCompanyEPS(companyData) / companyData.listPrice).toFixed(2);
+}
+
+Template.registerHelper('getCompanyEPS', getCompanyEPS);
+Template.registerHelper('getCompanyPERatio', getCompanyPERatio);
+Template.registerHelper('getCompanyEPRatio', getCompanyEPRatio);
+
 export function formatDateText(date) {
   if (! date) {
     return '????/??/?? ??:??:??';

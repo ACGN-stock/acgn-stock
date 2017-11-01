@@ -43,8 +43,9 @@ Template.companyDetail.onCreated(function() {
 Template.companyDetail.helpers({
   companyData() {
     const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId);
 
-    return dbCompanies.findOne(companyId);
+    return companyData;
   },
   getManageHref(companyId) {
     return FlowRouter.path('editCompany', {companyId});
@@ -287,7 +288,7 @@ function drawLineChart(templateInstance) {
                 fontColor: color,
                 beginAtZero: true,
                 callback: function(value) {
-                  return '$' + Math.round(value);
+                  return '$' + Math.round(value).toLocaleString();
                 }
               }
             }

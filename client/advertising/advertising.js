@@ -13,6 +13,7 @@ import { config } from '../../config';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { currencyFormat } from '../utils/helpers.js';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInEditAnnouncementMode = new ReactiveVar(false);
@@ -206,7 +207,7 @@ function saveAdvertisingModel(model) {
     `;
   }
   const message = `
-    <div>廣告總支出：$${totalPaid}</div>
+    <div>廣告總支出：$${currencyFormat(totalPaid)}</div>
     <div>廣告內容：${advertisingSample}</div>
     <div>確定發出廣告嗎？</div>
   `;

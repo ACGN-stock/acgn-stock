@@ -115,7 +115,7 @@
     </div>
     <div class="row border-grid-body" style="margin-top: 15px;">
       <div class="col-12 border-grid hidden-md-up company-description"><h4>角色簡介</h4>{{this.description}}</div>
-      <div class="col-12 border-grid">
+      <div class="col-12 border-grid stock-price-history">
         <a class="d-block h4" href="#" data-toggle-panel="chart">
           股價趨勢
           {{#if isDisplayPanel 'chart'}}
@@ -130,7 +130,7 @@
           {{> companyChart}}
         </div>
       {{/if}}
-      <div class="col-12 border-grid">
+      <div class="col-12 border-grid company-statistic">
         <a class="d-block h4" href="#" data-toggle-panel="numbers">
           數據資訊
           {{#if isDisplayPanel 'numbers'}}
@@ -142,27 +142,41 @@
       </div>
       {{#if isDisplayPanel 'numbers'}}
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">參考價格：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid" title="{{this.listPrice}}">
-          $ {{this.listPrice}}
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-list-price" title="{{this.listPrice}}">
+          $ {{currencyFormat this.listPrice}}
         </div>
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">最後價格：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-          <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">$ {{this.lastPrice}}</span>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-last-price" title="{{this.lastPrice}}">
+          <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">$ {{currencyFormat this.lastPrice}}</span>
         </div>
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">參考市值：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-          $ {{this.totalValue}}
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid company-value" title="{{this.totalValue}}">
+          $ {{currencyFormat this.totalValue}}
         </div>
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本季營利：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-          $ {{this.profit}}
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid company-profit" title="{{this.profit}}">
+          $ {{currencyFormat this.profit}}
         </div>
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總釋股量：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-total-release" title="{{this.totalRelase}}">
           {{this.totalRelease}}股
         </div>
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">日成交量：</div>
-        {{> companyTodayDealAmount}}
+          {{> companyTodayDealAmount}}
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">每股盈餘：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-EPS" title="{{getCompanyEPS this}}">
+          $ {{currencyFormat (getCompanyEPS this)}}
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本益比：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-PERatio"
+          title="{{getCompanyPERatio this}}">
+          {{getCompanyPERatio this}}
+        </div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">創立時間：</div>
+        <div class="col-8 col-md-4 col-lg-2 text-right border-grid company-created"
+          title="{{formatDateText this.createdAt}}">
+          {{formatDateText this.createdAt}}
+        </div>
       {{/if}}
       <div class="col-12 border-grid">
         <a class="d-block h4" href="#" data-toggle-panel="order">
@@ -240,7 +254,7 @@
 </template>
 
 <template name="companyTodayDealAmount">
-  <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
+  <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-deal-amount" title="{{getTodayDealAmount}}">
     {{getTodayDealAmount}} 股
   </div>
 </template>
@@ -289,7 +303,7 @@
     {{#each order in myOrderList}}
       <div>
         {{>userLink order.userId}}
-        以${{order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
+        以${{currencyFormat order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
         <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
           取消訂單
         </button>
@@ -298,7 +312,7 @@
     {{#each order in orderList}}
       <div>
         {{>userLink order.userId}}
-        以${{order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
+        以${{currencyFormat order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
       </div>
     {{/each}}
     {{#with paginationData}}

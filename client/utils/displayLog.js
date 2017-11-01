@@ -3,6 +3,7 @@ import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { currencyFormat } from './helpers.js';
 
 Template.displayLog.onRendered(function() {
   if (this.data.userId) {
@@ -76,7 +77,7 @@ Template.displayLog.helpers({
   getDescriptionHtml(logData) {
     switch (logData.logType) {
       case '驗證通過': {
-        return '帳號驗證通過，領取起始資金$' + logData.price + '！';
+        return '帳號驗證通過，領取起始資金$' + currencyFormat(logData.price) + '！';
       }
       case '登入紀錄': {
         return getUserLink(logData.userId[0]) + '從' + logData.message + '登入了系統！';
@@ -88,7 +89,7 @@ Template.displayLog.helpers({
         return getUserLink(logData.userId[0]) + '說道：「' + getPureMessage() + '」';
       }
       case '發薪紀錄': {
-        return '【發薪紀錄】系統向所有已驗證通過的使用者發給了$' + logData.price + '的薪水！';
+        return '【發薪紀錄】系統向所有已驗證通過的使用者發給了$' + currencyFormat(logData.price) + '的薪水！';
       }
       case '創立公司': {
         return (
@@ -101,7 +102,7 @@ Template.displayLog.helpers({
         return (
           '【參與投資】' +
           getUserLink(logData.userId[0]) +
-          '向「' + getPureMessage() + '公司創立計劃」投資了$' + logData.amount + '！'
+          '向「' + getPureMessage() + '公司創立計劃」投資了$' + currencyFormat(logData.amount) + '！'
         );
       }
       case '創立失敗': {
@@ -119,7 +120,7 @@ Template.displayLog.helpers({
         return (
           '【創立退款】' +
           '從「' + getPureMessage() +
-          '公司創立計劃」收回了$' + logData.amount + '的投資退款！'
+          '公司創立計劃」收回了$' + currencyFormat(logData.amount) + '的投資退款！'
         );
       }
       case '創立成功': {
@@ -131,14 +132,14 @@ Template.displayLog.helpers({
           '【創立成功】' +
           userLinkList.join('、') +
           '等人投資的「' + getCompanyLink(logData.companyId) +
-          '公司創立計劃」成功了，該公司正式上市，初始股價為$' + logData.price + '！'
+          '公司創立計劃」成功了，該公司正式上市，初始股價為$' + currencyFormat(logData.price) + '！'
         );
       }
       case '創立得股': {
         return (
           '【創立得股】' +
           '對「' + getCompanyLink(logData.companyId) +
-          '公司創立計劃」的$' + logData.price + '投資為' + getUserLink(logData.userId[0]) + '帶來了' +
+          '公司創立計劃」的$' + currencyFormat(logData.price) + '投資為' + getUserLink(logData.userId[0]) + '帶來了' +
           logData.amount + '數量的公司股票！'
         );
       }
@@ -146,7 +147,7 @@ Template.displayLog.helpers({
         return (
           '【購買下單】' +
           getUserLink(logData.userId[0]) +
-          '想要用每股$' + logData.price + '的單價購買' + logData.amount +
+          '想要用每股$' + currencyFormat(logData.price) + '的單價購買' + logData.amount +
           '數量的「' + getCompanyLink(logData.companyId) + '」公司股票！'
         );
       }
@@ -154,7 +155,7 @@ Template.displayLog.helpers({
         return (
           '【販賣下單】' +
           getUserLink(logData.userId[0]) +
-          '想要用每股$' + logData.price + '的單價販賣' + logData.amount +
+          '想要用每股$' + currencyFormat(logData.price) + '的單價販賣' + logData.amount +
           '數量的「' + getCompanyLink(logData.companyId) + '」公司股票！'
         );
       }
@@ -162,7 +163,7 @@ Template.displayLog.helpers({
         return (
           '【取消下單】' +
           getUserLink(logData.userId[0]) +
-          '取消了以每股$' + logData.price + '的單價' + logData.message + logData.amount +
+          '取消了以每股$' + currencyFormat(logData.price) + '的單價' + logData.message + logData.amount +
           '數量的「' + getCompanyLink(logData.companyId) + '」公司股票的訂單！'
         );
       }
@@ -170,7 +171,7 @@ Template.displayLog.helpers({
         return (
           '【系統撤單】因商業季度結束，系統自動取消了' +
           getUserLink(logData.userId[0]) +
-          '以每股＄' + logData.price + '的單價' + logData.message + logData.amount +
+          '以每股＄' + currencyFormat(logData.price) + '的單價' + logData.message + logData.amount +
           '數量的「' + getCompanyLink(logData.companyId) + '」公司股票的訂單！'
         );
       }
@@ -178,14 +179,14 @@ Template.displayLog.helpers({
         if (logData.userId[0] === '!system') {
           return (
             '【訂單完成】' + getCompanyLink(logData.companyId) +
-            '以每股$' + logData.price + '的單價釋出' + logData.amount +
+            '以每股$' + currencyFormat(logData.price) + '的單價釋出' + logData.amount +
             '數量股票的訂單已經全數交易完畢！'
           );
         }
         else {
           return (
             '【訂單完成】' + getUserLink(logData.userId[0]) +
-            '以每股$' + logData.price + '的單價' + logData.message + logData.amount +
+            '以每股$' + currencyFormat(logData.price) + '的單價' + logData.message + logData.amount +
             '數量的「' + getCompanyLink(logData.companyId) + '」公司股票的訂單已經全數交易完畢！'
           );
         }
@@ -194,13 +195,13 @@ Template.displayLog.helpers({
         return (
           '【公司釋股】' +
           '「' + getCompanyLink(logData.companyId) + '」公司以$' +
-          logData.price + '的價格釋出了' + logData.amount + '數量的股票到市場上套取利潤！'
+          currencyFormat(logData.price) + '的價格釋出了' + logData.amount + '數量的股票到市場上套取利潤！'
         );
       }
       case '交易紀錄': {
         return (
           '【交易紀錄】' +
-          getUserLink(logData.userId[0]) + '以$' + logData.price + '的單價向' +
+          getUserLink(logData.userId[0]) + '以$' + currencyFormat(logData.price) + '的單價向' +
           (logData.userId[1] ? getUserLink(logData.userId[1]) : '「' + getCompanyLink(logData.companyId) + '」公司') +
           '購買了' + logData.amount + '數量的「' +
           getCompanyLink(logData.companyId) + '」公司股票！'
@@ -275,39 +276,39 @@ Template.displayLog.helpers({
         return (
           '【公司營利】' +
           '「' + getCompanyLink(logData.companyId) +
-          '」公司在本商業季度一共獲利$' + logData.amount + '！'
+          '」公司在本商業季度一共獲利$' + currencyFormat(logData.amount) + '！'
         );
       }
       case '營利分紅': {
         return (
           '【營利分紅】' + getUserLink(logData.userId[0]) +
           '得到了「' + getCompanyLink(logData.companyId) +
-          '」公司的分紅$' + logData.amount + '！'
+          '」公司的分紅$' + currencyFormat(logData.amount) + '！'
         );
       }
       case '季度賦稅': {
         return (
           '【季度賦稅】' + getUserLink(logData.userId[0]) +
-          '在此次商業季度中產生了$' + logData.amount + '的財富稅與$' +
-          logData.price + '的殭屍稅！'
+          '在此次商業季度中產生了$' + currencyFormat(logData.amount) + '的財富稅與$' +
+          currencyFormat(logData.price) + '的殭屍稅！'
         );
       }
       case '繳納稅金': {
         return (
           '【繳納稅金】' + getUserLink(logData.userId[0]) +
-          '向系統繳納了$' + logData.amount + '的稅金！'
+          '向系統繳納了$' + currencyFormat(logData.amount) + '的稅金！'
         );
       }
       case '繳稅逾期': {
         return (
           '【繳稅逾期】' + getUserLink(logData.userId[0]) +
-          '由於繳稅逾期，被系統追加了$' + logData.amount + '的稅金！'
+          '由於繳稅逾期，被系統追加了$' + currencyFormat(logData.amount) + '的稅金！'
         );
       }
       case '繳稅沒金': {
         return (
           '【繳稅沒收】' + getUserLink(logData.userId[0]) +
-          '由於繳稅逾期，被系統沒收了$' + logData.amount + '的現金！'
+          '由於繳稅逾期，被系統沒收了$' + currencyFormat(logData.amount) + '的現金！'
         );
       }
       case '繳稅撤單': {
@@ -319,7 +320,7 @@ Template.displayLog.helpers({
       case '繳稅沒收': {
         return (
           '【繳稅沒收】' + getUserLink(logData.userId[0]) +
-          '由於繳稅逾期，被系統以參考價格$' + logData.price + '沒收了「' +
+          '由於繳稅逾期，被系統以參考價格$' + currencyFormat(logData.price) + '沒收了「' +
           getCompanyLink(logData.companyId) +
           '」公司的股份數量' + logData.amount + '！'
         );
@@ -328,14 +329,14 @@ Template.displayLog.helpers({
         return (
           '【廣告宣傳】' +
           getUserLink(logData.userId[0]) +
-          '以$ ' + logData.price + '的價格發布了一則廣告：「' + getPureMessage() + '」！'
+          '以$ ' + currencyFormat(logData.price) + '的價格發布了一則廣告：「' + getPureMessage() + '」！'
         );
       }
       case '廣告追加': {
         return (
           '【廣告競價】' +
           getUserLink(logData.userId[0]) +
-          '追加了$ ' + logData.price + '的廣告費用在廣告：「' + getPureMessage() + '」上！'
+          '追加了$ ' + currencyFormat(logData.price) + '的廣告費用在廣告：「' + getPureMessage() + '」上！'
         );
       }
       case '舉報違規': {
@@ -417,7 +418,7 @@ Template.displayLog.helpers({
           '【違規處理】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由向' +
-          getUserLink(logData.userId[1]) + '課以總數為$' + logData.amount + '的罰金。'
+          getUserLink(logData.userId[1]) + '課以總數為$' + currencyFormat(logData.amount) + '的罰金。'
         );
       }
       case '沒收股份': {
@@ -474,7 +475,7 @@ Template.displayLog.helpers({
           '【退還罰款】' +
           getUserLink(logData.userId[0]) +
           '以「' + getPureMessage() + '」的理由向' +
-          getUserLink(logData.userId[1]) + '退還總數為$' + logData.amount + '的罰金。'
+          getUserLink(logData.userId[1]) + '退還總數為$' + currencyFormat(logData.amount) + '的罰金。'
         );
       }
       case '解除禁任': {
@@ -515,7 +516,7 @@ Template.displayLog.helpers({
           '以「' + getPureMessage() + '」的理由將「' +
           getCompanyLink(logData.companyId) + '」公司的產品「' +
           getProductLink(logData.productId) + '」給下架了' +
-          (logData.price ? '，並追回了因該產品所產生的營利$' + logData.price + '。' : '。')
+          (logData.price ? '，並追回了因該產品所產生的營利$' + currencyFormat(logData.price) + '。' : '。')
         );
       }
       case '撤銷廣告': {
