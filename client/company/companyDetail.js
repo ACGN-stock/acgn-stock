@@ -102,6 +102,14 @@ Template.companyDetail.helpers({
     }
 
     return Date.now() < seasonData.endDate.getTime() - config.announceBonusTime;
+  },
+  isEmployee() {
+    const userId = Meteor.userId();
+    const companyId = FlowRouter.getParam('companyId');
+    const employed = false;
+    const resigned = false;
+
+    return dbEmployees.find({companyId, userId, employed, resigned}).count() > 0;
   }
 });
 Template.companyDetail.events({
@@ -163,8 +171,13 @@ Template.companyDetail.events({
       alertDialog.alert('您已取消報名！');
     }
     else {
-      Meteor.customCall('registerEmployee', companyId);
-      alertDialog.alert('您已報名成功！');
+      const message = '報名後將會被其他公司移出儲備員工名單，您確定要報名嗎？';
+      alertDialog.confirm(message, (result) => {
+        if (result) {
+          Meteor.customCall('registerEmployee', companyId);
+          alertDialog.alert('您已報名成功！');
+        }
+      });
     }
   },
   'click [data-toggle-favorite]'(event) {
