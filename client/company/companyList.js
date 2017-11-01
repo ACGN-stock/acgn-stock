@@ -84,6 +84,9 @@ Template.companyFilterForm.helpers({
     if (filterBy === 'favorite') {
       return '只顯示最愛';
     }
+    if (filterBy === 'order') {
+      return '只顯示訂單';
+    }
 
     return '全部顯示';
   },
