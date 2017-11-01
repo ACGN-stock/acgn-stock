@@ -6,6 +6,7 @@ import { resourceManager } from './resourceManager';
 import { dbAdvertising } from '../db/dbAdvertising';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
+import { dbEmployees } from '../db/dbEmployees';
 import { dbLog } from '../db/dbLog';
 import { dbOrders } from '../db/dbOrders';
 import { dbPrice } from '../db/dbPrice';
@@ -95,8 +96,11 @@ function doLoginObserver() {
             }) || {
               beginDate: new Date()
             };
-            const noLoginTime = nextLoginData.date.getTime() - Math.max(previousLoginData.date.getTime(), lastSeasonData.beginDate.getTime());
-            const noLoginDay = Math.floor(noLoginTime / 86400000);
+            const seasonBeginTime = lastSeasonData.beginDate.getTime();
+            const nextLoginTime = nextLoginData.date.getTime() - seasonBeginTime;
+            const previousLoginTime = Math.max(previousLoginData.date.getTime(), seasonBeginTime) - seasonBeginTime;
+
+            const noLoginDay = Math.ceil(nextLoginTime / 86400000) - Math.ceil(previousLoginTime / 86400000) - 1;
             if (noLoginDay > 0) {
               Meteor.users.update(newUserData._id, {
                 $set: {
@@ -217,6 +221,21 @@ function doSeasonWorks(lastSeasonData) {
       {
         $set: {
           profit: 0
+        }
+      },
+      {
+        multi: true
+      }
+    );
+    //遣散所有在職員工
+    dbEmployees.update(
+      {
+        employed: true
+      },
+      {
+        $set: {
+          employed: false,
+          resigned: true
         }
       },
       {
@@ -375,7 +394,7 @@ function generateNewSeason() {
   const companiesCount = dbCompanies.find({isSeal: false}).count();
   //本季度每個使用者可以得到多少推薦票
   const vote = Math.floor(Math.log10(companiesCount) * 18);
-  const votePrice = 3000;
+  const votePrice = config.votePricePerTicket;
   const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, companiesCount, productCount, votePrice});
   Meteor.users.update(
     {},
@@ -415,6 +434,48 @@ function generateNewSeason() {
       multi: true
     }
   );
+  //雇用所有上季報名的使用者
+  dbEmployees.update(
+    {
+      resigned: false,
+      registerAt: {
+        $lt: endDate.getTime() - config.seasonTime
+      }
+    },
+    {
+      $set: {
+        employed: true
+      }
+    },
+    {
+      multi: true
+    }
+  );
+  //更新所有公司員工薪資
+  dbCompanies.update(
+    {},
+    {
+      $rename: {
+        nextSeasonSalary: 'salary'
+      }
+    },
+    {
+      multi: true
+    }
+  );
+  //所有公司員工分紅與下季薪資改回預設值
+  dbCompanies.update(
+    {},
+    {
+      $set: {
+        nextSeasonSalary: config.defaultCompanySalaryPerDay,
+        seasonalBonusPercent: config.defaultSeasonalBonusPercent
+      }
+    },
+    {
+      multi: true
+    }
+  );
 
   return seasonId;
 }
@@ -439,7 +500,8 @@ function giveBonusByStocksFromProfit() {
           _id: 1,
           manager: 1,
           totalRelease: 1,
-          profit: 1
+          profit: 1,
+          seasonalBonusPercent: 1
         },
         disableOplog: true
       }
@@ -489,6 +551,52 @@ function giveBonusByStocksFromProfit() {
           needExecuteUserBulk = true;
           leftProfit -= managerProfit;
         }
+      }
+      //員工分紅
+      const employeeList = [];
+      dbEmployees.find({
+        companyId: companyId,
+        employed: true
+      }).forEach((employee) => {
+        const userData = Meteor.users.findOne(employee.userId, {
+          fields: {
+            'profile.ban': 1,
+            'status.lastLogin.date': 1
+          }
+        });
+        //被禁止交易者不分紅
+        if (! userData.profile || _.contains(userData.profile.ban, 'deal')) {
+          return true;
+        }
+        //七天未動作者不分紅
+        if (! userData.status || now - userData.status.lastLogin.date.getTime() > 604800000) {
+          return true;
+        }
+        employeeList.push(employee.userId);
+      });
+      if (employeeList.length > 0) {
+        const totalBonus = companyData.profit * companyData.seasonalBonusPercent * 0.01;
+        const bonus = Math.floor(totalBonus / employeeList.length);
+        _.each(employeeList, (userId, index) => {
+          logBulk.insert({
+            logType: '營利分紅',
+            userId: [userId],
+            companyId: companyId,
+            amount: bonus,
+            createdAt: new Date(now + 2 + index)
+          });
+          usersBulk
+            .find({
+              _id: userId
+            })
+            .updateOne({
+              $inc: {
+                'profile.money': bonus
+              }
+            });
+        });
+        leftProfit -= bonus * employeeList.length;
+        needExecuteUserBulk = true;
       }
       //剩餘收益先扣去公司營運成本
       leftProfit -= Math.ceil(companyData.profit * config.costFromProfit);
@@ -540,7 +648,7 @@ function giveBonusByStocksFromProfit() {
               userId: [directorData.userId],
               companyId: companyId,
               amount: directorProfit,
-              createdAt: new Date(now + 2 + index)
+              createdAt: new Date(now + 3 + employeeList.length + index)
             });
             usersBulk
               .find({

@@ -7,9 +7,10 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbLog } from '../../db/dbLog';
+import { dbLog, accuseLogTypeList } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbEmployees } from '../../db/dbEmployees';
 import { dbTaxes } from '../../db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { config } from '../../config';
@@ -25,6 +26,15 @@ Template.accountInfo.onCreated(function() {
     const userId = FlowRouter.getParam('userId');
     if (userId) {
       this.subscribe('accountInfo', userId);
+    }
+  });
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('employeeListByUser', userId);
     }
   });
   this.autorun(() => {
@@ -88,6 +98,24 @@ Template.accountInfoBasic.helpers({
       .find({
         manager: this._id
       });
+  },
+  employment() {
+    const userId = FlowRouter.getParam('userId');
+    const employed = true;
+
+    return dbEmployees.findOne({userId, employed});
+  },
+  nextSeasonEmployment() {
+    const userId = FlowRouter.getParam('userId');
+    const employed = false;
+
+    return dbEmployees.findOne({userId, employed});
+  },
+  showUnregisterEmployee() {
+    const userId = FlowRouter.getParam('userId');
+    const employed = false;
+
+    return userId === Meteor.userId() && dbEmployees.findOne({userId, employed});
   },
   isBaned(type) {
     return _.contains(this.profile.ban, type);
@@ -178,7 +206,7 @@ Template.accountInfoBasic.events({
             message: `請輸入罰金數額：`,
             callback: function(amount) {
               amount = parseInt(amount, 10);
-              if (amount && amount > 0) {
+              if (amount && amount >= 0) {
                 const userId = accuseUserData._id;
                 Meteor.customCall('forfeit', {userId, message, amount});
               }
@@ -228,6 +256,11 @@ Template.accountInfoBasic.events({
         }
       }
     });
+  },
+  'click [data-action="unregisterEmployee"]'(event) {
+    event.preventDefault();
+    Meteor.customCall('unregisterEmployee');
+    alertDialog.alert('您已取消報名！');
   }
 });
 
@@ -329,6 +362,62 @@ Template.accountInfoOwnStockList.helpers({
   }
 });
 
+
+export const accountLogViewerMode = new ReactiveVar('accuse');
+Template.accountLogViewer.helpers({
+  onlyViewAccuse() {
+    return accountLogViewerMode.get() === 'accuse';
+  }
+});
+
+export const accuseOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.accountAccuseLogList);
+Template.accountAccuseLogList.onCreated(function() {
+  accuseOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('accountAccuseLog', userId, accuseOffset.get());
+    }
+  });
+});
+Template.accountAccuseLogList.helpers({
+  accuseList() {
+    const userId = FlowRouter.getParam('userId');
+
+    return dbLog.find(
+      {
+        userId: userId,
+        logType: {
+          $in: accuseLogTypeList
+        }
+      },
+      {
+        sort: {
+          createdAt: -1
+        },
+        limit: 10
+      }
+    );
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfAccountAccuseLog',
+      dataNumberPerPage: 10,
+      offset: accuseOffset
+    };
+  }
+});
+Template.accountAccuseLogList.events({
+  'click button'(event) {
+    event.preventDefault();
+    accountLogViewerMode.set('all');
+  }
+});
+
 export const logOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.accountInfoLogList);
 Template.accountInfoLogList.onCreated(function() {
@@ -370,5 +459,11 @@ Template.accountInfoLogList.helpers({
       dataNumberPerPage: 30,
       offset: logOffset
     };
+  }
+});
+Template.accountInfoLogList.events({
+  'click button'(event) {
+    event.preventDefault();
+    accountLogViewerMode.set('accuse');
   }
 });

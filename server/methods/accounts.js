@@ -5,7 +5,7 @@ import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
-import { dbLog } from '../../db/dbLog';
+import { dbLog, accuseLogTypeList } from '../../db/dbLog';
 import { dbTaxes } from '../../db/dbTaxes';
 import { dbVariables } from '../../db/dbVariables';
 import { limitSubscription } from './rateLimit';
@@ -261,6 +261,72 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
 });
 //一分鐘最多20次
 limitSubscription('accountOwnStocks');
+
+Meteor.publish('accountAccuseLog', function(userId, offset) {
+  debug.log('publish accountAccuseLog', {userId, offset});
+  check(userId, String);
+  check(offset, Match.Integer);
+
+  let initialized = false;
+  let total = dbLog
+    .find(
+      {
+        userId: userId,
+        logType: {
+          $in: accuseLogTypeList
+        }
+      }
+    )
+    .count();
+  this.added('variables', 'totalCountOfAccountAccuseLog', {
+    value: total
+  });
+
+  const observer = dbLog
+    .find(
+      {
+        userId: userId,
+        logType: {
+          $in: accuseLogTypeList
+        }
+      },
+      {
+        sort: {
+          createdAt: -1
+        },
+        skip: offset,
+        limit: 10,
+        disableOplog: true
+      }
+    )
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('log', id, fields);
+        if (initialized) {
+          total += 1;
+          this.changed('variables', 'totalCountOfAccountAccuseLog', {
+            value: total
+          });
+        }
+      },
+      removed: (id) => {
+        this.removed('log', id);
+        if (initialized) {
+          total -= 1;
+          this.changed('variables', 'totalCountOfAccountInfoLog', {
+            value: total
+          });
+        }
+      }
+    });
+  initialized = true;
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
+});
+//一分鐘最多20次
+limitSubscription('accountInfoLog');
 
 Meteor.publish('accountInfoLog', function(userId, offset) {
   debug.log('publish accountInfoLog', {userId, offset});

@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbVariables } from '../../db/dbVariables';
+import { config } from '../../config.js';
 
 Meteor.subscribe('variables');
 
@@ -11,17 +12,20 @@ Template.registerHelper('getVariable', function(variableName) {
 });
 
 export function currencyFormat(money) {
-  if (typeof money === 'string') {
-    return parseInt(money, 10).toLocaleString();
-  }
-  else {
-    return money.toLocaleString();
+  switch (typeof money) {
+    case 'string':
+      return parseInt(money, 10).toLocaleString();
+    case 'number':
+      return money.toLocaleString();
+    default:
+      return money;
   }
 }
 Template.registerHelper('currencyFormat', currencyFormat);
 
 export function getCompanyEPS(companyData) {
-  return (0.8705 * companyData.profit / companyData.totalRelease).toFixed(2);
+  return ((1 - (config.managerProfitPercent + config.costFromProfit + config.maximumSeasonalBonusPercent / 100)) *
+    companyData.profit / companyData.totalRelease).toFixed(2);
 }
 
 export function getCompanyPERatio(companyData) {

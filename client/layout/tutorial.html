@@ -91,8 +91,8 @@
               <li>除了公司創立時的初始釋股，尚有三種釋股機制會讓一間公司的總釋出股份增多。</li>
               <li>因價格過高而釋股（高價釋股）：</li>
               <ol>
-                <li>每經過<span class="text-info">一到三小時</span>，系統會檢查一次全股市，以全股市<span class="text-info">最高「最後成交價格」的一半</span>作為釋股門檻。當一家公司的「最後成交價格」超過釋股門檻價格，且市面上不存在任何<span class="text-info">系統釋股賣單</span>或<span class="text-info">可成交價格範圍的股票賣單</span>時，系統就會釋出股票到市場上套利。此次釋股的數量上限為<span class="text-info">「其股價減渠釋股門檻價格再除以2」</span>與<span class="text-info">「百分之五的總釋股數量」</span>取其低值，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為當時股票的參考價格。</li>
-                <li>舉例而言，若一家公司的股價是全股市最高價的$500，且已釋出股票數量大於5000（百分之五為250），那進行高價釋股時將釋出1(最低釋股下限)到125(上限為當前股價500減去釋股門檻250再除以2)之間的隨機數字。</li>
+                <li>每經過<span class="text-info">三到六小時</span>，系統會檢查一次全股市，以全股市最後成交價格作為排序，排位<span class="text-info">前百分之五</span>且當前<span class="text-info">不存在任何釋股賣單</span>在市場上的公司皆會釋出股票到市場上套利。此次釋股的數量上限為<span class="text-info">「該公司總釋股數量的平方根」</span>，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為該公司當時可下買單價格的最高上限。</li>
+                <li>舉例而言，若當前市面上有101家未被查封的公司，則所有最後成交價格排名前五的公司都會進行高價釋股。若該公司的總釋股數量為1000股，則進行高價釋股時將釋出1(最低釋股下限)到31(總釋股數量的平方根)之間的隨機數字。</li>
               </ol>
               <li>因成交量過低而釋股（低量釋股）：</li>
               <ol>
@@ -123,9 +123,28 @@
               <li>除了申請創立公司成為經理人，使用者還競爭已存在公司的經理人位置，一但有驗證通過的使用者競爭經理人，在下個商業季度開始後，所有持有該公司股票的股東便可以對所有競爭者進行投票，各股東的票權與其持股比率相當，在下個商業季度結束時，所得票權最高的參選人便可成為經理人。</li>
               <li>除此之外，公司的經理人隨時可以辭職不幹。</li>
               <li>一週為一個商業季度。每個商業季度結束時，上個商業季度推出的產品將會進入投票榜，所有通過驗證的使用者將會得到與當季公司數量成正比的推薦票張數，可以向自己喜愛公司的產品投票推薦，每張推薦票都可以令產品公司獲得<span class="text-info">$3000</span>的營利額。</li>
-              <li>商業季度結束後，公司的收益金額將分出<span class="text-info">百分之五</span>作為經理人的薪水，之後扣除餘額的<span class="text-info">百分之十五</span>作為營運成本，剩餘的收益金額則依照持股比例由董事會成員均分。</li>
+              <li>經理人可以在商業季度結束前<span class="text-info">72</span>小時調整下個商業季度的員工薪資，調整範圍為<span class="text-info">$500~$2000</span>，以及在商業季度結束前<span class="text-info">24</span>小時調整本商業季度的員工分紅，調整範圍為總盈利額的<span class="text-info">1%~5%</span>。</li>
+              <li>商業季度結束後，公司的收益金額將分出<span class="text-info">百分之五</span>作為經理人的薪水、<span class="text-info">百分之十五</span>作為營運成本，剩餘的收益金額則依照持股比例由董事會成員均分。</li>
               <li>商業季度中未曾上線、被禁止交易權限的使用者將無法得到公司的季度分紅。</li>
               <li>除了產品收益，別忘了還有三種釋股機制也會為公司產生營利額。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            員工相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>玩家可以在任意時間向已創立的公司報名成為儲備員工，每次商業季度更替時儲備員工將轉為正職員工，員工任期為一個商業季度，不得中途轉任或離任。</li>
+              <li>每位正職員工在系統配發薪資時將從公司領取該公司指定的薪資，同時使公司產生與一張推薦票等價的營利額。所有正職員工將不會再從系統領取薪資。</li>
+              <li>玩家在一個商業季度內只能選擇一間公司報名，若再次報名則會自動從上次報名公司的儲備員工名單中刪除。</li>
+              <li>商業季度結束後，所有正職員工將均分經理人設定的員工分紅，分紅額非整數時無條件退位。</li>
+              <li>玩家可以在帳號資訊與公司資訊頁面確認是否正確報名或取消報名為儲備員工。</li>
             </ol>
           </div>
         </div>
@@ -234,22 +253,24 @@
         <div class="collapse">
           <div class="card-block">
             <ol>
-              <li>這個股票市場的規則會隨著使用者的討論及表決產生變化，目前玩家們主要在<a href="https://www.ptt.cc/bbs/C_Chat/index.html" target="_blank">批踢踢實業坊的C_Chat板</a>進行討論。如果你想要改變某些市場規則，歡迎按照<a href="https://www.ptt.cc/bbs/C_Chat/M.1503647472.A.51F.html" target="_blank">章程</a>進行提案討論。曾提案並且表決通過的玩家提案如下：</li>
+              <li>這個股票市場的規則會隨著使用者的討論及表決產生變化，目前玩家們主要在<a href="https://www.ptt.cc/bbs/ACGN_stock/index.html" target="_blank">批踢踢實業坊的ACGN_stock板</a>進行討論。如果你想要改變某些市場規則，歡迎按照<a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508996024.A.EAB.html" target="_blank">章程</a>進行提案討論。曾提案並且表決通過的玩家提案如下：</li>
               <ol>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1503907261.A.E15.html" target="_blank">產品推薦票制度</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1503935633.A.4E7.html" target="_blank">漲停跌停限制</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1504530233.A.EC0.html" target="_blank">低價股特殊規則</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1504625820.A.E58.html" target="_blank">經理人選舉日期調整</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1504944121.A.D2A.html" target="_blank">新創計劃投資期限與投資上限</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1505571902.A.0C6.html" target="_blank">課稅機制</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506125935.A.1DB.html" target="_blank">低價股門檻調整</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506089922.A.0FD.html" target="_blank">沒收股份處理辦法</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506740614.A.AAE.html" target="_blank">移除Gmail帳號登入</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1507125711.A.169.html" target="_blank">推薦票數量與價值調整</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1507618895.A.8CC.html" target="_blank">高價釋股調整</a></li>
-                <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506735339.A.94B.html" target="_blank">公司管理法</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508996085.A.B5E.html" target="_blank">產品推薦票制度</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508996159.A.677.html" target="_blank">漲停跌停限制</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508996159.A.677.html" target="_blank">低價股特殊規則</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508996239.A.7EA.html" target="_blank">經理人選舉日期調整</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509032797.A.C36.html" target="_blank">課稅機制</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509152035.A.8E7.html" target="_blank">低價股門檻調整</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509152123.A.B83.html" target="_blank">沒收股份處理辦法</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508997665.A.D21.html" target="_blank">移除Gmail帳號登入</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508997802.A.78E.html" target="_blank">推薦票數量與價值調整</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508997814.A.816.html" target="_blank">高價釋股調整</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1508953441.A.0B4.html" target="_blank">公司管理法</a></li>
+                <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509118436.A.3FA.html" target="_blank">高價釋股再次調整</a></li>
+                <li><a href="https://acgn-stock.com/ruleDiscuss/view/SHWDBSyGEWivx2kxs" target="_blank">未登入天數計算</a></li>
+                <li><a href="/ruleDiscuss/view/u4fC8N8LinC49ScME">員工系統</a></li>
               </ol>
-              <li>要維持股市市場的健康運作，適當的人工介入是必需的，目前的金管會加入<a href="https://www.ptt.cc/bbs/C_Chat/M.1507557527.A.980.html" target="_blank">章程</a>在此，制定的規則<a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit" target="_blank">在此</a>，成員如下：</li>
+              <li>要維持股市市場的健康運作，適當的人工介入是必需的，目前的金管會加入<a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509025008.A.ABF.html" target="_blank">章程</a>在此，制定的規則<a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit" target="_blank">在此</a>，成員如下：</li>
               <ol>
                 <li>{{> userLink 'nNiKSN7HEYwucPC6W'}}</li>
                 <li>{{> userLink '2HFha7H4TviS3Pbra'}}</li>
@@ -275,10 +296,10 @@
         <div class="collapse">
           <div class="card-block">
             <ol>
-              <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506504651.A.F8C.html" target="_blank">淺析釋股</a></li>
-              <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506600668.A.C21.html" target="_blank">稅、公司與你</a></li>
-              <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1506733828.A.887.html" target="_blank">商業與經濟概念科普</a></li>
-              <li><a href="https://www.ptt.cc/bbs/C_Chat/M.1507000429.A.902.html" target="_blank">低價股與狙擊</a></li>
+              <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509152299.A.556.html" target="_blank">淺析釋股</a></li>
+              <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509152332.A.ACC.html" target="_blank">稅、公司與你</a></li>
+              <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509152360.A.135.html" target="_blank">商業與經濟概念科普</a></li>
+              <li><a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509152376.A.EA1.html" target="_blank">低價股與狙擊</a></li>
             </ol>
           </div>
         </div>

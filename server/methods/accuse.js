@@ -297,7 +297,7 @@ function forfeit(user, {userId, message, amount}) {
     throw new Meteor.Error(404, '找不到識別碼為「' + userId + '」的使用者！');
   }
   amount *= -1;
-  if (amount < 0) {
+  if (amount <= 0) {
     dbLog.insert({
       logType: '課以罰款',
       userId: [user._id, userId],

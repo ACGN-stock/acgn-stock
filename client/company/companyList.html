@@ -5,6 +5,9 @@
       <hr />
       {{> companyFilterForm}}
       <hr />
+      {{#with paginationData}}
+        {{> pagination}}
+      {{/with}}
       {{#if viewModeIsCard}}
         <div class="media">
           <div class="media-body row">
@@ -39,6 +42,7 @@
         {{#if currentUser}}
           <a class="dropdown-item" href="#" value="favorite" data-action="filterBy">只顯示最愛</a>
           <a class="dropdown-item" href="#" value="mine" data-action="filterBy">只顯示持有</a>
+          <a class="dropdown-item" href="#" value="order" data-action="filterBy">只顯示訂單</a>
         {{/if}}
       </div>
     </div>

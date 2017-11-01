@@ -8,14 +8,17 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
+import { dbEmployees } from '../../db/dbEmployees';
 import { dbLog } from '../../db/dbLog';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
+import { dbSeason } from '../../db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct, toggleFavorite } from '../utils/methods';
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { currencyFormat } from '../utils/helpers.js';
 const rShowAllTags = new ReactiveVar(false);
 
 inheritedShowLoadingOnSubscribing(Template.companyDetail);
@@ -37,6 +40,15 @@ Template.companyDetail.onCreated(function() {
     const companyId = FlowRouter.getParam('companyId');
     if (companyId) {
       this.subscribe('companyDetail', companyId);
+    }
+  });
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('employeeListByCompany', companyId);
     }
   });
 });
@@ -66,6 +78,32 @@ Template.companyDetail.helpers({
     window.dbProducts = dbProducts;
 
     return dbProducts.find({companyId, overdue}).count() > 0;
+  },
+  canUpdateSalary() {
+    const seasonData = dbSeason
+      .findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+    if (! seasonData) {
+      return false;
+    }
+
+    return Date.now() < seasonData.endDate.getTime() - config.announceSalaryTime;
+  },
+  canUpdateSeasonalBonus() {
+    const seasonData = dbSeason
+      .findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+    if (! seasonData) {
+      return false;
+    }
+
+    return Date.now() < seasonData.endDate.getTime() - config.announceBonusTime;
   }
 });
 Template.companyDetail.events({
@@ -115,6 +153,22 @@ Template.companyDetail.events({
     event.preventDefault();
     rShowAllTags.set(true);
   },
+  'click [data-toggle-employ]'(event) {
+    event.preventDefault();
+    const userId = Meteor.userId();
+    const companyId = $(event.currentTarget).attr('data-toggle-employ');
+    const employed = false;
+    const resigned = false;
+    const employData = dbEmployees.findOne({companyId, userId, employed, resigned});
+    if (employData) {
+      Meteor.customCall('unregisterEmployee');
+      alertDialog.alert('您已取消報名！');
+    }
+    else {
+      Meteor.customCall('registerEmployee', companyId);
+      alertDialog.alert('您已報名成功！');
+    }
+  },
   'click [data-toggle-favorite]'(event) {
     event.preventDefault();
     const companyId = $(event.currentTarget).attr('data-toggle-favorite');
@@ -125,6 +179,48 @@ Template.companyDetail.events({
     const companyId = FlowRouter.getParam('companyId');
     const companyData = dbCompanies.findOne(companyId);
     changeChairmanTitle(companyData);
+  },
+  'click [data-action="updateSalary"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const message = '請輸入下季員工薪資：(' +
+      currencyFormat(config.minimumCompanySalaryPerDay) + '~' +
+      currencyFormat(config.maximumCompanySalaryPerDay) + ')';
+    alertDialog.prompt(message, function(salary) {
+      if (salary && salary.length > 0) {
+        salary = parseInt(salary, 10);
+        if (isNaN(salary) ||
+          salary < config.minimumCompanySalaryPerDay ||
+          salary > config.maximumCompanySalaryPerDay) {
+          alertDialog.alert('不正確的薪資設定！');
+
+          return false;
+        }
+
+        Meteor.customCall('updateNextSeasonSalary', companyId, salary);
+      }
+    });
+  },
+  'click [data-action="updateSeasonalBonus"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const message = '請輸入本季員工分紅占營收百分比：(' +
+      config.minimumSeasonalBonusPercent + '~' +
+      config.maximumSeasonalBonusPercent + ')';
+    alertDialog.prompt(message, function(percentage) {
+      if (percentage && percentage.length > 0) {
+        percentage = parseInt(percentage, 10);
+        if (isNaN(percentage) ||
+          percentage < config.minimumSeasonalBonusPercent ||
+          percentage > config.maximumSeasonalBonusPercent) {
+          alertDialog.alert('不正確的分紅設定！');
+
+          return false;
+        }
+
+        Meteor.customCall('updateSeasonalBonus', companyId, percentage);
+      }
+    });
   },
   'click [data-action="resignManager"]'(event) {
     event.preventDefault();
@@ -808,6 +904,30 @@ function getStockAmount(companyId) {
     return 0;
   }
 }
+
+inheritedShowLoadingOnSubscribing(Template.companyLogList);
+Template.companyEmployeeList.helpers({
+  employeeList() {
+    const companyId = FlowRouter.getParam('companyId');
+    const employed = true;
+
+    return dbEmployees.find({companyId, employed}, {
+      sort: {
+        registerAt: 1
+      }
+    });
+  },
+  nextSeasonEmployeeList() {
+    const companyId = FlowRouter.getParam('companyId');
+    const employed = false;
+
+    return dbEmployees.find({companyId, employed}, {
+      sort: {
+        registerAt: 1
+      }
+    });
+  }
+});
 
 const rLogOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.companyLogList);

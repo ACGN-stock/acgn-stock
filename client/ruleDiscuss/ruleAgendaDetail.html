@@ -40,9 +40,7 @@
       <div class="col-12 agenda-description"><h4>議程介紹</h4>{{this.description}}</div>
     </div>
     {{#each issue in getIssueList this.issues}}
-      {{#with issue}}
-        {{> ruleIssueList}}
-      {{/with}}
+      {{> ruleIssueList index=@index issue=issue}}
     {{/each}}
   </div>
 </template>
@@ -51,9 +49,9 @@
   <hr />
   <div class="row" style="margin-top: 15px;">
     <div class="col-12" style="padding: 5px 15px;">
-      <h4>議題：{{this.title}}</h4>
+      <h4>議題{{plus index 1}}：{{issue.title}}</h4>
       <ul class="list-group">
-        {{#each optionId in this.options}}
+        {{#each optionId in issue.options}}
           <li class="list-group-item justify-content-between">
             {{getOptionText optionId}}
             <button type="button" class="btn btn-primary btn-sm" data-show-vote="{{optionId}}">
