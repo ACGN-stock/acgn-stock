@@ -55,9 +55,8 @@ Template.companyDetail.onCreated(function() {
 Template.companyDetail.helpers({
   companyData() {
     const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId);
 
-    return companyData;
+    return dbCompanies.findOne(companyId);
   },
   getManageHref(companyId) {
     return FlowRouter.path('editCompany', {companyId});
