@@ -11,6 +11,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { rCompanyListViewMode } from '../utils/styles';
+import { currencyFormat } from '../utils/helpers.js';
 
 inheritedShowLoadingOnSubscribing(Template.foundationList);
 const rKeyword = new ReactiveVar('');
@@ -180,7 +181,7 @@ const foundationListEvents = {
       type: 'prompt',
       title: '投資',
       message: `
-        要投資多少金額？(${minimumInvest}~${maximumInvest})
+        要投資多少金額？(${currencyFormat(minimumInvest)}~${currencyFormat(maximumInvest)})
         <div class="text-danger">
           投資理財有賺有賠，請先確認您要投資的公司是否符合
           <a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit?usp=sharing" target="_blank">金管會的規定</a>。

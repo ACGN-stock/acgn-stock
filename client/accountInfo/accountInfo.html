@@ -121,10 +121,10 @@
       本季度未登入天數：{{this.profile.noLoginDayCount}}
     </div>
     <div>
-      上季度財富統計：{{this.profile.lastSeasonTotalWealth}}
+      上季度財富統計：{{currencyFormat this.profile.lastSeasonTotalWealth}}
     </div>
     <div>
-      帳號當前餘額：{{this.profile.money}}
+      帳號當前餘額：{{currencyFormat this.profile.money}}
     </div>
     <div>
       帳號剩餘推薦票：{{this.profile.vote}}
@@ -179,10 +179,10 @@
         {{#each taxes in taxesList}}
           <tr>
             <td class="text-center">{{formatDateText taxes.expireDate}}</td>
-            <td class="text-right">$ {{taxes.tax}}</td>
-            <td class="text-right">$ {{taxes.zombie}}</td>
-            <td class="text-right">$ {{taxes.fine}}</td>
-            <td class="text-right">$ {{taxes.paid}}</td>
+            <td class="text-right">$ {{currencyFormat taxes.tax}}</td>
+            <td class="text-right">$ {{currencyFormat taxes.zombie}}</td>
+            <td class="text-right">$ {{currencyFormat taxes.fine}}</td>
+            <td class="text-right">$ {{currencyFormat taxes.paid}}</td>
             {{#if isCurrentUser}}
               <td class="text-center">
                 <button class="btn btn-success btn-sm" type="button" data-pay="{{taxes._id._str}}">

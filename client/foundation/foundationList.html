@@ -106,13 +106,13 @@
         </div>
         <div class="row row-info d-flex justify-content-between">
           <p>總投資額</p>
-          <p>$ {{getTotalInvest this.invest}}</p>
+          <p>$ {{currencyFormat (getTotalInvest this.invest)}}</p>
         </div>
         {{#if currentUser}}
           <div class="row row-info d-flex justify-content-between">
             <p>個人投資額</p>
             {{#if alreadyInvest}}
-              <p>$ {{alreadyInvest this.invest}}</p>
+              <p>$ {{currencyFormat (alreadyInvest this.invest)}}</p>
             {{else}}
               <p>$ 0</p>
             {{/if}}
@@ -177,7 +177,7 @@
       </div>
       <div class="col-4 col-lg-3 text-right border-grid">總投資額：</div>
       <div class="col-8 col-lg-3 text-right text-right border-grid" title="{{getTotalInvest this.invest}}">
-        $ {{getTotalInvest this.invest}}
+        $ {{currencyFormat (getTotalInvest this.invest)}}
       </div>
       <div class="col-12 border-grid company-description"><h4>角色簡介：</h4>{{this.description}}</div>
       {{#if currentUser}}
@@ -194,7 +194,7 @@
           {{/if}}
           {{#if alreadyInvest}}
             <div class="mb-1">
-              您已經向此計劃投資了$ {{alreadyInvest this.invest}}。
+              您已經向此計劃投資了$ {{currencyFormat (alreadyInvest this.invest)}}。
               <button class="btn btn-primary btn-sm" type="button" data-action="invest">
                 追加投資
               </button>

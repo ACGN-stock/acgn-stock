@@ -18,6 +18,7 @@ import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, vo
 import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { currencyFormat } from '../utils/helpers.js';
 const rShowAllTags = new ReactiveVar(false);
 
 inheritedShowLoadingOnSubscribing(Template.companyDetail);
@@ -195,8 +196,8 @@ Template.companyDetail.events({
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
     const message = '請輸入下季員工薪資：(' +
-      config.minimumCompanySalaryPerDay + '~' +
-      config.maximumCompanySalaryPerDay + ')';
+      currencyFormat(config.minimumCompanySalaryPerDay) + '~' +
+      currencyFormat(config.maximumCompanySalaryPerDay) + ')';
     alertDialog.prompt(message, function(salary) {
       if (salary && salary.length > 0) {
         salary = parseInt(salary, 10);
@@ -395,7 +396,7 @@ function drawLineChart(templateInstance) {
                 fontColor: color,
                 beginAtZero: true,
                 callback: function(value) {
-                  return '$' + Math.round(value);
+                  return '$' + Math.round(value).toLocaleString();
                 }
               }
             }

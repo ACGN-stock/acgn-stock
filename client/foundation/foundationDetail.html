@@ -68,11 +68,11 @@
       {{#if isDisplayPanel 'numbers'}}
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總投資額：</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid" title="{{getTotalInvest this.invest}}">
-          $ {{getTotalInvest this.invest}}
+          $ {{currencyFormat (getTotalInvest this.invest)}}
         </div>
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">預計價格：</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
-          $ {{getStockPrice this.invest}}
+          $ {{currencyFormat (getStockPrice this.invest)}}
         </div>
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">預計釋股：</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
@@ -123,7 +123,7 @@
           {{>userLink invest.userId}}
         </div>
         <div class="col-3 text-right" title="{{invest.amount}}">
-          {{invest.amount}}
+          {{currencyFormat invest.amount}}
         </div>
         <div class="col-3 text-right" title="{{getPercentage invest.amount this.invest}} %">
           {{getPercentage invest.amount}} %
