@@ -34,7 +34,11 @@
             {{/if}}
             {{#if currentUser}}
               <a class="btn btn-primary float-right" href="#" data-toggle-employ="{{this._id}}">
-                員工報名
+                {{#if isEmployee}}
+                  取消員工報名
+                {{else}}
+                  員工報名
+                {{/if}}
               </a>
               {{#if isFavorite this._id}}
                 <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
