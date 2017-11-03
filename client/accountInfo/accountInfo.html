@@ -31,6 +31,19 @@
             {{> accountInfoOwnStockList}}
           {{/if}}
           <div class="col-12 border-grid">
+            <a class="d-block h4" href="#" data-toggle-panel="value">
+              資產資訊
+              {{#if isDisplayPanel 'value'}}
+                <i class="fa fa-folder-open" aria-hidden="true"></i>
+              {{else}}
+                <i class="fa fa-folder" aria-hidden="true"></i>
+              {{/if}}
+            </a>
+          </div>
+          {{#if isDisplayPanel 'value'}}
+            {{> accountValueInfo}}
+          {{/if}}
+          <div class="col-12 border-grid">
             <a class="d-block h4" href="#" data-toggle-panel="log">
               玩家紀錄
               {{#if isDisplayPanel 'log'}}
@@ -253,5 +266,30 @@
     {{#with paginationData}}
       {{> pagination}}
     {{/with}}
+  </div>
+</template>
+
+<template name="accountValueInfo">
+  <div class="col-12 border-grid">
+    <table class="table table-bordered mt-3" style="width: 100%; table-layout: fixed;">
+      <thead>
+        <tr>
+          <th class="text-center text-truncate" style="width: 200px">股票總值</th>
+          <th class="text-center text-truncate">預估股票分紅</th>
+          <th class="text-center text-truncate">預估經理薪水</th>
+          <th class="text-center text-truncate">預估員工薪水</th>
+          <th class="text-center text-truncate">預估本季稅金</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center">$ {{currencyFormat stockTotalValue}}</td>
+          <td class="text-right">$ {{currencyFormat stockTotalProfit}}</td>
+          <td class="text-right">$ {{currencyFormat managerProfit}}</td>
+          <td class="text-right">$ {{currencyFormat employedProfit}}</td>
+          <td class="text-right">$ {{currencyFormat tax}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
