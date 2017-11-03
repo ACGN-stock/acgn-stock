@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { dbSeason } from '../../db/dbSeason';
 import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { formatDateText } from '../utils/helpers';
@@ -52,5 +53,48 @@ Template.announcementForm.events({
   reset(event) {
     event.preventDefault();
     rInEditAnnouncementMode.set(false);
+  }
+});
+
+Template.systemStatusPanel.helpers({
+  stockPriceUpdateTime() {
+    const time = dbVariables.get('lastRecordListPriceTime');
+
+    return formatDateText(time ? new Date(time) : null);
+  },
+  lowPriceReleaseTime() {
+    const time = dbVariables.get('lastReleaseStocksForLowPriceTime');
+
+    return formatDateText(time ? new Date(time) : null);
+  },
+  highPriceReleaseTime() {
+    const time = dbVariables.get('lastReleaseStocksForHighPriceTime');
+
+    return formatDateText(time ? new Date(time) : null);
+  },
+  noDealReleaseTime() {
+    const time = dbVariables.get('lastReleaseStocksForNoDealTime');
+
+    return formatDateText(time ? new Date(time) : null);
+  },
+  updateSalaryDeadline() {
+    const seasonData = dbSeason
+      .findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+
+    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - config.announceSalaryTime) : null);
+  },
+  updateBonusDeadline() {
+    const seasonData = dbSeason
+      .findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+
+    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - config.announceBonusTime) : null);
   }
 });

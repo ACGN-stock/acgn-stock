@@ -68,6 +68,7 @@ export function releaseStocksForHighPrice() {
           release();
         });
       });
+    dbVariables.set('lastReleaseStocksForHighPriceTime', Date.now());
   }
   else {
     dbVariables.set('releaseStocksForHighPriceCounter', releaseStocksForHighPriceCounter);
@@ -223,6 +224,7 @@ export function releaseStocksForNoDeal() {
           });
         }
       });
+    dbVariables.set('lastReleaseStocksForNoDealTime', Date.now());
   }
   else {
     dbVariables.set('releaseStocksForNoDealCounter', releaseStocksForNoDealCounter);
@@ -363,6 +365,7 @@ export function releaseStocksForLowPrice() {
           });
         }
       });
+    dbVariables.set('lastReleaseStocksForLowPriceTime', Date.now());
   }
   else {
     dbVariables.set('releaseStocksForLowPriceCounter', releaseStocksForLowPriceCounter);
@@ -439,6 +442,7 @@ export function recordListPriceAndSellFSCStocks() {
           release();
         });
       });
+    dbVariables.set('lastRecordListPriceTime', Date.now());
   }
   else {
     dbVariables.set('recordListPriceConter', recordListPriceConter);
