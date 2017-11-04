@@ -8,13 +8,14 @@ import { config } from './config';
 
 //default route
 FlowRouter.route('/', {
-  name: 'tutorial',
+  name: 'announcement',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 教學導覽');
+    DocHead.setTitle(config.websiteName + ' - 系統公告');
   }
 });
 
 export const pageNameHash = {
+  announcement: '系統公告',
   tutorial: '教學導覽',
   instantMessage: '即時訊息',
   companyList: '股市總覽',
@@ -27,6 +28,13 @@ export const pageNameHash = {
   ruleAgendaList: '規則討論',
   accuseRecord: '舉報違規紀錄'
 };
+
+FlowRouter.route('/tutorial', {
+  name: 'tutorial',
+  action() {
+    DocHead.setTitle(config.websiteName + ' - 教學導覽');
+  }
+});
 
 FlowRouter.route('/instantMessage', {
   name: 'instantMessage',
