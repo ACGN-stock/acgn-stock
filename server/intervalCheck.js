@@ -14,6 +14,7 @@ import { dbProducts } from '../db/dbProducts';
 import { dbResourceLock } from '../db/dbResourceLock';
 import { dbSeason } from '../db/dbSeason';
 import { dbThreads } from '../db/dbThreads';
+import { dbValidatingUsers } from '../db/dbValidatingUsers';
 import { dbVoteRecord } from '../db/dbVoteRecord';
 import { checkFoundCompany } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
@@ -250,6 +251,8 @@ function doSeasonWorks(lastSeasonData) {
         $lt: new Date( Date.now() - 604800000 )
       }
     });
+    //移除所有待驗證註冊資料
+    dbValidatingUsers.remove({});
     //移除所有推薦票投票紀錄
     dbVoteRecord.remove({});
     //本季度未登入天數歸0
