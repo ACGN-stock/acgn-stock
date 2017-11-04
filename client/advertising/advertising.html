@@ -61,10 +61,10 @@
               <td class="text-center text-truncate">
                 {{#if currentUser}}
                   <button class="btn btn-primary btn-sm" type="button" data-add-pay="{{advertising._id}}">
-                    $ {{advertising.paid}}
+                    $ {{currencyFormat advertising.paid}}
                   </button>
                 {{else}}
-                  $ {{advertising.paid}}
+                  $ {{currencyFormat advertising.paid}}
                 {{/if}}
               </td>
               <td class="text-center text-truncate">
@@ -127,8 +127,8 @@
       {{{errorHtmlOf 'url'}}}
     </div>
     <div>
-      需支付的廣告費用為： $ {{valueOf 'paid'}}。
-      目前可立刻顯示的最小廣告費用為： $ {{getDisplayMinimumPaid}}。
+      需支付的廣告費用為： $ {{currencyFormat (valueOf 'paid')}}。
+      目前可立刻顯示的最小廣告費用為： $ {{currencyFormat getDisplayMinimumPaid}}。
     </div>
     <div class="form-group">
       <label for="extraPaid">追加廣告費用：</label>

@@ -3,12 +3,42 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbVariables } from '../../db/dbVariables';
+import { config } from '../../config.js';
 
 Meteor.subscribe('variables');
 
 Template.registerHelper('getVariable', function(variableName) {
   return dbVariables.get(variableName);
 });
+
+export function currencyFormat(money) {
+  switch (typeof money) {
+    case 'string':
+      return parseFloat(money).toLocaleString();
+    case 'number':
+      return money.toLocaleString();
+    default:
+      return money;
+  }
+}
+Template.registerHelper('currencyFormat', currencyFormat);
+
+export function getCompanyEPS(companyData) {
+  return ((1 - (config.managerProfitPercent + config.costFromProfit + config.maximumSeasonalBonusPercent / 100)) *
+    companyData.profit / companyData.totalRelease).toFixed(2);
+}
+
+export function getCompanyPERatio(companyData) {
+  return (companyData.profit === 0) ? '∞' : (companyData.listPrice / getCompanyEPS(companyData)).toFixed(2);
+}
+
+export function getCompanyEPRatio(companyData) {
+  return (getCompanyEPS(companyData) / companyData.listPrice).toFixed(2);
+}
+
+Template.registerHelper('getCompanyEPS', getCompanyEPS);
+Template.registerHelper('getCompanyPERatio', getCompanyPERatio);
+Template.registerHelper('getCompanyEPRatio', getCompanyEPRatio);
 
 export function formatDateText(date) {
   if (! date) {
