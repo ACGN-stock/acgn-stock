@@ -442,7 +442,7 @@ function generateNewSeason() {
     {
       resigned: false,
       registerAt: {
-        $lt: endDate.getTime() - config.seasonTime
+        $lt: new Date(endDate.getTime() - config.seasonTime)
       }
     },
     {
