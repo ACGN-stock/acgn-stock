@@ -5,6 +5,7 @@
     "node": true
   },
   "globals": {
+    "FlowRouter": true,
     "Chart": true
   }
 }
