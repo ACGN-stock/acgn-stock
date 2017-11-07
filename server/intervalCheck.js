@@ -627,21 +627,35 @@ function giveBonusByStocksFromProfit() {
           const userData = Meteor.users.findOne(directorData.userId, {
             fields: {
               'profile.ban': 1,
+              'profile.noLoginDayCount': 1,
               'status.lastLogin.date': 1
             }
           });
+          if (! userData.profile || ! userData.status || ! userData.status.lastLogin) {
+            return true;
+          }
+
           //被禁止交易者不分紅
-          if (! userData.profile || _.contains(userData.profile.ban, 'deal')) {
+          if (_.contains(userData.profile.ban, 'deal')) {
             return true;
           }
           //七天未動作者不分紅
-          if (! userData.status || now - userData.status.lastLogin.date.getTime() > 604800000) {
+          if (now - userData.status.lastLogin.date.getTime() > 604800000) {
             return true;
           }
-          canReceiveProfitStocks += directorData.stocks;
+          // 未上線天數 >= 5 者，持有股份以 0% 計，故直接排除分紅
+          if (userData.profile.noLoginDayCount >= 5) {
+            return true;
+          }
+
+          // 未上線天數 4 天者，持有股份以 50% 計，其餘則以 100% 計
+          const effectiveStocksFactor = userData.profile.noLoginDayCount === 4 ? 0.5 : 1;
+          const effectiveStocks = Math.round(effectiveStocksFactor * directorData.stocks);
+
+          canReceiveProfitStocks += effectiveStocks;
           canReceiveProfitDirectorList.push({
             userId: directorData.userId,
-            stocks: directorData.stocks
+            stocks: effectiveStocks
           });
         });
       _.each(canReceiveProfitDirectorList, (directorData, index) => {
