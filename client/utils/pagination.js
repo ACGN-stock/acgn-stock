@@ -1,6 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
 import { dbVariables } from '../../db/dbVariables';
 
