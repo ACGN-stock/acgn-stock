@@ -80,7 +80,7 @@ export function foundCompany(user, foundCompanyData) {
     }
     foundCompanyData.manager = userId;
     const createdAt = new Date();
-    foundCompanyData.createdAt = createdAt
+    foundCompanyData.createdAt = createdAt;
     dbLog.insert({
       logType: '創立公司',
       userId: [userId],
@@ -309,7 +309,7 @@ Meteor.publish('foundationList', function(keyword, offset) {
   if (keyword) {
     keyword = keyword.replace(/\\/g, '\\\\');
     const reg = new RegExp(keyword, 'i');
-    filter.$or =[
+    filter.$or = [
       {
         companyName: reg
       },
@@ -381,7 +381,7 @@ Meteor.publish('foundationDetail', function(foundationId) {
 
   const foundation = dbFoundations.findOne(foundationId);
   if (foundation) {
-    let total = foundation.invest.length;
+    const total = foundation.invest.length;
     this.added('variables', 'totalCountOfFounder', {
       value: total
     });

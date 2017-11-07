@@ -3,7 +3,7 @@ import url from 'url';
 import querystring from 'querystring';
 import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
-import { HTTP } from 'meteor/http'
+import { HTTP } from 'meteor/http';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbFoundations } from '../../db/dbFoundations';
 import { dbProducts } from '../../db/dbProducts';
@@ -101,11 +101,13 @@ WebApp.connectHandlers.use(function(req, res, next) {
       if (userData.services.google) {
         const accessToken = userData.services.google.accessToken;
         try {
+          /* eslint-disable camelcase */
           const response = HTTP.get('https://www.googleapis.com/oauth2/v1/userinfo', {
             params: {
               access_token: accessToken
             }
           });
+          /* eslint-enable camelcase */
           res.end(response.data.name);
         }
         catch (e) {

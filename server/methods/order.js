@@ -376,7 +376,8 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
     value: total
   });
 
-  const observer = dbOrders.find(filter, {
+  const observer = dbOrders
+    .find(filter, {
       sort: {
         unitPrice: type === '賣出' ? 1 : -1
       },

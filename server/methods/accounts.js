@@ -65,7 +65,7 @@ function payTax(user, taxId, amount) {
         $gt: new Date(dbVariables.get('lastPayTime').getTime())
       },
       logType: '繳納稅金'
-    })
+    });
     if (existsLogData) {
       dbLog.update(existsLogData._id, {
         $set: {
@@ -336,7 +336,7 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
   const firstLogData = dbLog.findOne({userId}, {
     sort: {
       createdAt: 1
-    } 
+    }
   });
   const firstLogDate = firstLogData ? firstLogData.createdAt : new Date();
 

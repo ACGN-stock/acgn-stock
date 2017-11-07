@@ -41,7 +41,7 @@ export const resourceManager = {
         });
         callback(release);
       }
-      catch(e) {
+      catch (e) {
         release();
         console.error('error happens while requesting resources, automatic release resources lock' + JSON.stringify({resourceList, task, threadId, time}) + '!');
         console.error('error: ' + JSON.stringify(e));

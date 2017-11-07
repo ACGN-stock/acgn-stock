@@ -90,11 +90,12 @@ function doLoginObserver() {
             });
           }
           if (nextLoginData.date.getTime() !== previousLoginData.date.getTime()) {
-            const lastSeasonData = dbSeason.findOne({}, {
+            let lastSeasonData = dbSeason.findOne({}, {
               sort: {
                 beginDate: -1
               }
-            }) || {
+            });
+            lastSeasonData = lastSeasonData ? lastSeasonData : {
               beginDate: new Date()
             };
             const seasonBeginTime = lastSeasonData.beginDate.getTime();
@@ -137,7 +138,7 @@ function doIntervalWork() {
   });
   if (! lastSeasonData) {
     //產生新的商業季度
-    generateNewSeason();    
+    generateNewSeason();
   }
   else if (now >= lastSeasonData.electTime) {
     //若有正在競選經理人的公司，則計算出選舉結果。
@@ -167,20 +168,20 @@ function doIntervalWork() {
   dbLog.remove({
     logType: '聊天發言',
     createdAt: {
-      $lt: new Date( Date.now() - 60000)
+      $lt: new Date(Date.now() - 60000)
     }
   });
   //移除所有到期的廣告
   dbAdvertising.remove({
     createdAt: {
-      $lt: new Date( Date.now() - config.advertisingExpireTime)
+      $lt: new Date(Date.now() - config.advertisingExpireTime)
     }
   });
   //移除5分鐘以上的resource lock
   dbResourceLock
     .find({
       time: {
-        $lt: new Date( Date.now() - 300000)
+        $lt: new Date(Date.now() - 300000)
       }
     })
     .forEach((lockData) => {
@@ -248,7 +249,7 @@ function doSeasonWorks(lastSeasonData) {
     //移除所有七天前的股價紀錄
     dbPrice.remove({
       createdAt: {
-        $lt: new Date( Date.now() - 604800000 )
+        $lt: new Date(Date.now() - 604800000)
       }
     });
     //移除所有待驗證註冊資料
@@ -442,7 +443,7 @@ function generateNewSeason() {
     {
       resigned: false,
       registerAt: {
-        $lt: endDate.getTime() - config.seasonTime
+        $lt: new Date(endDate.getTime() - config.seasonTime)
       }
     },
     {
@@ -643,29 +644,29 @@ function giveBonusByStocksFromProfit() {
             stocks: directorData.stocks
           });
         });
-        _.each(canReceiveProfitDirectorList, (directorData, index) => {
-          const directorProfit = Math.min(Math.ceil(forDirectorProfit * directorData.stocks / canReceiveProfitStocks), leftProfit);
-          if (directorProfit > 0) {
-            logBulk.insert({
-              logType: '營利分紅',
-              userId: [directorData.userId],
-              companyId: companyId,
-              amount: directorProfit,
-              createdAt: new Date(now + 3 + employeeList.length + index)
+      _.each(canReceiveProfitDirectorList, (directorData, index) => {
+        const directorProfit = Math.min(Math.ceil(forDirectorProfit * directorData.stocks / canReceiveProfitStocks), leftProfit);
+        if (directorProfit > 0) {
+          logBulk.insert({
+            logType: '營利分紅',
+            userId: [directorData.userId],
+            companyId: companyId,
+            amount: directorProfit,
+            createdAt: new Date(now + 3 + employeeList.length + index)
+          });
+          usersBulk
+            .find({
+              _id: directorData.userId
+            })
+            .updateOne({
+              $inc: {
+                'profile.money': directorProfit
+              }
             });
-            usersBulk
-              .find({
-                _id: directorData.userId
-              })
-              .updateOne({
-                $inc: {
-                  'profile.money': directorProfit
-                }
-              });
-            needExecuteUserBulk = true;
-            leftProfit -= directorProfit;
-          }
-        });
+          needExecuteUserBulk = true;
+          leftProfit -= directorProfit;
+        }
+      });
     });
   if (needExecuteLogBulk) {
     logBulk.execute();
@@ -762,7 +763,7 @@ function electManager(seasonData) {
 
           const voteStocksList = _.map(companyData.candidateList, (candidate, index) => {
             const voteDirectorList = voteList[index];
-            let stocks = _.reduce(voteDirectorList, (stocks, userId) => {
+            const stocks = _.reduce(voteDirectorList, (stocks, userId) => {
               const directorData = _.findWhere(directorList, {userId});
 
               return stocks + (directorData ? directorData.stocks : 0);

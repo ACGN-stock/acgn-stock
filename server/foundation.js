@@ -51,16 +51,18 @@ export function checkFoundCompany() {
           }
           let directors;
           let totalRelease;
-          do {
-            directors = _.map(invest, ({userId, amount}) => {
-              const stocks = Math.floor(amount / stockUnitPrice);
-              amount -= (stockUnitPrice * stocks);
+          const generateDirectorStocksList = ({userId, amount}) => {
+            const stocks = Math.floor(amount / stockUnitPrice);
+            amount -= (stockUnitPrice * stocks);
 
-              return {userId, stocks, amount};
-            });
-            totalRelease = _.reduce(directors, (sum, directorData) => {
-              return sum + directorData.stocks;
-            }, 0);
+            return {userId, stocks, amount};
+          };
+          const sumStocks = (sum, directorData) => {
+            return sum + directorData.stocks;
+          };
+          do {
+            directors = _.map(invest, generateDirectorStocksList);
+            totalRelease = _.reduce(directors, sumStocks, 0);
             if (totalRelease < minReleaseStock) {
               stockUnitPrice /= 2;
             }

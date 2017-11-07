@@ -380,7 +380,7 @@ function confiscateStocks(user, {userId, message}) {
   directorsBulk.execute();
   dbDirectors.remove({userId});
 
-  return  true;
+  return true;
 }
 
 Meteor.methods({
@@ -514,7 +514,7 @@ Meteor.methods({
 
     return true;
   }
-})
+});
 function fscAnnouncement(user, userId, message) {
   debug.log('fscAnnouncement', {user, userId, message});
   if (! user.profile.isAdmin) {

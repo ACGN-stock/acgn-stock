@@ -2,7 +2,7 @@
 import cheerio from 'cheerio';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http'
+import { HTTP } from 'meteor/http';
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { UserStatus } from 'meteor/mizzao:user-status';

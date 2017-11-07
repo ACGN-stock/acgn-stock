@@ -54,10 +54,9 @@ function createAgenda(user, agendaData) {
       throw new Meteor.Error(403, '議題選項過多！');
     }
   });
-    
+
   const issueIds = [];
   issues.forEach((issue, issueIndex) => {
-
     const optionIds = [];
     issue.options.forEach((option, optionIndex) => {
       const optionId = dbRuleIssueOptions.insert({
@@ -99,14 +98,14 @@ Meteor.publish('allRuleAgenda', function() {
 //一分鐘最多重複訂閱5次
 limitSubscription('allRuleAgenda', 5);
 
-Meteor.publish("ruleAgendaDetail", function (agendaId) {
+Meteor.publish('ruleAgendaDetail', function(agendaId) {
   debug.log('publish ruleAgendaDetail');
   check(agendaId, String);
 
   const agendaCursor = dbRuleAgendas.find(agendaId);
   const agenda = agendaCursor.fetch()[0];
   const issueCursor = dbRuleIssues.find({
-    _id: { 
+    _id: {
       $in: agenda.issues
     }
   });
@@ -120,7 +119,7 @@ Meteor.publish("ruleAgendaDetail", function (agendaId) {
     }
   });
 
-  return [ agendaCursor, issueCursor, optionCursor ];
+  return [agendaCursor, issueCursor, optionCursor];
 });
 //一分鐘最多重複訂閱5次
 limitSubscription('ruleAgendaDetail', 5);

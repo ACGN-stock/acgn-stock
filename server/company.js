@@ -389,7 +389,7 @@ export function recordListPriceAndSellFSCStocks() {
           fields: {
             _id: 1,
             lastPrice: 1,
-            listPrice: 1,
+            listPrice: 1
           },
           disableOplog: true
         }

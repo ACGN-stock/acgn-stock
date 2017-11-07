@@ -141,7 +141,7 @@ function rankCompany(seasonData) {
         }
       },
       {
-        $limit : 100
+        $limit: 100
       }
     ]);
 
@@ -150,7 +150,7 @@ function rankCompany(seasonData) {
         {
           isSeal: false
         },
-          {
+        {
           fields: {
             _id: 1,
             lastPrice: 1,
@@ -260,7 +260,7 @@ function rankCompany(seasonData) {
         }
       },
       {
-        $limit : 100
+        $limit: 100
       }
     ]);
 
@@ -304,7 +304,7 @@ function rankCompany(seasonData) {
           priceToEarn: Math.round(rankData.priceToEarn * 1000) / 1000
         });
       });
-      rankCompanyProfitBulk.execute();      
+      rankCompanyProfitBulk.execute();
     }
   }
 }
@@ -426,8 +426,8 @@ function generateNoStockUserWealthList() {
     },
     {
       $unwind: {
-          path: '$directorsData',
-          preserveNullAndEmptyArrays: true
+        path: '$directorsData',
+        preserveNullAndEmptyArrays: true
       }
     },
     {

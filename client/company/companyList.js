@@ -27,7 +27,7 @@ Template.companyList.onCreated(function() {
     const onlyShow = rFilterBy.get();
     const sort = rSortBy.get();
     const offset = rCompanyOffset.get();
-    this.subscribe('companyList', keyword, onlyShow, sort, offset);
+    this.subscribe('companyList', {keyword, onlyShow, sort, offset});
   });
   this.autorun(() => {
     if (shouldStopSubscribe()) {

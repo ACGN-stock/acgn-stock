@@ -144,7 +144,7 @@ function checkTax(todayBeginTime) {
     //紀錄各公司徵收到的股票
     const imposedStocksHash = {};
     expireTaxesCursor.forEach((taxData) => {
-      const taxId = ObjectID(taxData._id._str);
+      const taxId = new ObjectID(taxData._id._str);
       const userId = taxData.userId;
       const overdueDay = Math.ceil((todayBeginTime - taxData.expireDate.getTime()) / 86400000);
       //將使用者設為繳稅逾期狀態
@@ -196,7 +196,7 @@ function checkTax(todayBeginTime) {
             .updateOne({
               $inc: {
                 'profile.money': directPayMoney * -1
-              }              
+              }
             });
           logBulk.insert({
             logType: '繳稅沒金',
