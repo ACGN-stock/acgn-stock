@@ -612,6 +612,7 @@ function giveBonusByStocksFromProfit() {
           const userData = Meteor.users.findOne(directorData.userId, {
             fields: {
               'profile.ban': 1,
+              'profile.noLoginDayCount': 1,
               'status.lastLogin.date': 1
             }
           });
@@ -648,7 +649,7 @@ function giveBonusByStocksFromProfit() {
           canReceiveProfitStocks += effectiveStocks;
           canReceiveProfitDirectorList.push({
             userId: directorData.userId,
-            stocks: directorData.stocks
+            stocks: effectiveStocks
           });
         });
       _.each(canReceiveProfitDirectorList, (directorData, index) => {
