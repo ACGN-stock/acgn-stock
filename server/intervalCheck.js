@@ -199,7 +199,7 @@ function doIntervalWork() {
 }
 
 //商業季度結束檢查
-function doSeasonWorks(lastSeasonData) {
+export function doSeasonWorks(lastSeasonData) {
   debug.log('doSeasonWorks', lastSeasonData);
   //避免執行時間過長導致重複進行季節結算
   if (dbResourceLock.findOne('season')) {
@@ -631,25 +631,34 @@ function giveBonusByStocksFromProfit() {
               'status.lastLogin.date': 1
             }
           });
-          if (! userData.profile || ! userData.status || ! userData.status.lastLogin) {
+          const { profile: userProfile, status: userStatus } = userData;
+          if (! userProfile || ! userStatus || ! userStatus.lastLogin || ! userStatus.lastLogin.date) {
+            return true;
+          }
+          const lastLoginDate = userStatus.lastLogin.date;
+
+          const oneDayMs = 86400000;
+          const noLoginTime = now - lastLoginDate.getTime();
+          const noLoginDay = Math.min(Math.floor(noLoginTime / oneDayMs), 7);
+          const noLoginDayCount = Math.min(noLoginDay + (userProfile.noLoginDayCount || 0), Math.floor(config.seasonTime / oneDayMs));
+
+          //被禁止交易者不分紅
+          if (_.contains(userProfile.ban, 'deal')) {
             return true;
           }
 
-          //被禁止交易者不分紅
-          if (_.contains(userData.profile.ban, 'deal')) {
-            return true;
-          }
           //七天未動作者不分紅
-          if (now - userData.status.lastLogin.date.getTime() > 604800000) {
+          if (noLoginTime > 7 * oneDayMs) {
             return true;
           }
+
           // 未上線天數 >= 5 者，持有股份以 0% 計，故直接排除分紅
-          if (userData.profile.noLoginDayCount >= 5) {
+          if (noLoginDayCount >= 5) {
             return true;
           }
 
           // 未上線天數 4 天者，持有股份以 50% 計，其餘則以 100% 計
-          const effectiveStocksFactor = userData.profile.noLoginDayCount === 4 ? 0.5 : 1;
+          const effectiveStocksFactor = noLoginDayCount === 4 ? 0.5 : 1;
           const effectiveStocks = Math.round(effectiveStocksFactor * directorData.stocks);
 
           canReceiveProfitStocks += effectiveStocks;
