@@ -19,7 +19,6 @@ import { dbSeason } from './dbSeason';
 import { dbTaxes } from './dbTaxes';
 import { dbValidatingUsers } from './dbValidatingUsers';
 import { dbVoteRecord } from './dbVoteRecord';
-import { config } from '../config';
 
 if (Meteor.isServer) {
   Migrations.add({
@@ -425,9 +424,9 @@ if (Meteor.isServer) {
         {},
         {
           $set: {
-            salary: config.defaultCompanySalaryPerDay,
-            nextSeasonSalary: config.defaultCompanySalaryPerDay,
-            seasonalBonusPercent: config.defaultSeasonalBonusPercent
+            salary: Meteor.settings.public.defaultCompanySalaryPerDay,
+            nextSeasonSalary: Meteor.settings.public.defaultCompanySalaryPerDay,
+            seasonalBonusPercent: Meteor.settings.public.defaultSeasonalBonusPercent
           }
         },
         {

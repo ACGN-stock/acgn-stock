@@ -5,7 +5,6 @@ import { resourceManager } from '../resourceManager';
 import { check, Match } from 'meteor/check';
 import { dbAdvertising } from '../../db/dbAdvertising';
 import { dbLog } from '../../db/dbLog';
-import { config } from '../../config';
 import { limitSubscription } from './rateLimit';
 import { debug } from '../debug';
 
@@ -156,7 +155,7 @@ Meteor.publish('displayAdvertising', function() {
     sort: {
       paid: -1
     },
-    limit: config.displayAdvertisingNumber,
+    limit: Meteor.settings.public.displayAdvertisingNumber,
     disableOplog: true
   });
 });

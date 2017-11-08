@@ -3,7 +3,6 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbVariables } from '../../db/dbVariables';
-import { config } from '../../config.js';
 
 Meteor.subscribe('variables');
 
@@ -24,7 +23,7 @@ export function currencyFormat(money) {
 Template.registerHelper('currencyFormat', currencyFormat);
 
 export function getCompanyEPS(companyData) {
-  return ((1 - (config.managerProfitPercent + config.costFromProfit + config.maximumSeasonalBonusPercent / 100)) *
+  return ((1 - (Meteor.settings.public.managerProfitPercent + Meteor.settings.public.costFromProfit + Meteor.settings.public.maximumSeasonalBonusPercent / 100)) *
     companyData.profit / companyData.totalRelease).toFixed(2);
 }
 

@@ -5,7 +5,6 @@ import { check, Match } from 'meteor/check';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbEmployees } from '../../db/dbEmployees';
 import { dbSeason } from '../../db/dbSeason';
-import { config } from '../../config';
 import { limitMethod, limitSubscription } from './rateLimit';
 import { debug } from '../debug';
 
@@ -91,7 +90,7 @@ export function updateSeasonalBonus(user, companyId, percentage) {
   if (companyData.isSeal) {
     throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
-  if (percentage < config.minimumSeasonalBonusPercent || percentage > config.maximumSeasonalBonusPercent) {
+  if (percentage < Meteor.settings.public.minimumSeasonalBonusPercent || percentage > Meteor.settings.public.maximumSeasonalBonusPercent) {
     throw new Meteor.Error(403, '不正確的分紅設定！');
   }
 
@@ -104,8 +103,8 @@ export function updateSeasonalBonus(user, companyId, percentage) {
   if (! seasonData) {
     throw new Meteor.Error(500, '商業季度尚未開始！');
   }
-  if (Date.now() >= seasonData.endDate.getTime() - config.announceBonusTime) {
-    const hour = config.announceBonusTime / 1000 / 60 / 60;
+  if (Date.now() >= seasonData.endDate.getTime() - Meteor.settings.public.announceBonusTime) {
+    const hour = Meteor.settings.public.announceBonusTime / 1000 / 60 / 60;
     throw new Meteor.Error(403, `季度結束前${hour}小時不可更改分紅！`);
   }
 
@@ -143,7 +142,7 @@ export function updateNextSeasonSalary(user, companyId, salary) {
   if (companyData.isSeal) {
     throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
   }
-  if (salary < config.minimumCompanySalaryPerDay || salary > config.maximumCompanySalaryPerDay) {
+  if (salary < Meteor.settings.public.minimumCompanySalaryPerDay || salary > Meteor.settings.public.maximumCompanySalaryPerDay) {
     throw new Meteor.Error(403, '不正確的薪資設定！');
   }
 
@@ -156,8 +155,8 @@ export function updateNextSeasonSalary(user, companyId, salary) {
   if (! seasonData) {
     throw new Meteor.Error(500, '商業季度尚未開始！');
   }
-  if (Date.now() >= seasonData.endDate.getTime() - config.announceSalaryTime) {
-    const hour = config.announceSalaryTime / 1000 / 60 / 60;
+  if (Date.now() >= seasonData.endDate.getTime() - Meteor.settings.public.announceSalaryTime) {
+    const hour = Meteor.settings.public.announceSalaryTime / 1000 / 60 / 60;
     throw new Meteor.Error(403, `季度結束前${hour}小時不可更改薪資！`);
   }
 

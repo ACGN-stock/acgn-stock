@@ -9,7 +9,6 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbFoundations } from '../../db/dbFoundations';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { formatDateTimeText } from '../utils/helpers';
-import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 const rShowAllTags = new ReactiveVar(false);
@@ -22,7 +21,7 @@ Template.foundationDetail.onCreated(function() {
     if (foundationId) {
       const foundationData = dbFoundations.findOne(foundationId);
       if (foundationData) {
-        DocHead.setTitle(config.websiteName + ' - 「' + foundationData.companyName + '」公司資訊');
+        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + foundationData.companyName + '」公司資訊');
       }
     }
   });
@@ -91,7 +90,7 @@ const getTotalInvest = function(investList) {
   }, 0);
 };
 const getStockPrice = function(investList) {
-  const minReleaseStock = config.minReleaseStock;
+  const minReleaseStock = Meteor.settings.public.minReleaseStock;
   const totalInvest = getTotalInvest(investList);
   let stockUnitPrice = 1;
   while (Math.ceil(totalInvest / stockUnitPrice / 2) > minReleaseStock) {
@@ -119,28 +118,28 @@ Template.foundationDetailTable.helpers({
     return _.contains(rDisplayPanelList.get(), panelType);
   },
   investPplsNumberClass(investNumber) {
-    return (investNumber >= config.foundationNeedUsers) ? 'text-success' : 'text-danger';
+    return (investNumber >= Meteor.settings.public.foundationNeedUsers) ? 'text-success' : 'text-danger';
   },
   foundationNeedUsers() {
-    return config.foundationNeedUsers;
+    return Meteor.settings.public.foundationNeedUsers;
   },
   getTotalInvest(investList) {
     return getTotalInvest(investList);
   },
   getExpireDateText(createdAt) {
-    const expireDate = new Date(createdAt.getTime() + config.foundExpireTime);
+    const expireDate = new Date(createdAt.getTime() + Meteor.settings.public.foundExpireTime);
 
     return formatDateTimeText(expireDate);
   },
   getStockPrice(investList) {
-    if (investList.length < config.foundationNeedUsers) {
+    if (investList.length < Meteor.settings.public.foundationNeedUsers) {
       return 0;
     }
 
     return getStockPrice(investList);
   },
   getStockRelease(investList) {
-    if (investList.length < config.foundationNeedUsers) {
+    if (investList.length < Meteor.settings.public.foundationNeedUsers) {
       return 0;
     }
     const price = getStockPrice(investList);

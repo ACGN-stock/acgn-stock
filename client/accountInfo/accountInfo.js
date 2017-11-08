@@ -13,7 +13,6 @@ import { dbDirectors } from '../../db/dbDirectors';
 import { dbEmployees } from '../../db/dbEmployees';
 import { dbTaxes } from '../../db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
@@ -42,7 +41,7 @@ Template.accountInfo.onCreated(function() {
     if (userId) {
       const user = Meteor.users.findOne(userId);
       if (user) {
-        DocHead.setTitle(config.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
+        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
       }
     }
   });

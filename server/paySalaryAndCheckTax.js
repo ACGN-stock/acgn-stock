@@ -2,7 +2,6 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
-import { config } from '../config';
 import { resourceManager } from './resourceManager';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
@@ -13,7 +12,7 @@ import { dbTaxes } from '../db/dbTaxes';
 import { dbVariables } from '../db/dbVariables';
 import { debug } from './debug';
 
-const {salaryPerPay} = config;
+const {salaryPerPay} = Meteor.settings;
 export function paySalaryAndCheckTax() {
   debug.log('paySalary');
   const todayBeginTime = new Date().setHours(0, 0, 0, 0);
@@ -98,7 +97,7 @@ function paySalaryAndGenerateProfit(thisPayTime) {
       createdAt: thisPayTime
     });
 
-    const totalProfit = config.votePricePerTicket * employees.length;
+    const totalProfit = Meteor.settings.public.votePricePerTicket * employees.length;
     const totalSalary = company.salary * employees.length;
     companyBulk.find({
       _id: company._id

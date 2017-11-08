@@ -9,7 +9,6 @@ import { dbAdvertising } from '../../db/dbAdvertising';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { formatDateText } from '../utils/helpers';
-import { config } from '../../config';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -49,13 +48,13 @@ Template.advertising.helpers({
     });
   },
   advertisingDisplayClass(advertisingDisplayIndex) {
-    if (advertisingDisplayIndex < config.displayAdvertisingNumber) {
+    if (advertisingDisplayIndex < Meteor.settings.public.displayAdvertisingNumber) {
       return 'table-success';
     }
   },
   formatExpireDate(advertisingData) {
     const createdAtTime = advertisingData.createdAt.getTime();
-    const expireTime = new Date(createdAtTime + config.advertisingExpireTime);
+    const expireTime = new Date(createdAtTime + Meteor.settings.public.advertisingExpireTime);
 
     return formatDateText(expireTime);
   }

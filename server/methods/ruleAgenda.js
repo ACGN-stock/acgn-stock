@@ -5,7 +5,6 @@ import { check, Match } from 'meteor/check';
 import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { dbRuleIssues } from '../../db/dbRuleIssues';
 import { dbRuleIssueOptions } from '../../db/dbRuleIssueOptions';
-import { config } from '../../config';
 import { limitSubscription, limitMethod } from './rateLimit';
 import { debug } from '../debug';
 
@@ -42,7 +41,7 @@ function createAgenda(user, agendaData) {
   if (issues.length === 0) {
     throw new Meteor.Error(403, '沒有須投票的議題！');
   }
-  if (issues.length > config.maximumRuleIssue) {
+  if (issues.length > Meteor.settings.public.maximumRuleIssue) {
     throw new Meteor.Error(403, '須投票的議題過多！');
   }
 
@@ -50,7 +49,7 @@ function createAgenda(user, agendaData) {
     if (issue.options.length < 2) {
       throw new Meteor.Error(403, '每個議題應有至少兩個選項！');
     }
-    if (issue.options.length > config.maximumRuleIssueOption) {
+    if (issue.options.length > Meteor.settings.public.maximumRuleIssueOption) {
       throw new Meteor.Error(403, '議題選項過多！');
     }
   });
@@ -148,7 +147,7 @@ function voteAgenda(user, voteData) {
   if (user.profile.notPayTax) {
     throw new Meteor.Error(403, '有逾期稅單未繳納者不可投票！');
   }
-  if (Date.now() - user.createdAt.getTime() < config.voteUserNeedCreatedIn) {
+  if (Date.now() - user.createdAt.getTime() < Meteor.settings.public.voteUserNeedCreatedIn) {
     throw new Meteor.Error(403, '註冊未滿七日不可投票！');
   }
 

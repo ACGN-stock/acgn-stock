@@ -7,10 +7,9 @@ import { dbLog } from '../db/dbLog';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbPrice } from '../db/dbPrice';
-import { config } from '../config';
 import { debug } from './debug';
 
-const {foundExpireTime, foundationNeedUsers, minReleaseStock} = config;
+const {foundExpireTime, foundationNeedUsers, minReleaseStock} = Meteor.settings;
 export function checkFoundCompany() {
   debug.log('checkFoundCompany');
   const foundExpireDate = new Date(Date.now() - foundExpireTime);
@@ -97,9 +96,9 @@ export function checkFoundCompany() {
             profit: 0,
             candidateList: [foundationData.manager],
             voteList: [ [] ],
-            salary: config.defaultCompanySalaryPerDay,
-            nextSeasonSalary: config.defaultCompanySalaryPerDay,
-            seasonalBonusPercent: config.defaultSeasonalBonusPercent,
+            salary: Meteor.settings.public.defaultCompanySalaryPerDay,
+            nextSeasonSalary: Meteor.settings.public.defaultCompanySalaryPerDay,
+            seasonalBonusPercent: Meteor.settings.public.defaultSeasonalBonusPercent,
             isSeal: false,
             createdAt: basicCreatedAt
           });
@@ -167,7 +166,7 @@ export function checkFoundCompany() {
           });
           _.each(foundationData.invest, ({userId, amount}, index) => {
             if (userId === foundationData.manager) {
-              amount -= config.founderEarnestMoney;
+              amount -= Meteor.settings.public.founderEarnestMoney;
             }
             logBulk.insert({
               logType: '創立退款',

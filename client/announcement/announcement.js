@@ -7,7 +7,6 @@ import { dbSeason } from '../../db/dbSeason';
 import { dbVariables } from '../../db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { formatDateText } from '../utils/helpers';
-import { config } from '../../config';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.announcement);
@@ -85,7 +84,7 @@ Template.systemStatusPanel.helpers({
         }
       });
 
-    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - config.announceSalaryTime) : null);
+    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceSalaryTime) : null);
   },
   updateBonusDeadline() {
     const seasonData = dbSeason
@@ -95,6 +94,6 @@ Template.systemStatusPanel.helpers({
         }
       });
 
-    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - config.announceBonusTime) : null);
+    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceBonusTime) : null);
   }
 });

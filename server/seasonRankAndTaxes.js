@@ -10,7 +10,6 @@ import { dbRankCompanyValue } from '../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../db/dbRankUserWealth';
 import { dbTaxes } from '../db/dbTaxes';
 import { debug } from './debug';
-import { config } from '../config';
 
 //為所有公司與使用者進行排名結算
 export function generateRankAndTaxesData(seasonData) {
@@ -571,8 +570,8 @@ function generateUserTaxes(userWealthList) {
   _.each(userWealthList, (wealthData) => {
     const noLoginTime = createdAt.getTime() - (wealthData.lastLoginDate ? wealthData.lastLoginDate.getTime() : 0);
     const noLoginDay = Math.min(Math.floor(noLoginTime / 86400000), 7);
-    const noLoginDayCount = Math.min(noLoginDay + (wealthData.noLoginDayCount || 0), Math.floor(config.seasonTime / 86400000));
-    const zombie = noLoginDayCount * config.salaryPerPay;
+    const noLoginDayCount = Math.min(noLoginDay + (wealthData.noLoginDayCount || 0), Math.floor(Meteor.settings.public.seasonTime / 86400000));
+    const zombie = noLoginDayCount * Meteor.settings.public.salaryPerPay;
     const matchTaxConfig = _.find(taxConfigList, (taxConfig) => {
       return (
         wealthData.totalWealth >= taxConfig.from &&
