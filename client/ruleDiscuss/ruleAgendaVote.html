@@ -55,9 +55,9 @@
           <div class="form-check">
             <label class="form-check-label">
               {{#if issue.multiple}}
-                <input class="form-check-input" type="checkbox" name={{this._id}} value={{optionId}}>
+                <input class="form-check-input" type="checkbox" name={{issue._id}} value={{optionId}}>
               {{else}}
-                <input class="form-check-input" type="radio" name={{this._id}} value={{optionId}}>
+                <input class="form-check-input" type="radio" name={{issue._id}} value={{optionId}}>
               {{/if}}
               {{getOptionText optionId}}
             </label>
