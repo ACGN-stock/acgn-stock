@@ -145,7 +145,10 @@ function getIssueOptionInputName(issueId, optionId) {
 
 function validateModel(model) {
   const error = {};
-  if (! model.agendaTitle.length) {
+  if (! model.proposerId || model.proposerId.length === 0) {
+    error.proposerId = '請輸入提案人id！';
+  }
+  if (! model.agendaTitle || model.agendaTitle.length === 0) {
     error.agendaTitle = '請輸入議程主題！';
   }
   else if (model.agendaTitle.length > 100) {
@@ -223,6 +226,7 @@ function saveModel(model) {
 
       const newModel = {
         title: model.agendaTitle,
+        proposer: model.proposerId,
         description: model.description,
         discussionUrl: model.discussionUrl,
         issues: issues

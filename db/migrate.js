@@ -15,6 +15,7 @@ import { dbRankCompanyPrice } from './dbRankCompanyPrice';
 import { dbRankCompanyProfit } from './dbRankCompanyProfit';
 import { dbRankCompanyValue } from './dbRankCompanyValue';
 import { dbRankUserWealth } from './dbRankUserWealth';
+import { dbRuleAgendas } from './dbRuleAgendas';
 import { dbSeason } from './dbSeason';
 import { dbTaxes } from './dbTaxes';
 import { dbValidatingUsers } from './dbValidatingUsers';
@@ -434,6 +435,25 @@ if (Meteor.isServer) {
           multi: true
         }
       );
+    }
+  });
+
+  Migrations.add({
+    version: 10,
+    name: 'ruleAgenda add creator field.',
+    up() {
+      dbRuleAgendas.find().forEach((agenda) => {
+        dbRuleAgendas.update(
+          {
+            _id: agenda._id
+          },
+          {
+            $set: {
+              creator: agenda.proposer
+            }
+          }
+        );
+      });
     }
   });
 

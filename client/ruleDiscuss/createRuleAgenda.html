@@ -17,7 +17,17 @@
 <template name="ruleAgendaForm">
   <form>
     <div class="form-group">
-      <label for="companyName">議程主題：</label>
+      <label for="proposerId">提案人：</label>
+      <input
+        class="form-control"
+        type="text"
+        name="proposerId"
+        placeholder="請輸入提案人id"
+      />
+      {{{errorHtmlOf 'proposerId'}}}
+    </div>
+    <div class="form-group">
+      <label for="agendaTitle">議程主題：</label>
       <input
         class="form-control"
         type="text"
@@ -32,7 +42,7 @@
       {{{errorHtmlOf 'description'}}}
     </div>
     <div class="form-group">
-      <label for="description">議程討論網址：</label>
+      <label for="discussionUrl">議程討論網址：</label>
       <input
         class="form-control"
         type="text"

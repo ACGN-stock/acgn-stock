@@ -87,6 +87,20 @@ Template.ruleAgendaDetail.events({
         });
       }
     });
+  },
+  'click [data-action="updateAgendaProposer"]'(event) {
+    event.preventDefault();
+    const agendaId = FlowRouter.getParam('agendaId');
+    const message = '請輸入提案人id：';
+    alertDialog.prompt(message, (result) => {
+      if (result) {
+        Meteor.customCall('updateAgendaProposer', agendaId, result, function(error) {
+          if (! error) {
+            alertDialog.alert('修改成功！');
+          }
+        });
+      }
+    });
   }
 });
 
