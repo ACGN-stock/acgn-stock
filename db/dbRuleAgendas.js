@@ -30,6 +30,10 @@ const schema = new SimpleSchema({
   proposer: {
     type: String
   },
+  //議程建立委員userId
+  creator: {
+    type: String
+  },
   //議程建立時間
   createdAt: {
     type: Date

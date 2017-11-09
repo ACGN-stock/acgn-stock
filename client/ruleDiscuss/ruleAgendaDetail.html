@@ -19,7 +19,14 @@
         <h3>
           提案人：
           {{>userLink this.proposer}}
+          {{#if currentUser.profile.isAdmin}}
+            <button class="btn btn-primary btn-sm" data-action="updateAgendaProposer">修改</button>
+          {{/if}}
         </h3>
+        <h5>
+          議程建立委員：
+          {{>userLink this.creator}}
+        </h5>
         <hr />
         {{> ruleAgendaTable}}
       </div>

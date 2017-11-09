@@ -10,6 +10,10 @@
           提案人：
           {{>userLink this.proposer}}
         </h3>
+        <h5>
+          議程建立委員：
+          {{>userLink this.creator}}
+        </h5>
         <hr />
         {{#if currentUser}}
           {{#if canVote this}}
