@@ -455,30 +455,16 @@ function generateNewSeason() {
     }
   );
   //更新所有公司員工薪資
-  dbCompanies.update(
-    {},
-    {
-      $rename: {
-        nextSeasonSalary: 'salary'
+  dbCompanies.find().forEach((companyData) => {
+    dbCompanies.update(
+      companyData,
+      {
+        $set: {
+          salary: companyData.nextSeasonSalary
+        }
       }
-    },
-    {
-      multi: true
-    }
-  );
-  //所有公司員工分紅與下季薪資改回預設值
-  dbCompanies.update(
-    {},
-    {
-      $set: {
-        nextSeasonSalary: Meteor.settings.public.defaultCompanySalaryPerDay,
-        seasonalBonusPercent: Meteor.settings.public.defaultSeasonalBonusPercent
-      }
-    },
-    {
-      multi: true
-    }
-  );
+    );
+  });
 
   return seasonId;
 }
