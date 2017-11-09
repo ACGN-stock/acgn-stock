@@ -13,6 +13,7 @@ Meteor.methods({
     check(this.userId, String);
     check(agendaData, {
       title: String,
+      proposer: String,
       description: String,
       discussionUrl: new Match.Optional(String),
       issues: Match.Any
@@ -54,6 +55,13 @@ function createAgenda(user, agendaData) {
     }
   });
 
+  const proposer = Meteor.users.findOne({
+    _id: agendaData.proposer
+  });
+  if (! proposer) {
+    throw new Meteor.Error(404, '提案人帳號不存在！');
+  }
+
   const issueIds = [];
   issues.forEach((issue, issueIndex) => {
     const optionIds = [];
@@ -79,7 +87,8 @@ function createAgenda(user, agendaData) {
     title: agendaData.title,
     description: agendaData.description,
     discussionUrl: agendaData.discussionUrl,
-    proposer: userId,
+    proposer: agendaData.proposer,
+    creator: userId,
     createdAt: createdAt,
     issues: issueIds
   });
@@ -230,3 +239,36 @@ function takeDownRuleAgenda(user, agendaId) {
 }
 //二十秒鐘最多一次
 limitMethod('takeDownRuleAgenda', 1, 20000);
+
+Meteor.methods({
+  updateAgendaProposer(agendaId, proposerId) {
+    check(this.userId, String);
+    check(agendaId, String);
+    check(proposerId, String);
+    updateAgendaProposer(Meteor.user(), agendaId, proposerId);
+
+    return true;
+  }
+});
+function updateAgendaProposer(user, agendaId, proposerId) {
+  debug.log('updateAgendaProposer', {user, agendaId, proposerId});
+  if (! user.profile.isAdmin) {
+    throw new Meteor.Error(403, '非金管委員不得修改提案人！');
+  }
+
+  const proposer = Meteor.users.findOne({
+    _id: proposerId
+  });
+  if (! proposer) {
+    throw new Meteor.Error(404, '提案人帳號不存在！');
+  }
+
+  dbRuleAgendas.update({
+    _id: agendaId
+  }, {
+    $set: {
+      proposer: proposerId
+    }
+  });
+}
+limitMethod('updateAgendaProposer');
