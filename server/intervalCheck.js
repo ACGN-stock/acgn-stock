@@ -57,7 +57,7 @@ function intervalCheck() {
 
 //開始觀察以處理登入IP紀錄、未登入天數
 let loginObserver;
-function doLoginObserver() {
+export function doLoginObserver() {
   if (! loginObserver) {
     console.log('start observer login info at ' + threadId + ' ' + Date.now());
     loginObserver = Meteor.users
@@ -117,6 +117,7 @@ function doLoginObserver() {
       });
   }
 }
+
 //停止觀察處理登入IP紀錄、未登入天數
 function stopLoginObserver() {
   if (loginObserver) {

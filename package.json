@@ -1,12 +1,31 @@
 {
   "name": "acgn-stock",
   "private": true,
+  "watch": {
+    "test:units": {
+      "patterns": [
+        "server",
+        "client",
+        "tests/units",
+        "tests/babel-setting",
+        "./config",
+        "tests/mock"
+      ],
+      "extensions": "js, json",
+      "quiet": true,
+      "legacyWatch": true,
+      "delay": 2500
+    }
+  },
   "scripts": {
-    "start": "meteor run",
+    "start": "meteor run --settings ./config.json",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "pretest": "npm run lint --silent",
-    "deploy": "DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com meteor deploy acgn-stock.au.meteorapp.com --settings ./settings.json",
-    "postinstall": "opencollective postinstall"
+    "deploy": "DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com meteor deploy acgn-stock.au.meteorapp.com --settings ./config.json",
+    "postinstall": "opencollective postinstall",
+    "test": "meteor test --once --driver-package meteortesting:mocha --settings ./config.json",
+    "test:units": "tape -r ./tests/mock-setting.js tests/units/**/*.js|tap-spec",
+    "watch": "npm-watch"
   },
   "dependencies": {
     "babel-runtime": "6.26.0",
@@ -20,13 +39,21 @@
   "devDependencies": {
     "@meteorjs/eslint-config-meteor": "^1.0.5",
     "babel-eslint": "^7.2.3",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
     "eslint": "^4.3.0",
     "eslint-config-airbnb": "^15.0.2",
     "eslint-import-resolver-meteor": "^0.4.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-meteor": "^4.0.1",
-    "eslint-plugin-react": "^7.1.0"
+    "eslint-plugin-react": "^7.1.0",
+    "mock-require": "^2.0.2",
+    "npm-watch": "^0.3.0",
+    "sinon": "^4.1.2",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.8.0"
   },
   "collective": {
     "type": "opencollective",
