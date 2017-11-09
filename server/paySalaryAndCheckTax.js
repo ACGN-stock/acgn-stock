@@ -12,7 +12,7 @@ import { dbTaxes } from '../db/dbTaxes';
 import { dbVariables } from '../db/dbVariables';
 import { debug } from './debug';
 
-const {salaryPerPay} = Meteor.settings;
+const {salaryPerPay} = Meteor.settings.public;
 export function paySalaryAndCheckTax() {
   debug.log('paySalary');
   const todayBeginTime = new Date().setHours(0, 0, 0, 0);

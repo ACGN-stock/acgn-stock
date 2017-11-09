@@ -9,7 +9,7 @@ import { dbDirectors } from '../db/dbDirectors';
 import { dbPrice } from '../db/dbPrice';
 import { debug } from './debug';
 
-const {foundExpireTime, foundationNeedUsers, minReleaseStock} = Meteor.settings;
+const {foundExpireTime, foundationNeedUsers, minReleaseStock} = Meteor.settings.public;
 export function checkFoundCompany() {
   debug.log('checkFoundCompany');
   const foundExpireDate = new Date(Date.now() - foundExpireTime);
