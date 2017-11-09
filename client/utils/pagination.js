@@ -1,6 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
 import { dbVariables } from '../../db/dbVariables';
 
@@ -29,6 +30,16 @@ Template.pagination.helpers({
         return _.range(totalPages - 6, totalPages + 1);
       }
     }
+  },
+  currentPage() {
+    const offset = this.offset.get();
+
+    return (offset / this.dataNumberPerPage) + 1;
+  },
+  totalPages() {
+    const totalCount = dbVariables.get(this.useVariableForTotalCount);
+
+    return Math.ceil(totalCount / this.dataNumberPerPage);
   },
   pageItemClass(page) {
     const offset = this.offset.get();
@@ -68,5 +79,24 @@ Template.pagination.events({
       const newOffset = (toPage - 1) * data.dataNumberPerPage;
       data.offset.set(newOffset);
     }
+  },
+  'submit form'(event, templateInstance) {
+    event.preventDefault();
+
+    const data = templateInstance.data;
+    const targetPage = Number(templateInstance.$('form')
+      .find('input[name=page]')
+      .val());
+
+    if (data.useHrefRoute) {
+      FlowRouter.go(FlowRouter.path(FlowRouter.getRouteName(), { page: targetPage }));
+    }
+    else {
+      const newOffset = (targetPage - 1) * data.dataNumberPerPage;
+      data.offset.set(newOffset);
+    }
+  },
+  'click form button'(event) {
+    event.stopPropagation(); // 防止與外層的 click button 事件衝突 (e.g., 帳號資訊 > 玩家紀錄 > 金管會相關紀錄按鍵)
   }
 });
