@@ -8,9 +8,8 @@ import { dbVariables } from '../../db/dbVariables';
 Template.pagination.helpers({
   haveData() {
     const totalCount = dbVariables.get(this.useVariableForTotalCount);
-    const totalPages = Math.ceil(totalCount / this.dataNumberPerPage);
 
-    return totalPages > 0;
+    return totalCount > 0;
   },
   pages() {
     const totalCount = dbVariables.get(this.useVariableForTotalCount);
