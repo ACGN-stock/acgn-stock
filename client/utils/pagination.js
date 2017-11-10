@@ -8,8 +8,9 @@ import { dbVariables } from '../../db/dbVariables';
 Template.pagination.helpers({
   haveData() {
     const totalCount = dbVariables.get(this.useVariableForTotalCount);
+    const totalPages = Math.ceil(totalCount / this.dataNumberPerPage);
 
-    return totalCount > this.dataNumberPerPage;
+    return totalPages > 0;
   },
   pages() {
     const totalCount = dbVariables.get(this.useVariableForTotalCount);
@@ -38,8 +39,9 @@ Template.pagination.helpers({
   },
   totalPages() {
     const totalCount = dbVariables.get(this.useVariableForTotalCount);
+    const totalPages = Math.ceil(totalCount / this.dataNumberPerPage);
 
-    return Math.ceil(totalCount / this.dataNumberPerPage);
+    return totalPages;
   },
   pageItemClass(page) {
     const offset = this.offset.get();
