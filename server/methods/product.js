@@ -323,7 +323,7 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
       },
       sort: { [sortBy]: sortDir },
       skip: offset,
-      limit: 10,
+      limit: 30,
       disableOplog: true
     })
     .observeChanges({
