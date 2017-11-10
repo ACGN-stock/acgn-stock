@@ -12,6 +12,7 @@ import { dbPrice } from '../../db/dbPrice';
 import { checkImageUrl } from './checkImageUrl';
 import { limitMethod, limitSubscription } from './rateLimit';
 import { debug } from '../debug';
+import { publishTotalCount } from './utils';
 
 Meteor.methods({
   editCompany(companyId, newCompanyData) {
@@ -627,42 +628,25 @@ Meteor.publish('companyList', function({keyword, onlyShow, sortBy, offset}) {
   };
   const disableOplog = true;
 
-  let initialized = false;
-  let total = dbCompanies.find(filter).count();
-  this.added('variables', 'totalCountOfCompanyList', {
-    value: total
-  });
-
-  const observer = dbCompanies
+  const totalCountObserver = publishTotalCount('totalCountOfCompanyList', dbCompanies.find(filter), this);
+  const pageObserver = dbCompanies
     .find(filter, {sort, skip, limit, fields, disableOplog})
     .observeChanges({
       added: (id, fields) => {
         this.added('companies', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfCompanyList', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('companies', id, fields);
       },
       removed: (id) => {
         this.removed('companies', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfCompanyList', {
-            value: total
-          });
-        }
       }
     });
 
-  initialized = true;
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -794,17 +778,13 @@ Meteor.publish('companyDirector', function(companyId, offset) {
   check(companyId, String);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbDirectors.find({companyId}).count();
-  this.added('variables', 'totalCountOfCompanyDirector', {
-    value: total
-  });
+  const filter = { companyId };
 
-  const observer = dbDirectors
-    .find({companyId}, {
-      sort: {
-        stocks: -1
-      },
+  const totalCountObserver = publishTotalCount('totalCountOfCompanyDirector', dbDirectors.find(filter), this);
+
+  const pageObserver = dbDirectors
+    .find(filter, {
+      sort: { stocks: -1 },
       skip: offset,
       limit: 10,
       disableOplog: true
@@ -812,30 +792,19 @@ Meteor.publish('companyDirector', function(companyId, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('directors', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfCompanyDirector', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('directors', id, fields);
       },
       removed: (id) => {
         this.removed('directors', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfCompanyDirector', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -846,17 +815,13 @@ Meteor.publish('companyLog', function(companyId, offset) {
   check(companyId, String);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbLog.find({companyId}).count();
-  this.added('variables', 'totalCountOfcompanyLog', {
-    value: total
-  });
+  const filter = { companyId };
 
-  const observer = dbLog
-    .find({companyId}, {
-      sort: {
-        createdAt: -1
-      },
+  const totalCountObserver = publishTotalCount('totalCountOfcompanyLog', dbLog.find(filter), this);
+
+  const pageObserver = dbLog
+    .find(filter, {
+      sort: { createdAt: -1 },
       skip: offset,
       limit: 30,
       disableOplog: true
@@ -864,30 +829,19 @@ Meteor.publish('companyLog', function(companyId, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('log', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfcompanyLog', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('log', id, fields);
       },
       removed: (id) => {
         this.removed('log', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfcompanyLog', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
