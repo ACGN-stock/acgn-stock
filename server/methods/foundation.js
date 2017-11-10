@@ -10,6 +10,7 @@ import { dbSeason } from '../../db/dbSeason';
 import { checkImageUrl } from './checkImageUrl';
 import { limitMethod, limitSubscription } from './rateLimit';
 import { debug } from '../debug';
+import { publishTotalCount } from './utils';
 
 Meteor.methods({
   foundCompany(foundCompanyData) {
@@ -318,17 +319,11 @@ Meteor.publish('foundationList', function(keyword, offset) {
     ];
   }
 
-  let initialized = false;
-  let total = dbFoundations.find(filter).count();
-  this.added('variables', 'totalCountOfFoundationPlan', {
-    value: total
-  });
+  const totalCountObserver = publishTotalCount('totalCountOfFoundationPlan', dbFoundations.find(filter), this);
 
-  const observer = dbFoundations
+  const pageObserver = dbFoundations
     .find(filter, {
-      sort: {
-        createdAt: 1
-      },
+      sort: { createdAt: 1 },
       skip: offset,
       limit: 12,
       disableOplog: true
@@ -336,30 +331,19 @@ Meteor.publish('foundationList', function(keyword, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('foundations', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfFoundationPlan', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('foundations', id, fields);
       },
       removed: (id) => {
         this.removed('foundations', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfFoundationPlan', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次

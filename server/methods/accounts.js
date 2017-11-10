@@ -10,6 +10,7 @@ import { dbTaxes } from '../../db/dbTaxes';
 import { dbVariables } from '../../db/dbVariables';
 import { limitSubscription } from './rateLimit';
 import { debug } from '../debug';
+import { publishTotalCount } from './utils';
 
 Meteor.methods({
   payTax(taxId, amount) {
@@ -164,14 +165,12 @@ Meteor.publish('accountInfoTax', function(userId, offset) {
   check(userId, String);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbTaxes.find({userId}).count();
-  this.added('variables', 'totalCountOfAccountInfoTax', {
-    value: total
-  });
+  const filter = { userId };
 
-  const observer = dbTaxes
-    .find({userId}, {
+  const totalCountObserver = publishTotalCount('totalCountOfAccountInfoTax', dbTaxes.find(filter), this);
+
+  const pageObserver = dbTaxes
+    .find(filter, {
       skip: offset,
       limit: 10,
       disableOplog: true
@@ -179,30 +178,19 @@ Meteor.publish('accountInfoTax', function(userId, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('taxes', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfAccountInfoTax', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('taxes', id, fields);
       },
       removed: (id) => {
         this.removed('taxes', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfAccountInfoTax', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -213,14 +201,12 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
   check(userId, String);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbDirectors.find({userId}).count();
-  this.added('variables', 'totalCountOfAccountOwnStocks', {
-    value: total
-  });
+  const filter = { userId };
 
-  const observer = dbDirectors
-    .find({userId}, {
+  const totalCountObserver = publishTotalCount('totalCountOfAccountOwnStocks', dbDirectors.find(filter), this);
+
+  const pageObserver = dbDirectors
+    .find(filter, {
       fields: {
         userId: 1,
         companyId: 1,
@@ -233,30 +219,19 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('directors', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfAccountOwnStocks', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('directors', id, fields);
       },
       removed: (id) => {
         this.removed('directors', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfAccountOwnStocks', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -267,62 +242,33 @@ Meteor.publish('accountAccuseLog', function(userId, offset) {
   check(userId, String);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbLog
-    .find(
-      {
-        userId: userId,
-        logType: {
-          $in: accuseLogTypeList
-        }
-      }
-    )
-    .count();
-  this.added('variables', 'totalCountOfAccountAccuseLog', {
-    value: total
-  });
+  const filter = {
+    userId,
+    logType: { $in: accuseLogTypeList }
+  };
 
-  const observer = dbLog
-    .find(
-      {
-        userId: userId,
-        logType: {
-          $in: accuseLogTypeList
-        }
-      },
-      {
-        sort: {
-          createdAt: -1
-        },
-        skip: offset,
-        limit: 10,
-        disableOplog: true
-      }
-    )
+  const totalCountObserver = publishTotalCount('totalCountOfAccountAccuseLog', dbLog.find(filter), this);
+
+  const pageObserver = dbLog
+    .find(filter, {
+      sort: { createdAt: -1 },
+      skip: offset,
+      limit: 10,
+      disableOplog: true
+    })
     .observeChanges({
       added: (id, fields) => {
         this.added('log', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfAccountAccuseLog', {
-            value: total
-          });
-        }
       },
       removed: (id) => {
         this.removed('log', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfAccountInfoLog', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -333,73 +279,36 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
   check(userId, String);
   check(offset, Match.Integer);
 
-  const firstLogData = dbLog.findOne({userId}, {
-    sort: {
-      createdAt: 1
-    }
-  });
+  const firstLogData = dbLog.findOne({ userId }, { sort: { createdAt: 1 } });
   const firstLogDate = firstLogData ? firstLogData.createdAt : new Date();
 
-  let initialized = false;
-  let total = dbLog
-    .find(
-      {
-        userId: {
-          $in: [userId, '!all']
-        },
-        createdAt: {
-          $gte: firstLogDate
-        }
-      }
-    )
-    .count();
-  this.added('variables', 'totalCountOfAccountInfoLog', {
-    value: total
-  });
+  const filter = {
+    userId: { $in: [userId, '!all'] },
+    createdAt: { $gte: firstLogDate }
+  };
 
-  const observer = dbLog
-    .find(
-      {
-        userId: {
-          $in: [userId, '!all']
-        },
-        createdAt: {
-          $gte: firstLogDate
-        }
-      },
-      {
-        sort: {
-          createdAt: -1
-        },
-        skip: offset,
-        limit: 30,
-        disableOplog: true
-      }
-    )
+  const totalCountObserver = publishTotalCount('totalCountOfAccountInfoLog', dbLog.find(filter), this);
+
+  const pageObserver = dbLog
+    .find(filter, {
+      sort: { createdAt: -1 },
+      skip: offset,
+      limit: 30,
+      disableOplog: true
+    })
     .observeChanges({
       added: (id, fields) => {
         this.added('log', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfAccountInfoLog', {
-            value: total
-          });
-        }
       },
       removed: (id) => {
         this.removed('log', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfAccountInfoLog', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
