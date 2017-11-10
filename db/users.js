@@ -128,6 +128,11 @@ const schema = new SimpleSchema({
           }
         }),
         optional: true
+      },
+      //最後閱讀的金管會通告時間
+      lastReadFscAnnouncementDate: {
+        type: Date,
+        optional: true
       }
     }),
     optional: true

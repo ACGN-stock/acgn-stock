@@ -1,6 +1,7 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbVariables } from '../../db/dbVariables';
 
@@ -86,6 +87,16 @@ export function formatDateTimeText(date) {
   );
 }
 Template.registerHelper('formatDateTimeText', formatDateTimeText);
+
+export function currentUserId() {
+  return Meteor.userId();
+}
+Template.registerHelper('currentUserId', currentUserId);
+
+export function accountInfoLink(userId) {
+  return FlowRouter.path('accountInfo', { userId });
+}
+Template.registerHelper('accountInfoLink', accountInfoLink);
 
 export function isChairman(companyId) {
   const user = Meteor.user();

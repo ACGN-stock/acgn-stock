@@ -47,6 +47,43 @@ Template.footer.helpers({
   }
 });
 
+Template.unreadFscAnnouncementsNotification.onCreated(function() {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+
+    const user = Meteor.user();
+    if (! user) {
+      return false;
+    }
+
+    this.subscribe('lastFscAnnouncementDate');
+  });
+});
+Template.unreadFscAnnouncementsNotification.helpers({
+  hasUnreadFscAnnouncements() {
+    const user = Meteor.user();
+    if (! user) {
+      return false;
+    }
+
+    const lastFscAnnouncementDate = dbVariables.get('lastFscAnnouncementDate');
+
+    if (! lastFscAnnouncementDate) {
+      return false;
+    }
+
+    if (! user.status || ! user.status.lastReadFscAnnouncementDate) {
+      return true;
+    }
+
+    const lastReadFscAnnouncementDate = user.status.lastReadFscAnnouncementDate;
+
+    return lastReadFscAnnouncementDate < lastFscAnnouncementDate;
+  }
+});
+
 const rIsDisplayAnnouncement = new ReactiveVar(true);
 Template.displayAnnouncement.onCreated(function() {
   this.autorun(() => {

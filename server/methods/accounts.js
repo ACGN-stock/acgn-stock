@@ -265,6 +265,14 @@ Meteor.publish('accountAccuseLog', function(userId, offset) {
       }
     });
 
+  if (this.userId === userId) {
+    Meteor.users.update({
+      _id: userId
+    }, {
+      $set: { 'status.lastReadFscAnnouncementDate': new Date() }
+    });
+  }
+
   this.ready();
   this.onStop(() => {
     totalCountObserver.stop();
@@ -313,3 +321,27 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
 });
 //一分鐘最多20次
 limitSubscription('accountInfoLog');
+
+Meteor.publish('lastFscAnnouncementDate', function() {
+  debug.log('publish lastFscAnnouncementDate');
+
+  const userId = Meteor.userId();
+  check(userId, String);
+
+  this.added('variables', 'lastFscAnnouncementDate', { value: null });
+  const observer = dbLog.find({
+    logType: '金管通告',
+    userId
+  }, {
+    sort: { createdAt: -1 },
+    limit: 1
+  }).observeChanges({
+    added: (id, fields) => {
+      this.changed('variables', 'lastFscAnnouncementDate', { value: fields.createdAt });
+    }
+  });
+  this.ready();
+  this.onStop(() => {
+    observer.stop();
+  });
+});
