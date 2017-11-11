@@ -332,7 +332,8 @@ Meteor.publish('lastFscAnnouncementDate', function() {
   this.added('variables', 'lastFscAnnouncementDate', { value: null });
   const observer = dbLog.find({
     logType: '金管通告',
-    userId
+    userId,
+    'userId.0': { $ne: userId }
   }, {
     sort: { createdAt: -1 },
     limit: 1
