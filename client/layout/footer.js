@@ -48,39 +48,52 @@ Template.footer.helpers({
 });
 
 Template.unreadFscAnnouncementsNotification.onCreated(function() {
+  this.rIsDisplay = new ReactiveVar(false);
+
   this.autorun(() => {
     if (shouldStopSubscribe()) {
-      return false;
+      return;
     }
 
     const user = Meteor.user();
     if (! user) {
-      return false;
+      this.rIsDisplay.set(false);
+
+      return;
     }
 
     this.subscribe('lastFscAnnouncementDate');
-  });
-});
-Template.unreadFscAnnouncementsNotification.helpers({
-  hasUnreadFscAnnouncements() {
-    const user = Meteor.user();
-    if (! user) {
-      return false;
-    }
 
     const lastFscAnnouncementDate = dbVariables.get('lastFscAnnouncementDate');
 
     if (! lastFscAnnouncementDate) {
-      return false;
+      this.rIsDisplay.set(false);
+
+      return;
     }
 
     if (! user.status || ! user.status.lastReadFscAnnouncementDate) {
-      return true;
+      this.rIsDisplay.set(true);
+
+      return false;
     }
 
     const lastReadFscAnnouncementDate = user.status.lastReadFscAnnouncementDate;
 
-    return lastReadFscAnnouncementDate < lastFscAnnouncementDate;
+    this.rIsDisplay.set(lastReadFscAnnouncementDate < lastFscAnnouncementDate);
+  });
+});
+Template.unreadFscAnnouncementsNotification.helpers({
+  isDisplay() {
+    const instance = Template.instance();
+
+    return instance.rIsDisplay.get();
+  }
+});
+Template.unreadFscAnnouncementsNotification.events({
+  'click .btn'(event, instance) {
+    event.preventDefault();
+    instance.rIsDisplay.set(false);
   }
 });
 
