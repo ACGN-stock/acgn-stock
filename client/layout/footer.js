@@ -47,6 +47,56 @@ Template.footer.helpers({
   }
 });
 
+Template.unreadFscAnnouncementsNotification.onCreated(function() {
+  this.rIsDisplay = new ReactiveVar(false);
+
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return;
+    }
+
+    const user = Meteor.user();
+    if (! user) {
+      this.rIsDisplay.set(false);
+
+      return;
+    }
+
+    this.subscribe('lastFscAnnouncementDate');
+
+    const lastFscAnnouncementDate = dbVariables.get('lastFscAnnouncementDate');
+
+    if (! lastFscAnnouncementDate) {
+      this.rIsDisplay.set(false);
+
+      return;
+    }
+
+    if (! user.status || ! user.profile.lastReadFscAnnouncementDate) {
+      this.rIsDisplay.set(true);
+
+      return false;
+    }
+
+    const lastReadFscAnnouncementDate = user.profile.lastReadFscAnnouncementDate;
+
+    this.rIsDisplay.set(lastReadFscAnnouncementDate < lastFscAnnouncementDate);
+  });
+});
+Template.unreadFscAnnouncementsNotification.helpers({
+  isDisplay() {
+    const instance = Template.instance();
+
+    return instance.rIsDisplay.get();
+  }
+});
+Template.unreadFscAnnouncementsNotification.events({
+  'click .btn'(event, instance) {
+    event.preventDefault();
+    instance.rIsDisplay.set(false);
+  }
+});
+
 const rIsDisplayAnnouncement = new ReactiveVar(true);
 Template.displayAnnouncement.onCreated(function() {
   this.autorun(() => {

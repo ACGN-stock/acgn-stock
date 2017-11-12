@@ -88,6 +88,11 @@ const schema = new SimpleSchema({
       noLoginDayCount: {
         type: SimpleSchema.Integer,
         defaultValue: 0
+      },
+      //最後閱讀的金管會通告時間
+      lastReadFscAnnouncementDate: {
+        type: Date,
+        optional: true
       }
     })
   },
