@@ -325,7 +325,7 @@ limitSubscription('accountInfoLog');
 Meteor.publish('lastFscAnnouncementDate', function() {
   debug.log('publish lastFscAnnouncementDate');
 
-  const userId = Meteor.userId();
+  const userId = this.userId;
   check(userId, String);
 
   this.added('variables', 'lastFscAnnouncementDate', { value: null });
