@@ -72,13 +72,13 @@ Template.unreadFscAnnouncementsNotification.onCreated(function() {
       return;
     }
 
-    if (! user.status || ! user.status.lastReadFscAnnouncementDate) {
+    if (! user.status || ! user.profile.lastReadFscAnnouncementDate) {
       this.rIsDisplay.set(true);
 
       return false;
     }
 
-    const lastReadFscAnnouncementDate = user.status.lastReadFscAnnouncementDate;
+    const lastReadFscAnnouncementDate = user.profile.lastReadFscAnnouncementDate;
 
     this.rIsDisplay.set(lastReadFscAnnouncementDate < lastFscAnnouncementDate);
   });

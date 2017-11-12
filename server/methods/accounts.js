@@ -136,7 +136,6 @@ Meteor.publish('accountInfo', function(userId) {
         'services.google.email': 1,
         'status.lastLogin.date': 1,
         'status.lastLogin.ipAddr': 1,
-        'status.lastReadFscAnnouncementDate': 1,
         username: 1,
         profile: 1,
         createdAt: 1
@@ -270,7 +269,7 @@ Meteor.publish('accountAccuseLog', function(userId, offset) {
     Meteor.users.update({
       _id: userId
     }, {
-      $set: { 'status.lastReadFscAnnouncementDate': new Date() }
+      $set: { 'profile.lastReadFscAnnouncementDate': new Date() }
     });
   }
 
