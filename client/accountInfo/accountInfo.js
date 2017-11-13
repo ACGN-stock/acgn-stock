@@ -8,7 +8,6 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbLog, accuseLogTypeList } from '../../db/dbLog';
-import { dbVariables } from '../../db/dbVariables';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbEmployees } from '../../db/dbEmployees';
@@ -468,32 +467,3 @@ Template.accountInfoLogList.events({
   }
 });
 
-
-Template.accountValueInfo.onCreated(function() {
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountValueInfo', userId);
-    }
-  });
-});
-Template.accountValueInfo.helpers({
-  stockTotalValue() {
-    return dbVariables.get('stockTotalValue');
-  },
-  stockTotalProfit() {
-    return dbVariables.get('stockTotalProfit');
-  },
-  managerProfit() {
-    return dbVariables.get('managerProfit');
-  },
-  employedProfit() {
-    return dbVariables.get('employedProfit');
-  },
-  tax() {
-    return dbVariables.get('tax');
-  }
-});
