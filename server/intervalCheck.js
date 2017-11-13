@@ -178,16 +178,16 @@ function doIntervalWork() {
     }
   });
   //移除5分鐘以上的resource lock
-  dbResourceLock
-    .find({
-      time: {
-        $lt: new Date(Date.now() - 300000)
-      }
-    })
-    .forEach((lockData) => {
-      console.log(JSON.stringify(lockData) + ' locked time over 5 min...automatic release!');
-      dbResourceLock.remove(lockData._id);
-    });
+  // dbResourceLock
+  //   .find({
+  //     time: {
+  //       $lt: new Date(Date.now() - 300000)
+  //     }
+  //   })
+  //   .forEach((lockData) => {
+  //     console.log(JSON.stringify(lockData) + ' locked time over 5 min...automatic release!');
+  //     dbResourceLock.remove(lockData._id);
+  //   });
   //移除所有debug紀錄
   debug.clean();
   //移除沒有IP地址的user connections
