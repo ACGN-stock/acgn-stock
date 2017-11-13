@@ -8,7 +8,6 @@ import { dbRuleAgendas } from '../../db/dbRuleAgendas';
 import { dbRuleIssues } from '../../db/dbRuleIssues';
 import { dbRuleIssueOptions } from '../../db/dbRuleIssueOptions';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
@@ -22,7 +21,7 @@ Template.ruleAgendaVote.onCreated(function() {
     if (agendaId) {
       const agendaData = dbRuleAgendas.findOne(agendaId);
       if (agendaData) {
-        DocHead.setTitle(config.websiteName + ' - 「' + agendaData.title + '」議程資訊');
+        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + agendaData.title + '」議程資訊');
       }
     }
   });
@@ -50,7 +49,7 @@ Template.ruleAgendaVote.helpers({
     if (Meteor.user().profile.ban.length > 0) {
       return false;
     }
-    if (! Meteor.user().createdAt || Date.now() - Meteor.user().createdAt.getTime() < config.voteUserNeedCreatedIn) {
+    if (! Meteor.user().createdAt || Date.now() - Meteor.user().createdAt.getTime() < Meteor.settings.public.voteUserNeedCreatedIn) {
       return false;
     }
     if (agendaData.votes.indexOf(userId) >= 0) {

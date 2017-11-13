@@ -13,6 +13,7 @@ import { dbSeason } from '../../db/dbSeason';
 import { banTypeList } from '../../db/users';
 import { limitSubscription } from './rateLimit';
 import { debug } from '../debug';
+import { publishTotalCount } from './utils';
 
 Meteor.methods({
   accuseSomething(message) {
@@ -380,7 +381,7 @@ function confiscateStocks(user, {userId, message}) {
   directorsBulk.execute();
   dbDirectors.remove({userId});
 
-  return  true;
+  return true;
 }
 
 Meteor.methods({
@@ -514,7 +515,7 @@ Meteor.methods({
 
     return true;
   }
-})
+});
 function fscAnnouncement(user, userId, message) {
   debug.log('fscAnnouncement', {user, userId, message});
   if (! user.profile.isAdmin) {
@@ -532,58 +533,33 @@ Meteor.publish('accuseRecord', function(offset) {
   debug.log('publish accuseRecord', offset);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbLog
-    .find({
-      logType: {
-        $in: accuseLogTypeList
-      }
-    })
-    .count();
-  this.added('variables', 'totalCountOfAccuseRecord', {
-    value: total
-  });
+  const filter = {
+    logType: { $in: accuseLogTypeList }
+  };
 
-  const observer = dbLog
-    .find(
-      {
-        logType: {
-          $in: accuseLogTypeList
-        }
+  const totalCountObserver = publishTotalCount('totalCountOfAccuseRecord', dbLog.find(filter), this);
+
+  const pageObserver = dbLog
+    .find(filter, {
+      sort: {
+        createdAt: -1
       },
-      {
-        sort: {
-          createdAt: -1
-        },
-        skip: offset,
-        limit: 30,
-        disableOplog: true
-      }
-    )
+      skip: offset,
+      limit: 30,
+      disableOplog: true
+    })
     .observeChanges({
       added: (id, fields) => {
         this.added('log', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfAccuseRecord', {
-            value: total
-          });
-        }
       },
       removed: (id) => {
         this.removed('log', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfAccuseRecord', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多重複訂閱10次

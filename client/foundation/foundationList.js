@@ -6,7 +6,6 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '../../db/dbFoundations';
 import { formatDateText, isUserId } from '../utils/helpers';
-import { config } from '../../config';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -49,7 +48,7 @@ Template.foundationList.events({
   'click [data-action="createFoundation"]'(event) {
     event.preventDefault();
     const user = Meteor.user();
-    if (user.profile.money < config.founderEarnestMoney) {
+    if (user.profile.money < Meteor.settings.public.founderEarnestMoney) {
       alertDialog.alert('您的投資已達上限或剩餘金錢不足以進行投資！');
 
       return false;
@@ -99,10 +98,10 @@ const foundationListHelpers = {
     return tagList.join('、');
   },
   investPplsNumberClass(investNumber) {
-    return (investNumber >= config.foundationNeedUsers) ? 'text-success' : 'text-danger';
+    return (investNumber >= Meteor.settings.public.foundationNeedUsers) ? 'text-success' : 'text-danger';
   },
   foundationNeedUsers() {
-    return config.foundationNeedUsers;
+    return Meteor.settings.public.foundationNeedUsers;
   },
   getTotalInvest(investList) {
     return _.reduce(investList, (totalInvest, investData) => {
@@ -110,7 +109,7 @@ const foundationListHelpers = {
     }, 0);
   },
   getExpireDateText(createdAt) {
-    const expireDate = new Date(createdAt.getTime() + config.foundExpireTime);
+    const expireDate = new Date(createdAt.getTime() + Meteor.settings.public.foundExpireTime);
 
     return formatDateText(expireDate);
   },
@@ -166,11 +165,11 @@ const foundationListEvents = {
       return false;
     }
     const userId = user._id;
-    const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
+    const minimumInvest = Math.ceil(Meteor.settings.public.minReleaseStock / Meteor.settings.public.foundationNeedUsers);
     const foundationData = templaceInstance.data;
     const alreadyInvest = _.findWhere(foundationData.invest, {userId});
     const alreadyInvestAmount = alreadyInvest ? alreadyInvest.amount : 0;
-    const maximumInvest = Math.min(Meteor.user().profile.money, config.maximumInvest - alreadyInvestAmount);
+    const maximumInvest = Math.min(Meteor.user().profile.money, Meteor.settings.public.maximumInvest - alreadyInvestAmount);
     if (minimumInvest > maximumInvest) {
       alertDialog.alert('您的投資已達上限或剩餘金錢不足以進行投資！');
 

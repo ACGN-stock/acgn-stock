@@ -10,7 +10,6 @@ import { dbRankCompanyValue } from '../db/dbRankCompanyValue';
 import { dbRankUserWealth } from '../db/dbRankUserWealth';
 import { dbTaxes } from '../db/dbTaxes';
 import { debug } from './debug';
-import { config } from '../config';
 
 //為所有公司與使用者進行排名結算
 export function generateRankAndTaxesData(seasonData) {
@@ -141,7 +140,7 @@ function rankCompany(seasonData) {
         }
       },
       {
-        $limit : 100
+        $limit: 100
       }
     ]);
 
@@ -150,7 +149,7 @@ function rankCompany(seasonData) {
         {
           isSeal: false
         },
-          {
+        {
           fields: {
             _id: 1,
             lastPrice: 1,
@@ -260,7 +259,7 @@ function rankCompany(seasonData) {
         }
       },
       {
-        $limit : 100
+        $limit: 100
       }
     ]);
 
@@ -304,7 +303,7 @@ function rankCompany(seasonData) {
           priceToEarn: Math.round(rankData.priceToEarn * 1000) / 1000
         });
       });
-      rankCompanyProfitBulk.execute();      
+      rankCompanyProfitBulk.execute();
     }
   }
 }
@@ -426,8 +425,8 @@ function generateNoStockUserWealthList() {
     },
     {
       $unwind: {
-          path: '$directorsData',
-          preserveNullAndEmptyArrays: true
+        path: '$directorsData',
+        preserveNullAndEmptyArrays: true
       }
     },
     {
@@ -569,18 +568,22 @@ function generateUserTaxes(userWealthList) {
   const taxesBulk = dbTaxes.rawCollection().initializeUnorderedBulkOp();
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   _.each(userWealthList, (wealthData) => {
+    let totalWealth = wealthData.totalWealth;
+    if (wealthData.money < 0) {
+      totalWealth -= wealthData.money;
+    }
     const noLoginTime = createdAt.getTime() - (wealthData.lastLoginDate ? wealthData.lastLoginDate.getTime() : 0);
     const noLoginDay = Math.min(Math.floor(noLoginTime / 86400000), 7);
-    const noLoginDayCount = Math.min(noLoginDay + (wealthData.noLoginDayCount || 0), Math.floor(config.seasonTime / 86400000));
-    const zombie = noLoginDayCount * config.salaryPerPay;
+    const noLoginDayCount = Math.min(noLoginDay + (wealthData.noLoginDayCount || 0), Math.floor(Meteor.settings.public.seasonTime / 86400000));
+    const zombie = noLoginDayCount * Meteor.settings.public.salaryPerPay;
     const matchTaxConfig = _.find(taxConfigList, (taxConfig) => {
       return (
-        wealthData.totalWealth >= taxConfig.from &&
-        wealthData.totalWealth < taxConfig.to
+        totalWealth >= taxConfig.from &&
+        totalWealth < taxConfig.to
       );
     });
     if (matchTaxConfig) {
-      const tax = Math.ceil(wealthData.totalWealth * matchTaxConfig.ratio / 100) - matchTaxConfig.balance;
+      const tax = Math.ceil(totalWealth * matchTaxConfig.ratio / 100) - matchTaxConfig.balance;
       if (tax > 0) {
         taxesBulk.insert({
           userId: wealthData._id,
@@ -620,3 +623,4 @@ function generateUserTaxes(userWealthList) {
   taxesBulk.execute();
   logBulk.execute();
 }
+

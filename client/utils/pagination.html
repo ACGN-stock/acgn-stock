@@ -1,7 +1,7 @@
 <template name="pagination">
   {{#if haveData}}
-    <nav class="text-center">
-      <ul class="pagination pagination-sm justify-content-center mt-1">
+    <nav class="d-flex flex-columns flex-wrap align-items-baseline justify-content-center m-2">
+      <ul class="pagination pagination-sm d-inline-flex m-1">
         <li class="page-item">
           <a class="page-link" href="{{pageLinkHref 1}}" title="第一頁" aria-label="第一頁">
             <i class="fa fa-fast-backward" aria-hidden="true"></i>
@@ -32,6 +32,17 @@
           </a>
         </li>
       </ul>
+      <form class="form-inline m-1" autocomplete="off">
+        <div class="form-group">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">跳至頁數</span>
+            <input class="form-control" type="number" name="page" min="1" max="{{totalPages}}" value="{{currentPage}}" />
+            <span class="input-group-btn">
+              <button class="btn btn-primary">走！</button>
+            </span>
+          </div>
+        </div>
+      </form>
     </nav>
   {{/if}}
 </template>

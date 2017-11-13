@@ -11,6 +11,7 @@ import { dbLog } from '../../db/dbLog';
 import { dbVoteRecord } from '../../db/dbVoteRecord';
 import { limitMethod, limitSubscription } from './rateLimit';
 import { debug } from '../debug';
+import { publishTotalCount } from './utils';
 
 Meteor.methods({
   createProduct(productData) {
@@ -257,67 +258,42 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
   check(sortDir, new Match.OneOf(1, -1));
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbProducts
-    .find({
-      seasonId: seasonId,
-      overdue: {
-        $gt: 0
-      }
-    })
-    .count();
-  this.added('variables', 'totalCountOfProductList', {
-    value: total
-  });
+  const filter = {
+    seasonId: seasonId,
+    overdue: {
+      $gt: 0
+    }
+  };
 
-  const observer = dbProducts
-    .find(
-      {
-        seasonId: seasonId,
-        overdue: {
-          $gt: 0
-        }
+  const totalCountObserver = publishTotalCount('totalCountOfProductList', dbProducts.find(filter), this);
+
+  const pageObserver = dbProducts
+    .find(filter, {
+      fields: {
+        productName: 0,
+        url: 0
       },
-      {
-        fields: {
-          productName: 0,
-          url: 0
-        },
-        sort: {
-          [sortBy]: sortDir
-        },
-        skip: offset,
-        limit: 30,
-        disableOplog: true
-      }
-    )
+      sort: { [sortBy]: sortDir },
+      skip: offset,
+      limit: 30,
+      disableOplog: true
+    })
     .observeChanges({
       added: (id, fields) => {
         this.added('products', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfProductList', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('products', id, fields);
       },
       removed: (id) => {
         this.removed('products', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfProductList', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多重複訂閱10次
@@ -330,67 +306,42 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
   check(sortDir, new Match.OneOf(1, -1));
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbProducts
-    .find({
-      companyId: companyId,
-      overdue: {
-        $gt: 0
-      }
-    })
-    .count();
-  this.added('variables', 'totalCountOfProductList', {
-    value: total
-  });
+  const filter = {
+    companyId: companyId,
+    overdue: {
+      $gt: 0
+    }
+  };
 
-  const observer = dbProducts
-    .find(
-      {
-        companyId: companyId,
-        overdue: {
-          $gt: 0
-        }
+  const totalCountObserver = publishTotalCount('totalCountOfProductList', dbProducts.find(filter), this);
+
+  const pageObserver = dbProducts
+    .find(filter, {
+      fields: {
+        productName: 0,
+        url: 0
       },
-      {
-        fields: {
-          productName: 0,
-          url: 0
-        },
-        sort: {
-          [sortBy]: sortDir
-        },
-        skip: offset,
-        limit: 10,
-        disableOplog: true
-      }
-    )
+      sort: { [sortBy]: sortDir },
+      skip: offset,
+      limit: 30,
+      disableOplog: true
+    })
     .observeChanges({
       added: (id, fields) => {
         this.added('products', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfProductList', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('products', id, fields);
       },
       removed: (id) => {
         this.removed('products', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfProductList', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次

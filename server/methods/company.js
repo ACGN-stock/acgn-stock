@@ -11,8 +11,8 @@ import { dbLog } from '../../db/dbLog';
 import { dbPrice } from '../../db/dbPrice';
 import { checkImageUrl } from './checkImageUrl';
 import { limitMethod, limitSubscription } from './rateLimit';
-import { config } from '../../config';
 import { debug } from '../debug';
+import { publishTotalCount } from './utils';
 
 Meteor.methods({
   editCompany(companyId, newCompanyData) {
@@ -450,9 +450,10 @@ Meteor.methods({
     check(options.lastTime, Number);
     check(options.unitTime, Number);
     check(options.count, Number);
+
     return queryStocksCandlestick(companyId, options);
   }
-})
+});
 function queryStocksCandlestick(companyId, options) {
   debug.log('queryStocksCandlestick', {companyId, options});
   const list = dbPrice
@@ -477,6 +478,7 @@ function queryStocksCandlestick(companyId, options) {
     const priceList = _.filter(list, function(order) {
       return startTime <= order.createdAt && order.createdAt < startTime + options.unitTime;
     });
+
     return {
       time: startTime,
       open: _.min(priceList, function(order) {
@@ -490,9 +492,10 @@ function queryStocksCandlestick(companyId, options) {
       }).price || 0,
       low: _.min(priceList, function(order) {
         return order.price;
-      }).price || 0,
+      }).price || 0
     };
   });
+
   return _.filter(candlestickList, function(candlestick) {
     return candlestick.open > 0;
   });
@@ -506,7 +509,7 @@ Meteor.methods({
 
     return queryStocksPrice(companyId);
   }
-})
+});
 function queryStocksPrice(companyId) {
   debug.log('queryStocksPrice', companyId);
 
@@ -535,7 +538,7 @@ function queryStocksPrice(companyId) {
 //一分鐘最多10次
 limitMethod('queryStocksPrice');
 
-Meteor.publish('companyList', function(keyword, onlyShow, sortBy, offset) {
+Meteor.publish('companyList', function({keyword, onlyShow, sortBy, offset}) {
   debug.log('publish companyList', {keyword, onlyShow, sortBy, offset});
   check(keyword, String);
   check(onlyShow, new Match.OneOf('none', 'mine', 'favorite', 'order'));
@@ -547,7 +550,7 @@ Meteor.publish('companyList', function(keyword, onlyShow, sortBy, offset) {
   if (keyword) {
     keyword = keyword.replace(/\\/g, '\\\\');
     const reg = new RegExp(keyword, 'i');
-    filter.$or =[
+    filter.$or = [
       {
         companyName: reg
       },
@@ -625,42 +628,25 @@ Meteor.publish('companyList', function(keyword, onlyShow, sortBy, offset) {
   };
   const disableOplog = true;
 
-  let initialized = false;
-  let total = dbCompanies.find(filter).count();
-  this.added('variables', 'totalCountOfCompanyList', {
-    value: total
-  });
-
-  const observer = dbCompanies
+  const totalCountObserver = publishTotalCount('totalCountOfCompanyList', dbCompanies.find(filter), this);
+  const pageObserver = dbCompanies
     .find(filter, {sort, skip, limit, fields, disableOplog})
     .observeChanges({
       added: (id, fields) => {
         this.added('companies', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfCompanyList', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('companies', id, fields);
       },
       removed: (id) => {
         this.removed('companies', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfCompanyList', {
-            value: total
-          });
-        }
       }
     });
 
-  initialized = true;
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -767,11 +753,11 @@ Meteor.publish('companyDataForEdit', function(companyId) {
     }
   });
   if (
-      companyData &&
-      (
-        companyData.manager === this.userId ||
-        user.profile.isAdmin
-      )
+    companyData &&
+    (
+      companyData.manager === this.userId ||
+      user.profile.isAdmin
+    )
   ) {
     const overdue = 0;
 
@@ -792,17 +778,13 @@ Meteor.publish('companyDirector', function(companyId, offset) {
   check(companyId, String);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbDirectors.find({companyId}).count();
-  this.added('variables', 'totalCountOfCompanyDirector', {
-    value: total
-  });
+  const filter = { companyId };
 
-  const observer = dbDirectors
-    .find({companyId}, {
-      sort: {
-        stocks: -1
-      },
+  const totalCountObserver = publishTotalCount('totalCountOfCompanyDirector', dbDirectors.find(filter), this);
+
+  const pageObserver = dbDirectors
+    .find(filter, {
+      sort: { stocks: -1 },
       skip: offset,
       limit: 10,
       disableOplog: true
@@ -810,30 +792,19 @@ Meteor.publish('companyDirector', function(companyId, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('directors', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfCompanyDirector', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('directors', id, fields);
       },
       removed: (id) => {
         this.removed('directors', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfCompanyDirector', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -844,17 +815,13 @@ Meteor.publish('companyLog', function(companyId, offset) {
   check(companyId, String);
   check(offset, Match.Integer);
 
-  let initialized = false;
-  let total = dbLog.find({companyId}).count();
-  this.added('variables', 'totalCountOfcompanyLog', {
-    value: total
-  });
+  const filter = { companyId };
 
-  const observer = dbLog
-    .find({companyId}, {
-      sort: {
-        createdAt: -1
-      },
+  const totalCountObserver = publishTotalCount('totalCountOfcompanyLog', dbLog.find(filter), this);
+
+  const pageObserver = dbLog
+    .find(filter, {
+      sort: { createdAt: -1 },
       skip: offset,
       limit: 30,
       disableOplog: true
@@ -862,30 +829,19 @@ Meteor.publish('companyLog', function(companyId, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('log', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfcompanyLog', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('log', id, fields);
       },
       removed: (id) => {
         this.removed('log', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfcompanyLog', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -902,7 +858,7 @@ Meteor.methods({
 });
 function addFavoriteCompany(user, companyId) {
   debug.log('addFavoriteCompany', {user, companyId});
-  if (user.favorite.length >= config.maximumFavorite) {
+  if (user.favorite.length >= Meteor.settings.public.maximumFavorite) {
     throw new Meteor.Error(403, '您的最愛已達上限!');
   }
   Meteor.users.update(user._id, {
@@ -923,7 +879,7 @@ Meteor.methods({
   }
 });
 function removeFavoriteCompany(user, companyId) {
-  debug.log('removeFavoriteCompany', {user, companyId}); 
+  debug.log('removeFavoriteCompany', {user, companyId});
   const index = user.favorite.indexOf(companyId);
   if (index >= 0) {
     const newFavorite = user.favorite.slice();

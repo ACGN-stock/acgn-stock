@@ -2,7 +2,6 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-import { config } from '../config';
 
 export const debug = new Mongo.Collection('debugTemporary');
 export const dbDebugCrash = new Mongo.Collection('debugCrash');
@@ -14,7 +13,7 @@ function log(work, detail) {
 function clean() {
   debug.remove({});
 }
-if (config.debugMode) {
+if (Meteor.settings.public.debugMode) {
   debug.log = log;
   debug.clean = clean;
   Meteor.startup(function() {

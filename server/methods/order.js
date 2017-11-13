@@ -11,6 +11,7 @@ import { dbVariables } from '../../db/dbVariables';
 import { limitMethod, limitSubscription } from './rateLimit';
 import { createOrder } from '../transaction';
 import { debug } from '../debug';
+import { publishTotalCount } from './utils';
 
 Meteor.methods({
   createBuyOrder(orderData) {
@@ -370,16 +371,12 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
   }
 
   const variableId = 'totalCountOfCompanyOrder' + type;
-  let initialized = false;
-  let total = dbOrders.find(filter).count();
-  this.added('variables', variableId, {
-    value: total
-  });
 
-  const observer = dbOrders.find(filter, {
-      sort: {
-        unitPrice: type === '賣出' ? 1 : -1
-      },
+  const totalCountObserver = publishTotalCount(variableId, dbOrders.find(filter), this);
+
+  const pageObserver = dbOrders
+    .find(filter, {
+      sort: { unitPrice: type === '賣出' ? 1 : -1 },
       skip: offset,
       limit: 10,
       disableOplog: true
@@ -387,30 +384,19 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('orders', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', variableId, {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('orders', id, fields);
       },
       removed: (id) => {
         this.removed('orders', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', variableId, {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次

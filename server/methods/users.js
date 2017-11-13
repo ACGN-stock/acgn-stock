@@ -2,7 +2,7 @@
 import cheerio from 'cheerio';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http'
+import { HTTP } from 'meteor/http';
 import { check, Match } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import { UserStatus } from 'meteor/mizzao:user-status';
@@ -10,7 +10,6 @@ import { dbLog } from '../../db/dbLog';
 import { dbThreads } from '../../db/dbThreads';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbVariables } from '../../db/dbVariables';
-import { config } from '../../config';
 import { limitMethod, limitSubscription, limitGlobalMethod } from './rateLimit';
 import { debug } from '../debug';
 
@@ -187,7 +186,7 @@ Accounts.validateNewUser((user) => {
 Accounts.onCreateUser((options, user) => {
   debug.log('onCreateUser', options);
   user.profile = _.defaults({}, options.profile, {
-    money: config.beginMoney,
+    money: Meteor.settings.public.beginMoney,
     lastSeasonTotalWealth: 0,
     vote: 0,
     stone: 0,
@@ -198,7 +197,7 @@ Accounts.onCreateUser((options, user) => {
   dbLog.insert({
     logType: '驗證通過',
     userId: [user._id],
-    price: config.beginMoney,
+    price: Meteor.settings.public.beginMoney,
     createdAt: new Date()
   });
   if (user.services && user.services.google) {

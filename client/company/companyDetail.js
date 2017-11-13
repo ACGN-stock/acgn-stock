@@ -15,7 +15,6 @@ import { dbProducts } from '../../db/dbProducts';
 import { dbSeason } from '../../db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct, toggleFavorite } from '../utils/methods';
-import { config } from '../../config';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat } from '../utils/helpers.js';
@@ -29,7 +28,7 @@ Template.companyDetail.onCreated(function() {
     if (companyId) {
       const companyData = dbCompanies.findOne(companyId);
       if (companyData) {
-        DocHead.setTitle(config.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
+        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
       }
     }
   });
@@ -89,7 +88,7 @@ Template.companyDetail.helpers({
       return false;
     }
 
-    return Date.now() < seasonData.endDate.getTime() - config.announceSalaryTime;
+    return Date.now() < seasonData.endDate.getTime() - Meteor.settings.public.announceSalaryTime;
   },
   canUpdateSeasonalBonus() {
     const seasonData = dbSeason
@@ -102,7 +101,7 @@ Template.companyDetail.helpers({
       return false;
     }
 
-    return Date.now() < seasonData.endDate.getTime() - config.announceBonusTime;
+    return Date.now() < seasonData.endDate.getTime() - Meteor.settings.public.announceBonusTime;
   },
   isEmployee() {
     const userId = Meteor.userId();
@@ -196,14 +195,14 @@ Template.companyDetail.events({
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
     const message = '請輸入下季員工薪資：(' +
-      currencyFormat(config.minimumCompanySalaryPerDay) + '~' +
-      currencyFormat(config.maximumCompanySalaryPerDay) + ')';
+      currencyFormat(Meteor.settings.public.minimumCompanySalaryPerDay) + '~' +
+      currencyFormat(Meteor.settings.public.maximumCompanySalaryPerDay) + ')';
     alertDialog.prompt(message, function(salary) {
       if (salary && salary.length > 0) {
         salary = parseInt(salary, 10);
         if (isNaN(salary) ||
-          salary < config.minimumCompanySalaryPerDay ||
-          salary > config.maximumCompanySalaryPerDay) {
+          salary < Meteor.settings.public.minimumCompanySalaryPerDay ||
+          salary > Meteor.settings.public.maximumCompanySalaryPerDay) {
           alertDialog.alert('不正確的薪資設定！');
 
           return false;
@@ -217,14 +216,14 @@ Template.companyDetail.events({
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
     const message = '請輸入本季員工分紅占營收百分比：(' +
-      config.minimumSeasonalBonusPercent + '~' +
-      config.maximumSeasonalBonusPercent + ')';
+      Meteor.settings.public.minimumSeasonalBonusPercent + '~' +
+      Meteor.settings.public.maximumSeasonalBonusPercent + ')';
     alertDialog.prompt(message, function(percentage) {
       if (percentage && percentage.length > 0) {
         percentage = parseInt(percentage, 10);
         if (isNaN(percentage) ||
-          percentage < config.minimumSeasonalBonusPercent ||
-          percentage > config.maximumSeasonalBonusPercent) {
+          percentage < Meteor.settings.public.minimumSeasonalBonusPercent ||
+          percentage > Meteor.settings.public.maximumSeasonalBonusPercent) {
           alertDialog.alert('不正確的分紅設定！');
 
           return false;

@@ -2,7 +2,6 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
-import { config } from '../config';
 import { resourceManager } from './resourceManager';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
@@ -13,7 +12,7 @@ import { dbTaxes } from '../db/dbTaxes';
 import { dbVariables } from '../db/dbVariables';
 import { debug } from './debug';
 
-const {salaryPerPay} = config;
+const {salaryPerPay} = Meteor.settings.public;
 export function paySalaryAndCheckTax() {
   debug.log('paySalary');
   const todayBeginTime = new Date().setHours(0, 0, 0, 0);
@@ -98,7 +97,7 @@ function paySalaryAndGenerateProfit(thisPayTime) {
       createdAt: thisPayTime
     });
 
-    const totalProfit = config.votePricePerTicket * employees.length;
+    const totalProfit = Meteor.settings.public.votePricePerTicket * employees.length;
     const totalSalary = company.salary * employees.length;
     companyBulk.find({
       _id: company._id
@@ -144,7 +143,7 @@ function checkTax(todayBeginTime) {
     //紀錄各公司徵收到的股票
     const imposedStocksHash = {};
     expireTaxesCursor.forEach((taxData) => {
-      const taxId = ObjectID(taxData._id._str);
+      const taxId = new ObjectID(taxData._id._str);
       const userId = taxData.userId;
       const overdueDay = Math.ceil((todayBeginTime - taxData.expireDate.getTime()) / 86400000);
       //將使用者設為繳稅逾期狀態
@@ -196,7 +195,7 @@ function checkTax(todayBeginTime) {
             .updateOne({
               $inc: {
                 'profile.money': directPayMoney * -1
-              }              
+              }
             });
           logBulk.insert({
             logType: '繳稅沒金',

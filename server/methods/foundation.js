@@ -8,9 +8,9 @@ import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbSeason } from '../../db/dbSeason';
 import { checkImageUrl } from './checkImageUrl';
-import { config } from '../../config';
 import { limitMethod, limitSubscription } from './rateLimit';
 import { debug } from '../debug';
+import { publishTotalCount } from './utils';
 
 Meteor.methods({
   foundCompany(foundCompanyData) {
@@ -38,7 +38,7 @@ export function foundCompany(user, foundCompanyData) {
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
-  if (user.profile.money < config.founderEarnestMoney) {
+  if (user.profile.money < Meteor.settings.public.founderEarnestMoney) {
     throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
   }
   const userId = user._id;
@@ -50,8 +50,8 @@ export function foundCompany(user, foundCompanyData) {
       beginDate: -1
     }
   });
-  if (Date.now() >= (lastSeasonData.endDate.getTime() - config.foundExpireTime - 600000)) {
-    const hours = (config.foundExpireTime / 3600000);
+  if (Date.now() >= (lastSeasonData.endDate.getTime() - Meteor.settings.public.foundExpireTime - 600000)) {
+    const hours = (Meteor.settings.public.foundExpireTime / 3600000);
     throw new Meteor.Error(403, '商業季度即將結束前' + hours + '小時，禁止新創計劃！');
   }
   const companyName = foundCompanyData.companyName;
@@ -72,7 +72,7 @@ export function foundCompany(user, foundCompanyData) {
         'profile.money': 1
       }
     });
-    if (user.profile.money < config.founderEarnestMoney) {
+    if (user.profile.money < Meteor.settings.public.founderEarnestMoney) {
       throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
     }
     if (dbFoundations.find({manager: userId}).count() > 0) {
@@ -80,7 +80,7 @@ export function foundCompany(user, foundCompanyData) {
     }
     foundCompanyData.manager = userId;
     const createdAt = new Date();
-    foundCompanyData.createdAt = createdAt
+    foundCompanyData.createdAt = createdAt;
     dbLog.insert({
       logType: '創立公司',
       userId: [userId],
@@ -91,18 +91,18 @@ export function foundCompany(user, foundCompanyData) {
       logType: '參與投資',
       userId: [userId],
       message: foundCompanyData.companyName,
-      amount: config.founderEarnestMoney,
+      amount: Meteor.settings.public.founderEarnestMoney,
       createdAt: new Date(createdAt.getTime() + 1)
     });
     Meteor.users.update(userId, {
       $inc: {
-        'profile.money': -1 * config.founderEarnestMoney
+        'profile.money': -1 * Meteor.settings.public.founderEarnestMoney
       }
     });
     foundCompanyData.invest = [
       {
         userId: userId,
-        amount: config.founderEarnestMoney
+        amount: Meteor.settings.public.founderEarnestMoney
       }
     ];
     dbFoundations.insert(foundCompanyData);
@@ -225,11 +225,11 @@ export function investFoundCompany(user, companyId, amount) {
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
-  const minimumInvest = Math.ceil(config.minReleaseStock / config.foundationNeedUsers);
+  const minimumInvest = Math.ceil(Meteor.settings.public.minReleaseStock / Meteor.settings.public.foundationNeedUsers);
   if (amount < minimumInvest) {
     throw new Meteor.Error(403, '最低投資金額為' + minimumInvest + '！');
   }
-  const maximumInvest = config.maximumInvest;
+  const maximumInvest = Meteor.settings.public.maximumInvest;
   if (amount > maximumInvest) {
     throw new Meteor.Error(403, '最高投資金額為' + maximumInvest + '！');
   }
@@ -309,7 +309,7 @@ Meteor.publish('foundationList', function(keyword, offset) {
   if (keyword) {
     keyword = keyword.replace(/\\/g, '\\\\');
     const reg = new RegExp(keyword, 'i');
-    filter.$or =[
+    filter.$or = [
       {
         companyName: reg
       },
@@ -319,17 +319,11 @@ Meteor.publish('foundationList', function(keyword, offset) {
     ];
   }
 
-  let initialized = false;
-  let total = dbFoundations.find(filter).count();
-  this.added('variables', 'totalCountOfFoundationPlan', {
-    value: total
-  });
+  const totalCountObserver = publishTotalCount('totalCountOfFoundationPlan', dbFoundations.find(filter), this);
 
-  const observer = dbFoundations
+  const pageObserver = dbFoundations
     .find(filter, {
-      sort: {
-        createdAt: 1
-      },
+      sort: { createdAt: 1 },
       skip: offset,
       limit: 12,
       disableOplog: true
@@ -337,30 +331,19 @@ Meteor.publish('foundationList', function(keyword, offset) {
     .observeChanges({
       added: (id, fields) => {
         this.added('foundations', id, fields);
-        if (initialized) {
-          total += 1;
-          this.changed('variables', 'totalCountOfFoundationPlan', {
-            value: total
-          });
-        }
       },
       changed: (id, fields) => {
         this.changed('foundations', id, fields);
       },
       removed: (id) => {
         this.removed('foundations', id);
-        if (initialized) {
-          total -= 1;
-          this.changed('variables', 'totalCountOfFoundationPlan', {
-            value: total
-          });
-        }
       }
     });
-  initialized = true;
+
   this.ready();
   this.onStop(() => {
-    observer.stop();
+    totalCountObserver.stop();
+    pageObserver.stop();
   });
 });
 //一分鐘最多20次
@@ -381,7 +364,7 @@ Meteor.publish('foundationDetail', function(foundationId) {
 
   const foundation = dbFoundations.findOne(foundationId);
   if (foundation) {
-    let total = foundation.invest.length;
+    const total = foundation.invest.length;
     this.added('variables', 'totalCountOfFounder', {
       value: total
     });

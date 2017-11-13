@@ -14,7 +14,7 @@ Meteor.methods({
 
     return true;
   }
-})
+});
 function editAnnouncement(user, announcement, announcementDetail) {
   debug.log('editAnnouncement', {user, announcement, announcementDetail});
   if (! user.profile.isAdmin) {
@@ -24,7 +24,7 @@ function editAnnouncement(user, announcement, announcementDetail) {
   dbVariables.set('announcementDetail', announcementDetail);
 }
 
-Meteor.publish('announcementDetail', function () {
+Meteor.publish('announcementDetail', function() {
   debug.log('publish announcementDetail');
 
   return dbVariables.find(

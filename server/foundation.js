@@ -7,10 +7,9 @@ import { dbLog } from '../db/dbLog';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbPrice } from '../db/dbPrice';
-import { config } from '../config';
 import { debug } from './debug';
 
-const {foundExpireTime, foundationNeedUsers, minReleaseStock} = config;
+const {foundExpireTime, foundationNeedUsers, minReleaseStock} = Meteor.settings.public;
 export function checkFoundCompany() {
   debug.log('checkFoundCompany');
   const foundExpireDate = new Date(Date.now() - foundExpireTime);
@@ -51,16 +50,18 @@ export function checkFoundCompany() {
           }
           let directors;
           let totalRelease;
-          do {
-            directors = _.map(invest, ({userId, amount}) => {
-              const stocks = Math.floor(amount / stockUnitPrice);
-              amount -= (stockUnitPrice * stocks);
+          const generateDirectorStocksList = ({userId, amount}) => {
+            const stocks = Math.floor(amount / stockUnitPrice);
+            amount -= (stockUnitPrice * stocks);
 
-              return {userId, stocks, amount};
-            });
-            totalRelease = _.reduce(directors, (sum, directorData) => {
-              return sum + directorData.stocks;
-            }, 0);
+            return {userId, stocks, amount};
+          };
+          const sumStocks = (sum, directorData) => {
+            return sum + directorData.stocks;
+          };
+          do {
+            directors = _.map(invest, generateDirectorStocksList);
+            totalRelease = _.reduce(directors, sumStocks, 0);
             if (totalRelease < minReleaseStock) {
               stockUnitPrice /= 2;
             }
@@ -95,9 +96,9 @@ export function checkFoundCompany() {
             profit: 0,
             candidateList: [foundationData.manager],
             voteList: [ [] ],
-            salary: config.defaultCompanySalaryPerDay,
-            nextSeasonSalary: config.defaultCompanySalaryPerDay,
-            seasonalBonusPercent: config.defaultSeasonalBonusPercent,
+            salary: Meteor.settings.public.defaultCompanySalaryPerDay,
+            nextSeasonSalary: Meteor.settings.public.defaultCompanySalaryPerDay,
+            seasonalBonusPercent: Meteor.settings.public.defaultSeasonalBonusPercent,
             isSeal: false,
             createdAt: basicCreatedAt
           });
@@ -165,7 +166,7 @@ export function checkFoundCompany() {
           });
           _.each(foundationData.invest, ({userId, amount}, index) => {
             if (userId === foundationData.manager) {
-              amount -= config.founderEarnestMoney;
+              amount -= Meteor.settings.public.founderEarnestMoney;
             }
             logBulk.insert({
               logType: '創立退款',

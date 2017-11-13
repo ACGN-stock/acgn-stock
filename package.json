@@ -9,13 +9,13 @@
     "postinstall": "opencollective postinstall"
   },
   "dependencies": {
-    "babel-runtime": "^6.20.0",
-    "bcrypt": "^1.0.2",
+    "babel-runtime": "6.26.0",
+    "bcrypt": "^1.0.3",
     "cheerio": "1.0.0-rc.2",
     "image-type": "3.0.0",
-    "meteor-node-stubs": "~0.2.4",
+    "meteor-node-stubs": "0.2.11",
     "opencollective": "^1.0.3",
-    "simpl-schema": "0.3.1"
+    "simpl-schema": "0.3.2"
   },
   "devDependencies": {
     "@meteorjs/eslint-config-meteor": "^1.0.5",

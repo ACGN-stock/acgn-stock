@@ -29,7 +29,7 @@ function checkImageUrlAsync(url, callback) {
       }
     });
   };
-  if (url.indexOf('https://') === 0) {    
+  if (url.indexOf('https://') === 0) {
     https.get(url, httpCallback);
   }
   else {

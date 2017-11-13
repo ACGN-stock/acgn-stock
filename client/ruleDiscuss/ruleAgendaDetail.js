@@ -10,7 +10,6 @@ import { dbRuleIssues } from '../../db/dbRuleIssues';
 import { dbRuleIssueOptions } from '../../db/dbRuleIssueOptions';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
-import { config } from '../../config';
 import { shouldStopSubscribe } from '../utils/idle';
 const rShowOptionVoteDetail = new ReactiveVar(null);
 
@@ -22,7 +21,7 @@ Template.ruleAgendaDetail.onCreated(function() {
     if (agendaId) {
       const agendaData = dbRuleAgendas.findOne(agendaId);
       if (agendaData) {
-        DocHead.setTitle(config.websiteName + ' - 「' + agendaData.title + '」議程資訊');
+        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + agendaData.title + '」議程資訊');
       }
     }
   });
@@ -54,7 +53,7 @@ Template.ruleAgendaDetail.helpers({
     if (Meteor.user().profile.ban.length > 0) {
       return false;
     }
-    if (! Meteor.user().createdAt || Date.now() - Meteor.user().createdAt.getTime() < config.voteUserNeedCreatedIn) {
+    if (! Meteor.user().createdAt || Date.now() - Meteor.user().createdAt.getTime() < Meteor.settings.public.voteUserNeedCreatedIn) {
       return false;
     }
     if (agendaData.votes.indexOf(userId) >= 0) {
@@ -83,6 +82,20 @@ Template.ruleAgendaDetail.events({
           if (! error) {
             const path = FlowRouter.path('ruleAgendaList');
             FlowRouter.go(path);
+          }
+        });
+      }
+    });
+  },
+  'click [data-action="updateAgendaProposer"]'(event) {
+    event.preventDefault();
+    const agendaId = FlowRouter.getParam('agendaId');
+    const message = '請輸入提案人id：';
+    alertDialog.prompt(message, (result) => {
+      if (result) {
+        Meteor.customCall('updateAgendaProposer', agendaId, result, function(error) {
+          if (! error) {
+            alertDialog.alert('修改成功！');
           }
         });
       }

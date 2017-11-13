@@ -19,7 +19,7 @@ A stock system simulator game which use acgn characters as company.
 1. Install [Meteor](https://www.meteor.com/install)
 2. git clone this project from github
 3. type `meteor npm install` in project folder
-4. type `meteor` in project folder
+4. type `meteor run --settings config.json` in project folder
 
 ## Contributors
 

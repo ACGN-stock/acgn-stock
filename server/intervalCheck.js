@@ -23,10 +23,9 @@ import { recordListPriceAndSellFSCStocks, releaseStocksForHighPrice, releaseStoc
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
 import { threadId } from './thread';
 import { debug } from './debug';
-import { config } from '../config';
 
 Meteor.startup(function() {
-  Meteor.setInterval(intervalCheck, config.intervalTimer);
+  Meteor.setInterval(intervalCheck, Meteor.settings.public.intervalTimer);
 });
 
 function intervalCheck() {
@@ -90,11 +89,12 @@ function doLoginObserver() {
             });
           }
           if (nextLoginData.date.getTime() !== previousLoginData.date.getTime()) {
-            const lastSeasonData = dbSeason.findOne({}, {
+            let lastSeasonData = dbSeason.findOne({}, {
               sort: {
                 beginDate: -1
               }
-            }) || {
+            });
+            lastSeasonData = lastSeasonData ? lastSeasonData : {
               beginDate: new Date()
             };
             const seasonBeginTime = lastSeasonData.beginDate.getTime();
@@ -137,7 +137,7 @@ function doIntervalWork() {
   });
   if (! lastSeasonData) {
     //產生新的商業季度
-    generateNewSeason();    
+    generateNewSeason();
   }
   else if (now >= lastSeasonData.electTime) {
     //若有正在競選經理人的公司，則計算出選舉結果。
@@ -167,20 +167,20 @@ function doIntervalWork() {
   dbLog.remove({
     logType: '聊天發言',
     createdAt: {
-      $lt: new Date( Date.now() - 60000)
+      $lt: new Date(Date.now() - 60000)
     }
   });
   //移除所有到期的廣告
   dbAdvertising.remove({
     createdAt: {
-      $lt: new Date( Date.now() - config.advertisingExpireTime)
+      $lt: new Date(Date.now() - Meteor.settings.public.advertisingExpireTime)
     }
   });
   //移除5分鐘以上的resource lock
   dbResourceLock
     .find({
       time: {
-        $lt: new Date( Date.now() - 300000)
+        $lt: new Date(Date.now() - 300000)
       }
     })
     .forEach((lockData) => {
@@ -198,7 +198,7 @@ function doIntervalWork() {
 }
 
 //商業季度結束檢查
-function doSeasonWorks(lastSeasonData) {
+export function doSeasonWorks(lastSeasonData) {
   debug.log('doSeasonWorks', lastSeasonData);
   //避免執行時間過長導致重複進行季節結算
   if (dbResourceLock.findOne('season')) {
@@ -248,7 +248,7 @@ function doSeasonWorks(lastSeasonData) {
     //移除所有七天前的股價紀錄
     dbPrice.remove({
       createdAt: {
-        $lt: new Date( Date.now() - 604800000 )
+        $lt: new Date(Date.now() - 604800000)
       }
     });
     //移除所有待驗證註冊資料
@@ -390,14 +390,14 @@ function cancelAllOrder() {
 function generateNewSeason() {
   debug.log('generateNewSeason');
   const beginDate = new Date();
-  const endDate = new Date(beginDate.setMinutes(0, 0, 0) + config.seasonTime);
+  const endDate = new Date(beginDate.setMinutes(0, 0, 0) + Meteor.settings.public.seasonTime);
   const electTime = endDate.getTime() - 86400000;
   const userCount = Meteor.users.find().count();
   const productCount = dbProducts.find({overdue: 0}).count();
   const companiesCount = dbCompanies.find({isSeal: false}).count();
   //本季度每個使用者可以得到多少推薦票
   const vote = Math.floor(Math.log10(companiesCount) * 18);
-  const votePrice = config.votePricePerTicket;
+  const votePrice = Meteor.settings.public.votePricePerTicket;
   const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, companiesCount, productCount, votePrice});
   Meteor.users.update(
     {},
@@ -442,7 +442,7 @@ function generateNewSeason() {
     {
       resigned: false,
       registerAt: {
-        $lt: new Date(endDate.getTime() - config.seasonTime)
+        $lt: new Date(endDate.getTime() - Meteor.settings.public.seasonTime)
       }
     },
     {
@@ -455,30 +455,16 @@ function generateNewSeason() {
     }
   );
   //更新所有公司員工薪資
-  dbCompanies.update(
-    {},
-    {
-      $rename: {
-        nextSeasonSalary: 'salary'
+  dbCompanies.find().forEach((companyData) => {
+    dbCompanies.update(
+      companyData,
+      {
+        $set: {
+          salary: companyData.nextSeasonSalary
+        }
       }
-    },
-    {
-      multi: true
-    }
-  );
-  //所有公司員工分紅與下季薪資改回預設值
-  dbCompanies.update(
-    {},
-    {
-      $set: {
-        nextSeasonSalary: config.defaultCompanySalaryPerDay,
-        seasonalBonusPercent: config.defaultSeasonalBonusPercent
-      }
-    },
-    {
-      multi: true
-    }
-  );
+    );
+  });
 
   return seasonId;
 }
@@ -534,7 +520,7 @@ function giveBonusByStocksFromProfit() {
           //七天未動作者不分紅
           userData.status && now - userData.status.lastLogin.date.getTime() <= 604800000
         ) {
-          const managerProfit = Math.ceil(leftProfit * config.managerProfitPercent);
+          const managerProfit = Math.ceil(leftProfit * Meteor.settings.public.managerProfitPercent);
           logBulk.insert({
             logType: '營利分紅',
             userId: [companyData.manager],
@@ -602,7 +588,7 @@ function giveBonusByStocksFromProfit() {
         needExecuteUserBulk = true;
       }
       //剩餘收益先扣去公司營運成本
-      leftProfit -= Math.ceil(companyData.profit * config.costFromProfit);
+      leftProfit -= Math.ceil(companyData.profit * Meteor.settings.public.costFromProfit);
       const forDirectorProfit = leftProfit;
       //取得所有能夠領取紅利的董事userId與股份比例
       let canReceiveProfitStocks = 0;
@@ -626,46 +612,69 @@ function giveBonusByStocksFromProfit() {
           const userData = Meteor.users.findOne(directorData.userId, {
             fields: {
               'profile.ban': 1,
+              'profile.noLoginDayCount': 1,
               'status.lastLogin.date': 1
             }
           });
+          const { profile: userProfile, status: userStatus } = userData;
+          if (! userProfile || ! userStatus || ! userStatus.lastLogin || ! userStatus.lastLogin.date) {
+            return true;
+          }
+          const lastLoginDate = userStatus.lastLogin.date;
+
+          const oneDayMs = 86400000;
+          const noLoginTime = now - lastLoginDate.getTime();
+          const noLoginDay = Math.min(Math.floor(noLoginTime / oneDayMs), 7);
+          const noLoginDayCount = Math.min(noLoginDay + (userProfile.noLoginDayCount || 0), Math.floor(Meteor.settings.public.seasonTime / oneDayMs));
+
           //被禁止交易者不分紅
-          if (! userData.profile || _.contains(userData.profile.ban, 'deal')) {
+          if (_.contains(userProfile.ban, 'deal')) {
             return true;
           }
+
           //七天未動作者不分紅
-          if (! userData.status || now - userData.status.lastLogin.date.getTime() > 604800000) {
+          if (noLoginTime > 7 * oneDayMs) {
             return true;
           }
-          canReceiveProfitStocks += directorData.stocks;
+
+          // 未上線天數 >= 5 者，持有股份以 0% 計，故直接排除分紅
+          if (noLoginDayCount >= 5) {
+            return true;
+          }
+
+          // 未上線天數 4 天者，持有股份以 50% 計，其餘則以 100% 計
+          const effectiveStocksFactor = noLoginDayCount === 4 ? 0.5 : 1;
+          const effectiveStocks = Math.round(effectiveStocksFactor * directorData.stocks);
+
+          canReceiveProfitStocks += effectiveStocks;
           canReceiveProfitDirectorList.push({
             userId: directorData.userId,
-            stocks: directorData.stocks
+            stocks: effectiveStocks
           });
         });
-        _.each(canReceiveProfitDirectorList, (directorData, index) => {
-          const directorProfit = Math.min(Math.ceil(forDirectorProfit * directorData.stocks / canReceiveProfitStocks), leftProfit);
-          if (directorProfit > 0) {
-            logBulk.insert({
-              logType: '營利分紅',
-              userId: [directorData.userId],
-              companyId: companyId,
-              amount: directorProfit,
-              createdAt: new Date(now + 3 + employeeList.length + index)
+      _.each(canReceiveProfitDirectorList, (directorData, index) => {
+        const directorProfit = Math.min(Math.ceil(forDirectorProfit * directorData.stocks / canReceiveProfitStocks), leftProfit);
+        if (directorProfit > 0) {
+          logBulk.insert({
+            logType: '營利分紅',
+            userId: [directorData.userId],
+            companyId: companyId,
+            amount: directorProfit,
+            createdAt: new Date(now + 3 + employeeList.length + index)
+          });
+          usersBulk
+            .find({
+              _id: directorData.userId
+            })
+            .updateOne({
+              $inc: {
+                'profile.money': directorProfit
+              }
             });
-            usersBulk
-              .find({
-                _id: directorData.userId
-              })
-              .updateOne({
-                $inc: {
-                  'profile.money': directorProfit
-                }
-              });
-            needExecuteUserBulk = true;
-            leftProfit -= directorProfit;
-          }
-        });
+          needExecuteUserBulk = true;
+          leftProfit -= directorProfit;
+        }
+      });
     });
   if (needExecuteLogBulk) {
     logBulk.execute();
@@ -762,7 +771,7 @@ function electManager(seasonData) {
 
           const voteStocksList = _.map(companyData.candidateList, (candidate, index) => {
             const voteDirectorList = voteList[index];
-            let stocks = _.reduce(voteDirectorList, (stocks, userId) => {
+            const stocks = _.reduce(voteDirectorList, (stocks, userId) => {
               const directorData = _.findWhere(directorList, {userId});
 
               return stocks + (directorData ? directorData.stocks : 0);

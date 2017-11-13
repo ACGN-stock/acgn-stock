@@ -4,13 +4,12 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
 import { dbCompanies } from './db/dbCompanies';
 import { dbFoundations } from './db/dbFoundations';
-import { config } from './config';
 
 //default route
 FlowRouter.route('/', {
   name: 'announcement',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 系統公告');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 系統公告');
   }
 });
 
@@ -32,14 +31,14 @@ export const pageNameHash = {
 FlowRouter.route('/tutorial', {
   name: 'tutorial',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 教學導覽');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 教學導覽');
   }
 });
 
 FlowRouter.route('/instantMessage', {
   name: 'instantMessage',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 即時訊息');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 即時訊息');
   }
 });
 
@@ -58,7 +57,7 @@ companyRoute.route('/', {
 companyRoute.route('/:page', {
   name: 'companyList',
   action(params) {
-    DocHead.setTitle(config.websiteName + ' - 股市總覽');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 股市總覽');
     if (Meteor.isClient) {
       const { rCompanyOffset } = require('./client/company/companyList');
       const page = window.parseInt(params.page, 10) || 1;
@@ -76,17 +75,17 @@ companyRoute.route('/detail/:companyId', {
           companyName: 1
         }
       });
-      DocHead.setTitle(config.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
     }
     else {
-      DocHead.setTitle(config.websiteName + ' - 公司資訊');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 公司資訊');
     }
   }
 });
 FlowRouter.route('/edit/:companyId', {
   name: 'editCompany',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 經營管理');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 經營管理');
   }
 });
 
@@ -105,7 +104,7 @@ foundationRoute.route('/', {
 foundationRoute.route('/:page', {
   name: 'foundationList',
   action(params) {
-    DocHead.setTitle(config.websiteName + ' - 新創計劃');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 新創計劃');
     if (Meteor.isClient) {
       const { rFoundationOffset } = require('./client/foundation/foundationList');
       const page = window.parseInt(params.page, 10) || 1;
@@ -123,24 +122,24 @@ foundationRoute.route('/view/:foundationId', {
           companyName: 1
         }
       });
-      DocHead.setTitle(config.websiteName + ' - 「' + foundationData.companyName + '」公司資訊');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + foundationData.companyName + '」公司資訊');
     }
     else {
-      DocHead.setTitle(config.websiteName + ' - 新創計劃資訊');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 新創計劃資訊');
     }
   }
 });
 foundationRoute.route('/edit/new', {
   name: 'createFoundationPlan',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 發起新創計劃');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 發起新創計劃');
   }
 });
 foundationRoute.route('/edit/:foundationId', {
   name: 'editFoundationPlan',
   action() {
     if (Meteor.isClient) {
-      DocHead.setTitle(config.websiteName + ' - 編輯新創計劃');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 編輯新創計劃');
     }
   }
 });
@@ -152,7 +151,7 @@ const productCenterRoute = FlowRouter.group({
 productCenterRoute.route('/season/:seasonId', {
   name: 'productCenterBySeason',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 產品中心');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 產品中心');
   }
 });
 productCenterRoute.route('/company/:companyId', {
@@ -164,10 +163,10 @@ productCenterRoute.route('/company/:companyId', {
           companyName: 1
         }
       });
-      DocHead.setTitle(config.websiteName + ' - 產品中心 - ' + companyData.companyName);
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 產品中心 - ' + companyData.companyName);
     }
     else {
-      DocHead.setTitle(config.websiteName + ' - 產品中心');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 產品中心');
     }
   }
 });
@@ -175,7 +174,7 @@ productCenterRoute.route('/company/:companyId', {
 FlowRouter.route('/advertising', {
   name: 'advertising',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 廣告宣傳');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 廣告宣傳');
   }
 });
 
@@ -186,13 +185,13 @@ const seasonalReportRoute = FlowRouter.group({
 seasonalReportRoute.route('/', {
   name: 'seasonalReportRedirect',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 季度報告');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 季度報告');
   }
 });
 seasonalReportRoute.route('/:seasonId', {
   name: 'seasonalReport',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 季度報告');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 季度報告');
   }
 });
 
@@ -222,10 +221,10 @@ accountInfoRoute.route('/:userId', {
           'profile.name': 1
         }
       });
-      DocHead.setTitle(config.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
     }
     else {
-      DocHead.setTitle(config.websiteName + ' - 帳號資訊');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 帳號資訊');
     }
   }
 });
@@ -245,31 +244,31 @@ ruleDiscussRoute.route('/', {
 ruleDiscussRoute.route('/list', {
   name: 'ruleAgendaList',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 規則討論');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 規則討論');
   }
 });
 ruleDiscussRoute.route('/new', {
   name: 'createRuleAgenda',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 建立新議程');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 建立新議程');
   }
 });
 ruleDiscussRoute.route('/view/:agendaId', {
   name: 'ruleAgendaDetail',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 議程資訊');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 議程資訊');
   }
 });
 ruleDiscussRoute.route('/vote/:agendaId', {
   name: 'ruleAgendaVote',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 議程投票');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 議程投票');
   }
 });
 
 FlowRouter.route('/accuseRecord', {
   name: 'accuseRecord',
   action() {
-    DocHead.setTitle(config.websiteName + ' - 舉報違規紀錄');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 舉報違規紀錄');
   }
 });

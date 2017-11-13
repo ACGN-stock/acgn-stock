@@ -1,11 +1,11 @@
 'use strict';
+import { Meteor } from 'meteor/meteor';
 import { resourceManager } from './resourceManager';
 import { dbCompanies } from '../db/dbCompanies';
 import { dbDirectors } from '../db/dbDirectors';
 import { dbOrders } from '../db/dbOrders';
 import { dbLog } from '../db/dbLog';
 import { dbVariables } from '../db/dbVariables';
-import { config } from '../config';
 import { createOrder } from './transaction';
 import { debug } from './debug';
 
@@ -75,8 +75,8 @@ export function releaseStocksForHighPrice() {
   }
 }
 function generateReleaseStocksForHighPriceConter() {
-  const min = config.releaseStocksForHighPriceMinCounter;
-  const max = (config.releaseStocksForHighPriceMaxCounter - min);
+  const min = Meteor.settings.public.releaseStocksForHighPriceMinCounter;
+  const max = (Meteor.settings.public.releaseStocksForHighPriceMaxCounter - min);
 
   return min + Math.floor(Math.random() * max);
 }
@@ -89,7 +89,7 @@ export function releaseStocksForNoDeal() {
     releaseStocksForNoDealCounter = generateReleaseStocksForNoDealConter();
     dbVariables.set('releaseStocksForNoDealCounter', releaseStocksForNoDealCounter);
     console.info('releaseStocksForNoDeal triggered! next counter: ', releaseStocksForNoDealCounter);
-    const checkLogTime = new Date(Date.now() - (config.releaseStocksForNoDealMinCounter * config.intervalTimer));
+    const checkLogTime = new Date(Date.now() - (Meteor.settings.public.releaseStocksForNoDealMinCounter * Meteor.settings.public.intervalTimer));
     const lowPriceThreshold = dbVariables.get('lowPriceThreshold');
     dbCompanies
       .find(
@@ -231,8 +231,8 @@ export function releaseStocksForNoDeal() {
   }
 }
 function generateReleaseStocksForNoDealConter() {
-  const min = config.releaseStocksForNoDealMinCounter;
-  const max = (config.releaseStocksForNoDealMaxCounter - min);
+  const min = Meteor.settings.public.releaseStocksForNoDealMinCounter;
+  const max = (Meteor.settings.public.releaseStocksForNoDealMaxCounter - min);
 
   return min + Math.floor(Math.random() * max);
 }
@@ -242,7 +242,7 @@ export function releaseStocksForLowPrice() {
   let releaseStocksForLowPriceCounter = dbVariables.get('releaseStocksForLowPriceCounter') || 0;
   releaseStocksForLowPriceCounter -= 1;
   if (releaseStocksForLowPriceCounter <= 0) {
-    releaseStocksForLowPriceCounter = config.releaseStocksForLowPriceCounter;
+    releaseStocksForLowPriceCounter = Meteor.settings.public.releaseStocksForLowPriceCounter;
     dbVariables.set('releaseStocksForLowPriceCounter', releaseStocksForLowPriceCounter);
     console.info('releaseStocksForLowPrice triggered! next counter: ', releaseStocksForLowPriceCounter);
     const lowPriceThreshold = dbVariables.get('lowPriceThreshold');
@@ -389,7 +389,7 @@ export function recordListPriceAndSellFSCStocks() {
           fields: {
             _id: 1,
             lastPrice: 1,
-            listPrice: 1,
+            listPrice: 1
           },
           disableOplog: true
         }
@@ -449,20 +449,20 @@ export function recordListPriceAndSellFSCStocks() {
   }
 }
 function generateRecordListPriceConter() {
-  const min = config.recordListPriceMinCounter;
-  const max = (config.recordListPriceMaxCounter - min);
+  const min = Meteor.settings.public.recordListPriceMinCounter;
+  const max = (Meteor.settings.public.recordListPriceMaxCounter - min);
 
   return min + Math.floor(Math.random() * max);
 }
 
-let checkChairmanCounter = config.checkChairmanCounter;
+let checkChairmanCounter = Meteor.settings.public.checkChairmanCounter;
 export function checkChairman() {
   debug.log('checkChairman');
   checkChairmanCounter -= 1;
   if (checkChairmanCounter <= 0) {
     const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
     let needExecuteBulk = false;
-    checkChairmanCounter = config.checkChairmanCounter;
+    checkChairmanCounter = Meteor.settings.public.checkChairmanCounter;
     dbCompanies
       .find(
         {

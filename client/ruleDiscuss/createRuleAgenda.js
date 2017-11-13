@@ -8,7 +8,6 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, utilFormHelpers, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { alertDialog } from '../layout/alertDialog';
-import { config } from '../../config';
 
 const rIssueList = new ReactiveVar();
 const rIssueOptionList = new ReactiveVar();
@@ -47,7 +46,7 @@ Template.ruleAgendaForm.helpers({
     return optionList[issueId - 1];
   },
   showAddIssueButton() {
-    return rIssueList.get().length < config.maximumRuleIssue;
+    return rIssueList.get().length < Meteor.settings.public.maximumRuleIssue;
   },
   showAddOptionButton(issueId) {
     const list = rIssueOptionList.get();
@@ -55,7 +54,7 @@ Template.ruleAgendaForm.helpers({
       return false;
     }
 
-    return list[issueId - 1].length < config.maximumRuleIssueOption;
+    return list[issueId - 1].length < Meteor.settings.public.maximumRuleIssueOption;
   },
   showRemoveIssueButton() {
     return rIssueList.get().length > 1;
@@ -145,7 +144,10 @@ function getIssueOptionInputName(issueId, optionId) {
 
 function validateModel(model) {
   const error = {};
-  if (! model.agendaTitle.length) {
+  if (! model.proposerId || model.proposerId.length === 0) {
+    error.proposerId = '請輸入提案人id！';
+  }
+  if (! model.agendaTitle || model.agendaTitle.length === 0) {
     error.agendaTitle = '請輸入議程主題！';
   }
   else if (model.agendaTitle.length > 100) {
@@ -223,6 +225,7 @@ function saveModel(model) {
 
       const newModel = {
         title: model.agendaTitle,
+        proposer: model.proposerId,
         description: model.description,
         discussionUrl: model.discussionUrl,
         issues: issues
