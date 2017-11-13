@@ -27,6 +27,9 @@
               {{/if}}
             </a>
           </div>
+          {{#if isDisplayPanel 'stock'}}
+            {{> accountInfoOwnStockList}}
+          {{/if}}
           <div class="col-12 border-grid">
             <a class="d-block h4" href="#" data-toggle-panel="log">
               玩家紀錄
