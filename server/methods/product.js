@@ -182,13 +182,22 @@ export function voteProduct(user, productId) {
         profit: votePrice
       }
     });
-    dbProducts.update(productId, {
-      $inc: {
-        votes: 1,
-        likeCount: 1
-      }
-    });
-    dbProductLike.insert({productId, companyId, userId});
+    if (dbProductLike.find({productId, companyId, userId}).count() > 0) {
+      dbProducts.update(productId, {
+        $inc: {
+          votes: 1
+        }
+      });
+    }
+    else {
+      dbProducts.update(productId, {
+        $inc: {
+          votes: 1,
+          likeCount: 1
+        }
+      });
+      dbProductLike.insert({productId, companyId, userId});
+    }
     release();
   });
 }
