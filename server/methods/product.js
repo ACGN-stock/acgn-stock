@@ -182,7 +182,7 @@ export function voteProduct(user, productId) {
         profit: votePrice
       }
     });
-    if (dbProductLike.find({productId, companyId, userId}).count() > 0) {
+    if (dbProductLike.find({productId, userId}).count() > 0) {
       dbProducts.update(productId, {
         $inc: {
           votes: 1
