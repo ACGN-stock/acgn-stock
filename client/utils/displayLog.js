@@ -277,7 +277,7 @@ Template.displayLog.helpers({
           getUserLink(logData.userId[0]) +
           '向「' + getCompanyLink(logData.companyId) +
           '」公司的產品「' + getProductLink(logData.productId) + '」投了一張推薦票' +
-          '，使其獲得了$' + logData.price + '的營利額！'
+          '，使其獲得了$' + currencyFormat(logData.price) + '的營利額！'
         );
       }
       case '員工營利': {
@@ -288,7 +288,7 @@ Template.displayLog.helpers({
         return (
           '【員工營利】' + userLinkList.join('、') +
           '等人努力工作，使「' + getCompanyLink(logData.companyId) +
-          '」公司獲得了$' + logData.price + '的營利額！'
+          '」公司獲得了$' + currencyFormat(logData.price) + '的營利額！'
         );
       }
       case '公司營利': {

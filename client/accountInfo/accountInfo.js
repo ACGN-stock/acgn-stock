@@ -466,3 +466,4 @@ Template.accountInfoLogList.events({
     accountLogViewerMode.set('accuse');
   }
 });
+

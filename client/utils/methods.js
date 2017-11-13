@@ -11,6 +11,7 @@ import { dbVoteRecord } from '../../db/dbVoteRecord';
 import { addTask, resolveTask } from '../layout/loading';
 import { handleError } from './handleError';
 import { alertDialog } from '../layout/alertDialog';
+import { currencyFormat } from './helpers';
 
 Meteor.subscribe('isChangingSeason');
 
@@ -77,7 +78,7 @@ export function createBuyOrder(user, companyData) {
   alertDialog.dialog({
     type: 'prompt',
     title: '股份購入',
-    message: `請輸入您期望購入的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`,
+    message: `請輸入您期望購入的每股單價：(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`,
     callback: function(result) {
       const unitPrice = parseInt(result, 10);
       if (! unitPrice) {
@@ -139,7 +140,7 @@ export function createSellOrder(user, companyData) {
   alertDialog.dialog({
     type: 'prompt',
     title: '股份賣出',
-    message: `請輸入您期望賣出的每股單價：(${minimumUnitPrice}~${maximumUnitPrice})`,
+    message: `請輸入您期望賣出的每股單價：(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`,
     callback: function(result) {
       const unitPrice = parseInt(result, 10);
       if (! unitPrice) {
