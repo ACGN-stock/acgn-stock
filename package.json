@@ -33,7 +33,6 @@
     "cheerio": "1.0.0-rc.2",
     "image-type": "3.0.0",
     "meteor-node-stubs": "0.2.11",
-    "must-sinon": "0.0.0",
     "opencollective": "^1.0.3",
     "simpl-schema": "0.3.2"
   },
@@ -52,6 +51,7 @@
     "eslint-plugin-react": "^7.1.0",
     "mock-require": "^2.0.2",
     "must": "^0.13.4",
+    "must-sinon": "0.0.0",
     "npm-watch": "^0.3.0",
     "sinon": "^4.1.2",
     "tap-spec": "^4.1.1",
