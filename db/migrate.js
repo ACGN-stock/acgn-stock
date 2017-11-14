@@ -456,6 +456,18 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 11,
+    name: 'rename user.profile.lastReadFscAnnouncementDate to user.profile.lastReadAccuseLogDate',
+    up() {
+      Meteor.users.update({
+        lastReadFscAnnouncementDate: 1
+      }, {
+        $rename: { lastReadFscAnnouncementDate: 'lastReadAccuseLogDate' }
+      });
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });
