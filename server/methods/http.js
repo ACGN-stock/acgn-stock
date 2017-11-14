@@ -1,7 +1,6 @@
 'use strict';
 import url from 'url';
 import querystring from 'querystring';
-import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
 import { HTTP } from 'meteor/http';
 import { dbCompanyArchive } from '../../db/dbCompanyArchive';
