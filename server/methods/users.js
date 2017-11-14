@@ -59,63 +59,58 @@ function generateValidateCode() {
 Meteor.methods({
   validatePTTAccount(username) {
     check(username, String);
-    const result = validatePTTAccount(username);
 
-    if (result) {
+    validateAllPTTAccounts();
+
+    const existingUser = Meteor.users.findOne({ username });
+    const validatingUser = dbValidatingUsers.findOne({ username });
+    if (existingUser && ! validatingUser) {
       return true;
     }
-    else if (Meteor.users.find({username}).count() > 0) {
-      return true;
-    }
-    else {
-      throw new Meteor.Error(403, '驗證未能通過，請確定推文位置、推文文章、推文方式與推文驗證碼是否正確！');
-    }
+
+    throw new Meteor.Error(403, '驗證未能通過，請確定推文位置、推文文章、推文方式與推文驗證碼是否正確！');
   }
 });
 limitGlobalMethod('validatePTTAccount');
-function validatePTTAccount(checkUsername) {
-  debug.log('validatePTTAccount', checkUsername);
-  let checkResult = false;
+
+// 將未認證的所有帳號當作 PTT 帳號進行一次認證
+function validateAllPTTAccounts() {
+  debug.log('validateAllPTTAccounts');
   const validatingUserList = dbValidatingUsers.find({}).fetch();
-  if (validatingUserList.length > 0) {
-    const url = dbVariables.get('validateUserUrl');
-    const httpCallResult = HTTP.get(url);
-    const $pushList = cheerio.load(httpCallResult.content)('div.push');
-    validatingUserList.forEach((validatingUser) => {
-      const username = validatingUser.username;
-      const $userPushList = $pushList.find('.push-userid:contains(' + username + ')').closest('.push');
-      if ($userPushList.length > 0) {
-        const validateCode = validatingUser.validateCode;
-        if ($userPushList.find('.push-content:contains(' + validateCode + ')').length > 0) {
-          if (checkUsername === username) {
-            checkResult = true;
-          }
-          const password = validatingUser.password;
-          const existUser = Meteor.users.findOne({username}, {
-            fields: {
-              _id: 1
-            }
-          });
-          if (existUser) {
-            Accounts.setPassword(existUser._id, password, {
-              logout: true
-            });
-            dbValidatingUsers.remove(validatingUser._id);
-          }
-          else {
-            const profile = {
-              validateType: 'PTT',
-              name: username
-            };
-            Accounts.createUser({username, password, profile});
-            dbValidatingUsers.remove(validatingUser._id);
-          }
-        }
-      }
-    });
+  if (validatingUserList.length === 0) {
+    return;
   }
 
-  return checkResult;
+  const url = dbVariables.get('validateUserUrl');
+  const httpCallResult = HTTP.get(url);
+  const $pushList = cheerio.load(httpCallResult.content)('div.push');
+
+  validatingUserList.forEach((validatingUser) => {
+    const { username, validateCode, password } = validatingUser;
+
+    const $userPushList = $pushList.find(`.push-userid:contains(${username})`).closest('.push');
+    if ($userPushList.find(`.push-content:contains(${validateCode})`).length === 0) {
+      return;
+    }
+
+    const existingUser = Meteor.users.findOne({username}, { fields: { _id: 1 } });
+
+    if (existingUser) { // 既有帳號通過認證 → 重設密碼
+      Accounts.setPassword(existingUser._id, password, { logout: true });
+    }
+    else { // 新人通過認證 → 建立新帳號
+      Accounts.createUser({
+        username,
+        password,
+        profile: {
+          validateType: 'PTT',
+          name: username
+        }
+      });
+    }
+
+    dbValidatingUsers.remove(validatingUser._id);
+  });
 }
 
 Meteor.methods({
