@@ -105,6 +105,30 @@ describe('method loginOrRegister', function() {
           expect(result1).to.equal(result2);
         });
     });
+
+    it('should return the same validation code across different calls with different passwords', function() {
+      const params1 = {
+        username: userData.username,
+        password: 'password1',
+        type: userData.profile.validateType,
+        reset: false
+      };
+
+      const params2 = {
+        username: userData.username,
+        password: 'password2',
+        type: userData.profile.validateType,
+        reset: false
+      };
+
+      return Promise.all([
+        loginOrRegister(params1),
+        loginOrRegister(params2)
+      ])
+        .then(([result1, result2]) => {
+          expect(result1).to.equal(result2);
+        });
+    });
   });
 });
 

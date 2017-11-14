@@ -15,38 +15,38 @@ import { limitMethod, limitSubscription, limitGlobalMethod } from './rateLimit';
 import { debug } from '../debug';
 
 Meteor.methods({
-  loginOrRegister({username, password, type, reset}) {
-    debug.log('loginOrRegister', {username, password, type, reset});
+  loginOrRegister({ username, password, type, reset }) {
+    debug.log('loginOrRegister', { username, password, type, reset });
     check(username, String);
     check(password, String);
     check(type, new Match.OneOf('PTT', 'Bahamut'));
     check(reset, Boolean);
 
-    const checkUsername = (type === 'Bahamut') ? ('?' + username) : username;
-    if (Meteor.users.find({username: checkUsername}).count() > 0 && ! reset) {
+    const checkUsername = (type === 'Bahamut') ? `?${username}` : username;
+
+    if (Meteor.users.find({ username: checkUsername }).count() > 0 && ! reset) {
       return true;
     }
-    else {
-      const existValidatingUser = dbValidatingUsers.findOne({
-        username: checkUsername,
-        password
-      });
-      if (existValidatingUser) {
-        return existValidatingUser.validateCode;
-      }
-      else {
-        const validateCode = generateValidateCode();
-        const createdAt = new Date();
-        dbValidatingUsers.insert({
-          username: checkUsername,
-          password,
-          validateCode,
-          createdAt
-        });
 
-        return validateCode;
+    const validatingUser = dbValidatingUsers.findOne({ username: checkUsername });
+    if (validatingUser) {
+      if (validatingUser.password !== password) {
+        dbValidatingUsers.update({ _id: validatingUser._id }, { $set: { password }});
       }
+
+      return validatingUser.validateCode;
     }
+
+    const validateCode = generateValidateCode();
+    const createdAt = new Date();
+    dbValidatingUsers.insert({
+      username: checkUsername,
+      password,
+      validateCode,
+      createdAt
+    });
+
+    return validateCode;
   }
 });
 //一分鐘最多五次
