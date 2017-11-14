@@ -4,11 +4,14 @@ import { HTTP } from 'meteor/http';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import { promisify } from 'util';
 import expect from 'must';
+import mustSinon from 'must-sinon';
 import sinon from 'sinon';
 
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 
 import '/server/methods/users';
+
+mustSinon(expect);
 
 describe('method loginOrRegister', function() {
   const userData = {
@@ -221,9 +224,15 @@ describe('method validatePTTAccount', function() {
           validateCode: correctValidateCode,
           createdAt: new Date()
         });
+
+        sinon.spy(Accounts, 'setPassword');
       });
 
-      it('should return true even if the validation code in the article does not match', function() {
+      afterEach(function() {
+        Accounts.setPassword.restore();
+      });
+
+      it('should throw error if the validation code in the article does not match', function() {
         HTTP.get.returns({
           content: `
             <div class="push">
@@ -234,7 +243,25 @@ describe('method validatePTTAccount', function() {
         });
 
         return promisify(Meteor.call)('validatePTTAccount', username)
-          .must.resolve.with.true();
+          .must.reject.with.an.error(Meteor.Error);
+      });
+
+      it('should reset user password if the validation passed', function() {
+        HTTP.get.returns({
+          content: `
+            <div class="push">
+              <span class="push-userid">${username}</span>
+              <span class="push-content">: ${correctValidateCode}</span>
+            </div>
+          `
+        });
+
+        return promisify(Meteor.call)('validatePTTAccount', username)
+          .must.resolve.with.true()
+          .then(() => {
+            const { _id: userId } = Meteor.users.findOne({ username });
+            Accounts.setPassword.must.have.been.calledWith(userId, newPassword);
+          });
       });
     });
   });

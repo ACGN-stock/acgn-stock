@@ -33,6 +33,7 @@
     "cheerio": "1.0.0-rc.2",
     "image-type": "3.0.0",
     "meteor-node-stubs": "0.2.11",
+    "must-sinon": "0.0.0",
     "opencollective": "^1.0.3",
     "simpl-schema": "0.3.2"
   },
