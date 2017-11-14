@@ -810,12 +810,19 @@ Meteor.publish('companyDirector', function(companyId, offset) {
 //一分鐘最多20次
 limitSubscription('companyDirector');
 
-Meteor.publish('companyLog', function(companyId, offset) {
-  debug.log('publish companyLog', {companyId, offset});
+Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
+  debug.log('publish companyLog', {companyId, onlyShowMine, offset});
   check(companyId, String);
+  check(onlyShowMine, Boolean);
   check(offset, Match.Integer);
 
   const filter = { companyId };
+  const userId = Meteor.userId();
+  if (onlyShowMine && userId) {
+    filter.userId = {
+      $in: [userId, '!all']
+    };
+  }
 
   const totalCountObserver = publishTotalCount('totalCountOfcompanyLog', dbLog.find(filter), this);
 

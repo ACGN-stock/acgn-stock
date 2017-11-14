@@ -916,7 +916,7 @@ function getStockAmount(companyId) {
   }
 }
 
-inheritedShowLoadingOnSubscribing(Template.companyLogList);
+inheritedShowLoadingOnSubscribing(Template.companyEmployeeList);
 Template.companyEmployeeList.helpers({
   employeeList() {
     const companyId = FlowRouter.getParam('companyId');
@@ -940,6 +940,7 @@ Template.companyEmployeeList.helpers({
   }
 });
 
+const rIsOnlyShowMine = new ReactiveVar(false);
 const rLogOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.companyLogList);
 Template.companyLogList.onCreated(function() {
@@ -950,11 +951,14 @@ Template.companyLogList.onCreated(function() {
     }
     const companyId = FlowRouter.getParam('companyId');
     if (companyId) {
-      this.subscribe('companyLog', companyId, rLogOffset.get());
+      this.subscribe('companyLog', companyId, rIsOnlyShowMine.get(), rLogOffset.get());
     }
   });
 });
 Template.companyLogList.helpers({
+  onlyShowMine() {
+    return rIsOnlyShowMine.get();
+  },
   logList() {
     const companyId = FlowRouter.getParam('companyId');
 
@@ -971,5 +975,11 @@ Template.companyLogList.helpers({
       dataNumberPerPage: 30,
       offset: rLogOffset
     };
+  }
+});
+Template.companyLogList.events({
+  'click button'(event) {
+    event.preventDefault();
+    rIsOnlyShowMine.set(! rIsOnlyShowMine.get());
   }
 });
