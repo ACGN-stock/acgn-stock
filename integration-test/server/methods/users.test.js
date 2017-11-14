@@ -266,7 +266,3 @@ describe('method validatePTTAccount', function() {
     });
   });
 });
-
-describe('method validateBahamutAccount', function() {
-  it('pending');
-});
