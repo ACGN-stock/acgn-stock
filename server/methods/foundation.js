@@ -6,6 +6,7 @@ import { resourceManager } from '../resourceManager';
 import { dbFoundations } from '../../db/dbFoundations';
 import { dbLog } from '../../db/dbLog';
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbCompanyArchive } from '../../db/dbCompanyArchive';
 import { dbSeason } from '../../db/dbSeason';
 import { checkImageUrl } from './checkImageUrl';
 import { limitMethod, limitSubscription } from './rateLimit';
@@ -78,18 +79,29 @@ export function foundCompany(user, foundCompanyData) {
     if (dbFoundations.find({manager: userId}).count() > 0) {
       throw new Meteor.Error(403, '您現在已經有一家新創公司正在籌備中，無法同時發起第二家新創公司！');
     }
+    //存放進archive中並取得_id
+    foundCompanyData._id = dbCompanyArchive.insert({
+      status: 'foundation',
+      name: foundCompanyData.companyName,
+      tags: foundCompanyData.tags,
+      pictureSmall: foundCompanyData.pictureSmall,
+      pictureBig: foundCompanyData.pictureBig,
+      description: foundCompanyData.description
+    });
     foundCompanyData.manager = userId;
     const createdAt = new Date();
     foundCompanyData.createdAt = createdAt;
     dbLog.insert({
       logType: '創立公司',
       userId: [userId],
+      companyId: foundCompanyData._id,
       message: companyName,
       createdAt: createdAt
     });
     dbLog.insert({
       logType: '參與投資',
       userId: [userId],
+      companyId: foundCompanyData._id,
       message: foundCompanyData.companyName,
       amount: Meteor.settings.public.founderEarnestMoney,
       createdAt: new Date(createdAt.getTime() + 1)
@@ -144,20 +156,6 @@ export function editFoundCompany(user, foundCompanyData) {
   if (! oldFoundCompanyData) {
     throw new Meteor.Error(404, '找不到要編輯的新創計劃，該新創計劃可能已經創立成功或失敗！');
   }
-  const companyName = foundCompanyData.companyName;
-  if (dbCompanies.find({companyName}).count()) {
-    throw new Meteor.Error(403, '已有相同名稱的公司上市，無法創立同名公司！');
-  }
-  const sameCompanyNameCompaniesCursor = dbFoundations
-    .find({
-      _id: {
-        $ne: companyId
-      },
-      companyName: companyName
-    });
-  if (sameCompanyNameCompaniesCursor.count() > 0) {
-    throw new Meteor.Error(403, '已有相同名稱的公司正在創立中，無法創立同名公司！');
-  }
   if (oldFoundCompanyData.pictureBig && oldFoundCompanyData.pictureBig !== foundCompanyData.pictureBig) {
     checkImageUrl(foundCompanyData.pictureBig);
   }
@@ -202,6 +200,11 @@ function changeFoundCompanyName(user, foundationId, companyName) {
   dbFoundations.update(foundationId, {
     $set: {
       companyName: companyName
+    }
+  });
+  dbCompanyArchive.update(foundationId, {
+    $set: {
+      name: companyName
     }
   });
 }
@@ -281,6 +284,7 @@ export function investFoundCompany(user, companyId, amount) {
     dbLog.insert({
       logType: '參與投資',
       userId: [userId],
+      companyId: foundCompanyData._id,
       message: foundCompanyData.companyName,
       amount: amount,
       createdAt: new Date()

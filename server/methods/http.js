@@ -4,49 +4,27 @@ import querystring from 'querystring';
 import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
 import { HTTP } from 'meteor/http';
-import { dbCompanies } from '../../db/dbCompanies';
-import { dbFoundations } from '../../db/dbFoundations';
+import { dbCompanyArchive } from '../../db/dbCompanyArchive';
 import { dbProducts } from '../../db/dbProducts';
+import { dbUserArchive } from '../../db/dbUserArchive';
 import { debug } from '../debug';
 
 //以Ajax方式發布公司名稱
 WebApp.connectHandlers.use(function(req, res, next) {
-  debug.log('connectHandlers companyName');
+  debug.log('connectHandlers companyInfo');
   const parsedUrl = url.parse(req.url);
-  if (parsedUrl.pathname === '/companyName') {
+  if (parsedUrl.pathname === '/companyInfo') {
     const query = querystring.parse(parsedUrl.query);
     const companyId = query.id;
-    const companyData = dbCompanies.findOne(companyId, {
+    const companyData = dbCompanyArchive.findOne(companyId, {
       fields: {
-        companyName: 1
+        name: 1,
+        status: 1
       }
     });
     if (companyData) {
       res.setHeader('Cache-Control', 'public, max-age=604800');
-      res.end(companyData.companyName);
-    }
-    else {
-      res.end('');
-    }
-  }
-  else {
-    next();
-  }
-});
-WebApp.connectHandlers.use(function(req, res, next) {
-  debug.log('connectHandlers foundationName');
-  const parsedUrl = url.parse(req.url);
-  if (parsedUrl.pathname === '/foundationName') {
-    const query = querystring.parse(parsedUrl.query);
-    const foundationId = query.id;
-    const foundationData = dbFoundations.findOne(foundationId, {
-      fields: {
-        companyName: 1
-      }
-    });
-    if (foundationData) {
-      res.setHeader('Cache-Control', 'public, max-age=604800');
-      res.end(foundationData.companyName);
+      res.end(JSON.stringify(companyData));
     }
     else {
       res.end('');
@@ -59,9 +37,9 @@ WebApp.connectHandlers.use(function(req, res, next) {
 
 //以Ajax方式發布產品名稱、連結
 WebApp.connectHandlers.use(function(req, res, next) {
-  debug.log('connectHandlers productName');
+  debug.log('connectHandlers productInfo');
   const parsedUrl = url.parse(req.url);
-  if (parsedUrl.pathname === '/productName') {
+  if (parsedUrl.pathname === '/productInfo') {
     const query = querystring.parse(parsedUrl.query);
     const productId = query.id;
     const productData = dbProducts.findOne(productId, {
@@ -87,35 +65,36 @@ WebApp.connectHandlers.use(function(req, res, next) {
 WebApp.connectHandlers.use(function(req, res, next) {
   debug.log('connectHandlers userName');
   const parsedUrl = url.parse(req.url);
-  if (parsedUrl.pathname === '/userName') {
+  if (parsedUrl.pathname === '/userInfo') {
     const query = querystring.parse(parsedUrl.query);
     const userId = query.id;
-    const userData = Meteor.users.findOne(userId, {
+    const userData = dbUserArchive.findOne(userId, {
       fields: {
-        'services.google.accessToken': 1,
-        'profile.name': 1
+        name: 1,
+        status: 1,
+        validateType: 1,
+        accessToken: 1
       }
     });
     if (userData) {
       res.setHeader('Cache-Control', 'public, max-age=604800');
-      if (userData.services.google) {
-        const accessToken = userData.services.google.accessToken;
+      if (userData.validateType === 'Google' && userData.accessToken) {
         try {
           /* eslint-disable camelcase */
           const response = HTTP.get('https://www.googleapis.com/oauth2/v1/userinfo', {
             params: {
-              access_token: accessToken
+              access_token: userData.accessToken
             }
           });
           /* eslint-enable camelcase */
-          res.end(response.data.name);
+          userData.name = response.data.name;
         }
         catch (e) {
-          res.end(userData.profile.name);
+          userData.name = userData.name;
         }
       }
       else {
-        res.end(userData.profile.name);
+        res.end(JSON.stringify(userData));
       }
     }
     else {

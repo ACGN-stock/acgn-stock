@@ -188,15 +188,15 @@ Template.navCompanyLink.onRendered(function() {
   if (companyId) {
     const $link = this.$('a');
     $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: companyId
       },
-      success: (companyName) => {
+      success: (companyData) => {
         const path = FlowRouter.path('companyDetail', {companyId});
         $link
           .attr('href', path)
-          .text(companyName || '???');
+          .text(companyData.name);
       },
       error: () => {
         $link.text('???');

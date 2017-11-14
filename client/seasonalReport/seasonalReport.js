@@ -273,11 +273,12 @@ function drawCompanyPriceRankTable(templateInstance) {
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: rankData.companyId
       },
-      success: (companyName) => {
+      success: (companyData) => {
+        const companyName = companyData.name;
         if (companyName.length > 8) {
           companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
         }
@@ -356,11 +357,12 @@ function drawCompanyProfitRankTable(templateInstance) {
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: rankData.companyId
       },
-      success: (companyName) => {
+      success: (companyData) => {
+        const companyName = companyData.name;
         if (companyName.length > 8) {
           companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
         }
@@ -455,11 +457,12 @@ function drawCompanyValueRankTable(templateInstance) {
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: rankData.companyId
       },
-      success: (companyName) => {
+      success: (companyData) => {
+        const companyName = companyData.name;
         if (companyName.length > 8) {
           companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
         }
@@ -572,11 +575,12 @@ function drawUserRankChart(templateInstance) {
   const userNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
-      url: '/userName',
+      url: '/userInfo',
       data: {
         id: rankData.userId
       },
-      success: (userName) => {
+      success: (userData) => {
+        const userName = userData.name;
         if (userName.length > 13) {
           userNameHash[rankData.userId] = userName.slice(0, 10) + '...';
         }

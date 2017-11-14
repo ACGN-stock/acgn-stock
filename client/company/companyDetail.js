@@ -882,11 +882,12 @@ Template.companyElectInfo.events({
     const candidate = candidateList[candidateIndex];
     const supportList = instanceData.voteList[candidateIndex];
     $.ajax({
-      url: '/userName',
+      url: '/userInfo',
       data: {
         id: candidate
       },
-      success: (userName) => {
+      success: (userData) => {
+        const userName = userData.name;
         if (_.contains(supportList, user._id)) {
           alertDialog.alert('你已經正在支持使用者' + userName + '了，無法再次進行支持！');
         }

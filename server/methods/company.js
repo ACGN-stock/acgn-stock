@@ -4,6 +4,7 @@ import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
+import { dbCompanyArchive } from '../../db/dbCompanyArchive';
 import { dbDirectors } from '../../db/dbDirectors';
 import { dbOrders } from '../../db/dbOrders';
 import { dbProducts } from '../../db/dbProducts';
@@ -103,6 +104,11 @@ function changeCompanyName(user, companyId, companyName) {
   dbCompanies.update(companyId, {
     $set: {
       companyName: companyName
+    }
+  });
+  dbCompanyArchive.update(companyId, {
+    $set: {
+      name: companyName
     }
   });
 }

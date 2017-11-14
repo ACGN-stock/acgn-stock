@@ -17,12 +17,17 @@ Template.displayLog.onRendered(function() {
       }
       else {
         $.ajax({
-          url: '/userName',
+          url: '/userInfo',
           data: {
             id: userId
           },
-          success: (userName) => {
-            const path = FlowRouter.path('accountInfo', {userId});
+          dataType: 'json',
+          success: (userData) => {
+            const userName = userData.name;
+            let path;
+            if (userData.status === 'registered') {
+              path = FlowRouter.path('accountInfo', {userId});
+            }
             $link
               .filter('[data-user-link="' + userId + '"]')
               .html(`
@@ -37,12 +42,30 @@ Template.displayLog.onRendered(function() {
   if (companyId) {
     const $link = this.$('[data-company-link]');
     $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: companyId
       },
-      success: (companyName) => {
-        const path = FlowRouter.path('companyDetail', {companyId});
+      dataType: 'json',
+      success: (companyData) => {
+        const companyName = companyData.name;
+        let path;
+        switch (companyData.status) {
+          case 'archived': {
+            path = FlowRouter.path('archiveDetail', {companyId});
+            break;
+          }
+          case 'foundation': {
+            path = FlowRouter.path('foundationDetail', {
+              foundationId: companyId
+            });
+            break;
+          }
+          case 'market': {
+            path = FlowRouter.path('companyDetail', {companyId});
+            break;
+          }
+        }
         $link
           .filter('[data-company-link="' + companyId + '"]')
           .html(`
@@ -55,7 +78,7 @@ Template.displayLog.onRendered(function() {
   if (productId) {
     const $link = this.$('[data-product-link]');
     $.ajax({
-      url: '/productName',
+      url: '/productInfo',
       data: {
         id: productId
       },
@@ -100,17 +123,21 @@ Template.displayLog.helpers({
         '」公司向' + userLinkList.join('、') + '發給了$' + currencyFormat(logData.price) + '的薪水！';
       }
       case '創立公司': {
+        const companyName = logData.companyId ? getCompanyLink(logData.companyId) : getPureMessage();
+
         return (
           '【創立公司】' +
           getUserLink(logData.userId[0]) +
-          '發起了「' + getPureMessage() + '」的新公司創立計劃，誠意邀請有意者投資！'
+          '發起了「' + companyName + '」的新公司創立計劃，誠意邀請有意者投資！'
         );
       }
       case '參與投資': {
+        const companyName = logData.companyId ? getCompanyLink(logData.companyId) : getPureMessage();
+
         return (
           '【參與投資】' +
           getUserLink(logData.userId[0]) +
-          '向「' + getPureMessage() + '公司創立計劃」投資了$' + currencyFormat(logData.amount) + '！'
+          '向「' + companyName + '公司創立計劃」投資了$' + currencyFormat(logData.amount) + '！'
         );
       }
       case '創立失敗': {
@@ -125,9 +152,11 @@ Template.displayLog.helpers({
         );
       }
       case '創立退款': {
+        const companyName = logData.companyId ? getCompanyLink(logData.companyId) : getPureMessage();
+
         return (
           '【創立退款】' +
-          '從「' + getPureMessage() +
+          '從「' + companyName +
           '公司創立計劃」收回了$' + currencyFormat(logData.amount) + '的投資退款！'
         );
       }

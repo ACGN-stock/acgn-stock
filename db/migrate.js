@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { Migrations } from 'meteor/percolate:migrations';
 import { dbAdvertising } from './dbAdvertising';
 import { dbCompanies } from './dbCompanies';
+import { dbCompanyArchive } from './dbCompanyArchive';
 import { dbDirectors } from './dbDirectors';
 import { dbFoundations } from './dbFoundations';
 import { dbLog } from './dbLog';
@@ -18,6 +19,7 @@ import { dbRankUserWealth } from './dbRankUserWealth';
 import { dbRuleAgendas } from './dbRuleAgendas';
 import { dbSeason } from './dbSeason';
 import { dbTaxes } from './dbTaxes';
+import { dbUserArchive } from './dbUserArchive';
 import { dbValidatingUsers } from './dbValidatingUsers';
 import { dbVoteRecord } from './dbVoteRecord';
 
@@ -465,6 +467,100 @@ if (Meteor.isServer) {
       }, {
         $rename: { lastReadFscAnnouncementDate: 'lastReadAccuseLogDate' }
       });
+    }
+  });
+
+  Migrations.add({
+    version: 12,
+    name: 'archive company/user name.',
+    up() {
+      if (dbCompanies.find({isSeal: false}).count()) {
+        const companyArchiveBulk = dbCompanyArchive.rawCollection().initializeUnorderedBulkOp();
+        dbCompanies
+          .find({
+            isSeal: false
+          })
+          .forEach((companyData) => {
+            companyArchiveBulk.insert({
+              _id: companyData._id,
+              status: 'market',
+              name: companyData.companyName,
+              tags: companyData.tags,
+              pictureSmall: companyData.pictureSmall,
+              pictureBig: companyData.pictureSmall,
+              description: companyData.description
+            });
+          });
+        companyArchiveBulk.execute();
+      }
+      if (dbFoundations.find().count()) {
+        const companyArchiveBulk = dbCompanyArchive.rawCollection().initializeUnorderedBulkOp();
+        dbFoundations
+          .find()
+          .forEach((companyData) => {
+            companyArchiveBulk.insert({
+              _id: companyData._id,
+              status: 'foundation',
+              name: companyData.companyName,
+              tags: companyData.tags,
+              pictureSmall: companyData.pictureSmall,
+              pictureBig: companyData.pictureSmall,
+              description: companyData.description
+            });
+          });
+        companyArchiveBulk.execute();
+      }
+      if (Meteor.users.find().count()) {
+        const userBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+        let hasGoogleUser = false;
+        const userArchiveBulk = dbUserArchive.rawCollection().initializeUnorderedBulkOp();
+        Meteor.users.find().forEach((userData) => {
+          let userName = userData.profile.name;
+          if (userData.profile.validateType === 'Google') {
+            hasGoogleUser = true;
+            userName = userData.services.google.email;
+            userBulk
+              .find({
+                _id: userData._id
+              })
+              .updateOne({
+                $set: {
+                  'profile.name': userName
+                }
+              });
+          }
+          userArchiveBulk.insert({
+            _id: userData._id,
+            status: 'registered',
+            name: userName,
+            validateType: userData.profile.validateType,
+            isAdmin: userData.profile.isAdmin,
+            stone: userData.profile.stone,
+            ban: userData.profile.ban
+          });
+        });
+        if (hasGoogleUser) {
+          userBulk.execute();
+        }
+        userArchiveBulk.execute();
+      }
+      dbCompanyArchive.rawCollection().createIndex(
+        {
+          name: 1
+        },
+        {
+          unique: true
+        }
+      );
+      dbUserArchive.rawCollection().createIndex(
+        {
+          name: 1,
+          validateType: 1
+        },
+        {
+          unique: true
+        }
+      );
     }
   });
 

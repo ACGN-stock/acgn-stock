@@ -8,6 +8,7 @@ import { Accounts } from 'meteor/accounts-base';
 import { UserStatus } from 'meteor/mizzao:user-status';
 import { dbLog } from '../../db/dbLog';
 import { dbThreads } from '../../db/dbThreads';
+import { dbUserArchive } from '../../db/dbUserArchive';
 import { dbValidatingUsers } from '../../db/dbValidatingUsers';
 import { dbVariables } from '../../db/dbVariables';
 import { limitMethod, limitSubscription, limitGlobalMethod } from './rateLimit';
@@ -202,9 +203,26 @@ Accounts.onCreateUser((options, user) => {
   });
   if (user.services && user.services.google) {
     const email = user.services.google.email;
-    const gmailAccountNameEndIndex = email.indexOf('@');
     user.profile.validateType = 'Google';
-    user.profile.name = email.slice(0, gmailAccountNameEndIndex);
+    user.profile.name = email;
+  }
+  const existsArchiveUser = dbUserArchive.findOne({
+    name: user.profile.name,
+    validateType: user.profile.validateType
+  });
+  if (existsArchiveUser) {
+    user._id = existsArchiveUser._id;
+  }
+  else {
+    dbUserArchive.insert({
+      _id: user._id,
+      status: 'registered',
+      name: user.profile.name,
+      validateType: user.profile.validateType,
+      isAdmin: user.profile.isAdmin,
+      stone: user.profile.stone,
+      ban: user.profile.ban
+    });
   }
 
   return user;
