@@ -26,6 +26,11 @@
   border-right: 1px solid #dddddd;
 }
 
+.nav-dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
 .agenda-description {
   white-space: pre-wrap;
   word-break: break-all;
