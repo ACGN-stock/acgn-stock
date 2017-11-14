@@ -5,7 +5,7 @@ import { check, Match } from 'meteor/check';
 import { resourceManager } from '../resourceManager';
 import { dbCompanies } from '../../db/dbCompanies';
 import { dbDirectors } from '../../db/dbDirectors';
-import { dbLog, accuseLogTypeList } from '../../db/dbLog';
+import { dbLog, accuseLogTypeList, importantAccuseLogTypeList } from '../../db/dbLog';
 import { dbTaxes } from '../../db/dbTaxes';
 import { dbVariables } from '../../db/dbVariables';
 import { limitSubscription } from './rateLimit';
@@ -269,7 +269,7 @@ Meteor.publish('accountAccuseLog', function(userId, offset) {
     Meteor.users.update({
       _id: userId
     }, {
-      $set: { 'profile.lastReadFscAnnouncementDate': new Date() }
+      $set: { 'profile.lastReadAccuseLogDate': new Date() }
     });
   }
 
@@ -322,15 +322,15 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
 //一分鐘最多20次
 limitSubscription('accountInfoLog');
 
-Meteor.publish('lastFscAnnouncementDate', function() {
-  debug.log('publish lastFscAnnouncementDate');
+Meteor.publish('lastImportantAccuseLogDate', function() {
+  debug.log('publish lastImportantAccuseLogDate');
 
   const userId = this.userId;
   check(userId, String);
 
-  this.added('variables', 'lastFscAnnouncementDate', { value: null });
+  this.added('variables', 'lastImportantAccuseLogDate', { value: null });
   const observer = dbLog.find({
-    logType: '金管通告',
+    logType: { $in: importantAccuseLogTypeList },
     userId,
     'userId.0': { $ne: userId }
   }, {
@@ -338,7 +338,7 @@ Meteor.publish('lastFscAnnouncementDate', function() {
     limit: 1
   }).observeChanges({
     added: (id, fields) => {
-      this.changed('variables', 'lastFscAnnouncementDate', { value: fields.createdAt });
+      this.changed('variables', 'lastImportantAccuseLogDate', { value: fields.createdAt });
     }
   });
   this.ready();
@@ -346,3 +346,5 @@ Meteor.publish('lastFscAnnouncementDate', function() {
     observer.stop();
   });
 });
+//一分鐘最多20次
+limitSubscription('lastImportantAccuseLogDate');

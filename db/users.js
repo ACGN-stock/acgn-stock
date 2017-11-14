@@ -89,8 +89,8 @@ const schema = new SimpleSchema({
         type: SimpleSchema.Integer,
         defaultValue: 0
       },
-      //最後閱讀的金管會通告時間
-      lastReadFscAnnouncementDate: {
+      //最後閱讀的金管會相關訊息時間
+      lastReadAccuseLogDate: {
         type: Date,
         optional: true
       }

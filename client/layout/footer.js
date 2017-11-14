@@ -47,7 +47,7 @@ Template.footer.helpers({
   }
 });
 
-Template.unreadFscAnnouncementsNotification.onCreated(function() {
+Template.unreadImportantAccuseLogsNotification.onCreated(function() {
   this.rIsDisplay = new ReactiveVar(false);
 
   this.autorun(() => {
@@ -62,35 +62,35 @@ Template.unreadFscAnnouncementsNotification.onCreated(function() {
       return;
     }
 
-    this.subscribe('lastFscAnnouncementDate');
+    this.subscribe('lastImportantAccuseLogDate');
 
-    const lastFscAnnouncementDate = dbVariables.get('lastFscAnnouncementDate');
+    const lastImportantAccuseLogDate = dbVariables.get('lastImportantAccuseLogDate');
 
-    if (! lastFscAnnouncementDate) {
+    if (! lastImportantAccuseLogDate) {
       this.rIsDisplay.set(false);
 
       return;
     }
 
-    if (! user.status || ! user.profile.lastReadFscAnnouncementDate) {
+    if (! user.status || ! user.profile.lastReadAccuseLogDate) {
       this.rIsDisplay.set(true);
 
       return false;
     }
 
-    const lastReadFscAnnouncementDate = user.profile.lastReadFscAnnouncementDate;
+    const lastReadAccuseLogDate = user.profile.lastReadAccuseLogDate;
 
-    this.rIsDisplay.set(lastReadFscAnnouncementDate < lastFscAnnouncementDate);
+    this.rIsDisplay.set(lastReadAccuseLogDate < lastImportantAccuseLogDate);
   });
 });
-Template.unreadFscAnnouncementsNotification.helpers({
+Template.unreadImportantAccuseLogsNotification.helpers({
   isDisplay() {
     const instance = Template.instance();
 
     return instance.rIsDisplay.get();
   }
 });
-Template.unreadFscAnnouncementsNotification.events({
+Template.unreadImportantAccuseLogsNotification.events({
   'click .btn'(event, instance) {
     event.preventDefault();
     instance.rIsDisplay.set(false);

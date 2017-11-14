@@ -93,6 +93,25 @@ export const accuseLogTypeList = [
   '撤銷廣告'
 ];
 
+// 重要的金管會相關紀錄，需要發出未讀通知給使用者
+export const importantAccuseLogTypeList = [
+  '金管通告',
+  '禁止舉報',
+  '禁止下單',
+  '禁止聊天',
+  '禁止廣告',
+  '課以罰款',
+  '沒收股份',
+  '禁任經理',
+  '解除舉報',
+  '解除下單',
+  '解除聊天',
+  '解除廣告',
+  '退還罰款',
+  '解除禁任',
+  '撤銷廣告'
+];
+
 //schema
 const schema = new SimpleSchema({
   //紀錄類別
