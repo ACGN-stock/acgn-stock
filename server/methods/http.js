@@ -1,9 +1,11 @@
 'use strict';
 import url from 'url';
 import querystring from 'querystring';
+import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
 import { HTTP } from 'meteor/http';
 import { dbCompanyArchive } from '../../db/dbCompanyArchive';
+import { dbFoundations } from '../../db/dbFoundations';
 import { dbProducts } from '../../db/dbProducts';
 import { dbUserArchive } from '../../db/dbUserArchive';
 import { debug } from '../debug';
@@ -22,7 +24,23 @@ WebApp.connectHandlers.use(function(req, res, next) {
       }
     });
     if (companyData) {
-      res.setHeader('Cache-Control', 'public, max-age=604800');
+      if (companyData.status === 'market') {
+        res.setHeader('Cache-Control', 'public, max-age=604800');
+      }
+      else if (companyData.status === 'foundation') {
+        const foundationData = dbFoundations.findOne(companyId, {
+          fields: {
+            createdAt: 1
+          }
+        });
+        if (foundationData) {
+          const cacheMicroTime = foundationData.createdAt.getTime() + Meteor.settings.public.foundExpireTime - Date.now();
+          if (cacheMicroTime > 0) {
+            const cacheTime = Math.floor(cacheMicroTime / 1000);
+            res.setHeader('Cache-Control', 'public, max-age=' + cacheTime);
+          }
+        }
+      }
       res.end(JSON.stringify(companyData));
     }
     else {
