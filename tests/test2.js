@@ -1,9 +1,9 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbDirectors } from '../db/dbDirectors';
-import { dbOrders } from '../db/dbOrders';
-import { createBuyOrder, createSellOrder, retrieveOrder } from '../server/methods/order';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbDirectors } from '/db/dbDirectors';
+import { dbOrders } from '/db/dbOrders';
+import { createBuyOrder, createSellOrder, retrieveOrder } from '/server/methods/order';
 
 const user1Id = Meteor.users.findOne({}, {
   fields: {

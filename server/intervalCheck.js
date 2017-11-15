@@ -2,27 +2,28 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { UserStatus } from 'meteor/mizzao:user-status';
-import { resourceManager } from './resourceManager';
-import { dbAdvertising } from '../db/dbAdvertising';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbDirectors } from '../db/dbDirectors';
-import { dbEmployees } from '../db/dbEmployees';
-import { dbLog } from '../db/dbLog';
-import { dbOrders } from '../db/dbOrders';
-import { dbPrice } from '../db/dbPrice';
-import { dbProducts } from '../db/dbProducts';
-import { dbResourceLock } from '../db/dbResourceLock';
-import { dbSeason } from '../db/dbSeason';
-import { dbThreads } from '../db/dbThreads';
-import { dbValidatingUsers } from '../db/dbValidatingUsers';
-import { dbVoteRecord } from '../db/dbVoteRecord';
+
+import { resourceManager } from './imports/resourceManager';
+import { threadId } from './imports/thread';
+import { dbAdvertising } from '/db/dbAdvertising';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbDirectors } from '/db/dbDirectors';
+import { dbEmployees } from '/db/dbEmployees';
+import { dbLog } from '/db/dbLog';
+import { dbOrders } from '/db/dbOrders';
+import { dbPrice } from '/db/dbPrice';
+import { dbProducts } from '/db/dbProducts';
+import { dbResourceLock } from '/db/dbResourceLock';
+import { dbSeason } from '/db/dbSeason';
+import { dbThreads } from '/db/dbThreads';
+import { dbValidatingUsers } from '/db/dbValidatingUsers';
+import { dbVoteRecord } from '/db/dbVoteRecord';
 import { checkFoundCompany } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { setLowPriceThreshold } from './lowPriceThreshold';
 import { recordListPriceAndSellFSCStocks, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
-import { threadId } from './thread';
-import { debug } from './debug';
+import { debug } from '/server/imports/debug';
 
 Meteor.startup(function() {
   Meteor.setInterval(intervalCheck, Meteor.settings.public.intervalTimer);

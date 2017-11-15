@@ -2,8 +2,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbCompanies } from '../../db/dbCompanies';
-import { dbVariables } from '../../db/dbVariables';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbVariables } from '/db/dbVariables';
 
 Meteor.subscribe('variables');
 

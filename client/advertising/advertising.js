@@ -5,7 +5,7 @@ import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { dbAdvertising } from '../../db/dbAdvertising';
+import { dbAdvertising } from '/db/dbAdvertising';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { formatDateText } from '../utils/helpers';

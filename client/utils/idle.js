@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Tracker } from 'meteor/tracker';
 import { UserStatus } from 'meteor/mizzao:user-status';
 import { TimeSync } from 'meteor/mizzao:timesync';
-import { dbResourceLock } from '../../db/dbResourceLock';
+import { dbResourceLock } from '/db/dbResourceLock';
 
 Tracker.autorun(function() {
   if (TimeSync.isSynced() && ! UserStatus.isMonitoring()) {

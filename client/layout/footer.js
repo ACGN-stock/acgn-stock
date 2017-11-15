@@ -3,8 +3,8 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { dbAdvertising } from '../../db/dbAdvertising';
-import { dbVariables } from '../../db/dbVariables';
+import { dbAdvertising } from '/db/dbAdvertising';
+import { dbVariables } from '/db/dbVariables';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 

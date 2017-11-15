@@ -4,12 +4,12 @@ import { _ } from 'meteor/underscore';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { dbRankCompanyPrice } from '../../db/dbRankCompanyPrice';
-import { dbRankCompanyProfit } from '../../db/dbRankCompanyProfit';
-import { dbRankCompanyValue } from '../../db/dbRankCompanyValue';
-import { dbRankUserWealth } from '../../db/dbRankUserWealth';
-import { dbSeason } from '../../db/dbSeason';
-import { dbVariables } from '../../db/dbVariables';
+import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
+import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
+import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
+import { dbRankUserWealth } from '/db/dbRankUserWealth';
+import { dbSeason } from '/db/dbSeason';
+import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
 
