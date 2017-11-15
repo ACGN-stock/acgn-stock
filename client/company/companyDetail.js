@@ -744,7 +744,8 @@ Template.companyAllPrudctList.helpers({
         sort: {
           likeCount: -1,
           createdAt: -1
-        }
+        },
+        limit: 10
       });
   }
 });
