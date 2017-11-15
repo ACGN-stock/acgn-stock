@@ -154,6 +154,11 @@ export function checkFoundCompany() {
             usersBulk.execute();
           }
           dbFoundations.remove(companyId);
+          dbCompanyArchive.update(companyId, {
+            $set: {
+              status: 'market'
+            }
+          });
         }
         else {
           const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
