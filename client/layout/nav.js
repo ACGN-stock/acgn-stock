@@ -192,6 +192,7 @@ Template.navCompanyLink.onRendered(function() {
       data: {
         id: companyId
       },
+      dataType: 'json',
       success: (companyData) => {
         const path = FlowRouter.path('companyDetail', {companyId});
         $link
