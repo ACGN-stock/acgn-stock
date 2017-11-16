@@ -1,6 +1,10 @@
 require('babel-register')({
   presets: ['env'],
-  plugins: ['transform-es2015-modules-commonjs', 'transform-runtime']
+  plugins: [
+    'transform-es2015-modules-commonjs',
+    'transform-runtime',
+    ['module-resolver', { root: ['./'] } ]
+  ]
 });
 const libmock = require('mock-require');
 

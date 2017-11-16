@@ -3,7 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { dbLog, accuseLogTypeList } from '../../db/dbLog';
+import { dbLog, accuseLogTypeList } from '/db/dbLog';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
 import { alertDialog } from '../layout/alertDialog';

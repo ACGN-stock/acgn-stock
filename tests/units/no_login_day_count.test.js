@@ -3,8 +3,8 @@ import test from 'tape';
 import deepequal from 'deep-equal';
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-import { dbSeason } from '../../db/dbSeason';
-import { doLoginObserver } from '../../server/intervalCheck';
+import { dbSeason } from '/db/dbSeason';
+import { doLoginObserver } from '/server/intervalCheck';
 
 test('No login day computaion test', function(t) {
   const stubCursor = new Mongo.Cursors();

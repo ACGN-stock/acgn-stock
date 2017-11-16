@@ -1,15 +1,15 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbDirectors } from '../db/dbDirectors';
-import { dbLog } from '../db/dbLog';
-import { dbRankCompanyPrice } from '../db/dbRankCompanyPrice';
-import { dbRankCompanyProfit } from '../db/dbRankCompanyProfit';
-import { dbRankCompanyValue } from '../db/dbRankCompanyValue';
-import { dbRankUserWealth } from '../db/dbRankUserWealth';
-import { dbTaxes } from '../db/dbTaxes';
-import { debug } from './debug';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbDirectors } from '/db/dbDirectors';
+import { dbLog } from '/db/dbLog';
+import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
+import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
+import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
+import { dbRankUserWealth } from '/db/dbRankUserWealth';
+import { dbTaxes } from '/db/dbTaxes';
+import { debug } from '/server/imports/debug';
 
 //為所有公司與使用者進行排名結算
 export function generateRankAndTaxesData(seasonData) {

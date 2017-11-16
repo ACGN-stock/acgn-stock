@@ -4,7 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbProducts } from '../../db/dbProducts';
+import { dbProducts } from '/db/dbProducts';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { likeProduct } from '../utils/methods';
 import { shouldStopSubscribe } from '../utils/idle';
