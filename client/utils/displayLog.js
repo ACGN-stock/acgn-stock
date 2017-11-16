@@ -155,7 +155,7 @@ Template.displayLog.helpers({
         const companyName = logData.companyId ? getCompanyLink(logData.companyId) : getPureMessage();
 
         return (
-          '【創立退款】' +
+          '【創立退款】' + getUserLink(logData.userId) +
           '從「' + companyName +
           '公司創立計劃」收回了$' + currencyFormat(logData.amount) + '的投資退款！'
         );
@@ -594,3 +594,4 @@ function getProductLink(productId) {
 function getPureMessage() {
   return `<span data-message></span>`;
 }
+
