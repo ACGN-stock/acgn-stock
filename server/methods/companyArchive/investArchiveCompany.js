@@ -20,6 +20,9 @@ Meteor.methods({
 });
 export function investArchiveCompany(user, companyId) {
   debug.log('investArchiveCompany', {user, companyId});
+  if (user.profile.isInVacation) {
+    throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
+  }
   if (user.profile.notPayTax) {
     throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
   }
@@ -119,4 +122,3 @@ export function investArchiveCompany(user, companyId) {
 }
 //兩秒鐘最多一次
 limitMethod('investArchiveCompany', 1, 2000);
-

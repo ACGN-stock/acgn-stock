@@ -102,8 +102,23 @@
       {{#if showUnregisterEmployee}}
         <button class="btn btn-danger btn-sm" type="button" data-action="unregisterEmployee">取消員工報名</button>
       {{/if}}
+
+      {{#if isCurrentUser}}
+        {{#if this.profile.isInVacation}}
+          <button class="btn btn-info btn-sm" type="button" data-action="toggleEndingVacation">
+            {{#if this.profile.isEndingVacation}}
+              取消結束渡假
+            {{else}}
+              結束渡假
+            {{/if}}
+          </button>
+        {{else}}
+          <button class="btn btn-info btn-sm" type="button" data-action="startVacation">開始渡假</button>
+        {{/if}}
+      {{/if}}
       <hr />
     {{/if}}
+
     <div>
       帳號驗證方式：
       {{showValidateType}}
@@ -132,6 +147,12 @@
     <div>
       帳號擁有聖晶石：{{this.profile.stone}}
     </div>
+    {{#if this.profile.isInVacation}}
+      <div class="text-info">目前正在渡假中。</div>
+      {{#if this.profile.isEndingVacation}}
+        <div class="text-info">將於本商業季度結束渡假。</div>
+      {{/if}}
+    {{/if}}
     {{#if this.profile.isAdmin}}
       <div class="text-warning">
         是金融管理會委員。
@@ -255,4 +276,3 @@
     {{/with}}
   </div>
 </template>
-

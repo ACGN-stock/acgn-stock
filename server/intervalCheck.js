@@ -162,7 +162,7 @@ function doIntervalWork() {
   }
   else if (now >= lastSeasonData.endDate.getTime()) {
     //商業季度結束工作
-    doSeasonWorks(lastSeasonData);
+    doSeasonWorks(lastRoundData, lastSeasonData);
   }
   else {
     //設定低價位股價門檻
@@ -332,8 +332,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
 }
 
 //商業季度結束工作
-export function doSeasonWorks(lastSeasonData) {
-  debug.log('doSeasonWorks', lastSeasonData);
+export function doSeasonWorks(lastRoundData, lastSeasonData) {
+  debug.log('doSeasonWorks', { lastRoundData, lastSeasonData });
   //避免執行時間過長導致重複進行季節結算
   if (dbResourceLock.findOne('season')) {
     return false;
@@ -401,8 +401,50 @@ export function doSeasonWorks(lastSeasonData) {
         multi: true
       }
     );
+    // 最後兩個商業季度強制使用者收假
+    if (lastRoundData.endDate.getTime() - Date.now() <= Meteor.settings.public.seasonTime * 2) {
+      Meteor.users.update({ 'profile.isInVacation': true }, {
+        $set: { 'profile.isInVacation': false }
+      }, {
+        multi: true
+      });
+    }
+    // 處理使用者收假
+    processEndVacationRequests();
+    // 延後放假中使用者的繳稅期限
+    postponeInVacationTaxes();
     release();
   });
+}
+
+// 處理所有使用者的收假要求
+export function processEndVacationRequests() {
+  Meteor.users.update({
+    'profile.isInVacation': true,
+    'profile.isEndingVacation': true
+  }, {
+    $set: {
+      'profile.isInVacation': false,
+      'profile.isEndingVacation': false
+    }
+  });
+}
+
+// 將放假中使用者的繳稅期限延後
+export function postponeInVacationTaxes() {
+  const inVacationUserIds = Meteor.users
+    .find({ 'profile.isInVacation': true }, { _id: 1 })
+    .map(({ _id }) => {
+      return _id;
+    });
+
+  dbTaxes
+    .find({ userId: { $in: inVacationUserIds } }, { _id: 1, expireDate: 1 })
+    .forEach(({ _id: taxId, expireDate }) => {
+      dbTaxes.update({ _id: taxId }, {
+        $set: { expireDate: new Date(expireDate.getTime() + Meteor.settings.public.seasonTime) }
+      });
+    });
 }
 
 //取消所有尚未交易完畢的訂單
@@ -617,7 +659,7 @@ function generateNewSeason() {
 }
 
 //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
-function giveBonusByStocksFromProfit() {
+export function giveBonusByStocksFromProfit() {
   debug.log('giveBonusByStocksFromProfit');
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   let needExecuteLogBulk = false;
@@ -658,10 +700,14 @@ function giveBonusByStocksFromProfit() {
         const userData = Meteor.users.findOne(companyData.manager, {
           fields: {
             'profile.ban': 1,
+            'profile.isInVacation': 1,
+            'profile.lastVacationStartDate': 1,
             'status.lastLogin.date': 1
           }
         });
         if (
+          // 非當季開始放假者不分紅
+          userData.profile && (! userData.profile.isInVacation || now - userData.profile.lastVacationStartDate.getTime() <= Meteor.settings.public.seasonTime) &&
           //被禁止交易者不分紅
           userData.profile && ! _.contains(userData.profile.ban, 'deal') &&
           //七天未動作者不分紅
@@ -697,17 +743,31 @@ function giveBonusByStocksFromProfit() {
         const userData = Meteor.users.findOne(employee.userId, {
           fields: {
             'profile.ban': 1,
+            'profile.isInVacation': 1,
+            'profile.lastVacationStartDate': 1,
             'status.lastLogin.date': 1
           }
         });
+
+        if (! userData || ! userData.profile || ! userData.status) {
+          return;
+        }
+
+        // 非當季開始放假者不分紅
+        if (userData.profile.isInVacation && now - userData.profile.lastVacationStartDate.getTime() > Meteor.settings.public.seasonTime) {
+          return;
+        }
+
         //被禁止交易者不分紅
-        if (! userData.profile || _.contains(userData.profile.ban, 'deal')) {
+        if (_.contains(userData.profile.ban, 'deal')) {
           return true;
         }
+
         //七天未動作者不分紅
-        if (! userData.status || now - userData.status.lastLogin.date.getTime() > 604800000) {
+        if (now - userData.status.lastLogin.date.getTime() > 604800000) {
           return true;
         }
+
         employeeList.push(employee.userId);
       });
       if (employeeList.length > 0) {
@@ -760,6 +820,8 @@ function giveBonusByStocksFromProfit() {
             fields: {
               'profile.ban': 1,
               'profile.noLoginDayCount': 1,
+              'profile.isInVacation': 1,
+              'profile.lastVacationStartDate': 1,
               'status.lastLogin.date': 1
             }
           });
@@ -773,6 +835,11 @@ function giveBonusByStocksFromProfit() {
           const noLoginTime = now - lastLoginDate.getTime();
           const noLoginDay = Math.min(Math.floor(noLoginTime / oneDayMs), 7);
           const noLoginDayCount = Math.min(noLoginDay + (userProfile.noLoginDayCount || 0), Math.floor(Meteor.settings.public.seasonTime / oneDayMs));
+
+          // 非當季開始放假者不分紅
+          if (userData.profile.isInVacation && now - userData.profile.lastVacationStartDate.getTime() > Meteor.settings.public.seasonTime) {
+            return;
+          }
 
           //被禁止交易者不分紅
           if (_.contains(userProfile.ban, 'deal')) {
