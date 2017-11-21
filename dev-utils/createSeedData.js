@@ -1,10 +1,52 @@
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
-import { resetDatabase } from 'meteor/xolvio:cleaner';
 
 import { pttUserFactory, companyFactory } from './factories';
+import { dbAdvertising } from '/db/dbAdvertising';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
+import { dbDirectors } from '/db/dbDirectors';
+import { dbFoundations } from '/db/dbFoundations';
+import { dbLog } from '/db/dbLog';
+import { dbOrders } from '/db/dbOrders';
+import { dbPrice } from '/db/dbPrice';
+import { dbProducts } from '/db/dbProducts';
+import { dbProductLike } from '/db/dbProductLike';
+import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
+import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
+import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
+import { dbRankUserWealth } from '/db/dbRankUserWealth';
+import { dbRound } from '/db/dbRound';
+import { dbRuleAgendas } from '/db/dbRuleAgendas';
+import { dbSeason } from '/db/dbSeason';
+import { dbTaxes } from '/db/dbTaxes';
+import { dbUserArchive } from '/db/dbUserArchive';
+import { dbValidatingUsers } from '/db/dbValidatingUsers';
+import { dbVoteRecord } from '/db/dbVoteRecord';
+
+function resetDatabase() {
+  dbAdvertising.remove({});
+  dbCompanies.remove({});
+  dbCompanyArchive.remove({});
+  dbDirectors.remove({});
+  dbFoundations.remove({});
+  dbLog.remove({});
+  dbOrders.remove({});
+  dbPrice.remove({});
+  dbProducts.remove({});
+  dbProductLike.remove({});
+  dbRankCompanyPrice.remove({});
+  dbRankCompanyProfit.remove({});
+  dbRankCompanyValue.remove({});
+  dbRankUserWealth.remove({});
+  dbRound.remove({});
+  dbRuleAgendas.remove({});
+  dbSeason.remove({});
+  dbTaxes.remove({});
+  dbUserArchive.remove({});
+  dbValidatingUsers.remove({});
+  dbVoteRecord.remove({});
+}
 
 if (Meteor.isServer && Meteor.isDevelopment) {
   module.exports.createSeedData = function({ reset } = {}) {

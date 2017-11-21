@@ -53,7 +53,7 @@ Template.companyArchiveDetail.helpers({
   }
 });
 Template.companyArchiveDetail.events({
-  'click [data-action="invest"]'(event, templaceInstance) {
+  'click [data-action="invest"]'(event) {
     event.preventDefault();
     investArchiveCompany(this);
   },
