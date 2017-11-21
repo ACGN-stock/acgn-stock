@@ -378,8 +378,11 @@ function cancelAllOrder() {
         companiesBulk.execute = Meteor.wrapAsync(companiesBulk.execute);
         companiesBulk.execute();
       }
-      directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
-      directorsBulk.execute();
+
+      if (Object.keys(increaseStocksHash).filter((k) => k !== '!system').length > 0) {
+        directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
+        directorsBulk.execute();
+      }
     }
     logBulk.execute = Meteor.wrapAsync(logBulk.execute);
     logBulk.execute();
@@ -397,7 +400,7 @@ function generateNewSeason() {
   const productCount = dbProducts.find({overdue: 0}).count();
   const companiesCount = dbCompanies.find({isSeal: false}).count();
   //本季度每個使用者可以得到多少推薦票
-  const vote = Math.floor(Math.log10(companiesCount) * 18);
+  const vote = Math.floor(Math.log10(companiesCount || 1) * 18);
   const votePrice = Meteor.settings.public.votePricePerTicket;
   const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, companiesCount, productCount, votePrice});
   Meteor.users.update(

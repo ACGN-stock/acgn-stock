@@ -1,3 +1,14 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");html {
+  font-family: sans-serif;
+  line-height: 1.15;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%
+}
+
+body {
+  font-family: "Source Sans Pro", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 #main > .card {
   margin-bottom: 2rem;
 }
@@ -224,4 +235,14 @@
 }
 .container-dark .company-card-default .btn-tab {
   color: #839496;
+}
+
+#system-time-info .non-break {
+  white-space: nowrap;
+}
+
+@media screen and (min-width: 992px) {
+  #system-time-info .time-info {
+    white-space: nowrap;
+  }
 }

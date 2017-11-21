@@ -58,24 +58,34 @@
 </template>
 
 <template name="systemStatusPanel">
-  <div class="row">
-    <div class="col-12 col-md-6">
-      上次股價更新時間：{{stockPriceUpdateTime}}
+  <div id="system-time-info" class="row">
+    <div class="col-12 col-md-2 non-break">最近股價更新區間</div>
+    <div class="col-12 col-lg-4 time-info {{taskIsReady stockPriceUpdateBegin stockPriceUpdateEnd}}">
+      <span class="non-break">{{stockPriceUpdateBegin}}</span>
+      <span class="non-break">~ {{stockPriceUpdateEnd}}</span>
     </div>
-    <div class="col-12 col-md-6">
-      上次高價釋股時間：{{highPriceReleaseTime}}
+    <div class="col-12 col-md-2 non-break">最近高價釋股區間</div>
+    <div class="col-12 col-lg-4 time-info {{taskIsReady highPriceReleaseBegin highPriceReleaseEnd}}">
+      <span class="non-break">{{highPriceReleaseBegin}}</span>
+      <span class="non-break">~ {{highPriceReleaseEnd}}</span>
     </div>
-    <div class="col-12 col-md-6">
-      上次低價釋股時間：{{lowPriceReleaseTime}}
+    <div class="col-12 col-md-2 non-break">最近低價釋股區間</div>
+    <div class="col-12 col-lg-4 time-info {{taskIsReady lowPriceReleaseBegin lowPriceReleaseEnd}}">
+      <span class="non-break">{{lowPriceReleaseBegin}}</span>
+      <span class="non-break">~ {{lowPriceReleaseEnd}}</span>
     </div>
-    <div class="col-12 col-md-6">
-      上次低量釋股時間：{{noDealReleaseTime}}
+    <div class="col-12 col-md-2 non-break">最近低量釋股區間</div>
+    <div class="col-12 col-lg-4 time-info {{taskIsReady noDealReleaseBegin noDealReleaseEnd}}">
+      <span class="non-break">{{noDealReleaseBegin}}</span>
+      <span class="non-break">~ {{noDealReleaseEnd}}</span>
     </div>
-    <div class="col-12 col-md-6">
-      員工薪資修改期限：{{updateSalaryDeadline}}
+    <div class="col-12 col-md-2 non-break">員工薪資修改期限</div>
+    <div class="col-12 col-lg-4 {{taskIsAboutToEnd updateSalaryDeadline}}">
+      {{updateSalaryDeadline}} {{taskLeftInfo updateSalaryDeadline}}
     </div>
-    <div class="col-12 col-md-6">
-      員工分紅修改期限：{{updateBonusDeadline}}
+    <div class="col-12 col-md-2 non-break">員工分紅修改期限</div>
+    <div class="col-12 col-lg-4 {{taskIsAboutToEnd updateBonusDeadline}}">
+      {{updateBonusDeadline}} {{taskLeftInfo updateBonusDeadline}}
     </div>
   </div>
 </template>

@@ -622,6 +622,7 @@ Meteor.publish('companyList', function({keyword, onlyShow, sortBy, offset}) {
     totalRelease: 1,
     lastPrice: 1,
     listPrice: 1,
+    seasonalBonusPercent: 1,
     profit: 1,
     totalValue: 1,
     createdAt: 1
