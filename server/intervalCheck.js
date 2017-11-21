@@ -7,15 +7,21 @@ import { resourceManager } from './imports/resourceManager';
 import { threadId } from './imports/thread';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
-import { dbLog } from '/db/dbLog';
+import { dbFoundations } from '/db/dbFoundations';
+import { dbLog, accuseLogTypeList } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
 import { dbPrice } from '/db/dbPrice';
+import { dbProductLike } from '/db/dbProductLike';
 import { dbProducts } from '/db/dbProducts';
 import { dbResourceLock } from '/db/dbResourceLock';
+import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
+import { dbTaxes } from '/db/dbTaxes';
 import { dbThreads } from '/db/dbThreads';
+import { dbUserArchive } from '/db/dbUserArchive';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVoteRecord } from '/db/dbVoteRecord';
 import { checkFoundCompany } from './foundation';
@@ -47,7 +53,7 @@ function intervalCheck() {
   }
   //取出負責intervalWork的thread資料
   const threadData = dbThreads.findOne({doIntervalWork: true});
-  if (threadData._id === threadId) {
+  if (threadData && threadData._id === threadId) {
     doLoginObserver();
     doIntervalWork();
   }
@@ -132,6 +138,11 @@ function stopLoginObserver() {
 function doIntervalWork() {
   debug.log('doIntervalWork');
   const now = Date.now();
+  const lastRoundData = dbRound.findOne({}, {
+    sort: {
+      beginDate: -1
+    }
+  });
   const lastSeasonData = dbSeason.findOne({}, {
     sort: {
       beginDate: -1
@@ -141,12 +152,16 @@ function doIntervalWork() {
     //產生新的商業季度
     generateNewSeason();
   }
+  if (now >= lastRoundData.endDate.getTime()) {
+    //賽季結束工作
+    doRoundWorks(lastRoundData, lastSeasonData);
+  }
   else if (now >= lastSeasonData.electTime) {
     //若有正在競選經理人的公司，則計算出選舉結果。
     electManager(lastSeasonData);
   }
   else if (now >= lastSeasonData.endDate.getTime()) {
-    //商業季度結束檢查
+    //商業季度結束工作
     doSeasonWorks(lastSeasonData);
   }
   else {
@@ -199,7 +214,111 @@ function doIntervalWork() {
   });
 }
 
-//商業季度結束檢查
+//賽季結束工作
+export function doRoundWorks(lastRoundData, lastSeasonData) {
+  debug.log('doRoundWorks', lastSeasonData);
+  //避免執行時間過長導致重複進行賽季結算
+  if (dbResourceLock.findOne('season')) {
+    return false;
+  }
+  console.info(new Date().toLocaleString() + ': doRoundWorks');
+  resourceManager.request('doRoundWorks', ['season'], (release) => {
+    //當賽季結束時，取消所有尚未交易完畢的訂單
+    cancelAllOrder();
+    //當賽季結束時，結算所有公司的營利額並按照股權分給股東。
+    giveBonusByStocksFromProfit();
+    //為所有公司與使用者進行排名結算
+    generateRankAndTaxesData(lastSeasonData);
+    //移除所有廣告
+    dbAdvertising.remove({});
+    //保管所有未被查封的公司的狀態
+    dbCompanies
+      .find({}, {
+        fields: {
+          _id: 1,
+          companyName: 1,
+          tags: 1,
+          pictureSmall: 1,
+          pictureBig: 1,
+          description: 1,
+          isSeal: 1
+        }
+      })
+      .forEach((companyData) => {
+        if (companyData.isSeal) {
+          dbCompanyArchive.remove(companyData._id);
+        }
+        else {
+          dbCompanyArchive.upsert(
+            {
+              _id: companyData._id
+            },
+            {
+              $set: {
+                status: 'archived',
+                name: companyData.companyName,
+                tags: companyData.tags,
+                pictureSmall: companyData.pictureSmall,
+                pictureBig: companyData.pictureBig,
+                description: companyData.description,
+                invest: []
+              }
+            }
+          );
+        }
+      });
+    //移除所有公司資料
+    dbCompanies.remove({});
+    //移除所有股份資料
+    dbDirectors.remove({});
+    //移除所有員工資料
+    dbEmployees.remove({});
+    //移除所有新創資料
+    dbFoundations.remove({});
+    //移除所有除了金管會相關以外的紀錄資料
+    dbLog.remove({
+      logType: {
+        $nin: accuseLogTypeList
+      }
+    });
+    //移除所有訂單資料
+    dbOrders.remove({});
+    //移除所有價格資料
+    dbPrice.remove({});
+    //移除所有產品資料
+    dbProductLike.remove({});
+    dbProducts.remove({});
+    //移除所有稅金料
+    dbTaxes.remove({});
+    //保管所有使用者的狀態
+    Meteor.users.find({}).forEach((userData) => {
+      dbUserArchive.upsert(
+        {
+          _id: userData._id
+        },
+        {
+          $set: {
+            status: 'archived',
+            name: userData.profile.name,
+            validateType: userData.profile.validateType,
+            isAdmin: userData.profile.isAdmin,
+            stone: userData.profile.stone,
+            ban: userData.profile.ban
+          }
+        }
+      );
+    });
+    //移除所有使用者資料
+    Meteor.users.remove({});
+    //產生新的賽季
+    generateNewRound();
+    //產生新的商業季度
+    generateNewSeason();
+    release();
+  });
+}
+
+//商業季度結束工作
 export function doSeasonWorks(lastSeasonData) {
   debug.log('doSeasonWorks', lastSeasonData);
   //避免執行時間過長導致重複進行季節結算
@@ -388,6 +507,17 @@ function cancelAllOrder() {
   }
 }
 
+//產生新的賽季
+function generateNewRound() {
+  debug.log('generateNewRound');
+  const beginDate = new Date();
+  const roundTime = Meteor.settings.public.seasonTime * Meteor.settings.public.seasonNumberInRound;
+  const endDate = new Date(beginDate.setMinutes(0, 0, 0) + roundTime);
+  const roundId = dbRound.insert({beginDate, endDate});
+
+  return roundId;
+}
+
 //產生新的商業季度
 function generateNewSeason() {
   debug.log('generateNewSeason');
@@ -398,7 +528,7 @@ function generateNewSeason() {
   const productCount = dbProducts.find({overdue: 0}).count();
   const companiesCount = dbCompanies.find({isSeal: false}).count();
   //本季度每個使用者可以得到多少推薦票
-  const vote = Math.floor(Math.log10(companiesCount) * 18);
+  const vote = Math.max(Math.floor(Math.log10(companiesCount) * 18), 0);
   const votePrice = Meteor.settings.public.votePricePerTicket;
   const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, companiesCount, productCount, votePrice});
   Meteor.users.update(

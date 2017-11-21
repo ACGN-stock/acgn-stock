@@ -19,7 +19,7 @@ Meteor.methods({
   }
 });
 export function investFoundCompany(user, companyId, amount) {
-  debug.log('foundCompany', {user, companyId, amount});
+  debug.log('investFoundCompany', {user, companyId, amount});
   if (user.profile.notPayTax) {
     throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
   }

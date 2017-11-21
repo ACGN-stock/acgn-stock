@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
 import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
@@ -18,6 +19,8 @@ Template.announcement.onCreated(function() {
       return false;
     }
     this.subscribe('announcementDetail');
+    this.subscribe('currentRound');
+    this.subscribe('currentSeason');
   });
 });
 Template.announcement.helpers({
@@ -56,6 +59,42 @@ Template.announcementForm.events({
 });
 
 Template.systemStatusPanel.helpers({
+  roundStartTime() {
+    const currentRound = dbRound.findOne({}, {
+      sort: {
+        beginDate: -1
+      }
+    });
+
+    return formatDateText(currentRound.beginDate);
+  },
+  roundEndTime() {
+    const currentRound = dbRound.findOne({}, {
+      sort: {
+        beginDate: -1
+      }
+    });
+
+    return formatDateText(currentRound.endDate);
+  },
+  seasonStartTime() {
+    const currentSeason = dbSeason.findOne({}, {
+      sort: {
+        beginDate: -1
+      }
+    });
+
+    return formatDateText(currentSeason.beginDate);
+  },
+  seasonEndTime() {
+    const currentSeason = dbSeason.findOne({}, {
+      sort: {
+        beginDate: -1
+      }
+    });
+
+    return formatDateText(currentSeason.endDate);
+  },
   stockPriceUpdateTime() {
     const time = dbVariables.get('lastRecordListPriceTime');
 
