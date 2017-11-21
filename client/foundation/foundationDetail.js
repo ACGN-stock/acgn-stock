@@ -6,7 +6,8 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbFoundations } from '../../db/dbFoundations';
+import { dbFoundations } from '/db/dbFoundations';
+import { dbLog } from '/db/dbLog';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { formatDateTimeText } from '../utils/helpers';
 import { alertDialog } from '../layout/alertDialog';
@@ -177,5 +178,49 @@ Template.foundationFounderList.helpers({
     const foundation = dbFoundations.findOne(foundationId);
 
     return (100 * amount / getTotalInvest(foundation.invest)).toFixed(2);
+  }
+});
+
+const rIsOnlyShowMine = new ReactiveVar(false);
+const rLogOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.foundationLogList);
+Template.foundationLogList.onCreated(function() {
+  rLogOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const companyId = FlowRouter.getParam('foundationId');
+    if (companyId) {
+      this.subscribe('companyLog', companyId, rIsOnlyShowMine.get(), rLogOffset.get());
+    }
+  });
+});
+Template.foundationLogList.helpers({
+  onlyShowMine() {
+    return rIsOnlyShowMine.get();
+  },
+  logList() {
+    const companyId = FlowRouter.getParam('foundationId');
+
+    return dbLog.find({companyId}, {
+      sort: {
+        createdAt: -1
+      },
+      limit: 30
+    });
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfcompanyLog',
+      dataNumberPerPage: 30,
+      offset: rLogOffset
+    };
+  }
+});
+Template.foundationLogList.events({
+  'click button'(event) {
+    event.preventDefault();
+    rIsOnlyShowMine.set(! rIsOnlyShowMine.get());
   }
 });

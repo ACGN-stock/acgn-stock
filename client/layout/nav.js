@@ -4,8 +4,9 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbSeason } from '../../db/dbSeason';
-import { pageNameHash } from '../../routes';
+
+import { dbSeason } from '/db/dbSeason';
+import { pageNameHash } from '/routes';
 import { rAccountDialogMode } from './accountDialog';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -188,15 +189,16 @@ Template.navCompanyLink.onRendered(function() {
   if (companyId) {
     const $link = this.$('a');
     $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: companyId
       },
-      success: (companyName) => {
+      dataType: 'json',
+      success: (companyData) => {
         const path = FlowRouter.path('companyDetail', {companyId});
         $link
           .attr('href', path)
-          .text(companyName || '???');
+          .text(companyData.name);
       },
       error: () => {
         $link.text('???');

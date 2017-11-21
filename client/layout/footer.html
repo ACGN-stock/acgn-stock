@@ -1,7 +1,7 @@
 <template name="footer">
   <div class="fixed-bottom">
     <div class={{containerClass}}>
-      {{> unreadFscAnnouncementsNotification}}
+      {{> unreadImportantAccuseLogsNotification}}
       {{> displayAnnouncement}}
       {{#each advertisingList}}
         {{> displayAdvertising}}
@@ -20,12 +20,12 @@
   </div>
 </template>
 
-<template name="unreadFscAnnouncementsNotification">
+<template name="unreadImportantAccuseLogsNotification">
   {{#if isDisplay}}
     <div class="media bg-danger text-white px-2 py-1 my-2 rounded" style="word-break: break-all;">
       <div class="media-body">
         <strong style="color: yellow">【注意】</strong>
-        您有未讀的金管會通告！請至您的<a style="color: yellow" href="{{accountInfoLink currentUserId}}">帳號資訊</a>頁面查看。
+        您有未讀的重要金管會相關訊息！請至您的<a style="color: yellow" href="{{accountInfoLink currentUserId}}">帳號資訊</a>頁面查看。
       </div>
       <div class="d-flex">
         <a class="btn btn-danger btn-sm" href="#">

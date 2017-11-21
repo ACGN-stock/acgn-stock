@@ -2,15 +2,15 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
-import { dbFoundations } from '../db/dbFoundations';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbOrders } from '../db/dbOrders';
-import { dbDirectors } from '../db/dbDirectors';
-import { dbProducts } from '../db/dbProducts';
-import { foundCompany, investFoundCompany } from '../server/methods/foundation';
-import { createBuyOrder, createSellOrder, retrieveOrder } from '../server/methods/order';
-import { createProduct, voteProduct } from '../server/methods/product';
-import { resignManager, contendManager, supportCandidate } from '../server/methods/company';
+import { dbFoundations } from '/db/dbFoundations';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbOrders } from '/db/dbOrders';
+import { dbDirectors } from '/db/dbDirectors';
+import { dbProducts } from '/db/dbProducts';
+import { foundCompany, investFoundCompany } from '/server/methods/foundation';
+import { createBuyOrder, createSellOrder, retrieveOrder } from '/server/methods/order';
+import { createProduct, voteProduct } from '/server/methods/product';
+import { resignManager, contendManager, supportCandidate } from '/server/methods/company';
 
 if (Meteor.users.find().count() < 1) {
   for (let i = 1; i <= 30; i += 1) {

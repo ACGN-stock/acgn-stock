@@ -1,13 +1,14 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
-import { resourceManager } from './resourceManager';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbDirectors } from '../db/dbDirectors';
-import { dbOrders } from '../db/dbOrders';
-import { dbLog } from '../db/dbLog';
-import { dbVariables } from '../db/dbVariables';
-import { createOrder } from './transaction';
-import { debug } from './debug';
+
+import { createOrder } from './imports/createOrder';
+import { resourceManager } from '/server/imports/resourceManager';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbDirectors } from '/db/dbDirectors';
+import { dbOrders } from '/db/dbOrders';
+import { dbLog } from '/db/dbLog';
+import { dbVariables } from '/db/dbVariables';
+import { debug } from '/server/imports/debug';
 
 const counterBase = 1000 * 60;
 

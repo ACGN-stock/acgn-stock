@@ -2,8 +2,8 @@
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
-import { dbCompanies } from './db/dbCompanies';
-import { dbFoundations } from './db/dbFoundations';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbFoundations } from '/db/dbFoundations';
 
 //default route
 FlowRouter.route('/', {
@@ -59,7 +59,7 @@ companyRoute.route('/:page', {
   action(params) {
     DocHead.setTitle(Meteor.settings.public.websiteName + ' - 股市總覽');
     if (Meteor.isClient) {
-      const { rCompanyOffset } = require('./client/company/companyList');
+      const { rCompanyOffset } = require('/client/company/companyList');
       const page = window.parseInt(params.page, 10) || 1;
       const offset = (page - 1) * 12;
       rCompanyOffset.set(offset);
@@ -106,7 +106,7 @@ foundationRoute.route('/:page', {
   action(params) {
     DocHead.setTitle(Meteor.settings.public.websiteName + ' - 新創計劃');
     if (Meteor.isClient) {
-      const { rFoundationOffset } = require('./client/foundation/foundationList');
+      const { rFoundationOffset } = require('/client/foundation/foundationList');
       const page = window.parseInt(params.page, 10) || 1;
       const offset = (page - 1) * 12;
       rFoundationOffset.set(offset);

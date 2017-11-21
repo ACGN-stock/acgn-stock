@@ -4,11 +4,14 @@ import sinon from 'sinon';
 import deepequal from 'deep-equal';
 import { Meteor } from 'meteor/meteor';
 import { _ } from 'meteor/underscore';
-import { dbSeason } from '../../db/dbSeason';
-import { dbCompanies } from '../../db/dbCompanies';
-import { dbEmployees } from '../../db/dbEmployees';
+import { dbSeason } from '/db/dbSeason';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbEmployees } from '/db/dbEmployees';
 
-import { registerEmployee, unregisterEmployee, updateSeasonalBonus, updateNextSeasonSalary } from '../../server/methods/employee';
+import { registerEmployee } from '/server/methods/employee/registerEmployee';
+import { unregisterEmployee } from '/server/methods/employee/unregisterEmployee';
+import { updateSeasonalBonus } from '/server/methods/employee/updateSeasonalBonus';
+import { updateNextSeasonSalary } from '/server/methods/employee/updateNextSeasonSalary';
 
 test('Register employee test', function(t) {
   _.contains.callsFake(function(arr, obj) {
@@ -269,4 +272,3 @@ test('Update next season salary test', function(t) {
 
   t.end();
 });
-

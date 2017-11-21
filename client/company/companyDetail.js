@@ -6,13 +6,13 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbCompanies } from '../../db/dbCompanies';
-import { dbDirectors } from '../../db/dbDirectors';
-import { dbEmployees } from '../../db/dbEmployees';
-import { dbLog } from '../../db/dbLog';
-import { dbOrders } from '../../db/dbOrders';
-import { dbProducts } from '../../db/dbProducts';
-import { dbSeason } from '../../db/dbSeason';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbDirectors } from '/db/dbDirectors';
+import { dbEmployees } from '/db/dbEmployees';
+import { dbLog } from '/db/dbLog';
+import { dbOrders } from '/db/dbOrders';
+import { dbProducts } from '/db/dbProducts';
+import { dbSeason } from '/db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct, toggleFavorite } from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
@@ -744,7 +744,8 @@ Template.companyAllPrudctList.helpers({
         sort: {
           likeCount: -1,
           createdAt: -1
-        }
+        },
+        limit: 10
       });
   }
 });
@@ -882,11 +883,12 @@ Template.companyElectInfo.events({
     const candidate = candidateList[candidateIndex];
     const supportList = instanceData.voteList[candidateIndex];
     $.ajax({
-      url: '/userName',
+      url: '/userInfo',
       data: {
         id: candidate
       },
-      success: (userName) => {
+      success: (userData) => {
+        const userName = userData.name;
         if (_.contains(supportList, user._id)) {
           alertDialog.alert('你已經正在支持使用者' + userName + '了，無法再次進行支持！');
         }
@@ -916,7 +918,7 @@ function getStockAmount(companyId) {
   }
 }
 
-inheritedShowLoadingOnSubscribing(Template.companyLogList);
+inheritedShowLoadingOnSubscribing(Template.companyEmployeeList);
 Template.companyEmployeeList.helpers({
   employeeList() {
     const companyId = FlowRouter.getParam('companyId');
@@ -940,6 +942,7 @@ Template.companyEmployeeList.helpers({
   }
 });
 
+const rIsOnlyShowMine = new ReactiveVar(false);
 const rLogOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.companyLogList);
 Template.companyLogList.onCreated(function() {
@@ -950,11 +953,14 @@ Template.companyLogList.onCreated(function() {
     }
     const companyId = FlowRouter.getParam('companyId');
     if (companyId) {
-      this.subscribe('companyLog', companyId, rLogOffset.get());
+      this.subscribe('companyLog', companyId, rIsOnlyShowMine.get(), rLogOffset.get());
     }
   });
 });
 Template.companyLogList.helpers({
+  onlyShowMine() {
+    return rIsOnlyShowMine.get();
+  },
   logList() {
     const companyId = FlowRouter.getParam('companyId');
 
@@ -971,5 +977,11 @@ Template.companyLogList.helpers({
       dataNumberPerPage: 30,
       offset: rLogOffset
     };
+  }
+});
+Template.companyLogList.events({
+  'click button'(event) {
+    event.preventDefault();
+    rIsOnlyShowMine.set(! rIsOnlyShowMine.get());
   }
 });

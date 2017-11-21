@@ -4,12 +4,12 @@ import { _ } from 'meteor/underscore';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { dbRankCompanyPrice } from '../../db/dbRankCompanyPrice';
-import { dbRankCompanyProfit } from '../../db/dbRankCompanyProfit';
-import { dbRankCompanyValue } from '../../db/dbRankCompanyValue';
-import { dbRankUserWealth } from '../../db/dbRankUserWealth';
-import { dbSeason } from '../../db/dbSeason';
-import { dbVariables } from '../../db/dbVariables';
+import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
+import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
+import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
+import { dbRankUserWealth } from '/db/dbRankUserWealth';
+import { dbSeason } from '/db/dbSeason';
+import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
 
@@ -273,11 +273,12 @@ function drawCompanyPriceRankTable(templateInstance) {
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: rankData.companyId
       },
-      success: (companyName) => {
+      success: (companyData) => {
+        const companyName = companyData.name;
         if (companyName.length > 8) {
           companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
         }
@@ -356,11 +357,12 @@ function drawCompanyProfitRankTable(templateInstance) {
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: rankData.companyId
       },
-      success: (companyName) => {
+      success: (companyData) => {
+        const companyName = companyData.name;
         if (companyName.length > 8) {
           companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
         }
@@ -455,11 +457,12 @@ function drawCompanyValueRankTable(templateInstance) {
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
-      url: '/companyName',
+      url: '/companyInfo',
       data: {
         id: rankData.companyId
       },
-      success: (companyName) => {
+      success: (companyData) => {
+        const companyName = companyData.name;
         if (companyName.length > 8) {
           companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
         }
@@ -572,11 +575,12 @@ function drawUserRankChart(templateInstance) {
   const userNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
-      url: '/userName',
+      url: '/userInfo',
       data: {
         id: rankData.userId
       },
-      success: (userName) => {
+      success: (userData) => {
+        const userName = userData.name;
         if (userName.length > 13) {
           userNameHash[rankData.userId] = userName.slice(0, 10) + '...';
         }

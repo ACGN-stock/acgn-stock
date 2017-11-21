@@ -1,13 +1,14 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { resourceManager } from './resourceManager';
-import { dbFoundations } from '../db/dbFoundations';
-import { dbLog } from '../db/dbLog';
-import { dbCompanies } from '../db/dbCompanies';
-import { dbDirectors } from '../db/dbDirectors';
-import { dbPrice } from '../db/dbPrice';
-import { debug } from './debug';
+import { resourceManager } from '/server/imports/resourceManager';
+import { dbFoundations } from '/db/dbFoundations';
+import { dbLog } from '/db/dbLog';
+import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanyArchive } from '/db/dbCompanyArchive';
+import { dbDirectors } from '/db/dbDirectors';
+import { dbPrice } from '/db/dbPrice';
+import { debug } from '/server/imports/debug';
 
 const {foundExpireTime, foundationNeedUsers, minReleaseStock} = Meteor.settings.public;
 export function checkFoundCompany() {
@@ -127,6 +128,7 @@ export function checkFoundCompany() {
               logBulk.insert({
                 logType: '創立退款',
                 userId: [userId],
+                companyId: companyId,
                 message: foundationData.companyName,
                 amount: amount,
                 createdAt: createdAt
@@ -152,6 +154,11 @@ export function checkFoundCompany() {
             usersBulk.execute();
           }
           dbFoundations.remove(companyId);
+          dbCompanyArchive.update(companyId, {
+            $set: {
+              status: 'market'
+            }
+          });
         }
         else {
           const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
@@ -181,13 +188,21 @@ export function checkFoundCompany() {
               }
             });
           });
+          dbFoundations.remove(companyId);
+          dbCompanyArchive.remove(companyId);
+          logBulk
+            .find({companyId})
+            .update({
+              $unset: {
+                companyId: ''
+              }
+            });
           logBulk.execute = Meteor.wrapAsync(logBulk.execute);
           logBulk.execute();
           if (foundationData.invest.length > 0) {
             usersBulk.execute = Meteor.wrapAsync(usersBulk.execute);
             usersBulk.execute();
           }
-          dbFoundations.remove(companyId);
         }
         release();
       });
