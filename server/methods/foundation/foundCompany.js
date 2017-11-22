@@ -4,7 +4,6 @@ import { check, Match } from 'meteor/check';
 
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
-import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbSeason } from '/db/dbSeason';
 import { checkImageUrl } from '/server/imports/checkImageUrl';
@@ -55,7 +54,7 @@ export function foundCompany(user, foundCompanyData) {
     throw new Meteor.Error(403, '商業季度即將結束前' + hours + '小時，禁止新創計劃！');
   }
   const companyName = foundCompanyData.companyName;
-  if (dbFoundations.find({companyName}).count() > 0 || dbCompanies.find({companyName}).count() > 0) {
+  if (dbCompanyArchive.find({name: companyName}).count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
   }
   if (foundCompanyData.pictureBig) {

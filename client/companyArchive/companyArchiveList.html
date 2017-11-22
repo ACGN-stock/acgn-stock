@@ -13,12 +13,16 @@
           <div class="media-body row">
             {{#each companyArchiveList}}
               {{> companyArchiveListCard}}
+            {{else}}
+              <div class="col-12">目前沒有任何公司在保管庫中！</div>
             {{/each}}
           </div>
         </div>
       {{else}}
         {{#each companyArchiveList}}
           {{> companyArchiveListTable}}
+        {{else}}
+          <div>目前沒有任何公司在保管庫中！</div>
         {{/each}} 
       {{/if}}
       {{#with paginationData}}

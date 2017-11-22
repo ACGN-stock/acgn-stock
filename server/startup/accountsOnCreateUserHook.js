@@ -45,6 +45,9 @@ Accounts.onCreateUser((options, user) => {
     });
   }
   else {
+    if (user.profile.validateType === 'Google') {
+      throw new Meteor.Error(403, '暫時停止以Google帳號進行註冊！');
+    }
     dbUserArchive.insert({
       _id: user._id,
       status: 'registered',

@@ -75,18 +75,18 @@ export function investArchiveCompany(user, companyId) {
         'profile.money': amount * -1
       }
     });
+    archiveCompanyData.invest.push(userId);
     if (archiveCompanyData.invest.length >= Meteor.settings.public.archiveReviveNeedUsers) {
-      archiveCompanyData.invest.push(userId);
-      const userIdList = _.shuffle(archiveCompanyData.invest);
+      const investUserIdList = _.shuffle(archiveCompanyData.invest);
       dbLog.insert({
         logType: '公司復活',
-        userId: userIdList,
+        userId: investUserIdList,
         companyId: companyId,
         message: archiveCompanyData.name,
         amount: amount,
         createdAt: new Date(createdAt.getTime() + 1)
       });
-      const invest = _.map(userIdList, (userId) => {
+      const invest = _.map(investUserIdList, (userId) => {
         return {userId, amount};
       });
       dbCompanyArchive.update(companyId, {
@@ -98,7 +98,7 @@ export function investArchiveCompany(user, companyId) {
       dbFoundations.insert({
         _id: companyId,
         companyName: archiveCompanyData.name,
-        manager: userIdList[0],
+        manager: investUserIdList[0],
         tags: archiveCompanyData.tags,
         pictureSmall: archiveCompanyData.pictureSmall,
         pictureBig: archiveCompanyData.pictureBig,
@@ -108,11 +108,9 @@ export function investArchiveCompany(user, companyId) {
       });
     }
     else {
-      const invest = archiveCompanyData.invest;
-      invest.push(userId);
       dbCompanyArchive.update(companyId, {
         $set: {
-          invest: invest
+          invest: archiveCompanyData.invest
         }
       });
     }

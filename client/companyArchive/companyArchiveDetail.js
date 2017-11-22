@@ -53,7 +53,7 @@ Template.companyArchiveDetail.helpers({
   }
 });
 Template.companyArchiveDetail.events({
-  'click [data-action="invest"]'(event, templaceInstance) {
+  'click [data-action="invest"]'(event) {
     event.preventDefault();
     investArchiveCompany(this);
   },
@@ -65,6 +65,22 @@ Template.companyArchiveDetail.events({
 
 //是否展開面板
 const rDisplayPanelList = new ReactiveVar([]);
+Template.companyArchiveDetailTable.onRendered(function() {
+  switch (this.data.status) {
+    case 'market': {
+      FlowRouter.go('companyDetail', {
+        companyId: this.data._id
+      });
+      break;
+    }
+    case 'foundation': {
+      FlowRouter.go('foundationDetail', {
+        foundationId: this.data._id
+      });
+      break;
+    }
+  }
+});
 Template.companyArchiveDetailTable.helpers({
   isDisplayPanel(panelType) {
     return _.contains(rDisplayPanelList.get(), panelType);
