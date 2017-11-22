@@ -65,6 +65,22 @@ Template.companyArchiveDetail.events({
 
 //是否展開面板
 const rDisplayPanelList = new ReactiveVar([]);
+Template.companyArchiveDetailTable.onRendered(function() {
+  switch (this.data.status) {
+    case 'market': {
+      FlowRouter.go('companyDetail', {
+        companyId: this.data._id
+      });
+      break;
+    }
+    case 'foundation': {
+      FlowRouter.go('foundationDetail', {
+        foundationId: this.data._id
+      });
+      break;
+    }
+  }
+});
 Template.companyArchiveDetailTable.helpers({
   isDisplayPanel(panelType) {
     return _.contains(rDisplayPanelList.get(), panelType);
