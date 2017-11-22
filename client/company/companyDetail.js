@@ -940,6 +940,42 @@ Template.companyEmployeeList.helpers({
         registerAt: 1
       }
     });
+  },
+  isCurrentUserEmployed() {
+    const userId = Meteor.userId();
+    const companyId = FlowRouter.getParam('companyId');
+
+    if (! userId) {
+      return false;
+    }
+
+    return dbEmployees.find({ companyId, userId, employed: true }).count() > 0;
+  },
+  showMessage(message) {
+    return message || '無';
+  },
+  getMyMessage() {
+    const userId = Meteor.userId();
+    const companyId = FlowRouter.getParam('companyId');
+
+    const employeeData = dbEmployees.findOne({ companyId, userId, employed: true });
+    if (! employeeData) {
+      return '';
+    }
+
+    return employeeData.message;
+  }
+});
+Template.companyEmployeeList.events({
+  'submit form'(event, templateInstance) {
+    event.preventDefault();
+    const message = templateInstance.$('[name="message"]').val();
+    if (message.length > 100) {
+      alertDialog.alert('輸入訊息過長！');
+    }
+    else if (Meteor.user() && message.length) {
+      Meteor.customCall('setEmployeeMessage', templateInstance.data._id, message);
+    }
   }
 });
 

@@ -29,7 +29,12 @@ const schema = new SimpleSchema({
   resigned: {
     type: Boolean,
     defaultValue: false
+  },
+  // 員工留言
+  message: {
+    type: String,
+    max: 100,
+    optional: true
   }
 });
 dbEmployees.attachSchema(schema);
-
