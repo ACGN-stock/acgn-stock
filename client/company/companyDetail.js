@@ -887,6 +887,7 @@ Template.companyElectInfo.events({
       data: {
         id: candidate
       },
+      dataType: 'json',
       success: (userData) => {
         const userName = userData.name;
         if (_.contains(supportList, user._id)) {
