@@ -66,7 +66,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return formatDateText(currentRound.beginDate);
+    return currentRound ? formatDateText(currentRound.beginDate) : '';
   },
   roundEndTime() {
     const currentRound = dbRound.findOne({}, {
@@ -75,7 +75,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return formatDateText(currentRound.endDate);
+    return currentRound ? formatDateText(currentRound.endDate) : '';
   },
   seasonStartTime() {
     const currentSeason = dbSeason.findOne({}, {
@@ -84,7 +84,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return formatDateText(currentSeason.beginDate);
+    return currentSeason ? formatDateText(currentSeason.beginDate) : '';
   },
   seasonEndTime() {
     const currentSeason = dbSeason.findOne({}, {
@@ -93,7 +93,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return formatDateText(currentSeason.endDate);
+    return currentSeason ? formatDateText(currentSeason.endDate) : '';
   },
   stockPriceUpdateTime() {
     const time = dbVariables.get('lastRecordListPriceTime');
