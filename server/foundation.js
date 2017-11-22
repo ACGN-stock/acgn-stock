@@ -81,6 +81,10 @@ export function checkFoundCompany() {
             price: stockUnitPrice,
             createdAt: basicCreatedAt
           });
+          const candidateList = [];
+          if (foundationData.manager !== '!none') {
+            candidateList.push(candidateList);
+          }
           companiesBulk.insert({
             _id: companyId,
             companyName: foundationData.companyName,
@@ -95,7 +99,7 @@ export function checkFoundCompany() {
             listPrice: stockUnitPrice,
             totalValue: totalRelease * stockUnitPrice,
             profit: 0,
-            candidateList: [foundationData.manager],
+            candidateList: candidateList,
             voteList: [ [] ],
             salary: Meteor.settings.public.defaultCompanySalaryPerDay,
             nextSeasonSalary: Meteor.settings.public.defaultCompanySalaryPerDay,
