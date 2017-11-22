@@ -2,8 +2,7 @@
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
-import { dbCompanies } from '/db/dbCompanies';
-import { dbFoundations } from '/db/dbFoundations';
+import { dbCompanyArchive } from '/db/dbCompanyArchive';
 
 //default route
 FlowRouter.route('/', {
@@ -19,6 +18,7 @@ export const pageNameHash = {
   instantMessage: '即時訊息',
   companyList: '股市總覽',
   foundationList: '新創計劃',
+  companyArchiveList: '公司保管庫',
   advertising: '廣告宣傳',
   productCenterBySeason: '產品中心',
   productCenterByCompany: '產品中心',
@@ -70,12 +70,12 @@ companyRoute.route('/detail/:companyId', {
   name: 'companyDetail',
   action(params) {
     if (Meteor.isServer) {
-      const companyData = dbCompanies.findOne(params.companyId, {
+      const companyArchiveData = companyArchiveData.findOne(params.companyId, {
         fields: {
           companyName: 1
         }
       });
-      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + companyArchiveData.companyName + '」公司資訊');
     }
     else {
       DocHead.setTitle(Meteor.settings.public.websiteName + ' - 公司資訊');
@@ -117,12 +117,12 @@ foundationRoute.route('/view/:foundationId', {
   name: 'foundationDetail',
   action(params) {
     if (Meteor.isServer) {
-      const foundationData = dbFoundations.findOne(params.foundationId, {
+      const companyArchiveData = companyArchiveData.findOne(params.foundationId, {
         fields: {
           companyName: 1
         }
       });
-      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + foundationData.companyName + '」公司資訊');
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + companyArchiveData.companyName + '」公司資訊');
     }
     else {
       DocHead.setTitle(Meteor.settings.public.websiteName + ' - 新創計劃資訊');
@@ -144,6 +144,47 @@ foundationRoute.route('/edit/:foundationId', {
   }
 });
 
+const archiveRoute = FlowRouter.group({
+  prefix: '/companyArchive',
+  name: 'companyArchiveRoute'
+});
+archiveRoute.route('/', {
+  name: 'companyArchiveRedirect',
+  triggersEnter: [
+    (context, redirect) => {
+      redirect('/companyArchive/1');
+    }
+  ]
+});
+archiveRoute.route('/:page', {
+  name: 'companyArchiveList',
+  action(params) {
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 公司保管庫');
+    if (Meteor.isClient) {
+      const { rArchiveOffset } = require('/client/companyArchive/companyArchiveList');
+      const page = window.parseInt(params.page, 10) || 1;
+      const offset = (page - 1) * 12;
+      rArchiveOffset.set(offset);
+    }
+  }
+});
+archiveRoute.route('/view/:companyId', {
+  name: 'companyArchiveDetail',
+  action(params) {
+    if (Meteor.isServer) {
+      const companyArchiveData = dbCompanyArchive.findOne(params.companyId, {
+        fields: {
+          companyName: 1
+        }
+      });
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + companyArchiveData.companyName + '」保管庫公司資訊');
+    }
+    else {
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 保管庫資訊');
+    }
+  }
+});
+
 const productCenterRoute = FlowRouter.group({
   prefix: '/productCenter',
   name: 'productCenterRoute'
@@ -158,12 +199,12 @@ productCenterRoute.route('/company/:companyId', {
   name: 'productCenterByCompany',
   action(params) {
     if (Meteor.isServer) {
-      const companyData = dbCompanies.findOne(params.companyId, {
+      const companyArchiveData = dbCompanyArchive.findOne(params.companyId, {
         fields: {
           companyName: 1
         }
       });
-      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 產品中心 - ' + companyData.companyName);
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 產品中心 - ' + companyArchiveData.companyName);
     }
     else {
       DocHead.setTitle(Meteor.settings.public.websiteName + ' - 產品中心');

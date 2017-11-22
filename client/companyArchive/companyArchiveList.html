@@ -1,0 +1,138 @@
+<template name="companyArchiveList">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">公司保管庫</h1>
+      <hr />
+      {{> companyArchiveListFilterForm}}
+      <hr />
+      {{#with paginationData}}
+        {{> pagination}}
+      {{/with}}
+      {{#if viewModeIsCard}}
+        <div class="media">
+          <div class="media-body row">
+            {{#each companyArchiveList}}
+              {{> companyArchiveListCard}}
+            {{/each}}
+          </div>
+        </div>
+      {{else}}
+        {{#each companyArchiveList}}
+          {{> companyArchiveListTable}}
+        {{/each}} 
+      {{/if}}
+      {{#with paginationData}}
+        {{> pagination}}
+      {{/with}}
+    </div>
+  </div>
+</template>
+
+<template name="companyArchiveListFilterForm">
+  <form class="form-inline">
+    <button class="btn btn-secondary mr-1" type="button" data-action="toggleViewMode">
+      <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
+    </button>
+    <div class="input-group">
+      <input
+        class="form-control"
+        style="width: 300px"
+        type="text"
+        name="keyword"
+        placeholder="請輸入關鍵字"
+        value="{{keyword}}"
+      />
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-search" aria-hidden="true"></i>
+          搜索
+        </button>
+      </span>
+    </div>
+  </form>
+</template>
+
+<template name="companyArchiveListCard">
+  <div class="col-12 col-md-6 col-lg-4 col-xl-3" style="margin-bottom: 25px;">
+    <div class="company-card {{cardDisplayClass this}}">
+      <div class="company-card-mask">
+        <hr style="margin: 0px;" />
+        <div class="row row-cover d-flex justify-content-around">
+          <div class="d-flex flex-column align-self-center">
+            <div class="picture">
+              {{#if this.pictureSmall}}
+                <img src="{{this.pictureSmall}}" />
+              {{else}}
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
+              {{/if}}
+            </div>
+          </div>
+          <div class="d-flex flex-column align-self-center">
+            <div class="d-flex flex-row-reverse">
+              <div class="member-panel">
+                <div class="d-flex flex-row-reverse" style="margin-top: 0.5rem;">
+                  <small>已投資人數</small>
+                </div>
+                <div class="d-flex flex-row-reverse {{investPplsNumberClass}}">
+                  <h4>{{this.invest.length}} / {{archiveReviveNeedUsers}}</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="title-starter">
+          {{>companyLink this._id}}
+        </div>
+        <hr style="margin: 0px;" />
+        <div class="row">
+          <button class="btn btn-tab accordion dropdown-toggle" data-expand-order="1">角色資訊</button>
+          <div class="order-panel">
+            <div class="description">{{this.description}}</div>
+          </div>
+        </div>
+        {{#if currentUser}}
+          <hr style="margin: 0px;" />
+          <div class="row text-center">
+            <button class="btn btn-tab btn-block" type="button" data-action="invest">
+              投資
+            </button>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="companyArchiveListTable">
+  <div class="media company-summary-item">
+    <div class="d-sm-flex picture">
+      {{#if this.pictureSmall}}
+        <img src="{{this.pictureSmall}}" />
+      {{else}}
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
+      {{/if}}
+    </div>
+    <div class="media-body row border-grid-body">
+      <div class="col-4 text-right border-grid">角色名稱：</div>
+      <div class="col-8 text-truncate border-grid" title="{{this.companyName}}">
+        {{>companyLink this._id}}
+        {{#if currentUser}}
+          <button
+            class="btn btn-primary btn-sm float-right"
+            type="button"
+            data-action="invest"
+          >
+            進行投資
+          </button>
+        {{/if}}
+      </div>
+      <div class="col-4 text-right border-grid">投資人數：</div>
+      <div class="col-8 text-right text-truncate border-grid">
+        <span class="{{investPplsNumberClass this.invest.length}}">
+          {{this.invest.length}} / {{archiveReviveNeedUsers}}
+        </span>
+      </div>
+      <div class="col-12 border-grid company-description"><h4>角色簡介：</h4>{{this.description}}</div>
+    </div>
+  </div>
+</template>

@@ -24,13 +24,18 @@ Template.userLink.onRendered(function() {
       dataType: 'json',
       success: (userData) => {
         const userName = userData.name;
-        let path;
         if (userData.status === 'registered') {
-          path = FlowRouter.path('accountInfo', {userId});
+          const path = FlowRouter.path('accountInfo', {userId});
+          $link
+            .attr('href', path)
+            .text(('' + userName).trim() || '???');
         }
-        $link
-          .attr('href', path)
-          .text(('' + userName).trim() || '???');
+        else {
+          $link.wrapInner('<span></sapn>');
+          $link.find('span')
+            .text(('' + userName).trim() || '???')
+            .unwrap();
+        }
       },
       error: () => {
         $link.text('???');
@@ -54,7 +59,7 @@ Template.companyLink.onRendered(function() {
         let path;
         switch (companyData.status) {
           case 'archived': {
-            path = FlowRouter.path('archiveDetail', {companyId});
+            path = FlowRouter.path('companyArchiveDetail', {companyId});
             break;
           }
           case 'foundation': {

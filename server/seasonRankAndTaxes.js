@@ -19,20 +19,22 @@ export function generateRankAndTaxesData(seasonData) {
   rankHasStockUser(_.first(hasStockUserWealthList, 100), seasonData);
   const noStockUserWealthList = generateNoStockUserWealthList();
   const userWealthList = hasStockUserWealthList.concat(noStockUserWealthList);
-  generateUserTaxes(userWealthList);
-  const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
-  _.each(userWealthList, (wealthData) => {
-    usersBulk
-      .find({
-        _id: wealthData._id
-      })
-      .updateOne({
-        $set: {
-          'profile.lastSeasonTotalWealth': wealthData.totalWealth
-        }
-      });
-  });
-  usersBulk.execute();
+  if (userWealthList && userWealthList.length) {
+    generateUserTaxes(userWealthList);
+    const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+    _.each(userWealthList, (wealthData) => {
+      usersBulk
+        .find({
+          _id: wealthData._id
+        })
+        .updateOne({
+          $set: {
+            'profile.lastSeasonTotalWealth': wealthData.totalWealth
+          }
+        });
+    });
+    usersBulk.execute();
+  }
 }
 
 function rankCompany(seasonData) {
@@ -393,16 +395,18 @@ function generateHasStockUserWealthList() {
 }
 
 function rankHasStockUser(hasStockUserWealthList, seasonData) {
-  const rankUserBulk = dbRankUserWealth.rawCollection().initializeUnorderedBulkOp();
-  _.each(hasStockUserWealthList, (rankData) => {
-    rankUserBulk.insert({
-      seasonId: seasonData._id,
-      userId: rankData._id,
-      money: rankData.money,
-      stocksValue: rankData.stocksValue
+  if (hasStockUserWealthList && hasStockUserWealthList.length > 0) {
+    const rankUserBulk = dbRankUserWealth.rawCollection().initializeUnorderedBulkOp();
+    _.each(hasStockUserWealthList, (rankData) => {
+      rankUserBulk.insert({
+        seasonId: seasonData._id,
+        userId: rankData._id,
+        money: rankData.money,
+        stocksValue: rankData.stocksValue
+      });
     });
-  });
-  rankUserBulk.execute();
+    rankUserBulk.execute();
+  }
 }
 
 function generateNoStockUserWealthList() {

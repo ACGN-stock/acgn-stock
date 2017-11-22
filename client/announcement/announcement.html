@@ -21,11 +21,7 @@
         </div>
       </div>
       <hr />
-      <div class="row">
-        <div class="col-12">
-          {{> systemStatusPanel}}
-        </div>
-      </div>
+      {{> systemStatusPanel}}
       <hr />
       <div class="row">
         <div class="col-12">
@@ -59,6 +55,18 @@
 
 <template name="systemStatusPanel">
   <div id="system-time-info" class="row">
+    <div class="col-12 col-md-6">
+      當前賽季開始時間：{{roundStartTime}}
+    </div>
+    <div class="col-12 col-md-6">
+      當前賽季結束時間：{{roundEndTime}}
+    </div>
+    <div class="col-12 col-md-6">
+      商業季度開始時間：{{seasonStartTime}}
+    </div>
+    <div class="col-12 col-md-6">
+      商業季度結束時間：{{seasonEndTime}}
+    </div>
     <div class="col-12 col-md-2 non-break">最近股價更新區間</div>
     <div class="col-12 col-lg-4 time-info {{taskIsReady stockPriceUpdateBegin stockPriceUpdateEnd}}">
       <span class="non-break">{{stockPriceUpdateBegin}}</span>

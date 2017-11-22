@@ -34,6 +34,15 @@ Accounts.onCreateUser((options, user) => {
   });
   if (existsArchiveUser) {
     user._id = existsArchiveUser._id;
+    user.profile.name = existsArchiveUser.name;
+    user.profile.isAdmin = existsArchiveUser.isAdmin;
+    user.profile.stone = existsArchiveUser.stone;
+    user.profile.ban = existsArchiveUser.ban;
+    dbUserArchive.update(existsArchiveUser._id, {
+      $set: {
+        status: 'registered'
+      }
+    });
   }
   else {
     dbUserArchive.insert({

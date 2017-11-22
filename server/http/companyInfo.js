@@ -5,6 +5,7 @@ import querystring from 'querystring';
 
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbFoundations } from '/db/dbFoundations';
+import { dbRound } from '/db/dbRound';
 import { debug } from '/server/imports/debug';
 
 //以Ajax方式發布公司名稱
@@ -22,7 +23,18 @@ WebApp.connectHandlers.use(function(req, res, next) {
     });
     if (companyData) {
       if (companyData.status === 'market') {
-        res.setHeader('Cache-Control', 'public, max-age=604800');
+        const lastRoundData = dbRound.findOne({}, {
+          sort: {
+            beginDate: -1
+          }
+        });
+        if (lastRoundData) {
+          const cacheMicroTime = lastRoundData.endDate.getTime() - Date.now();
+          if (cacheMicroTime > 0) {
+            const cacheTime = Math.min(Math.floor(cacheMicroTime / 1000), 604800);
+            res.setHeader('Cache-Control', 'public, max-age=' + cacheTime);
+          }
+        }
       }
       else if (companyData.status === 'foundation') {
         const foundationData = dbFoundations.findOne(companyId, {

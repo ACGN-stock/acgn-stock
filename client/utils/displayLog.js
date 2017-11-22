@@ -24,15 +24,21 @@ Template.displayLog.onRendered(function() {
           dataType: 'json',
           success: (userData) => {
             const userName = userData.name;
-            let path;
             if (userData.status === 'registered') {
-              path = FlowRouter.path('accountInfo', {userId});
+              const path = FlowRouter.path('accountInfo', {userId});
+              $link
+                .filter('[data-user-link="' + userId + '"]')
+                .html(`
+                  <a href="${path}">${userName}</a>
+                `);
             }
-            $link
-              .filter('[data-user-link="' + userId + '"]')
-              .html(`
-                <a href="${path}">${userName}</a>
-              `);
+            else {
+              $link
+                .filter('[data-user-link="' + userId + '"]')
+                .html(`
+                  <span>${userName}</span>
+                `);
+            }
           }
         });
       }
@@ -52,7 +58,7 @@ Template.displayLog.onRendered(function() {
         let path;
         switch (companyData.status) {
           case 'archived': {
-            path = FlowRouter.path('archiveDetail', {companyId});
+            path = FlowRouter.path('companyArchiveDetail', {companyId});
             break;
           }
           case 'foundation': {
@@ -122,6 +128,17 @@ Template.displayLog.helpers({
         return '【發薪紀錄】「' + getCompanyLink(logData.companyId) +
         '」公司向' + userLinkList.join('、') + '發給了$' + currencyFormat(logData.price) + '的薪水！';
       }
+      case '公司復活': {
+        const userLinkList = _.map(logData.userId, (userId) => {
+          return getUserLink(userId);
+        });
+
+        return (
+          '【公司復活】由於' + userLinkList.join('、') + '等人的投資，位於保管庫中的「' +
+          getCompanyLink(logData.companyId) + '」公司成功復活並重新進入新創計劃，' +
+          getUserLink(logData.userId[0]) + '將就任公司經理。'
+        );
+      }
       case '創立公司': {
         const companyName = logData.companyId ? getCompanyLink(logData.companyId) : getPureMessage();
 
@@ -137,7 +154,7 @@ Template.displayLog.helpers({
         return (
           '【參與投資】' +
           getUserLink(logData.userId[0]) +
-          '向「' + companyName + '公司創立計劃」投資了$' + currencyFormat(logData.amount) + '！'
+          '向「' + companyName + '」公司投資了$' + currencyFormat(logData.amount) + '！'
         );
       }
       case '創立失敗': {
@@ -535,11 +552,12 @@ Template.displayLog.helpers({
         );
       }
       case '查封關停': {
+        const companyName = logData.companyId ? getCompanyLink(logData.companyId) : '???';
+
         return (
           '【查封關停】' +
           getUserLink(logData.userId[0]) +
-          '以「' + getPureMessage() + '」的理由查封關停了「' +
-          getCompanyLink(logData.companyId) + '」公司。'
+          '以「' + getPureMessage() + '」的理由查封關停了「' + companyName + '」公司。'
         );
       }
       case '解除查封': {

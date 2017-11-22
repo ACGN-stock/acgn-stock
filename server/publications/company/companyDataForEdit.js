@@ -30,7 +30,14 @@ Meteor.publish('companyDataForEdit', function(companyId) {
     const overdue = 0;
 
     return [
-      dbCompanies.find(companyId),
+      dbCompanies.find(companyId, {
+        fields: {
+          tags: 1,
+          pictureSmall: 1,
+          pictureBig: 1,
+          description: 1
+        }
+      }),
       dbProducts.find({companyId, overdue})
     ];
   }

@@ -16,6 +16,7 @@ import { dbRankCompanyPrice } from './dbRankCompanyPrice';
 import { dbRankCompanyProfit } from './dbRankCompanyProfit';
 import { dbRankCompanyValue } from './dbRankCompanyValue';
 import { dbRankUserWealth } from './dbRankUserWealth';
+import { dbRound } from './dbRound';
 import { dbRuleAgendas } from './dbRuleAgendas';
 import { dbSeason } from './dbSeason';
 import { dbTaxes } from './dbTaxes';
@@ -472,8 +473,27 @@ if (Meteor.isServer) {
 
   Migrations.add({
     version: 12,
-    name: 'archive company/user name.',
+    name: 'round system',
     up() {
+      dbRound.rawCollection().createIndex({
+        beginDate: -1
+      });
+      const firstSeasonData = dbSeason.findOne({}, {
+        sort: {
+          beginDate: 1
+        }
+      });
+      let beginDate;
+      if (firstSeasonData) {
+        beginDate = firstSeasonData.beginDate;
+      }
+      else {
+        beginDate = new Date();
+      }
+      const roundTime = Meteor.settings.public.seasonTime * Meteor.settings.public.seasonNumberInRound;
+      const endDate = new Date(beginDate.setMinutes(0, 0, 0) + roundTime);
+      dbRound.insert({beginDate, endDate});
+
       if (dbCompanies.find({isSeal: false}).count()) {
         const companyArchiveBulk = dbCompanyArchive.rawCollection().initializeUnorderedBulkOp();
         dbCompanies
@@ -552,6 +572,9 @@ if (Meteor.isServer) {
           unique: true
         }
       );
+      dbCompanyArchive.rawCollection().createIndex({
+        status: 1
+      });
       dbUserArchive.rawCollection().createIndex(
         {
           name: 1,

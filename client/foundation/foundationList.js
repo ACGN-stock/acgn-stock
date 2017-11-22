@@ -162,6 +162,8 @@ const foundationListEvents = {
     event.preventDefault();
     const user = Meteor.user();
     if (! user) {
+      alertDialog.alert('您尚未登入！');
+
       return false;
     }
     const userId = user._id;

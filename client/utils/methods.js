@@ -259,3 +259,42 @@ export function toggleFavorite(companyId) {
     Meteor.customCall('addFavoriteCompany', companyId);
   }
 }
+
+export function investArchiveCompany(companyData) {
+  const user = Meteor.user();
+  if (! user) {
+    alertDialog.alert('您尚未登入！');
+
+    return false;
+  }
+  const userId = user._id;
+  if (_.contains(companyData.invest, userId)) {
+    alertDialog.alert('您已經投資過此保管庫公司了！');
+
+    return false;
+  }
+  const minimumInvest = Meteor.settings.public.founderEarnestMoney;
+  if (minimumInvest > Meteor.user().profile.money) {
+    alertDialog.alert('您的剩餘金錢不足以進行投資！');
+
+    return false;
+  }
+  const archiveReviveNeedUsers = Meteor.settings.public.archiveReviveNeedUsers;
+
+  alertDialog.dialog({
+    type: 'confirm',
+    title: '投資保管庫公司',
+    message: `
+      確定要花費$${currencyFormat(minimumInvest)}來投資保管庫公司「${companyData.name}」嗎？
+      <div class="text-danger">
+        對保管庫公司進行投資時，除非總投資人數成功抵達${archiveReviveNeedUsers}人門檻，否則投資永遠無法收回！
+      </div>
+    `,
+    defaultValue: null,
+    callback: function(result) {
+      if (result) {
+        Meteor.customCall('investArchiveCompany', companyData._id);
+      }
+    }
+  });
+}

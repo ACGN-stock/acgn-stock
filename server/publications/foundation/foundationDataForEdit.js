@@ -9,7 +9,14 @@ Meteor.publish('foundationDataForEdit', function(foundationId) {
   debug.log('publish foundationDataForEdit', {foundationId});
   check(foundationId, String);
 
-  return dbFoundations.find(foundationId);
+  return dbFoundations.find(foundationId, {
+    fields: {
+      tags: 1,
+      pictureSmall: 1,
+      pictureBig: 1,
+      description: 1
+    }
+  });
 });
 //一分鐘最多10次
 limitSubscription('foundationDataForEdit', 10);
