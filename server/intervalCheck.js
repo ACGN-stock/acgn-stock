@@ -498,8 +498,15 @@ function cancelAllOrder() {
         companiesBulk.execute = Meteor.wrapAsync(companiesBulk.execute);
         companiesBulk.execute();
       }
-      directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
-      directorsBulk.execute();
+
+      const nonSystemIncreaseStocksDirectorList = Object.keys(increaseStocksHash).filter((k) => {
+        return k !== '!system';
+      });
+
+      if (nonSystemIncreaseStocksDirectorList.length > 0) {
+        directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
+        directorsBulk.execute();
+      }
     }
     logBulk.execute = Meteor.wrapAsync(logBulk.execute);
     logBulk.execute();
