@@ -70,7 +70,7 @@ Template.companyArchiveListFilterForm.events({
   submit(event, templateInstance) {
     event.preventDefault();
     rKeyword.set(templateInstance.$keyword.val());
-    FlowRouter.go('companyArchiveListFilterForm', {
+    FlowRouter.go('companyArchiveList', {
       page: 1
     });
   }
