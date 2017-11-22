@@ -94,10 +94,11 @@ Template.productLink.onRendered(function() {
         id: productId
       },
       dataType: 'json',
-      success: (productData) => {
+      success: ({ productName, url }) => {
         $link
-          .attr('href', productData.url)
-          .text(productData.productName || '???');
+          .attr('href', url)
+          .attr('title', productName || '???')
+          .text(productName || '???');
       },
       error: () => {
         $link.text('???');
