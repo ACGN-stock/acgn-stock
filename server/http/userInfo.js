@@ -22,7 +22,9 @@ WebApp.connectHandlers.use(function(req, res, next) {
       }
     });
     if (userData) {
-      res.setHeader('Cache-Control', 'public, max-age=604800');
+      if (userData.status === 'registered') {
+        res.setHeader('Cache-Control', 'public, max-age=604800');
+      }
       if (userData.validateType === 'Google' && userData.accessToken) {
         try {
           /* eslint-disable camelcase */
