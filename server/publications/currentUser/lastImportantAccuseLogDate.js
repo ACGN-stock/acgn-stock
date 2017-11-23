@@ -1,17 +1,18 @@
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-
 import { limitSubscription } from '/server/imports/rateLimit';
 import { dbLog, importantAccuseLogTypeList } from '/db/dbLog';
 import { debug } from '/server/imports/debug';
 
 Meteor.publish('lastImportantAccuseLogDate', function() {
   debug.log('publish lastImportantAccuseLogDate');
-
   const userId = this.userId;
-  check(userId, String);
+  if (! userId) {
+    return [];
+  }
 
-  this.added('variables', 'lastImportantAccuseLogDate', { value: null });
+  this.added('variables', 'lastImportantAccuseLogDate', {
+    value: null
+  });
   const observer = dbLog.find({
     logType: { $in: importantAccuseLogTypeList },
     userId,
@@ -21,7 +22,9 @@ Meteor.publish('lastImportantAccuseLogDate', function() {
     limit: 1
   }).observeChanges({
     added: (id, fields) => {
-      this.changed('variables', 'lastImportantAccuseLogDate', { value: fields.createdAt });
+      this.changed('variables', 'lastImportantAccuseLogDate', {
+        value: fields.createdAt
+      });
     }
   });
   this.ready();
