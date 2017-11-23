@@ -46,29 +46,26 @@
         {{/if}}
       </div>
     </div>
-    <button class="{{sortByBtnClass 'lastPrice'}}" value="lastPrice" type="button" data-action="sortBy">
-      依股價排序
-    </button>
-    <button class="{{sortByBtnClass 'totalValue'}}" value="totalValue" type="button" data-action="sortBy">
-      依總市值排序
-    </button>
-    <button class="{{sortByBtnClass 'createdAt'}}" value="createdAt" type="button" data-action="sortBy">
-      依上市日期排序
-    </button>
-    <div class="input-group">
-      <input
-        class="form-control"
-        type="text"
-        name="keyword"
-        placeholder="請輸入關鍵字"
-        value="{{keyword}}"
-      />
-      <span class="input-group-btn">
+    <div class="d-flex flex-wrap">
+      <button class="{{sortByBtnClass 'lastPrice'}}" value="lastPrice" type="button" data-action="sortBy">
+        依股價排序
+      </button>
+      <button class="{{sortByBtnClass 'totalValue'}}" value="totalValue" type="button" data-action="sortBy">
+        依總市值排序
+      </button>
+      <button class="{{sortByBtnClass 'createdAt'}}" value="createdAt" type="button" data-action="sortBy">
+        依上市日期排序
+      </button>
+    </div>
+    <div class="d-flex flex-wrap justify-content-center">
+        <input class="form-control" type="text" name="keyword" placeholder="請輸入關鍵字" value="{{keyword}}" />
+        <select class="form-control" name="matchType">
+          <option value="exact">完全比對</option>
+          <option value="fuzzy">模糊比對</option>
+        </select>
         <button type="submit" class="btn btn-primary">
-          <i class="fa fa-search" aria-hidden="true"></i>
-          搜索
+          <i class="fa fa-search" aria-hidden="true"></i> 搜索
         </button>
-      </span>
     </div>
   </form>
 </template>
@@ -156,7 +153,7 @@
             <div class="order-panel">
               {{#each ownOrderList this._id}}
                 <div class="mb-1">
-                  {{orderType}}{{done}}/{{amount}} (${{unitPrice}}) 
+                  {{orderType}}{{done}}/{{amount}} (${{unitPrice}})
                   <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{_id}}">
                     取消
                   </button>

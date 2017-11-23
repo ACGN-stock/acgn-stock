@@ -29,7 +29,7 @@
       {{else}}
         {{#each foundationList}}
           {{> foundationListTable}}
-        {{/each}} 
+        {{/each}}
       {{/if}}
       {{#with paginationData}}
         {{> pagination}}
@@ -43,21 +43,15 @@
     <button class="btn btn-secondary mr-1" type="button" data-action="toggleViewMode">
       <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
     </button>
-    <div class="input-group">
-      <input
-        class="form-control"
-        style="width: 300px"
-        type="text"
-        name="keyword"
-        placeholder="請輸入關鍵字"
-        value="{{keyword}}"
-      />
-      <span class="input-group-btn">
+    <div class="d-flex flex-wrap justify-content-center">
+        <input class="form-control" type="text" name="keyword" placeholder="請輸入關鍵字" value="{{keyword}}" />
+        <select class="form-control" name="matchType">
+          <option value="exact">完全比對</option>
+          <option value="fuzzy">模糊比對</option>
+        </select>
         <button type="submit" class="btn btn-primary">
-          <i class="fa fa-search" aria-hidden="true"></i>
-          搜索
+          <i class="fa fa-search" aria-hidden="true"></i> 搜索
         </button>
-      </span>
     </div>
   </form>
 </template>
