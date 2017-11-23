@@ -396,13 +396,12 @@ export function doSeasonWorks(lastSeasonData) {
 function cancelAllOrder() {
   debug.log('cancelAllOrder');
   const now = new Date();
-  const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
-  const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
-  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-  const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
-
   const userOrdersCursor = dbOrders.find({});
   if (userOrdersCursor.count() > 0) {
+    const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
+    const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
+    const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+    const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
     //紀錄整個取消過程裡金錢有增加的userId及增加量
     const increaseMoneyHash = {};
     //紀錄整個取消過程裡股份有增加的userId及增加公司及增加量
@@ -498,8 +497,11 @@ function cancelAllOrder() {
         companiesBulk.execute = Meteor.wrapAsync(companiesBulk.execute);
         companiesBulk.execute();
       }
-      directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
-      directorsBulk.execute();
+      //不是只有系統釋股單時
+      if (! (_.size(increaseStocksHash) === 1 && increaseStocksHash['!system'])) {
+        directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
+        directorsBulk.execute();
+      }
     }
     logBulk.execute = Meteor.wrapAsync(logBulk.execute);
     logBulk.execute();
