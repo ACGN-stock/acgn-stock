@@ -395,9 +395,10 @@
       <div class="col-3 text-center">投票</div>
     </div>
     {{#each product in productList}}
-      <div class="row mb-1">
-        <div class="col-9 text-truncate">
-          {{>productLink product._id}}
+      <div class="row mb-1 align-items-center">
+        <div class="col-9">
+          <div class="text-truncate">{{>productLink product._id}}</div>
+          <div class="small text-truncate" title="{{product.description}}">{{product.description}}</div>
         </div>
         <div class="col-3 text-center">
           <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
@@ -424,9 +425,10 @@
       <div class="col-3 text-center">投票</div>
     </div>
     {{#each product in productList}}
-      <div class="row mb-1">
-        <div class="col-9 text-truncate">
-          {{>productLink product._id}}
+      <div class="row mb-1 align-items-center">
+        <div class="col-9">
+          <div class="text-truncate">{{>productLink product._id}}</div>
+          <div class="small text-truncate">{{product.description}}</div>
         </div>
         <div class="col-3 text-center">
           <button class="btn btn-primary btn-sm" type="button" data-like-product="{{product._id}}">

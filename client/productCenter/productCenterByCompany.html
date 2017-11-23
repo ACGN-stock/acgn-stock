@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-block">
       <h1 class="card-title mb-1">
-        產品中心 - 
+        產品中心 -
         {{#with companyId}}
           {{>companyLink}}
         {{/with}}
@@ -26,13 +26,19 @@
           股東評價
           {{{getSortIcon 'likeCount'}}}
         </th>
+        {{#if currentUser.profile.isAdmin}}
+          <th class="text-center" style="width: 70px;" title="下架">
+            下架
+          </th>
+        {{/if}}
       </tr>
     </thead>
     <tbody>
       {{#each product in productList}}
         <tr>
-          <td class="text-left text-truncate px-2">
-            {{>productLink product._id}}
+          <td class="text-left px-2">
+            <div>{{>productLink product._id}}</div>
+            <div class="small">{{product.description}}</div>
           </td>
           <td class="text-center text-truncate">
             {{product.type}}
@@ -47,6 +53,17 @@
               <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
             </button>
           </td>
+          {{#if currentUser.profile.isAdmin}}
+            <td class="text-center px-2">
+              <button
+                class="btn btn-danger btn-sm"
+                type="button"
+                data-take-down="{{product._id}}"
+              >
+                下架
+              </button>
+            </td>
+          {{/if}}
         </tr>
       {{else}}
         <tr>

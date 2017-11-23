@@ -215,13 +215,16 @@ Template.companyProductEditForm.events({
 function validateProductModel(model) {
   const error = {};
   if (model.productName.length < 4) {
-    error.productName = '產品名稱字數過短！';
+    error.productName = '產品名稱字數過短，至少需要 4 個字！';
   }
   else if (model.productName.length > 255) {
-    error.productName = '產品名稱字數過長！';
+    error.productName = '產品名稱字數過長，最多不超過 255 字！';
   }
   if (! SimpleSchema.RegEx.Url.test(model.url)) {
     error.url = '連結格式錯誤！';
+  }
+  if (model.description.length > 500) {
+    error.productName = '產品描述字數過長，最多不超過 500 字！';
   }
 
   if (_.size(error) > 0) {

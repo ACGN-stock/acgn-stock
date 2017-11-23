@@ -72,6 +72,9 @@ export const productFactory = new Factory()
     url() {
       return faker.internet.url();
     },
+    description() {
+      return faker.lorem.sentence(20);
+    },
     createdAt() {
       return new Date();
     }
