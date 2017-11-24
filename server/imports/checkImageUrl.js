@@ -14,7 +14,17 @@ function checkImageUrlAsync(url, callback) {
   if (! SimpleSchema.RegEx.Url.test(url)) {
     callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
   }
-  const httpCallback = (res) => {
+  let req;
+  if (url.indexOf('https://') === 0) {
+    req = https.get(url);
+  }
+  else {
+    req = http.get(url);
+  }
+  req.on('error', (a, b, c) => {
+    callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
+  });
+  req.on('response', (res) => {
     let checkResult;
     res.once('data', (chunk) => {
       checkResult = imageType(chunk);
@@ -28,22 +38,5 @@ function checkImageUrlAsync(url, callback) {
         callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
       }
     });
-    res.on('error', () => {
-      callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
-    });
-  };
-  const agent = false;
-  const httpOptions = {url, agent};
-  if (url.indexOf('https://') === 0) {
-    const req = https.get(httpOptions, httpCallback);
-    req.on('error', () => {
-      callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
-    });
-  }
-  else {
-    const req = http.get(httpOptions, httpCallback);
-    req.on('error', () => {
-      callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
-    });
-  }
+  });
 }
