@@ -5,23 +5,24 @@ import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { limitSubscription } from '/server/imports/rateLimit';
 import { debug } from '/server/imports/debug';
 import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { buildSearchRegExp } from '/server/imports/buildSearchRegExp';
 
-Meteor.publish('companyArchiveList', function(keyword, offset) {
-  debug.log('publish companyArchiveList', {keyword, offset});
+Meteor.publish('companyArchiveList', function({keyword, matchType, offset}) {
+  debug.log('publish companyArchiveList', {keyword, matchType, offset});
   check(keyword, String);
+  check(matchType, new Match.OneOf('exact', 'fuzzy'));
   check(offset, Match.Integer);
   const filter = {
     status: 'archived'
   };
   if (keyword) {
-    keyword = keyword.replace(/\\/g, '\\\\');
-    const reg = new RegExp(keyword, 'i');
+    const regexp = buildSearchRegExp(keyword, matchType);
     filter.$or = [
       {
-        name: reg
+        name: regexp
       },
       {
-        tags: reg
+        tags: regexp
       }
     ];
   }
