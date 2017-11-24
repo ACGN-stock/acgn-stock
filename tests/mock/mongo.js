@@ -14,6 +14,7 @@ const CollectionImpl = function() {
   this.attachSchema = sinon.stub();
   this.insert = sinon.stub();
   this.update = sinon.stub();
+  this.upsert = sinon.stub();
   this.remove = sinon.stub();
   this.findOne = sinon.stub();
   this.find = sinon.stub();
