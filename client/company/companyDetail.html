@@ -569,26 +569,26 @@
     <div class="row mb-1">
       <div class="col-2 text-center">使用者帳號</div>
       <div class="col-3 text-center">報名時間</div>
-      <div class="col text-center">留言</div>
+      <div class="col-7 text-center">留言</div>
     </div>
 
-    {{#each employee in employeeList}}
-      <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
+    <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
+      {{#each employee in employeeList}}
         <div class="col-2 text-truncate">
           {{>userLink employee.userId}}
         </div>
-        <div class="col-3 text-center">
+        <div class="col-3">
           {{formatDateText employee.registerAt}}
         </div>
-        <div class="col text-left">
+        <div class="col-7">
           {{showMessage employee.message}}
         </div>
-      </div>
-    {{else}}
-      <div class="mb-1 text-center">
-        沒有在職員工！
-      </div>
-    {{/each}}
+      {{else}}
+        <div class="col-12 text-center">
+          沒有在職員工！
+        </div>
+      {{/each}}
+    </div>
 
     {{#if isCurrentUserEmployed}}
       <form>
@@ -616,22 +616,22 @@
     </h4>
     <div class="row mb-1">
       <div class="col-2 text-center">使用者帳號</div>
-      <div class="col-3 text-center">報名時間</div>
+      <div class="col-10">報名時間</div>
     </div>
-    {{#each employee in nextSeasonEmployeeList}}
-      <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
-        <div class="col-2 text-truncate">
-          {{>userLink employee.userId}}
+    <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
+      {{#each employee in nextSeasonEmployeeList}}
+          <div class="col-2 text-truncate">
+            {{>userLink employee.userId}}
+          </div>
+          <div class="col-10">
+            {{formatDateText employee.registerAt}}
+          </div>
+      {{else}}
+        <div class="col-12 text-center">
+          沒有儲備員工！
         </div>
-        <div class="col-3 text-center">
-          {{formatDateText employee.registerAt}}
-        </div>
-      </div>
-    {{else}}
-      <div class="mb-1 text-center">
-        沒有儲備員工！
-      </div>
-    {{/each}}
+      {{/each}}
+    </div>
   </div>
 </template>
 
