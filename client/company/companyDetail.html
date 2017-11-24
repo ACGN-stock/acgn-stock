@@ -571,8 +571,9 @@
       <div class="col-3 text-center">報名時間</div>
       <div class="col text-center">留言</div>
     </div>
-    <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
-      {{#each employee in employeeList}}
+
+    {{#each employee in employeeList}}
+      <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
         <div class="col-2 text-truncate">
           {{>userLink employee.userId}}
         </div>
@@ -582,12 +583,13 @@
         <div class="col text-left">
           {{showMessage employee.message}}
         </div>
-      {{else}}
-        <div class="col text-center">
-          沒有在職員工！
-        </div>
-      {{/each}}
-    </div>
+      </div>
+    {{else}}
+      <div class="mb-1 text-center">
+        沒有在職員工！
+      </div>
+    {{/each}}
+
     {{#if isCurrentUserEmployed}}
       <form>
         <div class="form-group">
@@ -626,7 +628,7 @@
         </div>
       </div>
     {{else}}
-      <div class="text-center">
+      <div class="mb-1 text-center">
         沒有儲備員工！
       </div>
     {{/each}}
