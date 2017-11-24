@@ -29,10 +29,13 @@ export function setLowPriceThreshold() {
     }
   );
   if (quartileCompanyData) {
-    //取得最後成交價格的第一四分位數
+    //取得最後成交價格
     const quartilePrice = quartileCompanyData.lastPrice;
     //設定低價股價格門檻
     dbVariables.set('lowPriceThreshold', quartilePrice);
+  }
+  else {
+    dbVariables.set('lowPriceThreshold', 0);
   }
 }
 setLowPriceThreshold();
