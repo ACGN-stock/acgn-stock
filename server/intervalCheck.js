@@ -267,6 +267,19 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
           );
         }
       });
+    //重置所有保管庫資料
+    dbCompanyArchive.update(
+      {},
+      {
+        $set: {
+          status: 'archived',
+          invest: []
+        }
+      },
+      {
+        multi: true
+      }
+    );
     //移除所有公司資料
     dbCompanies.remove({});
     //移除所有股份資料
