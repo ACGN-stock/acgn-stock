@@ -15,6 +15,7 @@ import { rCompanyListViewMode } from '../utils/styles';
 
 inheritedShowLoadingOnSubscribing(Template.companyList);
 const rKeyword = new ReactiveVar('');
+const rMatchType = new ReactiveVar('exact');
 const rFilterBy = new ReactiveVar('none');
 const rSortBy = new ReactiveVar('lastPrice');
 export const rCompanyOffset = new ReactiveVar(0);
@@ -24,10 +25,11 @@ Template.companyList.onCreated(function() {
       return false;
     }
     const keyword = rKeyword.get();
+    const matchType = rMatchType.get();
     const onlyShow = rFilterBy.get();
     const sortBy = rSortBy.get();
     const offset = rCompanyOffset.get();
-    this.subscribe('companyList', {keyword, onlyShow, sortBy, offset});
+    this.subscribe('companyList', {keyword, matchType, onlyShow, sortBy, offset});
   });
   this.autorun(() => {
     if (shouldStopSubscribe()) {
@@ -63,6 +65,7 @@ Template.companyList.helpers({
 
 Template.companyFilterForm.onRendered(function() {
   this.$keyword = this.$('[name="keyword"]');
+  this.$matchType = this.$('[name="matchType"]');
 });
 Template.companyFilterForm.helpers({
   viewModeBtnClass() {
@@ -143,6 +146,7 @@ Template.companyFilterForm.events({
       page: 1
     });
     rKeyword.set(templateInstance.$keyword.val());
+    rMatchType.set(templateInstance.$matchType.val());
   }
 });
 

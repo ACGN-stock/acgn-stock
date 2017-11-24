@@ -24,55 +24,57 @@ export function releaseStocksForHighPrice() {
 
     const companiesNumber = dbCompanies.find({isSeal: false}).count();
     const highPriceCompaniesNumber = Math.floor(companiesNumber * 0.05);
-    dbCompanies
-      .find(
-        {
-          isSeal: false
-        },
-        {
-          sort: {
-            lastPrice: -1
+    if (highPriceCompaniesNumber > 0) {
+      dbCompanies
+        .find(
+          {
+            isSeal: false
           },
-          fields: {
-            _id: 1
-          },
-          limit: highPriceCompaniesNumber,
-          disableOplog: true
-        }
-      )
-      .forEach((companyData) => {
-        const companyId = companyData._id;
-        const existsReleaseOrderCount = dbOrders
-          .find({
-            companyId: companyId,
-            userId: '!system'
-          })
-          .count();
-        //有尚存在的任何釋股單在市場上時不會繼續釋股
-        if (existsReleaseOrderCount > 0) {
-          return false;
-        }
-        //先鎖定資源，再重新讀取一次資料進行運算
-        resourceManager.request('releaseStocksForHighPrice', ['companyOrder' + companyId], (release) => {
-          const companyData = dbCompanies.findOne(companyId, {
+          {
+            sort: {
+              lastPrice: -1
+            },
             fields: {
-              _id: 1,
-              listPrice: 1,
-              totalRelease: 1
-            }
+              _id: 1
+            },
+            limit: highPriceCompaniesNumber,
+            disableOplog: true
+          }
+        )
+        .forEach((companyData) => {
+          const companyId = companyData._id;
+          const existsReleaseOrderCount = dbOrders
+            .find({
+              companyId: companyId,
+              userId: '!system'
+            })
+            .count();
+          //有尚存在的任何釋股單在市場上時不會繼續釋股
+          if (existsReleaseOrderCount > 0) {
+            return false;
+          }
+          //先鎖定資源，再重新讀取一次資料進行運算
+          resourceManager.request('releaseStocksForHighPrice', ['companyOrder' + companyId], (release) => {
+            const companyData = dbCompanies.findOne(companyId, {
+              fields: {
+                _id: 1,
+                listPrice: 1,
+                totalRelease: 1
+              }
+            });
+            const maxReleaseStocks = Math.floor(Math.sqrt(companyData.totalRelease));
+            const releaseStocks = 1 + Math.floor(Math.random() * maxReleaseStocks);
+            createOrder({
+              userId: '!system',
+              companyId: companyId,
+              orderType: '賣出',
+              unitPrice: Math.ceil(companyData.listPrice * 1.15),
+              amount: releaseStocks
+            });
+            release();
           });
-          const maxReleaseStocks = Math.floor(Math.sqrt(companyData.totalRelease));
-          const releaseStocks = 1 + Math.floor(Math.random() * maxReleaseStocks);
-          createOrder({
-            userId: '!system',
-            companyId: companyId,
-            orderType: '賣出',
-            unitPrice: Math.ceil(companyData.listPrice * 1.15),
-            amount: releaseStocks
-          });
-          release();
         });
-      });
+    }
   }
   else {
     dbVariables.set('releaseStocksForHighPriceCounter', releaseStocksForHighPriceCounter);

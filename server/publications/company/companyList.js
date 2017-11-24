@@ -7,28 +7,32 @@ import { dbOrders } from '/db/dbOrders';
 import { limitSubscription } from '/server/imports/rateLimit';
 import { debug } from '/server/imports/debug';
 import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { buildSearchRegExp } from '/server/imports/buildSearchRegExp';
 
-Meteor.publish('companyList', function({keyword, onlyShow, sortBy, offset}) {
-  debug.log('publish companyList', {keyword, onlyShow, sortBy, offset});
+Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, offset}) {
+  debug.log('publish companyList', {keyword, matchType, onlyShow, sortBy, offset});
   check(keyword, String);
+  check(matchType, new Match.OneOf('exact', 'fuzzy', 'regexp'));
   check(onlyShow, new Match.OneOf('none', 'mine', 'favorite', 'order'));
   check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
   check(offset, Match.Integer);
+
   const filter = {
     isSeal: false
   };
+
   if (keyword) {
-    keyword = keyword.replace(/\\/g, '\\\\');
-    const reg = new RegExp(keyword, 'i');
+    const regexp = buildSearchRegExp(keyword, matchType);
     filter.$or = [
       {
-        companyName: reg
+        companyName: regexp
       },
       {
-        tags: reg
+        tags: regexp
       }
     ];
   }
+
   const userId = this.userId;
   if (userId) {
     if (onlyShow === 'mine') {

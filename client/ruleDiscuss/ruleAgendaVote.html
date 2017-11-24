@@ -35,9 +35,14 @@
 
 <template name="ruleAgendaVoteForm">
   <form class="form-vote">
-    <div class="row" style="margin-top: 15px;">
-      <div class="col-12 agenda-description"><h4>議程介紹</h4>{{this.description}}</div>
+    <div class="d-inline-flex align-items-center">
+      <h4 class="mt-1 mb-1 mr-1">議程介紹</h4>
+      <a class="btn btn-info btn-sm m-1" href="{{this.discussionUrl}}" target="_blank">
+        <i class="fa fa-external-link"></i> 相關討論
+      </a>
     </div>
+
+    <div class="agenda-description">{{this.description}}</div>
     {{#each issue in getIssueList this.issues}}
       {{> ruleIssueVoteList index=@index issue=issue}}
     {{/each}}

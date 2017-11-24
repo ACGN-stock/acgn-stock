@@ -20,7 +20,7 @@
             {{> companyLogList}}
           </div>
         </div>
-      {{else}}       
+      {{else}}
         <div class="card-block">
           <h1 class="card-title text-truncate">
             {{this.companyName}}
@@ -395,9 +395,10 @@
       <div class="col-3 text-center">投票</div>
     </div>
     {{#each product in productList}}
-      <div class="row mb-1">
-        <div class="col-9 text-truncate">
-          {{>productLink product._id}}
+      <div class="row mb-1 align-items-center">
+        <div class="col-9">
+          <div class="text-truncate">{{>productLink product._id}}</div>
+          <div class="small text-truncate" title="{{product.description}}">{{product.description}}</div>
         </div>
         <div class="col-3 text-center">
           <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
@@ -424,9 +425,10 @@
       <div class="col-3 text-center">投票</div>
     </div>
     {{#each product in productList}}
-      <div class="row mb-1">
-        <div class="col-9 text-truncate">
-          {{>productLink product._id}}
+      <div class="row mb-1 align-items-center">
+        <div class="col-9">
+          <div class="text-truncate">{{>productLink product._id}}</div>
+          <div class="small text-truncate">{{product.description}}</div>
         </div>
         <div class="col-3 text-center">
           <button class="btn btn-primary btn-sm" type="button" data-like-product="{{product._id}}">
@@ -560,51 +562,74 @@
 </template>
 
 <template name="companyEmployeeList">
-  <div class="col-12 col-md-6 border-grid">
+  <div class="col-12 border-grid">
     <h4>
       在職員工
     </h4>
     <div class="row mb-1">
-      <div class="col-6 text-center">使用者帳號</div>
-      <div class="col-6 text-center">報名時間</div>
+      <div class="col-2 text-center">使用者帳號</div>
+      <div class="col-3 text-center">報名時間</div>
+      <div class="col text-center">留言</div>
     </div>
     <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
       {{#each employee in employeeList}}
-        <div class="col-6 text-truncate">
+        <div class="col-2 text-truncate">
           {{>userLink employee.userId}}
         </div>
-        <div class="col-6 text-right">
+        <div class="col-3 text-center">
           {{formatDateText employee.registerAt}}
         </div>
+        <div class="col text-left">
+          {{showMessage employee.message}}
+        </div>
       {{else}}
-        <div class="col-12 text-center">
+        <div class="col text-center">
           沒有在職員工！
         </div>
       {{/each}}
     </div>
+    {{#if isCurrentUserEmployed}}
+      <form>
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon">員工留言</span>
+            <input
+              class="form-control"
+              type="text"
+              name="message"
+              placeholder="身為現任員工，你可以留下一則不超過一百個字的留言，同一時間只能存在一則留言。"
+              maxlength="100"
+              value="{{getMyMessage}}"/>
+            <span class="input-group-btn">
+              <button class="btn btn-primary" type="submit">送出</button>
+            </span>
+          </div>
+        </div>
+      </form>
+    {{/if}}
   </div>
-  <div class="col-12 col-md-6 border-grid">
+  <div class="col-12 border-grid">
     <h4>
       儲備員工
     </h4>
     <div class="row mb-1">
-      <div class="col-6 text-center">使用者帳號</div>
-      <div class="col-6 text-center">報名時間</div>
+      <div class="col-2 text-center">使用者帳號</div>
+      <div class="col-3 text-center">報名時間</div>
     </div>
-    <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
-      {{#each employee in nextSeasonEmployeeList}}
-        <div class="col-6 text-truncate">
+    {{#each employee in nextSeasonEmployeeList}}
+      <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
+        <div class="col-2 text-truncate">
           {{>userLink employee.userId}}
         </div>
-        <div class="col-6 text-right">
+        <div class="col-3 text-center">
           {{formatDateText employee.registerAt}}
         </div>
-      {{else}}
-        <div class="col-12 text-center">
-          沒有儲備員工！
-        </div>
-      {{/each}}
-    </div>
+      </div>
+    {{else}}
+      <div class="text-center">
+        沒有儲備員工！
+      </div>
+    {{/each}}
   </div>
 </template>
 

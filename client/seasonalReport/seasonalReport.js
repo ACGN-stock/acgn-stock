@@ -579,6 +579,7 @@ function drawUserRankChart(templateInstance) {
       data: {
         id: rankData.userId
       },
+      dataType: 'json',
       success: (userData) => {
         const userName = userData.name;
         if (userName.length > 13) {

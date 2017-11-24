@@ -29,7 +29,7 @@
   <table class="table-bordered" style="width: 100%; table-layout: fixed;">
     <thead>
       <tr>
-        <th class="text-center text-truncate">產品名稱</th>
+        <th class="text-center text-truncate">產品</th>
         <th class="text-center text-truncate" title="公司名稱">
           公司名稱
         </th>
@@ -43,7 +43,7 @@
         </th>
         {{#if currentUser.profile.isAdmin}}
           <th class="text-center" style="width: 70px;" title="下架">
-            得票數
+            下架
           </th>
         {{/if}}
       </tr>
@@ -69,8 +69,9 @@
 
 <template name="productInfoBySeasonTable">
   <tr>
-    <td class="text-left text-truncate px-2">
-      {{>productLink this._id}}
+    <td class="text-left px-2">
+      <div>{{>productLink this._id}}</div>
+      <div class="small">{{this.description}}</div>
     </td>
     <td class="text-left text-truncate px-2">
       {{>companyLink this.companyId}}

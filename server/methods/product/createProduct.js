@@ -13,7 +13,8 @@ Meteor.methods({
       productName: String,
       companyId: String,
       type: String,
-      url: String
+      url: String,
+      description: String
     });
     createProduct(Meteor.user(), productData);
 

@@ -76,14 +76,14 @@ export function checkFoundCompany() {
           const basicCreatedAt = new Date();
           logBulk.insert({
             logType: '創立成功',
-            userId: _.union([foundationData.manager], _.pluck(invest, 'userId')),
+            userId: _.pluck(invest, 'userId'),
             companyId: companyId,
             price: stockUnitPrice,
             createdAt: basicCreatedAt
           });
           const candidateList = [];
           if (foundationData.manager !== '!none') {
-            candidateList.push(candidateList);
+            candidateList.push(foundationData.manager);
           }
           companiesBulk.insert({
             _id: companyId,

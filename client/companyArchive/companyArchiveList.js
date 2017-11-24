@@ -12,13 +12,18 @@ import { investArchiveCompany } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.companyArchiveList);
 const rKeyword = new ReactiveVar('');
+const rMatchType = new ReactiveVar('exact');
 export const rArchiveOffset = new ReactiveVar(0);
 Template.companyArchiveList.onCreated(function() {
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
     }
-    this.subscribe('companyArchiveList', rKeyword.get(), rArchiveOffset.get());
+    this.subscribe('companyArchiveList', {
+      keyword: rKeyword.get(),
+      matchType: rMatchType.get(),
+      offset: rArchiveOffset.get()
+    });
   });
 });
 Template.companyArchiveList.helpers({
@@ -42,6 +47,7 @@ Template.companyArchiveList.helpers({
 
 Template.companyArchiveListFilterForm.onRendered(function() {
   this.$keyword = this.$('[name="keyword"]');
+  this.$matchType = this.$('[name="matchType"]');
 });
 Template.companyArchiveListFilterForm.helpers({
   viewModeBtnClass() {
@@ -70,6 +76,7 @@ Template.companyArchiveListFilterForm.events({
   submit(event, templateInstance) {
     event.preventDefault();
     rKeyword.set(templateInstance.$keyword.val());
+    rMatchType.set(templateInstance.$matchType.val());
     FlowRouter.go('companyArchiveList', {
       page: 1
     });

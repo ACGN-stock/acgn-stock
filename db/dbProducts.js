@@ -49,6 +49,12 @@ const schema = new SimpleSchema({
     type: String,
     regEx: SimpleSchema.RegEx.Url
   },
+  // 產品描述
+  description: {
+    type: String,
+    max: 500,
+    optional: true
+  },
   //總票數
   votes: {
     type: SimpleSchema.Integer,
@@ -65,4 +71,3 @@ const schema = new SimpleSchema({
   }
 });
 dbProducts.attachSchema(schema);
-
