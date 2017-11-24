@@ -100,7 +100,7 @@ export function formatTimeText(time) {
   return (
     padZero(Math.floor(time / 60)) +
     ':' +
-    padZero(Math.floor(time % 60))
+    padZero(time % 60)
   );
 }
 

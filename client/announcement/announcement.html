@@ -56,44 +56,58 @@
 <template name="systemStatusPanel">
   <div id="system-time-info" class="row">
     <div class="col-12 col-md-6">
-      當前賽季開始時間：{{roundStartTime}}
+      <span class="non-break">當前賽季起訖時間：</span>
+      <span class="{{taskIsAboutToEnd seasonEndTime 168}}">
+        <span class="non-break">{{roundStartTime}}</span>
+        <span class="non-break">~ {{roundEndTime}}</span>
+      </span>
     </div>
     <div class="col-12 col-md-6">
-      當前賽季結束時間：{{roundEndTime}}
+      <span class="non-break">商業季度起訖時間：</span>
+      <span class="{{taskIsAboutToEnd seasonEndTime 24}}">
+        <span class="non-break">{{seasonStartTime}}</span>
+        <span class="non-break">~ {{seasonEndTime}}</span>
+      </span>
     </div>
     <div class="col-12 col-md-6">
-      商業季度開始時間：{{seasonStartTime}}
+      <span class="non-break">員工薪資修改期限：</span>
+      <span class="non-break {{taskIsAboutToEnd updateSalaryDeadline 24}}">
+        {{updateSalaryDeadline}} {{taskLeftInfo updateSalaryDeadline 24}}
+      </span>
     </div>
     <div class="col-12 col-md-6">
-      商業季度結束時間：{{seasonEndTime}}
+      <span class="non-break">員工分紅修改期限：</span>
+      <span class="non-break {{taskIsAboutToEnd updateBonusDeadline 24}}">
+        {{updateBonusDeadline}} {{taskLeftInfo updateBonusDeadline 24}}
+      </span>
     </div>
-    <div class="col-12 col-md-2 non-break">最近股價更新區間</div>
-    <div class="col-12 col-lg-4 time-info {{taskIsReady stockPriceUpdateBegin stockPriceUpdateEnd}}">
-      <span class="non-break">{{stockPriceUpdateBegin}}</span>
-      <span class="non-break">~ {{stockPriceUpdateEnd}}</span>
+    <div class="col-12 col-md-6">
+      <span class="non-break">最近股價更新區間：</span>
+      <span class="{{taskIsReady stockPriceUpdateBegin stockPriceUpdateEnd}}">
+        <span class="non-break">{{stockPriceUpdateBegin}}</span>
+        <span class="non-break">~ {{stockPriceUpdateEnd}}</span>
+      </span>
     </div>
-    <div class="col-12 col-md-2 non-break">最近高價釋股區間</div>
-    <div class="col-12 col-lg-4 time-info {{taskIsReady highPriceReleaseBegin highPriceReleaseEnd}}">
-      <span class="non-break">{{highPriceReleaseBegin}}</span>
-      <span class="non-break">~ {{highPriceReleaseEnd}}</span>
+    <div class="col-12 col-md-6">
+      <span class="non-break">最近高價釋股區間：</span>
+      <span class="{{taskIsReady highPriceReleaseBegin highPriceReleaseEnd}}">
+        <span class="non-break">{{highPriceReleaseBegin}}</span>
+        <span class="non-break">~ {{highPriceReleaseEnd}}</span>
+      </span>
     </div>
-    <div class="col-12 col-md-2 non-break">最近低價釋股區間</div>
-    <div class="col-12 col-lg-4 time-info {{taskIsReady lowPriceReleaseBegin lowPriceReleaseEnd}}">
-      <span class="non-break">{{lowPriceReleaseBegin}}</span>
-      <span class="non-break">~ {{lowPriceReleaseEnd}}</span>
+    <div class="col-12 col-md-6">
+      <span class="non-break">最近低價釋股區間：</span>
+      <span class="{{taskIsReady lowPriceReleaseBegin lowPriceReleaseEnd}}">
+        <span class="non-break">{{lowPriceReleaseBegin}}</span>
+        <span class="non-break">~ {{lowPriceReleaseEnd}}</span>
+      </span>
     </div>
-    <div class="col-12 col-md-2 non-break">最近低量釋股區間</div>
-    <div class="col-12 col-lg-4 time-info {{taskIsReady noDealReleaseBegin noDealReleaseEnd}}">
-      <span class="non-break">{{noDealReleaseBegin}}</span>
-      <span class="non-break">~ {{noDealReleaseEnd}}</span>
-    </div>
-    <div class="col-12 col-md-2 non-break">員工薪資修改期限</div>
-    <div class="col-12 col-lg-4 {{taskIsAboutToEnd updateSalaryDeadline}}">
-      {{updateSalaryDeadline}} {{taskLeftInfo updateSalaryDeadline}}
-    </div>
-    <div class="col-12 col-md-2 non-break">員工分紅修改期限</div>
-    <div class="col-12 col-lg-4 {{taskIsAboutToEnd updateBonusDeadline}}">
-      {{updateBonusDeadline}} {{taskLeftInfo updateBonusDeadline}}
+    <div class="col-12 col-md-6">
+      <span class="non-break">最近低量釋股區間：</span>
+      <span class="{{taskIsReady noDealReleaseBegin noDealReleaseEnd}}">
+        <span class="non-break">{{noDealReleaseBegin}}</span>
+        <span class="non-break">~ {{noDealReleaseEnd}}</span>
+      </span>
     </div>
   </div>
 </template>

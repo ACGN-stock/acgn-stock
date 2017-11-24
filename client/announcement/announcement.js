@@ -63,12 +63,11 @@ Meteor.setInterval(function() {
   nowTime.set(Date.now());
 }, 1000);
 
-function abountToEnd(end, hour) {
+function aboutToEnd(end, hour) {
   const threshold = 1000 * 60 * 60 * hour;
-  const now = nowTime.get();
 
   if (end) {
-    const rest = (new Date(end).getTime() - now);
+    const rest = new Date(end).getTime() - nowTime.get();
 
     return ((rest >= 0) && (rest <= threshold));
   }
@@ -85,7 +84,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentRound ? formatDateText(currentRound.beginDate) : '';
+    return currentRound ? formatDateText(currentRound.beginDate) : '????/??/?? ??:??:??';
   },
   roundEndTime() {
     const currentRound = dbRound.findOne({}, {
@@ -94,7 +93,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentRound ? formatDateText(currentRound.endDate) : '';
+    return currentRound ? formatDateText(currentRound.endDate) : '????/??/?? ??:??:??';
   },
   seasonStartTime() {
     const currentSeason = dbSeason.findOne({}, {
@@ -103,7 +102,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentSeason ? formatDateText(currentSeason.beginDate) : '';
+    return currentSeason ? formatDateText(currentSeason.beginDate) : '????/??/?? ??:??:??';
   },
   seasonEndTime() {
     const currentSeason = dbSeason.findOne({}, {
@@ -112,7 +111,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentSeason ? formatDateText(currentSeason.endDate) : '';
+    return currentSeason ? formatDateText(currentSeason.endDate) : '????/??/?? ??:??:??';
   },
   stockPriceUpdateBegin() {
     const time = dbVariables.get('recordListPriceBegin');
@@ -184,12 +183,12 @@ Template.systemStatusPanel.helpers({
       return (now >= begin && now <= end) ? 'text-danger' : '';
     }
   },
-  taskLeftInfo(end) {
+  taskLeftInfo(end, hour) {
     const rest = (new Date(end).getTime() - nowTime.get());
 
-    return abountToEnd(end, 24) ? '(' + formatTimeText(rest) + ')' : '';
+    return aboutToEnd(end, hour) ? '(' + formatTimeText(rest) + ')' : '';
   },
-  taskIsAboutToEnd(end) {
-    return abountToEnd(end, 24) ? 'text-danger' : '';
+  taskIsAboutToEnd(end, hour) {
+    return aboutToEnd(end, hour) ? 'text-danger' : '';
   }
 });

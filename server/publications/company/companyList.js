@@ -94,7 +94,8 @@ Meteor.publish('companyList', function({keyword, onlyShow, sortBy, offset}) {
     listPrice: 1,
     profit: 1,
     totalValue: 1,
-    createdAt: 1
+    createdAt: 1,
+    seasonalBonusPercent: 1
   };
   const disableOplog = true;
 
