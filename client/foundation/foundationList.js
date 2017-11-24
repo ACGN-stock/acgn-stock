@@ -14,13 +14,18 @@ import { currencyFormat } from '../utils/helpers.js';
 
 inheritedShowLoadingOnSubscribing(Template.foundationList);
 const rKeyword = new ReactiveVar('');
+const rMatchType = new ReactiveVar('exact');
 export const rFoundationOffset = new ReactiveVar(0);
 Template.foundationList.onCreated(function() {
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
     }
-    this.subscribe('foundationList', rKeyword.get(), rFoundationOffset.get());
+    this.subscribe('foundationList', {
+      keyword: rKeyword.get(),
+      matchType: rMatchType.get(),
+      offset: rFoundationOffset.get()
+    });
   });
 });
 Template.foundationList.helpers({
@@ -59,6 +64,7 @@ Template.foundationList.events({
 
 Template.foundationListFilterForm.onRendered(function() {
   this.$keyword = this.$('[name="keyword"]');
+  this.$matchType = this.$('[name="matchType"]');
 });
 Template.foundationListFilterForm.helpers({
   viewModeBtnClass() {
@@ -87,6 +93,7 @@ Template.foundationListFilterForm.events({
   submit(event, templateInstance) {
     event.preventDefault();
     rKeyword.set(templateInstance.$keyword.val());
+    rMatchType.set(templateInstance.$matchType.val());
     FlowRouter.go('foundationList', {
       page: 1
     });
