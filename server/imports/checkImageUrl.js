@@ -28,11 +28,22 @@ function checkImageUrlAsync(url, callback) {
         callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
       }
     });
+    res.on('error', () => {
+      callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
+    });
   };
+  const agent = false;
+  const httpOptions = {url, agent};
   if (url.indexOf('https://') === 0) {
-    https.get(url, httpCallback);
+    const req = https.get(httpOptions, httpCallback);
+    req.on('error', () => {
+      callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
+    });
   }
   else {
-    http.get(url, httpCallback);
+    const req = http.get(httpOptions, httpCallback);
+    req.on('error', () => {
+      callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
+    });
   }
 }
