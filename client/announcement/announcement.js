@@ -7,7 +7,7 @@ import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
 import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateText } from '../utils/helpers';
+import { formatDateText, formatTimeText } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.announcement);
@@ -58,6 +58,24 @@ Template.announcementForm.events({
   }
 });
 
+const nowTime = new ReactiveVar(Date.now());
+Meteor.setInterval(function() {
+  nowTime.set(Date.now());
+}, 1000);
+
+function aboutToEnd(end, hour) {
+  const threshold = 1000 * 60 * 60 * hour;
+
+  if (end) {
+    const rest = new Date(end).getTime() - nowTime.get();
+
+    return ((rest >= 0) && (rest <= threshold));
+  }
+  else {
+    return false;
+  }
+}
+
 Template.systemStatusPanel.helpers({
   roundStartTime() {
     const currentRound = dbRound.findOne({}, {
@@ -66,7 +84,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentRound ? formatDateText(currentRound.beginDate) : '';
+    return currentRound ? formatDateText(currentRound.beginDate) : '????/??/?? ??:??:??';
   },
   roundEndTime() {
     const currentRound = dbRound.findOne({}, {
@@ -75,7 +93,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentRound ? formatDateText(currentRound.endDate) : '';
+    return currentRound ? formatDateText(currentRound.endDate) : '????/??/?? ??:??:??';
   },
   seasonStartTime() {
     const currentSeason = dbSeason.findOne({}, {
@@ -84,7 +102,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentSeason ? formatDateText(currentSeason.beginDate) : '';
+    return currentSeason ? formatDateText(currentSeason.beginDate) : '????/??/?? ??:??:??';
   },
   seasonEndTime() {
     const currentSeason = dbSeason.findOne({}, {
@@ -93,25 +111,45 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentSeason ? formatDateText(currentSeason.endDate) : '';
+    return currentSeason ? formatDateText(currentSeason.endDate) : '????/??/?? ??:??:??';
   },
-  stockPriceUpdateTime() {
-    const time = dbVariables.get('lastRecordListPriceTime');
+  stockPriceUpdateBegin() {
+    const time = dbVariables.get('recordListPriceBegin');
 
     return formatDateText(time ? new Date(time) : null);
   },
-  lowPriceReleaseTime() {
-    const time = dbVariables.get('lastReleaseStocksForLowPriceTime');
+  stockPriceUpdateEnd() {
+    const time = dbVariables.get('recordListPriceEnd');
 
     return formatDateText(time ? new Date(time) : null);
   },
-  highPriceReleaseTime() {
-    const time = dbVariables.get('lastReleaseStocksForHighPriceTime');
+  lowPriceReleaseBegin() {
+    const time = dbVariables.get('releaseStocksForLowPriceBegin');
 
     return formatDateText(time ? new Date(time) : null);
   },
-  noDealReleaseTime() {
-    const time = dbVariables.get('lastReleaseStocksForNoDealTime');
+  lowPriceReleaseEnd() {
+    const time = dbVariables.get('releaseStocksForLowPriceEnd');
+
+    return formatDateText(time ? new Date(time) : null);
+  },
+  highPriceReleaseBegin() {
+    const time = dbVariables.get('releaseStocksForHighPriceBegin');
+
+    return formatDateText(time ? new Date(time) : null);
+  },
+  highPriceReleaseEnd() {
+    const time = dbVariables.get('releaseStocksForHighPriceEnd');
+
+    return formatDateText(time ? new Date(time) : null);
+  },
+  noDealReleaseBegin() {
+    const time = dbVariables.get('releaseStocksForNoDealBegin');
+
+    return formatDateText(time ? new Date(time) : null);
+  },
+  noDealReleaseEnd() {
+    const time = dbVariables.get('releaseStocksForNoDealEnd');
 
     return formatDateText(time ? new Date(time) : null);
   },
@@ -134,5 +172,23 @@ Template.systemStatusPanel.helpers({
       });
 
     return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceBonusTime) : null);
+  },
+  taskIsReady(begin, end) {
+    const now = nowTime.get();
+
+    if (begin && end) {
+      begin = new Date(begin).getTime();
+      end = new Date(end).getTime();
+
+      return (now >= begin && now <= end) ? 'text-danger' : '';
+    }
+  },
+  taskLeftInfo(end, hour) {
+    const rest = (new Date(end).getTime() - nowTime.get());
+
+    return aboutToEnd(end, hour) ? '(' + formatTimeText(rest) + ')' : '';
+  },
+  taskIsAboutToEnd(end, hour) {
+    return aboutToEnd(end, hour) ? 'text-danger' : '';
   }
 });

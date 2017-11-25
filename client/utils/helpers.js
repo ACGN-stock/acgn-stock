@@ -24,7 +24,7 @@ export function currencyFormat(money) {
 Template.registerHelper('currencyFormat', currencyFormat);
 
 export function getCompanyEPS(companyData) {
-  return ((1 - (Meteor.settings.public.managerProfitPercent + Meteor.settings.public.costFromProfit + Meteor.settings.public.maximumSeasonalBonusPercent / 100)) *
+  return ((1 - (Meteor.settings.public.managerProfitPercent + Meteor.settings.public.costFromProfit + companyData.seasonalBonusPercent / 100)) *
     companyData.profit / companyData.totalRelease).toFixed(2);
 }
 
@@ -87,6 +87,22 @@ export function formatDateTimeText(date) {
   );
 }
 Template.registerHelper('formatDateTimeText', formatDateTimeText);
+
+export function formatTimeText(time) {
+  const timeBase = 1000 * 60;
+
+  if (! time) {
+    return '??:??';
+  }
+
+  time = Math.floor(time / timeBase);
+
+  return (
+    padZero(Math.floor(time / 60)) +
+    ':' +
+    padZero(time % 60)
+  );
+}
 
 export function currentUserId() {
   return Meteor.userId();

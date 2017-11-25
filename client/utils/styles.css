@@ -230,3 +230,7 @@
 .container-dark .company-card-default .btn-tab {
   color: #839496;
 }
+
+#system-time-info .non-break {
+  white-space: nowrap;
+}

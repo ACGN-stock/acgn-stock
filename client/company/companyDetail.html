@@ -345,7 +345,7 @@
     {{#each order in orderList}}
       <div>
         {{>userLink order.userId}}
-        以${{order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
+        以${{currencyFormat order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
       </div>
     {{/each}}
     {{#with paginationData}}
