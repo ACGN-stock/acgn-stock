@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 
 import { resourceManager } from '/server/imports/resourceManager';
 import { dbProducts } from '/db/dbProducts';
@@ -14,7 +14,7 @@ Meteor.methods({
       companyId: String,
       type: String,
       url: String,
-      description: String
+      description: new Match.Maybe(String)
     });
     createProduct(Meteor.user(), productData);
 
