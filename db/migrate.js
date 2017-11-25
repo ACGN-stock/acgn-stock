@@ -494,12 +494,10 @@ if (Meteor.isServer) {
       const endDate = new Date(beginDate.setMinutes(0, 0, 0) + roundTime);
       dbRound.insert({beginDate, endDate});
 
-      if (dbCompanies.find({isSeal: false}).count()) {
+      if (dbCompanies.find().count()) {
         const companyArchiveBulk = dbCompanyArchive.rawCollection().initializeUnorderedBulkOp();
         dbCompanies
-          .find({
-            isSeal: false
-          })
+          .find({})
           .forEach((companyData) => {
             companyArchiveBulk.insert({
               _id: companyData._id,
@@ -507,7 +505,7 @@ if (Meteor.isServer) {
               name: companyData.companyName,
               tags: companyData.tags,
               pictureSmall: companyData.pictureSmall,
-              pictureBig: companyData.pictureSmall,
+              pictureBig: companyData.pictureBig,
               description: companyData.description
             });
           });
@@ -524,7 +522,7 @@ if (Meteor.isServer) {
               name: companyData.companyName,
               tags: companyData.tags,
               pictureSmall: companyData.pictureSmall,
-              pictureBig: companyData.pictureSmall,
+              pictureBig: companyData.pictureBig,
               description: companyData.description
             });
           });
