@@ -59,6 +59,9 @@ Template.companyArchiveListFilterForm.helpers({
   },
   keyword() {
     return rKeyword.get();
+  },
+  showMatchTypeSelectedAttr(matchType) {
+    return matchType === rMatchType.get() ? 'selected' : '';
   }
 });
 Template.companyArchiveListFilterForm.events({

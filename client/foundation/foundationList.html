@@ -44,14 +44,14 @@
       <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
     </button>
     <div class="d-flex flex-wrap justify-content-center">
-        <input class="form-control" type="text" name="keyword" placeholder="請輸入關鍵字" value="{{keyword}}" />
-        <select class="form-control" name="matchType">
-          <option value="exact">完全比對</option>
-          <option value="fuzzy">模糊比對</option>
-        </select>
-        <button type="submit" class="btn btn-primary">
-          <i class="fa fa-search" aria-hidden="true"></i> 搜索
-        </button>
+      <input class="form-control" type="text" name="keyword" placeholder="請輸入關鍵字" value="{{keyword}}" />
+      <select class="form-control" name="matchType">
+        <option value="exact" {{showMatchTypeSelectedAttr 'exact'}}>完全比對</option>
+        <option value="fuzzy" {{showMatchTypeSelectedAttr 'fuzzy'}}>模糊比對</option>
+      </select>
+      <button type="submit" class="btn btn-primary">
+        <i class="fa fa-search" aria-hidden="true"></i> 搜索
+      </button>
     </div>
   </form>
 </template>
