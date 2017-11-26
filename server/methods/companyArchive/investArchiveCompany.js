@@ -40,7 +40,7 @@ export function investArchiveCompany(user, companyId) {
     throw new Meteor.Error(404, '保管庫公司並不存在，可能已經上市或被移除！');
   }
   const userId = user._id;
-  if (_.contains(archiveCompanyData.invest, {userId})) {
+  if (_.contains(archiveCompanyData.invest, userId)) {
     throw new Meteor.Error(403, '您已經投資過此保管庫公司了！');
   }
   //先鎖定資源，再重新讀取一次資料進行運算
@@ -58,7 +58,7 @@ export function investArchiveCompany(user, companyId) {
     if (! archiveCompanyData || archiveCompanyData.status !== 'archived') {
       throw new Meteor.Error(404, '保管庫公司並不存在，可能已經上市或被移除！');
     }
-    if (_.contains(archiveCompanyData.invest, {userId})) {
+    if (_.contains(archiveCompanyData.invest, userId)) {
       throw new Meteor.Error(403, '您已經投資過此保管庫公司了！');
     }
     const createdAt = new Date();
