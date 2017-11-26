@@ -76,6 +76,9 @@ Template.foundationListFilterForm.helpers({
   },
   keyword() {
     return rKeyword.get();
+  },
+  showMatchTypeSelectedAttr(matchType) {
+    return matchType === rMatchType.get() ? 'selected' : '';
   }
 });
 Template.foundationListFilterForm.events({
