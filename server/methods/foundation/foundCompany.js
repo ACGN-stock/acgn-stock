@@ -5,6 +5,7 @@ import { check, Match } from 'meteor/check';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
+import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
 import { checkImageUrl } from '/server/imports/checkImageUrl';
 import { limitMethod } from '/server/imports/rateLimit';
@@ -53,7 +54,7 @@ export function foundCompany(user, foundCompanyData) {
     const hours = (Meteor.settings.public.foundExpireTime / 3600000);
     throw new Meteor.Error(403, '商業季度即將結束前' + hours + '小時，禁止新創計劃！');
   }
-  const lastRoundData = dbSeason.findOne({}, {
+  const lastRoundData = dbRound.findOne({}, {
     sort: {
       beginDate: -1
     }
