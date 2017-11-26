@@ -103,6 +103,9 @@ Template.companyFilterForm.helpers({
   },
   keyword() {
     return rKeyword.get();
+  },
+  showMatchTypeSelectedAttr(matchType) {
+    return matchType === rMatchType.get() ? 'selected' : '';
   }
 });
 Template.companyFilterForm.events({
