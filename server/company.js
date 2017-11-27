@@ -16,14 +16,18 @@ export function releaseStocksForHighPrice() {
   debug.log('releaseStocksForHighPrice');
   let releaseStocksForHighPriceCounter = dbVariables.get('releaseStocksForHighPriceCounter') || 0;
   releaseStocksForHighPriceCounter -= 1;
+
+  const companiesNumber = dbCompanies.find({isSeal: false}).count();
+  const highPriceCompaniesNumber = Math.floor(companiesNumber * 0.05);
+
+  dbVariables.set('highPriceCompanyCount', highPriceCompaniesNumber);
+
   if (releaseStocksForHighPriceCounter <= 0) {
     releaseStocksForHighPriceCounter = generateReleaseStocksForHighPriceConter();
     dbVariables.set('releaseStocksForHighPriceCounter', releaseStocksForHighPriceCounter);
     console.info('releaseStocksForHighPrice triggered! next counter: ', releaseStocksForHighPriceCounter);
     updateReleaseStocksForHighPricePeriod();
 
-    const companiesNumber = dbCompanies.find({isSeal: false}).count();
-    const highPriceCompaniesNumber = Math.floor(companiesNumber * 0.05);
     if (highPriceCompaniesNumber > 0) {
       dbCompanies
         .find(

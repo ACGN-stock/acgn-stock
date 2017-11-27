@@ -231,6 +231,60 @@
   color: #839496;
 }
 
-#system-time-info .non-break {
+.text-non-break {
   white-space: nowrap;
+}
+
+@media only screen and (max-width: 800px) {
+  /* Force table to not be like tables anymore */
+  #tax-info-table table, 
+  #tax-info-table thead, 
+  #tax-info-table tbody, 
+  #tax-info-table th, 
+  #tax-info-table td, 
+  #tax-info-table tr { 
+    display: block; 
+  }
+ 
+  /* Hide table headers (but not display: none;, for accessibility) */
+  #tax-info-table thead tr { 
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+ 
+  #tax-info-table tr { border: 2px solid #ccc; }
+ 
+  #tax-info-table td { 
+    /* Behave  like a "row" */
+    border: none;
+    border-bottom: 1px solid #eee; 
+    position: relative;
+    padding-left: 35%; 
+    white-space: normal;
+    text-align: left !important;
+  }
+
+  #tax-info-table td:last-child {
+    border-bottom: none;
+  }
+ 
+  #tax-info-table td:before { 
+    /* Now like a table header */
+    position: absolute;
+    /* Top/left values mimic padding */
+    top: 6px;
+    left: 6px;
+    width: 45%; 
+    padding-right: 10px;
+    padding-bottom: 0px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+ 
+  /*
+  Label the data
+  */
+  #tax-info-table td:before { content: attr(data-title); }
 }

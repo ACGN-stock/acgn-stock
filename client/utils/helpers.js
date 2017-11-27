@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbCompanies } from '/db/dbCompanies';
+import { dbEmployees } from '/db/dbEmployees';
 import { dbVariables } from '/db/dbVariables';
 
 Meteor.subscribe('variables');
@@ -24,12 +25,22 @@ export function currencyFormat(money) {
 Template.registerHelper('currencyFormat', currencyFormat);
 
 export function getCompanyEPS(companyData) {
-  return ((1 - (Meteor.settings.public.managerProfitPercent + Meteor.settings.public.costFromProfit + companyData.seasonalBonusPercent / 100)) *
-    companyData.profit / companyData.totalRelease).toFixed(2);
+  let multiplier = 1;
+
+  multiplier -= (companyData.manager !== '!none') ? Meteor.settings.public.managerProfitPercent : 0;
+  multiplier -= (dbEmployees.find({
+    companyId: companyData._id,
+    employed: true
+  }).count() > 0) ? (companyData.seasonalBonusPercent / 100) : 0;
+  multiplier -= Meteor.settings.public.costFromProfit;
+
+  return (companyData.profit * multiplier / companyData.totalRelease).toFixed(2);
 }
 
 export function getCompanyPERatio(companyData) {
-  return (companyData.profit === 0) ? '∞' : (companyData.listPrice / getCompanyEPS(companyData)).toFixed(2);
+  const eps = parseFloat(getCompanyEPS(companyData));
+
+  return (eps === 0) ? '∞' : (companyData.listPrice / eps).toFixed(2);
 }
 
 export function getCompanyEPRatio(companyData) {

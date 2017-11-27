@@ -218,10 +218,13 @@
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-EPS" title="{{getCompanyEPS this}}">
           $ {{currencyFormat (getCompanyEPS this)}}
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本益比：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">
+          <span style="white-space: nowrap;">本益比／</span>
+          <span style="white-space: nowrap;">益本比：</span>
+        </div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-PERatio"
-          title="{{getCompanyPERatio this}}">
-          {{getCompanyPERatio this}}
+          title="{{getCompanyPERatio this}}／{{getCompanyEPRatio this}}">
+          {{getCompanyPERatio this}}／{{getCompanyEPRatio this}}
         </div>
         <div class="col-4 col-md-2 col-lg-2 text-right border-grid">創立時間：</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid company-created"

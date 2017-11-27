@@ -117,6 +117,12 @@ Template.nav.helpers({
   },
   isSSL() {
     return location.protocol === 'https:';
+  },
+  getHref(page, params) {
+    return FlowRouter.path(page, params);
+  },
+  getLinkText(page) {
+    return pageNameHash[page];
   }
 });
 Template.nav.events({
