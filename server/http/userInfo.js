@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
 import { HTTP } from 'meteor/http';
 import url from 'url';
@@ -17,20 +18,24 @@ WebApp.connectHandlers.use(function(req, res, next) {
       fields: {
         name: 1,
         status: 1,
-        validateType: 1,
-        accessToken: 1
+        validateType: 1
       }
     });
     if (userData) {
       if (userData.status === 'registered') {
         res.setHeader('Cache-Control', 'public, max-age=604800');
       }
-      if (userData.validateType === 'Google' && userData.accessToken) {
+      if (userData.validateType === 'Google') {
         try {
+          const accessToken = Meteor.users.findOne(userId, {
+            fields: {
+              'services.google.accessToken': 1
+            }
+          }).services.google.accessToken;
           /* eslint-disable camelcase */
           const response = HTTP.get('https://www.googleapis.com/oauth2/v1/userinfo', {
             params: {
-              access_token: userData.accessToken
+              access_token: accessToken
             }
           });
           /* eslint-enable camelcase */

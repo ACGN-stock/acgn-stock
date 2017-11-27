@@ -26,6 +26,9 @@ Meteor.methods({
 });
 export function createSellOrder(user, orderData) {
   debug.log('createSellOrder', {user, orderData});
+  if (user.profile.isInVacation) {
+    throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
+  }
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }

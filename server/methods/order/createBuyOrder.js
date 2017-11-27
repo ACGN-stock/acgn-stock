@@ -25,6 +25,9 @@ Meteor.methods({
 });
 export function createBuyOrder(user, orderData) {
   debug.log('createBuyOrder', {user, orderData});
+  if (user.profile.isInVacation) {
+    throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
+  }
   if (user.profile.notPayTax) {
     throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
   }

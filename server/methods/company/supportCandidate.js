@@ -21,6 +21,9 @@ Meteor.methods({
 });
 export function supportCandidate(user, companyId, supportUserId) {
   debug.log('supportCandidate', {user, companyId, supportUserId});
+  if (user.profile.isInVacation) {
+    throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
+  }
   if (user.profile.notPayTax) {
     throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
   }

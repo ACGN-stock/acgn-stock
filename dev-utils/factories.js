@@ -2,6 +2,7 @@ import { Factory } from 'rosie';
 import faker from 'faker';
 
 import { productTypeList } from '/db/dbProducts';
+import { orderTypeList } from '/db/dbOrders';
 
 export const pttUserFactory = new Factory()
   .sequence('username', (n) => {
@@ -92,5 +93,21 @@ export const taxFactory = new Factory()
     paid: 0,
     expireDate() {
       return faker.date.future(0.1);
+    }
+  });
+
+export const orderFactory = new Factory()
+  .attrs({
+    orderType() {
+      return faker.random.arrayElement(orderTypeList);
+    },
+    amount() {
+      return faker.random.number({ min: 1 });
+    },
+    unitPrice() {
+      return faker.random.number({ min: 1 });
+    },
+    createdAt() {
+      return new Date();
     }
   });

@@ -18,6 +18,9 @@ Meteor.methods({
 });
 export function retrieveOrder(user, orderId) {
   debug.log('retrieveOrder', {user, orderId});
+  if (user.profile.isInVacation) {
+    throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
+  }
   if (user.profile.money < 1) {
     throw new Meteor.Error(403, '無法支付手續費1元，撤回訂單失敗！');
   }

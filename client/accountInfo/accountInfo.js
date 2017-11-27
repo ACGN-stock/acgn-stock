@@ -119,6 +119,20 @@ Template.accountInfoBasic.helpers({
   },
   isBaned(type) {
     return _.contains(this.profile.ban, type);
+  },
+  isInVacation() {
+    return this.profile.isInVacation;
+  },
+  isEndingVacation() {
+    return this.profile.isEndingVacation;
+  },
+  isCurrentUser() { // TODO 和 tax 那邊合併
+    const user = Meteor.user();
+    if (user && user._id === FlowRouter.getParam('userId')) {
+      return true;
+    }
+
+    return false;
   }
 });
 Template.accountInfoBasic.events({
@@ -260,7 +274,24 @@ Template.accountInfoBasic.events({
   'click [data-action="unregisterEmployee"]'(event) {
     event.preventDefault();
     Meteor.customCall('unregisterEmployee');
+    // FIXME 底下改成 customCall 的 callback
     alertDialog.alert('您已取消報名！');
+  },
+  'click [data-action="startVacation"]'(event) {
+    event.preventDefault();
+    Meteor.customCall('startVacation', function(err) {
+      if (! err) {
+        alertDialog.alert('您已進入渡假模式！');
+      }
+    });
+  },
+  'click [data-action="toggleEndingVacation"]'(event) {
+    event.preventDefault();
+    Meteor.customCall('toggleEndingVacation', function(err, result) {
+      if (! err) {
+        alertDialog.alert(result ? '您已送出收假請求！' : '您已取消收假請求！');
+      }
+    });
   }
 });
 
@@ -467,4 +498,3 @@ Template.accountInfoLogList.events({
     accountLogViewerMode.set('accuse');
   }
 });
-

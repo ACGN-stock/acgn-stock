@@ -49,6 +49,12 @@ function customCall(...args) {
 Meteor.customCall = customCall;
 
 export function createBuyOrder(user, companyData) {
+  if (user.profile.isInVacation) {
+    alertDialog.alert('您現在正在渡假中，請好好放鬆！');
+
+    return false;
+  }
+
   const companyId = companyData._id;
   const existsSellOrder = dbOrders.findOne({
     companyId: companyId,
@@ -117,6 +123,12 @@ export function createBuyOrder(user, companyData) {
 }
 
 export function createSellOrder(user, companyData) {
+  if (user.profile.isInVacation) {
+    alertDialog.alert('您現在正在渡假中，請好好放鬆！');
+
+    return false;
+  }
+
   const userId = user._id;
   const companyId = companyData._id;
   const existsBuyOrder = dbOrders.findOne({
@@ -190,6 +202,20 @@ export function retrieveOrder(orderData) {
 }
 
 export function changeChairmanTitle(companyData) {
+  const user = Meteor.user();
+
+  if (! user) {
+    alertDialog.alert('您尚未登入，無法修改董事長頭銜！');
+
+    return false;
+  }
+
+  if (user.profile.isInVacation) {
+    alertDialog.alert('您現在正在渡假中，請好好放鬆！');
+
+    return false;
+  }
+
   alertDialog.prompt('要修改董事長的頭銜嗎？', function(chairmanTitle) {
     if (chairmanTitle && chairmanTitle.length > 0 && chairmanTitle.length <= 20) {
       Meteor.customCall('changeChairmanTitle', companyData._id, chairmanTitle);
@@ -207,6 +233,13 @@ export function voteProduct(productId, companyId) {
 
     return false;
   }
+
+  if (user.profile.isInVacation) {
+    alertDialog.alert('您現在正在渡假中，請好好放鬆！');
+
+    return false;
+  }
+
   if (user.profile.vote < 1) {
     alertDialog.alert('您的推薦票數量不足，無法繼續推薦產品！');
 
@@ -232,6 +265,13 @@ export function likeProduct(productId) {
 
     return false;
   }
+
+  if (user.profile.isInVacation) {
+    alertDialog.alert('您現在正在渡假中，請好好放鬆！');
+
+    return false;
+  }
+
   const userId = user._id;
   if (dbProductLike.find({productId, userId}).count() > 0) {
     alertDialog.confirm('您已經對此產品做出過正面評價，要收回評價嗎？', function(result) {
@@ -267,6 +307,13 @@ export function investArchiveCompany(companyData) {
 
     return false;
   }
+
+  if (user.profile.isInVacation) {
+    alertDialog.alert('您現在正在渡假中，請好好放鬆！');
+
+    return false;
+  }
+
   const userId = user._id;
   if (_.contains(companyData.invest, userId)) {
     alertDialog.alert('您已經投資過此保管庫公司了！');

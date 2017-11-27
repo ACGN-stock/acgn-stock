@@ -19,6 +19,9 @@ Meteor.methods({
 });
 export function likeProduct(user, productId) {
   debug.log('likeProduct', {user, productId});
+  if (user.profile.isInVacation) {
+    throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
+  }
   if (user.profile.notPayTax) {
     throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
   }
