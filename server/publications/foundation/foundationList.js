@@ -2,10 +2,10 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbFoundations } from '/db/dbFoundations';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
-import { buildSearchRegExp } from '/server/imports/buildSearchRegExp';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
+import { buildSearchRegExp } from '/server/imports/utils/buildSearchRegExp';
 
 Meteor.publish('foundationList', function({keyword, matchType, offset}) {
   debug.log('publish foundationPlan', {keyword, matchType, offset});

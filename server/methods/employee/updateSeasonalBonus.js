@@ -3,8 +3,8 @@ import { check, Match } from 'meteor/check';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbSeason } from '/db/dbSeason';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   updateSeasonalBonus(companyId, percentage) {

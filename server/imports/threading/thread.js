@@ -23,3 +23,18 @@ export function refreshThread() {
     });
   }
 }
+
+export function findIntervalWorkThreadId() {
+  //先移除所有一分鐘未更新的thread資料
+  dbThreads.remove({ refreshTime: { $lt: new Date(Date.now() - 60000) } });
+  //如果現在沒有負責intervalWork的thread
+  if (dbThreads.find({ doIntervalWork: true }).count() < 1) {
+    //將第一個thread指派為負責intervalWork工作
+    dbThreads.update({}, { $set: { doIntervalWork: true } });
+  }
+
+  //取出負責intervalWork的thread資料
+  const threadData = dbThreads.findOne({ doIntervalWork: true });
+
+  return threadData ? threadData._id : null;
+}

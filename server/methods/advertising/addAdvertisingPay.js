@@ -4,8 +4,8 @@ import { check, Match } from 'meteor/check';
 
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbLog } from '/db/dbLog';
-import { resourceManager } from '/server/imports/resourceManager';
-import { debug } from '/server/imports/debug';
+import { resourceManager } from '/server/imports/threading/resourceManager';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   addAdvertisingPay(advertisingId, addPay) {

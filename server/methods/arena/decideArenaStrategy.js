@@ -3,11 +3,11 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   decideArenaStrategy(companyId, strategyData) {

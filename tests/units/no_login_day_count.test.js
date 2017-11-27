@@ -4,7 +4,7 @@ import deepequal from 'deep-equal';
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { dbSeason } from '/db/dbSeason';
-import { doLoginObserver } from '/server/intervalCheck';
+import { loginObserver } from '/server/imports/utils/loginObserver';
 
 test('No login day computaion test', function(t) {
   const stubCursor = new Mongo.Cursors();
@@ -25,7 +25,7 @@ test('No login day computaion test', function(t) {
       t.fail('Try to update with incorrect no login day computation');
   });
 
-  doLoginObserver();
+  loginObserver.start();
 
   stubCursor.observe.yieldTo('changed', {
     _id: 'FOOBAR',

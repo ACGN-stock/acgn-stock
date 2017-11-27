@@ -2,9 +2,9 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbProducts } from '/db/dbProducts';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, offset}) {
   debug.log('publish productListBySeasonId', {seasonId, sortBy, sortDir, offset});

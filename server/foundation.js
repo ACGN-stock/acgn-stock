@@ -1,14 +1,14 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbPrice } from '/db/dbPrice';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 const {foundExpireTime, foundationNeedUsers, minReleaseStock} = Meteor.settings.public;
 export function checkFoundCompany() {

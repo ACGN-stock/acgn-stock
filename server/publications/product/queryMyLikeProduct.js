@@ -3,8 +3,8 @@ import { check } from 'meteor/check';
 
 import { dbProductLike } from '/db/dbProductLike';
 import { dbVoteRecord } from '/db/dbVoteRecord';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('queryMyLikeProduct', function(companyId) {
   debug.log('publish queryMyLikeProduct', companyId);

@@ -5,7 +5,7 @@ import { dbArenaFighters, MAX_MANNER_SIZE, getAttributeNumber } from '/db/dbAren
 import { dbArenaLog } from '/db/dbArenaLog';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 export function startArenaFight() {
   console.log('start arena fight...');

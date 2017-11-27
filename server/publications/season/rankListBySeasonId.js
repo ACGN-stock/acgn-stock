@@ -4,8 +4,8 @@ import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
 import { dbRankUserWealth } from '/db/dbRankUserWealth';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('rankListBySeasonId', function(seasonId) {
   debug.log('publish rankListBySeasonId', seasonId);
