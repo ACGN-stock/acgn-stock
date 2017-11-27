@@ -22,6 +22,7 @@ export const config = {
   salaryPerPay: 1000, //所有驗證通過的使用者每隔一段時間可以固定領取的薪資數量
   seasonNumberInRound: 12, //一個賽季有幾個商業季度
   seasonTime: 604800000, //每個商業季度的持續時間，單位為微秒
+  electManagerTime: 86400000, //每個商業季度結束前多久時間會進行經理競選，單位為微秒
   seasonProfitPerUser: 140000, //每個商業季度、每個驗證的使用者的「所有推薦票加總」將產生多少可能營利額
   managerProfitPercent: 0.05, //經理人獲得公司營利分紅的比例
   costFromProfit: 0.15, //系統將扣除多少公司的營利做為公司營運成本

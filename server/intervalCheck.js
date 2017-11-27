@@ -580,7 +580,7 @@ function generateNewSeason() {
   debug.log('generateNewSeason');
   const beginDate = new Date();
   const endDate = new Date(beginDate.setMinutes(0, 0, 0) + Meteor.settings.public.seasonTime);
-  const electTime = endDate.getTime() - 86400000;
+  const electTime = endDate.getTime() - Meteor.settings.public.electManagerTime;
   const userCount = Meteor.users.find().count();
   const productCount = dbProducts.find({overdue: 0}).count();
   const companiesCount = dbCompanies.find({isSeal: false}).count();

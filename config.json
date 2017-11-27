@@ -21,6 +21,7 @@
     "salaryPerPay": 1000,
     "seasonNumberInRound": 12,
     "seasonTime": 604800000,
+    "electManagerTime": 86400000,
     "seasonProfitPerUser": 140000,
     "managerProfitPercent": 0.05,
     "costFromProfit": 0.15,
