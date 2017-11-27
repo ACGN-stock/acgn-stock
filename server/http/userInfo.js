@@ -40,9 +40,7 @@ WebApp.connectHandlers.use(function(req, res, next) {
           userData.name = userData.name;
         }
       }
-      else {
-        res.end(JSON.stringify(userData));
-      }
+      res.end(JSON.stringify(userData));
     }
     else {
       res.end('');
