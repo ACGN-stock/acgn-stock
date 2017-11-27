@@ -93,6 +93,26 @@ const schema = new SimpleSchema({
       lastReadAccuseLogDate: {
         type: Date,
         optional: true
+      },
+      // 是否處於渡假模式
+      isInVacation: {
+        type: Boolean,
+        defaultValue: false
+      },
+      // 是否將要收假
+      isEndingVacation: {
+        type: Boolean,
+        defaultValue: false
+      },
+      // 最後一次假期的開始時間
+      lastVacationStartDate: {
+        type: Date,
+        optional: true
+      },
+      // 最後一次假期的結束時間
+      lastVacationEndDate: {
+        type: Date,
+        optional: true
       }
     })
   },

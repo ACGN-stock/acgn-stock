@@ -371,6 +371,9 @@ function generateHasStockUserWealthList() {
         },
         lastLoginDate:  {
           $arrayElemAt: ['$userData.status.lastLogin.date', 0]
+        },
+        isInVacation:  {
+          $arrayElemAt: ['$userData.profile.isInVacation', 0]
         }
       }
     },
@@ -381,6 +384,7 @@ function generateHasStockUserWealthList() {
         money: 1,
         noLoginDayCount: 1,
         lastLoginDate: 1,
+        isInVacation: 1,
         totalWealth: {
           $add: ['$money', '$stocksValue']
         }
@@ -416,7 +420,8 @@ function generateNoStockUserWealthList() {
         userId: 1,
         totalWealth: '$profile.money',
         noLoginDayCount: '$profile.noLoginDayCount',
-        lastLoginDate: '$status.lastLogin.date'
+        lastLoginDate: '$status.lastLogin.date',
+        isInVacation: '$profile.isInVacation'
       }
     },
     {
@@ -572,6 +577,11 @@ function generateUserTaxes(userWealthList) {
   const taxesBulk = dbTaxes.rawCollection().initializeUnorderedBulkOp();
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   _.each(userWealthList, (wealthData) => {
+    // 放假中除了開始渡假當季以外，不再產生新的稅
+    if (wealthData.isInVacation && dbTaxes.find({ userId: wealthData._id }).count() >= 1) {
+      return;
+    }
+
     let totalWealth = wealthData.totalWealth;
     if (wealthData.money < 0) {
       totalWealth -= wealthData.money;
@@ -579,7 +589,8 @@ function generateUserTaxes(userWealthList) {
     const noLoginTime = createdAt.getTime() - (wealthData.lastLoginDate ? wealthData.lastLoginDate.getTime() : 0);
     const noLoginDay = Math.min(Math.floor(noLoginTime / 86400000), 7);
     const noLoginDayCount = Math.min(noLoginDay + (wealthData.noLoginDayCount || 0), Math.floor(Meteor.settings.public.seasonTime / 86400000));
-    const zombie = noLoginDayCount * Meteor.settings.public.salaryPerPay;
+    const zombieTaxPerDay = wealthData.isInVacation ? Meteor.settings.public.vacationModeZombieTaxPerDay : Meteor.settings.public.salaryPerPay;
+    const zombie = noLoginDayCount * zombieTaxPerDay;
     const matchTaxConfig = _.find(taxConfigList, (taxConfig) => {
       return (
         totalWealth >= taxConfig.from &&
@@ -627,4 +638,3 @@ function generateUserTaxes(userWealthList) {
   taxesBulk.execute();
   logBulk.execute();
 }
-

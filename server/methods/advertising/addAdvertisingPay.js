@@ -19,6 +19,9 @@ Meteor.methods({
 });
 function addAdvertisingPay(user, advertisingId, addPay) {
   debug.log('addAdvertisingPay', {user, advertisingId, addPay});
+  if (user.profile.isInVacation) {
+    throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
+  }
   if (_.contains(user.profile.ban, 'advertise')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有廣告宣傳行為！');
   }

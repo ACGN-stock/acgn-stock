@@ -21,6 +21,9 @@ Meteor.methods({
 });
 function payTax(user, taxId, amount) {
   debug.log('payTax', {user, taxId, amount});
+  if (user.profile.isInVacation) {
+    throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
+  }
   if (amount < 1) {
     throw new Meteor.Error(403, '繳納稅金數量錯誤！');
   }

@@ -167,15 +167,21 @@ Template.companyDetail.events({
     const resigned = false;
     const employData = dbEmployees.findOne({companyId, userId, employed, resigned});
     if (employData) {
-      Meteor.customCall('unregisterEmployee');
-      alertDialog.alert('您已取消報名！');
+      Meteor.customCall('unregisterEmployee', function(err) {
+        if (! err) {
+          alertDialog.alert('您已取消報名！');
+        }
+      });
     }
     else {
       const message = '報名後將會被其他公司移出儲備員工名單，您確定要報名嗎？';
       alertDialog.confirm(message, (result) => {
         if (result) {
-          Meteor.customCall('registerEmployee', companyId);
-          alertDialog.alert('您已報名成功！');
+          Meteor.customCall('registerEmployee', companyId, function(err) {
+            if (! err) {
+              alertDialog.alert('您已報名成功！');
+            }
+          });
         }
       });
     }
@@ -812,6 +818,11 @@ Template.companyDirectorList.helpers({
     const userId = Meteor.user()._id;
 
     return dbDirectors.findOne({companyId, userId}).message;
+  },
+  isDirectorInVacation(userId) {
+    const user = Meteor.users.findOne(userId);
+
+    return user ? user.profile.isInVacation : false;
   }
 });
 Template.companyDirectorList.events({
