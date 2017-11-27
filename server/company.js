@@ -536,7 +536,7 @@ export function checkChairman() {
             }
           }
         );
-        if (chairmanData.userId !== companyData.chairman) {
+        if (chairmanData && chairmanData.userId !== companyData.chairman) {
           needExecuteBulk = true;
           companiesBulk
             .find({
