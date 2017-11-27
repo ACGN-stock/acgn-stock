@@ -278,9 +278,13 @@ Template.accountInfoBasic.events({
   },
   'click [data-action="startVacation"]'(event) {
     event.preventDefault();
-    Meteor.customCall('startVacation', function(err) {
-      if (! err) {
-        alertDialog.alert('您已進入渡假模式！');
+    alertDialog.confirm('確定要開始渡假嗎？', (result) => {
+      if (result) {
+        Meteor.customCall('startVacation', (err) => {
+          if (! err) {
+            alertDialog.alert('您已進入渡假模式！');
+          }
+        });
       }
     });
   },
