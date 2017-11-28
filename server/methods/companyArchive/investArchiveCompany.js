@@ -29,6 +29,9 @@ export function investArchiveCompany(user, companyId) {
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
+  if (_.contains(user.profile.ban, 'manager')) {
+    throw new Meteor.Error(403, '您現在被金融管理會禁止了擔任經理人的資格！');
+  }
   const amount = Meteor.settings.public.founderEarnestMoney;
   if (user.profile.money < amount) {
     throw new Meteor.Error(403, '金錢不足，無法投資！');
@@ -80,7 +83,18 @@ export function investArchiveCompany(user, companyId) {
     });
     archiveCompanyData.invest.push(userId);
     if (archiveCompanyData.invest.length >= Meteor.settings.public.archiveReviveNeedUsers) {
-      const investUserIdList = _.shuffle(archiveCompanyData.invest);
+      let investUserIdList;
+      let manager;
+      do {
+        investUserIdList = _.shuffle(archiveCompanyData.invest);
+        manager = Meteor.users.findOne(investUserIdList[0], {
+          fields: {
+            _id: 1,
+            profile: 1
+          }
+        });
+      }
+      while (manager && ! _.contains(manager.profile.ban, 'manager'));
       dbLog.insert({
         logType: '公司復活',
         userId: investUserIdList,
@@ -101,7 +115,7 @@ export function investArchiveCompany(user, companyId) {
       dbFoundations.insert({
         _id: companyId,
         companyName: archiveCompanyData.name,
-        manager: investUserIdList[0],
+        manager: manager._id,
         tags: archiveCompanyData.tags,
         pictureSmall: archiveCompanyData.pictureSmall,
         pictureBig: archiveCompanyData.pictureBig,
