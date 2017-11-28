@@ -155,6 +155,43 @@ Template.companyDetail.events({
       }
     });
   },
+  'click [data-action="fscAnnouncement"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1,
+        manager: 1
+      }
+    });
+
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '金管會通告 - 輸入通知訊息',
+      message: `請輸入要通告的訊息：`,
+      callback: function(message) {
+        if (message) {
+          const userIds = [companyData.manager];
+          Meteor.customCall('fscAnnouncement', { userIds, companyId, message });
+        }
+      }
+    });
+  },
+  'click [data-action="accuseCompany"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, { fields: { companyName: 1 } });
+    alertDialog.dialog({
+      type: 'prompt',
+      title: `舉報違規 - 「${companyData.companyName}」公司`,
+      message: `請輸入您要舉報的內容：`,
+      callback: function(message) {
+        if (message) {
+          Meteor.customCall('accuseCompany', companyId, message);
+        }
+      }
+    });
+  },
   'click [data-action="showAllTags"]'(event) {
     event.preventDefault();
     rShowAllTags.set(true);

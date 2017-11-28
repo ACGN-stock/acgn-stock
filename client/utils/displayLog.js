@@ -405,40 +405,56 @@ Template.displayLog.helpers({
         );
       }
       case '舉報違規': {
-        let extraDescription = '';
-        if (logData.userId[1]) {
-          extraDescription = (
-            getUserLink(logData.userId[1]) +
-            (logData.userId[2] ? '(' + logData.userId[2] + ')' : '') +
-            '的違規行為'
-          );
+        const sourceUserLink = getUserLink(logData.userId[0]);
+        const reason = getPureMessage();
+        let result = `【舉報違規】${sourceUserLink}以「${reason}」的理由向金融管理會舉報`;
+
+        if (logData.companyId) {
+          const companyLink = getCompanyLink(logData.companyId);
+          result += `「${companyLink}」公司`;
+
+          if (logData.userId[1]) {
+            const managerUserLink = getUserLink(logData.userId[1]);
+            result += `及其經理人${managerUserLink}`;
+          }
+
+          result += '的違例事項。';
         }
-        else if (logData.productId) {
-          extraDescription = getProductLink(logData.productId) + '的違例事項';
-        }
-        else {
-          extraDescription = getCompanyLink(logData.companyId) + '的違例事項';
+        else if (logData.userId[1]) {
+          const targetUserLink = getUserLink(logData.userId[1]);
+          const ipAddr = logData.userId[2];
+
+          result += `${targetUserLink}`;
+
+          if (ipAddr) {
+            result += `(${ipAddr})`;
+          }
+
+          result += '的違規行為。';
         }
 
-        return (
-          '【舉報違規】' +
-          getUserLink(logData.userId[0]) +
-          '以「' + getPureMessage() + '」的理由向金融管理會舉報' + extraDescription + '。'
-        );
+        return result;
       }
       case '金管通告': {
-        const extraDescription = (logData.userId && logData.userId.length) ? (
-          '向' +
-          _.map(logData.userId.slice(1), (userId) => {
-            return getUserLink(userId);
-          }).join('、')
-        ) : '';
+        const [sourceUserLink, ...targetUserLinks] = _.map(logData.userId, getUserLink);
 
-        return (
-          '【金管通告】' +
-          getUserLink(logData.userId[0]) +
-          '以金管會的名義' + extraDescription + '通告：「' + getPureMessage() + '」。'
-        );
+        let result = `【金管通告】${sourceUserLink}以金管會的名義`;
+
+        if (logData.companyId) { // 針對公司
+          const companyLink = getCompanyLink(logData.companyId);
+          result += `向「${companyLink}」公司`;
+
+          if (targetUserLinks.length > 0) {
+            result += `及其經理人${targetUserLinks[0]}`;
+          }
+        }
+        else if (targetUserLinks.length > 0) { // 針對使用者
+          result += `向${targetUserLinks.join('、')}`;
+        }
+
+        result += `通告：「${getPureMessage()}」。`;
+
+        return result;
       }
       case '通報金管': {
         return (
@@ -612,4 +628,3 @@ function getProductLink(productId) {
 function getPureMessage() {
   return `<span data-message></span>`;
 }
-
