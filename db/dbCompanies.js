@@ -100,23 +100,17 @@ const schema = new SimpleSchema({
   //員工每日薪資
   salary: {
     type: SimpleSchema.Integer,
-    min: Meteor.settings.public.minimumCompanySalaryPerDay,
-    max: Meteor.settings.public.maximumCompanySalaryPerDay,
     defaultValue: Meteor.settings.public.defaultCompanySalaryPerDay
   },
   //下季員工每日薪資
   nextSeasonSalary: {
     type: SimpleSchema.Integer,
-    min: Meteor.settings.public.minimumCompanySalaryPerDay,
-    max: Meteor.settings.public.maximumCompanySalaryPerDay,
     defaultValue: Meteor.settings.public.defaultCompanySalaryPerDay,
     optional: true
   },
   //員工季末分紅占總營收百分比
   seasonalBonusPercent: {
     type: SimpleSchema.Integer,
-    min: Meteor.settings.public.minimumSeasonalBonusPercent,
-    max: Meteor.settings.public.maximumSeasonalBonusPercent,
     defaultValue: Meteor.settings.public.defaultSeasonalBonusPercent
   },
   //是否被金管會查封關停
