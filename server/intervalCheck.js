@@ -427,6 +427,8 @@ export function processEndVacationRequests() {
       'profile.isInVacation': false,
       'profile.isEndingVacation': false
     }
+  }, {
+    multi: true
   });
 }
 
