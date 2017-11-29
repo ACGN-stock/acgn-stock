@@ -25,8 +25,16 @@ export const pageNameHash = {
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
   ruleAgendaList: '規則討論',
-  accuseRecord: '舉報違規紀錄'
+  accuseRecord: '舉報違規紀錄',
+  fscStock: '金管會持股'
 };
+
+FlowRouter.route('/fscStock', {
+  name: 'fscStock',
+  action() {
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 金管會持股');
+  }
+});
 
 FlowRouter.route('/tutorial', {
   name: 'tutorial',
