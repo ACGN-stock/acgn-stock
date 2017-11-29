@@ -144,8 +144,8 @@ Template.accountInfoBasic.events({
       message: `請輸入要通告的訊息：`,
       callback: function(message) {
         if (message) {
-          const userId = [accuseUser._id];
-          Meteor.customCall('fscAnnouncement', userId, message);
+          const userIds = [accuseUser._id];
+          Meteor.customCall('fscAnnouncement', { userIds, message });
         }
       }
     });
