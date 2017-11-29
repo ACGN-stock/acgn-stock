@@ -41,6 +41,7 @@
     "announceSalaryTime": 259200000,
     "announceBonusTime": 86400000,
     "vacationModeZombieTaxPerDay": 500,
-    "minIntervalTimeBetweenVacations": 604800000
+    "minIntervalTimeBetweenVacations": 604800000,
+    "taxExpireTime": 259200000
   }
 }
