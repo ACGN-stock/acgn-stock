@@ -7,6 +7,12 @@
           {{currentUser.profile.name}}
         </a>
         <div class="dropdown-menu px-3 text-right">
+          <a class="d-block" href="{{getHref 'accountInfo' accountInfoParams}}" title="帳號資訊">
+            <span class="float-left">
+              <i class="fa fa-user-circle" aria-hidden="true"></i>
+            </span>
+            {{getLinkText 'accountInfo' accountInfoParams}}
+          </a>
           <li title="現有資金：${{currentUser.profile.money}}">
             <span class="float-left">
               <i class="fa fa-usd" aria-hidden="true"></i>
@@ -23,6 +29,7 @@
             <img class="float-left" style="margin-top: 5px; width: 1rem; height: 1rem;" src="/stone.jpeg" title="聖晶石" />
             {{currentUser.profile.stone}}
           </li>
+          <li class="dropdown-divider"></li>
           <a class="d-block" href="#" title="登出" data-action="logout">
             <span class="float-left">
               <i class="fa fa-sign-out" aria-hidden="true"></i>
@@ -52,6 +59,9 @@
     </button>
     <div class="{{getNavLinkListClassList}}">
       <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="{{getHref 'announcement'}}">{{getLinkText 'announcement'}}</a>
+        </li>
         {{#navLinkGroup text='交易大廳'}}
           {{> navLink page='instantMessage'}}
           {{> navLink page='companyList' params=page1}}
@@ -68,12 +78,8 @@
           {{/navLinkGroup}}
         {{/if}}
         {{#navLinkGroup text='其他資訊'}}
-          {{> navLink page='announcement'}}
           {{> navLink page='tutorial'}}
           {{> navLink page='seasonalReport' params=previousSeasonParams}}
-          {{#if currentUser}}
-            {{> navLink page='accountInfo' params=accountInfoParams}}
-          {{/if}}
           {{> navLink page='ruleAgendaList'}}
           {{> navLink page='accuseRecord'}}
         {{/navLinkGroup}}

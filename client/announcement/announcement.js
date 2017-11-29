@@ -7,7 +7,7 @@ import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
 import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateText, formatTimeText } from '../utils/helpers';
+import { formatDateText, formatTimeText, currencyFormat } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.announcement);
@@ -172,6 +172,12 @@ Template.systemStatusPanel.helpers({
       });
 
     return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceBonusTime) : null);
+  },
+  highPriceCompanyCount() {
+    return dbVariables.get('highPriceCompanyCount');
+  },
+  lowPriceThreshold() {
+    return currencyFormat(dbVariables.get('lowPriceThreshold'));
   },
   taskIsReady(begin, end) {
     const now = nowTime.get();

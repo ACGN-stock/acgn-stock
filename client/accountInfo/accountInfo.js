@@ -15,6 +15,7 @@ import { dbTaxes } from '/db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { currencyFormat } from '../utils/helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
@@ -349,7 +350,7 @@ Template.accountInfoTaxList.events({
       alertDialog.dialog({
         type: 'prompt',
         title: '繳納稅金',
-        message: `請輸入您要繳納的金額：(1~${maxPayMoney})`,
+        message: `請輸入您要繳納的金額：(1~${currencyFormat(maxPayMoney)})`,
         callback: function(amount) {
           amount = parseInt(amount, 10);
           if (amount) {
