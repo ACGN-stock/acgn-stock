@@ -22,14 +22,24 @@ function accuseCompany(user, companyId, message) {
   if (_.contains(user.profile.ban, 'accuse')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有舉報違規行為！');
   }
-  if (dbCompanies.find(companyId).count() < 1) {
+
+  const companyData = dbCompanies.findOne(companyId);
+  if (! companyData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
   }
+
+  const userIds = [user._id];
+  const { manager } = companyData;
+
+  if (manager && manager !== '!none') {
+    userIds[1] = manager;
+  }
+
   dbLog.insert({
     logType: '舉報違規',
-    userId: [user._id],
-    companyId: companyId,
-    message: message,
+    userId: userIds,
+    companyId,
+    message,
     createdAt: new Date()
   });
 }

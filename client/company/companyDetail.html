@@ -31,6 +31,9 @@
               <a class="btn btn-warning float-right" href="#" data-action="changeCompanyName">
                 更名
               </a>
+              <a class="btn btn-info float-right" href="#" data-action="fscAnnouncement">
+                金管會通告
+              </a>
             {{/if}}
             {{#if currentUser}}
               <a class="btn btn-primary float-right" href="#" data-toggle-employ="{{this._id}}">
@@ -49,6 +52,9 @@
                   加入最愛
                 </a>
               {{/if}}
+              <a class="btn btn-danger float-right" href="#" data-action="accuseCompany">
+                舉報違規
+              </a>
             {{/if}}
           </h1>
           {{#if showAllTags this.tags}}

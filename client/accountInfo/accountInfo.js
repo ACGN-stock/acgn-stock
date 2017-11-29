@@ -145,8 +145,8 @@ Template.accountInfoBasic.events({
       message: `請輸入要通告的訊息：`,
       callback: function(message) {
         if (message) {
-          const userId = [accuseUser._id];
-          Meteor.customCall('fscAnnouncement', userId, message);
+          const userIds = [accuseUser._id];
+          Meteor.customCall('fscAnnouncement', { userIds, message });
         }
       }
     });
@@ -279,9 +279,13 @@ Template.accountInfoBasic.events({
   },
   'click [data-action="startVacation"]'(event) {
     event.preventDefault();
-    Meteor.customCall('startVacation', function(err) {
-      if (! err) {
-        alertDialog.alert('您已進入渡假模式！');
+    alertDialog.confirm('確定要開始渡假嗎？', (result) => {
+      if (result) {
+        Meteor.customCall('startVacation', (err) => {
+          if (! err) {
+            alertDialog.alert('您已進入渡假模式！');
+          }
+        });
       }
     });
   },
