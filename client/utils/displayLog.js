@@ -136,7 +136,7 @@ Template.displayLog.helpers({
         return (
           '【公司復活】由於' + userLinkList.join('、') + '等人的投資，位於保管庫中的「' +
           getCompanyLink(logData.companyId) + '」公司成功復活並重新進入新創計劃，' +
-          getUserLink(logData.userId[0]) + '將就任公司經理。'
+          getUserLink(logData.message) + '將就任公司經理。'
         );
       }
       case '創立公司': {

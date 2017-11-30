@@ -83,27 +83,26 @@ export function investArchiveCompany(user, companyId) {
     });
     archiveCompanyData.invest.push(userId);
     if (archiveCompanyData.invest.length >= Meteor.settings.public.archiveReviveNeedUsers) {
-      let investUserIdList;
-      let manager;
-      do {
-        investUserIdList = _.shuffle(archiveCompanyData.invest);
-        manager = Meteor.users.findOne(investUserIdList[0], {
+      const shuffledInvestUserId = _.shuffle(archiveCompanyData.invest);
+      const managerId = _.find(shuffledInvestUserId, (userId) => {
+        const manager = Meteor.users.findOne(userId, {
           fields: {
             _id: 1,
             profile: 1
           }
         });
-      }
-      while (manager && ! _.contains(manager.profile.ban, 'manager'));
+
+        return manager && ! _.contains(manager.profile.ban, 'manager');
+      }) || '!none';
       dbLog.insert({
         logType: '公司復活',
-        userId: investUserIdList,
+        userId: archiveCompanyData.invest,
         companyId: companyId,
-        message: archiveCompanyData.name,
+        message: managerId,
         amount: amount,
         createdAt: new Date(createdAt.getTime() + 1)
       });
-      const invest = _.map(investUserIdList, (userId) => {
+      const invest = _.map(archiveCompanyData.invest, (userId) => {
         return {userId, amount};
       });
       dbCompanyArchive.update(companyId, {
@@ -115,7 +114,7 @@ export function investArchiveCompany(user, companyId) {
       dbFoundations.insert({
         _id: companyId,
         companyName: archiveCompanyData.name,
-        manager: manager._id,
+        manager: managerId,
         tags: archiveCompanyData.tags,
         pictureSmall: archiveCompanyData.pictureSmall,
         pictureBig: archiveCompanyData.pictureBig,
