@@ -89,7 +89,7 @@ export function investArchiveCompany(user, companyId) {
           }
         });
 
-        return manager && ! _.contains(manager.profile.ban, 'manager');
+        return manager && ! manager.profile.isInVacation && ! _.contains(manager.profile.ban, 'manager');
       }) || '!none';
       dbLog.insert({
         logType: '公司復活',
