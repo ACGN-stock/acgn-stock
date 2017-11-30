@@ -14,7 +14,7 @@ export const logTypeList = [
   '免費得石', //因為「message」的理由獲得了amount顆聖晶石！
   '聊天發言', //userId0說道：「message」
   '發薪紀錄', //(系統 || 「companyId」公司)向(所有已驗證通過且未就業的使用者 || userId...)發給了$price的薪水！
-  '公司復活', //由於userId...等人的投資，位於保管庫中的「companyId」公司成功復活並重新進入新創計劃，userId0將就任公司經理。
+  '公司復活', //由於userId...等人的投資，位於保管庫中的「companyId」公司成功復活並重新進入新創計劃，message將就任公司經理。
   '創立公司', //userId0發起了「message」的新公司創立計劃，誠意邀請有意者投資！
   '參與投資', //userId0向「（(companyId || message)公司創立計劃」投資了$amount！
   '創立失敗', //userId...等人投資的「message公司創立計劃」由於投資人數不足失敗了，投資金額將全數返回！
