@@ -130,7 +130,7 @@ export function isChairman(companyId) {
   if (user) {
     const companyData = dbCompanies.findOne(companyId);
 
-    return user._id === companyData.chairman;
+    return companyData && user._id === companyData.chairman;
   }
   else {
     return false;
