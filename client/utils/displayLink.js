@@ -4,7 +4,12 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 Template.userLink.onRendered(function() {
-  const userId = this.data;
+  let userId = this.data;
+
+  if (typeof userId === 'object') {
+    userId = this.data.id;
+  }
+
   if (userId === '!none') {
     this.$('a').text('無');
   }
@@ -45,7 +50,12 @@ Template.userLink.onRendered(function() {
 });
 
 Template.companyLink.onRendered(function() {
-  const companyId = this.data;
+  let companyId = this.data;
+
+  if (typeof companyId === 'object') {
+    companyId = this.data.id;
+  }
+
   if (companyId) {
     const $link = this.$('a');
     $.ajax({
