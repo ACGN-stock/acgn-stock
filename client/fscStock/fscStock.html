@@ -1,0 +1,31 @@
+<template name="fscStock">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">金管會持股</h1>
+      <hr />
+      <table class="table-bordered" style="max-width: 720px; width: 100%; table-layout: fixed; margin-left: auto; margin-right: auto">
+        <thead>
+          <tr>
+            <th class="text-center text-truncate" title="公司名稱">公司名稱</th>
+            <th class="text-center text-truncate" title="持有股數">持有股數</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each stockData in stockList}}
+            <tr>
+              <td class="text-left text-truncate">
+                {{>companyLink stockData.companyId}}
+              </td>
+              <td class="text-right">
+                {{stockData.stocks}} 股
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{#with paginationData}}
+        {{> pagination}}
+      {{/with}}
+    </div>
+  </div>
+</template>

@@ -573,7 +573,7 @@ const taxConfigList = [
 
 function generateUserTaxes(userWealthList) {
   const createdAt = new Date();
-  const expireDate = new Date(new Date().setHours(0, 0, 0, 0) + 259200000);
+  const expireDate = new Date(new Date().setHours(0, 0, 0, 0) + Meteor.settings.public.taxExpireTime);
   const taxesBulk = dbTaxes.rawCollection().initializeUnorderedBulkOp();
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   _.each(userWealthList, (wealthData) => {
