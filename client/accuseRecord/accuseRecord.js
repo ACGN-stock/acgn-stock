@@ -51,14 +51,14 @@ Template.accuseRecord.events({
       title: '金管會通告 - 選擇使用者',
       message: `請輸入要通告的使用者識別碼：<br />（可不輸入，多於一位玩家時需以,分隔）`,
       callback: function(userIdStringList) {
-        const userId = userIdStringList ? _.compact(userIdStringList.split(',')) : [];
+        const userIds = userIdStringList ? _.compact(userIdStringList.split(',')) : [];
         alertDialog.dialog({
           type: 'prompt',
           title: '金管會通告 - 輸入通知訊息',
           message: `請輸入要通告的訊息：`,
           callback: function(message) {
             if (message) {
-              Meteor.customCall('fscAnnouncement', userId, message);
+              Meteor.customCall('fscAnnouncement', { userIds, message });
             }
           }
         });
