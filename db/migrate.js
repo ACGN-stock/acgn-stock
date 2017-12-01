@@ -3,6 +3,9 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Migrations } from 'meteor/percolate:migrations';
 import { dbAdvertising } from './dbAdvertising';
+import { dbArena } from '/db/dbArena';
+import { dbArenaFighters } from '/db/dbArenaFighters';
+import { dbArenaLog } from '/db/dbArenaLog';
 import { dbCompanies } from './dbCompanies';
 import { dbCompanyArchive } from './dbCompanyArchive';
 import { dbDirectors } from './dbDirectors';
@@ -22,6 +25,7 @@ import { dbSeason } from './dbSeason';
 import { dbTaxes } from './dbTaxes';
 import { dbUserArchive } from './dbUserArchive';
 import { dbValidatingUsers } from './dbValidatingUsers';
+import { dbVariables } from '/db/dbVariables';
 import { dbVoteRecord } from './dbVoteRecord';
 
 if (Meteor.isServer) {
@@ -261,11 +265,13 @@ if (Meteor.isServer) {
               }
             }
           );
-          dbCompanies.update(companyData._id, {
-            $set: {
-              chairman: chairmanData.userId
-            }
-          });
+          if (chairmanData) {
+            dbCompanies.update(companyData._id, {
+              $set: {
+                chairman: chairmanData._id
+              }
+            });
+          }
         });
     }
   });
@@ -582,6 +588,50 @@ if (Meteor.isServer) {
           unique: true
         }
       );
+    }
+  });
+
+  Migrations.add({
+    version: 13,
+    name: 'arena system',
+    up() {
+      dbArena.rawCollection().createIndex({
+        beginDate: 1
+      });
+      dbArenaFighters.rawCollection().createIndex(
+        {
+          arenaId: 1,
+          companyId: 1
+        },
+        {
+          unique: true
+        }
+      );
+      dbArenaLog.rawCollection().createIndex(
+        {
+          arenaId: 1,
+          sequence: 1
+        },
+        {
+          unique: true
+        }
+      );
+      const lastSeasonData = dbSeason.findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+      if (lastSeasonData) {
+        const {beginDate, endDate} = lastSeasonData;
+        const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSasonNumber);
+        dbArena.insert({
+          beginDate: beginDate,
+          endDate: arenaEndDate,
+          joinEndDate: new Date(arenaEndDate.getTime() - Meteor.settings.public.electManagerTime),
+          fighterSequence: []
+        });
+      }
+      dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSasonNumber);
     }
   });
 

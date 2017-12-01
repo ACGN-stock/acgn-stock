@@ -50,7 +50,7 @@ export function contendManager(user, companyId) {
   if (_.contains(candidateList, userId)) {
     throw new Meteor.Error(403, '使用者已經是該公司的經理人候選者了！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['season', 'elect' + companyId]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'elect', 'elect' + companyId]);
   //先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('resignManager', ['elect' + companyId], (release) => {
     const companyData = dbCompanies.findOne(companyId, {

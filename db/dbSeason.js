@@ -2,7 +2,7 @@
 import SimpleSchema from 'simpl-schema';
 import { Mongo } from 'meteor/mongo';
 
-//公司產品資料集
+//季度資料集
 export const dbSeason = new Mongo.Collection('season');
 export default dbSeason;
 

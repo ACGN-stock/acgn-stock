@@ -610,6 +610,28 @@ Template.displayLog.helpers({
           '發布的廣告「' + getPureMessage() + '」給撤銷了。'
         );
       }
+      case '亂鬥報名': {
+        return (
+          '【最萌亂鬥】' +
+          getUserLink(logData.userId[0]) +
+          '替「' + getCompanyLink(logData.companyId) + '」公司報名參加了這一屆的最萌亂鬥大賽！'
+        );
+      }
+      case '亂鬥加強': {
+        return (
+          '【最萌亂鬥】' +
+          getUserLink(logData.userId[0]) +
+          '對這一屆最萌亂鬥大賽參賽者「' + getCompanyLink(logData.companyId) + '」公司' +
+          '的' + logData.message + '能力值投資了$' + currencyFormat(logData.amount) + '的金錢！'
+        );
+      }
+      case '亂鬥營利': {
+        return (
+          '【最萌亂鬥】' +
+          '「' + getCompanyLink(logData.companyId) + '」公司' +
+          '在這一屆最萌亂鬥大賽中表現出眾，獲得了$' + currencyFormat(logData.amount) + '的營利金額！'
+        );
+      }
     }
   }
 });

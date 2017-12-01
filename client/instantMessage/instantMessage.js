@@ -125,6 +125,11 @@ const messageTypeGroupHash = {
   ],
   '推薦產品': [
     '推薦產品'
+  ],
+  '最萌亂鬥': [
+    '亂鬥報名',
+    '亂鬥加強',
+    '亂鬥營利'
   ]
 };
 const defaultFilterValue = _.chain(messageTypeGroupHash)
