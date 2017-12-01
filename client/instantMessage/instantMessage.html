@@ -9,17 +9,19 @@
       {{/if}}
       <form>
         <div class="form-group">
-          篩選器：
+          <span style="display: inline-block; float: left; padding-top: 4px; margin-top: 4px;">篩選器：</span>
           {{> instantMessageFilterButton type='聊天發言'}}
           {{> instantMessageFilterButton type='交易相關'}}
           {{> instantMessageFilterButton type='新創相關'}}
           {{> instantMessageFilterButton type='競選相關'}}
           {{> instantMessageFilterButton type='經理管理'}}
           {{> instantMessageFilterButton type='推薦產品'}}
-          <button class="btn btn-sm btn-danger float-right" type="button" data-action="clearMessage">
+          <button class="btn btn-sm btn-danger float-right" style="margin-top: 4px;"
+            type="button" data-action="clearMessage">
             清除舊訊息
           </button>
-          <button class="{{isDontInterruptButtonClass}}" type="button" data-action="dontInterrupt">
+          <button class="{{isDontInterruptButtonClass}}" style="margin-top: 4px;"
+            type="button" data-action="dontInterrupt">
             勿擾模式
           </button>
         </div>
@@ -49,15 +51,15 @@
 </template>
 
 <template name="instantMessageFilterButton">
-  <button class="{{btnClass}}" type="button">
+  <button class="{{btnClass}}" style="margin-top: 4px;" type="button">
     {{btnText}}
   </button>
 </template>
 
 <template name="instantMessageFilterById">
-  <div class="form-group row">
-    <div class="col" style="max-width: 360px;">
-      <div class="btn-group">
+  <div class="form-group row" style="display: block;">
+    <div class="col">
+      <div class="btn-group" style="flex-wrap: wrap;">
         <div class="input-group-btn">
           {{> instantMessageFilterButton type='只看指定使用者或公司'}}
         </div>
@@ -95,27 +97,27 @@
 </template>
 
 <template name="instantMessageFilterByUserId">
-  <small class="badge badge-success">
-    {{> userLink this}}
+  <span class="badge badge-success" style="font-size: 14px;">
+    {{> userLink id=this class="text-white"}}
     <i
       class="fa fa-times"
-      style="cursor: pointer;"
+      style="cursor: pointer; margin: 0 6px 0 6px"
       data-action="remove"
     >
     </i>
-  </small>
+  </span>
 </template>
 
 <template name="instantMessageFilterByCompanyId">
-  <small class="badge badge-info text-white">
-    {{> companyLink this}}
+  <span class="badge badge-info text-white" style="font-size: 14px;">
+    {{> companyLink id=this class="text-white"}}
     <i
       class="fa fa-times"
-      style="cursor: pointer;"
+      style="cursor: pointer; margin: 0 6px 0 6px"
       data-action="remove"
     >
     </i>
-  </small>
+  </span>
 </template>
 
 <template name="instantMessageList">
