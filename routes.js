@@ -22,6 +22,7 @@ export const pageNameHash = {
   advertising: '廣告宣傳',
   productCenterBySeason: '產品中心',
   productCenterByCompany: '產品中心',
+  arenaInfo: '最萌亂鬥大賽',
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
   ruleAgendaList: '規則討論',
@@ -224,6 +225,23 @@ FlowRouter.route('/advertising', {
   name: 'advertising',
   action() {
     DocHead.setTitle(Meteor.settings.public.websiteName + ' - 廣告宣傳');
+  }
+});
+
+const arenaInfoRoute = FlowRouter.group({
+  prefix: '/arenaInfo',
+  name: 'arenaInfoRoute'
+});
+arenaInfoRoute.route('/', {
+  name: 'arenaInfoRedirect',
+  action() {
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 最萌亂鬥大賽');
+  }
+});
+arenaInfoRoute.route('/:arenaId', {
+  name: 'arenaInfo',
+  action() {
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 最萌亂鬥大賽');
   }
 });
 

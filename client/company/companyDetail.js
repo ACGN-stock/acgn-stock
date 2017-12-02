@@ -6,6 +6,8 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { dbArena } from '/db/dbArena';
+import { dbArenaFighters, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
@@ -18,6 +20,7 @@ import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, vo
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat } from '../utils/helpers.js';
+import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 const rShowAllTags = new ReactiveVar(false);
 
 inheritedShowLoadingOnSubscribing(Template.companyDetail);
@@ -1023,6 +1026,209 @@ Template.companyEmployeeList.events({
     }
     else if (Meteor.user() && message.length) {
       Meteor.customCall('setEmployeeMessage', templateInstance.data._id, message);
+    }
+  }
+});
+
+inheritedShowLoadingOnSubscribing(Template.companyArenaInfo);
+Template.companyArenaInfo.onCreated(function() {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const companyId = FlowRouter.getParam('companyId');
+    if (companyId) {
+      this.subscribe('companyArenaInfo', companyId);
+    }
+  });
+});
+Template.companyArenaInfo.helpers({
+  currentArenaLinkHref() {
+    const arenaData = dbArena.findOne({}, {
+      sort: {
+        beginDate: -1
+      }
+    });
+    const arenaId = arenaData._id;
+
+    return FlowRouter.path('arenaInfo', {arenaId});
+  },
+  currentArenaData() {
+    const arenaData = dbArena.findOne({}, {
+      sort: {
+        beginDate: -1
+      }
+    });
+    if (arenaData) {
+      arenaData.companyData = this;
+      arenaData.joinData = dbArenaFighters.findOne({
+        arenaId: arenaData._id,
+        companyId: this._id
+      });
+
+      return arenaData;
+    }
+    else {
+      return false;
+    }
+  },
+  getAttributeNumber(attribute, number) {
+    return getAttributeNumber(attribute, number);
+  },
+  inCanJoinTime() {
+    return Date.now() < this.joinEndDate.getTime();
+  }
+});
+Template.companyArenaInfo.events({
+  'click [data-action="joinArena"]'(event, templateInstance) {
+    const {_id, companyName} = templateInstance.data;
+    const message = '你確定要讓「' + companyName + '」報名這一屆的最萌亂鬥大賽嗎？\n報名後將無法取消，請輸入「' + companyName + '」以表示確定。';
+    alertDialog.prompt(message, function(confirmMessage) {
+      if (confirmMessage === companyName) {
+        Meteor.customCall('joinArena', _id);
+      }
+    });
+  },
+  'click [data-invest]'(event, templateInstance) {
+    event.preventDefault();
+    const {_id, companyName} = templateInstance.data;
+    const investTarget = $(event.currentTarget).attr('data-invest');
+    const user = Meteor.user();
+    if (! user) {
+      alertDialog.alert('您尚未登入！');
+
+      return false;
+    }
+    const minimumUnitPrice = 1;
+    const maximumUnitPrice = user.profile.money;
+    const message = (
+      '請輸入要您要投資在「' + companyName + '」' +
+      '的屬性「' + investTarget.toUpperCase() + '」的金錢：' +
+      `(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`
+    );
+    alertDialog.prompt(message, function(investMoney) {
+      const intInvestMoney = parseInt(investMoney, 10);
+      if (! intInvestMoney) {
+        return false;
+      }
+      if (intInvestMoney < minimumUnitPrice || intInvestMoney > maximumUnitPrice) {
+        alertDialog.alert('不正確的金額設定！');
+
+        return false;
+      }
+      Meteor.customCall('investArenaFigher', _id, investTarget, intInvestMoney);
+    });
+  }
+});
+
+inheritUtilForm(Template.arenaStrategyForm);
+Template.arenaStrategyForm.onCreated(function() {
+  this.validateModel = validateStrategyModel;
+  this.handleInputChange = handleStrategyInputChange;
+  this.saveModel = saveStrategyModel;
+  this.model.set(this.data.joinData);
+  this.draggingIndex = null;
+});
+Template.arenaStrategyForm.onRendered(function() {
+  this.model.set(this.data.joinData);
+});
+function validateStrategyModel(model) {
+  const error = {};
+  if (model.spCost > model.sp) {
+    error.spCost = '特攻消耗數值不可超過角色的SP值！';
+  }
+  else if (model.spCost < 1) {
+    error.spCost = '特攻消耗數值不可低於1！';
+  }
+
+  if (_.size(error) > 0) {
+    return error;
+  }
+}
+function handleStrategyInputChange(event) {
+  switch (event.currentTarget.name) {
+    case 'spCost': {
+      const model = this.model.get();
+      model.spCost = parseInt(event.currentTarget.value, 10);
+      this.model.set(model);
+      break;
+    }
+    case 'normalManner': {
+      const model = this.model.get();
+      model.normalManner = this.$input
+        .filter('[name="normalManner"]')
+        .map((index, input) => {
+          return input.value;
+        })
+        .toArray();
+      this.model.set(model);
+      break;
+    }
+    case 'specialManner': {
+      const model = this.model.get();
+      model.specialManner = this.$input
+        .filter('[name="specialManner"]')
+        .map((index, input) => {
+          return input.value;
+        })
+        .toArray();
+      this.model.set(model);
+      break;
+    }
+    default: {
+      inheritedHandleInputChange.call(this, event);
+      break;
+    }
+  }
+}
+function saveStrategyModel(model) {
+  const submitData = _.pick(model, 'spCost', 'attackSequence', 'normalManner', 'specialManner');
+  Meteor.customCall('decideArenaStrategy', model.companyId, submitData);
+}
+Template.arenaStrategyForm.helpers({
+  getManner(type, index) {
+    const model = Template.instance().model.get();
+    const fieldName = type + 'Manner';
+
+    return model[fieldName][index];
+  },
+  hasEnemy() {
+    return this.fighterSequence.length > 0;
+  },
+  enemyList() {
+    const fighterSequence = this.fighterSequence;
+    const model = Template.instance().model.get();
+
+    return _.map(model.attackSequence, (attackIndex) => {
+      return fighterSequence[attackIndex];
+    });
+  }
+});
+Template.arenaStrategyForm.events({
+  'dragstart [data-drag]'(event, templateInstance) {
+    templateInstance.draggingIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
+  },
+  'dragover [data-drag]'(event, templateInstance) {
+    const draggingIndex = templateInstance.draggingIndex;
+    const selfDraggingIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
+    if (draggingIndex !== null && draggingIndex !== selfDraggingIndex) {
+      event.preventDefault();
+    }
+  },
+  'dragend [data-drag]'(event, templateInstance) {
+    templateInstance.draggingIndex = null;
+  },
+  'drop [data-drag]'(event, templateInstance) {
+    const draggingIndex = templateInstance.draggingIndex;
+    if (draggingIndex !== null) {
+      const model = templateInstance.model.get();
+      const attackSequence = model.attackSequence;
+      const draggingItem = attackSequence[draggingIndex];
+      const dropIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
+      const dropItem = attackSequence[dropIndex];
+      attackSequence[dropIndex] = draggingItem;
+      attackSequence[draggingIndex] = dropItem;
+      templateInstance.model.set(model);
     }
   }
 });

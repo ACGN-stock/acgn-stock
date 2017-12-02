@@ -5,6 +5,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
+import { dbArena } from '/db/dbArena';
 import { dbSeason } from '/db/dbSeason';
 import { pageNameHash } from '/routes';
 import { rAccountDialogMode } from './accountDialog';
@@ -38,6 +39,7 @@ Template.nav.onCreated(function() {
       return false;
     }
     this.subscribe('currentSeason');
+    this.subscribe('currentArena');
   });
   this.autorun(() => {
     if (shouldStopSubscribe()) {
@@ -84,6 +86,23 @@ Template.nav.helpers({
     if (seasonData) {
       return {
         seasonId: seasonData._id
+      };
+    }
+    else {
+      return {};
+    }
+  },
+  currentArenaParams() {
+    const arenaData = dbArena
+      .findOne({}, {
+        sort: {
+          beginDate: -1
+        }
+      });
+
+    if (arenaData) {
+      return {
+        arenaId: arenaData._id
       };
     }
     else {

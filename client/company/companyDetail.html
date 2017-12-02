@@ -295,6 +295,19 @@
         {{> companyEmployeeList}}
       {{/if}}
       <div class="col-12 border-grid">
+        <a class="d-block h4" href="#" data-toggle-panel="arena">
+          最萌亂鬥大賽
+          {{#if isDisplayPanel 'arena'}}
+            <i class="fa fa-folder-open" aria-hidden="true"></i>
+          {{else}}
+            <i class="fa fa-folder" aria-hidden="true"></i>
+          {{/if}}
+        </a>
+      </div>
+      {{#if isDisplayPanel 'arena'}}
+        {{> companyArenaInfo}}
+      {{/if}}
+      <div class="col-12 border-grid">
         <a class="d-block h4" href="#" data-toggle-panel="log">
           所有紀錄
           {{#if isDisplayPanel 'log'}}
@@ -636,6 +649,242 @@
         </div>
       {{/each}}
     </div>
+  </div>
+</template>
+
+<template name="companyArenaInfo">
+  <div class="col-12 border-grid py-1">
+    {{#with currentArenaData}}
+      <div>
+        <a href="{{currentArenaLinkHref}}">本次最萌亂鬥大賽</a>起迄時間為：
+        {{formatDateText currentArenaData.beginDate}}~
+        {{formatDateText currentArenaData.endDate}}
+      </div>
+      <div>報名截止時間為：{{formatDateText currentArenaData.joinEndDate}}</div>
+      {{#if this.joinData}}
+        <div>
+          {{companyData.companyName}}已經報名參加這一屆的最萌亂鬥大賽。目前的屬性值如下：
+        </div>
+      {{else}}
+        <div>
+          {{companyData.companyName}}並沒有參加這一屆的最萌亂鬥大賽！
+          {{#if isUserId companyData.manager}}
+            {{#if inCanJoinTime}}
+              <button class="btn btn-primary btn-sm" type="button" data-action="joinArena">
+                報名參賽
+              </button>
+            {{/if}}
+          {{/if}}
+        </div>
+      {{/if}}
+      {{#with this.joinData}}
+        <div class="mb-1">
+          <a
+            class="d-inline-block d-sm-none"
+            href="#"
+            title="投資加點"
+            data-invest="hp"
+          >
+            HP：
+          </a>
+          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">HP：</span>
+          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            {{getAttributeNumber 'hp' this.hp}}
+            (已投資${{currencyFormat this.hp}})
+          </span>
+          <button
+            class="btn btn-success btn-sm d-none d-sm-inline-block"
+            type="button"
+            data-invest="hp"
+          >
+            投資加點
+          </button>
+        </div>
+        <div class="mb-1">
+          <a
+            class="d-inline-block d-sm-none"
+            href="#"
+            title="投資加點"
+            data-invest="sp"
+          >
+            SP：
+          </a>
+          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">SP：</span>
+          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            {{getAttributeNumber 'sp' this.sp}}
+            (已投資${{currencyFormat this.sp}})
+          </span>
+          <button
+            class="btn btn-success btn-sm d-none d-sm-inline-block"
+            type="button"
+            data-invest="sp"
+          >
+            投資加點
+          </button>
+        </div>
+        <div class="mb-1">
+          <a
+            class="d-inline-block d-sm-none"
+            href="#"
+            title="投資加點"
+            data-invest="atk"
+          >
+            ATK：
+          </a>
+          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">ATK：</span>
+          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            {{getAttributeNumber 'atk' this.atk}}
+            (已投資${{currencyFormat this.atk}})
+          </span>
+          <button
+            class="btn btn-success btn-sm d-none d-sm-inline-block"
+            type="button"
+            data-invest="atk"
+          >
+            投資加點
+          </button>
+        </div>
+        <div class="mb-1">
+          <a
+            class="d-inline-block d-sm-none"
+            href="#"
+            title="投資加點"
+            data-invest="def"
+          >
+            DEF：
+          </a>
+          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">DEF：</span>
+          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            {{getAttributeNumber 'def' this.def}}
+            (已投資${{currencyFormat this.def}})
+          </span>
+          <button
+            class="btn btn-success btn-sm d-none d-sm-inline-block"
+            type="button"
+            data-invest="def"
+          >
+            投資加點
+          </button>
+        </div>
+        <div class="mb-1">
+          <a
+            class="d-inline-block d-sm-none"
+            href="#"
+            title="投資加點"
+            data-invest="agi"
+          >
+            AGI：
+          </a>
+          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">AGI：</span>
+          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            {{getAttributeNumber 'agi' this.agi}}
+            (已投資${{currencyFormat this.agi}})
+          </span>
+          <button
+            class="btn btn-success btn-sm d-none d-sm-inline-block"
+            type="button"
+            data-invest="agi"
+          >
+            投資加點
+          </button>
+        </div>
+      {{/with}}
+      {{#if isUserId this.joinData.manager}}
+        {{> arenaStrategyForm}}
+      {{/if}}
+    {{else}}
+      <div>現在並沒有舉辦最萌亂鬥大賽！</div>
+    {{/with}}
+  </div>
+</template>
+
+<template name="arenaStrategyForm">
+  <div class="mt-3 row">
+    <form class="col-12 offset-md-2 col-md-8 offset-lg-3 col-lg-6 py-1" style="border: 1px solid #999;">
+      <h5>決定這一屆大賽的賽場策略：</h5>
+      <div class="form-group">
+        <label for="spCost">設定特攻消耗數值：</label>
+        <input
+          class="form-control"
+          type="number"
+          name="spCost"
+          value="{{valueOf 'spCost'}}"
+        />
+        <small class="form-text text-warning">數值越高越容易使出特殊攻擊，但也會越快耗盡SP。</small>
+        {{{errorHtmlOf 'spCost'}}}
+      </div>
+      <div class="form-group">
+        <label for="normalManner">設定普通攻擊招式名：</label>
+        <input
+          class="form-control"
+          type="text"
+          name="normalManner"
+          value="{{getManner 'normal' 0}}"
+          placeholder="請設定第一招普通攻擊的招式名稱"
+        />
+        <input
+          class="form-control"
+          type="text"
+          name="normalManner"
+          value="{{getManner 'normal' 1}}"
+          placeholder="請設定第二招普通攻擊的招式名稱"
+        />
+        <input
+          class="form-control"
+          type="text"
+          name="normalManner"
+          value="{{getManner 'normal' 2}}"
+          placeholder="請設定第三招普通攻擊的招式名稱"
+        />
+      </div>
+      <div class="form-group">
+        <label for="specialManner">設定特殊攻擊招式名：</label>
+        <input
+          class="form-control"
+          type="text"
+          name="specialManner"
+          value="{{getManner 'special' 0}}"
+          placeholder="請設定第一招特殊攻擊的招式名稱"
+        />
+        <input
+          class="form-control"
+          type="text"
+          name="specialManner"
+          value="{{getManner 'special' 1}}"
+          placeholder="請設定第二招特殊攻擊的招式名稱"
+        />
+        <input
+          class="form-control"
+          type="text"
+          name="specialManner"
+          value="{{getManner 'special' 2}}"
+          placeholder="請設定第三招特殊攻擊的招式名稱"
+        />
+      </div>
+      {{#if hasEnemy}}
+        <div class="form-group">
+          <label for="spCost">拖曳參賽者以排列攻擊優先順序：</label>
+          <div class="form-control" style="max-height: 400px; overflow-y: auto;">
+            {{#each enemyList}}
+              <div
+                class="px-1 py-1"
+                style="border: 1px solid #DDD; cursor: move;"
+                draggable="true"
+                data-drag="{{@index}}"
+              >
+                {{>companyLink}}
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      {{else}}
+        <div class="text-info">報名尚未截止，暫時無法設定攻擊優先順序。</div>
+      {{/if}}
+      <div class="text-right">
+        <hr />
+        <button class="btn btn-primary" type="submit">送出</button>
+      </div>
+    </form>
   </div>
 </template>
 

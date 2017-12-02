@@ -66,7 +66,10 @@ export const logTypeList = [
   '解除查封', //userId0以「message」的理由解除了「companyId」公司的查封關停狀態。
   '公司更名', //userId0對公司進行了更名動作，舊名：「message」。
   '產品下架', //userId0以「message」的理由將「companyId」公司的產品「productId」給下架了，並追回了因該產品所產生的營利$price。
-  '撤銷廣告' //userId0將userId1發布的廣告「message」給撤銷了。
+  '撤銷廣告', //userId0將userId1發布的廣告「message」給撤銷了。
+  '亂鬥報名', //userId0替「companyId」公司報名參加了這一屆的最萌亂鬥大賽！
+  '亂鬥加強', //userId0對這一屆最萌亂鬥大賽參賽者「companyId」公司的message能力值投資了$amount的金錢！
+  '亂鬥營利' //「companyId」公司在這一屆最萌亂鬥大賽中表現出眾，獲得了$amount的營利金額！
 ];
 
 export const accuseLogTypeList = [
