@@ -14,8 +14,7 @@ export function startArenaFight() {
       beginDate: -1
     },
     fields: {
-      _id: 1,
-      fighterSequence: 1
+      _id: 1
     }
   });
   const arenaId = lastArenaData._id;
@@ -61,12 +60,18 @@ export function startArenaFight() {
   let round = 1;
   //直到戰到剩下一人為止
   while (loser.length < fighterListBySequence.length - 1) {
-    //所有存活者依序行動
+    //超過十萬回合後自動中止
+    if (round > 100000) {
+      console.log('round > 100000!');
+      break;
+    }
+    //所有參賽者依序攻擊
     for (const attacker of fighterListBySequence) {
+      //跳過已倒下參賽者的行動
       if (attacker.currentHp <= 0) {
         continue;
       }
-      //取得防禦者
+      //依此攻擊者的攻擊優先順序取得防禦者
       let defender;
       for (const attackTargetIndex of attacker.attackSequence) {
         defender = fighterListBySequence[attackTargetIndex];
@@ -87,7 +92,7 @@ export function startArenaFight() {
       //決定使用的招式
       arenaLog.attackManner = Math.floor((Math.random() * MAX_MANNER_SIZE) + 1);
       //決定使用特殊攻擊還是普通攻擊
-      if (attacker.spCost > attacker.currentSp) {
+      if (attacker.currentSp >= attacker.spCost) {
         const randomSp = Math.floor((Math.random() * 10) + 1);
         if (attacker.spCost >= randomSp) {
           attacker.currentSp -= attacker.spCost;
@@ -96,6 +101,7 @@ export function startArenaFight() {
       }
       //決定造成的傷害
       arenaLog.damage = 0;
+      //特殊攻擊時傷害等於攻擊者atk
       if (arenaLog.attackManner < 0) {
         arenaLog.damage = attacker.atk;
       }
@@ -121,13 +127,14 @@ export function startArenaFight() {
           }
         }
       }
+      arenaLog.defenderHp = defender.currentHp;
       arenaLogBulk.insert(arenaLog);
       sequence += 1;
     }
     //回合結束，所有存活者回復一點sp
     _.each(fighterListBySequence, (fighter) => {
       if (fighter.currentHp > 0) {
-        fighter.currentHp = Math.min(fighter.currentSp + 1, fighter.sp);
+        fighter.currentSp = Math.min(fighter.currentSp + 1, fighter.sp);
       }
     });
     round += 1;
@@ -153,11 +160,14 @@ export function startArenaFight() {
     });
     logBulk.execute();
   }
-  //取得最後贏家
-  const lastWinnder = _.find(fighterListBySequence, (fighter) => {
+  //取得所有存活者
+  const aliveList = _.filter(fighterListBySequence, (fighter) => {
     return fighter.currentHp > 0;
   });
-  const winnerList = [lastWinnder.companyId].concat(loser.reverse());
+  //取得最後贏家
+  const sortedWinnerList = _.sortBy(aliveList, 'currentHp');
+  const sortedWinnerIdList = _.pluck(sortedWinnerList, 'companyId');
+  const winnerList = sortedWinnerIdList.concat(loser.reverse());
   dbArena.update(arenaId, {
     $set: {
       winnerList: winnerList,
