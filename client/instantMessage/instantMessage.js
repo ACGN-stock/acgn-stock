@@ -41,7 +41,7 @@ function queryInstantMessage() {
 }
 Template.instantMessage.helpers({
   isDontInterruptButtonClass() {
-    return rDontInterrupt.get() ? 'btn btn-sm btn-warning float-right mr-1' : 'btn btn-sm btn-outline-warning float-right mr-1';
+    return rDontInterrupt.get() ? 'btn btn-sm btn-warning float-right mr-1' : 'btn btn-sm btn-secondary float-right mr-1';
   }
 });
 Template.instantMessage.events({
@@ -146,7 +146,7 @@ Template.instantMessageFilterButton.helpers({
       return 'btn btn-sm btn-primary';
     }
     else {
-      return 'btn btn-sm btn-outline-primary';
+      return 'btn btn-sm btn-secondary';
     }
   },
   btnText() {
@@ -208,7 +208,7 @@ Template.instantMessageFilterById.events({
       message: `
         <div>請輸入公司識別碼：</div>
         <div><small class="text-info">使用者識別碼可以在公司細節頁面的網址列中取得。</small></div>
-        <div><small>http://acgn-stock.com/company/<span class="text-danger">識別碼</span></small></div>
+        <div><small>http://acgn-stock.com/company/detail/<span class="text-danger">識別碼</span></small></div>
       `,
       defaultValue: '',
       callback: function(companyId) {

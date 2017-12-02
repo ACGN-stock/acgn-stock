@@ -14,7 +14,7 @@ Template.fscStock.onCreated(function() {
       return false;
     }
     const userId = '!FSC';
-    this.subscribe('accountOwnStocks', userId, ownStocksOffset.get());
+    this.subscribe('fscOwnStocks', userId, ownStocksOffset.get());
   });
 });
 Template.fscStock.helpers({
@@ -27,7 +27,7 @@ Template.fscStock.helpers({
   },
   paginationData() {
     return {
-      useVariableForTotalCount: 'totalCountOfAccountOwnStocks',
+      useVariableForTotalCount: 'totalCountOfFSCOwnStocks',
       dataNumberPerPage: 20,
       offset: ownStocksOffset
     };
