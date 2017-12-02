@@ -21,8 +21,10 @@ export function createOrder(orderData) {
     tradeTools.logBulk.insert({
       logType: '公司釋股',
       companyId: orderData.companyId,
-      price: orderData.unitPrice,
-      amount: orderData.amount,
+      data: {
+        price: orderData.unitPrice,
+        amount: orderData.amount
+      },
       createdAt: tradeTools.createdAt
     });
     tradeTools.companiesBulk
@@ -40,8 +42,10 @@ export function createOrder(orderData) {
       logType: (orderData.orderType === '購入') ? '購買下單' : '販賣下單',
       userId: [orderData.userId],
       companyId: orderData.companyId,
-      price: orderData.unitPrice,
-      amount: orderData.amount,
+      data: {
+        price: orderData.unitPrice,
+        amount: orderData.amount
+      },
       createdAt: tradeTools.createdAt
     });
   }
@@ -81,9 +85,11 @@ export function createOrder(orderData) {
       logType: '訂單完成',
       userId: [orderData.userId],
       companyId: orderData.companyId,
-      price: orderData.unitPrice,
-      amount: orderData.amount,
-      message: orderData.orderType,
+      data: {
+        orderType: orderData.orderType,
+        price: orderData.unitPrice,
+        amount: orderData.amount
+      },
       createdAt: new Date(orderData.createdAt.getTime() + (tradeList.length * 2) + 1)
     });
   }
@@ -258,8 +264,10 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
       logType: '交易紀錄',
       userId: logUserId,
       companyId: companyId,
-      price: tradeData.price,
-      amount: tradeData.amount,
+      data: {
+        price: tradeData.price,
+        amount: tradeData.amount
+      },
       createdAt: new Date(basicCreatedAtTime + (index * 2) + 1)
     });
     //記錄誰的股份有增加
@@ -284,9 +292,11 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
         logType: '訂單完成',
         userId: [removeOrderData.userId],
         companyId: removeOrderData.companyId,
-        price: removeOrderData.unitPrice,
-        amount: removeOrderData.amount,
-        message: removeOrderData.orderType,
+        data: {
+          orderType: removeOrderData.orderType,
+          price: removeOrderData.unitPrice,
+          amount: removeOrderData.amount
+        },
         createdAt: new Date(basicCreatedAtTime + (index * 2) + 2)
       });
     }

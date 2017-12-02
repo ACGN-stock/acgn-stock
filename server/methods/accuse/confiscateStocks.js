@@ -36,8 +36,10 @@ function confiscateStocks(user, {userId, message}) {
       logType: '沒收股份',
       userId: [user._id, userId],
       companyId: companyId,
-      amount: stocks,
-      message: message,
+      data: {
+        reason: message,
+        stocks
+      },
       createdAt: createdAt
     });
     if (dbDirectors.find({companyId, userId: '!FSC'}).count() > 0) {

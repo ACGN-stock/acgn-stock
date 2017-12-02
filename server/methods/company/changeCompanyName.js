@@ -33,7 +33,9 @@ function changeCompanyName(user, companyId, companyName) {
   dbLog.insert({
     logType: '公司更名',
     userId: [user._id],
-    message: companyData.companyName,
+    data: {
+      oldCompanyName: companyData.companyName
+    },
     createdAt: new Date()
   });
   dbCompanies.update(companyId, {

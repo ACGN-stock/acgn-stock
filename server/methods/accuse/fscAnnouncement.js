@@ -29,7 +29,7 @@ function fscAnnouncement(user, {userIds, companyId, message}) {
     logType: '金管通告',
     userId: [user._id, ...nonEmptyUserIds],
     companyId,
-    message,
+    data: { message },
     createdAt: new Date()
   });
 }

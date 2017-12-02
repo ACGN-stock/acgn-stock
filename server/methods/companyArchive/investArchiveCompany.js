@@ -69,8 +69,10 @@ export function investArchiveCompany(user, companyId) {
       logType: '參與投資',
       userId: [userId],
       companyId: companyId,
-      message: archiveCompanyData.name,
-      amount: amount,
+      data: {
+        companyName: archiveCompanyData.name,
+        fund: amount
+      },
       createdAt: createdAt
     });
     Meteor.users.update(userId, {
@@ -95,8 +97,9 @@ export function investArchiveCompany(user, companyId) {
         logType: '公司復活',
         userId: archiveCompanyData.invest,
         companyId: companyId,
-        message: managerId,
-        amount: amount,
+        data: {
+          manager: managerId
+        },
         createdAt: new Date(createdAt.getTime() + 1)
       });
       const invest = _.map(archiveCompanyData.invest, (userId) => {

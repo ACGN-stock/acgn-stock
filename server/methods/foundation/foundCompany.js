@@ -102,15 +102,17 @@ export function foundCompany(user, foundCompanyData) {
       logType: '創立公司',
       userId: [userId],
       companyId: foundCompanyData._id,
-      message: companyName,
+      data: { companyName },
       createdAt: createdAt
     });
     dbLog.insert({
       logType: '參與投資',
       userId: [userId],
       companyId: foundCompanyData._id,
-      message: foundCompanyData.companyName,
-      amount: Meteor.settings.public.founderEarnestMoney,
+      data: {
+        companyName,
+        fund: Meteor.settings.public.founderEarnestMoney
+      },
       createdAt: new Date(createdAt.getTime() + 1)
     });
     Meteor.users.update(userId, {
