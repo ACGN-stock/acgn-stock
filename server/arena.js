@@ -61,8 +61,8 @@ export function startArenaFight() {
   //直到戰到剩下一人為止
   while (loser.length < fighterListBySequence.length - 1) {
     //超過十萬回合後自動中止
-    if (round > 100000) {
-      console.log('round > 100000!');
+    if (round > 500) {
+      console.log('round > 500!');
       break;
     }
     //所有參賽者依序攻擊

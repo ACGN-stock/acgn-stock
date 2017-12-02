@@ -112,19 +112,19 @@
             <div>{{>companyLink fighter.companyId}}</div>
           </td>
           <td class="text-right text-truncate">
-            {{fighter.hp}}
+            {{getAttributeNumber fighter 'hp'}}
           </td>
           <td class="text-right text-truncate">
-            {{fighter.sp}}
+            {{getAttributeNumber fighter 'sp'}}
           </td>
           <td class="text-right text-truncate">
-            {{fighter.atk}}
+            {{getAttributeNumber fighter 'atk'}}
           </td>
           <td class="text-right text-truncate">
-            {{fighter.def}}
+            {{getAttributeNumber fighter 'def'}}
           </td>
           <td class="text-right text-truncate">
-            {{fighter.agi}}
+            {{getAttributeNumber fighter 'agi'}}
           </td>
           <td class="text-center text-truncate">
             {{fighter.winnerIndex}}

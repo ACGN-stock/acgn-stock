@@ -5,7 +5,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbArena } from '/db/dbArena';
-import { dbArenaFighters } from '/db/dbArenaFighters';
+import { dbArenaFighters, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbArenaLog } from '/db/dbArenaLog';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -209,7 +209,7 @@ Template.arenaFighterTable.helpers({
             return (fighter1.createdAt.getTime() - fighter2.createdAt.getTime()) * sortDir * -1;
           }
           else {
-            return agi1 - agi2 * sortDir;
+            return (agi1 - agi2) * sortDir;
           }
         }
         default: {
@@ -217,6 +217,9 @@ Template.arenaFighterTable.helpers({
         }
       }
     });
+  },
+  getAttributeNumber(fighter, attributeName) {
+    return getAttributeNumber(attributeName, fighter[attributeName]);
   }
 });
 Template.arenaFighterTable.events({

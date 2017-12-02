@@ -1134,11 +1134,14 @@ Template.arenaStrategyForm.onRendered(function() {
 });
 function validateStrategyModel(model) {
   const error = {};
-  if (model.spCost > model.sp) {
+  if (model.spCost > getAttributeNumber('sp', model.sp)) {
     error.spCost = '特攻消耗數值不可超過角色的SP值！';
   }
   else if (model.spCost < 1) {
     error.spCost = '特攻消耗數值不可低於1！';
+  }
+  else if (model.spCost > 10) {
+    error.spCost = '特攻消耗數值不可高於10！';
   }
 
   if (_.size(error) > 0) {
@@ -1183,7 +1186,11 @@ function handleStrategyInputChange(event) {
 }
 function saveStrategyModel(model) {
   const submitData = _.pick(model, 'spCost', 'attackSequence', 'normalManner', 'specialManner');
-  Meteor.customCall('decideArenaStrategy', model.companyId, submitData);
+  Meteor.customCall('decideArenaStrategy', model.companyId, submitData, (error) => {
+    if (! error) {
+      alertDialog.alert('決策完成！');
+    }
+  });
 }
 Template.arenaStrategyForm.helpers({
   getManner(type, index) {
