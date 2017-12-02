@@ -1094,6 +1094,11 @@ Template.companyArenaInfo.events({
     const {_id, companyName} = templateInstance.data;
     const investTarget = $(event.currentTarget).attr('data-invest');
     const user = Meteor.user();
+    if (! user) {
+      alertDialog.alert('您尚未登入！');
+
+      return false;
+    }
     const minimumUnitPrice = 1;
     const maximumUnitPrice = user.profile.money;
     const message = (
