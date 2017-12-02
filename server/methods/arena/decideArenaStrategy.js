@@ -5,7 +5,7 @@ import { check, Match } from 'meteor/check';
 
 import { resourceManager } from '/server/imports/resourceManager';
 import { dbArena } from '/db/dbArena';
-import { dbArenaFighters } from '/db/dbArenaFighters';
+import { dbArenaFighters, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
 import { debug } from '/server/imports/debug';
 
@@ -88,7 +88,7 @@ function decideArenaStrategy({user, companyId, strategyData}) {
   if (! fighterData) {
     throw new Meteor.Error(403, '這家公司並沒有報名參加這一屆的最萌亂鬥大賽！');
   }
-  if (strategyData.spCost > fighterData.sp) {
+  if (strategyData.spCost > getAttributeNumber('sp', fighterData.sp)) {
     throw new Meteor.Error(403, '特攻消耗數值不可超過角色的SP值！');
   }
   else if (strategyData.spCost > 10) {
