@@ -1133,7 +1133,8 @@ function electManager(seasonData) {
       dbArenaFighters
         .find({}, {
           fields: {
-            _id: 1
+            _id: 1,
+            companyId: 1
           }
         })
         .forEach((fighter) => {
