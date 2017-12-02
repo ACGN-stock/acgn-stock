@@ -57,23 +57,25 @@ function decideArenaStrategy({user, companyId, strategyData}) {
   if (! lastArenaData) {
     throw new Meteor.Error(403, '現在並沒有舉辦最萌亂鬥大賽！');
   }
-  if ((lastArenaData.fighterSequence.length - 1) !== strategyData.attackSequence.length) {
-    throw new Meteor.Error(403, '攻擊優先順序的資料格式錯誤！');
-  }
-  let attackSequenceIsInvalid = false;
-  const attackSequenceSet = new Set();
-  _.some(strategyData.attackSequence, (sequence) => {
-    if (sequence < 0) {
-      attackSequenceIsInvalid = true;
-
-      return true;
+  if (lastArenaData.fighterSequence.length) {
+    if ((lastArenaData.fighterSequence.length - 1) !== strategyData.attackSequence.length) {
+      throw new Meteor.Error(403, '攻擊優先順序的資料格式錯誤！');
     }
-    attackSequenceSet.add(sequence);
+    let attackSequenceIsInvalid = false;
+    const attackSequenceSet = new Set();
+    _.some(strategyData.attackSequence, (sequence) => {
+      if (sequence < 0) {
+        attackSequenceIsInvalid = true;
 
-    return false;
-  });
-  if (attackSequenceIsInvalid || attackSequenceSet.size !== strategyData.attackSequence.length) {
-    throw new Meteor.Error(403, '攻擊優先順序的資料格式錯誤！');
+        return true;
+      }
+      attackSequenceSet.add(sequence);
+
+      return false;
+    });
+    if (attackSequenceIsInvalid || attackSequenceSet.size !== strategyData.attackSequence.length) {
+      throw new Meteor.Error(403, '攻擊優先順序的資料格式錯誤！');
+    }
   }
 
   const arenaId = lastArenaData._id;
@@ -88,6 +90,12 @@ function decideArenaStrategy({user, companyId, strategyData}) {
   }
   if (strategyData.spCost > fighterData.sp) {
     throw new Meteor.Error(403, '特攻消耗數值不可超過角色的SP值！');
+  }
+  else if (strategyData.spCost > 10) {
+    throw new Meteor.Error(403, '特攻消耗數值不可超過10！');
+  }
+  else if (strategyData.spCost < 1) {
+    throw new Meteor.Error(403, '特攻消耗數值不可小於1！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season']);
   dbArenaFighters.update(fighterData._id, {
