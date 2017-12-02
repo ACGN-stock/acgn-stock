@@ -209,7 +209,7 @@ Template.arenaFighterTable.helpers({
             return (fighter1.createdAt.getTime() - fighter2.createdAt.getTime()) * sortDir * -1;
           }
           else {
-            return agi1 - agi2 * sortDir;
+            return (agi1 - agi2) * sortDir;
           }
         }
         default: {
