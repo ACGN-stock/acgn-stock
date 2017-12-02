@@ -158,7 +158,6 @@ Template.arenaFighterTable.onCreated(function() {
   }
 });
 Template.arenaFighterTable.onRendered(function() {
-  console.log('!!!');
   if (Date.now() > this.data.endDate) {
     rFighterSortBy.set('winnerIndex');
     rFighterSortDir.set(1);

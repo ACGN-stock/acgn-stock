@@ -57,12 +57,25 @@ function decideArenaStrategy({user, companyId, strategyData}) {
   if (! lastArenaData) {
     throw new Meteor.Error(403, '現在並沒有舉辦最萌亂鬥大賽！');
   }
-  if (
-    lastArenaData.fighterSequence.length !== strategyData.attackSequence.length ||
-    _.unique(strategyData.attackSequence).length !== strategyData.attackSequence.length
-  ) {
+  if ((lastArenaData.fighterSequence.length - 1) !== strategyData.attackSequence.length) {
     throw new Meteor.Error(403, '攻擊優先順序的資料格式錯誤！');
   }
+  let attackSequenceIsInvalid = false;
+  const attackSequenceSet = new Set();
+  _.some(strategyData.attackSequence, (sequence) => {
+    if (sequence < 0) {
+      attackSequenceIsInvalid = true;
+
+      return true;
+    }
+    attackSequenceSet.add(sequence);
+
+    return false;
+  });
+  if (attackSequenceIsInvalid || attackSequenceSet.size !== strategyData.attackSequence.length) {
+    throw new Meteor.Error(403, '攻擊優先順序的資料格式錯誤！');
+  }
+
   const arenaId = lastArenaData._id;
   const fighterData = dbArenaFighters.findOne({arenaId, companyId}, {
     fields: {

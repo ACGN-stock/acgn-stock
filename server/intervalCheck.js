@@ -1129,20 +1129,21 @@ function electManager(seasonData) {
         }
       });
       const attackSequence = _.range(fighterSequence.length);
-      //隨機設定所有參賽者的攻擊優先順序
-      dbArenaFighters.update(
-        {
-          arenaId: arenaId
-        },
-        {
-          $set: {
-            attackSequence: _.shuffle(attackSequence)
+      const shuffledAttackSequence = _.shuffle(attackSequence);
+      dbArenaFighters
+        .find({}, {
+          fields: {
+            _id: 1
           }
-        },
-        {
-          multi: true
-        }
-      );
+        })
+        .forEach((fighter) => {
+          const thisFighterSequence = _.indexOf(fighterSequence, fighter.companyId);
+          dbArenaFighters.update(fighter._id, {
+            $set: {
+              attackSequence: _.without(shuffledAttackSequence, thisFighterSequence)
+            }
+          });
+        });
     }
   }
 }

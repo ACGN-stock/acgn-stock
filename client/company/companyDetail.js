@@ -1150,17 +1150,23 @@ function handleStrategyInputChange(event) {
     }
     case 'normalManner': {
       const model = this.model.get();
-      model.normalManner = this.$input.filter('[name="normalManner"]').map((index, input) => {
-        return input.value;
-      }).toArray();
+      model.normalManner = this.$input
+        .filter('[name="normalManner"]')
+        .map((index, input) => {
+          return input.value;
+        })
+        .toArray();
       this.model.set(model);
       break;
     }
     case 'specialManner': {
       const model = this.model.get();
-      model.specialManner = this.$input.filter('[name="specialManner"]').map((index, input) => {
-        return input.value;
-      }).toArray();
+      model.specialManner = this.$input
+        .filter('[name="specialManner"]')
+        .map((index, input) => {
+          return input.value;
+        })
+        .toArray();
       this.model.set(model);
       break;
     }
