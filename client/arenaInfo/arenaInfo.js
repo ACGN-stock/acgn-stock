@@ -234,6 +234,8 @@ Template.arenaFighterTable.events({
 
 const rLogOffset = new ReactiveVar(0);
 const rCompanyId = new ReactiveVar('');
+const rFighterIdList = new ReactiveVar([]);
+const rFighterList = new ReactiveVar([]);
 inheritedShowLoadingOnSubscribing(Template.arenaLogList);
 Template.arenaLogList.onCreated(function() {
   rLogOffset.set(0);
@@ -246,8 +248,49 @@ Template.arenaLogList.onCreated(function() {
       this.subscribe('arenaLog', arenaId, rCompanyId.get(), rLogOffset.get());
     }
   });
+  this.autorun(() => {
+    const arenaId = FlowRouter.getParam('arenaId');
+    const fighterIdList = dbArenaFighters.find({arenaId}).map((fighter) => {
+      return fighter.companyId;
+    });
+    rFighterIdList.set(fighterIdList);
+  });
+  const ajaxList = [];
+  this.autorun(() => {
+    _.invoke(ajaxList, 'abort');
+    ajaxList.splice(0);
+    const fighterList = [];
+    _.each(rFighterIdList.get(), (companyId, index) => {
+      const ajaxResult = $.ajax({
+        url: '/companyInfo',
+        data: {
+          id: companyId
+        },
+        dataType: 'json',
+        success: (companyData) => {
+          fighterList[index] = {
+            _id: companyId,
+            name: companyData.name
+          };
+        },
+        error: () => {
+          fighterList[index] = {
+            _id: companyId,
+            name: '???'
+          };
+        }
+      });
+      ajaxList.push(ajaxResult);
+    });
+    $.when(...ajaxList).always(() => {
+      rFighterList.set(fighterList);
+    });
+  });
 });
 Template.arenaLogList.helpers({
+  fighterList() {
+    return rFighterList.get();
+  },
   logList() {
     const arenaId = FlowRouter.getParam('arenaId');
     window.dbArenaLog = dbArenaLog;
@@ -275,7 +318,7 @@ Template.arenaLogList.helpers({
       const companyId = log.attackerId;
       const attacker = dbArenaFighters.findOne({arenaId, companyId});
 
-      return `(SP:${log.attackerSp}-${attacker.spCost})`;
+      return `(SP:${log.attackerSp}<span class="text-danger">-${attacker.spCost}</span>)`;
     }
   },
   displayAttackManaer(log) {
@@ -311,5 +354,11 @@ Template.arenaLogList.helpers({
       dataNumberPerPage: 30,
       offset: rLogOffset
     };
+  }
+});
+Template.arenaLogList.events({
+  'change [name="companyId"]'(event) {
+    const companyId = $(event.currentTarget).val();
+    rCompanyId.set(companyId);
   }
 });

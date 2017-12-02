@@ -147,6 +147,9 @@
           篩選：
           <select class="form-control" name="companyId">
             <option value="">所有參賽者</option>
+            {{#each fighter in fighterList}}
+              <option value="{{fighter._id}}">{{fighter.name}}</option>
+            {{/each}}
           </select>
         </label>
       </div>
@@ -155,7 +158,7 @@
       <div>
         【回合{{log.round}}】
         {{>companyLink log.attackerId}}
-        {{displaySp log}}
+        {{{displaySp log}}}
         的{{displayAttackManaer log}}
         {{#if log.damage}}
           對{{>companyLink log.defenderId}}造成了{{log.damage}}傷害
@@ -170,5 +173,8 @@
         {{/if}}
       </div>
     {{/each}}
+    {{#with paginationData}}
+      {{> pagination}}
+    {{/with}}
   </div>
 </template>
