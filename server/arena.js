@@ -146,15 +146,17 @@ export function startArenaFight() {
   //若有任何擊倒收益，則插入一般紀錄
   if (_.size(gainProfitHash) > 0) {
     const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-    _.each(gainProfitHash, (profit, companyId) => {
+    _.each(gainProfitHash, (reward, companyId) => {
       logBulk.insert({
         logType: '亂鬥營利',
         companyId: companyId,
-        data: { profit }
+        data: {
+          reward
+        }
       });
       dbCompanies.update(companyId, {
         $inc: {
-          profit: profit
+          profit: reward
         }
       });
     });

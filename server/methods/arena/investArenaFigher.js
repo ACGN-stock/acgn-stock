@@ -79,7 +79,7 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
         'profile.money': -1 * investMoney
       }
     });
-    const message = attribute.toUpperCase();
+    const attrName = attribute.toUpperCase();
     const createdAt = new Date();
     //若有上次發薪後的亂鬥加強紀錄，則併為同一筆紀錄
     const existsLogData = dbLog.findOne({
@@ -89,7 +89,9 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
       },
       companyId: companyId,
       logType: '亂鬥加強',
-      data: { attrName: message }
+      data: {
+        attrName
+      }
     });
     if (existsLogData) {
       dbLog.update(existsLogData._id, {
@@ -107,7 +109,7 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
         userId: [userId],
         companyId: companyId,
         data: {
-          attrName: message,
+          attrName: attrName,
           money: investMoney
         },
         createdAt: createdAt

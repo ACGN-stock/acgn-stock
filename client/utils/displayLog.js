@@ -382,10 +382,10 @@ Template.displayLog.helpers({
         return `【最萌亂鬥】${users[0]}替「${company}」公司報名參加了這一屆的最萌亂鬥大賽！`;
       }
       case '亂鬥加強': {
-        return `【最萌亂鬥】${users[0]}對這一屆最萌亂鬥大賽參賽者「${company}」公司的${data.attrName}能力值投資了$${data.money}的金錢！`;
+        return `【最萌亂鬥】${users[0]}對這一屆最萌亂鬥大賽參賽者「${company}」公司的${data.attrName}能力值投資了$${currencyFormat(data.money)}的金錢！`;
       }
       case '亂鬥營利': {
-        return `【最萌亂鬥】「${company}」公司在這一屆最萌亂鬥大賽中表現出眾，獲得了$${data.reward}的營利金額！`;
+        return `【最萌亂鬥】「${company}」公司在這一屆最萌亂鬥大賽中表現出眾，獲得了$${currencyFormat(data.reward)}的營利金額！`;
       }
     }
   }
