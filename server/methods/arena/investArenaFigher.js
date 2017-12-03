@@ -89,7 +89,7 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
       },
       companyId: companyId,
       logType: '亂鬥加強',
-      message: message
+      data: { attrName: message }
     });
     if (existsLogData) {
       dbLog.update(existsLogData._id, {
@@ -97,7 +97,7 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
           createdAt: createdAt
         },
         $inc: {
-          amount: investMoney
+          'data.money': investMoney
         }
       });
     }
@@ -106,8 +106,10 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
         logType: '亂鬥加強',
         userId: [userId],
         companyId: companyId,
-        amount: investMoney,
-        message: message,
+        data: {
+          attrName: message,
+          money: investMoney
+        },
         createdAt: createdAt
       });
     }

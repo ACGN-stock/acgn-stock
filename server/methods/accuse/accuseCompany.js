@@ -39,7 +39,9 @@ function accuseCompany(user, companyId, message) {
     logType: '舉報違規',
     userId: userIds,
     companyId,
-    message,
+    data: {
+      reason: message
+    },
     createdAt: new Date()
   });
 }

@@ -86,8 +86,10 @@ export function investFoundCompany(user, companyId, amount) {
       logType: '參與投資',
       userId: [userId],
       companyId: foundCompanyData._id,
-      message: foundCompanyData.companyName,
-      amount: amount,
+      data: {
+        companyName: foundCompanyData.companyName,
+        fund: amount
+      },
       createdAt: new Date()
     });
     Meteor.users.update(userId, {

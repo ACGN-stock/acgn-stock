@@ -54,7 +54,7 @@ function paySystemSalary(thisPayTime) {
   dbLog.insert({
     logType: '發薪紀錄',
     userId: ['!all'],
-    price: salaryPerPay,
+    data: { salary: salaryPerPay },
     createdAt: thisPayTime
   });
 }
@@ -93,7 +93,7 @@ function paySalaryAndGenerateProfit(thisPayTime) {
       logType: '發薪紀錄',
       userId: employees,
       companyId: company._id,
-      price: company.salary,
+      data: { salary: company.salary },
       createdAt: thisPayTime
     });
 
@@ -110,7 +110,7 @@ function paySalaryAndGenerateProfit(thisPayTime) {
       logType: '員工營利',
       userId: employees,
       companyId: company._id,
-      price: totalProfit,
+      data: { profit: totalProfit },
       createdAt: thisPayTime
     });
   });
@@ -172,7 +172,7 @@ function checkTax(todayBeginTime) {
         logBulk.insert({
           logType: '繳稅逾期',
           userId: [userId],
-          amount: amount,
+          data: { fine: amount },
           createdAt: new Date(createdAtBasicTime)
         });
       }
@@ -200,7 +200,7 @@ function checkTax(todayBeginTime) {
           logBulk.insert({
             logType: '繳稅沒金',
             userId: [userId],
-            amount: directPayMoney,
+            data: { money: directPayMoney },
             createdAt: new Date(createdAtBasicTime + 1)
           });
           imposedMoney += directPayMoney;
@@ -279,8 +279,10 @@ function checkTax(todayBeginTime) {
                 logType: '繳稅沒收',
                 userId: [userId],
                 companyId: stockData.companyId,
-                price: stockData.listPrice,
-                amount: stockData.stocks,
+                data: {
+                  price: stockData.listPrice,
+                  stocks: stockData.stocks
+                },
                 createdAt: new Date(createdAtBasicTime + index + 2)
               });
               //因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
@@ -298,8 +300,10 @@ function checkTax(todayBeginTime) {
                 logType: '繳稅沒收',
                 userId: [userId],
                 companyId: stockData.companyId,
-                price: stockData.listPrice,
-                amount: imposedStocks,
+                data: {
+                  price: stockData.listPrice,
+                  stocks: imposedStocks
+                },
                 createdAt: new Date(createdAtBasicTime + index + 2)
               });
               //因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行

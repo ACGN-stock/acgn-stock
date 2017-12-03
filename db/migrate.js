@@ -1,6 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
+import { MongoInternals } from 'meteor/mongo';
 import { Migrations } from 'meteor/percolate:migrations';
 import { dbAdvertising } from './dbAdvertising';
 import { dbArena } from '/db/dbArena';
@@ -632,6 +633,288 @@ if (Meteor.isServer) {
         });
       }
       dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSasonNumber);
+    }
+  });
+
+  Migrations.add({
+    version: 14,
+    name: 'log - adjust schema & indexing logType',
+    up() {
+      dbLog.rawCollection().createIndex({ logType: 1, createdAt: -1 });
+
+      const logCursor = dbLog.find({ data: { $exists: false }});
+      if (logCursor.count() === 0) {
+        return;
+      }
+
+      let logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+
+      logCursor.forEach((logData, i) => {
+        const updateOperations = {
+          $unset: {
+            productId: 1,
+            price: 1,
+            amount: 1,
+            message: 1
+          }
+        };
+
+        // 將與 indexes 無關的 fields 移至 data，並重新給予適當名稱
+        switch (logData.logType) {
+          case '驗證通過':
+            updateOperations.$set = {
+              'data.money': logData.price
+            };
+            break;
+
+          case '登入紀錄':
+            updateOperations.$set = {
+              'data.ipAddr': logData.message
+            };
+            break;
+
+          case '免費得石':
+            updateOperations.$set = {
+              'data.reason': logData.message,
+              'data.stones': logData.amount
+            };
+            break;
+
+          case '聊天發言':
+            updateOperations.$set = {
+              'data.message': logData.message
+            };
+            break;
+
+          case '發薪紀錄':
+            updateOperations.$set = {
+              'data.salary': logData.price
+            };
+            break;
+
+          case '公司復活':
+            updateOperations.$set = {
+              'data.manager': logData.message
+            };
+            break;
+
+          case '創立公司':
+            updateOperations.$set = {
+              'data.companyName': logData.message
+            };
+            break;
+
+          case '參與投資':
+            updateOperations.$set = {
+              'data.companyName': logData.message,
+              'data.fund': logData.amount
+            };
+            break;
+
+          case '創立失敗':
+            updateOperations.$set = {
+              'data.companyName': logData.message
+            };
+            break;
+
+          case '創立退款':
+            updateOperations.$set = {
+              'data.companyName': logData.message,
+              'data.refund': logData.amount
+            };
+            break;
+
+          case '創立成功':
+            updateOperations.$set = {
+              'data.price': logData.price
+            };
+            break;
+
+          case '創立得股':
+            updateOperations.$set = {
+              'data.fund': logData.price,
+              'data.stocks': logData.amount
+            };
+            break;
+
+          case '購買下單':
+          case '販賣下單':
+          case '公司釋股':
+          case '交易紀錄':
+            updateOperations.$set = {
+              'data.price': logData.price,
+              'data.amount': logData.amount
+            };
+            break;
+
+          case '取消下單':
+          case '系統撤單':
+          case '訂單完成':
+            updateOperations.$set = {
+              'data.orderType': logData.message,
+              'data.price': logData.price,
+              'data.amount': logData.amount
+            };
+            break;
+
+          case '推薦產品':
+            updateOperations.$set = {
+              'data.productId': logData.productId,
+              'data.profit': logData.price
+            };
+            break;
+
+          case '員工營利':
+            updateOperations.$set = {
+              'data.profit': logData.price
+            };
+            break;
+
+          case '公司營利':
+            updateOperations.$set = {
+              'data.profit': logData.amount
+            };
+            break;
+
+          case '營利分紅':
+            updateOperations.$set = {
+              'data.bonus': logData.amount
+            };
+            break;
+
+          case '季度賦稅':
+            updateOperations.$set = {
+              'data.assetTax': logData.amount,
+              'data.zombieTax': logData.price
+            };
+            break;
+
+          case '繳納稅金':
+            updateOperations.$set = {
+              'data.paid': logData.amount
+            };
+            break;
+
+          case '繳稅逾期':
+            updateOperations.$set = {
+              'data.fine': logData.amount
+            };
+            break;
+
+          case '繳稅沒金':
+            updateOperations.$set = {
+              'data.money': logData.amount
+            };
+            break;
+
+          case '繳稅沒收':
+            updateOperations.$set = {
+              'data.price': logData.price,
+              'data.stocks': logData.amount
+            };
+            break;
+
+          case '廣告宣傳':
+          case '廣告追加':
+            updateOperations.$set = {
+              'data.cost': logData.price,
+              'data.message': logData.message
+            };
+            break;
+
+          case '舉報違規':
+            updateOperations.$set = {
+              'data.reason': logData.message,
+              'data.ipAddr': logData.userId[2],
+              'userId': logData.userId.slice(0, 2)
+            };
+            break;
+
+          case '金管通告':
+          case '通報金管':
+            updateOperations.$set = {
+              'data.message': logData.message
+            };
+            break;
+
+          case '禁止舉報':
+          case '禁止下單':
+          case '禁止聊天':
+          case '禁止廣告':
+          case '禁任經理':
+          case '解除舉報':
+          case '解除下單':
+          case '解除聊天':
+          case '解除廣告':
+          case '解除禁任':
+          case '查封關停':
+          case '解除查封':
+            updateOperations.$set = {
+              'data.reason': logData.message
+            };
+            break;
+
+          case '課以罰款':
+          case '退還罰款':
+            updateOperations.$set = {
+              'data.reason': logData.message,
+              'data.fine': logData.amount
+            };
+            break;
+
+          case '沒收股份':
+            updateOperations.$set = {
+              'data.reason': logData.message,
+              'data.stocks': logData.amount
+            };
+            break;
+
+          case '公司更名':
+            updateOperations.$set = {
+              'data.oldCompanyName': logData.message
+            };
+            break;
+
+          case '產品下架':
+            updateOperations.$set = {
+              'data.productId': logData.productId,
+              'data.reason': logData.message,
+              'data.profit': logData.price
+            };
+            break;
+
+          case '撤銷廣告':
+            updateOperations.$set = {
+              'data.message': logData.message
+            };
+            break;
+
+          case '亂鬥報名':
+            break;
+
+          case '亂鬥加強':
+            updateOperations.$set = {
+              'data.attrName': logData.message,
+              'data.money': logData.amount
+            };
+            break;
+
+          case '亂鬥營利':
+            updateOperations.$set = {
+              'data.profit': logData.amount
+            };
+            break;
+        }
+
+        logBulk.find({ _id: new MongoInternals.NpmModule.ObjectID(logData._id._str) }).updateOne(updateOperations);
+
+        if (i % 100000 === 0) {
+          logBulk.execute();
+          logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+        }
+      });
+
+      logBulk.execute();
     }
   });
 

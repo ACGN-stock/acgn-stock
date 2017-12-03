@@ -60,8 +60,10 @@ function buyAdvertising(user, advertisingData) {
     dbLog.insert({
       logType: '廣告宣傳',
       userId: [userId],
-      price: advertisingData.paid,
-      message: advertisingData.message,
+      data: {
+        cost: advertisingData.paid,
+        message: advertisingData.message
+      },
       createdAt: createdAt
     });
     Meteor.users.update(user._id, {

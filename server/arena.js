@@ -150,7 +150,7 @@ export function startArenaFight() {
       logBulk.insert({
         logType: '亂鬥營利',
         companyId: companyId,
-        amount: profit
+        data: { profit }
       });
       dbCompanies.update(companyId, {
         $inc: {

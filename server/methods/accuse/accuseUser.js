@@ -30,8 +30,11 @@ function accuseUser(user, userId, message) {
   }
   dbLog.insert({
     logType: '舉報違規',
-    userId: [user._id, userId, accuseUserData.status.lastLogin.ipAddr],
-    message: message,
+    userId: [user._id, userId],
+    data: {
+      reason: message,
+      ipAddr: accuseUserData.status.lastLogin.ipAddr
+    },
     createdAt: new Date()
   });
 }
