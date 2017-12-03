@@ -65,7 +65,7 @@ Template.accuseRecord.events({
       }
     });
   },
-  'click [data-action="accuseSomething"]'(event) {
+  'click [data-action="contactFsc"]'(event) {
     event.preventDefault();
     alertDialog.dialog({
       type: 'prompt',
@@ -73,7 +73,7 @@ Template.accuseRecord.events({
       message: `請輸入要告知金管會的訊息：<br />（若要舉報使用者，請在該使用者的帳號資訊頁面進行舉報。）`,
       callback: function(message) {
         if (message) {
-          Meteor.customCall('accuseSomething', message);
+          Meteor.customCall('contactFsc', message);
         }
       }
     });
