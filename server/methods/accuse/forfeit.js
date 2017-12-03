@@ -41,7 +41,7 @@ function forfeit(user, {userId, message, amount}) {
       userId: [user._id, userId],
       data: {
         reason: message,
-        find: amount
+        fine: amount
       },
       createdAt: new Date()
     });
