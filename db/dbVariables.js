@@ -1,7 +1,7 @@
 'use strict';
 import { Mongo } from 'meteor/mongo';
 
-//公司產品資料集
+//任意變數資料集
 export const dbVariables = new Mongo.Collection('variables');
 export default dbVariables;
 

@@ -8,7 +8,6 @@ export const dbPrice = new Mongo.Collection('price', {
 });
 export default dbPrice;
 
-//schema
 const schema = new SimpleSchema({
   //股份所屬公司ID
   companyId: {
@@ -25,4 +24,3 @@ const schema = new SimpleSchema({
   }
 });
 dbPrice.attachSchema(schema);
-

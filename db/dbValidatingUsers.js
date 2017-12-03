@@ -2,11 +2,10 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//待驗證的PTT使用者資料集
+//待驗證的使用者資料集
 export const dbValidatingUsers = new Mongo.Collection('validatingUsers');
 export default dbValidatingUsers;
 
-//schema
 const schema = new SimpleSchema({
   //使用者PTT帳號或巴哈姆特帳號(巴哈姆特帳號會前綴以?)
   username: {

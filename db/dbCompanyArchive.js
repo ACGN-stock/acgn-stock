@@ -2,7 +2,7 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//使用者保管庫
+//公司保管庫資料集
 export const dbCompanyArchive = new Mongo.Collection('companyArchive');
 export default dbCompanyArchive;
 
