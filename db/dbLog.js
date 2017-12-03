@@ -315,7 +315,7 @@ export const logTypeList = [
   '亂鬥加強',
 
   /**
-   * 【最萌亂鬥】「companyId」公司在這一屆最萌亂鬥大賽中表現出眾，獲得了$data.profit的營利金額！
+   * 【最萌亂鬥】「companyId」公司在這一屆最萌亂鬥大賽中表現出眾，獲得了$data.reward的營利金額！
    */
   '亂鬥營利'
 ];
