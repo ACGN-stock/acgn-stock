@@ -362,7 +362,7 @@ Template.displayLog.helpers({
         return `【解除查封】${users[0]}以「${sanitizeHtml(data.reason)}」的理由解除了「${company}」公司的查封關停狀態。`;
       }
       case '公司更名': {
-        return `【公司更名】${users[0]}對公司進行了更名動作，舊名：「${sanitizeHtml(data.oldCompanyName)}」。`;
+        return `【公司更名】${users[0]}將「${company}」公司的名稱由「${sanitizeHtml(data.oldCompanyName)}」改為「${sanitizeHtml(data.newCompanyName)}」。`;
       }
       case '產品下架': {
         let result = `【產品下架】${users[0]}以「${sanitizeHtml(data.reason)}」的理由將「${company}」公司的產品「${productSpan(data.productId)}」給下架了`;
