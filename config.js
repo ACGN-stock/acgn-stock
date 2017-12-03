@@ -44,6 +44,7 @@ export const config = {
   announceBonusTime: 86400000, //季度結束前多久開放設定分紅，單位為微秒
   vacationModeZombieTaxPerDay: 500, // 渡假當季的殭屍稅率 (每天)
   minIntervalTimeBetweenVacations: 604800000, // 收假後再次放假所需間隔 (ms)
-  taxExpireTime: 259200000 // 稅單的繳費期限 (ms)
+  taxExpireTime: 259200000, // 稅單的繳費期限 (ms)
+  releaseStocksForNoDealTradeLogLookbackIntervalTime: 86400000 // 低量釋股的成交量統計區間 (ms)
 };
 export default config;
