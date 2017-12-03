@@ -229,6 +229,11 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
   resourceManager.request('doRoundWorks', ['season'], (release) => {
     //當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
+    //若arenaCounter為0，則舉辦最萌亂鬥大賽
+    const arenaCounter = dbVariables.get('arenaCounter');
+    if (arenaCounter === 0) {
+      startArenaFight();
+    }
     //當賽季結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
     //為所有公司與使用者進行排名結算
