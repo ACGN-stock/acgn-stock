@@ -54,9 +54,11 @@ export function retrieveOrder(user, orderId) {
       logType: '取消下單',
       userId: [userId],
       companyId: companyId,
-      price: orderData.unitPrice,
-      amount: leftAmount,
-      message: orderData.orderType,
+      data: {
+        orderType: orderData.orderType,
+        price: orderData.unitPrice,
+        amount: leftAmount
+      },
       createdAt: createdAt
     });
     let increaseMoney = -1;

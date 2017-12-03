@@ -20,7 +20,9 @@ Accounts.onCreateUser((options, user) => {
   dbLog.insert({
     logType: '驗證通過',
     userId: [user._id],
-    price: Meteor.settings.public.beginMoney,
+    data: {
+      money: Meteor.settings.public.beginMoney
+    },
     createdAt: new Date()
   });
   if (user.services && user.services.google) {

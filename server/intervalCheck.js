@@ -95,7 +95,7 @@ export function doLoginObserver() {
             dbLog.insert({
               logType: '登入紀錄',
               userId: [newUserData._id],
-              message: nextLoginData.ipAddr,
+              data: { ipAddr: nextLoginData.ipAddr },
               createdAt: new Date()
             });
           }
@@ -501,9 +501,11 @@ function cancelAllOrder() {
         logType: '系統撤單',
         userId: [userId],
         companyId: companyId,
-        price: orderData.unitPrice,
-        amount: leftAmount,
-        message: orderType,
+        data: {
+          orderType,
+          price: orderData.unitPrice,
+          amount: leftAmount
+        },
         createdAt: now
       });
     });
@@ -740,7 +742,7 @@ export function giveBonusByStocksFromProfit() {
       logBulk.insert({
         logType: '公司營利',
         companyId: companyId,
-        amount: leftProfit,
+        data: { profit: leftProfit },
         createdAt: new Date(now)
       });
       needExecuteLogBulk = true;
@@ -767,7 +769,7 @@ export function giveBonusByStocksFromProfit() {
             logType: '營利分紅',
             userId: [companyData.manager],
             companyId: companyId,
-            amount: managerProfit,
+            data: { bonus: managerProfit },
             createdAt: new Date(now + 1)
           });
           usersBulk
@@ -827,7 +829,7 @@ export function giveBonusByStocksFromProfit() {
             logType: '營利分紅',
             userId: [userId],
             companyId: companyId,
-            amount: bonus,
+            data: { bonus },
             createdAt: new Date(now + 2 + index)
           });
           usersBulk
@@ -922,7 +924,7 @@ export function giveBonusByStocksFromProfit() {
             logType: '營利分紅',
             userId: [directorData.userId],
             companyId: companyId,
-            amount: directorProfit,
+            data: { bonus: directorProfit },
             createdAt: new Date(now + 3 + employeeList.length + index)
           });
           usersBulk
@@ -1008,7 +1010,7 @@ function electManager(seasonData) {
                   logType: '就任經理',
                   userId: [newManager],
                   companyId: companyId,
-                  message: electMessage,
+                  data: { seasonName: electMessage },
                   createdAt: new Date()
                 });
                 companiesBulk
@@ -1071,8 +1073,10 @@ function electManager(seasonData) {
                 logType: '就任經理',
                 userId: [winnerData.userId, companyData.manager],
                 companyId: companyId,
-                message: electMessage,
-                amount: winnerData.stocks,
+                data: {
+                  seasonName: electMessage,
+                  amount: winnerData.stocks
+                },
                 createdAt: new Date()
               });
               companiesBulk

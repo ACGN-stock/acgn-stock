@@ -91,8 +91,10 @@ export function voteProduct(user, productId) {
       logType: '推薦產品',
       userId: [userId],
       companyId: companyId,
-      productId: productId,
-      price: votePrice,
+      data: {
+        productId: productId,
+        profit: votePrice
+      },
       createdAt: new Date()
     });
     dbVoteRecord.insert({companyId, userId});

@@ -22,7 +22,9 @@ function accuseSomething(user, message) {
   dbLog.insert({
     logType: '通報金管',
     userId: [user._id],
-    message: message,
+    data: {
+      reason: message
+    },
     createdAt: new Date()
   });
 }
