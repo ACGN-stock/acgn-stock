@@ -30,10 +30,7 @@ Meteor.methods({
           logType: logData.logType,
           userId: logData.userId,
           companyId: logData.companyId,
-          productId: logData.productId,
-          price: logData.price,
-          amount: logData.amount,
-          message: logData.message,
+          data: logData.data,
           createdAt: logTime
         };
       });
