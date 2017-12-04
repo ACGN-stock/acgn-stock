@@ -2,9 +2,9 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbLog, accuseLogTypeList } from '/db/dbLog';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('accountAccuseLog', function(userId, offset) {
   debug.log('publish accountAccuseLog', {userId, offset});

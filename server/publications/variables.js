@@ -1,8 +1,8 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { dbVariables } from '/db/dbVariables';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('variables', function() {
   debug.log('publish variables');

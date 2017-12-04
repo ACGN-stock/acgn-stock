@@ -4,9 +4,9 @@ import { check, Match } from 'meteor/check';
 
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { resourceManager } from '/server/imports/resourceManager';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 
 Meteor.methods({
   investFoundCompany(companyId, amount) {

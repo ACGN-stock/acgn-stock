@@ -4,8 +4,8 @@ import { check } from 'meteor/check';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbLog } from '/db/dbLog';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   changeFoundCompanyName(companyId, newCompanyName) {

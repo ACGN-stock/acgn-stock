@@ -6,7 +6,7 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { banTypeList } from '/db/users';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   banUser({userId, message, banType}) {

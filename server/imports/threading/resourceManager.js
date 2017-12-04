@@ -1,9 +1,10 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { dbResourceLock } from '/db/dbResourceLock';
+
 import { threadId } from './thread';
-import { debug } from '/server/imports/debug';
+import { dbResourceLock } from '/db/dbResourceLock';
+import { debug } from '/server/imports/utils/debug';
 
 export const resourceManager = {
   request(task, resourceList, callback) {

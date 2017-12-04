@@ -4,8 +4,8 @@ import { check } from 'meteor/check';
 
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('companyArenaInfo', function(companyId) {
   debug.log('publish companyArenaInfo', companyId);

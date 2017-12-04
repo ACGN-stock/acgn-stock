@@ -4,9 +4,9 @@ import { Meteor } from 'meteor/meteor';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
-import { limitMethod } from '/server/imports/rateLimit';
-import { resourceManager } from '/server/imports/resourceManager';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { resourceManager } from '/server/imports/threading/resourceManager';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   contendManager(companyId) {
