@@ -290,13 +290,11 @@ Template.displayLog.helpers({
         return result;
       }
       case '金管通告': {
-        // FIXME 多人通告從未使用，可考慮簡化 code
         const [sourceUser, ...targetUsers] = users;
 
         let result = `【金管通告】${sourceUser}以金管會的名義`;
 
         if (companyId) { // 針對公司
-          const company = company;
           result += `向「${company}」公司`;
 
           if (targetUsers.length > 0) {
