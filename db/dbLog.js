@@ -365,7 +365,6 @@ export const importantAccuseLogTypeList = [
   '撤銷廣告'
 ];
 
-//schema
 const schema = new SimpleSchema({
   // 紀錄類別
   logType: {

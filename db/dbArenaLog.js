@@ -2,13 +2,12 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//紀錄資料集
+//最萌亂鬥大賽紀錄資料集
 export const dbArenaLog = new Mongo.Collection('arenaLog', {
   idGeneration: 'MONGO'
 });
 export default dbArenaLog;
 
-//schema
 const schema = new SimpleSchema({
   //對應的大賽id
   arenaId: {

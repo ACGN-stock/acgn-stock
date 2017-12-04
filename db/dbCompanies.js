@@ -7,7 +7,6 @@ import SimpleSchema from 'simpl-schema';
 export const dbCompanies = new Mongo.Collection('companies');
 export default dbCompanies;
 
-//schema
 const schema = new SimpleSchema({
   //公司名稱
   companyName: {

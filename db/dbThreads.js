@@ -2,11 +2,10 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//交易價格資料集
+//執行緒資訊
 export const dbThreads = new Mongo.Collection('threads');
 export default dbThreads;
 
-//schema
 const schema = new SimpleSchema({
   //是否負則interval work檢查
   doIntervalWork: {
