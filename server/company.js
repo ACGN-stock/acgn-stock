@@ -109,8 +109,7 @@ export function releaseStocksForNoDeal() {
     console.info('releaseStocksForNoDeal triggered! next counter: ', releaseStocksForNoDealCounter);
     updateReleaseStocksForNoDealPeriod();
 
-    // TODO 獨立一個設定值給 checkLogTime
-    const checkLogTime = new Date(Date.now() - (Meteor.settings.public.releaseStocksForNoDealMinCounter * Meteor.settings.public.intervalTimer));
+    const checkLogTime = new Date(Date.now() - Meteor.settings.public.releaseStocksForNoDealTradeLogLookbackIntervalTime);
     const lowPriceThreshold = dbVariables.get('lowPriceThreshold');
     dbCompanies
       .find(
