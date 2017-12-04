@@ -93,6 +93,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
     chairmanTitle: 1,
     chairman: 1,
     pictureSmall: 1,
+    illegalReason: 1,
     totalRelease: 1,
     lastPrice: 1,
     listPrice: 1,

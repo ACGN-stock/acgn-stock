@@ -290,6 +290,42 @@ Template.companyDetail.events({
         Meteor.customCall('resignManager', companyId);
       }
     });
+  },
+  'click [data-action="markCompanyIllegal"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1
+      }
+    });
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '設定違規標記',
+      message: '請輸入違規事由：',
+      defaultValue: companyData.illegalReason,
+      callback: (reason) => {
+        if (! reason) {
+          return;
+        }
+        if (reason.length > 10) {
+          alertDialog.alert('違規標記事由不可大於十個字！');
+
+          return;
+        }
+
+        Meteor.customCall('markCompanyIllegal', companyId, reason);
+      }
+    });
+  },
+  'click [data-action="unmarkCompanyIllegal"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    alertDialog.confirm('是否解除違規標記？', (result) => {
+      if (result) {
+        Meteor.customCall('unmarkCompanyIllegal', companyId);
+      }
+    });
   }
 });
 

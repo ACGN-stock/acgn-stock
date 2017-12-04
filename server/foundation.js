@@ -95,6 +95,7 @@ export function checkFoundCompany() {
             pictureSmall: foundationData.pictureSmall,
             pictureBig: foundationData.pictureBig,
             description: foundationData.description,
+            illegalReason: foundationData.illegalReason,
             totalRelease: totalRelease,
             lastPrice: stockUnitPrice,
             listPrice: stockUnitPrice,
