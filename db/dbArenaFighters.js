@@ -76,11 +76,11 @@ const schema = new SimpleSchema({
     min: 1
   },
   //攻擊優先順序，對應dbArena資料集中的shuffledFighterCompanyIdList陣列的index
-  shuffledFighterCompanyIdList: {
+  attackSequence: {
     type: Array,
     defaultValue: []
   },
-  'shuffledFighterCompanyIdList.$': SimpleSchema.Integer,
+  'attackSequence.$': SimpleSchema.Integer,
   //一般攻擊招式表
   normalManner: {
     type: Array,
