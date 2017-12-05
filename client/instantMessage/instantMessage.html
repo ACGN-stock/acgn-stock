@@ -16,12 +16,21 @@
           {{> instantMessageFilterButton type='競選相關'}}
           {{> instantMessageFilterButton type='經理管理'}}
           {{> instantMessageFilterButton type='推薦產品'}}
-          <button class="btn btn-sm btn-danger float-right" style="margin-top: 4px;"
-            type="button" data-action="clearMessage">
+          {{> instantMessageFilterButton type='最萌亂鬥'}}
+          <button
+            class="btn btn-sm btn-danger float-right"
+            style="margin-top: 4px;"
+            type="button"
+            data-action="clearMessage"
+          >
             清除舊訊息
           </button>
-          <button class="{{isDontInterruptButtonClass}}" style="margin-top: 4px;"
-            type="button" data-action="dontInterrupt">
+          <button
+            class="{{isDontInterruptButtonClass}}"
+            style="margin-top: 4px;"
+            type="button"
+            data-action="dontInterrupt"
+          >
             勿擾模式
           </button>
         </div>

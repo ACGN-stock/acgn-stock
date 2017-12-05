@@ -150,7 +150,9 @@ function banUser(user, {userId, message, banType}) {
     dbLog.insert({
       logType: logType,
       userId: [user._id, userId],
-      message: message,
+      data: {
+        reason: message
+      },
       createdAt: new Date()
     });
   }

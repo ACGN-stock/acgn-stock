@@ -22,7 +22,7 @@ Meteor.methods({
     dbLog.insert({
       logType: '聊天發言',
       userId: [this.userId],
-      message: message,
+      data: { message },
       createdAt: new Date()
     });
   }

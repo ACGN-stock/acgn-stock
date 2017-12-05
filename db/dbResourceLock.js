@@ -5,7 +5,6 @@ import SimpleSchema from 'simpl-schema';
 export const dbResourceLock = new Mongo.Collection('resourceLock');
 export default dbResourceLock;
 
-//schema
 const schema = new SimpleSchema({
   //執行鎖定的程式所在thread id
   threadId: {

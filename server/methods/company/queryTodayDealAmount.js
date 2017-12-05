@@ -26,13 +26,13 @@ function queryTodayDealAmount(companyId) {
       },
       {
         fields: {
-          amount: 1,
+          'data.amount': 1,
           createdAt: 1
         }
       }
     )
     .forEach((logData) => {
-      data += logData.amount;
+      data += logData.data.amount;
     });
 
   return data;

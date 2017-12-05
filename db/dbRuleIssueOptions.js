@@ -6,7 +6,6 @@ import SimpleSchema from 'simpl-schema';
 export const dbRuleIssueOptions = new Mongo.Collection('ruleIssueOptions');
 export default dbRuleIssueOptions;
 
-//schema
 const schema = new SimpleSchema({
   //議題選項標題
   title: {
@@ -28,4 +27,3 @@ const schema = new SimpleSchema({
   }
 });
 dbRuleIssueOptions.attachSchema(schema);
-

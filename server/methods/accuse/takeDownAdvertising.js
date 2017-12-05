@@ -26,7 +26,9 @@ function takeDownAdvertising(user, advertisingId) {
   dbLog.insert({
     logType: '撤銷廣告',
     userId: [user._id, advertisingData.userId],
-    message: advertisingData.message,
+    data: {
+      message: advertisingData.message
+    },
     createdAt: new Date()
   });
   dbAdvertising.remove(advertisingId);

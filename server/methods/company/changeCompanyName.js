@@ -8,17 +8,17 @@ import { limitMethod } from '/server/imports/rateLimit';
 import { debug } from '/server/imports/debug';
 
 Meteor.methods({
-  changeCompanyName(companyId, companyName) {
+  changeCompanyName(companyId, newCompanyName) {
     check(this.userId, String);
     check(companyId, String);
-    check(companyName, String);
-    changeCompanyName(Meteor.user(), companyId, companyName);
+    check(newCompanyName, String);
+    changeCompanyName(Meteor.user(), companyId, newCompanyName);
 
     return true;
   }
 });
-function changeCompanyName(user, companyId, companyName) {
-  debug.log('changeCompanyName', {user, companyId, companyName});
+function changeCompanyName(user, companyId, newCompanyName) {
+  debug.log('changeCompanyName', {user, companyId, newCompanyName});
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
@@ -30,20 +30,27 @@ function changeCompanyName(user, companyId, companyName) {
   if (! companyData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
   }
+
+  const oldCompanyName = companyData.companyName;
+
   dbLog.insert({
     logType: '公司更名',
     userId: [user._id],
-    message: companyData.companyName,
+    companyId: companyId,
+    data: {
+      oldCompanyName,
+      newCompanyName
+    },
     createdAt: new Date()
   });
   dbCompanies.update(companyId, {
     $set: {
-      companyName: companyName
+      companyName: newCompanyName
     }
   });
   dbCompanyArchive.update(companyId, {
     $set: {
-      name: companyName
+      name: newCompanyName
     }
   });
 }

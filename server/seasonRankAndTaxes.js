@@ -51,9 +51,9 @@ function rankCompany(seasonData) {
       {
         $project: {
           companyId: 1,
-          dealAmount: '$amount',
+          dealAmount: '$data.amount',
           dealMoney: {
-            $multiply: ['$amount', '$price']
+            $multiply: ['$data.amount', '$data.price']
           }
         }
       },
@@ -180,9 +180,9 @@ function rankCompany(seasonData) {
       {
         $project: {
           companyId: 1,
-          dealAmount: '$amount',
+          dealAmount: '$data.amount',
           dealMoney: {
-            $multiply: ['$amount', '$price']
+            $multiply: ['$data.amount', '$data.price']
           }
         }
       },
@@ -602,18 +602,20 @@ function generateUserTaxes(userWealthList) {
       if (tax > 0) {
         taxesBulk.insert({
           userId: wealthData._id,
-          tax: tax,
-          zombie: zombie,
+          tax,
+          zombie,
           fine: 0,
           paid: 0,
-          expireDate: expireDate
+          expireDate
         });
         logBulk.insert({
           logType: '季度賦稅',
           userId: [wealthData._id],
-          amount: tax,
-          price: zombie,
-          createdAt: createdAt
+          data: {
+            assetTax: tax,
+            zombieTax: zombie
+          },
+          createdAt
         });
       }
     }
@@ -621,17 +623,19 @@ function generateUserTaxes(userWealthList) {
       taxesBulk.insert({
         userId: wealthData._id,
         tax: 0,
-        zombie: zombie,
+        zombie,
         fine: 0,
         paid: 0,
-        expireDate: expireDate
+        expireDate
       });
       logBulk.insert({
         logType: '季度賦稅',
         userId: [wealthData._id],
-        amount: 0,
-        price: zombie,
-        createdAt: createdAt
+        data: {
+          assetTax: 0,
+          zombieTax: zombie
+        },
+        createdAt
       });
     }
   });

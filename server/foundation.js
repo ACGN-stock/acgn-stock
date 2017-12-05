@@ -53,13 +53,14 @@ export function checkFoundCompany() {
           let totalRelease;
           const generateDirectorStocksList = ({userId, amount}) => {
             const stocks = Math.floor(amount / stockUnitPrice);
-            amount -= (stockUnitPrice * stocks);
+            const remainingMoney = amount - (stockUnitPrice * stocks);
 
-            return {userId, stocks, amount};
+            return {userId, stocks, remainingMoney};
           };
           const sumStocks = (sum, directorData) => {
             return sum + directorData.stocks;
           };
+          // TODO 解掉 do-while
           do {
             directors = _.map(invest, generateDirectorStocksList);
             totalRelease = _.reduce(directors, sumStocks, 0);
@@ -78,7 +79,7 @@ export function checkFoundCompany() {
             logType: '創立成功',
             userId: _.pluck(invest, 'userId'),
             companyId: companyId,
-            price: stockUnitPrice,
+            data: { price: stockUnitPrice },
             createdAt: basicCreatedAt
           });
           const candidateList = [];
@@ -114,33 +115,37 @@ export function checkFoundCompany() {
           });
           let needExecuteDirectorsBulk = false;
           let needExecuteUserBulk = false;
-          _.each(directors, ({userId, stocks, amount}, index) => {
+          _.each(directors, ({userId, stocks, remainingMoney}, index) => {
             const createdAt = new Date(basicCreatedAt.getTime() + index + 1);
             if (stocks > 0) {
               logBulk.insert({
                 logType: '創立得股',
                 userId: [userId],
                 companyId: companyId,
-                price: (stockUnitPrice * stocks) + amount,
-                amount: stocks,
+                data: {
+                  fund: (stockUnitPrice * stocks) + remainingMoney,
+                  stocks
+                },
                 createdAt: createdAt
               });
               needExecuteDirectorsBulk = true;
               directorsBulk.insert({companyId, userId, stocks, createdAt});
             }
-            if (amount > 0) {
+            if (remainingMoney > 0) {
               logBulk.insert({
                 logType: '創立退款',
                 userId: [userId],
                 companyId: companyId,
-                message: foundationData.companyName,
-                amount: amount,
+                data: {
+                  companyName: foundationData.companyName, // TODO lagecy field
+                  refund: remainingMoney
+                },
                 createdAt: createdAt
               });
               needExecuteUserBulk = true;
               usersBulk.find({_id: userId}).updateOne({
                 $inc: {
-                  'profile.money': amount
+                  'profile.money': remainingMoney
                 }
               });
             }
@@ -172,7 +177,9 @@ export function checkFoundCompany() {
           logBulk.insert({
             logType: '創立失敗',
             userId: _.union([foundationData.manager], _.pluck(invest, 'userId')),
-            message: foundationData.companyName,
+            data: {
+              companyName: foundationData.companyName
+            },
             createdAt: createdAt
           });
           _.each(foundationData.invest, ({userId, amount}, index) => {
@@ -182,8 +189,10 @@ export function checkFoundCompany() {
             logBulk.insert({
               logType: '創立退款',
               userId: [userId],
-              message: foundationData.companyName,
-              amount: amount,
+              data: {
+                companyName: foundationData.companyName,
+                refund: amount
+              },
               createdAt: new Date(createdAt.getTime() + index + 1)
             });
             usersBulk.find({_id: userId}).updateOne({
@@ -212,4 +221,3 @@ export function checkFoundCompany() {
       });
     });
 }
-

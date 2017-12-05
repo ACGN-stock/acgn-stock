@@ -28,8 +28,10 @@ function forfeit(user, {userId, message, amount}) {
     dbLog.insert({
       logType: '課以罰款',
       userId: [user._id, userId],
-      message: message,
-      amount: amount * -1,
+      data: {
+        reason: message,
+        fine: amount * -1
+      },
       createdAt: new Date()
     });
   }
@@ -37,8 +39,10 @@ function forfeit(user, {userId, message, amount}) {
     dbLog.insert({
       logType: '退還罰款',
       userId: [user._id, userId],
-      message: message,
-      amount: amount,
+      data: {
+        reason: message,
+        fine: amount
+      },
       createdAt: new Date()
     });
   }

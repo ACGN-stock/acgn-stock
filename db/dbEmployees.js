@@ -6,7 +6,6 @@ import SimpleSchema from 'simpl-schema';
 export const dbEmployees = new Mongo.Collection('employees');
 export default dbEmployees;
 
-//schema
 const schema = new SimpleSchema({
   //公司Id
   companyId: {

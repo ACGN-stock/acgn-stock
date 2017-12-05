@@ -40,9 +40,11 @@ function takeDownProduct(user, {productId, message}) {
     logType: '產品下架',
     userId: [user._id],
     companyId: companyId,
-    productId: productId,
-    price: voteProfit,
-    message: message,
+    data: {
+      reason: message,
+      productId: productId,
+      profit: voteProfit
+    },
     createdAt: new Date()
   });
   dbProducts.remove(productId);

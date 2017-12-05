@@ -73,7 +73,7 @@ function payTax(user, taxId, amount) {
           createdAt: createdAt
         },
         $inc: {
-          amount: amount
+          'data.paid': amount
         }
       });
     }
@@ -81,7 +81,7 @@ function payTax(user, taxId, amount) {
       dbLog.insert({
         logType: '繳納稅金',
         userId: [userId],
-        amount: amount,
+        'data.paid': amount,
         createdAt: createdAt
       });
     }

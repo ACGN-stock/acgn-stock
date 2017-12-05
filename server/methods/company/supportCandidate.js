@@ -63,7 +63,7 @@ export function supportCandidate(user, companyId, supportUserId) {
   if (_.contains(voteList[candidateIndex], userId)) {
     throw new Meteor.Error(403, '使用者已經正在支持使用者' + supportUserId + '擔任「' + companyName + '」公司經理人了，無法再次進行支持！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['season', 'elect' + companyId, 'user' + userId]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'elect', 'elect' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('resignManager', ['elect' + companyId, 'user' + userId], (release) => {
     const companyData = dbCompanies.findOne(companyId, {

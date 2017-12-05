@@ -2,11 +2,10 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//公司產品資料集
+//公司產品正面評價資料集
 export const dbProductLike = new Mongo.Collection('productLike');
 export default dbProductLike;
 
-//schema
 const schema = new SimpleSchema({
   //產品ID
   productId: {
@@ -22,4 +21,3 @@ const schema = new SimpleSchema({
   }
 });
 dbProductLike.attachSchema(schema);
-

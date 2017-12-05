@@ -34,7 +34,7 @@ function sealCompany(user, {companyId, message}) {
       logType: '解除查封',
       userId: [user._id],
       companyId: companyId,
-      message: message,
+      data: { reason: message },
       createdAt: new Date()
     });
     dbCompanies.update(companyId, {
@@ -48,7 +48,7 @@ function sealCompany(user, {companyId, message}) {
       logType: '查封關停',
       userId: [user._id],
       companyId: companyId,
-      message: message,
+      data: { reason: message },
       createdAt: new Date()
     });
     dbCompanies.update(companyId, {

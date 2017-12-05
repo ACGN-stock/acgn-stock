@@ -6,7 +6,6 @@ import SimpleSchema from 'simpl-schema';
 export const dbRuleAgendas = new Mongo.Collection('ruleAgendas');
 export default dbRuleAgendas;
 
-//schema
 const schema = new SimpleSchema({
   //議程標題
   title: {
@@ -60,4 +59,3 @@ const schema = new SimpleSchema({
   }
 });
 dbRuleAgendas.attachSchema(schema);
-

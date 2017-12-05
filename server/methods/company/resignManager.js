@@ -36,7 +36,7 @@ export function resignManager(user, companyId) {
   if (userId !== companyData.manager) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['season', 'elect' + companyId]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'elect', 'elect' + companyId]);
   //先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('resignManager', ['elect' + companyId], (release) => {
     const companyData = dbCompanies.findOne(companyId, {

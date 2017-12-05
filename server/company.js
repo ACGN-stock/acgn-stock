@@ -109,7 +109,7 @@ export function releaseStocksForNoDeal() {
     console.info('releaseStocksForNoDeal triggered! next counter: ', releaseStocksForNoDealCounter);
     updateReleaseStocksForNoDealPeriod();
 
-    const checkLogTime = new Date(Date.now() - (Meteor.settings.public.releaseStocksForNoDealMinCounter * Meteor.settings.public.intervalTimer));
+    const checkLogTime = new Date(Date.now() - Meteor.settings.public.releaseStocksForNoDealTradeLogLookbackIntervalTime);
     const lowPriceThreshold = dbVariables.get('lowPriceThreshold');
     dbCompanies
       .find(
@@ -140,7 +140,7 @@ export function releaseStocksForNoDeal() {
             $group: {
               _id: null,
               amount: {
-                $sum: '$amount'
+                $sum: '$data.amount'
               }
             }
           }
