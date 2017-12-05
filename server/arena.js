@@ -1,5 +1,6 @@
 'use strict';
 import { _ } from 'meteor/underscore';
+import { Meteor } from 'meteor/meteor';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters, MAX_MANNER_SIZE, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbArenaLog } from '/db/dbArenaLog';
@@ -14,10 +15,23 @@ export function startArenaFight() {
       beginDate: -1
     },
     fields: {
-      _id: 1
+      _id: 1,
+      shuffledFighterCompanyIdList: 1
     }
   });
   const arenaId = lastArenaData._id;
+  const shuffledFighterCompanyIdList = lastArenaData.shuffledFighterCompanyIdList;
+  if (shuffledFighterCompanyIdList.length < 1) {
+    dbArena.update(arenaId, {
+      $set: {
+        winnerList: [],
+        endDate: new Date()
+      }
+    });
+
+    return true;
+  }
+  const fighterHashByCompanyId = {};
   const fighterListBySequence = dbArenaFighters
     .find(
       {
@@ -45,6 +59,7 @@ export function startArenaFight() {
       arenaFighter.agi = getAttributeNumber('agi', arenaFighter.agi);
       arenaFighter.currentHp = arenaFighter.hp;
       arenaFighter.currentSp = arenaFighter.sp;
+      fighterHashByCompanyId[arenaFighter.companyId] = arenaFighter;
 
       return arenaFighter;
     });
@@ -58,11 +73,12 @@ export function startArenaFight() {
   let sequence = 0;
   //回合數
   let round = 1;
+  const maximumRound = Meteor.settings.public.arenaMaximumRound;
   //直到戰到剩下一人為止
   while (loser.length < fighterListBySequence.length - 1) {
     //超過十萬回合後自動中止
-    if (round > 500) {
-      console.log('round > 500!');
+    if (round > maximumRound) {
+      console.log(`round > maximum round ${maximumRound}!`);
       break;
     }
     //所有參賽者依序攻擊
@@ -74,7 +90,8 @@ export function startArenaFight() {
       //依此攻擊者的攻擊優先順序取得防禦者
       let defender;
       for (const attackTargetIndex of attacker.attackSequence) {
-        defender = fighterListBySequence[attackTargetIndex];
+        const companyId = shuffledFighterCompanyIdList[attackTargetIndex];
+        defender = fighterHashByCompanyId[companyId];
         if (defender && defender.currentHp > 0) {
           break;
         }

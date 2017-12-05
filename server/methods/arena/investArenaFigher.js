@@ -1,7 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbArena } from '/db/dbArena';
@@ -57,6 +57,8 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
   if (! fighterData) {
     throw new Meteor.Error(404, '這家公司尚未報名參加這一屆最萌亂鬥大賽！');
   }
+  //避免總投資額出現太誇張的數字
+  check(fighterData[attribute] + investMoney, Match.Integer);
   const userId = user._id;
   resourceManager.throwErrorIsResourceIsLock(['season', 'arena' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
@@ -69,6 +71,8 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
     if (user.profile.money < investMoney) {
       throw new Meteor.Error(403, '剩餘金錢不足！');
     }
+    //避免總投資額出現太誇張的數字
+    check(fighterData[attribute] + investMoney, Match.Integer);
     dbArenaFighters.update(fighterData._id, {
       $inc: {
         [attribute]: investMoney

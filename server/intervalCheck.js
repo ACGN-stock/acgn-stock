@@ -575,7 +575,7 @@ function generateNewSeason() {
       beginDate: beginDate,
       endDate: arenaEndDate,
       joinEndDate: new Date(arenaEndDate.getTime() - Meteor.settings.public.electManagerTime),
-      fighterSequence: [],
+      shuffledFighterCompanyIdList: [],
       winnerList: []
     });
     dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSasonNumber);
@@ -1014,12 +1014,8 @@ function electManager(seasonData) {
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
   if (arenaCounter <= 0) {
     if (lastArenaData) {
-      const fighterSequence = dbArenaFighters
+      const fighterCompanyIdList = dbArenaFighters
         .find({arenaId}, {
-          sort: {
-            agi: -1,
-            createdAt: 1
-          },
           fields: {
             companyId: 1
           }
@@ -1027,13 +1023,13 @@ function electManager(seasonData) {
         .map((arenaFighter) => {
           return arenaFighter.companyId;
         });
+      const shuffledFighterCompanyIdList = _.shuffle(fighterCompanyIdList);
       dbArena.update(arenaId, {
         $set: {
-          fighterSequence: fighterSequence
+          shuffledFighterCompanyIdList
         }
       });
-      const attackSequence = _.range(fighterSequence.length);
-      const shuffledAttackSequence = _.shuffle(attackSequence);
+      const attackSequence = _.range(shuffledFighterCompanyIdList.length);
       dbArenaFighters
         .find({}, {
           fields: {
@@ -1042,10 +1038,10 @@ function electManager(seasonData) {
           }
         })
         .forEach((fighter) => {
-          const thisFighterSequence = _.indexOf(fighterSequence, fighter.companyId);
+          const thisFighterIndex = _.indexOf(shuffledFighterCompanyIdList, fighter.companyId);
           dbArenaFighters.update(fighter._id, {
             $set: {
-              attackSequence: _.without(shuffledAttackSequence, thisFighterSequence)
+              attackSequence: _.without(attackSequence, thisFighterIndex)
             }
           });
         });
