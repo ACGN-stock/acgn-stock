@@ -31,6 +31,7 @@ export function startArenaFight() {
 
     return true;
   }
+  const fighterHashByCompanyId = {};
   const fighterListBySequence = dbArenaFighters
     .find(
       {
@@ -58,6 +59,7 @@ export function startArenaFight() {
       arenaFighter.agi = getAttributeNumber('agi', arenaFighter.agi);
       arenaFighter.currentHp = arenaFighter.hp;
       arenaFighter.currentSp = arenaFighter.sp;
+      fighterHashByCompanyId[arenaFighter.companyId] = arenaFighter;
 
       return arenaFighter;
     });
@@ -89,7 +91,7 @@ export function startArenaFight() {
       let defender;
       for (const attackTargetIndex of attacker.attackSequence) {
         const companyId = shuffledFighterCompanyIdList[attackTargetIndex];
-        defender = _.findWhere(fighterListBySequence, {companyId});
+        defender = fighterHashByCompanyId[companyId];
         if (defender && defender.currentHp > 0) {
           break;
         }
