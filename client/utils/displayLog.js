@@ -3,7 +3,8 @@ import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { currencyFormat } from './helpers.js';
+
+import { currencyFormat, sanitizeHtml } from './helpers.js';
 
 Template.displayLog.onRendered(function() {
   if (this.data.userId) {
@@ -399,10 +400,4 @@ function companySpan(companyId) {
 
 function productSpan(productId) {
   return `<span data-product-link="${productId}"></span>`;
-}
-
-function sanitizeHtml(str) {
-  return $('<span></span>')
-    .text(str)
-    .html();
 }
