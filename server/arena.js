@@ -1,5 +1,6 @@
 'use strict';
 import { _ } from 'meteor/underscore';
+import { Meteor } from 'meteor/meteor';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters, MAX_MANNER_SIZE, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbArenaLog } from '/db/dbArenaLog';
@@ -58,11 +59,12 @@ export function startArenaFight() {
   let sequence = 0;
   //回合數
   let round = 1;
+  const maximumRound = Meteor.settings.public.arenaMaximumRound;
   //直到戰到剩下一人為止
   while (loser.length < fighterListBySequence.length - 1) {
     //超過十萬回合後自動中止
-    if (round > 500) {
-      console.log('round > 500!');
+    if (round > maximumRound) {
+      console.log(`round > maximum round ${maximumRound}!`);
       break;
     }
     //所有參賽者依序攻擊
