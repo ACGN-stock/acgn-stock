@@ -1,9 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 
-import { limitSubscription } from '/server/imports/rateLimit';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { dbCompanies } from '/db/dbCompanies';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('accountInfo', function(userId) {
   debug.log('publish accountInfo', userId);

@@ -1,9 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { dbDirectors } from '/db/dbDirectors';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('fscOwnStocks', function(userId, offset) {
   debug.log('publish fscOwnStocks', {userId, offset});

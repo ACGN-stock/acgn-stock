@@ -3,8 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { UserStatus } from 'meteor/mizzao:user-status';
 
-import { resourceManager } from './imports/resourceManager';
-import { threadId } from './imports/thread';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
@@ -22,7 +21,6 @@ import { dbResourceLock } from '/db/dbResourceLock';
 import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
 import { dbTaxes } from '/db/dbTaxes';
-import { dbThreads } from '/db/dbThreads';
 import { dbUserArchive } from '/db/dbUserArchive';
 import { dbVariables } from '/db/dbVariables';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
@@ -33,113 +31,10 @@ import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { setLowPriceThreshold } from './lowPriceThreshold';
 import { recordListPriceAndSellFSCStocks, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
-import { debug } from '/server/imports/debug';
-
-Meteor.startup(function() {
-  Meteor.setInterval(intervalCheck, Meteor.settings.public.intervalTimer);
-});
-
-function intervalCheck() {
-  //先移除所有一分鐘未更新的thread資料
-  dbThreads.remove({
-    refreshTime: {
-      $lt: new Date(Date.now() - 60000)
-    }
-  });
-  //如果現在沒有負責intervalWork的thread
-  if (dbThreads.find({doIntervalWork: true}).count() < 1) {
-    //將第一個thread指派為負責intervalWork工作
-    dbThreads.update({}, {
-      $set: {
-        doIntervalWork: true
-      }
-    });
-  }
-  //取出負責intervalWork的thread資料
-  const threadData = dbThreads.findOne({doIntervalWork: true});
-  if (threadData && threadData._id === threadId) {
-    doLoginObserver();
-    doIntervalWork();
-  }
-  else {
-    stopLoginObserver();
-  }
-}
-
-//開始觀察以處理登入IP紀錄、未登入天數
-let loginObserver;
-export function doLoginObserver() {
-  if (! loginObserver) {
-    console.log('start observer login info at ' + threadId + ' ' + Date.now());
-    loginObserver = Meteor.users
-      .find(
-        {},
-        {
-          fields: {
-            _id: 1,
-            'status.lastLogin.date': 1,
-            'status.lastLogin.ipAddr': 1
-          },
-          disableOplog: true
-        }
-      )
-      .observe({
-        changed: (newUserData, oldUserData) => {
-          const previousLoginData = (oldUserData.status && oldUserData.status.lastLogin) || {
-            date: new Date()
-          };
-          const nextLoginData = (newUserData.status && newUserData.status.lastLogin) || {
-            date: new Date()
-          };
-          if (nextLoginData.ipAddr && nextLoginData.ipAddr !== previousLoginData.ipAddr) {
-            dbLog.insert({
-              logType: '登入紀錄',
-              userId: [newUserData._id],
-              data: { ipAddr: nextLoginData.ipAddr },
-              createdAt: new Date()
-            });
-          }
-          if (nextLoginData.date.getTime() !== previousLoginData.date.getTime()) {
-            let lastSeasonData = dbSeason.findOne({}, {
-              sort: {
-                beginDate: -1
-              }
-            });
-            lastSeasonData = lastSeasonData ? lastSeasonData : {
-              beginDate: new Date()
-            };
-            const seasonBeginTime = lastSeasonData.beginDate.getTime();
-            const nextLoginTime = nextLoginData.date.getTime() - seasonBeginTime;
-            const previousLoginTime = Math.max(previousLoginData.date.getTime(), seasonBeginTime) - seasonBeginTime;
-
-            const noLoginDay = Math.ceil(nextLoginTime / 86400000) - Math.ceil(previousLoginTime / 86400000) - 1;
-            if (noLoginDay > 0) {
-              Meteor.users.update(newUserData._id, {
-                $set: {
-                  'status.lastLogin.date': nextLoginData.date
-                },
-                $inc: {
-                  'profile.noLoginDayCount': Math.min(noLoginDay, 6)
-                }
-              });
-            }
-          }
-        }
-      });
-  }
-}
-
-//停止觀察處理登入IP紀錄、未登入天數
-function stopLoginObserver() {
-  if (loginObserver) {
-    console.log('stop observer login info at ' + threadId + ' ' + Date.now());
-    loginObserver.stop();
-    loginObserver = null;
-  }
-}
+import { debug } from '/server/imports/utils/debug';
 
 //週期檢查工作內容
-function doIntervalWork() {
+export function doIntervalWork() {
   debug.log('doIntervalWork');
   const now = Date.now();
   const lastRoundData = dbRound.findOne({}, {
@@ -680,7 +575,7 @@ function generateNewSeason() {
       beginDate: beginDate,
       endDate: arenaEndDate,
       joinEndDate: new Date(arenaEndDate.getTime() - Meteor.settings.public.electManagerTime),
-      fighterSequence: [],
+      shuffledFighterCompanyIdList: [],
       winnerList: []
     });
     dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
@@ -1119,12 +1014,8 @@ function electManager(seasonData) {
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
   if (arenaCounter <= 0) {
     if (lastArenaData) {
-      const fighterSequence = dbArenaFighters
+      const fighterCompanyIdList = dbArenaFighters
         .find({arenaId}, {
-          sort: {
-            agi: -1,
-            createdAt: 1
-          },
           fields: {
             companyId: 1
           }
@@ -1132,13 +1023,13 @@ function electManager(seasonData) {
         .map((arenaFighter) => {
           return arenaFighter.companyId;
         });
+      const shuffledFighterCompanyIdList = _.shuffle(fighterCompanyIdList);
       dbArena.update(arenaId, {
         $set: {
-          fighterSequence: fighterSequence
+          shuffledFighterCompanyIdList
         }
       });
-      const attackSequence = _.range(fighterSequence.length);
-      const shuffledAttackSequence = _.shuffle(attackSequence);
+      const attackSequence = _.range(shuffledFighterCompanyIdList.length);
       dbArenaFighters
         .find({}, {
           fields: {
@@ -1147,10 +1038,10 @@ function electManager(seasonData) {
           }
         })
         .forEach((fighter) => {
-          const thisFighterSequence = _.indexOf(fighterSequence, fighter.companyId);
+          const thisFighterIndex = _.indexOf(shuffledFighterCompanyIdList, fighter.companyId);
           dbArenaFighters.update(fighter._id, {
             $set: {
-              attackSequence: _.without(shuffledAttackSequence, thisFighterSequence)
+              attackSequence: _.without(attackSequence, thisFighterIndex)
             }
           });
         });

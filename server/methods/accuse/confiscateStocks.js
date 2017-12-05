@@ -3,7 +3,7 @@ import { check } from 'meteor/check';
 
 import { dbDirectors } from '/db/dbDirectors';
 import { dbLog } from '/db/dbLog';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   confiscateStocks({userId, message}) {

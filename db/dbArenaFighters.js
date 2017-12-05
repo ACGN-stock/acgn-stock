@@ -74,7 +74,7 @@ const schema = new SimpleSchema({
     defaultValue: 5,
     min: 1
   },
-  //攻擊優先順序，對應dbArena資料集中的fighterSequence陣列的index
+  //攻擊優先順序，對應dbArena資料集中的shuffledFighterCompanyIdList陣列的index
   attackSequence: {
     type: Array,
     defaultValue: []

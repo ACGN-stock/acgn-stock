@@ -1,7 +1,7 @@
 'use strict';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 //計算所謂「低價股」的價格門檻
 export function setLowPriceThreshold() {

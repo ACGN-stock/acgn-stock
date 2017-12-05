@@ -4,8 +4,8 @@ import { Meteor } from 'meteor/meteor';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbLog } from '/db/dbLog';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   changeCompanyName(companyId, newCompanyName) {

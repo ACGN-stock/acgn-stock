@@ -7,10 +7,10 @@ import { dbLog } from '/db/dbLog';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
-import { checkImageUrl } from '/server/imports/checkImageUrl';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { resourceManager } from '/server/imports/resourceManager';
+import { checkImageUrl } from '/server/imports/utils/checkImageUrl';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 
 Meteor.methods({
   foundCompany(foundCompanyData) {

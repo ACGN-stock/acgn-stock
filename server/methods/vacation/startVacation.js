@@ -7,7 +7,7 @@ import { dbOrders } from '/db/dbOrders';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbRound } from '/db/dbRound';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   startVacation() {

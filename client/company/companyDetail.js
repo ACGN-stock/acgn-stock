@@ -290,6 +290,42 @@ Template.companyDetail.events({
         Meteor.customCall('resignManager', companyId);
       }
     });
+  },
+  'click [data-action="markCompanyIllegal"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1
+      }
+    });
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '設定違規標記',
+      message: '請輸入違規事由：',
+      defaultValue: companyData.illegalReason,
+      callback: (reason) => {
+        if (! reason) {
+          return;
+        }
+        if (reason.length > 10) {
+          alertDialog.alert('違規標記事由不可大於十個字！');
+
+          return;
+        }
+
+        Meteor.customCall('markCompanyIllegal', companyId, reason);
+      }
+    });
+  },
+  'click [data-action="unmarkCompanyIllegal"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    alertDialog.confirm('是否解除違規標記？', (result) => {
+      if (result) {
+        Meteor.customCall('unmarkCompanyIllegal', companyId);
+      }
+    });
   }
 });
 
@@ -1122,12 +1158,14 @@ Template.companyArenaInfo.events({
 });
 
 inheritUtilForm(Template.arenaStrategyForm);
+const rSortedAttackSequence = new ReactiveVar([]);
 Template.arenaStrategyForm.onCreated(function() {
   this.validateModel = validateStrategyModel;
   this.handleInputChange = handleStrategyInputChange;
   this.saveModel = saveStrategyModel;
   this.model.set(this.data.joinData);
   this.draggingIndex = null;
+  rSortedAttackSequence.set([]);
 });
 Template.arenaStrategyForm.onRendered(function() {
   this.model.set(this.data.joinData);
@@ -1185,7 +1223,8 @@ function handleStrategyInputChange(event) {
   }
 }
 function saveStrategyModel(model) {
-  const submitData = _.pick(model, 'spCost', 'attackSequence', 'normalManner', 'specialManner');
+  const submitData = _.pick(model, 'spCost', 'normalManner', 'specialManner');
+  submitData.attackSequence = rSortedAttackSequence.get();
   Meteor.customCall('decideArenaStrategy', model.companyId, submitData, (error) => {
     if (! error) {
       alertDialog.alert('決策完成！');
@@ -1193,6 +1232,19 @@ function saveStrategyModel(model) {
   });
 }
 Template.arenaStrategyForm.helpers({
+  spForecast() {
+    const model = Template.instance().model.get();
+    const sp = getAttributeNumber('sp', model.sp);
+    const spCost = model.spCost;
+    const tenRoundForecast = Math.floor(Math.min((sp + 1) / spCost, spCost));
+    const maximumRound = Meteor.settings.public.arenaMaximumRound;
+    const maximumForecast = Math.floor(Math.min((sp + Math.floor(maximumRound / 10)) / spCost, spCost / 10 * maximumRound));
+
+
+    return `目前的SP量為 ${sp}
+      ，在 10 回合的戰鬥中估計可以發出 ${tenRoundForecast} 次特殊攻擊，
+      在 ${maximumRound} 回合的戰鬥中估計可以發出 ${maximumForecast} 次特殊攻擊。`;
+  },
   getManner(type, index) {
     const model = Template.instance().model.get();
     const fieldName = type + 'Manner';
@@ -1200,43 +1252,56 @@ Template.arenaStrategyForm.helpers({
     return model[fieldName][index];
   },
   hasEnemy() {
-    return this.fighterSequence.length > 0;
+    return this.shuffledFighterCompanyIdList.length > 0;
   },
   enemyList() {
-    const fighterSequence = this.fighterSequence;
+    const shuffledFighterCompanyIdList = this.shuffledFighterCompanyIdList;
     const model = Template.instance().model.get();
 
     return _.map(model.attackSequence, (attackIndex) => {
-      return fighterSequence[attackIndex];
+      return {
+        _id: attackIndex,
+        companyId: shuffledFighterCompanyIdList[attackIndex]
+      };
+    });
+  },
+  notSorted(index) {
+    return ! _.contains(rSortedAttackSequence.get(), index);
+  },
+  sortedEnemyList() {
+    const shuffledFighterCompanyIdList = this.shuffledFighterCompanyIdList;
+
+    return _.map(rSortedAttackSequence.get(), (attackIndex) => {
+      return {
+        _id: attackIndex,
+        companyId: shuffledFighterCompanyIdList[attackIndex]
+      };
     });
   }
 });
 Template.arenaStrategyForm.events({
-  'dragstart [data-drag]'(event, templateInstance) {
-    templateInstance.draggingIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
+  'click [data-action="sortAll"]'(event, templateInstance) {
+    const model = templateInstance.model.get();
+    const attackSequence = rSortedAttackSequence.get();
+    const needSortAttackSequence = _.reject(model.attackSequence, (attackIndex) => {
+      return _.contains(rSortedAttackSequence.get(), attackIndex);
+    });
+    rSortedAttackSequence.set(_.union(attackSequence, needSortAttackSequence));
   },
-  'dragover [data-drag]'(event, templateInstance) {
-    const draggingIndex = templateInstance.draggingIndex;
-    const selfDraggingIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
-    if (draggingIndex !== null && draggingIndex !== selfDraggingIndex) {
-      event.preventDefault();
-    }
+  'click [data-add]'(event) {
+    const index = parseFloat($(event.currentTarget).attr('data-add'));
+    const sortedAttackSequence = rSortedAttackSequence.get();
+    rSortedAttackSequence.set(_.union(sortedAttackSequence, [index]));
   },
-  'dragend [data-drag]'(event, templateInstance) {
-    templateInstance.draggingIndex = null;
+  'click [data-remove]'(event) {
+    const index = parseFloat($(event.currentTarget).attr('data-remove'));
+    const sortedAttackSequence = rSortedAttackSequence.get();
+    rSortedAttackSequence.set(_.without(sortedAttackSequence, index));
   },
-  'drop [data-drag]'(event, templateInstance) {
-    const draggingIndex = templateInstance.draggingIndex;
-    if (draggingIndex !== null) {
-      const model = templateInstance.model.get();
-      const attackSequence = model.attackSequence;
-      const draggingItem = attackSequence[draggingIndex];
-      const dropIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
-      const dropItem = attackSequence[dropIndex];
-      attackSequence[dropIndex] = draggingItem;
-      attackSequence[draggingIndex] = dropItem;
-      templateInstance.model.set(model);
-    }
+  reset(event, templateInstance) {
+    event.preventDefault();
+    templateInstance.model.set(templateInstance.data.joinData);
+    rSortedAttackSequence.set([]);
   }
 });
 

@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 
 import { dbSeason } from '/db/dbSeason';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('currentSeason', function() {
   debug.log('publish currentSeason');
