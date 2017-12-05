@@ -165,6 +165,19 @@
   word-break: break-all;  
 }
 
+@media only screen and (max-width: 525px) {
+  .media.company-summary-item {
+    display: block;
+  }
+}
+
+@media only screen and (max-width: 380px) {
+  .media.company-summary-item .row-title{
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
 .company-summary-item {
   margin-top: 15px;
 }

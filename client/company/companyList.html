@@ -199,21 +199,21 @@
       {{/if}}
     </div>
     <div class="media-body row border-grid-body">
-      <div class="col-4 col-lg-3 text-right border-grid">角色名稱：</div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">角色名稱：</div>
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>companyLink this._id}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">經理人：</div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">經理人：</div>
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>userLink this.manager}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">創立日期：</div>
-      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateText this.createdAt}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">創立日期：</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid" title="{{formatDateText this.createdAt}}">
         {{formatDateText this.createdAt}}
       </div>
-      <div class="col-4 col-lg-3 text-right text-truncate border-grid" title="{{this.chairmanTitle}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title" title="{{this.chairmanTitle}}">
         {{#if isChairman this._id}}
-          <a href="#" data-action="changeChairmanTitle">
+          <a class="text-truncate" href="#" data-action="changeChairmanTitle">
             {{this.chairmanTitle}}：
           </a>
         {{else}}
@@ -223,25 +223,25 @@
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>userLink this.chairman}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">總市值：</div>
-      <div class="col-8 col-lg-3 text-right border-grid company-asset" title="{{this.totalValue}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總市值：</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid company-asset" title="{{this.totalValue}}">
         $ {{currencyFormat this.totalValue}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">股票價格：</div>
-      <div class="col-8 col-lg-3 text-right border-grid stock-price" title="{{this.lastPrice}}({{this.listPrice}})">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">股票價格：</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid stock-price" title="{{this.lastPrice}}({{this.listPrice}})">
         <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
           $ {{currencyFormat this.lastPrice}}({{currencyFormat this.listPrice}})
         </span>
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">總釋股量：</div>
-      <div class="col-8 col-lg-3 text-right border-grid stock-release" title="{{this.totalRelease}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總釋股量：</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid stock-release" title="{{this.totalRelease}}">
         <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
           {{this.totalRelease}}
         </span>
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">每股盈餘：</div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">每股盈餘：</div>
       <div class="col-8 col-lg-3 text-right border-grid stock-EPS" title="{{getCompanyEPS this}}">
-        <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
+        <span class="text-truncate {{priceDisplayClass this.lastPrice this.listPrice}}">
           {{currencyFormat(getCompanyEPS this)}}
         </span>
       </div>

@@ -19,7 +19,7 @@ Meteor.publish('foundationList', function({keyword, matchType, offset}) {
     const regexp = buildSearchRegExp(keyword, matchType);
     filter.$or = [
       {
-        name: regexp
+        companyName: regexp
       },
       {
         tags: regexp
