@@ -290,6 +290,16 @@ export const logTypeList = [
   '解除查封',
 
   /**
+   * 【違規標記】userId0以「data.reason」的理由將「companyId」公司標記為違規！
+   */
+  '違規標記',
+
+  /**
+   * 【違規標記】userId0移除了「companyId」公司的違規標記！
+   */
+  '違規解標',
+
+  /**
    * 【公司更名】userId0將「companyId」公司的名稱由「data.oldCompanyName」改為「data.newCompanyName」。
    */
   '公司更名',
