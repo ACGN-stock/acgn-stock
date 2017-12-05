@@ -80,6 +80,42 @@ Template.foundationDetail.events({
   'click [data-action="showAllTags"]'(event) {
     event.preventDefault();
     rShowAllTags.set(true);
+  },
+  'click [data-action="markFoundationIllegal"]'(event) {
+    event.preventDefault();
+    const foundationId = FlowRouter.getParam('foundationId');
+    const companyData = dbFoundations.findOne(foundationId, {
+      fields: {
+        companyName: 1
+      }
+    });
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '設定違規標記',
+      message: '請輸入違規事由：',
+      defaultValue: companyData.illegalReason,
+      callback: (reason) => {
+        if (! reason) {
+          return;
+        }
+        if (reason.length > 10) {
+          alertDialog.alert('違規標記事由不可大於十個字！');
+
+          return;
+        }
+
+        Meteor.customCall('markFoundationIllegal', foundationId, reason);
+      }
+    });
+  },
+  'click [data-action="unmarkFoundationIllegal"]'(event) {
+    event.preventDefault();
+    const foundationId = FlowRouter.getParam('foundationId');
+    alertDialog.confirm('是否解除違規標記？', (result) => {
+      if (result) {
+        Meteor.customCall('unmarkFoundationIllegal', foundationId);
+      }
+    });
   }
 });
 

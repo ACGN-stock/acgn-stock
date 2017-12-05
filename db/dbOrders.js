@@ -11,7 +11,6 @@ export const orderTypeList = [
   '賣出'
 ];
 
-//schema
 const schema = new SimpleSchema({
   //訂單所有者的userId
   userId: {
@@ -48,4 +47,3 @@ const schema = new SimpleSchema({
   }
 });
 dbOrders.attachSchema(schema);
-

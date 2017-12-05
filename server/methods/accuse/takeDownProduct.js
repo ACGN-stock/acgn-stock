@@ -6,7 +6,7 @@ import { dbProducts } from '/db/dbProducts';
 import { dbProductLike } from '/db/dbProductLike';
 import { dbLog } from '/db/dbLog';
 import { dbSeason } from '/db/dbSeason';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   takeDownProduct({productId, message}) {

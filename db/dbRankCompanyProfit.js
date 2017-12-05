@@ -8,7 +8,6 @@ export const dbRankCompanyProfit = new Mongo.Collection('rankCompanyProfit', {
 });
 export default dbRankCompanyProfit;
 
-//schema
 const schema = new SimpleSchema({
   //商業季度
   seasonId: {

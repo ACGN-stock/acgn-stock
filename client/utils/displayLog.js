@@ -3,7 +3,8 @@ import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { currencyFormat } from './helpers.js';
+
+import { currencyFormat, sanitizeHtml } from './helpers.js';
 
 Template.displayLog.onRendered(function() {
   if (this.data.userId) {
@@ -214,7 +215,7 @@ Template.displayLog.helpers({
 
         result += '擊敗了所有競爭對手，';
 
-        if (userId[1] === '!none') {
+        if (! userId[1] || userId[1] === '!none') {
           result += '成為了公司的經理人。';
         }
         else if (userId[0] === userId[1]) {
@@ -290,13 +291,11 @@ Template.displayLog.helpers({
         return result;
       }
       case '金管通告': {
-        // FIXME 多人通告從未使用，可考慮簡化 code
         const [sourceUser, ...targetUsers] = users;
 
         let result = `【金管通告】${sourceUser}以金管會的名義`;
 
         if (companyId) { // 針對公司
-          const company = company;
           result += `向「${company}」公司`;
 
           if (targetUsers.length > 0) {
@@ -362,7 +361,7 @@ Template.displayLog.helpers({
         return `【解除查封】${users[0]}以「${sanitizeHtml(data.reason)}」的理由解除了「${company}」公司的查封關停狀態。`;
       }
       case '公司更名': {
-        return `【公司更名】${users[0]}對公司進行了更名動作，舊名：「${sanitizeHtml(data.oldCompanyName)}」。`;
+        return `【公司更名】${users[0]}將「${company}」公司的名稱由「${sanitizeHtml(data.oldCompanyName)}」改為「${sanitizeHtml(data.newCompanyName)}」。`;
       }
       case '產品下架': {
         let result = `【產品下架】${users[0]}以「${sanitizeHtml(data.reason)}」的理由將「${company}」公司的產品「${productSpan(data.productId)}」給下架了`;
@@ -401,10 +400,4 @@ function companySpan(companyId) {
 
 function productSpan(productId) {
   return `<span data-product-link="${productId}"></span>`;
-}
-
-function sanitizeHtml(str) {
-  return $('<span></span>')
-    .text(str)
-    .html();
 }

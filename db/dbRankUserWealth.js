@@ -8,7 +8,6 @@ export const dbRankUserWealth = new Mongo.Collection('rankUserWealth', {
 });
 export default dbRankUserWealth;
 
-//schema
 const schema = new SimpleSchema({
   //商業季度
   seasonId: {

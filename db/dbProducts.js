@@ -15,7 +15,6 @@ export const productTypeList = [
   '裏物'
 ];
 
-//schema
 const schema = new SimpleSchema({
   //產品名稱
   productName: {

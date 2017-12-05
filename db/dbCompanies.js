@@ -7,7 +7,6 @@ import SimpleSchema from 'simpl-schema';
 export const dbCompanies = new Mongo.Collection('companies');
 export default dbCompanies;
 
-//schema
 const schema = new SimpleSchema({
   //公司名稱
   companyName: {
@@ -58,6 +57,12 @@ const schema = new SimpleSchema({
     type: String,
     min: 10,
     max: 3000
+  },
+  // 違規描述
+  illegalReason: {
+    type: String,
+    max: 10,
+    optional: true
   },
   //目前總釋出股份
   totalRelease: {

@@ -3,9 +3,9 @@ import { Meteor } from 'meteor/meteor';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
-import { checkImageUrl } from '/server/imports/checkImageUrl';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { checkImageUrl } from '/server/imports/utils/checkImageUrl';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   editCompany(companyId, newCompanyData) {

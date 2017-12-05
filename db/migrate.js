@@ -901,7 +901,7 @@ if (Meteor.isServer) {
 
           case '亂鬥營利':
             updateOperations.$set = {
-              'data.profit': logData.amount
+              'data.reward': logData.amount
             };
             break;
         }

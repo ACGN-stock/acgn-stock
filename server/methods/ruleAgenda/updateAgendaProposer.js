@@ -2,8 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   updateAgendaProposer(agendaId, proposerId) {

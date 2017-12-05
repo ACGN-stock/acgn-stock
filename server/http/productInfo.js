@@ -3,7 +3,7 @@ import url from 'url';
 import querystring from 'querystring';
 
 import { dbProducts } from '/db/dbProducts';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 //以Ajax方式發布產品名稱、連結
 WebApp.connectHandlers.use(function(req, res, next) {

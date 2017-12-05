@@ -2,13 +2,13 @@
 import { Meteor } from 'meteor/meteor';
 
 import { createOrder } from './imports/createOrder';
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbOrders } from '/db/dbOrders';
 import { dbLog } from '/db/dbLog';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 const counterBase = 1000 * 60;
 
@@ -109,8 +109,7 @@ export function releaseStocksForNoDeal() {
     console.info('releaseStocksForNoDeal triggered! next counter: ', releaseStocksForNoDealCounter);
     updateReleaseStocksForNoDealPeriod();
 
-    // TODO 獨立一個設定值給 checkLogTime
-    const checkLogTime = new Date(Date.now() - (Meteor.settings.public.releaseStocksForNoDealMinCounter * Meteor.settings.public.intervalTimer));
+    const checkLogTime = new Date(Date.now() - Meteor.settings.public.releaseStocksForNoDealTradeLogLookbackIntervalTime);
     const lowPriceThreshold = dbVariables.get('lowPriceThreshold');
     dbCompanies
       .find(

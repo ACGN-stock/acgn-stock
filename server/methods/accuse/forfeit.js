@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbLog } from '/db/dbLog';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   forfeit({userId, message, amount}) {
@@ -41,7 +41,7 @@ function forfeit(user, {userId, message, amount}) {
       userId: [user._id, userId],
       data: {
         reason: message,
-        find: amount
+        fine: amount
       },
       createdAt: new Date()
     });

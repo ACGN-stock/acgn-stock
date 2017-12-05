@@ -113,6 +113,13 @@
   text-overflow: ellipsis;
   display: block;
 }
+.company-card .illegal-description {
+  background: #ff0000;
+  background: -webkit-linear-gradient(left, transparent, #ff0000 5%, #ff0000 95%, transparent);
+  background: -o-linear-gradient(left, transparent, #ff0000 5%, #ff0000 95%, transparent);
+  background: -moz-linear-gradient(left, transparent, #ff0000 5%, #ff0000 95%, transparent);
+  background: -linear-gradient(left, transparent, #ff0000 5%, #ff0000 95%, transparent);
+}
 .company-card .row {
   color: #000;
   vertical-align: middle;
@@ -162,7 +169,7 @@
 .company-card div.description {
   font-size: 0.8rem;
   white-space: pre-wrap;
-  word-break: break-all;  
+  word-break: break-all;
 }
 
 .company-summary-item {
@@ -237,30 +244,30 @@
 
 @media only screen and (max-width: 800px) {
   /* Force table to not be like tables anymore */
-  #tax-info-table table, 
-  #tax-info-table thead, 
-  #tax-info-table tbody, 
-  #tax-info-table th, 
-  #tax-info-table td, 
-  #tax-info-table tr { 
-    display: block; 
+  #tax-info-table table,
+  #tax-info-table thead,
+  #tax-info-table tbody,
+  #tax-info-table th,
+  #tax-info-table td,
+  #tax-info-table tr {
+    display: block;
   }
- 
+
   /* Hide table headers (but not display: none;, for accessibility) */
-  #tax-info-table thead tr { 
+  #tax-info-table thead tr {
     position: absolute;
     top: -9999px;
     left: -9999px;
   }
- 
+
   #tax-info-table tr { border: 2px solid #ccc; }
- 
-  #tax-info-table td { 
+
+  #tax-info-table td {
     /* Behave  like a "row" */
     border: none;
-    border-bottom: 1px solid #eee; 
+    border-bottom: 1px solid #eee;
     position: relative;
-    padding-left: 35%; 
+    padding-left: 35%;
     white-space: normal;
     text-align: left !important;
   }
@@ -268,21 +275,21 @@
   #tax-info-table td:last-child {
     border-bottom: none;
   }
- 
-  #tax-info-table td:before { 
+
+  #tax-info-table td:before {
     /* Now like a table header */
     position: absolute;
     /* Top/left values mimic padding */
     top: 6px;
     left: 6px;
-    width: 45%; 
+    width: 45%;
     padding-right: 10px;
     padding-bottom: 0px;
     white-space: nowrap;
     text-align: left;
     font-weight: bold;
   }
- 
+
   /*
   Label the data
   */

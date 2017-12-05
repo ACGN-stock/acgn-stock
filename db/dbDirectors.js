@@ -8,7 +8,6 @@ export const dbDirectors = new Mongo.Collection('directors', {
 });
 export default dbDirectors;
 
-//schema
 const schema = new SimpleSchema({
   //公司id
   companyId: {

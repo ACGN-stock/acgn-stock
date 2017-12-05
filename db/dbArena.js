@@ -6,7 +6,6 @@ import { Mongo } from 'meteor/mongo';
 export const dbArena = new Mongo.Collection('arena');
 export default dbArena;
 
-//schema
 const schema = new SimpleSchema({
   //起始日期
   beginDate: {

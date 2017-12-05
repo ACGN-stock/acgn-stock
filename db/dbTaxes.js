@@ -2,13 +2,12 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//交易價格資料集
+//稅金資料集
 export const dbTaxes = new Mongo.Collection('taxes', {
   idGeneration: 'MONGO'
 });
 export default dbTaxes;
 
-//schema
 const schema = new SimpleSchema({
   //需繳稅人Id
   userId: {

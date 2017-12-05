@@ -1,10 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
-import { limitSubscription } from '/server/imports/rateLimit';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { dbTaxes } from '/db/dbTaxes';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('accountInfoTax', function(userId, offset) {
   debug.log('publish accountInfoTax', {userId, offset});

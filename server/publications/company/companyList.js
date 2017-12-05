@@ -4,10 +4,10 @@ import { Meteor } from 'meteor/meteor';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbOrders } from '/db/dbOrders';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
-import { buildSearchRegExp } from '/server/imports/buildSearchRegExp';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
+import { buildSearchRegExp } from '/server/imports/utils/buildSearchRegExp';
 
 Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, offset}) {
   debug.log('publish companyList', {keyword, matchType, onlyShow, sortBy, offset});
@@ -93,6 +93,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
     chairmanTitle: 1,
     chairman: 1,
     pictureSmall: 1,
+    illegalReason: 1,
     totalRelease: 1,
     lastPrice: 1,
     listPrice: 1,

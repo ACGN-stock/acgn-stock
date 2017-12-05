@@ -2,11 +2,10 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//交易訂單資料集
+//廣告資料集
 export const dbAdvertising = new Mongo.Collection('advertising');
 export default dbAdvertising;
 
-//schema
 const schema = new SimpleSchema({
   //廣告者的帳號ID
   userId: {
@@ -34,4 +33,3 @@ const schema = new SimpleSchema({
   }
 });
 dbAdvertising.attachSchema(schema);
-

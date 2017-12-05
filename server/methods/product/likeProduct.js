@@ -5,8 +5,8 @@ import { check } from 'meteor/check';
 import { dbProducts } from '/db/dbProducts';
 import { dbProductLike } from '/db/dbProductLike';
 import { dbCompanies } from '/db/dbCompanies';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   likeProduct(productId) {

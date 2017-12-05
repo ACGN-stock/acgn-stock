@@ -290,7 +290,7 @@ export const logTypeList = [
   '解除查封',
 
   /**
-   * 【公司更名】userId0對公司進行了更名動作，舊名：「data.oldCompanyName」。
+   * 【公司更名】userId0將「companyId」公司的名稱由「data.oldCompanyName」改為「data.newCompanyName」。
    */
   '公司更名',
 
@@ -365,7 +365,6 @@ export const importantAccuseLogTypeList = [
   '撤銷廣告'
 ];
 
-//schema
 const schema = new SimpleSchema({
   // 紀錄類別
   logType: {

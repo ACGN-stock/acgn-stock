@@ -2,8 +2,8 @@ import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 
 import { dbLog } from '/db/dbLog';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   queryInstantMessage(lastTime) {
@@ -30,10 +30,7 @@ Meteor.methods({
           logType: logData.logType,
           userId: logData.userId,
           companyId: logData.companyId,
-          productId: logData.productId,
-          price: logData.price,
-          amount: logData.amount,
-          message: logData.message,
+          data: logData.data,
           createdAt: logTime
         };
       });

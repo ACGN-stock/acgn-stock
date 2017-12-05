@@ -2,11 +2,10 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//新創資料集
+//新創公司資料集
 export const dbFoundations = new Mongo.Collection('foundations');
 export default dbFoundations;
 
-//schema
 const schema = new SimpleSchema({
   //公司名稱
   companyName: {
@@ -48,6 +47,12 @@ const schema = new SimpleSchema({
     min: 10,
     max: 3000
   },
+  // 違規描述
+  illegalReason: {
+    type: String,
+    max: 10,
+    optional: true
+  },
   //投資人列表
   invest: {
     type: Array,
@@ -70,4 +75,3 @@ const schema = new SimpleSchema({
   }
 });
 dbFoundations.attachSchema(schema);
-

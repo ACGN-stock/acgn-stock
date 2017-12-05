@@ -25,7 +25,6 @@ export function getAttributeNumber(attribute, amount) {
   }
 }
 
-//schema
 const schema = new SimpleSchema({
   //對應的大賽id
   arenaId: {

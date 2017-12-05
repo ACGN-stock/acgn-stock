@@ -6,7 +6,6 @@ import SimpleSchema from 'simpl-schema';
 export const dbRuleIssues = new Mongo.Collection('ruleIssues');
 export default dbRuleIssues;
 
-//schema
 const schema = new SimpleSchema({
   //議題標題
   title: {
@@ -31,4 +30,3 @@ const schema = new SimpleSchema({
   }
 });
 dbRuleIssues.attachSchema(schema);
-
