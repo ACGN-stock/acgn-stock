@@ -15,10 +15,22 @@ export function startArenaFight() {
       beginDate: -1
     },
     fields: {
-      _id: 1
+      _id: 1,
+      shuffledFighterCompanyIdList: 1
     }
   });
   const arenaId = lastArenaData._id;
+  const shuffledFighterCompanyIdList = lastArenaData.shuffledFighterCompanyIdList;
+  if (shuffledFighterCompanyIdList.length < 1) {
+    dbArena.update(arenaId, {
+      $set: {
+        winnerList: [],
+        endDate: new Date()
+      }
+    });
+
+    return true;
+  }
   const fighterListBySequence = dbArenaFighters
     .find(
       {
@@ -76,7 +88,8 @@ export function startArenaFight() {
       //依此攻擊者的攻擊優先順序取得防禦者
       let defender;
       for (const attackTargetIndex of attacker.attackSequence) {
-        defender = fighterListBySequence[attackTargetIndex];
+        const companyId = shuffledFighterCompanyIdList[attackTargetIndex];
+        defender = _.findWhere(fighterListBySequence, {companyId});
         if (defender && defender.currentHp > 0) {
           break;
         }

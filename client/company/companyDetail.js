@@ -1200,14 +1200,14 @@ Template.arenaStrategyForm.helpers({
     return model[fieldName][index];
   },
   hasEnemy() {
-    return this.fighterSequence.length > 0;
+    return this.shuffledFighterCompanyIdList.length > 0;
   },
   enemyList() {
-    const fighterSequence = this.fighterSequence;
+    const shuffledFighterCompanyIdList = this.shuffledFighterCompanyIdList;
     const model = Template.instance().model.get();
 
     return _.map(model.attackSequence, (attackIndex) => {
-      return fighterSequence[attackIndex];
+      return shuffledFighterCompanyIdList[attackIndex];
     });
   }
 });

@@ -20,12 +20,12 @@ const schema = new SimpleSchema({
   joinEndDate: {
     type: Date
   },
-  //所有參賽者companyId依攻擊順序排列，在報名截止後開始計算，dbArenaFighters的attackSequence將對應此陣列的index。
-  fighterSequence: {
+  //所有參賽者companyId依隨機順序排列，在報名截止後生成，dbArenaFighters的attackSequence將對應此陣列的index。
+  shuffledFighterCompanyIdList: {
     type: Array,
     defaultValue: []
   },
-  'fighterSequence.$': String,
+  'shuffledFighterCompanyIdList.$': String,
   //所有參賽者companyId依存活時間排列，第一位為最後的勝利者
   winnerList: {
     type: Array,

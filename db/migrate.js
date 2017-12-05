@@ -629,7 +629,7 @@ if (Meteor.isServer) {
           beginDate: beginDate,
           endDate: arenaEndDate,
           joinEndDate: new Date(arenaEndDate.getTime() - Meteor.settings.public.electManagerTime),
-          fighterSequence: []
+          shuffledFighterCompanyIdList: []
         });
       }
       dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSasonNumber);
