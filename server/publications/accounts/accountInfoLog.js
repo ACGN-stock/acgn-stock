@@ -19,7 +19,7 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
     createdAt: { $gte: firstLogDate }
   };
 
-  const totalCountObserver = publishTotalCount('totalCountOfAccountInfoLog', dbLog.find(filter), this);
+  publishTotalCount('totalCountOfAccountInfoLog', dbLog.find(filter), this);
 
   const pageObserver = dbLog
     .find(filter, {
@@ -39,7 +39,6 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

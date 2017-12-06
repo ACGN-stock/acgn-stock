@@ -284,9 +284,10 @@ Template.companyDetail.events({
     const companyId = FlowRouter.getParam('companyId');
     const companyData = dbCompanies.findOne(companyId);
     const companyName = companyData.companyName;
-    const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + companyName + '」以表示確定。';
+    const checkCompanyName = companyName.replace(/\s/g, '');
+    const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + checkCompanyName + '」以表示確定。';
     alertDialog.prompt(message, function(confirmMessage) {
-      if (confirmMessage === companyName) {
+      if (confirmMessage === checkCompanyName) {
         Meteor.customCall('resignManager', companyId);
       }
     });
@@ -1118,9 +1119,10 @@ Template.companyArenaInfo.helpers({
 Template.companyArenaInfo.events({
   'click [data-action="joinArena"]'(event, templateInstance) {
     const {_id, companyName} = templateInstance.data;
-    const message = '你確定要讓「' + companyName + '」報名這一屆的最萌亂鬥大賽嗎？\n報名後將無法取消，請輸入「' + companyName + '」以表示確定。';
+    const checkCompanyName = companyName.replace(/\s/g, '');
+    const message = '你確定要讓「' + companyName + '」報名這一屆的最萌亂鬥大賽嗎？\n報名後將無法取消，請輸入「' + checkCompanyName + '」以表示確定。';
     alertDialog.prompt(message, function(confirmMessage) {
-      if (confirmMessage === companyName) {
+      if (confirmMessage === checkCompanyName) {
         Meteor.customCall('joinArena', _id);
       }
     });
@@ -1137,6 +1139,11 @@ Template.companyArenaInfo.events({
     }
     const minimumUnitPrice = 1;
     const maximumUnitPrice = user.profile.money;
+    if (maximumUnitPrice < minimumUnitPrice) {
+      alertDialog.alert('您的金錢不足以投資！');
+
+      return false;
+    }
     const message = (
       '請輸入要您要投資在「' + companyName + '」' +
       '的屬性「' + investTarget.toUpperCase() + '」的金錢：' +

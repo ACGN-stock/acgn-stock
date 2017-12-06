@@ -13,7 +13,7 @@ Meteor.publish('accountInfoTax', function(userId, offset) {
 
   const filter = { userId };
 
-  const totalCountObserver = publishTotalCount('totalCountOfAccountInfoTax', dbTaxes.find(filter), this);
+  publishTotalCount('totalCountOfAccountInfoTax', dbTaxes.find(filter), this);
 
   const pageObserver = dbTaxes
     .find(filter, {
@@ -35,7 +35,6 @@ Meteor.publish('accountInfoTax', function(userId, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

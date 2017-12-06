@@ -13,7 +13,7 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
 
   const filter = { userId };
 
-  const totalCountObserver = publishTotalCount('totalCountOfAccountOwnStocks', dbDirectors.find(filter), this);
+  publishTotalCount('totalCountOfAccountOwnStocks', dbDirectors.find(filter), this);
 
   const pageObserver = dbDirectors
     .find(filter, {
@@ -40,7 +40,6 @@ Meteor.publish('accountOwnStocks', function(userId, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

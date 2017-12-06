@@ -26,7 +26,7 @@ import { dbVariables } from '/db/dbVariables';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVoteRecord } from '/db/dbVoteRecord';
 import { startArenaFight } from './arena';
-import { checkFoundCompany } from './foundation';
+import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { setLowPriceThreshold } from './lowPriceThreshold';
 import { recordListPriceAndSellFSCStocks, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
@@ -67,7 +67,7 @@ export function doIntervalWork() {
     //設定低價位股價門檻
     setLowPriceThreshold();
     //檢查所有創立中且投資時間截止的公司是否成功創立
-    checkFoundCompany();
+    checkExpiredFoundations();
     //當發薪時間到時，發給所有驗證通過的使用者薪水，並檢查賦稅、增加滯納罰金與強制繳稅
     paySalaryAndCheckTax();
     //隨機時間讓符合條件的公司釋出股票

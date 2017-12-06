@@ -624,7 +624,7 @@ if (Meteor.isServer) {
       });
       if (lastSeasonData) {
         const {beginDate, endDate} = lastSeasonData;
-        const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSasonNumber);
+        const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber);
         dbArena.insert({
           beginDate: beginDate,
           endDate: arenaEndDate,
@@ -632,7 +632,7 @@ if (Meteor.isServer) {
           shuffledFighterCompanyIdList: []
         });
       }
-      dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSasonNumber);
+      dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
     }
   });
 

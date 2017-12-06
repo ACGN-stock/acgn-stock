@@ -23,13 +23,21 @@ Meteor.publish('accountInfo', function(userId) {
     dbCompanies
       .find(
         {
-          manager: userId,
+          $or: [
+            {
+              manager: userId
+            },
+            {
+              chairman: userId
+            }
+          ],
           isSeal: false
         },
         {
           fields: {
             companyName: 1,
-            manager: 1
+            manager: 1,
+            chairman: 1
           },
           disableOplog: true
         }

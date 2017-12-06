@@ -21,7 +21,7 @@ export const config = {
   beginMoney: 10000, //所有使用者驗證通過後的起始資金數量
   salaryPerPay: 1000, //所有驗證通過的使用者每隔一段時間可以固定領取的薪資數量
   seasonNumberInRound: 12, //一個賽季有幾個商業季度
-  arenaIntervalSasonNumber: 1, //最萌亂鬥大賽的舉行會間隔多少個商業季度，0為每個商業季度都會舉辦一次
+  arenaIntervalSeasonNumber: 1, //最萌亂鬥大賽的舉行會間隔多少個商業季度，0為每個商業季度都會舉辦一次
   arenaMaximumRound: 500, //最萌亂鬥大賽的最大回合數
   seasonTime: 604800000, //每個商業季度的持續時間，單位為微秒
   electManagerTime: 86400000, //每個商業季度結束前多久時間會進行經理競選，單位為微秒
