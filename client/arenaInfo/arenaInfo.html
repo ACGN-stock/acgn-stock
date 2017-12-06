@@ -148,13 +148,24 @@
     <form class="form-inline">
       <div class="form-group">
         <label>
-          篩選：
-          <select class="form-control" name="companyId">
-            <option value="">所有參賽者</option>
-            {{#each fighter in fighterList}}
-              <option value="{{fighter._id}}">{{fighter.name}}</option>
-            {{/each}}
-          </select>
+          篩選參賽者：
+          <div class="input-group show">
+            <input
+              class="form-control"
+              type="text"
+              name="companyId"
+              placeholder="全部參賽者"
+            />
+            {{#if hasFilterResult}}
+              <div class="dropdown-menu">
+                {{#each filterResultList}}
+                  <a class="dropdown-item" href="#" data-filter="{{this._id}}">
+                    {{this.name}}
+                  </a>
+                {{/each}}
+              </div>
+            {{/if}}
+          </div>
         </label>
       </div>
     </form>
