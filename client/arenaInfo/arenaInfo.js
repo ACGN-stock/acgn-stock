@@ -239,6 +239,7 @@ const rLogOffset = new ReactiveVar(0);
 const rCompanyId = new ReactiveVar('');
 const rFighterIdList = new ReactiveVar([]);
 const rFighterList = new ReactiveVar([]);
+const rFilterResultList = new ReactiveVar([]);
 inheritedShowLoadingOnSubscribing(Template.arenaLogList);
 Template.arenaLogList.onCreated(function() {
   rLogOffset.set(0);
@@ -291,8 +292,11 @@ Template.arenaLogList.onCreated(function() {
   });
 });
 Template.arenaLogList.helpers({
-  fighterList() {
-    return rFighterList.get();
+  hasFilterResult() {
+    return rFilterResultList.get().length > 0;
+  },
+  filterResultList() {
+    return rFilterResultList.get();
   },
   logList() {
     const arenaId = FlowRouter.getParam('arenaId');
@@ -360,8 +364,32 @@ Template.arenaLogList.helpers({
   }
 });
 Template.arenaLogList.events({
-  'change [name="companyId"]'(event) {
-    const companyId = $(event.currentTarget).val();
+  'focus [name="companyId"]': generateFilterResult,
+  'keyup [name="companyId"]': generateFilterResult,
+  'click [data-filter]'(event, templateInstance) {
+    event.preventDefault();
+    const companyId = $(event.currentTarget).attr('data-filter');
     rCompanyId.set(companyId);
+    rFilterResultList.set([]);
+    const fighterData = _.find(rFighterList.get(), (fighter) => {
+      return fighter._id === companyId;
+    });
+    if (fighterData) {
+      templateInstance.$('[name="companyId"]').val(fighterData.name || '');
+    }
   }
 });
+
+function generateFilterResult(event) {
+  const searchName = $(event.currentTarget).val();
+  if (searchName) {
+    const searchRegExp = new RegExp(searchName);
+    const filterResultList = _.filter(rFighterList.get(), (fighter) => {
+      return searchRegExp.test(fighter.name);
+    });
+    rFilterResultList.set(filterResultList);
+  }
+  else {
+    rFilterResultList.set([]);
+  }
+}
