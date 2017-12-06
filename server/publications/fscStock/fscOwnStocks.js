@@ -3,6 +3,7 @@ import { check, Match } from 'meteor/check';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { dbDirectors } from '/db/dbDirectors';
+import { dbCompanies } from '/db/dbCompanies';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('fscOwnStocks', function(userId, offset) {
@@ -10,37 +11,28 @@ Meteor.publish('fscOwnStocks', function(userId, offset) {
   check(userId, String);
   check(offset, Match.Integer);
 
-  const filter = { userId };
+  this.autorun(() => {
+    const companyList = dbCompanies.find({isSeal: false})
+      .map((company) => {
+        return company._id;
+      });
 
-  publishTotalCount('totalCountOfFSCOwnStocks', dbDirectors.find(filter), this);
+    const filter = { userId, companyId: { $in: companyList } };
 
-  const pageObserver = dbDirectors
-    .find(filter, {
-      fields: {
-        userId: 1,
-        companyId: 1,
-        stocks: 1
-      },
-      skip: offset,
-      limit: 20,
-      disableOplog: true
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('directors', id, fields);
-      },
-      changed: (id, fields) => {
-        this.changed('directors', id, fields);
-      },
-      removed: (id) => {
-        this.removed('directors', id);
-      }
-    });
+    publishTotalCount('totalCountOfFSCOwnStocks', dbDirectors.find(filter), this);
 
-  this.ready();
-  this.onStop(() => {
-    pageObserver.stop();
+    return dbDirectors
+      .find(filter, {
+        fields: {
+          userId: 1,
+          companyId: 1,
+          stocks: 1
+        },
+        skip: offset,
+        limit: 10,
+        disableOplog: true
+      });
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('fscOwnStocks');
