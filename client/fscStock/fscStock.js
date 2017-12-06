@@ -22,13 +22,13 @@ Template.fscStock.helpers({
     const userId = '!FSC';
 
     return dbDirectors.find({userId}, {
-      limit: 20
+      limit: 10
     });
   },
   paginationData() {
     return {
       useVariableForTotalCount: 'totalCountOfFSCOwnStocks',
-      dataNumberPerPage: 20,
+      dataNumberPerPage: 10,
       offset: ownStocksOffset
     };
   }
