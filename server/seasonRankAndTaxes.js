@@ -209,7 +209,9 @@ function rankCompany(seasonData) {
         $project: {
           _id: 1,
           avgPrice: {
-            $divide: ['$totalDealMoney', '$totalDealAmount']
+            $cond: [ { $eq: ['$totalDealAmount', 0] },
+              { $arrayElemAt: ['$companyData.listPrice', 0] },
+              { $divide: ['$totalDealMoney', '$totalDealAmount'] } ]
           },
           isSeal: {
             $arrayElemAt: ['$companyData.isSeal', 0]
