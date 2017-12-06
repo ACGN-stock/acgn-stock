@@ -27,7 +27,7 @@ Meteor.publish('companyArchiveList', function({keyword, matchType, offset}) {
     ];
   }
 
-  const totalCountObserver = publishTotalCount('totalCountOfCompanyArchiveList', dbCompanyArchive.find(filter), this);
+  publishTotalCount('totalCountOfCompanyArchiveList', dbCompanyArchive.find(filter), this);
 
   const pageObserver = dbCompanyArchive
     .find(filter, {
@@ -52,7 +52,6 @@ Meteor.publish('companyArchiveList', function({keyword, matchType, offset}) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

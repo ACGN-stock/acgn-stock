@@ -104,7 +104,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
   };
   const disableOplog = true;
 
-  const totalCountObserver = publishTotalCount('totalCountOfCompanyList', dbCompanies.find(filter), this);
+  publishTotalCount('totalCountOfCompanyList', dbCompanies.find(filter), this);
   const pageObserver = dbCompanies
     .find(filter, {sort, skip, limit, fields, disableOplog})
     .observeChanges({
@@ -121,7 +121,6 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

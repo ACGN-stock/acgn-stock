@@ -16,7 +16,7 @@ Meteor.publish('arenaLog', function(arenaId, companyId, offset) {
     filter.companyId = companyId;
   }
 
-  const totalCountObserver = publishTotalCount('totalCountOfArenaLog', dbArenaLog.find(filter), this);
+  publishTotalCount('totalCountOfArenaLog', dbArenaLog.find(filter), this);
 
   const pageObserver = dbArenaLog
     .find(filter, {
@@ -41,7 +41,6 @@ Meteor.publish('arenaLog', function(arenaId, companyId, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });
