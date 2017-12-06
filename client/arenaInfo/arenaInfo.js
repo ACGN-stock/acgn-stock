@@ -366,6 +366,9 @@ Template.arenaLogList.helpers({
 Template.arenaLogList.events({
   'focus [name="companyId"]': generateFilterResult,
   'keyup [name="companyId"]': generateFilterResult,
+  'submit'(event) {
+    event.preventDefault();
+  },
   'click [data-filter]'(event, templateInstance) {
     event.preventDefault();
     const companyId = $(event.currentTarget).attr('data-filter');
