@@ -20,7 +20,7 @@
     "beginMoney": 10000,
     "salaryPerPay": 1000,
     "seasonNumberInRound": 12,
-    "arenaIntervalSasonNumber": 1,
+    "arenaIntervalSeasonNumber": 1,
     "arenaMaximumRound": 500,
     "seasonTime": 604800000,
     "electManagerTime": 86400000,
