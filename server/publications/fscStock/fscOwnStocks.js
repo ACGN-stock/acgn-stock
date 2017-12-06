@@ -12,7 +12,7 @@ Meteor.publish('fscOwnStocks', function(userId, offset) {
 
   const filter = { userId };
 
-  const totalCountObserver = publishTotalCount('totalCountOfFSCOwnStocks', dbDirectors.find(filter), this);
+  publishTotalCount('totalCountOfFSCOwnStocks', dbDirectors.find(filter), this);
 
   const pageObserver = dbDirectors
     .find(filter, {
@@ -39,7 +39,6 @@ Meteor.publish('fscOwnStocks', function(userId, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

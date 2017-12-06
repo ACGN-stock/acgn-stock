@@ -27,7 +27,7 @@ Meteor.publish('foundationList', function({keyword, matchType, offset}) {
     ];
   }
 
-  const totalCountObserver = publishTotalCount('totalCountOfFoundationPlan', dbFoundations.find(filter), this);
+  publishTotalCount('totalCountOfFoundationPlan', dbFoundations.find(filter), this);
 
   const pageObserver = dbFoundations
     .find(filter, {
@@ -50,7 +50,6 @@ Meteor.publish('foundationList', function({keyword, matchType, offset}) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

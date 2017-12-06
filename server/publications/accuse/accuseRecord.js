@@ -14,7 +14,7 @@ Meteor.publish('accuseRecord', function(offset) {
     logType: { $in: accuseLogTypeList }
   };
 
-  const totalCountObserver = publishTotalCount('totalCountOfAccuseRecord', dbLog.find(filter), this);
+  publishTotalCount('totalCountOfAccuseRecord', dbLog.find(filter), this);
 
   const pageObserver = dbLog
     .find(filter, {
@@ -35,7 +35,6 @@ Meteor.publish('accuseRecord', function(offset) {
     });
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

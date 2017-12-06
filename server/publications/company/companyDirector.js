@@ -13,12 +13,7 @@ Meteor.publish('companyDirector', function(companyId, offset) {
 
   const filter = { companyId };
 
-  const totalCountObserver = publishTotalCount('totalCountOfCompanyDirector', dbDirectors.find(filter), this);
-
-  // TODO 移進 publishTotalCount 以簡化程式
-  this.onStop(() => {
-    totalCountObserver.stop();
-  });
+  publishTotalCount('totalCountOfCompanyDirector', dbDirectors.find(filter), this);
 
   const directorsCursor = dbDirectors.find(filter, {
     sort: { stocks: -1 },

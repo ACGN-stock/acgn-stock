@@ -20,7 +20,7 @@ Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
     };
   }
 
-  const totalCountObserver = publishTotalCount('totalCountOfcompanyLog', dbLog.find(filter), this);
+  publishTotalCount('totalCountOfcompanyLog', dbLog.find(filter), this);
 
   const pageObserver = dbLog
     .find(filter, {
@@ -43,7 +43,6 @@ Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

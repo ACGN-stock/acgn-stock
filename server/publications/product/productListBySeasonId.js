@@ -20,7 +20,7 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
     }
   };
 
-  const totalCountObserver = publishTotalCount('totalCountOfProductList', dbProducts.find(filter), this);
+  publishTotalCount('totalCountOfProductList', dbProducts.find(filter), this);
 
   const pageObserver = dbProducts
     .find(filter, {
@@ -47,7 +47,6 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });
