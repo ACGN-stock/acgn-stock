@@ -570,7 +570,7 @@ function generateNewSeason() {
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
   //若上一個商業季度為最萌亂鬥大賽的舉辦季度，則產生新的arena Data
   if (arenaCounter <= 0) {
-    const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSasonNumber);
+    const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber);
     dbArena.insert({
       beginDate: beginDate,
       endDate: arenaEndDate,
@@ -578,7 +578,7 @@ function generateNewSeason() {
       shuffledFighterCompanyIdList: [],
       winnerList: []
     });
-    dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSasonNumber);
+    dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
   }
   else {
     //若下一個商業季度為最萌亂鬥大賽的舉辦季度，則以新產生的商業季度結束時間與選舉時間更新最萌亂鬥大賽的時間，以糾正季度更換時的時間偏差
