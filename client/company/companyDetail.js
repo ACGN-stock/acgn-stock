@@ -1139,6 +1139,11 @@ Template.companyArenaInfo.events({
     }
     const minimumUnitPrice = 1;
     const maximumUnitPrice = user.profile.money;
+    if (maximumUnitPrice < minimumUnitPrice) {
+      alertDialog.alert('您的金錢不足以投資！');
+
+      return false;
+    }
     const message = (
       '請輸入要您要投資在「' + companyName + '」' +
       '的屬性「' + investTarget.toUpperCase() + '」的金錢：' +
