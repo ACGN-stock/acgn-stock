@@ -163,6 +163,11 @@
         被撤銷了擔任經理人的資格！
       </div>
     {{/if}}
+    {{#each ownCompanies}}
+      <div class="text-primary">
+        是「{{>companyLink this._id}}」公司的董事長。
+      </div>
+    {{/each}}
     {{#each manageCompanies}}
       <div class="text-primary">
         是「{{>companyLink this._id}}」公司的總經理。
