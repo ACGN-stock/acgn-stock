@@ -2,10 +2,10 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
-import { buildSearchRegExp } from '/server/imports/buildSearchRegExp';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
+import { buildSearchRegExp } from '/server/imports/utils/buildSearchRegExp';
 
 Meteor.publish('companyArchiveList', function({keyword, matchType, offset}) {
   debug.log('publish companyArchiveList', {keyword, matchType, offset});

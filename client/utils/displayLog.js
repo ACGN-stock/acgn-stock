@@ -3,7 +3,8 @@ import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { currencyFormat } from './helpers.js';
+
+import { currencyFormat, sanitizeHtml } from './helpers.js';
 
 Template.displayLog.onRendered(function() {
   if (this.data.userId) {
@@ -214,7 +215,7 @@ Template.displayLog.helpers({
 
         result += '擊敗了所有競爭對手，';
 
-        if (userId[1] === '!none') {
+        if (! userId[1] || userId[1] === '!none') {
           result += '成為了公司的經理人。';
         }
         else if (userId[0] === userId[1]) {
@@ -399,10 +400,4 @@ function companySpan(companyId) {
 
 function productSpan(productId) {
   return `<span data-product-link="${productId}"></span>`;
-}
-
-function sanitizeHtml(str) {
-  return $('<span></span>')
-    .text(str)
-    .html();
 }

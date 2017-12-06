@@ -83,7 +83,16 @@
           {{/if}}
         {{/if}}
       </div>
-      <hr style="margin: 0px;" />
+      <hr class="m-0"/>
+      {{#if this.illegalReason}}
+        <div class="row text-left illegal-description">
+          <div class="col text-center text-white text-truncate" title="{{sanitizeHtml this.illegalReason}}">
+            <i class="fa fa-warning"></i>
+            {{sanitizeHtml this.illegalReason}}
+          </div>
+        </div>
+        <hr class="m-0"/>
+      {{/if}}
       <div class="row row-cover d-flex justify-content-around">
         <div class="d-flex flex-column align-self-center">
           <div class="picture">
@@ -199,7 +208,14 @@
       {{/if}}
     </div>
     <div class="media-body row border-grid-body">
+      {{#if this.illegalReason}}
+        <div class="col-12 text-center text-danger text-truncate border-grid" title="{{showIllegalDescription}}">
+          <i class="fa fa-warning"></i>
+          本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
+        </div>
+      {{/if}}
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">角色名稱：</div>
+    
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>companyLink this._id}}
       </div>

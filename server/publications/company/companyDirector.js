@@ -2,9 +2,9 @@ import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 
 import { dbDirectors } from '/db/dbDirectors';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('companyDirector', function(companyId, offset) {
   debug.log('publish companyDirector', {companyId, offset});

@@ -2,15 +2,15 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbProducts } from '/db/dbProducts';
 import { dbProductLike } from '/db/dbProductLike';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbSeason } from '/db/dbSeason';
 import { dbLog } from '/db/dbLog';
 import { dbVoteRecord } from '/db/dbVoteRecord';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   voteProduct(productId) {

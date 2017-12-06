@@ -9,7 +9,7 @@ import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
 import { dbRankUserWealth } from '/db/dbRankUserWealth';
 import { dbTaxes } from '/db/dbTaxes';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 //為所有公司與使用者進行排名結算
 export function generateRankAndTaxesData(seasonData) {

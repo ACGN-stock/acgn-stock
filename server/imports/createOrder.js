@@ -6,7 +6,7 @@ import { dbDirectors } from '/db/dbDirectors';
 import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
 import { dbPrice } from '/db/dbPrice';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 export function createOrder(orderData) {
   debug.log('createOrder', orderData);

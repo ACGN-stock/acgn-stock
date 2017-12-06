@@ -3,11 +3,11 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   decideArenaStrategy(companyId, strategyData) {
@@ -51,14 +51,14 @@ function decideArenaStrategy({user, companyId, strategyData}) {
     fields: {
       _id: 1,
       endDate: 1,
-      fighterSequence: 1
+      shuffledFighterCompanyIdList: 1
     }
   });
   if (! lastArenaData) {
     throw new Meteor.Error(403, '現在並沒有舉辦最萌亂鬥大賽！');
   }
-  if (lastArenaData.fighterSequence.length) {
-    if ((lastArenaData.fighterSequence.length - 1) !== strategyData.attackSequence.length) {
+  if (lastArenaData.shuffledFighterCompanyIdList.length) {
+    if ((lastArenaData.shuffledFighterCompanyIdList.length - 1) !== strategyData.attackSequence.length) {
       throw new Meteor.Error(403, '攻擊優先順序的資料格式錯誤！');
     }
     let attackSequenceIsInvalid = false;

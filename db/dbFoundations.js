@@ -47,6 +47,12 @@ const schema = new SimpleSchema({
     min: 10,
     max: 3000
   },
+  // 違規描述
+  illegalReason: {
+    type: String,
+    max: 10,
+    optional: true
+  },
   //投資人列表
   invest: {
     type: Array,

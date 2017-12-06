@@ -56,8 +56,6 @@
   </form>
 </template>
 
-
-
 <template name="foundationListCard">
   <div class="col-12 col-md-6 col-lg-4 col-xl-3" style="margin-bottom: 25px;">
     <div class="company-card {{cardDisplayClass this}}">
@@ -65,7 +63,16 @@
         <div class="row row-info">
           <small>{{getExpireDateText this.createdAt}} 截止</small>
         </div>
-        <hr style="margin: 0px;" />
+        <hr class="m-0"/>
+        {{#if this.illegalReason}}
+          <div class="row text-left illegal-description">
+            <div class="col text-center text-white text-truncate" title="{{sanitizeHtml this.illegalReason}}">
+              <i class="fa fa-warning"></i>
+              {{sanitizeHtml this.illegalReason}}
+            </div>
+          </div>
+          <hr class="m-0"/>
+        {{/if}}
         <div class="row row-cover d-flex justify-content-around">
           <div class="d-flex flex-column align-self-center">
             <div class="picture">
@@ -89,7 +96,7 @@
             </div>
           </div>
         </div>
-        <div class="title-starter">
+        <div class="row title-starter">
           {{>companyLink this._id}}
         </div>
         <div class="row row-info d-flex justify-content-between">
@@ -120,7 +127,7 @@
           </div>
         </div>
         {{#if currentUser}}
-          <hr style="margin: 0px;" />
+          <hr class="m-0">
           <div class="row btn-group">
             {{#if currentUser.profile.isAdmin}}
               <a class="btn btn-tab" href="{{getEditHref this._id}}">
@@ -147,6 +154,12 @@
       {{/if}}
     </div>
     <div class="media-body row border-grid-body">
+      {{#if this.illegalReason}}
+        <div class="col-12 text-center text-danger text-truncate border-grid" title="{{showIllegalDescription}}">
+          <i class="fa fa-warning"></i>
+          本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
+        </div>
+      {{/if}}
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">角色名稱：</div>
       <div class="col-8 col-lg-3 text-truncate border-grid" title="{{this.companyName}}">
         {{>companyLink this._id}}

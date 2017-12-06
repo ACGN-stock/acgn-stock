@@ -79,6 +79,7 @@
     <thead>
       <tr>
         <th class="text-center text-truncate" title="參賽選手">參賽選手</th>
+        <th class="text-center text-truncate" title="決策者">決策者</th>
         <th class="text-center text-truncate" style="width: 100px; cursor: pointer;" title="HP" data-sort="hp">
           HP
           {{{getSortIcon 'hp'}}}
@@ -108,25 +109,28 @@
     <tbody>
       {{#each fighter in fighterList}}
         <tr>
-          <td class="text-left px-2">
+          <td class="text-left px-1 text-truncate">
             <div>{{>companyLink fighter.companyId}}</div>
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-left px-1 text-truncate">
+            <div>{{>userLink fighter.manager}}</div>
+          </td>
+          <td class="text-right px-1 text-truncate">
             {{getAttributeNumber fighter 'hp'}}
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-right px-1 text-truncate">
             {{getAttributeNumber fighter 'sp'}}
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-right px-1 text-truncate">
             {{getAttributeNumber fighter 'atk'}}
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-right px-1 text-truncate">
             {{getAttributeNumber fighter 'def'}}
           </td>
-          <td class="text-right text-truncate">
+          <td class="text-right px-1 text-truncate">
             {{getAttributeNumber fighter 'agi'}}
           </td>
-          <td class="text-center text-truncate">
+          <td class="text-center px-1 text-truncate">
             {{fighter.winnerIndex}}
           </td>
         </tr>
