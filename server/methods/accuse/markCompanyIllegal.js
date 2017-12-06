@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 
 import { dbCompanies } from '/db/dbCompanies';
+import { dbLog } from '/db/dbLog';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 
@@ -26,5 +27,12 @@ function markCompanyIllegal(user, companyId, reason) {
   }
 
   dbCompanies.update(companyId, { $set: { illegalReason: reason } });
+  dbLog.insert({
+    logType: '違規標記',
+    userId: [user._id],
+    companyId,
+    data: { reason },
+    createdAt: new Date()
+  });
 }
 limitMethod('markCompanyIllegal');
