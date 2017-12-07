@@ -169,7 +169,8 @@ export function startArenaFight() {
         companyId: companyId,
         data: {
           reward
-        }
+        },
+        createdAt: new Date()
       });
       dbCompanies.update(companyId, {
         $inc: {
