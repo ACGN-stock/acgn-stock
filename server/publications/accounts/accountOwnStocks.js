@@ -1,47 +1,46 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
-
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { dbDirectors } from '/db/dbDirectors';
+import { dbCompanies } from '/db/dbCompanies';
 import { debug } from '/server/imports/utils/debug';
 
-Meteor.publish('accountOwnStocks', function(userId, offset) {
-  debug.log('publish accountOwnStocks', {userId, offset});
+Meteor.publish('accountOwnStocks', function(userId, offset, {limit = 10, includeSeal = true} = {}) {
+  debug.log('publish accountOwnStocks', {userId, offset, limit, includeSeal});
   check(userId, String);
   check(offset, Match.Integer);
+  check(limit, Match.Integer);
+  check(includeSeal, Boolean);
 
-  const filter = { userId };
+  this.autorun(() => {
+    let filter;
 
-  const totalCountObserver = publishTotalCount('totalCountOfAccountOwnStocks', dbDirectors.find(filter), this);
+    if (! includeSeal) {
+      const companyList = dbCompanies.find({isSeal: false})
+        .map((company) => {
+          return company._id;
+        });
 
-  const pageObserver = dbDirectors
-    .find(filter, {
-      fields: {
-        userId: 1,
-        companyId: 1,
-        stocks: 1
-      },
-      skip: offset,
-      limit: 10,
-      disableOplog: true
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('directors', id, fields);
-      },
-      changed: (id, fields) => {
-        this.changed('directors', id, fields);
-      },
-      removed: (id) => {
-        this.removed('directors', id);
-      }
-    });
+      filter = { userId, companyId: { $in: companyList } };
+    }
+    else {
+      filter = { userId };
+    }
 
-  this.ready();
-  this.onStop(() => {
-    totalCountObserver.stop();
-    pageObserver.stop();
+    publishTotalCount('totalCountOfAccountOwnStocks', dbDirectors.find(filter), this);
+
+    return dbDirectors
+      .find(filter, {
+        fields: {
+          userId: 1,
+          companyId: 1,
+          stocks: 1
+        },
+        skip: offset,
+        limit: limit,
+        disableOplog: true
+      });
   });
 });
 //一分鐘最多20次

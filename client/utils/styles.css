@@ -212,6 +212,10 @@
   object-fit: scale-down;
 }
 
+.media-body.row {
+  overflow: hidden;
+}
+
 /* 暗色主題 */
 .container-dark .bg-info .media-body {
   color: #ffffff;
