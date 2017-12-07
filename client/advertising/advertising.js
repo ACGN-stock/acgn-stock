@@ -85,7 +85,11 @@ Template.advertising.events({
     event.preventDefault();
     const advertisingId = $(event.currentTarget).attr('data-take-down');
     const advertisingData = dbAdvertising.findOne(advertisingId);
-    alertDialog.confirm('確定要撤銷廣告「' + advertisingData.message + '」？', (result) => {
+    const message = `
+      <div>確定要撤銷廣告？</div>
+      <div style="max-height: 100px; overflow: scroll;">${advertisingData.message}</div>
+    `;
+    alertDialog.confirm(message, (result) => {
       if (result) {
         Meteor.customCall('takeDownAdvertising', advertisingId);
       }
@@ -183,7 +187,8 @@ function saveAdvertisingModel(model) {
   }
   const message = `
     <div>廣告總支出：$${currencyFormat(totalPaid)}</div>
-    <div>廣告內容：${advertisingSample}</div>
+    <div>廣告內容：</div>
+    <div style="max-height: 100px; overflow: scroll;">${advertisingSample}</div>
     <div>確定發出廣告嗎？</div>
   `;
   alertDialog.confirm(message, (result) => {

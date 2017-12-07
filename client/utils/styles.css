@@ -259,7 +259,7 @@
   white-space: nowrap;
 }
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 768px) {
   /* Force table to not be like tables anymore */
   #tax-info-table table,
   #tax-info-table thead,
@@ -277,16 +277,15 @@
     left: -9999px;
   }
 
-  #tax-info-table tr { border: 2px solid #ccc; }
+  #tax-info-table tr { border: 2px solid; }
 
   #tax-info-table td {
     /* Behave  like a "row" */
     border: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid;
     position: relative;
     padding-left: 35%;
     white-space: normal;
-    text-align: left !important;
   }
 
   #tax-info-table td:last-child {
@@ -297,11 +296,7 @@
     /* Now like a table header */
     position: absolute;
     /* Top/left values mimic padding */
-    top: 6px;
-    left: 6px;
-    width: 45%;
-    padding-right: 10px;
-    padding-bottom: 0px;
+    left: 4px;
     white-space: nowrap;
     text-align: left;
     font-weight: bold;
@@ -311,4 +306,58 @@
   Label the data
   */
   #tax-info-table td:before { content: attr(data-title); }
+}
+
+@media only screen and (max-width: 768px) {
+  /* Force table to not be like tables anymore */
+  #ad-list-table table,
+  #ad-list-table thead,
+  #ad-list-table tbody,
+  #ad-list-table th,
+  #ad-list-table td,
+  #ad-list-table tr {
+    display: block;
+  }
+
+  /* Hide table headers (but not display: none;, for accessibility) */
+  #ad-list-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  #ad-list-table tr { border: 2px solid; }
+
+  #ad-list-table td {
+    /* Behave  like a "row" */
+    border: none;
+    border-bottom: 1px solid;
+    position: relative;
+    padding-left: 35%;
+    white-space: normal;
+  }
+
+  #ad-list-table td:last-child {
+    border-bottom: none;
+  }
+
+  #ad-list-table td:before {
+    /* Now like a table header */
+    position: absolute;
+    /* Top/left values mimic padding */
+    left: 4px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  /*
+  Label the data
+  */
+  #ad-list-table td:before { content: attr(data-title); }
+
+  #ad-list-table td.adv-content {
+    max-height: 100px;
+    overflow-y: auto;
+  }
 }

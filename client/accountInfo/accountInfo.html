@@ -191,7 +191,7 @@
     <table id="tax-info-table" class="table table-bordered mt-3" style="width: 100%; table-layout: fixed;">
       <thead>
         <tr>
-          <th class="text-center text-non-break" style="width: 200px">繳稅期限</th>
+          <th class="text-center text-non-break" style="width: 160px">繳稅期限</th>
           <th class="text-center text-non-break">財稅額</th>
           <th class="text-center text-non-break">殭屍稅</th>
           <th class="text-center text-non-break ">逾期罰金</th>
@@ -204,7 +204,7 @@
       <tbody>
         {{#each taxes in taxesList}}
           <tr>
-            <td class="text-center text-truncate" data-title="繳稅期限">
+            <td class="text-right text-truncate" data-title="繳稅期限">
               {{formatDateText taxes.expireDate}}
             </td>
             <td class="text-right text-truncate" data-title="財稅額" title="{{taxes.tax}}">
