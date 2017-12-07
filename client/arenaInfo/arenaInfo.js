@@ -372,7 +372,8 @@ Template.arenaLogList.events({
   'click [data-filter]'(event, templateInstance) {
     event.preventDefault();
     const companyId = $(event.currentTarget).attr('data-filter');
-    rCompanyId.set(companyId);
+    rFilterCompanyId.set(companyId);
+    rLogOffset.set(0);
     rFilterResultList.set([]);
     const fighterData = _.find(rFighterList.get(), (fighter) => {
       return fighter._id === companyId;
