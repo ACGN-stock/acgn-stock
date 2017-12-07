@@ -19,9 +19,10 @@ export function startArenaFight() {
       shuffledFighterCompanyIdList: 1
     }
   });
+
   const arenaId = lastArenaData._id;
   const shuffledFighterCompanyIdList = lastArenaData.shuffledFighterCompanyIdList;
-  if (shuffledFighterCompanyIdList.length < 1) {
+  if (! shuffledFighterCompanyIdList || shuffledFighterCompanyIdList.length < 1) {
     dbArena.update(arenaId, {
       $set: {
         winnerList: [],

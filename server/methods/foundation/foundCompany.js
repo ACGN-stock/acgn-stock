@@ -51,7 +51,7 @@ export function foundCompany(user, foundCompanyData) {
     }
   });
   if (Date.now() >= (lastSeasonData.endDate.getTime() - Meteor.settings.public.foundExpireTime - 600000)) {
-    const hours = (Meteor.settings.public.foundExpireTime / 3600000);
+    const hours = Math.ceil(Meteor.settings.public.foundExpireTime / 3600000);
     throw new Meteor.Error(403, '商業季度即將結束前' + hours + '小時，禁止新創計劃！');
   }
   const lastRoundData = dbRound.findOne({}, {
