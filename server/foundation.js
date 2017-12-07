@@ -129,10 +129,15 @@ export function doOnFoundationSuccess(foundationData) {
     candidateList.push(foundationData.manager);
   }
 
-  companiesBulk.insert(dbCompanies.simpleSchema().clean({
-    _id: companyId,
+  const voteList = candidateList.map(() => {
+    return [];
+  });
+
+  const companySchema = dbCompanies.simpleSchema();
+  const newCompanyData = companySchema.clean({
     companyName: foundationData.companyName,
     manager: foundationData.manager,
+    chairman: '!none',
     chairmanTitle: '董事長',
     tags: foundationData.tags,
     pictureSmall: foundationData.pictureSmall,
@@ -144,10 +149,15 @@ export function doOnFoundationSuccess(foundationData) {
     listPrice: price,
     totalValue: totalRelease * price,
     candidateList: candidateList,
+    voteList: voteList,
     createdAt: basicCreatedAt
-  }, {
-    filter: false // 防止 _id 被 filter 掉
-  }));
+  });
+  companySchema.validate(newCompanyData);
+
+  companiesBulk.insert({
+    _id: companyId,
+    ...newCompanyData
+  });
 
   dbPrice.insert({
     companyId: companyId,
