@@ -5,11 +5,11 @@ import mustSinon from 'must-sinon';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { companyFactory } from '/dev-utils/factories';
-import { runCheckChairman } from '/server/functions/company/checkChairman';
+import { checkChairman } from '/server/functions/company/checkChairman';
 
 mustSinon(expect);
 
-describe('function runCheckChairman', function() {
+describe('function checkChairman', function() {
   let companyId;
 
   beforeEach(function() {
@@ -22,7 +22,7 @@ describe('function runCheckChairman', function() {
     dbDirectors.insert({ userId: 'user1', companyId, stocks: 100, createdAt: new Date() });
     dbDirectors.insert({ userId: 'user2', companyId, stocks: 110, createdAt: new Date() });
 
-    runCheckChairman();
+    checkChairman();
 
     dbCompanies.findOne(companyId).chairman.must.be.equal('user2');
   });
@@ -31,7 +31,7 @@ describe('function runCheckChairman', function() {
     dbDirectors.insert({ userId: 'user1', companyId, stocks: 100, createdAt: new Date(0) });
     dbDirectors.insert({ userId: 'user2', companyId, stocks: 100, createdAt: new Date(1) });
 
-    runCheckChairman();
+    checkChairman();
 
     dbCompanies.findOne(companyId).chairman.must.be.equal('user1');
   });
@@ -40,7 +40,7 @@ describe('function runCheckChairman', function() {
     dbDirectors.insert({ userId: '!FSC', companyId, stocks: 100, createdAt: new Date() });
     dbDirectors.insert({ userId: 'user1', companyId, stocks: 90, createdAt: new Date() });
 
-    runCheckChairman();
+    checkChairman();
 
     dbCompanies.findOne(companyId).chairman.must.be.equal('user1');
   });
@@ -48,13 +48,13 @@ describe('function runCheckChairman', function() {
   it('should set the chairman to !none if the user !FSC is the only director', function() {
     dbDirectors.insert({ userId: '!FSC', companyId, stocks: 100, createdAt: new Date() });
 
-    runCheckChairman();
+    checkChairman();
 
     dbCompanies.findOne(companyId).chairman.must.be.equal('!none');
   });
 
   it('should set the chairman to !none if there is no director', function() {
-    runCheckChairman();
+    checkChairman();
 
     dbCompanies.findOne(companyId).chairman.must.be.equal('!none');
   });

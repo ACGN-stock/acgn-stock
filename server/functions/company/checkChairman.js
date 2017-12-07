@@ -27,11 +27,12 @@ export function countDownCheckChairman() {
   const nextCounter = generateCheckChairmanCounter();
   countdownManager.set(counterKey, nextCounter);
 
-  runCheckChairman();
+  checkChairman();
 }
 
-export function runCheckChairman() {
-  debug.log('runCheckChairman');
+// 對全市場進行董事長檢查
+export function checkChairman() {
+  debug.log('checkChairman');
 
   const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
   let needExecuteBulk = false;
