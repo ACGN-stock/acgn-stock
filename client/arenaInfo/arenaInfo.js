@@ -424,12 +424,8 @@ Template.arenaLogList.events({
     rFilterCompanyId.set(companyId);
     rLogOffset.set(0);
     rFilterResultList.set([]);
-    const fighterData = _.find(rFighterList.get(), (fighter) => {
-      return fighter._id === companyId;
-    });
-    if (fighterData) {
-      templateInstance.$('[name="companyId"]').val(fighterData.name || '');
-    }
+    const fighterName = rFighterNameHash.get()[companyId];
+    templateInstance.$('[name="companyId"]').val(fighterName || '');
   }
 });
 
@@ -437,8 +433,14 @@ function generateFilterResult(event) {
   const searchName = $(event.currentTarget).val();
   if (searchName) {
     const searchRegExp = new RegExp(searchName);
-    const filterResultList = _.filter(rFighterList.get(), (fighter) => {
-      return searchRegExp.test(fighter.name);
+    const filterResultList = [];
+    _.each(rFighterNameHash.get(), (fighterName, companyId) => {
+      if (searchRegExp.test(fighterName)) {
+        filterResultList.push({
+          _id: companyId,
+          name: fighterName
+        });
+      }
     });
     rFilterResultList.set(filterResultList);
   }
