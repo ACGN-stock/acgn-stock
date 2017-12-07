@@ -93,6 +93,12 @@ Template.accountInfoBasic.helpers({
       }
     }
   },
+  ownCompanies() {
+    return dbCompanies
+      .find({
+        chairman: this._id
+      });
+  },
   manageCompanies() {
     return dbCompanies
       .find({

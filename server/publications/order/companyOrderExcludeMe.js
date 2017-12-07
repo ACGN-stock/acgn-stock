@@ -25,7 +25,7 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
 
   const variableId = 'totalCountOfCompanyOrder' + type;
 
-  const totalCountObserver = publishTotalCount(variableId, dbOrders.find(filter), this);
+  publishTotalCount(variableId, dbOrders.find(filter), this);
 
   const pageObserver = dbOrders
     .find(filter, {
@@ -48,7 +48,6 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

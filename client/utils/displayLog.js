@@ -360,6 +360,12 @@ Template.displayLog.helpers({
       case '解除查封': {
         return `【解除查封】${users[0]}以「${sanitizeHtml(data.reason)}」的理由解除了「${company}」公司的查封關停狀態。`;
       }
+      case '違規標記': {
+        return `【違規標記】${users[0]}以「${sanitizeHtml(data.reason)}」的理由將「${company}」公司標記為違規！`;
+      }
+      case '違規解標': {
+        return `【違規標記】${users[0]}移除了「${company}」公司的違規標記！`;
+      }
       case '公司更名': {
         return `【公司更名】${users[0]}將「${company}」公司的名稱由「${sanitizeHtml(data.oldCompanyName)}」改為「${sanitizeHtml(data.newCompanyName)}」。`;
       }
