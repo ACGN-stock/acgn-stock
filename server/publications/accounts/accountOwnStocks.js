@@ -41,6 +41,8 @@ Meteor.publish('accountOwnStocks', function(userId, offset, {limit = 10, include
         limit: limit,
         disableOplog: true
       });
+  });
 });
+
 //一分鐘最多20次
 limitSubscription('accountOwnStocks');
