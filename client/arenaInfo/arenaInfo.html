@@ -108,12 +108,12 @@
     </thead>
     <tbody>
       {{#each fighter in fighterList}}
-        <tr>
+        <tr data-id="{{fighter.companyId}}">
           <td class="text-left px-1 text-truncate">
-            <div>{{>companyLink fighter.companyId}}</div>
+            <a href="{{fighterUrl fighter.companyId}}">{{fighterName fighter.companyId}}</a>
           </td>
           <td class="text-left px-1 text-truncate">
-            <div>{{>userLink fighter.manager}}</div>
+            <a href="{{managerUrl fighter.manager}}">{{managerName fighter.manager}}</a>
           </td>
           <td class="text-right px-1 text-truncate">
             {{getAttributeNumber fighter 'hp'}}
