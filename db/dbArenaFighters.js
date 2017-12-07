@@ -86,13 +86,21 @@ const schema = new SimpleSchema({
     maxCount: MAX_MANNER_SIZE,
     defaultValue: []
   },
-  'normalManner.$': String,
+  'normalManner.$': {
+    type: String,
+    min: 1,
+    max: 150
+  },
   //特殊攻擊招式表
   specialManner: {
     type: Array,
     maxCount: MAX_MANNER_SIZE,
     defaultValue: []
   },
-  'specialManner.$': String
+  'specialManner.$': {
+    type: String,
+    min: 1,
+    max: 150
+  }
 });
 dbArenaFighters.attachSchema(schema);

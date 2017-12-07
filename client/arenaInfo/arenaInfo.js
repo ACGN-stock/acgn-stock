@@ -145,6 +145,83 @@ Template.arenaInfoNav.helpers({
   }
 });
 
+//auto load company/fighter name info
+const rFighterIdList = new ReactiveVar([]);
+const rFighterUrlHash = new ReactiveVar({});
+const rFighterNameHash = new ReactiveVar({});
+const rManagerIdList = new ReactiveVar([]);
+const rManagerUrlHash = new ReactiveVar({});
+const rManagerNameHash = new ReactiveVar({});
+Template.arenaInfo.onCreated(function() {
+  this.autorun(() => {
+    const arenaId = FlowRouter.getParam('arenaId');
+    const fighterIdList = new Set();
+    const managerIdList = new Set();
+    dbArenaFighters.find({arenaId}).forEach((fighter) => {
+      fighterIdList.add(fighter.companyId);
+      managerIdList.add(fighter.manager);
+    });
+    rFighterIdList.set([...fighterIdList]);
+    rManagerIdList.set([...managerIdList]);
+  });
+  const fighterAjaxList = [];
+  this.autorun(() => {
+    _.invoke(fighterAjaxList, 'abort');
+    fighterAjaxList.splice(0);
+    const fighterUrlHash = {};
+    const fighterNameHash = {};
+    _.each(rFighterIdList.get(), (companyId) => {
+      fighterUrlHash[companyId] = FlowRouter.path('companyDetail', {companyId});
+      const ajaxResult = $.ajax({
+        url: '/companyInfo',
+        data: {
+          id: companyId
+        },
+        dataType: 'json',
+        success: (companyData) => {
+          fighterNameHash[companyId] = companyData.name;
+        },
+        error: () => {
+          fighterNameHash[companyId] = '???';
+        }
+      });
+      fighterAjaxList.push(ajaxResult);
+    });
+    $.when(...fighterAjaxList).always(() => {
+      rFighterUrlHash.set(fighterUrlHash);
+      rFighterNameHash.set(fighterNameHash);
+    });
+  });
+  const managerAjaxList = [];
+  this.autorun(() => {
+    _.invoke(managerAjaxList, 'abort');
+    managerAjaxList.splice(0);
+    const managerUrlHash = {};
+    const managerNameHash = {};
+    _.each(rManagerIdList.get(), (userId) => {
+      managerUrlHash[userId] = FlowRouter.path('accountInfo', {userId});
+      const ajaxResult = $.ajax({
+        url: '/userInfo',
+        data: {
+          id: userId
+        },
+        dataType: 'json',
+        success: (userData) => {
+          managerNameHash[userId] = userData.name;
+        },
+        error: () => {
+          managerNameHash[userId] = '???';
+        }
+      });
+      managerAjaxList.push(ajaxResult);
+    });
+    $.when(...managerAjaxList).always(() => {
+      rManagerUrlHash.set(managerUrlHash);
+      rManagerNameHash.set(managerNameHash);
+    });
+  });
+});
+
 const rFighterSortBy = new ReactiveVar('');
 const rFighterSortDir = new ReactiveVar(-1);
 Template.arenaFighterTable.onCreated(function() {
@@ -218,6 +295,18 @@ Template.arenaFighterTable.helpers({
       }
     });
   },
+  fighterUrl(companyId) {
+    return rFighterUrlHash.get()[companyId];
+  },
+  fighterName(companyId) {
+    return rFighterNameHash.get()[companyId];
+  },
+  managerUrl(manager) {
+    return rManagerUrlHash.get()[manager];
+  },
+  managerName(manager) {
+    return rManagerNameHash.get()[manager];
+  },
   getAttributeNumber(fighter, attributeName) {
     return getAttributeNumber(attributeName, fighter[attributeName]);
   }
@@ -236,9 +325,7 @@ Template.arenaFighterTable.events({
 });
 
 const rLogOffset = new ReactiveVar(0);
-const rCompanyId = new ReactiveVar('');
-const rFighterIdList = new ReactiveVar([]);
-const rFighterList = new ReactiveVar([]);
+const rFilterCompanyId = new ReactiveVar('');
 const rFilterResultList = new ReactiveVar([]);
 inheritedShowLoadingOnSubscribing(Template.arenaLogList);
 Template.arenaLogList.onCreated(function() {
@@ -249,46 +336,8 @@ Template.arenaLogList.onCreated(function() {
     }
     const arenaId = FlowRouter.getParam('arenaId');
     if (arenaId) {
-      this.subscribe('arenaLog', arenaId, rCompanyId.get(), rLogOffset.get());
+      this.subscribe('arenaLog', arenaId, rFilterCompanyId.get(), rLogOffset.get());
     }
-  });
-  this.autorun(() => {
-    const arenaId = FlowRouter.getParam('arenaId');
-    const fighterIdList = dbArenaFighters.find({arenaId}).map((fighter) => {
-      return fighter.companyId;
-    });
-    rFighterIdList.set(fighterIdList);
-  });
-  const ajaxList = [];
-  this.autorun(() => {
-    _.invoke(ajaxList, 'abort');
-    ajaxList.splice(0);
-    const fighterList = [];
-    _.each(rFighterIdList.get(), (companyId, index) => {
-      const ajaxResult = $.ajax({
-        url: '/companyInfo',
-        data: {
-          id: companyId
-        },
-        dataType: 'json',
-        success: (companyData) => {
-          fighterList[index] = {
-            _id: companyId,
-            name: companyData.name
-          };
-        },
-        error: () => {
-          fighterList[index] = {
-            _id: companyId,
-            name: '???'
-          };
-        }
-      });
-      ajaxList.push(ajaxResult);
-    });
-    $.when(...ajaxList).always(() => {
-      rFighterList.set(fighterList);
-    });
   });
 });
 Template.arenaLogList.helpers({
@@ -372,14 +421,11 @@ Template.arenaLogList.events({
   'click [data-filter]'(event, templateInstance) {
     event.preventDefault();
     const companyId = $(event.currentTarget).attr('data-filter');
-    rCompanyId.set(companyId);
+    rFilterCompanyId.set(companyId);
+    rLogOffset.set(0);
     rFilterResultList.set([]);
-    const fighterData = _.find(rFighterList.get(), (fighter) => {
-      return fighter._id === companyId;
-    });
-    if (fighterData) {
-      templateInstance.$('[name="companyId"]').val(fighterData.name || '');
-    }
+    const fighterName = rFighterNameHash.get()[companyId];
+    templateInstance.$('[name="companyId"]').val(fighterName || '');
   }
 });
 
@@ -387,8 +433,14 @@ function generateFilterResult(event) {
   const searchName = $(event.currentTarget).val();
   if (searchName) {
     const searchRegExp = new RegExp(searchName);
-    const filterResultList = _.filter(rFighterList.get(), (fighter) => {
-      return searchRegExp.test(fighter.name);
+    const filterResultList = [];
+    _.each(rFighterNameHash.get(), (fighterName, companyId) => {
+      if (searchRegExp.test(fighterName)) {
+        filterResultList.push({
+          _id: companyId,
+          name: fighterName
+        });
+      }
     });
     rFilterResultList.set(filterResultList);
   }
