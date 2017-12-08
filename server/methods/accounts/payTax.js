@@ -81,7 +81,7 @@ function payTax(user, taxId, amount) {
       dbLog.insert({
         logType: '繳納稅金',
         userId: [userId],
-        'data.paid': amount,
+        data: { paid: amount },
         createdAt: createdAt
       });
     }
