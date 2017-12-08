@@ -25,11 +25,16 @@ import { dbUserArchive } from '/db/dbUserArchive';
 import { dbVariables } from '/db/dbVariables';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVoteRecord } from '/db/dbVoteRecord';
+import { updateLowPriceThreshold } from './functions/company/updateLowPriceThreshold';
+import { updateHighPriceCompanyCount } from './functions/company/updateHighPriceCompanyCount';
+import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
+import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
+import { countDownReleaseStocksForLowPrice } from './functions/company/releaseStocksForLowPrice';
+import { countDownRecordListPrice } from './functions/company/recordListPrice';
+import { countDownCheckChairman } from './functions/company/checkChairman';
 import { startArenaFight } from './arena';
 import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
-import { setLowPriceThreshold } from './lowPriceThreshold';
-import { recordListPriceAndSellFSCStocks, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
 import { debug } from '/server/imports/utils/debug';
 
@@ -65,19 +70,21 @@ export function doIntervalWork() {
   }
   else {
     //設定低價位股價門檻
-    setLowPriceThreshold();
+    updateLowPriceThreshold();
+    // 更新高價公司的總數
+    updateHighPriceCompanyCount();
     //檢查所有創立中且投資時間截止的公司是否成功創立
     checkExpiredFoundations();
     //當發薪時間到時，發給所有驗證通過的使用者薪水，並檢查賦稅、增加滯納罰金與強制繳稅
     paySalaryAndCheckTax();
     //隨機時間讓符合條件的公司釋出股票
-    releaseStocksForHighPrice();
-    releaseStocksForNoDeal();
-    releaseStocksForLowPrice();
+    countDownReleaseStocksForHighPrice();
+    countDownReleaseStocksForNoDeal();
+    countDownReleaseStocksForLowPrice();
     //隨機時間售出金管會股票並紀錄公司的參考價格
-    recordListPriceAndSellFSCStocks();
+    countDownRecordListPrice();
     //檢查並更新各公司的董事長位置
-    checkChairman();
+    countDownCheckChairman();
   }
   //移除所有一分鐘以前的聊天發言紀錄
   dbLog.remove({
