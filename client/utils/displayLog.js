@@ -214,7 +214,7 @@ Template.displayLog.helpers({
 
         result += '擊敗了所有競爭對手，';
 
-        if (userId[1] === '!none') {
+        if (! userId[1] || userId[1] === '!none') {
           result += '成為了公司的經理人。';
         }
         else if (userId[0] === userId[1]) {
