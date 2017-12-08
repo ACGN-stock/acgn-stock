@@ -144,6 +144,7 @@ export function doOnFoundationSuccess(foundationData) {
     pictureBig: foundationData.pictureBig,
     description: foundationData.description,
     illegalReason: foundationData.illegalReason,
+    capital: totalRelease * price,
     totalRelease: totalRelease,
     lastPrice: price,
     listPrice: price,

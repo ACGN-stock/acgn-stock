@@ -338,13 +338,14 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
   //依increaseMoneyHash，將金錢的變動寫入unordered bulk op中
   _.each(increaseMoneyHash, (money, userId) => {
     if (userId === '!system') {
+      // 系統釋股→增加資本額
       tradeTools.companiesBulk
         .find({
           _id: companyId
         })
         .updateOne({
           $inc: {
-            profit: money
+            capital: money
           }
         });
     }

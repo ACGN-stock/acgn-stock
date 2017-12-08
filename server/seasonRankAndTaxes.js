@@ -7,6 +7,7 @@ import { dbLog } from '/db/dbLog';
 import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
+import { dbRankCompanyCapital } from '/db/dbRankCompanyCapital';
 import { dbRankUserWealth } from '/db/dbRankUserWealth';
 import { dbTaxes } from '/db/dbTaxes';
 import { debug } from '/server/imports/utils/debug';
@@ -267,6 +268,20 @@ function rankCompany(seasonData) {
       }
     ]);
 
+    const rankCompanyCapitalList = dbCompanies
+      .find({ isSeal: false }, {
+        fields: {
+          _id: 1,
+          capital: 1,
+          totalRelease: 1,
+          totalValue: 1
+        },
+        sort: { capital: -1 },
+        limit: 100,
+        disableOplog: true
+      })
+      .fetch();
+
     const seasonId = seasonData._id;
     if (rankCompanyPriceList.length > 0) {
       const rankCompanyPriceBulk = dbRankCompanyPrice.rawCollection().initializeUnorderedBulkOp();
@@ -308,6 +323,20 @@ function rankCompany(seasonData) {
         });
       });
       rankCompanyProfitBulk.execute();
+    }
+
+    if (rankCompanyCapitalList.length > 0) {
+      const rankCompanyCapitalBulk = dbRankCompanyCapital.rawCollection().initializeUnorderedBulkOp();
+      _.each(rankCompanyCapitalList, (rankData) => {
+        rankCompanyCapitalBulk.insert({
+          seasonId,
+          companyId: rankData._id,
+          capital: rankData.capital,
+          totalRelease: rankData.totalRelease,
+          totalValue: rankData.totalValue
+        });
+      });
+      rankCompanyCapitalBulk.execute();
     }
   }
 }

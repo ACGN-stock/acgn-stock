@@ -32,6 +32,7 @@ import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStoc
 import { countDownReleaseStocksForLowPrice } from './functions/company/releaseStocksForLowPrice';
 import { countDownRecordListPrice } from './functions/company/recordListPrice';
 import { countDownCheckChairman } from './functions/company/checkChairman';
+import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
 import { startArenaFight } from './arena';
 import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
@@ -260,6 +261,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     }
     //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
+    // 更新所有公司的評級
+    updateCompanyGrades();
     //為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
     //所有公司當季正營利額歸零

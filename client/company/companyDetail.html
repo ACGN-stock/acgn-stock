@@ -214,44 +214,58 @@
         </a>
       </div>
       {{#if isDisplayPanel 'numbers'}}
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">參考價格：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-list-price" title="{{this.listPrice}}">
-          $ {{currencyFormat this.listPrice}}
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">參考價格</span>
+          <span class="text-nowrap">$ {{currencyFormat this.listPrice}}</span>
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">最後價格：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-last-price" title="{{this.lastPrice}}">
-          <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">$ {{currencyFormat this.lastPrice}}</span>
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">最後價格</span>
+          <span class="text-nowrap {{priceDisplayClass this.lastPrice this.listPrice}}">$ {{currencyFormat this.lastPrice}}</span>
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">參考市值：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid company-value" title="{{this.totalValue}}">
-          $ {{currencyFormat this.totalValue}}
+
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">日成交量</span>
+          <span class="text-nowrap">{{> companyTodayDealAmount}}</span>
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">本季營利：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid company-profit" title="{{this.profit}}">
-          $ {{currencyFormat this.profit}}
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">總釋股數</span>
+          <span class="text-nowrap">{{this.totalRelease}} 股</span>
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總釋股量：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-total-release" title="{{this.totalRelase}}">
-          {{this.totalRelease}}股
+
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">資本額</span>
+          <span class="text-nowrap">$ {{currencyFormat this.capital}}</span>
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">日成交量：</div>
-          {{> companyTodayDealAmount}}
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">每股盈餘：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-EPS" title="{{getCompanyEPS this}}">
-          $ {{currencyFormat (getCompanyEPS this)}}
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">參考市值</span>
+          <span class="text-nowrap">$ {{currencyFormat this.totalValue}}</span>
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">
-          <span style="white-space: nowrap;">本益比／</span>
-          <span style="white-space: nowrap;">益本比：</span>
+
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">本季營利</span>
+          <span class="text-nowrap">$ {{currencyFormat this.profit}}</span>
         </div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-PERatio"
-          title="{{getCompanyPERatio this}}／{{getCompanyEPRatio this}}">
-          {{getCompanyPERatio this}}／{{getCompanyEPRatio this}}
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">每股盈餘</span>
+          <span class="text-nowrap">$ {{currencyFormat (getCompanyEPS this)}}</span>
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">創立時間：</div>
-        <div class="col-8 col-md-4 col-lg-2 text-right border-grid company-created"
-          title="{{formatDateText this.createdAt}}">
-          {{formatDateText this.createdAt}}
+
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">本益比</span>
+          <span class="text-nowrap">{{getCompanyPERatio this}}</span>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">益本比</span>
+          <span class="text-nowrap">{{getCompanyEPRatio this}}</span>
+        </div>
+
+        <div class="col-4 col-md-2 col-lg-1 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">公司評級</span>
+          <span class="text-nowrap">{{this.grade}}</span>
+        </div>
+        <div class="col-8 col-md-4 col-lg-3 border-grid d-flex flex-column align-items-center justify-content-between">
+          <span class="text-nowrap">創立時間</span>
+          <span class="text-nowrap">{{formatDateText this.createdAt}}</span>
         </div>
       {{/if}}
       <div class="col-12 border-grid">
@@ -356,9 +370,7 @@
 </template>
 
 <template name="companyTodayDealAmount">
-  <div class="col-8 col-md-4 col-lg-2 text-right border-grid stock-deal-amount" title="{{getTodayDealAmount}}">
-    {{getTodayDealAmount}} 股
-  </div>
+  {{getTodayDealAmount}} 股
 </template>
 
 <template name="companyBuyOrderList">
@@ -815,7 +827,7 @@
 
 <template name="arenaStrategyForm">
   <form class="row">
-    <h5 class="col-12">決定這一屆大賽的賽場策略：</h5>    
+    <h5 class="col-12">決定這一屆大賽的賽場策略：</h5>
     <div class="form-group col-12 col-lg-6">
       <label for="spCost">設定特攻消耗數值：</label>
       <input
