@@ -23,6 +23,7 @@ export const config = {
   seasonNumberInRound: 12, //一個賽季有幾個商業季度
   arenaIntervalSeasonNumber: 1, //最萌亂鬥大賽的舉行會間隔多少個商業季度，0為每個商業季度都會舉辦一次
   arenaMaximumRound: 1000, //最萌亂鬥大賽的最大回合數
+  arenaMinInvestedAmount: 10000, //最萌亂鬥大賽的參賽所需最小總投資金額
   seasonTime: 604800000, //每個商業季度的持續時間，單位為微秒
   electManagerTime: 86400000, //每個商業季度結束前多久時間會進行經理競選，單位為微秒
   seasonProfitPerUser: 140000, //每個商業季度、每個驗證的使用者的「所有推薦票加總」將產生多少可能營利額

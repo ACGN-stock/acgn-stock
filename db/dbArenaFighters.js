@@ -8,6 +8,8 @@ export default dbArenaFighters;
 
 export const MAX_MANNER_SIZE = 3;
 
+export const arenaFighterAttributeNameList = ['hp', 'sp', 'atk', 'def', 'agi'];
+
 export function getAttributeNumber(attribute, amount) {
   switch (attribute) {
     case 'hp': {
@@ -23,6 +25,13 @@ export function getAttributeNumber(attribute, amount) {
       return Math.floor(amount / 1000);
     }
   }
+}
+
+// 取得總投資額
+export function getTotalInvestedAmount(arenaFighterData) {
+  return arenaFighterAttributeNameList.reduce((sum, attrName) => {
+    return sum + arenaFighterData[attrName];
+  }, 0);
 }
 
 const schema = new SimpleSchema({
@@ -63,6 +72,23 @@ const schema = new SimpleSchema({
   agi: {
     type: SimpleSchema.Integer,
     defaultValue: 0
+  },
+  // 投資人列表
+  investors: {
+    type: Array,
+    defaultValue: [],
+    optional: true
+  },
+  'investors.$': {
+    type: new SimpleSchema({
+      userId: {
+        type: String
+      },
+      amount: {
+        type: SimpleSchema.Integer,
+        min: 1
+      }
+    })
   },
   //公司上市日期，在agi相等時排列攻擊順序使用
   createdAt: {

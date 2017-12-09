@@ -7,7 +7,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbArena } from '/db/dbArena';
-import { dbArenaFighters, getAttributeNumber } from '/db/dbArenaFighters';
+import { dbArenaFighters, getAttributeNumber, getTotalInvestedAmount } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
@@ -1114,6 +1114,15 @@ Template.companyArenaInfo.helpers({
   },
   inCanJoinTime() {
     return Date.now() < this.joinEndDate.getTime();
+  },
+  totalInvestedAmount() {
+    return getTotalInvestedAmount(this);
+  },
+  arenaMinInvestedAmount() {
+    return Meteor.settings.public.arenaMinInvestedAmount;
+  },
+  notEnoughInvestedAmount() {
+    return getTotalInvestedAmount(this) < Meteor.settings.public.arenaMinInvestedAmount;
   }
 });
 Template.companyArenaInfo.events({

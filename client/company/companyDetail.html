@@ -690,7 +690,7 @@
       <div>報名截止時間為：{{formatDateText currentArenaData.joinEndDate}}</div>
       {{#if this.joinData}}
         <div>
-          {{companyData.companyName}}已經報名參加這一屆的最萌亂鬥大賽。目前的屬性值如下：
+          {{companyData.companyName}}已經報名參加這一屆的最萌亂鬥大賽。
         </div>
       {{else}}
         <div>
@@ -705,6 +705,13 @@
         </div>
       {{/if}}
       {{#with this.joinData}}
+        <div>
+          總投資額：${{currencyFormat totalInvestedAmount}}
+          {{#if notEnoughInvestedAmount}}
+            <span class="text-danger">（總投資額未達${{currencyFormat arenaMinInvestedAmount}}，大賽開始時將會自動失去參賽資格！）</span>
+          {{/if}}
+        </div>
+        <div>目前的屬性值如下：</div>
         <div class="mb-1">
           <a
             class="d-inline-block d-sm-none"
