@@ -101,7 +101,7 @@ Template.displayLog.onRendered(function() {
   }
 });
 Template.displayLog.helpers({
-  getDescriptionHtml({ logType, userId, companyId, data }) {
+  getDescriptionHtml({ logType, userId, companyId, data = {} }) {
     const company = companySpan(companyId);
     const users = userId ? userId.map(userSpan) : [];
 
