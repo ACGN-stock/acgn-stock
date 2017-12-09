@@ -11,7 +11,7 @@ import { dbCompanies } from './dbCompanies';
 import { dbCompanyArchive } from './dbCompanyArchive';
 import { dbDirectors } from './dbDirectors';
 import { dbFoundations } from './dbFoundations';
-import { dbLog } from './dbLog';
+import { dbLog, logTypeList } from './dbLog';
 import { dbOrders } from './dbOrders';
 import { dbPrice } from './dbPrice';
 import { dbProducts } from './dbProducts';
@@ -643,199 +643,282 @@ if (Meteor.isServer) {
     up() {
       dbLog.rawCollection().createIndex({ logType: 1, createdAt: -1 });
 
-      const logCursor = dbLog.find({ data: { $exists: false }});
-      if (logCursor.count() === 0) {
-        return;
-      }
+      logTypeList.forEach((logType) => {
+        // console.log(`migrating logType ${logType}...`);
 
-      let logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+        const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+        let runBulk = false;
 
-      logCursor.forEach((logData, i) => {
-        const updateOperations = {
-          $unset: {
-            productId: 1,
-            price: 1,
-            amount: 1,
-            message: 1
-          }
-        };
+        const bulkCursor = logBulk.find({
+          logType,
+          data: { $exists: false }
+        });
 
         // 將與 indexes 無關的 fields 移至 data，並重新給予適當名稱
-        switch (logData.logType) {
+        switch (logType) {
           case '驗證通過':
-            updateOperations.$set = {
-              'data.money': logData.price
-            };
+            bulkCursor.update({
+              $rename: {
+                price: 'data.money'
+              }
+            });
+            runBulk = true;
             break;
 
           case '登入紀錄':
-            updateOperations.$set = {
-              'data.ipAddr': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.ipAddr'
+              }
+            });
+            runBulk = true;
             break;
 
           case '免費得石':
-            updateOperations.$set = {
-              'data.reason': logData.message,
-              'data.stones': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.reason',
+                amount: 'data.stones'
+              }
+            });
+            runBulk = true;
             break;
 
           case '聊天發言':
-            updateOperations.$set = {
-              'data.message': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.message'
+              }
+            });
+            runBulk = true;
             break;
 
           case '發薪紀錄':
-            updateOperations.$set = {
-              'data.salary': logData.price
-            };
+            bulkCursor.update({
+              $rename: {
+                price: 'data.salary'
+              }
+            });
+            runBulk = true;
             break;
 
           case '公司復活':
-            updateOperations.$set = {
-              'data.manager': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.manager'
+              }
+            });
+            runBulk = true;
             break;
 
           case '創立公司':
-            updateOperations.$set = {
-              'data.companyName': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.companyName'
+              }
+            });
+            runBulk = true;
             break;
 
           case '參與投資':
-            updateOperations.$set = {
-              'data.companyName': logData.message,
-              'data.fund': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.companyName',
+                amount: 'data.fund'
+              }
+            });
+            runBulk = true;
             break;
 
           case '創立失敗':
-            updateOperations.$set = {
-              'data.companyName': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.companyName'
+              }
+            });
+            runBulk = true;
             break;
 
           case '創立退款':
-            updateOperations.$set = {
-              'data.companyName': logData.message,
-              'data.refund': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.companyName',
+                amount: 'data.refund'
+              }
+            });
+            runBulk = true;
             break;
 
           case '創立成功':
-            updateOperations.$set = {
-              'data.price': logData.price
-            };
+            bulkCursor.update({
+              $rename: {
+                price: 'data.price'
+              }
+            });
+            runBulk = true;
             break;
 
           case '創立得股':
-            updateOperations.$set = {
-              'data.fund': logData.price,
-              'data.stocks': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                price: 'data.fund',
+                amount: 'data.stocks'
+              }
+            });
+            runBulk = true;
             break;
 
           case '購買下單':
           case '販賣下單':
           case '公司釋股':
           case '交易紀錄':
-            updateOperations.$set = {
-              'data.price': logData.price,
-              'data.amount': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                price: 'data.price',
+                amount: 'data.amount'
+              }
+            });
+            runBulk = true;
             break;
 
           case '取消下單':
           case '系統撤單':
           case '訂單完成':
-            updateOperations.$set = {
-              'data.orderType': logData.message,
-              'data.price': logData.price,
-              'data.amount': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.orderType',
+                price: 'data.price',
+                amount: 'data.amount'
+              }
+            });
+            runBulk = true;
             break;
 
           case '推薦產品':
-            updateOperations.$set = {
-              'data.productId': logData.productId,
-              'data.profit': logData.price
-            };
+            bulkCursor.update({
+              $rename: {
+                productId: 'data.productId',
+                price: 'data.profit'
+              }
+            });
+            runBulk = true;
             break;
 
           case '員工營利':
-            updateOperations.$set = {
-              'data.profit': logData.price
-            };
+            bulkCursor.update({
+              $rename: {
+                price: 'data.profit'
+              }
+            });
+            runBulk = true;
             break;
 
           case '公司營利':
-            updateOperations.$set = {
-              'data.profit': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                amount: 'data.profit'
+              }
+            });
+            runBulk = true;
             break;
 
           case '營利分紅':
-            updateOperations.$set = {
-              'data.bonus': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                amount: 'data.bonus'
+              }
+            });
+            runBulk = true;
             break;
 
           case '季度賦稅':
-            updateOperations.$set = {
-              'data.assetTax': logData.amount,
-              'data.zombieTax': logData.price
-            };
+            bulkCursor.update({
+              $rename: {
+                amount: 'data.assetTax',
+                price: 'data.zombieTax'
+              }
+            });
+            runBulk = true;
             break;
 
           case '繳納稅金':
-            updateOperations.$set = {
-              'data.paid': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                amount: 'data.paid'
+              }
+            });
+            runBulk = true;
             break;
 
           case '繳稅逾期':
-            updateOperations.$set = {
-              'data.fine': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                amount: 'data.fine'
+              }
+            });
+            runBulk = true;
             break;
 
           case '繳稅沒金':
-            updateOperations.$set = {
-              'data.money': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                amount: 'data.money'
+              }
+            });
+            runBulk = true;
             break;
 
           case '繳稅沒收':
-            updateOperations.$set = {
-              'data.price': logData.price,
-              'data.stocks': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                price: 'data.price',
+                amount: 'data.stocks'
+              }
+            });
+            runBulk = true;
             break;
 
           case '廣告宣傳':
           case '廣告追加':
-            updateOperations.$set = {
-              'data.cost': logData.price,
-              'data.message': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                price: 'data.cost',
+                message: 'data.message'
+              }
+            });
+            runBulk = true;
             break;
 
           case '舉報違規':
-            updateOperations.$set = {
-              'data.reason': logData.message,
-              'data.ipAddr': logData.userId[2],
-              'userId': logData.userId.slice(0, 2)
-            };
+            dbLog
+              .find({
+                logType,
+                data: { $exists: false }
+              })
+              .forEach((logData) => {
+                logBulk
+                  .find({ _id: new MongoInternals.NpmModule.ObjectID(logData._id._str) })
+                  .update({
+                    $rename: {
+                      message: 'data.reason'
+                    },
+                    $set: {
+                      'data.ipAddr': logData.userId[2],
+                      userId: logData.userId.slice(0, 2)
+                    }
+                  });
+              });
+            runBulk = true;
             break;
 
           case '金管通告':
           case '通報金管':
-            updateOperations.$set = {
-              'data.message': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.message'
+              }
+            });
+            runBulk = true;
             break;
 
           case '禁止舉報':
@@ -850,72 +933,91 @@ if (Meteor.isServer) {
           case '解除禁任':
           case '查封關停':
           case '解除查封':
-            updateOperations.$set = {
-              'data.reason': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.reason'
+              }
+            });
+            runBulk = true;
             break;
 
           case '課以罰款':
           case '退還罰款':
-            updateOperations.$set = {
-              'data.reason': logData.message,
-              'data.fine': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.reason',
+                amount: 'data.fine'
+              }
+            });
+            runBulk = true;
             break;
 
           case '沒收股份':
-            updateOperations.$set = {
-              'data.reason': logData.message,
-              'data.stocks': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.reason',
+                amount: 'data.stocks'
+              }
+            });
+            runBulk = true;
             break;
 
           case '公司更名':
-            updateOperations.$set = {
-              'data.oldCompanyName': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.oldCompanyName'
+              }
+            });
+            runBulk = true;
             break;
 
           case '產品下架':
-            updateOperations.$set = {
-              'data.productId': logData.productId,
-              'data.reason': logData.message,
-              'data.profit': logData.price
-            };
+            bulkCursor.update({
+              $rename: {
+                productId: 'data.productId',
+                message: 'data.reason',
+                price: 'data.profit'
+              }
+            });
+            runBulk = true;
             break;
 
           case '撤銷廣告':
-            updateOperations.$set = {
-              'data.message': logData.message
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.message'
+              }
+            });
+            runBulk = true;
             break;
 
           case '亂鬥報名':
             break;
 
           case '亂鬥加強':
-            updateOperations.$set = {
-              'data.attrName': logData.message,
-              'data.money': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                message: 'data.attrName',
+                amount: 'data.money'
+              }
+            });
+            runBulk = true;
             break;
 
           case '亂鬥營利':
-            updateOperations.$set = {
-              'data.reward': logData.amount
-            };
+            bulkCursor.update({
+              $rename: {
+                amount: 'data.reward'
+              }
+            });
+            runBulk = true;
             break;
         }
 
-        logBulk.find({ _id: new MongoInternals.NpmModule.ObjectID(logData._id._str) }).updateOne(updateOperations);
-
-        if (i % 100000 === 0) {
-          logBulk.execute();
-          logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+        if (runBulk) {
+          Meteor.wrapAsync(logBulk.execute).call(logBulk);
         }
       });
-
-      logBulk.execute();
     }
   });
 
