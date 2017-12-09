@@ -415,17 +415,25 @@ Template.arenaLogList.helpers({
 Template.arenaLogList.events({
   'focus [name="companyId"]': generateFilterResult,
   'keyup [name="companyId"]': generateFilterResult,
-  'submit'(event) {
+  'change [name="companyId"]': generateFilterResult,
+  'click [data-filter]': selectedCompanyIdFliter,
+  'touchstart [data-filter]': selectedCompanyIdFliter,
+  'submit'(event, templateInstance) {
     event.preventDefault();
-  },
-  'click [data-filter]'(event, templateInstance) {
-    event.preventDefault();
-    const companyId = $(event.currentTarget).attr('data-filter');
-    rFilterCompanyId.set(companyId);
-    rLogOffset.set(0);
-    rFilterResultList.set([]);
-    const fighterName = rFighterNameHash.get()[companyId];
-    templateInstance.$('[name="companyId"]').val(fighterName || '');
+    const filterResultList = rFilterResultList.get();
+    if (filterResultList.length === 1) {
+      const companyData = filterResultList[0];
+      rFilterCompanyId.set(companyData._id);
+      rLogOffset.set(0);
+      rFilterResultList.set([]);
+      templateInstance.$('[name="companyId"]').val(companyData.name || '');
+    }
+    else {
+      rFilterCompanyId.set('');
+      rLogOffset.set(0);
+      rFilterResultList.set([]);
+      templateInstance.$('[name="companyId"]').val('');
+    }
   }
 });
 
@@ -447,4 +455,14 @@ function generateFilterResult(event) {
   else {
     rFilterResultList.set([]);
   }
+}
+
+function selectedCompanyIdFliter(event, templateInstance) {
+  event.preventDefault();
+  const companyId = $(event.currentTarget).attr('data-filter');
+  rFilterCompanyId.set(companyId);
+  rLogOffset.set(0);
+  rFilterResultList.set([]);
+  const fighterName = rFighterNameHash.get()[companyId];
+  templateInstance.$('[name="companyId"]').val(fighterName || '');
 }
