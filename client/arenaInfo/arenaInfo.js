@@ -31,7 +31,7 @@ Template.arenaInfo.helpers({
     //更換大賽資訊，自動依據大賽是否已過期來重設選手排列依據
     if (arenaData) {
       if (Date.now() > arenaData.endDate) {
-        rFighterSortBy.set('winnerIndex');
+        rFighterSortBy.set('index');
         rFighterSortDir.set(1);
       }
       else {
@@ -225,25 +225,26 @@ Template.arenaInfo.onCreated(function() {
 const rFighterSortBy = new ReactiveVar('');
 const rFighterSortDir = new ReactiveVar(-1);
 Template.arenaFighterTable.onCreated(function() {
-  if (Date.now() > this.data.endDate) {
-    rFighterSortBy.set('winnerIndex');
-    rFighterSortDir.set(1);
-  }
-  else {
-    rFighterSortBy.set('agi');
-    rFighterSortDir.set(-1);
-  }
+  resetSortSetting(this.data);
 });
 Template.arenaFighterTable.onRendered(function() {
-  if (Date.now() > this.data.endDate) {
-    rFighterSortBy.set('winnerIndex');
-    rFighterSortDir.set(1);
+  resetSortSetting(this.data);
+});
+function resetSortSetting(data) {
+  if (Date.now() > data.joinEndDate.getTime()) {
+    rFighterSortBy.set('index');
+    if (Date.now() > data.endDate.getTime()) {
+      rFighterSortDir.set(1);
+    }
+    else {
+      rFighterSortDir.set(-1);
+    }
   }
   else {
     rFighterSortBy.set('agi');
     rFighterSortDir.set(-1);
   }
-});
+}
 Template.arenaFighterTable.helpers({
   getSortIcon(fieldName) {
     if (fieldName === rFighterSortBy.get()) {
@@ -257,18 +258,29 @@ Template.arenaFighterTable.helpers({
 
     return '';
   },
+  getIndexDisplayText() {
+    if (Date.now() > this.endDate.getTime()) {
+      return '名次';
+    }
+    else if (Date.now() > this.joinEndDate.getTime()) {
+      return '預設排序';
+    }
+    else {
+      return '';
+    }
+  },
   fighterList() {
-    const winnerList = this.winnerList;
     const arenaId = this._id;
+    const companyIdIndexList = Date.now() > this.endDate.getTime() ? this.winnerList : this.shuffledFighterCompanyIdList;
 
     const fighterList = dbArenaFighters
       .find({arenaId})
       .map((figher) => {
-        if (winnerList.length) {
-          figher.winnerIndex = _.indexOf(winnerList, figher.companyId) + 1;
+        if (companyIdIndexList.length) {
+          figher.index = _.indexOf(companyIdIndexList, figher.companyId) + 1;
         }
         else {
-          figher.winnerIndex = '';
+          figher.index = '';
         }
 
         return figher;
