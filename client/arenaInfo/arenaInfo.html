@@ -6,8 +6,8 @@
       {{> arenaInfoNav}}
       <hr />
       {{#with arenaData}}
-        {{#if nowIsBeforeTimeOf arenaData.endDate}}
-          {{#if nowIsBeforeTimeOf arenaData.joinEndDate}}
+        {{#if nowIsBeforeTimeOf this.endDate}}
+          {{#if nowIsBeforeTimeOf this.joinEndDate}}
             <div>本屆最萌亂鬥大賽正在報名中。</div>
           {{else}}
             <div>本屆最萌亂鬥大賽報名已經截止。</div>
@@ -100,9 +100,9 @@
           AGI
           {{{getSortIcon 'agi'}}}
         </th>
-        <th class="text-center text-truncate" style="width: 100px; cursor: pointer;" title="排名" data-sort="winnerIndex">
-          排名
-          {{{getSortIcon 'winnerIndex'}}}
+        <th class="text-center text-truncate" style="width: 100px; cursor: pointer;" title="{{getIndexDisplayText}}" data-sort="index">
+          {{getIndexDisplayText}}
+          {{{getSortIcon 'index'}}}
         </th>
       </tr>
     </thead>
@@ -131,7 +131,7 @@
             {{getAttributeNumber fighter 'agi'}}
           </td>
           <td class="text-center px-1 text-truncate">
-            {{fighter.winnerIndex}}
+            {{fighter.index}}
           </td>
         </tr>
       {{else}}
