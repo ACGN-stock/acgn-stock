@@ -71,11 +71,25 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
     if (user.profile.money < investMoney) {
       throw new Meteor.Error(403, '剩餘金錢不足！');
     }
+    const fighterData = dbArenaFighters.findOne({arenaId, companyId});
     //避免總投資額出現太誇張的數字
     check(fighterData[attribute] + investMoney, Match.Integer);
+
+    const investors = fighterData.investors || [];
+    const existingInvestor = _.findWhere(investors, { userId });
+    if (existingInvestor) {
+      existingInvestor.amount += investMoney;
+    }
+    else {
+      investors.push({ userId, amount: investMoney });
+    }
+
     dbArenaFighters.update(fighterData._id, {
       $inc: {
         [attribute]: investMoney
+      },
+      $set: {
+        investors
       }
     });
     Meteor.users.update(userId, {

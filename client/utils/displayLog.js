@@ -362,6 +362,12 @@ Template.displayLog.helpers({
       case '亂鬥報名': {
         return `【最萌亂鬥】${users[0]}替「${company}」公司報名參加了這一屆的最萌亂鬥大賽！`;
       }
+      case '亂鬥失格': {
+        return `【最萌亂鬥】「${company}」公司因為總投資金額未達標，失去了這一屆最萌亂鬥大賽的參賽資格！`;
+      }
+      case '亂鬥退款': {
+        return `【最萌亂鬥】${users[0]}從「${company}」公司收回了$${data.refund}的投資退款！`;
+      }
       case '亂鬥加強': {
         return `【最萌亂鬥】${users[0]}對這一屆最萌亂鬥大賽參賽者「${company}」公司的${data.attrName}能力值投資了$${currencyFormat(data.money)}的金錢！`;
       }
