@@ -361,14 +361,12 @@ Template.arenaLogList.helpers({
   },
   logList() {
     const arenaId = FlowRouter.getParam('arenaId');
-    window.dbArenaLog = dbArenaLog;
 
     return dbArenaLog
-      .find({arenaId}, {
+      .find(arenaId, {}, {
         sort: {
           sequence: 1
-        },
-        limit: 30
+        }
       })
       .map((log) => {
         log.attackerId = log.companyId[0];

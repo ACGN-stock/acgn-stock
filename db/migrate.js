@@ -6,7 +6,6 @@ import { Migrations } from 'meteor/percolate:migrations';
 import { dbAdvertising } from './dbAdvertising';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
-import { dbArenaLog } from '/db/dbArenaLog';
 import { dbCompanies } from './dbCompanies';
 import { dbCompanyArchive } from './dbCompanyArchive';
 import { dbDirectors } from './dbDirectors';
@@ -604,15 +603,6 @@ if (Meteor.isServer) {
         {
           arenaId: 1,
           companyId: 1
-        },
-        {
-          unique: true
-        }
-      );
-      dbArenaLog.rawCollection().createIndex(
-        {
-          arenaId: 1,
-          sequence: 1
         },
         {
           unique: true
