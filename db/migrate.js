@@ -794,6 +794,16 @@ if (Meteor.isServer) {
             runBulk = true;
             break;
 
+          case '就任經理':
+            bulkCursor.update({
+              $rename: {
+                message: 'data.seasonName',
+                amount: 'data.stocks'
+              }
+            });
+            runBulk = true;
+            break;
+
           case '推薦產品':
             bulkCursor.update({
               $rename: {

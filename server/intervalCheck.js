@@ -980,7 +980,7 @@ function electManager(seasonData) {
                 companyId: companyId,
                 data: {
                   seasonName: electMessage,
-                  amount: winnerData.stocks
+                  stocks: winnerData.stocks
                 },
                 createdAt: new Date()
               });
