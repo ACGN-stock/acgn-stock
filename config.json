@@ -21,7 +21,7 @@
     "salaryPerPay": 1000,
     "seasonNumberInRound": 12,
     "arenaIntervalSeasonNumber": 1,
-    "arenaMaximumRound": 500,
+    "arenaMaximumRound": 1000,
     "seasonTime": 604800000,
     "electManagerTime": 86400000,
     "seasonProfitPerUser": 140000,

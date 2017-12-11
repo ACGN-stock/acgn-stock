@@ -11,15 +11,16 @@ Meteor.publish('arenaLog', function(arenaId, companyId, offset) {
   check(companyId, String);
   check(offset, Match.Integer);
 
-  const filter = { arenaId };
+  const filter = {};
   if (companyId) {
     filter.companyId = companyId;
   }
 
-  publishTotalCount('totalCountOfArenaLog', dbArenaLog.find(filter), this);
+  publishTotalCount('totalCountOfArenaLog', dbArenaLog.find(arenaId, filter), this);
 
+  const collectionName = dbArenaLog.getCollectionName(arenaId);
   const pageObserver = dbArenaLog
-    .find(filter, {
+    .find(arenaId, filter, {
       sort: {
         sequence: 1
       },
@@ -29,13 +30,13 @@ Meteor.publish('arenaLog', function(arenaId, companyId, offset) {
     })
     .observeChanges({
       added: (id, fields) => {
-        this.added('arenaLog', id, fields);
+        this.added(collectionName, id, fields);
       },
       changed: (id, fields) => {
-        this.changed('arenaLog', id, fields);
+        this.changed(collectionName, id, fields);
       },
       removed: (id) => {
-        this.removed('arenaLog', id);
+        this.removed(collectionName, id);
       }
     });
 

@@ -33,6 +33,7 @@ export function startArenaFight() {
     return true;
   }
   const fighterHashByCompanyId = {};
+  let allFighterTotalInvest = 0;
   const fighterListBySequence = dbArenaFighters
     .find(
       {
@@ -53,6 +54,7 @@ export function startArenaFight() {
         arenaFighter.def +
         arenaFighter.agi
       );
+      allFighterTotalInvest += arenaFighter.totalInvest;
       arenaFighter.hp = getAttributeNumber('hp', arenaFighter.hp);
       arenaFighter.sp = getAttributeNumber('sp', arenaFighter.sp);
       arenaFighter.atk = getAttributeNumber('atk', arenaFighter.atk);
@@ -69,7 +71,10 @@ export function startArenaFight() {
   const loser = [];
   //獲得收益的紀錄用hash
   const gainProfitHash = {};
-  const arenaLogBulk = dbArenaLog.rawCollection().initializeUnorderedBulkOp();
+  _.each(fighterListBySequence, (fighter) => {
+    gainProfitHash[fighter.companyId] = 0;
+  });
+  const arenaLogBulk = dbArenaLog.create(arenaId);
   //log次序
   let sequence = 0;
   //回合數
@@ -135,14 +140,10 @@ export function startArenaFight() {
         // hp降到0或0以下則進入loser
         if (defender.currentHp <= 0) {
           loser.push(defender.companyId);
-          //取得擊倒盈利
-          arenaLog.profit = defender.totalInvest;
-          if (_.isNumber(gainProfitHash[attacker.companyId])) {
-            gainProfitHash[attacker.companyId] += defender.totalInvest;
-          }
-          else {
-            gainProfitHash[attacker.companyId] = defender.totalInvest;
-          }
+          //取得擊倒盈利＋擊倒獎勵
+          const reward = defender.totalInvest + 5000;
+          arenaLog.profit = reward;
+          gainProfitHash[attacker.companyId] += reward;
         }
       }
       arenaLog.defenderHp = defender.currentHp;
@@ -161,26 +162,6 @@ export function startArenaFight() {
   if (fighterListBySequence.length > 1) {
     arenaLogBulk.execute();
   }
-  //若有任何擊倒收益，則插入一般紀錄
-  if (_.size(gainProfitHash) > 0) {
-    const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-    _.each(gainProfitHash, (reward, companyId) => {
-      logBulk.insert({
-        logType: '亂鬥營利',
-        companyId: companyId,
-        data: {
-          reward
-        },
-        createdAt: new Date()
-      });
-      dbCompanies.update(companyId, {
-        $inc: {
-          profit: reward
-        }
-      });
-    });
-    logBulk.execute();
-  }
   //取得所有存活者
   const aliveList = _.filter(fighterListBySequence, (fighter) => {
     return fighter.currentHp > 0;
@@ -188,7 +169,32 @@ export function startArenaFight() {
   //取得最後贏家
   const sortedWinnerList = _.sortBy(aliveList, 'currentHp');
   const sortedWinnerIdList = _.pluck(sortedWinnerList, 'companyId');
+  //取的排名列表
   const winnerList = sortedWinnerIdList.concat(loser.reverse());
+  //計算排名獎勵
+  const rankReward = allFighterTotalInvest / Math.log10(winnerList.length) * 0.177;
+  _.each(winnerList, (companyId, index) => {
+    const rank = index + 1;
+    gainProfitHash[companyId] += Math.floor(rankReward / rank);
+  });
+  //將收益紀錄插入dbLog
+  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  _.each(gainProfitHash, (reward, companyId) => {
+    logBulk.insert({
+      logType: '亂鬥營利',
+      companyId: companyId,
+      data: {
+        reward
+      },
+      createdAt: new Date()
+    });
+    dbCompanies.update(companyId, {
+      $inc: {
+        profit: reward
+      }
+    });
+  });
+  logBulk.execute();
   dbArena.update(arenaId, {
     $set: {
       winnerList: winnerList,

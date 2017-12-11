@@ -1287,13 +1287,16 @@ Template.arenaStrategyForm.helpers({
   }
 });
 Template.arenaStrategyForm.events({
+  'click [data-action="randomAll"]'(event, templateInstance) {
+    const model = templateInstance.model.get();
+    const attackSequence = rSortedAttackSequence.get();
+    const shuffledAttackSequence = _.shuffle(model.attackSequence);
+    rSortedAttackSequence.set(_.union(attackSequence, shuffledAttackSequence));
+  },
   'click [data-action="sortAll"]'(event, templateInstance) {
     const model = templateInstance.model.get();
     const attackSequence = rSortedAttackSequence.get();
-    const needSortAttackSequence = _.reject(model.attackSequence, (attackIndex) => {
-      return _.contains(rSortedAttackSequence.get(), attackIndex);
-    });
-    rSortedAttackSequence.set(_.union(attackSequence, needSortAttackSequence));
+    rSortedAttackSequence.set(_.union(attackSequence, model.attackSequence));
   },
   'click [data-add]'(event) {
     const index = parseFloat($(event.currentTarget).attr('data-add'));
