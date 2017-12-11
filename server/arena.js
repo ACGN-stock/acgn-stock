@@ -92,19 +92,10 @@ export function startArenaFight() {
   removeUnqualifiedArenaFighters(lastArenaData);
 
   const arenaId = lastArenaData._id;
-  const shuffledFighterCompanyIdList = lastArenaData.shuffledFighterCompanyIdList;
-  if (! shuffledFighterCompanyIdList || shuffledFighterCompanyIdList.length < 1) {
-    dbArena.update(arenaId, {
-      $set: {
-        winnerList: [],
-        endDate: new Date()
-      }
-    });
 
-    return true;
-  }
-  const fighterHashByCompanyId = {};
+  // 取得所有參賽者的數值資料與統計總投入金額
   let allFighterTotalInvest = 0;
+  const fighterHashByCompanyId = {};
   const fighterListBySequence = dbArenaFighters
     .find(
       {
@@ -137,7 +128,23 @@ export function startArenaFight() {
 
       return arenaFighter;
     });
+
+  // 實際參賽人數不足兩人，不開打
+  if (fighterListBySequence.length < 2) {
+    dbArena.update(arenaId, {
+      $set: {
+        winnerList: [],
+        endDate: new Date()
+      }
+    });
+
+    return true;
+  }
+
   debug.log('startArenaFight', fighterListBySequence);
+
+  const shuffledFighterCompanyIdList = lastArenaData.shuffledFighterCompanyIdList;
+
   //輸家companyId陣列，依倒下的順序排列
   const loser = [];
   //獲得收益的紀錄用hash
