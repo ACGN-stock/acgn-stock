@@ -172,7 +172,7 @@ export function startArenaFight() {
   //取的排名列表
   const winnerList = sortedWinnerIdList.concat(loser.reverse());
   //計算排名獎勵
-  const rankReward = allFighterTotalInvest / Math.log10(winnerList.length) * 0.177;
+  const rankReward = allFighterTotalInvest / (Math.log(winnerList.length) + 0.57722 + (1 / (2 * winnerList.length)));
   _.each(winnerList, (companyId, index) => {
     const rank = index + 1;
     gainProfitHash[companyId] += Math.floor(rankReward / rank);
