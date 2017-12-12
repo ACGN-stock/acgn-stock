@@ -55,18 +55,15 @@ export function countDownReleaseStocksForHighPrice() {
 
 // 對全市場進行高價釋股
 export function releaseStocksForHighPrice() {
-  const highPriceCompanyCount = dbVariables.get('highPriceCompanyCount');
-
-  // 無高價公司則不進行釋股
-  if (highPriceCompanyCount <= 0) {
-    return;
-  }
+  const highPriceThreshold = dbVariables.get('highPriceThreshold');
 
   dbCompanies
-    .find({ isSeal: false }, {
+    .find({
+      isSeal: false,
+      lastPrice: { $gte: highPriceThreshold }
+    }, {
       sort: { lastPrice: -1 },
       fields: { _id: 1 },
-      limit: highPriceCompanyCount,
       disableOplog: true
     })
     .forEach(({ _id: companyId }) => {

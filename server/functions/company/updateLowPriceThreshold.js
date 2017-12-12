@@ -1,4 +1,3 @@
-'use strict';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
 import { debug } from '/server/imports/utils/debug';
