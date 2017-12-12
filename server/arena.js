@@ -24,7 +24,7 @@ export function removeUnqualifiedArenaFighters(arenaData) {
       $project: {
         companyId: 1,
         investors: 1,
-        totalInvestedAmount: { $sum: '$investors.amount'}
+        totalInvestedAmount: { $sum: '$investors.amount' }
       }
     }, {
       $match: {
@@ -72,6 +72,9 @@ export function removeUnqualifiedArenaFighters(arenaData) {
     });
     Meteor.wrapAsync(logBulk.execute).call(logBulk);
   }
+
+  // 移除（剩下參賽者的）投資人資訊
+  dbArenaFighters.update({ arenaId }, { $unset: { investors: 1 } });
 }
 
 export function startArenaFight() {

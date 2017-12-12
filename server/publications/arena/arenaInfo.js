@@ -14,9 +14,8 @@ Meteor.publish('arenaInfo', function(arenaId) {
 
   return [
     dbArena.find(arenaId, {disableOplog}),
-    dbArenaFighters.find({arenaId}, {disableOplog})
+    dbArenaFighters.find({ arenaId }, { fields: { investors: 0 } }, { disableOplog })
   ];
 });
 //一分鐘最多20次
 limitSubscription('arenaInfo');
-
