@@ -32,7 +32,6 @@ export function removeUnqualifiedArenaFighters(arenaData) {
       }
     } ])
     .forEach(({ _id: arenaFighterId, companyId, investors }) => {
-
       const logCreatedAt = new Date();
 
       logDataList.push({
