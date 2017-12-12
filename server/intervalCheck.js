@@ -1049,9 +1049,11 @@ function electManager(seasonData) {
         })
         .forEach((fighter) => {
           const thisFighterIndex = _.indexOf(shuffledFighterCompanyIdList, fighter.companyId);
+          const thisAttackSequence = _.without(attackSequence, thisFighterIndex);
+          const shuffledAttackSequence = _.shuffle(thisAttackSequence);
           dbArenaFighters.update(fighter._id, {
             $set: {
-              attackSequence: _.without(attackSequence, thisFighterIndex)
+              attackSequence: shuffledAttackSequence
             }
           });
         });
