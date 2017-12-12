@@ -231,14 +231,9 @@ Template.arenaFighterTable.onRendered(function() {
   resetSortSetting(this.data);
 });
 function resetSortSetting(data) {
-  if (Date.now() > data.joinEndDate.getTime()) {
+  if (Date.now() > data.endDate.getTime()) {
     rFighterSortBy.set('index');
-    if (Date.now() > data.endDate.getTime()) {
-      rFighterSortDir.set(1);
-    }
-    else {
-      rFighterSortDir.set(-1);
-    }
+    rFighterSortDir.set(1);
   }
   else {
     rFighterSortBy.set('agi');
@@ -258,26 +253,15 @@ Template.arenaFighterTable.helpers({
 
     return '';
   },
-  getIndexDisplayText() {
-    if (Date.now() > this.endDate.getTime()) {
-      return '名次';
-    }
-    else if (Date.now() > this.joinEndDate.getTime()) {
-      return '預設排序';
-    }
-    else {
-      return '';
-    }
-  },
   fighterList() {
     const arenaId = this._id;
-    const companyIdIndexList = Date.now() > this.endDate.getTime() ? this.winnerList : this.shuffledFighterCompanyIdList;
+    const winnerList = this.winnerList;
 
     const fighterList = dbArenaFighters
       .find({arenaId})
       .map((figher) => {
-        if (companyIdIndexList.length) {
-          figher.index = _.indexOf(companyIdIndexList, figher.companyId) + 1;
+        if (winnerList.length) {
+          figher.index = _.indexOf(winnerList, figher.companyId) + 1;
         }
         else {
           figher.index = '';
