@@ -361,6 +361,7 @@ Template.accountInfoTaxList.events({
         type: 'prompt',
         title: '繳納稅金',
         message: `請輸入您要繳納的金額：(1~${currencyFormat(maxPayMoney)})`,
+        defaultValue: maxPayMoney,
         callback: function(amount) {
           amount = parseInt(amount, 10);
           if (amount) {
