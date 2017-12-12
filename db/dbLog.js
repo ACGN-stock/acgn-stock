@@ -320,6 +320,16 @@ export const logTypeList = [
   '亂鬥報名',
 
   /**
+   * 【最萌亂鬥】「companyId」公司因為總投資金額未達標，失去了這一屆最萌亂鬥大賽的參賽資格！
+   */
+  '亂鬥失格',
+
+  /**
+   * 【最萌亂鬥】userId0從「companyId」公司收回了$data.refund的投資退款！
+   */
+  '亂鬥退款',
+
+  /**
    * 【最萌亂鬥】userId0對這一屆最萌亂鬥大賽參賽者「companyId」公司的data.attrName能力值投資了$data.money的金錢！
    */
   '亂鬥加強',

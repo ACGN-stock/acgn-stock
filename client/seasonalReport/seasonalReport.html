@@ -9,6 +9,7 @@
         {{> reportTableSelectButton type='companyPriceRankTable'}}
         {{> reportTableSelectButton type='companyProfitRankTable'}}
         {{> reportTableSelectButton type='companyValueRankTable'}}
+        {{> reportTableSelectButton type='companyCapitalRankTable'}}
         {{> reportTableSelectButton type='userRankTable'}}
         {{> switchViewTypeButton}}
       </form>
@@ -167,6 +168,44 @@
           </td>
           <td class="text-right text-truncate company-asset" title="{{rankData.totalValue}}">
             $ {{currencyFormat rankData.totalValue}}
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</template>
+
+<template name="companyCapitalRankTable">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
+        <th class="text-center text-truncate" title="公司名稱">公司名稱</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="總釋股數">總釋股數</th>
+        <th class="text-center text-truncate" style="max-width: 120px;" title="總市值">總市值</th>
+        <th class="text-center text-truncate" style="max-width: 240px;" title="資本額">
+          資本額
+          <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each rankData in rankList}}
+        <tr>
+          <td class="text-center text-truncate">
+            {{plus @index 1}}
+          </td>
+          <td class="text-left text-truncate">
+            {{>companyLink rankData.companyId}}
+          </td>
+          <td class="text-right text-truncate company-stock-last-price" title="{{rankData.totalRelease}}">
+            {{rankData.totalRelease}}
+          </td>
+          <td class="text-right text-truncate company-stock-relase" title="{{rankData.totalValue}}">
+            $ {{currencyFormat rankData.totalValue}}
+          </td>
+          <td class="text-right text-truncate company-asset" title="{{rankData.capital}}">
+            $ {{currencyFormat rankData.capital}}
           </td>
         </tr>
       {{/each}}

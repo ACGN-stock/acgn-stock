@@ -99,4 +99,10 @@ describe('method startVacation', function() {
     user.profile.isEndingVacation.must.be.false();
     user.profile.lastVacationStartDate.must.be.exist();
   });
+
+  it('should allow past employees to start vacation', function() {
+    const companyId = dbCompanies.insert(companyFactory.build());
+    dbEmployees.insert({ userId, companyId, employed: false, resigned: true, registerAt: new Date() });
+    startVacation.bind(null, userId).must.not.throw();
+  });
 });

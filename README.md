@@ -1,4 +1,4 @@
-# CCHAT-STOCK
+# ACGN-STOCK
 
 [![Backers on Open Collective](https://opencollective.com/acgn-stock/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/acgn-stock/sponsors/badge.svg)](#sponsors)
