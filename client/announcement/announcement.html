@@ -56,65 +56,65 @@
 <template name="systemStatusPanel">
   <div id="system-time-info" class="row">
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">當前賽季起訖時間：</span>
+      <span class="font-weight-bold text-nowrap">當前賽季起訖時間：</span>
       <span class="{{taskIsAboutToEnd roundEndTime 168}}">
-        <span class="text-non-break">{{roundStartTime}}</span>
-        <span class="text-non-break">~ {{roundEndTime}}</span>
+        <span class="text-nowrap">{{roundStartTime}}</span>
+        <span class="text-nowrap">~ {{roundEndTime}}</span>
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">商業季度起訖時間：</span>
+      <span class="font-weight-bold text-nowrap">商業季度起訖時間：</span>
       <span class="{{taskIsAboutToEnd seasonEndTime 24}}">
-        <span class="text-non-break">{{seasonStartTime}}</span>
-        <span class="text-non-break">~ {{seasonEndTime}}</span>
+        <span class="text-nowrap">{{seasonStartTime}}</span>
+        <span class="text-nowrap">~ {{seasonEndTime}}</span>
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">員工薪資修改期限：</span>
-      <span class="text-non-break {{taskIsAboutToEnd updateSalaryDeadline 24}}">
+      <span class="font-weight-bold text-nowrap">員工薪資修改期限：</span>
+      <span class="text-nowrap {{taskIsAboutToEnd updateSalaryDeadline 24}}">
         {{updateSalaryDeadline}} {{taskLeftInfo updateSalaryDeadline 24}}
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">員工分紅修改期限：</span>
-      <span class="text-non-break {{taskIsAboutToEnd updateBonusDeadline 24}}">
+      <span class="font-weight-bold text-nowrap">員工分紅修改期限：</span>
+      <span class="text-nowrap {{taskIsAboutToEnd updateBonusDeadline 24}}">
         {{updateBonusDeadline}} {{taskLeftInfo updateBonusDeadline 24}}
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">最近低量釋股區間：</span>
+      <span class="font-weight-bold text-nowrap">最近低量釋股區間：</span>
       <span class="{{taskIsReady noDealReleaseBegin noDealReleaseEnd}}">
-        <span class="text-non-break">{{noDealReleaseBegin}}</span>
-        <span class="text-non-break">~ {{noDealReleaseEnd}}</span>
+        <span class="text-nowrap">{{noDealReleaseBegin}}</span>
+        <span class="text-nowrap">~ {{noDealReleaseEnd}}</span>
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">最近股價更新區間：</span>
+      <span class="font-weight-bold text-nowrap">最近股價更新區間：</span>
       <span class="{{taskIsReady stockPriceUpdateBegin stockPriceUpdateEnd}}">
-        <span class="text-non-break">{{stockPriceUpdateBegin}}</span>
-        <span class="text-non-break">~ {{stockPriceUpdateEnd}}</span>
+        <span class="text-nowrap">{{stockPriceUpdateBegin}}</span>
+        <span class="text-nowrap">~ {{stockPriceUpdateEnd}}</span>
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">最近高價釋股區間：</span>
+      <span class="font-weight-bold text-nowrap">最近高價釋股區間：</span>
       <span class="{{taskIsReady highPriceReleaseBegin highPriceReleaseEnd}}">
-        <span class="text-non-break">{{highPriceReleaseBegin}}</span>
-        <span class="text-non-break">~ {{highPriceReleaseEnd}}</span>
+        <span class="text-nowrap">{{highPriceReleaseBegin}}</span>
+        <span class="text-nowrap">~ {{highPriceReleaseEnd}}</span>
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">高價釋股公司數量：</span>
+      <span class="font-weight-bold text-nowrap">高價釋股公司數量：</span>
       <span>{{highPriceCompanyCount}}</span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">最近低價釋股區間：</span>
+      <span class="font-weight-bold text-nowrap">最近低價釋股區間：</span>
       <span class="{{taskIsReady lowPriceReleaseBegin lowPriceReleaseEnd}}">
-        <span class="text-non-break">{{lowPriceReleaseBegin}}</span>
-        <span class="text-non-break">~ {{lowPriceReleaseEnd}}</span>
+        <span class="text-nowrap">{{lowPriceReleaseBegin}}</span>
+        <span class="text-nowrap">~ {{lowPriceReleaseEnd}}</span>
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-non-break">低價釋股價格上限：</span>
+      <span class="font-weight-bold text-nowrap">低價釋股價格上限：</span>
       <span>$ {{lowPriceThreshold}}</span>
     </div>
   </div>

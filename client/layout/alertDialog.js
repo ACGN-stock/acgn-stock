@@ -8,6 +8,8 @@ let strAlertDialogTitle = '';
 let strAlertDialogMessage = '';
 let strAlertDialogDefaultValue = null;
 let strAlertDialogType = 'alert';
+let strAlertDialogInputType = 'text';
+let strAlertDialogCustomSetting = '';
 let funcAlertDialogCallback = null;
 let blAlertDialogOK = false;
 
@@ -16,37 +18,44 @@ export const alertDialog = {
     strAlertDialogType = options.type;
     strAlertDialogTitle = options.title;
     strAlertDialogMessage = options.message;
-    strAlertDialogDefaultValue = options.defaultValue;
+    strAlertDialogInputType = options.inputType || 'text';
+    strAlertDialogDefaultValue = options.defaultValue || null;
+    strAlertDialogCustomSetting = options.customSetting || '';
     funcAlertDialogCallback = options.callback;
     blAlertDialogOK = false;
     rShowAlertDialog.set(true);
   },
-  alert: function(message) {
-    this.dialog({
+  alert: function(options) {
+    const defaultOption = {
       type: 'alert',
-      title: '',
-      message: message,
-      defaultValue: null,
-      callback: null
-    });
+      title: ''
+    };
+
+    if (typeof options === 'string') {
+      defaultOption.message = options;
+      options = {};
+    }
+
+    Object.assign(defaultOption, options);
+    this.dialog(defaultOption);
   },
-  confirm: function(message, callback) {
-    this.dialog({
+  confirm: function(options) {
+    const defaultOption = {
       type: 'confirm',
-      title: '',
-      message: message,
-      defaultValue: null,
-      callback: callback
-    });
+      title: ''
+    };
+
+    Object.assign(defaultOption, options);
+    this.dialog(defaultOption);
   },
-  prompt: function(message, callback, defaultValue) {
-    this.dialog({
+  prompt: function(options) {
+    const defaultOption = {
       type: 'prompt',
-      title: '',
-      message: message,
-      defaultValue: defaultValue,
-      callback: callback
-    });
+      title: ''
+    };
+
+    Object.assign(defaultOption, options);
+    this.dialog(defaultOption);
   }
 };
 
@@ -89,19 +98,24 @@ Template.alertDialog.onDestroyed(function() {
   }
 });
 Template.alertDialog.helpers({
+  customInput() {
+    return `
+      <input id="alert-dialog-custom-input" class="form-control"
+             type="${strAlertDialogInputType}"
+             value="${(strAlertDialogDefaultValue === null) ? '' : strAlertDialogDefaultValue}"
+             ${strAlertDialogCustomSetting} />
+    `;
+  },
   alertDialogTitle() {
     return strAlertDialogTitle;
   },
   alertDialogMessage() {
     return strAlertDialogMessage;
   },
-  alertDialogDefaultValue() {
-    return strAlertDialogDefaultValue;
-  },
   showTitle() {
     return strAlertDialogTitle.length > 0;
   },
-  showTextInput() {
+  showInput() {
     return strAlertDialogType === 'prompt';
   },
   showCancelButton() {

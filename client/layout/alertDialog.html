@@ -10,9 +10,9 @@
         <div class="modal-body">
           <div>
             <div class="form-group">
-              {{#if showTextInput}}
-                <label for="input-text" class="form-control-label">{{{alertDialogMessage}}}</label>
-                <input id="input-text" class="form-control" type="text" value="{{alertDialogDefaultValue}}" />
+              {{#if showInput}}
+                <label for="alert-dialog-custom-input" class="form-control-label">{{{alertDialogMessage}}}</label>
+                {{{customInput}}}
               {{else}}
                 <p>{{{alertDialogMessage}}}</p>
               {{/if}}

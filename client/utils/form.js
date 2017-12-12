@@ -68,7 +68,7 @@ export const utilFormHelpers = {
   }
 };
 const utilFormEvents = {
-  'click [for]'(event, templateInstance) {
+  'click [for], touchstart [for]'(event, templateInstance) {
     const forFieldName = $(event.currentTarget).attr('for');
     templateInstance.$input.filter(`[name="${forFieldName}"]`)
       .trigger('focus');

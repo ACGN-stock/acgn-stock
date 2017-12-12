@@ -129,7 +129,7 @@ Template.companyDetail.events({
       title: '公司更名',
       message: `請輸入新的公司名稱：`,
       defaultValue: companyData.companyName,
-      callback: function(companyName) {
+      callback: (companyName) => {
         if (companyName) {
           Meteor.customCall('changeCompanyName', companyId, companyName);
         }
@@ -151,7 +151,7 @@ Template.companyDetail.events({
       type: 'prompt',
       title: title,
       message: `請輸入處理事由：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           Meteor.customCall('sealCompany', {companyId, message});
         }
@@ -172,7 +172,7 @@ Template.companyDetail.events({
       type: 'prompt',
       title: '金管會通告 - 輸入通知訊息',
       message: `請輸入要通告的訊息：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           const userIds = [companyData.manager];
           Meteor.customCall('fscAnnouncement', { userIds, companyId, message });
@@ -188,7 +188,7 @@ Template.companyDetail.events({
       type: 'prompt',
       title: `舉報違規 - 「${companyData.companyName}」公司`,
       message: `請輸入您要舉報的內容：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           Meteor.customCall('accuseCompany', companyId, message);
         }
@@ -215,13 +215,16 @@ Template.companyDetail.events({
     }
     else {
       const message = '報名後將會被其他公司移出儲備員工名單，您確定要報名嗎？';
-      alertDialog.confirm(message, (result) => {
-        if (result) {
-          Meteor.customCall('registerEmployee', companyId, function(err) {
-            if (! err) {
-              alertDialog.alert('您已報名成功！');
-            }
-          });
+      alertDialog.confirm({
+        message,
+        callback: (result) => {
+          if (result) {
+            Meteor.customCall('registerEmployee', companyId, function(err) {
+              if (! err) {
+                alertDialog.alert('您已報名成功！');
+              }
+            });
+          }
         }
       });
     }
@@ -240,42 +243,50 @@ Template.companyDetail.events({
   'click [data-action="updateSalary"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
-    const message = '請輸入下季員工薪資：(' +
-      currencyFormat(Meteor.settings.public.minimumCompanySalaryPerDay) + '~' +
-      currencyFormat(Meteor.settings.public.maximumCompanySalaryPerDay) + ')';
-    alertDialog.prompt(message, function(salary) {
-      if (salary && salary.length > 0) {
-        salary = parseInt(salary, 10);
-        if (isNaN(salary) ||
-          salary < Meteor.settings.public.minimumCompanySalaryPerDay ||
-          salary > Meteor.settings.public.maximumCompanySalaryPerDay) {
-          alertDialog.alert('不正確的薪資設定！');
+    const minSalary = Meteor.settings.public.minimumCompanySalaryPerDay;
+    const maxSalary = Meteor.settings.public.maximumCompanySalaryPerDay;
+    const message = `請輸入下季員工薪資：(${currencyFormat(minSalary)}~${currencyFormat(maxSalary)})`;
 
-          return false;
+    alertDialog.prompt({
+      message,
+      inputType: 'number',
+      customSetting: `min="${minSalary}" max="${maxSalary}"`,
+      callback: (salary) => {
+        if (salary && salary.length > 0) {
+          salary = parseInt(salary, 10);
+          if (isNaN(salary) || salary < minSalary || salary > maxSalary) {
+            alertDialog.alert('不正確的薪資設定！');
+
+            return false;
+          }
+
+          Meteor.customCall('updateNextSeasonSalary', companyId, salary);
         }
-
-        Meteor.customCall('updateNextSeasonSalary', companyId, salary);
       }
     });
   },
   'click [data-action="updateSeasonalBonus"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
-    const message = '請輸入本季員工分紅占營收百分比：(' +
-      Meteor.settings.public.minimumSeasonalBonusPercent + '~' +
-      Meteor.settings.public.maximumSeasonalBonusPercent + ')';
-    alertDialog.prompt(message, function(percentage) {
-      if (percentage && percentage.length > 0) {
-        percentage = parseInt(percentage, 10);
-        if (isNaN(percentage) ||
-          percentage < Meteor.settings.public.minimumSeasonalBonusPercent ||
-          percentage > Meteor.settings.public.maximumSeasonalBonusPercent) {
-          alertDialog.alert('不正確的分紅設定！');
+    const minBonus = Meteor.settings.public.minimumSeasonalBonusPercent;
+    const maxBonus = Meteor.settings.public.maximumSeasonalBonusPercent;
+    const message = `請輸入本季員工分紅占營收百分比：(${minBonus}~${maxBonus})`;
 
-          return false;
+    alertDialog.prompt({
+      message,
+      inputType: 'number',
+      customSetting: `min="${minBonus}" max="${maxBonus}"`,
+      callback: (percentage) => {
+        if (percentage && percentage.length > 0) {
+          percentage = parseInt(percentage, 10);
+          if (isNaN(percentage) || percentage < minBonus || percentage > maxBonus) {
+            alertDialog.alert('不正確的分紅設定！');
+
+            return false;
+          }
+
+          Meteor.customCall('updateSeasonalBonus', companyId, percentage);
         }
-
-        Meteor.customCall('updateSeasonalBonus', companyId, percentage);
       }
     });
   },
@@ -286,9 +297,13 @@ Template.companyDetail.events({
     const companyName = companyData.companyName;
     const checkCompanyName = companyName.replace(/\s/g, '');
     const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + checkCompanyName + '」以表示確定。';
-    alertDialog.prompt(message, function(confirmMessage) {
-      if (confirmMessage === checkCompanyName) {
-        Meteor.customCall('resignManager', companyId);
+
+    alertDialog.prompt({
+      message,
+      callback: (confirmMessage) => {
+        if (confirmMessage === checkCompanyName) {
+          Meteor.customCall('resignManager', companyId);
+        }
       }
     });
   },
@@ -322,9 +337,12 @@ Template.companyDetail.events({
   'click [data-action="unmarkCompanyIllegal"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
-    alertDialog.confirm('是否解除違規標記？', (result) => {
-      if (result) {
-        Meteor.customCall('unmarkCompanyIllegal', companyId);
+    alertDialog.confirm({
+      message: '是否解除違規標記？',
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('unmarkCompanyIllegal', companyId);
+        }
       }
     });
   }
@@ -953,9 +971,12 @@ Template.companyElectInfo.events({
     event.preventDefault();
     const instanceData = templateInstance.data;
     const companyName = instanceData.companyName;
-    alertDialog.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？', function(result) {
-      if (result) {
-        Meteor.customCall('contendManager', instanceData._id);
+    alertDialog.confirm({
+      message: '你確定要參與競爭「' + companyName + '」的經理人職位嗎？',
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('contendManager', instanceData._id);
+        }
       }
     });
   },
@@ -982,9 +1003,12 @@ Template.companyElectInfo.events({
           alertDialog.alert('你已經正在支持使用者' + userName + '了，無法再次進行支持！');
         }
         else {
-          alertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
-            if (result) {
-              Meteor.customCall('supportCandidate', instanceData._id, candidate);
+          alertDialog.confirm({
+            message: '你確定要支持候選人「' + userName + '」嗎？',
+            callback: (result) => {
+              if (result) {
+                Meteor.customCall('supportCandidate', instanceData._id, candidate);
+              }
             }
           });
         }
@@ -1120,10 +1144,18 @@ Template.companyArenaInfo.events({
   'click [data-action="joinArena"]'(event, templateInstance) {
     const {_id, companyName} = templateInstance.data;
     const checkCompanyName = companyName.replace(/\s/g, '');
-    const message = '你確定要讓「' + companyName + '」報名這一屆的最萌亂鬥大賽嗎？\n報名後將無法取消，請輸入「' + checkCompanyName + '」以表示確定。';
-    alertDialog.prompt(message, function(confirmMessage) {
-      if (confirmMessage === checkCompanyName) {
-        Meteor.customCall('joinArena', _id);
+    const message = '你確定要讓「' +
+      companyName +
+      '」報名這一屆的最萌亂鬥大賽嗎？\n報名後將無法取消，請輸入「' +
+      checkCompanyName +
+      '」以表示確定。';
+
+    alertDialog.prompt({
+      message,
+      callback: (confirmMessage) => {
+        if (confirmMessage === checkCompanyName) {
+          Meteor.customCall('joinArena', _id);
+        }
       }
     });
   },
@@ -1149,17 +1181,23 @@ Template.companyArenaInfo.events({
       '的屬性「' + investTarget.toUpperCase() + '」的金錢：' +
       `(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`
     );
-    alertDialog.prompt(message, function(investMoney) {
-      const intInvestMoney = parseInt(investMoney, 10);
-      if (! intInvestMoney) {
-        return false;
-      }
-      if (intInvestMoney < minimumUnitPrice || intInvestMoney > maximumUnitPrice) {
-        alertDialog.alert('不正確的金額設定！');
 
-        return false;
+    alertDialog.prompt({
+      message,
+      inputType: 'number',
+      customSetting: `min="${minimumUnitPrice}" max="${maximumUnitPrice}"`,
+      callback: (investMoney) => {
+        const intInvestMoney = parseInt(investMoney, 10);
+        if (! intInvestMoney) {
+          return false;
+        }
+        if (intInvestMoney < minimumUnitPrice || intInvestMoney > maximumUnitPrice) {
+          alertDialog.alert('不正確的金額設定！');
+
+          return false;
+        }
+        Meteor.customCall('investArenaFigher', _id, investTarget, intInvestMoney);
       }
-      Meteor.customCall('investArenaFigher', _id, investTarget, intInvestMoney);
     });
   }
 });

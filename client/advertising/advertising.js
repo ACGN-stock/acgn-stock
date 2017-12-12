@@ -70,9 +70,12 @@ Template.advertising.events({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     if (advertisingData) {
       if (advertisingData.userId !== Meteor.user()._id) {
-        alertDialog.confirm('您並非該廣告的初始購買人，確定要在這個廣告上追加廣告金額嗎？', (result) => {
-          if (result) {
-            showAskAddPayDialog(advertisingId);
+        alertDialog.confirm({
+          message: '您並非該廣告的初始購買人，確定要在這個廣告上追加廣告金額嗎？',
+          callback: (result) => {
+            if (result) {
+              showAskAddPayDialog(advertisingId);
+            }
           }
         });
       }
@@ -89,9 +92,13 @@ Template.advertising.events({
       <div>確定要撤銷廣告？</div>
       <div style="max-height: 100px; overflow: scroll;">${advertisingData.message}</div>
     `;
-    alertDialog.confirm(message, (result) => {
-      if (result) {
-        Meteor.customCall('takeDownAdvertising', advertisingId);
+
+    alertDialog.confirm({
+      message,
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('takeDownAdvertising', advertisingId);
+        }
       }
     });
   }
@@ -101,8 +108,10 @@ function showAskAddPayDialog(advertisingId) {
     type: 'prompt',
     title: '追加廣告金額',
     message: '請輸入要額外追加的廣告金額：',
-    defaultValue: null,
-    callback: function(result) {
+    inputType: 'number',
+    defaultValue: 1,
+    customSetting: `min="1"`,
+    callback: (result) => {
       const addPay = parseInt(result, 10);
       if (addPay) {
         Meteor.customCall('addAdvertisingPay', advertisingId, addPay);
@@ -191,11 +200,14 @@ function saveAdvertisingModel(model) {
     <div style="max-height: 100px; overflow: scroll;">${advertisingSample}</div>
     <div>確定發出廣告嗎？</div>
   `;
-  alertDialog.confirm(message, (result) => {
-    if (result) {
-      Meteor.customCall('buyAdvertising', submitData, () => {
-        rInBuyAdvertisingMode.set(false);
-      });
+  alertDialog.confirm({
+    message,
+    callback: (result) => {
+      if (result) {
+        Meteor.customCall('buyAdvertising', submitData, () => {
+          rInBuyAdvertisingMode.set(false);
+        });
+      }
     }
   });
 }

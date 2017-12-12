@@ -118,14 +118,17 @@ function saveModel(model) {
       <div class="text-danger">創立重複、無ACG點等違反金管會規則的角色將視情節處以罰款或永久停權。</div>
       <div>請再次輸入角色名稱以表示確定。</div>
     `;
-    alertDialog.prompt(message, function(companyName) {
-      if (companyName === model.companyName) {
-        Meteor.customCall('foundCompany', model, (error) => {
-          if (! error) {
-            const path = FlowRouter.path('foundationList');
-            FlowRouter.go(path);
-          }
-        });
+    alertDialog.prompt({
+      message,
+      callback: (companyName) => {
+        if (companyName === model.companyName) {
+          Meteor.customCall('foundCompany', model, (error) => {
+            if (! error) {
+              const path = FlowRouter.path('foundationList');
+              FlowRouter.go(path);
+            }
+          });
+        }
       }
     });
   }
