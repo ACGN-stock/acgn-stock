@@ -2,51 +2,21 @@ import { Meteor } from 'meteor/meteor';
 
 import { createOrder } from '/server/imports/createOrder';
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { countdownManager } from '/server/imports/utils/countdownManager';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/utils/debug';
 import { calculateHighPriceBuyAmount, getPriceLimits } from './helpers';
 
-const counterBase = 1000 * 60;
+export function updateReleaseStocksForLowPricePeriod() {
+  // TODO 移除 counter 設定，改用時間計算
+  const { releaseStocksForLowPriceCounter, intervalTimer } = Meteor.settings.public;
 
-function generateReleaseStocksForLowPriceCounter() {
-  return Meteor.settings.public.releaseStocksForLowPriceCounter;
-}
-
-function updateReleaseStocksForLowPricePeriod() {
   const jitter = 30;
   const now = Date.now();
-  const begin = now + (Meteor.settings.public.releaseStocksForLowPriceCounter - jitter) * counterBase;
-  const end = now + (Meteor.settings.public.releaseStocksForLowPriceCounter + jitter) * counterBase;
+  const begin = now + (releaseStocksForLowPriceCounter - jitter) * intervalTimer;
+  const end = now + (releaseStocksForLowPriceCounter + jitter) * intervalTimer;
 
   dbVariables.set('releaseStocksForLowPriceBegin', begin);
   dbVariables.set('releaseStocksForLowPriceEnd', end);
-}
-
-export function countDownReleaseStocksForLowPrice() {
-  debug.log('countDownReleaseStocksForLowPrice');
-
-  const counterKey = 'releaseStocksForLowPriceCounter';
-
-  if (! countdownManager.isInitialized(counterKey)) {
-    countdownManager.set(counterKey, generateReleaseStocksForLowPriceCounter());
-  }
-
-  countdownManager.countDown(counterKey);
-
-  if (! countdownManager.isZeroReached(counterKey)) {
-    return;
-  }
-
-  const nextCounter = generateReleaseStocksForLowPriceCounter();
-  countdownManager.set(counterKey, nextCounter);
-  console.info('releaseStocksForLowPrice triggered! next counter: ', nextCounter);
-
-  // 更新下次可能觸發時間區間
-  updateReleaseStocksForLowPricePeriod();
-
-  releaseStocksForLowPrice();
 }
 
 // 對全市場進行低價釋股

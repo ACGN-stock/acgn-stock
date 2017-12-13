@@ -4,8 +4,8 @@ import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
 import { Migrations } from 'meteor/percolate:migrations';
 import { dbAdvertising } from './dbAdvertising';
-import { dbArena } from '/db/dbArena';
-import { dbArenaFighters } from '/db/dbArenaFighters';
+import { dbArena } from './dbArena';
+import { dbArenaFighters } from './dbArenaFighters';
 import { dbCompanies } from './dbCompanies';
 import { dbCompanyArchive } from './dbCompanyArchive';
 import { dbDirectors } from './dbDirectors';
@@ -28,6 +28,7 @@ import { dbUserArchive } from './dbUserArchive';
 import { dbValidatingUsers } from './dbValidatingUsers';
 import { dbVariables } from '/db/dbVariables';
 import { dbVoteRecord } from './dbVoteRecord';
+import { dbEventSchedules } from './dbEventSchedules';
 
 if (Meteor.isServer) {
   Migrations.add({
@@ -1096,6 +1097,41 @@ if (Meteor.isServer) {
       });
 
       Meteor.wrapAsync(companiesBulk.execute).call(companiesBulk);
+    }
+  });
+
+  Migrations.add({
+    version: 16,
+    name: 'eventSchedules - replace counter-based triggers & schedule season.electManager and arena.joinEnded',
+    up() {
+      const { intervalTimer } = Meteor.settings.public;
+
+      const counterToEventMap = {
+        checkChairmanCounter: 'company.checkChairman',
+        recordListPriceCounter: 'company.recordListPrice',
+        releaseStocksForHighPriceCounter: 'company.releaseStocksForHighPrice',
+        releaseStocksForNoDealCounter: 'company.releaseStocksForNoDeal',
+        releaseStocksForLowPriceCounter: 'company.releaseStocksForLowPrice'
+      };
+
+      _.pairs(counterToEventMap).forEach(([counterId, eventId]) => {
+        const counterValue = dbVariables.get(counterId);
+        if (counterValue) {
+          dbVariables.remove(counterId);
+          dbEventSchedules.upsert(eventId, { $set: { scheduledAt: new Date(Date.now() + counterValue * intervalTimer) }});
+        }
+      });
+
+      const currentSeason = dbSeason.findOne({}, { sort: { beginDate: -1 }});
+      if (currentSeason && currentSeason.electTime) {
+        dbEventSchedules.upsert('season.electManager', { $set: { scheduledAt: currentSeason.electTime }});
+      }
+      dbSeason.update({}, { $unset: { electTime: 1 }}, { multi: true });
+
+      const currentArena = dbArena.findOne({}, { sort: { beginDate: -1 }});
+      if (currentArena) {
+        dbEventSchedules.upsert('arena.joinEnded', { $set: { scheduledAt: currentArena.joinEndDate }});
+      }
     }
   });
 

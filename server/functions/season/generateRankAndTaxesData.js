@@ -1,6 +1,6 @@
-'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
+
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbLog } from '/db/dbLog';
