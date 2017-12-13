@@ -1,5 +1,5 @@
 'use strict';
-import { Meteor } from 'meteor/meteor';
+// import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 // import SimpleSchema from 'simpl-schema';
 
@@ -15,26 +15,23 @@ export const dbArenaLog = {
       const collection = new Mongo.Collection(collectionName, {
         idGeneration: 'MONGO'
       });
+      // 加schema好像沒啥意義?  Bulk insert的不會被SimpleSchema檢查到
+      // collection.attachSchema(schema);
+      collection.rawCollection().createIndex(
+        {
+          sequence: 1
+        },
+        {
+          unique: true
+        }
+      );
       collectionHash[arenaId] = collection;
     }
 
     return collectionHash[arenaId];
   },
-  create(arenaId) {
-    if (collectionHash[arenaId]) {
-      throw new Meteor.Error(500, `重複建立已存在的arena log collection arenaLog${arenaId}！`);
-    }
+  getBulk(arenaId) {
     const collection = this.getCollection(arenaId);
-    // 加schema好像沒啥意義?  Bulk insert的不會被SimpleSchema檢查到
-    // collection.attachSchema(schema);
-    collection.rawCollection().createIndex(
-      {
-        sequence: 1
-      },
-      {
-        unique: true
-      }
-    );
 
     return collection.rawCollection().initializeUnorderedBulkOp();
   },

@@ -153,7 +153,7 @@ export function startArenaFight() {
   _.each(fighterListBySequence, (fighter) => {
     gainProfitHash[fighter.companyId] = 0;
   });
-  const arenaLogBulk = dbArenaLog.create(arenaId);
+  const arenaLogBulk = dbArenaLog.getBulk(arenaId);
   //log次序
   let sequence = 0;
   //回合數
