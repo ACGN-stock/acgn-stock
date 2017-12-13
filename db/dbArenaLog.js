@@ -1,5 +1,5 @@
 'use strict';
-// import { Meteor } from 'meteor/meteor';
+import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 // import SimpleSchema from 'simpl-schema';
 
@@ -17,14 +17,16 @@ export const dbArenaLog = {
       });
       // 加schema好像沒啥意義?  Bulk insert的不會被SimpleSchema檢查到
       // collection.attachSchema(schema);
-      collection.rawCollection().createIndex(
-        {
-          sequence: 1
-        },
-        {
-          unique: true
-        }
-      );
+      if (Meteor.isServer) {
+        collection.rawCollection().createIndex(
+          {
+            sequence: 1
+          },
+          {
+            unique: true
+          }
+        );
+      }
       collectionHash[arenaId] = collection;
     }
 
