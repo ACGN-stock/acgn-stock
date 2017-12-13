@@ -7,6 +7,7 @@ import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbLog } from '/db/dbLog';
+import { dbTaxes } from '/db/dbTaxes';
 import { dbVariables } from '/db/dbVariables';
 import { debug } from '/server/imports/utils/debug';
 
@@ -25,9 +26,6 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
-  if (user.profile.notPayTax) {
-    throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
-  }
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -36,6 +34,10 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
   }
   if (user.profile.money < investMoney) {
     throw new Meteor.Error(403, '剩餘金錢不足！');
+  }
+  const userId = user._id;
+  if (dbTaxes.find({userId}).count() > 0) {
+    throw new Meteor.Error(403, '請先繳清稅單再參加賭搏！');
   }
   const lastArenaData = dbArena.findOne({}, {
     sort: {
@@ -59,7 +61,6 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
   }
   //避免總投資額出現太誇張的數字
   check(fighterData[attribute] + investMoney, Match.Integer);
-  const userId = user._id;
   resourceManager.throwErrorIsResourceIsLock(['season', 'arena' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('investArenaFigher', ['arena' + companyId, 'user' + userId], (release) => {
