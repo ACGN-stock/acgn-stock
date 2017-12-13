@@ -70,7 +70,7 @@ Template.foundationDetail.events({
       title: '公司更名',
       message: `請輸入新的公司名稱：`,
       defaultValue: companyData.companyName,
-      callback: function(companyName) {
+      callback: (companyName) => {
         if (companyName) {
           Meteor.customCall('changeFoundCompanyName', foundationId, companyName);
         }
@@ -94,6 +94,7 @@ Template.foundationDetail.events({
       title: '設定違規標記',
       message: '請輸入違規事由：',
       defaultValue: companyData.illegalReason,
+      customSetting: `maxlength="10"`,
       callback: (reason) => {
         if (! reason) {
           return;
@@ -111,9 +112,12 @@ Template.foundationDetail.events({
   'click [data-action="unmarkFoundationIllegal"]'(event) {
     event.preventDefault();
     const foundationId = FlowRouter.getParam('foundationId');
-    alertDialog.confirm('是否解除違規標記？', (result) => {
-      if (result) {
-        Meteor.customCall('unmarkFoundationIllegal', foundationId);
+    alertDialog.confirm({
+      message: '是否解除違規標記？',
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('unmarkFoundationIllegal', foundationId);
+        }
       }
     });
   }

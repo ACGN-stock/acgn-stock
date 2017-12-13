@@ -42,7 +42,7 @@
         <tbody>
           {{#each advertising in advertisingList}}
             <tr class="{{advertisingDisplayClass @index}}">
-              <td class="text-left text-truncate" data-title="購買者">
+              <td class="text-left text-truncate adv-buyer" data-title="購買者">
                 {{>userLink advertising.userId}}
               </td>
               <td class="text-left text-truncate adv-content" data-title="廣告內容" title="{{advertising.message}}">

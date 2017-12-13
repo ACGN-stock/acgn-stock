@@ -76,14 +76,17 @@ Template.ruleAgendaVote.events({
     };
 
     const message = '投票送出後不可再修改與重新投票，確認是否送出？<br>若有未選擇的議題則視為放棄該題之投票權。';
-    alertDialog.confirm(message, function(result) {
-      if (result) {
-        Meteor.customCall('voteAgenda', model, function(error) {
-          if (! error) {
-            const path = FlowRouter.path('ruleAgendaDetail', {agendaId});
-            FlowRouter.go(path);
-          }
-        });
+    alertDialog.confirm({
+      message,
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('voteAgenda', model, function(error) {
+            if (! error) {
+              const path = FlowRouter.path('ruleAgendaDetail', {agendaId});
+              FlowRouter.go(path);
+            }
+          });
+        }
       }
     });
   }

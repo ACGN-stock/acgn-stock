@@ -188,9 +188,12 @@ Template.companyProductManage.events({
     const productId = $(event.currentTarget).attr('data-retrieve');
     const productData = dbProducts.findOne(productId);
     if (productData) {
-      alertDialog.confirm('確定要刪除「' + productData.productName + '」這項待上架產品嗎？', function(result) {
-        if (result) {
-          Meteor.customCall('retrieveProduct', productId);
+      alertDialog.confirm({
+        message: '確定要刪除「' + productData.productName + '」這項待上架產品嗎？',
+        callback: (result) => {
+          if (result) {
+            Meteor.customCall('retrieveProduct', productId);
+          }
         }
       });
     }

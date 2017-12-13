@@ -1,3 +1,14 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");html {
+    font-family: sans-serif;
+    line-height: 1.15;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%
+}
+
+body {
+  font-family: "Source Sans Pro", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 #main > .card {
   margin-bottom: 2rem;
 }
@@ -255,10 +266,6 @@
   color: #839496;
 }
 
-.text-non-break {
-  white-space: nowrap;
-}
-
 @media only screen and (max-width: 768px) {
   /* Force table to not be like tables anymore */
   #tax-info-table table,
@@ -359,5 +366,13 @@
   #ad-list-table td.adv-content {
     max-height: 100px;
     overflow-y: auto;
+  }
+}
+
+@media only screen and (min-width: 769px) {
+  #ad-list-table td.adv-buyer,
+  #ad-list-table td.adv-content {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 }

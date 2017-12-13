@@ -144,10 +144,10 @@ Template.instantMessageFilterButton.helpers({
     const btnType = this.type;
     const messageTypeList = messageTypeGroupHash[btnType] || [btnType];
     if (_.contains(rFilterTypeList.get(), messageTypeList[0])) {
-      return 'btn btn-sm btn-primary';
+      return 'btn btn-sm btn-primary mt-1';
     }
     else {
-      return 'btn btn-sm btn-secondary';
+      return 'btn btn-sm btn-secondary mt-1';
     }
   },
   btnText() {
