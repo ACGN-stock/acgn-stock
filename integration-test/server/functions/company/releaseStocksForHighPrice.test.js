@@ -13,15 +13,16 @@ mustSinon(expect);
 
 describe('function releaseStocksForHighPrice', function() {
   let companyId;
+  const lastPrice = 1000;
 
   beforeEach(function() {
     resetDatabase();
-    dbVariables.set('highPriceCompanyCount', 1);
-    companyId = dbCompanies.insert(companyFactory.build({ totalRelease: 1000 }));
+    dbVariables.set('highPriceThreshold', 0);
+    companyId = dbCompanies.insert(companyFactory.build({ lastPrice, totalRelease: 1000 }));
   });
 
-  it('should not release stocks if there is no high price companies', function() {
-    dbVariables.set('highPriceCompanyCount', 0);
+  it('should not release stocks if the company is not a high price company', function() {
+    dbVariables.set('highPriceThreshold', lastPrice + 1);
     releaseStocksForHighPrice();
     dbOrders.find({}).count().must.be.equal(0);
   });

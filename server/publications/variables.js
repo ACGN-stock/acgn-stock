@@ -16,7 +16,7 @@ Meteor.publish('variables', function() {
           'validateUserBoardName',
           'validateUserAID',
           'lowPriceThreshold',
-          'highPriceCompanyCount',
+          'highPriceThreshold',
           'recordListPriceBegin',
           'recordListPriceEnd',
           'releaseStocksForLowPriceBegin',

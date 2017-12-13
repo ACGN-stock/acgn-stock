@@ -9,6 +9,13 @@ export function isLowPriceCompany(companyData) {
   return companyData.listPrice < lowPriceThreshold;
 }
 
+// 判斷是否為高價公司
+export function isHighPriceCompany(companyData) {
+  const highPriceThreshold = dbVariables.get('highPriceThreshold');
+
+  return companyData.listPrice >= highPriceThreshold;
+}
+
 // 取得買賣單的上下限
 export function getPriceLimits(companyData) {
   if (isLowPriceCompany(companyData)) {

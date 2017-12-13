@@ -26,7 +26,7 @@ import { dbVariables } from '/db/dbVariables';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVoteRecord } from '/db/dbVoteRecord';
 import { updateLowPriceThreshold } from './functions/company/updateLowPriceThreshold';
-import { updateHighPriceCompanyCount } from './functions/company/updateHighPriceCompanyCount';
+import { updateHighPriceThreshold } from './functions/company/updateHighPriceThreshold';
 import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
 import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
 import { countDownReleaseStocksForLowPrice } from './functions/company/releaseStocksForLowPrice';
@@ -70,10 +70,9 @@ export function doIntervalWork() {
     doSeasonWorks(lastRoundData, lastSeasonData);
   }
   else {
-    //設定低價位股價門檻
+    // 更新高低價位股價門檻
     updateLowPriceThreshold();
-    // 更新高價公司的總數
-    updateHighPriceCompanyCount();
+    updateHighPriceThreshold();
     //檢查所有創立中且投資時間截止的公司是否成功創立
     checkExpiredFoundations();
     //當發薪時間到時，發給所有驗證通過的使用者薪水，並檢查賦稅、增加滯納罰金與強制繳稅
