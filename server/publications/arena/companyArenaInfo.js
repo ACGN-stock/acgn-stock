@@ -26,17 +26,21 @@ Meteor.publish('companyArenaInfo', function(companyId) {
         if (arenaFightersObserverHash[arenaId]) {
           arenaFightersObserverHash[arenaId].stop();
         }
-        arenaFightersObserverHash[arenaId] = dbArenaFighters.find({arenaId, companyId}).observeChanges({
-          added: (id, fields) => {
-            this.added('arenaFighters', id, fields);
-          },
-          changed: (id, fields) => {
-            this.changed('arenaFighters', id, fields);
-          },
-          removed: (id) => {
-            this.removed('arenaFighters', id);
-          }
-        });
+        arenaFightersObserverHash[arenaId] = dbArenaFighters
+          .find({ arenaId, companyId }, {
+            fields: { investors: 0 }
+          })
+          .observeChanges({
+            added: (id, fields) => {
+              this.added('arenaFighters', id, fields);
+            },
+            changed: (id, fields) => {
+              this.changed('arenaFighters', id, fields);
+            },
+            removed: (id) => {
+              this.removed('arenaFighters', id);
+            }
+          });
       },
       changed: (id, fields) => {
         this.changed('arena', id, fields);
@@ -62,4 +66,3 @@ Meteor.publish('companyArenaInfo', function(companyId) {
 });
 //一分鐘最多20次
 limitSubscription('companyArenaInfo');
-

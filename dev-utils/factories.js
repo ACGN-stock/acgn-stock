@@ -43,6 +43,9 @@ export const companyFactory = new Factory()
   })
   .attr('totalValue', ['totalRelease', 'listPrice'], (totalRelease, listPrice) => {
     return totalRelease * listPrice;
+  })
+  .attr('capital', ['totalRelease', 'listPrice'], (totalRelease, listPrice) => {
+    return totalRelease * listPrice;
   });
 
 export const foundationFactory = new Factory()
