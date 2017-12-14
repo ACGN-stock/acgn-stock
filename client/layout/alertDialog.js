@@ -100,7 +100,7 @@ Template.alertDialog.onDestroyed(function() {
 Template.alertDialog.helpers({
   customInput() {
     return `
-      <input id="alert-dialog-custom-input" class="form-control"
+      <input name="alert-dialog-custom-input" class="form-control"
              type="${strAlertDialogInputType}"
              value="${(strAlertDialogDefaultValue === null) ? '' : strAlertDialogDefaultValue}"
              ${strAlertDialogCustomSetting} />
@@ -123,6 +123,12 @@ Template.alertDialog.helpers({
   }
 });
 Template.alertDialog.events({
+  'click [for], touchstart [for]'(event, templateInstance) {
+    const forFieldName = $(event.currentTarget).attr('for');
+    const $inputTarget = $(templateInstance.find(`[name="${forFieldName}"]`));
+
+    $inputTarget.trigger('focus');
+  },
   reset(event) {
     event.preventDefault();
     blAlertDialogOK = false;

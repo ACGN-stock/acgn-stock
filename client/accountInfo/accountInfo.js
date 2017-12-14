@@ -16,6 +16,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat } from '../utils/helpers';
+import { changeChairmanTitle } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
@@ -343,6 +344,12 @@ Template.chairmanTitleList.helpers({
       dataNumberPerPage: 10,
       offset: chairmanOffset
     };
+  }
+});
+Template.chairmanTitleList.events({
+  'click [data-action="changeChairmanTitle"]'() {
+    const companyData = this;
+    changeChairmanTitle(companyData);
   }
 });
 

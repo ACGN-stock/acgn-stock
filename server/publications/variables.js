@@ -25,7 +25,8 @@ Meteor.publish('variables', function() {
           'releaseStocksForHighPriceEnd',
           'releaseStocksForNoDealBegin',
           'releaseStocksForNoDealEnd',
-          'arenaCounter'
+          'arenaCounter',
+          'fscRuleURL'
         ]
       }
     },

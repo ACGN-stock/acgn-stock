@@ -85,6 +85,8 @@ export function createBuyOrder(user, companyData) {
     type: 'prompt',
     title: '股份購入',
     message: `請輸入您期望購入的每股單價：(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`,
+    inputType: 'number',
+    customSetting: `min="${minimumUnitPrice}" max="${maximumUnitPrice}"`,
     callback: function(result) {
       const unitPrice = parseInt(result, 10);
       if (! unitPrice) {
@@ -105,6 +107,8 @@ export function createBuyOrder(user, companyData) {
         type: 'prompt',
         title: '股份購入',
         message: `請輸入總購入數量：(1~${maximumAmount})`,
+        inputType: 'number',
+        customSetting: `min="1" max="${maximumAmount}"`,
         callback: function(result) {
           const amount = parseInt(result, 10);
           if (! amount) {
@@ -153,6 +157,8 @@ export function createSellOrder(user, companyData) {
     type: 'prompt',
     title: '股份賣出',
     message: `請輸入您期望賣出的每股單價：(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`,
+    inputType: 'number',
+    customSetting: `min="${minimumUnitPrice}" max="${maximumUnitPrice}"`,
     callback: function(result) {
       const unitPrice = parseInt(result, 10);
       if (! unitPrice) {
@@ -169,6 +175,8 @@ export function createSellOrder(user, companyData) {
         type: 'prompt',
         title: '股份賣出',
         message: `請輸入總賣出數量：(1~${maximumAmount})`,
+        inputType: 'number',
+        customSetting: `min="1" max="${maximumAmount}"`,
         callback: function(result) {
           const amount = parseInt(result, 10);
           if (! amount) {
@@ -222,6 +230,7 @@ export function changeChairmanTitle(companyData) {
   alertDialog.prompt({
     message: '要修改董事長的頭銜嗎？',
     defaultValue: companyData.chairmanTitle,
+    customSetting: `minlength="1" maxlength="20"`,
     callback: (chairmanTitle) => {
       if (chairmanTitle && chairmanTitle.length > 0 && chairmanTitle.length <= 20) {
         Meteor.customCall('changeChairmanTitle', companyData._id, chairmanTitle);

@@ -12,7 +12,7 @@ import { formatDateText } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat } from '../utils/helpers.js';
+import { currencyFormat, sanitizeHtml } from '../utils/helpers.js';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInBuyAdvertisingMode = new ReactiveVar(false);
@@ -90,7 +90,7 @@ Template.advertising.events({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     const message = `
       <div>確定要撤銷廣告？</div>
-      <div style="max-height: 100px; overflow: scroll;">${advertisingData.message}</div>
+      <div style="max-height: 100px; overflow: scroll;">${sanitizeHtml(advertisingData.message)}</div>
     `;
 
     alertDialog.confirm({
@@ -197,7 +197,7 @@ function saveAdvertisingModel(model) {
   const message = `
     <div>廣告總支出：$${currencyFormat(totalPaid)}</div>
     <div>廣告內容：</div>
-    <div style="max-height: 100px; overflow: scroll;">${advertisingSample}</div>
+    <div style="max-height: 100px; overflow: scroll;">${sanitizeHtml(advertisingSample)}</div>
     <div>確定發出廣告嗎？</div>
   `;
   alertDialog.confirm({

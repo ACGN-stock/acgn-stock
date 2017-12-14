@@ -106,26 +106,30 @@
 </template>
 
 <template name="instantMessageFilterByUserId">
-  <span class="badge badge-success" style="font-size: 14px;">
-    {{> userLink id=this class="text-white"}}
-    <i
-      class="fa fa-times"
-      style="cursor: pointer; margin: 0 6px 0 6px"
-      data-action="remove"
-    >
-    </i>
+  <span class="badge badge-success d-inline-flex flex-nowrap" style="max-width: inherit;">
+    <div class="d-inline-block text-truncate">{{> userLink id=this class="text-white"}}</div>
+    <div class="text-nowrap">
+      <i
+        class="fa fa-times"
+        style="cursor: pointer; margin: 0 6px 0 6px"
+        data-action="remove"
+      >
+      </i>
+    </div>
   </span>
 </template>
 
 <template name="instantMessageFilterByCompanyId">
-  <span class="badge badge-info text-white" style="font-size: 14px;">
-    {{> companyLink id=this class="text-white"}}
-    <i
-      class="fa fa-times"
-      style="cursor: pointer; margin: 0 6px 0 6px"
-      data-action="remove"
-    >
-    </i>
+  <span class="badge badge-info d-inline-flex flex-nowrap" style="max-width: inherit;">
+    <div class="d-inline-block text-truncate">{{> companyLink id=this class="text-white"}}</div>
+    <div class="text-nowrap">
+      <i
+        class="fa fa-times"
+        style="cursor: pointer; margin: 0 6px 0 6px"
+        data-action="remove"
+      >
+      </i>
+    </div>
   </span>
 </template>
 
