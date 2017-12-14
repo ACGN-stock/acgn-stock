@@ -1,56 +1,20 @@
 import { Meteor } from 'meteor/meteor';
-import { _ } from 'meteor/underscore';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { countdownManager } from '/server/imports/utils/countdownManager';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/utils/debug';
-import { sellFscStocks } from './sellFscStocks';
 
-const counterBase = 1000 * 60;
+// 更新下次可能觸發時間區間
+export function updateRecordListPricePeriod() {
+  // TODO 移除 counter 設定，改用時間計算
+  const { recordListPriceMinCounter, recordListPriceMaxCounter, intervalTimer } = Meteor.settings.public;
 
-function generateRecordListPriceCounter() {
-  return _.random(
-    Meteor.settings.public.recordListPriceMinCounter,
-    Meteor.settings.public.recordListPriceMaxCounter
-  );
-}
-
-function updateRecordListPricePeriod() {
   const now = Date.now();
-  const begin = now + Meteor.settings.public.recordListPriceMinCounter * counterBase;
-  const end = now + Meteor.settings.public.recordListPriceMaxCounter * counterBase;
+  const begin = now + recordListPriceMinCounter * intervalTimer;
+  const end = now + recordListPriceMaxCounter * intervalTimer;
 
   dbVariables.set('recordListPriceBegin', begin);
   dbVariables.set('recordListPriceEnd', end);
-}
-
-// 倒數更新參考價
-export function countDownRecordListPrice() {
-  debug.log('countDownRecordListPrice');
-
-  const counterKey = 'recordListPriceCounter';
-
-  if (! countdownManager.isInitialized(counterKey)) {
-    countdownManager.set(counterKey, generateRecordListPriceCounter());
-  }
-
-  countdownManager.countDown(counterKey);
-
-  if (! countdownManager.isZeroReached(counterKey)) {
-    return;
-  }
-
-  const nextCounter = generateRecordListPriceCounter();
-  countdownManager.set(counterKey, nextCounter);
-  console.info('recordListPrice triggered! next counter: ', nextCounter);
-
-  // 更新下次可能觸發時間區間
-  updateRecordListPricePeriod();
-
-  recordListPrice();
-  sellFscStocks(); // 參考價更新同時賣出金管會持股
 }
 
 // 更新參考價（與參考市值）

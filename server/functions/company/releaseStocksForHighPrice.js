@@ -1,56 +1,23 @@
 import { Meteor } from 'meteor/meteor';
-import { _ } from 'meteor/underscore';
 
 import { createOrder } from '/server/imports/createOrder';
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { countdownManager } from '/server/imports/utils/countdownManager';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbOrders } from '/db/dbOrders';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/utils/debug';
 import { getPriceLimits } from './helpers';
 
-const counterBase = 1000 * 60;
-
-// 產生新的高價釋股倒數值
-function generateReleaseStocksForHighPriceCounter() {
-  return _.random(Meteor.settings.public.releaseStocksForHighPriceMinCounter, Meteor.settings.public.releaseStocksForHighPriceMaxCounter);
-}
-
 // 記錄高價釋股時間
-function updateReleaseStocksForHighPricePeriod() {
+export function updateReleaseStocksForHighPricePeriod() {
+  // TODO 移除 counter 設定，改用時間計算
+  const { releaseStocksForHighPriceMinCounter, releaseStocksForHighPriceMaxCounter, intervalTimer } = Meteor.settings.public;
+
   const now = Date.now();
-  const begin = now + Meteor.settings.public.releaseStocksForHighPriceMinCounter * counterBase;
-  const end = now + Meteor.settings.public.releaseStocksForHighPriceMaxCounter * counterBase;
+  const begin = now + releaseStocksForHighPriceMinCounter * intervalTimer;
+  const end = now + releaseStocksForHighPriceMaxCounter * intervalTimer;
 
   dbVariables.set('releaseStocksForHighPriceBegin', begin);
   dbVariables.set('releaseStocksForHighPriceEnd', end);
-}
-
-// 倒數高價釋股
-export function countDownReleaseStocksForHighPrice() {
-  debug.log('countDownReleaseStocksForHighPrice');
-
-  const counterKey = 'releaseStocksForHighPriceCounter';
-
-  if (! countdownManager.isInitialized(counterKey)) {
-    countdownManager.set(counterKey, generateReleaseStocksForHighPriceCounter());
-  }
-
-  countdownManager.countDown(counterKey);
-
-  if (! countdownManager.isZeroReached(counterKey)) {
-    return;
-  }
-
-  const nextCounter = generateReleaseStocksForHighPriceCounter();
-  countdownManager.set(counterKey, nextCounter);
-  console.info('releaseStocksForHighPrice triggered! next counter: ', nextCounter);
-
-  // 更新下次可能觸發時間區間
-  updateReleaseStocksForHighPricePeriod();
-
-  releaseStocksForHighPrice();
 }
 
 // 對全市場進行高價釋股

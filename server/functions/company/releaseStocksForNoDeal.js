@@ -1,56 +1,21 @@
 import { Meteor } from 'meteor/meteor';
-import { _ } from 'meteor/underscore';
 
 import { createOrder } from '/server/imports/createOrder';
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { countdownManager } from '/server/imports/utils/countdownManager';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/utils/debug';
 import { calculateHighPriceBuyAmount, calculateDealAmount, getPriceLimits } from './helpers';
 
-const counterBase = 1000 * 60;
+export function updateReleaseStocksForNoDealPeriod() {
+  // TODO 移除 counter 設定，改用時間計算
+  const { releaseStocksForNoDealMinCounter, releaseStocksForNoDealMaxCounter, intervalTimer } = Meteor.settings.public;
 
-function generateReleaseStocksForNoDealCounter() {
-  return _.random(
-    Meteor.settings.public.releaseStocksForNoDealMinCounter,
-    Meteor.settings.public.releaseStocksForNoDealMaxCounter
-  );
-}
-
-function updateReleaseStocksForNoDealPeriod() {
   const now = Date.now();
-  const begin = now + Meteor.settings.public.releaseStocksForNoDealMinCounter * counterBase;
-  const end = now + Meteor.settings.public.releaseStocksForNoDealMaxCounter * counterBase;
+  const begin = now + releaseStocksForNoDealMinCounter * intervalTimer;
+  const end = now + releaseStocksForNoDealMaxCounter * intervalTimer;
 
   dbVariables.set('releaseStocksForNoDealBegin', begin);
   dbVariables.set('releaseStocksForNoDealEnd', end);
-}
-
-// 倒數低量釋股
-export function countDownReleaseStocksForNoDeal() {
-  debug.log('countDownReleaseStocksForNoDeal');
-
-  const counterKey = 'releaseStocksForNoDealCounter';
-
-  if (! countdownManager.isInitialized(counterKey)) {
-    countdownManager.set(counterKey, generateReleaseStocksForNoDealCounter());
-  }
-
-  countdownManager.countDown(counterKey);
-
-  if (! countdownManager.isZeroReached(counterKey)) {
-    return;
-  }
-
-  const nextCounter = generateReleaseStocksForNoDealCounter();
-  countdownManager.set(counterKey, nextCounter);
-  console.info('releaseStocksForNoDeal triggered! next counter: ', nextCounter);
-
-  // 更新下次可能觸發時間區間
-  updateReleaseStocksForNoDealPeriod();
-
-  releaseStocksForNoDeal();
 }
 
 // 對全市場進行低量釋股

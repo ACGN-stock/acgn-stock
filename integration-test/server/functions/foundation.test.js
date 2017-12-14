@@ -14,7 +14,7 @@ import { dbLog } from '/db/dbLog';
 import { dbPrice } from '/db/dbPrice';
 import { dbDirectors } from '/db/dbDirectors';
 import { foundationFactory } from '/dev-utils/factories';
-import { checkExpiredFoundations, doOnFoundationSuccess, doOnFoundationFailure } from '/server/foundation';
+import { checkExpiredFoundations, doOnFoundationSuccess, doOnFoundationFailure } from '/server/functions/foundation/checkExpiredFoundations';
 
 mustSinon(expect);
 
