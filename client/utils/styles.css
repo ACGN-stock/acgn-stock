@@ -482,7 +482,7 @@ table.next-season-product .product-description {
   max-height: 3.5rem;
 }
 
-[attr-required]:after {
+[data-required]:after {
   font-size: 0.75rem;
   content: '＊';
   vertical-align: super;

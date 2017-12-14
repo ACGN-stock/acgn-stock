@@ -199,7 +199,7 @@
       ＊必須
     </div>
     <div class="form-group">
-      <label for="productName" attr-required>產品名稱</label>
+      <label for="productName" data-required>產品名稱</label>
       <input
         class="form-control"
         type="text"
@@ -212,7 +212,7 @@
       {{{errorHtmlOf 'productName'}}}
     </div>
     <div class="form-group">
-      <label for="type" attr-required>產品類別</label>
+      <label for="type" data-required>產品類別</label>
       <select class="form-control" name="type">
         {{#each type in productTypeList}}
           <option value="{{type}}">{{type}}</option>
@@ -221,7 +221,7 @@
       {{{errorHtmlOf 'type'}}}
     </div>
     <div class="form-group">
-      <label for="url" attr-required>產品連結</label>
+      <label for="url" data-required>產品連結</label>
       <input
         class="form-control"
         type="url"
