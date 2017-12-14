@@ -37,7 +37,7 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
   }
   const userId = user._id;
   if (dbTaxes.find({userId}).count() > 0) {
-    throw new Meteor.Error(403, '請先繳清稅單再參加賭搏！');
+    throw new Meteor.Error(403, '要先繳清稅單，才能在最萌亂鬥大賽中進行投注！');
   }
   const lastArenaData = dbArena.findOne({}, {
     sort: {
