@@ -7,6 +7,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '/db/dbFoundations';
+import { dbVariables } from '/db/dbVariables';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
@@ -136,6 +137,9 @@ function saveModel(model) {
 
 const previewPictureType = new ReactiveVar('');
 Template.foundCompanyForm.helpers({
+  fscRuleURL() {
+    return dbVariables.get('fscRuleURL');
+  },
   isCompanyNameDisabled() {
     const templateInstance = Template.instance();
 

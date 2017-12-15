@@ -5,7 +5,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
 import { dbDirectors } from '/db/dbDirectors';
 
-const showListPerPage = 10;
+const showListPerPage = 20;
 export const ownStocksOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.fscStock);
 Template.fscStock.onCreated(function() {
