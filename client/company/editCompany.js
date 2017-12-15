@@ -12,6 +12,7 @@ import { dbProducts, productTypeList } from '/db/dbProducts';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { sanitizeHtml } from '../utils/helpers';
 
 inheritedShowLoadingOnSubscribing(Template.editCompany);
 Template.editCompany.onCreated(function() {
@@ -44,6 +45,7 @@ Template.companyEditForm.onCreated(function() {
     this.model.set(companyData);
   });
 });
+
 function validateCompanyModel(model) {
   const error = {};
   if (model.tags.length > 50) {
@@ -134,6 +136,21 @@ Template.companyEditForm.events({
     }
   }
 });
+
+
+Template.bigPicturePreviewModal.helpers({
+  modalClass() {
+    return (previewPictureType.get() === 'pictureBig')
+      ? 'big-picture-preivew modal fade show' : 'big-picture-preivew modal fade';
+  }
+});
+Template.bigPicturePreviewModal.events({
+  'click div.modal'() {
+    previewPictureType.set('');
+  }
+});
+
+
 function addNewTag(event, templatInstance) {
   const $input = templatInstance.$input.filter('[name="tags"]');
   const model = _.clone(templatInstance.model.get());
@@ -189,7 +206,7 @@ Template.companyProductManage.events({
     const productData = dbProducts.findOne(productId);
     if (productData) {
       alertDialog.confirm({
-        message: '確定要刪除「' + productData.productName + '」這項待上架產品嗎？',
+        message: `確定要刪除「${sanitizeHtml(productData.productName)}」這項待上架產品嗎？`,
         callback: (result) => {
           if (result) {
             Meteor.customCall('retrieveProduct', productId);

@@ -164,7 +164,7 @@
     {{/if}}
     {{#if this.profile.isAdmin}}
       <div>
-        是<div class="d-inline bg-warning text-white">金融管理會委員</div>。
+        是<span class="bg-warning text-white">金融管理會委員</span>。
       </div>
     {{/if}}
     {{#if this.profile.revokeQualification}}
@@ -209,7 +209,17 @@
 
 <template name="chairmanTitleList">
   {{#each titleList}}
-    {{> companyTitle companyId=this._id title='董事長'}}
+    <div class="text-primary d-flex flex-nowrap">
+      <div class="text-nowrap">是「</div>
+      <div class="d-inline-block text-truncate" style="min-width: 1rem;">{{>companyLink this._id}}</div>
+      <div class="text-nowrap">」公司的「</div>
+      <div class="d-inline-block text-truncate" style="min-width: 1rem;">
+        <a href="#" data-action="changeChairmanTitle">
+          {{this.chairmanTitle}}
+        </a>
+      </div>
+      <div class="text-nowrap">」</div>
+    </div>
   {{else}}
     查無資料！
   {{/each}}
@@ -253,7 +263,7 @@
 
 <template name="accountInfoTaxList">
   <div class="col-12 border-grid">
-    <table id="tax-info-table" class="table table-bordered mt-3" style="width: 100%; table-layout: fixed;">
+    <table class="table table-bordered mt-3 account-tax-info" style="width: 100%; table-layout: fixed;">
       <thead>
         <tr>
           <th class="text-center text-nowrap" style="width: 160px">繳稅期限</th>
@@ -293,11 +303,11 @@
             {{/if}}
           </tr>
         {{else}}
-          <tr>
+          <tr class="default-content">
             {{#if isCurrentUser}}
-              <td class="text-center text-truncate" colspan="6">目前沒有任何需要繳納的稅金！</td>
+              <td class="text-center text-truncate" colspan="6">目前沒有需要繳納的稅金！</td>
             {{else}}
-              <td class="text-center text-truncate" colspan="5">目前沒有任何需要繳納的稅金！</td>
+              <td class="text-center text-truncate" colspan="5">目前沒有需要繳納的稅金！</td>
             {{/if}}
           </tr>
         {{/each}}
