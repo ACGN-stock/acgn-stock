@@ -2,7 +2,7 @@ import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 
 import { dbEmployees } from '/db/dbEmployees';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   setEmployeeMessage(companyId, message) {

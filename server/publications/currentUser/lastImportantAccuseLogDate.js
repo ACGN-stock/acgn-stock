@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
-import { limitSubscription } from '/server/imports/rateLimit';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { dbLog, importantAccuseLogTypeList } from '/db/dbLog';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('lastImportantAccuseLogDate', function() {
   debug.log('publish lastImportantAccuseLogDate');

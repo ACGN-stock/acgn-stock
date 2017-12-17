@@ -7,7 +7,7 @@ import { dbOrders } from '/db/dbOrders';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbRound } from '/db/dbRound';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   startVacation() {
@@ -62,7 +62,7 @@ export function startVacation(userId) {
     throw new Meteor.Error(403, '您現在有稅單未繳，全部結清後才能進行渡假！');
   }
 
-  if (dbEmployees.find({ userId, employed: false }).count()) {
+  if (dbEmployees.find({ userId, employed: false, resigned: false }).count()) {
     throw new Meteor.Error(403, '您有登記為公司的儲備員工，無法進行渡假！');
   }
 

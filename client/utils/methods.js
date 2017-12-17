@@ -85,6 +85,8 @@ export function createBuyOrder(user, companyData) {
     type: 'prompt',
     title: '股份購入',
     message: `請輸入您期望購入的每股單價：(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`,
+    inputType: 'number',
+    customSetting: `min="${minimumUnitPrice}" max="${maximumUnitPrice}"`,
     callback: function(result) {
       const unitPrice = parseInt(result, 10);
       if (! unitPrice) {
@@ -105,6 +107,8 @@ export function createBuyOrder(user, companyData) {
         type: 'prompt',
         title: '股份購入',
         message: `請輸入總購入數量：(1~${maximumAmount})`,
+        inputType: 'number',
+        customSetting: `min="1" max="${maximumAmount}"`,
         callback: function(result) {
           const amount = parseInt(result, 10);
           if (! amount) {
@@ -153,6 +157,8 @@ export function createSellOrder(user, companyData) {
     type: 'prompt',
     title: '股份賣出',
     message: `請輸入您期望賣出的每股單價：(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`,
+    inputType: 'number',
+    customSetting: `min="${minimumUnitPrice}" max="${maximumUnitPrice}"`,
     callback: function(result) {
       const unitPrice = parseInt(result, 10);
       if (! unitPrice) {
@@ -169,6 +175,8 @@ export function createSellOrder(user, companyData) {
         type: 'prompt',
         title: '股份賣出',
         message: `請輸入總賣出數量：(1~${maximumAmount})`,
+        inputType: 'number',
+        customSetting: `min="1" max="${maximumAmount}"`,
         callback: function(result) {
           const amount = parseInt(result, 10);
           if (! amount) {
@@ -193,9 +201,12 @@ export function retrieveOrder(orderData) {
       '確定要取消「以$' + orderData.unitPrice +
       '單價' + orderData.orderType + '數量' + orderData.amount + '的「' +
       companyData.companyName + '」公司股份」這筆訂單嗎？（將付出手續費$1）';
-    alertDialog.confirm(message, function(result) {
-      if (result) {
-        Meteor.customCall('retrieveOrder', orderData._id);
+    alertDialog.confirm({
+      message,
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('retrieveOrder', orderData._id);
+        }
       }
     });
   }
@@ -216,14 +227,19 @@ export function changeChairmanTitle(companyData) {
     return false;
   }
 
-  alertDialog.prompt('要修改董事長的頭銜嗎？', function(chairmanTitle) {
-    if (chairmanTitle && chairmanTitle.length > 0 && chairmanTitle.length <= 20) {
-      Meteor.customCall('changeChairmanTitle', companyData._id, chairmanTitle);
+  alertDialog.prompt({
+    message: '要修改董事長的頭銜嗎？',
+    defaultValue: companyData.chairmanTitle,
+    customSetting: `minlength="1" maxlength="20"`,
+    callback: (chairmanTitle) => {
+      if (chairmanTitle && chairmanTitle.length > 0 && chairmanTitle.length <= 20) {
+        Meteor.customCall('changeChairmanTitle', companyData._id, chairmanTitle);
+      }
+      else if (chairmanTitle) {
+        alertDialog.alert('無效的頭銜名稱！');
+      }
     }
-    else if (chairmanTitle) {
-      alertDialog.alert('無效的頭銜名稱！');
-    }
-  }, companyData.chairmanTitle);
+  });
 }
 
 export function voteProduct(productId, companyId) {
@@ -251,9 +267,12 @@ export function voteProduct(productId, companyId) {
 
     return false;
   }
-  alertDialog.confirm('您的推薦票剩餘' + user.profile.vote + '張，確定要向產品投出推薦票嗎？', function(result) {
-    if (result) {
-      Meteor.customCall('voteProduct', productId);
+  alertDialog.confirm({
+    message: '您的推薦票剩餘' + user.profile.vote + '張，確定要向產品投出推薦票嗎？',
+    callback: (result) => {
+      if (result) {
+        Meteor.customCall('voteProduct', productId);
+      }
     }
   });
 }
@@ -274,9 +293,12 @@ export function likeProduct(productId) {
 
   const userId = user._id;
   if (dbProductLike.find({productId, userId}).count() > 0) {
-    alertDialog.confirm('您已經對此產品做出過正面評價，要收回評價嗎？', function(result) {
-      if (result) {
-        Meteor.customCall('likeProduct', productId);
+    alertDialog.confirm({
+      message: '您已經對此產品做出過正面評價，要收回評價嗎？',
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('likeProduct', productId);
+        }
       }
     });
   }
@@ -338,7 +360,7 @@ export function investArchiveCompany(companyData) {
       </div>
     `,
     defaultValue: null,
-    callback: function(result) {
+    callback: (result) => {
       if (result) {
         Meteor.customCall('investArchiveCompany', companyData._id);
       }

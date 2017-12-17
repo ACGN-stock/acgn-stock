@@ -83,7 +83,16 @@
           {{/if}}
         {{/if}}
       </div>
-      <hr style="margin: 0px;" />
+      <hr class="m-0"/>
+      {{#if this.illegalReason}}
+        <div class="row text-left illegal-description">
+          <div class="col text-center text-white text-truncate" title="{{sanitizeHtml this.illegalReason}}">
+            <i class="fa fa-warning"></i>
+            {{sanitizeHtml this.illegalReason}}
+          </div>
+        </div>
+        <hr class="m-0"/>
+      {{/if}}
       <div class="row row-cover d-flex justify-content-around">
         <div class="d-flex flex-column align-self-center">
           <div class="picture">
@@ -100,16 +109,16 @@
               <div class="d-flex flex-row-reverse">
                 {{#if isChairman this._id}}
                   <a class="small" href="#" data-action="changeChairmanTitle">
-                    {{this.chairmanTitle}}：
+                    {{this.chairmanTitle}}
                   </a>
                 {{else}}
-                  <small>{{this.chairmanTitle}}：</small>
+                  <small>{{this.chairmanTitle}}</small>
                 {{/if}}
               </div>
               <div class="d-flex flex-row-reverse">
                 <h4>{{>userLink this.chairman}}</h4>
               </div>
-              <div class="d-flex flex-row-reverse" style="margin-top: 0.5rem;">
+              <div class="d-flex flex-row-reverse mt-2">
                 <small>經理人</small>
               </div>
               <div class="d-flex flex-row-reverse">
@@ -199,49 +208,56 @@
       {{/if}}
     </div>
     <div class="media-body row border-grid-body">
-      <div class="col-4 col-lg-3 text-right border-grid">角色名稱：</div>
+      {{#if this.illegalReason}}
+        <div class="col-12 text-center text-danger text-truncate border-grid" title="{{showIllegalDescription}}">
+          <i class="fa fa-warning"></i>
+          本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
+        </div>
+      {{/if}}
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">角色名稱</div>
+    
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>companyLink this._id}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">經理人：</div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">經理人</div>
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>userLink this.manager}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">創立日期：</div>
-      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateText this.createdAt}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">創立日期</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid" title="{{formatDateText this.createdAt}}">
         {{formatDateText this.createdAt}}
       </div>
-      <div class="col-4 col-lg-3 text-right text-truncate border-grid" title="{{this.chairmanTitle}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title" title="{{this.chairmanTitle}}">
         {{#if isChairman this._id}}
-          <a href="#" data-action="changeChairmanTitle">
-            {{this.chairmanTitle}}：
+          <a class="text-truncate" href="#" data-action="changeChairmanTitle">
+            {{this.chairmanTitle}}
           </a>
         {{else}}
-          {{this.chairmanTitle}}：
+          {{this.chairmanTitle}}
         {{/if}}
       </div>
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>userLink this.chairman}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">總市值：</div>
-      <div class="col-8 col-lg-3 text-right border-grid company-asset" title="{{this.totalValue}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總市值</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid company-asset" title="{{this.totalValue}}">
         $ {{currencyFormat this.totalValue}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">股票價格：</div>
-      <div class="col-8 col-lg-3 text-right border-grid stock-price" title="{{this.lastPrice}}({{this.listPrice}})">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">股票價格</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid stock-price" title="{{this.lastPrice}}({{this.listPrice}})">
         <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
           $ {{currencyFormat this.lastPrice}}({{currencyFormat this.listPrice}})
         </span>
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">總釋股量：</div>
-      <div class="col-8 col-lg-3 text-right border-grid stock-release" title="{{this.totalRelease}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總釋股量</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid stock-release" title="{{this.totalRelease}}">
         <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
           {{this.totalRelease}}
         </span>
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">每股盈餘：</div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">每股盈餘</div>
       <div class="col-8 col-lg-3 text-right border-grid stock-EPS" title="{{getCompanyEPS this}}">
-        <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
+        <span class="text-truncate {{priceDisplayClass this.lastPrice this.listPrice}}">
           {{currencyFormat(getCompanyEPS this)}}
         </span>
       </div>

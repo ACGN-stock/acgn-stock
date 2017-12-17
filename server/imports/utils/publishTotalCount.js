@@ -19,5 +19,9 @@ export function publishTotalCount(variableId, cursor, publisher) {
   });
   initialized = true;
 
+  publisher.onStop(() => {
+    observer.stop();
+  });
+
   return observer;
 }

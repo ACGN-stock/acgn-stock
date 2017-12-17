@@ -7,6 +7,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '/db/dbFoundations';
+import { dbVariables } from '/db/dbVariables';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
@@ -118,14 +119,17 @@ function saveModel(model) {
       <div class="text-danger">創立重複、無ACG點等違反金管會規則的角色將視情節處以罰款或永久停權。</div>
       <div>請再次輸入角色名稱以表示確定。</div>
     `;
-    alertDialog.prompt(message, function(companyName) {
-      if (companyName === model.companyName) {
-        Meteor.customCall('foundCompany', model, (error) => {
-          if (! error) {
-            const path = FlowRouter.path('foundationList');
-            FlowRouter.go(path);
-          }
-        });
+    alertDialog.prompt({
+      message,
+      callback: (companyName) => {
+        if (companyName === model.companyName) {
+          Meteor.customCall('foundCompany', model, (error) => {
+            if (! error) {
+              const path = FlowRouter.path('foundationList');
+              FlowRouter.go(path);
+            }
+          });
+        }
       }
     });
   }
@@ -133,6 +137,9 @@ function saveModel(model) {
 
 const previewPictureType = new ReactiveVar('');
 Template.foundCompanyForm.helpers({
+  fscRuleURL() {
+    return dbVariables.get('fscRuleURL');
+  },
   isCompanyNameDisabled() {
     const templateInstance = Template.instance();
 

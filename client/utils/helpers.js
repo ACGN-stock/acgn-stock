@@ -2,9 +2,12 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { $ } from 'meteor/jquery';
+
 import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbVariables } from '/db/dbVariables';
+
 
 Meteor.subscribe('variables');
 
@@ -170,3 +173,10 @@ Template.registerHelper('minus', function(value1, value2) {
 Template.registerHelper('displayManager', function(manager) {
   return manager === '!none' ? '無' : manager;
 });
+
+export function sanitizeHtml(str) {
+  return $('<span></span>')
+    .text(str)
+    .html();
+}
+Template.registerHelper('sanitizeHtml', sanitizeHtml);

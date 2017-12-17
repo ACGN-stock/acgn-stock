@@ -5,6 +5,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '/db/dbFoundations';
+import { dbVariables } from '/db/dbVariables';
 import { formatDateText, isUserId } from '../utils/helpers';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
@@ -195,7 +196,7 @@ const foundationListEvents = {
         要投資多少金額？(${currencyFormat(minimumInvest)}~${currencyFormat(maximumInvest)})
         <div class="text-danger">
           投資理財有賺有賠，請先確認您要投資的公司是否符合
-          <a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit?usp=sharing" target="_blank">金管會的規定</a>。
+          <a href="${dbVariables.get('fscRuleURL')}" target="_blank">金管會的規定</a>。
         </div>
       `,
       defaultValue: null,

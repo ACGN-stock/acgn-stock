@@ -1,106 +1,83 @@
-'use strict';
-import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { currencyFormat } from './helpers.js';
+
+import { currencyFormat, sanitizeHtml } from './helpers.js';
 
 Template.displayLog.onRendered(function() {
-  if (this.data.userId) {
-    const $link = this.$('[data-user-link]');
-    _.each(this.data.userId, (userId) => {
-      if (userId === '!system') {
-        $link.text('系統');
-      }
-      else if (userId === '!FSC') {
-        $link.text('金管會');
-      }
-      else {
-        $.ajax({
-          url: '/userInfo',
-          data: {
-            id: userId
-          },
-          dataType: 'json',
-          success: (userData) => {
-            const userName = userData.name;
-            if (userData.status === 'registered') {
-              const path = FlowRouter.path('accountInfo', {userId});
-              $link
-                .filter('[data-user-link="' + userId + '"]')
-                .html(`
-                  <a href="${path}">${userName}</a>
-                `);
-            }
-            else {
-              $link
-                .filter('[data-user-link="' + userId + '"]')
-                .html(`
-                  <span>${userName}</span>
-                `);
-            }
+  this.$('[data-user-link]').each((_, elem) => {
+    const $link = $(elem);
+    const userId = $link.attr('data-user-link');
+
+    // TODO write a helper
+    if (userId === '!system') {
+      $link.text('系統');
+    }
+    else if (userId === '!FSC') {
+      $link.text('金管會');
+    }
+    else {
+      $.ajax({
+        url: '/userInfo',
+        data: { id: userId },
+        dataType: 'json',
+        success: ({ name: userName, status }) => {
+          if (status === 'registered') {
+            const path = FlowRouter.path('accountInfo', { userId });
+            $link.html(`<a href="${path}">${userName}</a>`);
           }
-        });
-      }
-    });
-  }
-  const companyId = this.data.companyId;
-  if (companyId) {
-    const $link = this.$('[data-company-link]');
+          else {
+            $link.text(userName);
+          }
+        }
+      });
+    }
+  });
+
+  this.$('[data-company-link]').each((_, elem) => {
+    const $link = $(elem);
+    const companyId = $link.attr('data-company-link');
     $.ajax({
       url: '/companyInfo',
-      data: {
-        id: companyId
-      },
+      data: { id: companyId },
       dataType: 'json',
-      success: (companyData) => {
-        const companyName = companyData.name;
+      success: ({ name: companyName, status }) => {
         let path;
-        switch (companyData.status) {
+        // TODO write a helper
+        switch (status) {
           case 'archived': {
-            path = FlowRouter.path('companyArchiveDetail', {companyId});
+            path = FlowRouter.path('companyArchiveDetail', { companyId });
             break;
           }
           case 'foundation': {
-            path = FlowRouter.path('foundationDetail', {
-              foundationId: companyId
-            });
+            path = FlowRouter.path('foundationDetail', { foundationId: companyId });
             break;
           }
           case 'market': {
-            path = FlowRouter.path('companyDetail', {companyId});
+            path = FlowRouter.path('companyDetail', { companyId });
             break;
           }
         }
-        $link
-          .filter('[data-company-link="' + companyId + '"]')
-          .html(`
-            <a href="${path}">${companyName}</a>
-          `);
+        $link.html(`<a href="${path}">${companyName}</a>`);
       }
     });
-  }
-  const productId = this.data.productId;
-  if (productId) {
-    const $link = this.$('[data-product-link]');
+  });
+
+  this.$('[data-product-link]').each((_, elem) => {
+    const $link = $(elem);
+    const productId = $link.attr('data-product-link');
     $.ajax({
       url: '/productInfo',
-      data: {
-        id: productId
-      },
+      data: { id: productId },
       dataType: 'json',
-      success: (productData) => {
-        $link
-          .filter('[data-product-link="' + productId + '"]')
-          .html(`
-            <a href="${productData.url}" target="_blank">${productData.productName}</a>
-          `);
+      success: ({ url, productName }) => {
+        $link.html(`<a href="${url}" target="_blank">${productName}</a>`);
       }
     });
-  }
+  });
 });
 Template.displayLog.helpers({
-  getDescriptionHtml({ logType, userId, companyId, data }) {
+  getDescriptionHtml({ logType, userId, companyId, data = {} }) {
     const company = companySpan(companyId);
     const users = userId ? userId.map(userSpan) : [];
 
@@ -214,7 +191,7 @@ Template.displayLog.helpers({
 
         result += '擊敗了所有競爭對手，';
 
-        if (userId[1] === '!none') {
+        if (! userId[1] || userId[1] === '!none') {
           result += '成為了公司的經理人。';
         }
         else if (userId[0] === userId[1]) {
@@ -359,6 +336,12 @@ Template.displayLog.helpers({
       case '解除查封': {
         return `【解除查封】${users[0]}以「${sanitizeHtml(data.reason)}」的理由解除了「${company}」公司的查封關停狀態。`;
       }
+      case '違規標記': {
+        return `【違規標記】${users[0]}以「${sanitizeHtml(data.reason)}」的理由將「${company}」公司標記為違規！`;
+      }
+      case '違規解標': {
+        return `【違規標記】${users[0]}移除了「${company}」公司的違規標記！`;
+      }
       case '公司更名': {
         return `【公司更名】${users[0]}將「${company}」公司的名稱由「${sanitizeHtml(data.oldCompanyName)}」改為「${sanitizeHtml(data.newCompanyName)}」。`;
       }
@@ -378,6 +361,12 @@ Template.displayLog.helpers({
       }
       case '亂鬥報名': {
         return `【最萌亂鬥】${users[0]}替「${company}」公司報名參加了這一屆的最萌亂鬥大賽！`;
+      }
+      case '亂鬥失格': {
+        return `【最萌亂鬥】「${company}」公司因為總投資金額未達標，失去了這一屆最萌亂鬥大賽的參賽資格！`;
+      }
+      case '亂鬥退款': {
+        return `【最萌亂鬥】${users[0]}從「${company}」公司收回了$${data.refund}的投資退款！`;
       }
       case '亂鬥加強': {
         return `【最萌亂鬥】${users[0]}對這一屆最萌亂鬥大賽參賽者「${company}」公司的${data.attrName}能力值投資了$${currencyFormat(data.money)}的金錢！`;
@@ -399,10 +388,4 @@ function companySpan(companyId) {
 
 function productSpan(productId) {
   return `<span data-product-link="${productId}"></span>`;
-}
-
-function sanitizeHtml(str) {
-  return $('<span></span>')
-    .text(str)
-    .html();
 }

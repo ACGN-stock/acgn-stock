@@ -2,8 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 
 import { dbSeason } from '/db/dbSeason';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('adjacentSeason', function(seasonId) {
   debug.log('publish adjacentSeason', seasonId);

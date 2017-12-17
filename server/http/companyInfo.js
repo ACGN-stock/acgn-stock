@@ -6,7 +6,7 @@ import querystring from 'querystring';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbRound } from '/db/dbRound';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 //以Ajax方式發布公司名稱
 WebApp.connectHandlers.use(function(req, res, next) {

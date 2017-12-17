@@ -108,6 +108,7 @@ const messageTypeGroupHash = {
     '公司釋股'
   ],
   '新創相關': [
+    '公司復活',
     '創立公司',
     '參與投資',
     '創立失敗',
@@ -143,10 +144,10 @@ Template.instantMessageFilterButton.helpers({
     const btnType = this.type;
     const messageTypeList = messageTypeGroupHash[btnType] || [btnType];
     if (_.contains(rFilterTypeList.get(), messageTypeList[0])) {
-      return 'btn btn-sm btn-primary';
+      return 'btn btn-sm btn-primary mt-1';
     }
     else {
-      return 'btn btn-sm btn-secondary';
+      return 'btn btn-sm btn-secondary mt-1';
     }
   },
   btnText() {

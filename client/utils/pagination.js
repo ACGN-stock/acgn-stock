@@ -14,20 +14,26 @@ Template.pagination.helpers({
   pages() {
     const totalCount = dbVariables.get(this.useVariableForTotalCount);
     const totalPages = Math.ceil(totalCount / this.dataNumberPerPage);
-    if (totalPages <= 7) {
+    let displayCount = 6;
+    displayCount = Math.max(3, displayCount);
+
+    if (totalPages <= displayCount) {
       return _.range(1, totalPages + 1);
     }
     else {
       const offset = this.offset.get();
       const currentPage = (offset / this.dataNumberPerPage) + 1;
-      if (currentPage - 3 >= 1 && currentPage + 3 <= totalPages) {
-        return _.range(currentPage - 3, currentPage + 4);
+      const prev = Math.floor(displayCount / 2);
+      const next = Math.floor((displayCount - 1) / 2);
+
+      if (currentPage - prev >= 1 && currentPage + next <= totalPages) {
+        return _.range(currentPage - prev, currentPage + (next + 1));
       }
-      else if (currentPage - 3 < 1) {
-        return _.range(1, 8);
+      else if ((currentPage - prev) < 1) {
+        return _.range(1, (displayCount + 1));
       }
-      else if (currentPage + 3 > totalPages) {
-        return _.range(totalPages - 6, totalPages + 1);
+      else if ((currentPage + next) > totalPages) {
+        return _.range(totalPages - (displayCount - 1), totalPages + 1);
       }
     }
   },

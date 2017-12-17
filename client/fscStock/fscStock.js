@@ -5,6 +5,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
 import { dbDirectors } from '/db/dbDirectors';
 
+const showListPerPage = 20;
 export const ownStocksOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.fscStock);
 Template.fscStock.onCreated(function() {
@@ -14,7 +15,7 @@ Template.fscStock.onCreated(function() {
       return false;
     }
     const userId = '!FSC';
-    this.subscribe('fscOwnStocks', userId, ownStocksOffset.get());
+    this.subscribe('accountOwnStocks', userId, ownStocksOffset.get(), {limit: showListPerPage, includeSeal: false});
   });
 });
 Template.fscStock.helpers({
@@ -22,13 +23,13 @@ Template.fscStock.helpers({
     const userId = '!FSC';
 
     return dbDirectors.find({userId}, {
-      limit: 20
+      limit: showListPerPage
     });
   },
   paginationData() {
     return {
-      useVariableForTotalCount: 'totalCountOfFSCOwnStocks',
-      dataNumberPerPage: 20,
+      useVariableForTotalCount: 'totalCountOfAccountOwnStocks',
+      dataNumberPerPage: showListPerPage,
       offset: ownStocksOffset
     };
   }

@@ -31,7 +31,7 @@ Template.arenaInfo.helpers({
     //更換大賽資訊，自動依據大賽是否已過期來重設選手排列依據
     if (arenaData) {
       if (Date.now() > arenaData.endDate) {
-        rFighterSortBy.set('winnerIndex');
+        rFighterSortBy.set('index');
         rFighterSortDir.set(1);
       }
       else {
@@ -145,28 +145,101 @@ Template.arenaInfoNav.helpers({
   }
 });
 
+//auto load company/fighter name info
+const rFighterIdList = new ReactiveVar([]);
+const rFighterUrlHash = new ReactiveVar({});
+const rFighterNameHash = new ReactiveVar({});
+const rManagerIdList = new ReactiveVar([]);
+const rManagerUrlHash = new ReactiveVar({});
+const rManagerNameHash = new ReactiveVar({});
+Template.arenaInfo.onCreated(function() {
+  this.autorun(() => {
+    const arenaId = FlowRouter.getParam('arenaId');
+    const fighterIdList = new Set();
+    const managerIdList = new Set();
+    dbArenaFighters.find({arenaId}).forEach((fighter) => {
+      fighterIdList.add(fighter.companyId);
+      managerIdList.add(fighter.manager);
+    });
+    rFighterIdList.set([...fighterIdList]);
+    rManagerIdList.set([...managerIdList]);
+  });
+  const fighterAjaxList = [];
+  this.autorun(() => {
+    _.invoke(fighterAjaxList, 'abort');
+    fighterAjaxList.splice(0);
+    const fighterUrlHash = {};
+    const fighterNameHash = {};
+    _.each(rFighterIdList.get(), (companyId) => {
+      fighterUrlHash[companyId] = FlowRouter.path('companyDetail', {companyId});
+      const ajaxResult = $.ajax({
+        url: '/companyInfo',
+        data: {
+          id: companyId
+        },
+        dataType: 'json',
+        success: (companyData) => {
+          fighterNameHash[companyId] = companyData.name;
+        },
+        error: () => {
+          fighterNameHash[companyId] = '???';
+        }
+      });
+      fighterAjaxList.push(ajaxResult);
+    });
+    $.when(...fighterAjaxList).always(() => {
+      rFighterUrlHash.set(fighterUrlHash);
+      rFighterNameHash.set(fighterNameHash);
+    });
+  });
+  const managerAjaxList = [];
+  this.autorun(() => {
+    _.invoke(managerAjaxList, 'abort');
+    managerAjaxList.splice(0);
+    const managerUrlHash = {};
+    const managerNameHash = {};
+    _.each(rManagerIdList.get(), (userId) => {
+      managerUrlHash[userId] = FlowRouter.path('accountInfo', {userId});
+      const ajaxResult = $.ajax({
+        url: '/userInfo',
+        data: {
+          id: userId
+        },
+        dataType: 'json',
+        success: (userData) => {
+          managerNameHash[userId] = userData.name;
+        },
+        error: () => {
+          managerNameHash[userId] = '???';
+        }
+      });
+      managerAjaxList.push(ajaxResult);
+    });
+    $.when(...managerAjaxList).always(() => {
+      rManagerUrlHash.set(managerUrlHash);
+      rManagerNameHash.set(managerNameHash);
+    });
+  });
+});
+
 const rFighterSortBy = new ReactiveVar('');
 const rFighterSortDir = new ReactiveVar(-1);
 Template.arenaFighterTable.onCreated(function() {
-  if (Date.now() > this.data.endDate) {
-    rFighterSortBy.set('winnerIndex');
-    rFighterSortDir.set(1);
-  }
-  else {
-    rFighterSortBy.set('agi');
-    rFighterSortDir.set(-1);
-  }
+  resetSortSetting(this.data);
 });
 Template.arenaFighterTable.onRendered(function() {
-  if (Date.now() > this.data.endDate) {
-    rFighterSortBy.set('winnerIndex');
+  resetSortSetting(this.data);
+});
+function resetSortSetting(data) {
+  if (Date.now() > data.endDate.getTime()) {
+    rFighterSortBy.set('index');
     rFighterSortDir.set(1);
   }
   else {
     rFighterSortBy.set('agi');
     rFighterSortDir.set(-1);
   }
-});
+}
 Template.arenaFighterTable.helpers({
   getSortIcon(fieldName) {
     if (fieldName === rFighterSortBy.get()) {
@@ -181,17 +254,17 @@ Template.arenaFighterTable.helpers({
     return '';
   },
   fighterList() {
-    const winnerList = this.winnerList;
     const arenaId = this._id;
+    const winnerList = this.winnerList;
 
     const fighterList = dbArenaFighters
       .find({arenaId})
       .map((figher) => {
         if (winnerList.length) {
-          figher.winnerIndex = _.indexOf(winnerList, figher.companyId) + 1;
+          figher.index = _.indexOf(winnerList, figher.companyId) + 1;
         }
         else {
-          figher.winnerIndex = '';
+          figher.index = '';
         }
 
         return figher;
@@ -218,6 +291,18 @@ Template.arenaFighterTable.helpers({
       }
     });
   },
+  fighterUrl(companyId) {
+    return rFighterUrlHash.get()[companyId];
+  },
+  fighterName(companyId) {
+    return rFighterNameHash.get()[companyId];
+  },
+  managerUrl(manager) {
+    return rManagerUrlHash.get()[manager];
+  },
+  managerName(manager) {
+    return rManagerNameHash.get()[manager];
+  },
   getAttributeNumber(fighter, attributeName) {
     return getAttributeNumber(attributeName, fighter[attributeName]);
   }
@@ -236,9 +321,8 @@ Template.arenaFighterTable.events({
 });
 
 const rLogOffset = new ReactiveVar(0);
-const rCompanyId = new ReactiveVar('');
-const rFighterIdList = new ReactiveVar([]);
-const rFighterList = new ReactiveVar([]);
+const rFilterCompanyId = new ReactiveVar('');
+const rFilterResultList = new ReactiveVar([]);
 inheritedShowLoadingOnSubscribing(Template.arenaLogList);
 Template.arenaLogList.onCreated(function() {
   rLogOffset.set(0);
@@ -248,62 +332,25 @@ Template.arenaLogList.onCreated(function() {
     }
     const arenaId = FlowRouter.getParam('arenaId');
     if (arenaId) {
-      this.subscribe('arenaLog', arenaId, rCompanyId.get(), rLogOffset.get());
+      this.subscribe('arenaLog', arenaId, rFilterCompanyId.get(), rLogOffset.get());
     }
-  });
-  this.autorun(() => {
-    const arenaId = FlowRouter.getParam('arenaId');
-    const fighterIdList = dbArenaFighters.find({arenaId}).map((fighter) => {
-      return fighter.companyId;
-    });
-    rFighterIdList.set(fighterIdList);
-  });
-  const ajaxList = [];
-  this.autorun(() => {
-    _.invoke(ajaxList, 'abort');
-    ajaxList.splice(0);
-    const fighterList = [];
-    _.each(rFighterIdList.get(), (companyId, index) => {
-      const ajaxResult = $.ajax({
-        url: '/companyInfo',
-        data: {
-          id: companyId
-        },
-        dataType: 'json',
-        success: (companyData) => {
-          fighterList[index] = {
-            _id: companyId,
-            name: companyData.name
-          };
-        },
-        error: () => {
-          fighterList[index] = {
-            _id: companyId,
-            name: '???'
-          };
-        }
-      });
-      ajaxList.push(ajaxResult);
-    });
-    $.when(...ajaxList).always(() => {
-      rFighterList.set(fighterList);
-    });
   });
 });
 Template.arenaLogList.helpers({
-  fighterList() {
-    return rFighterList.get();
+  hasFilterResult() {
+    return rFilterResultList.get().length > 0;
+  },
+  filterResultList() {
+    return rFilterResultList.get();
   },
   logList() {
     const arenaId = FlowRouter.getParam('arenaId');
-    window.dbArenaLog = dbArenaLog;
 
     return dbArenaLog
-      .find({arenaId}, {
+      .find(arenaId, {}, {
         sort: {
           sequence: 1
-        },
-        limit: 30
+        }
       })
       .map((log) => {
         log.attackerId = log.companyId[0];
@@ -360,8 +407,56 @@ Template.arenaLogList.helpers({
   }
 });
 Template.arenaLogList.events({
-  'change [name="companyId"]'(event) {
-    const companyId = $(event.currentTarget).val();
-    rCompanyId.set(companyId);
+  'focus [name="companyId"]': generateFilterResult,
+  'keyup [name="companyId"]': generateFilterResult,
+  'change [name="companyId"]': generateFilterResult,
+  'click [data-filter]': selectedCompanyIdFliter,
+  'touchstart [data-filter]': selectedCompanyIdFliter,
+  'submit'(event, templateInstance) {
+    event.preventDefault();
+    const filterResultList = rFilterResultList.get();
+    if (filterResultList.length === 1) {
+      const companyData = filterResultList[0];
+      rFilterCompanyId.set(companyData._id);
+      rLogOffset.set(0);
+      rFilterResultList.set([]);
+      templateInstance.$('[name="companyId"]').val(companyData.name || '');
+    }
+    else {
+      rFilterCompanyId.set('');
+      rLogOffset.set(0);
+      rFilterResultList.set([]);
+      templateInstance.$('[name="companyId"]').val('');
+    }
   }
 });
+
+function generateFilterResult(event) {
+  const searchName = $(event.currentTarget).val();
+  if (searchName) {
+    const searchRegExp = new RegExp(searchName);
+    const filterResultList = [];
+    _.each(rFighterNameHash.get(), (fighterName, companyId) => {
+      if (searchRegExp.test(fighterName)) {
+        filterResultList.push({
+          _id: companyId,
+          name: fighterName
+        });
+      }
+    });
+    rFilterResultList.set(filterResultList);
+  }
+  else {
+    rFilterResultList.set([]);
+  }
+}
+
+function selectedCompanyIdFliter(event, templateInstance) {
+  event.preventDefault();
+  const companyId = $(event.currentTarget).attr('data-filter');
+  rFilterCompanyId.set(companyId);
+  rLogOffset.set(0);
+  rFilterResultList.set([]);
+  const fighterName = rFighterNameHash.get()[companyId];
+  templateInstance.$('[name="companyId"]').val(fighterName || '');
+}
