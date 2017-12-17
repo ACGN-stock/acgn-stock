@@ -345,6 +345,7 @@ function resolveInstantTradeList(companyId, tradeList, tradeTools) {
         })
         .updateOne({
           $inc: {
+            profit: money, // TODO 等配套措施完成再移除這行以拿掉釋股營利
             capital: money
           }
         });
