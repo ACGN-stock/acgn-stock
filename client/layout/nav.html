@@ -2,7 +2,7 @@
   <nav id="nav" class="navbar navbar-toggleable-md navbar-light bg-faded">
     {{#if currentUser}}
       <span class="navbar-brand dropdown" title="當前登入使用者：{{currentUser.profile.name}}">
-        <a class="dropdown-toggle" href="#">
+        <a class="dropdown-toggle d-inline-block text-truncate" style="max-width: 15rem; margin-bottom: -5px;" href="#">
           <i class="fa fa-user-o" aria-hidden="true"></i>
           {{currentUser.profile.name}}
         </a>
@@ -72,7 +72,7 @@
           {{> navLink page='arenaInfo'  params=currentArenaParams}}
         {{/navLinkGroup}}
         {{#if hasFavorite}}
-          {{#navLinkGroup text='我的最愛'}}
+          {{#navLinkGroup text='我的最愛' style='max-width: 100%'}}
             {{#each companyId in currentUser.favorite}}
               {{>navCompanyLink companyId}}
             {{/each}}
@@ -107,7 +107,7 @@
       <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
         {{{this.text}}}
       </a>
-      <div class="dropdown-menu px-3 nav-dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+      <div class="dropdown-menu px-3 nav-dropdown-menu" style="{{style}}" aria-labelledby="navbarDropdownMenuLink">
         {{> Template.contentBlock}}
       </div>
     </li>
@@ -124,6 +124,6 @@
 
 <template name="navCompanyLink">
   <li class="nav-item">
-    <a class="nav-link"></a>
+    <a class="nav-link text-truncate"></a>
   </li>
 </template>

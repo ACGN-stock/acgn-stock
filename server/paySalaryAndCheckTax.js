@@ -2,7 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
@@ -10,7 +10,7 @@ import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 const {salaryPerPay} = Meteor.settings.public;
 export function paySalaryAndCheckTax() {

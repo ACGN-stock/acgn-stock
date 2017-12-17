@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 
 import { dbThreads } from '/db/dbThreads';
-import { debug } from '/server/imports/debug';
-import { limitSubscription } from '/server/imports/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
 
 Meteor.publish('onlinePeopleNumber', function() {
   debug.log('publish onlinePeopleNumber');

@@ -1,14 +1,15 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbLog } from '/db/dbLog';
+import { dbTaxes } from '/db/dbTaxes';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   investArenaFigher(companyId, attribute, investMoney) {
@@ -25,9 +26,6 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
-  if (user.profile.notPayTax) {
-    throw new Meteor.Error(403, '您現在有稅單逾期未繳！');
-  }
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
@@ -36,6 +34,10 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
   }
   if (user.profile.money < investMoney) {
     throw new Meteor.Error(403, '剩餘金錢不足！');
+  }
+  const userId = user._id;
+  if (dbTaxes.find({userId}).count() > 0) {
+    throw new Meteor.Error(403, '要先繳清稅單，才能在最萌亂鬥大賽中進行投注！');
   }
   const lastArenaData = dbArena.findOne({}, {
     sort: {
@@ -57,7 +59,8 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
   if (! fighterData) {
     throw new Meteor.Error(404, '這家公司尚未報名參加這一屆最萌亂鬥大賽！');
   }
-  const userId = user._id;
+  //避免總投資額出現太誇張的數字
+  check(fighterData[attribute] + investMoney, Match.Integer);
   resourceManager.throwErrorIsResourceIsLock(['season', 'arena' + companyId, 'user' + userId]);
   //先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('investArenaFigher', ['arena' + companyId, 'user' + userId], (release) => {
@@ -69,9 +72,25 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
     if (user.profile.money < investMoney) {
       throw new Meteor.Error(403, '剩餘金錢不足！');
     }
+    const fighterData = dbArenaFighters.findOne({arenaId, companyId});
+    //避免總投資額出現太誇張的數字
+    check(fighterData[attribute] + investMoney, Match.Integer);
+
+    const investors = fighterData.investors || [];
+    const existingInvestor = _.findWhere(investors, { userId });
+    if (existingInvestor) {
+      existingInvestor.amount += investMoney;
+    }
+    else {
+      investors.push({ userId, amount: investMoney });
+    }
+
     dbArenaFighters.update(fighterData._id, {
       $inc: {
         [attribute]: investMoney
+      },
+      $set: {
+        investors
       }
     });
     Meteor.users.update(userId, {

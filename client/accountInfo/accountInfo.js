@@ -16,6 +16,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat } from '../utils/helpers';
+import { changeChairmanTitle } from '../utils/methods';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
@@ -93,24 +94,6 @@ Template.accountInfoBasic.helpers({
       }
     }
   },
-  manageCompanies() {
-    return dbCompanies
-      .find({
-        manager: this._id
-      });
-  },
-  employment() {
-    const userId = FlowRouter.getParam('userId');
-    const employed = true;
-
-    return dbEmployees.findOne({userId, employed});
-  },
-  nextSeasonEmployment() {
-    const userId = FlowRouter.getParam('userId');
-    const employed = false;
-
-    return dbEmployees.findOne({userId, employed});
-  },
   showUnregisterEmployee() {
     const userId = FlowRouter.getParam('userId');
     const employed = false;
@@ -135,6 +118,7 @@ Template.accountInfoBasic.helpers({
     return false;
   }
 });
+
 Template.accountInfoBasic.events({
   'click [data-action="fscAnnouncement"]'(event, templateInstance) {
     event.preventDefault();
@@ -143,7 +127,7 @@ Template.accountInfoBasic.events({
       type: 'prompt',
       title: '金管會通告 - 輸入通知訊息',
       message: `請輸入要通告的訊息：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           const userIds = [accuseUser._id];
           Meteor.customCall('fscAnnouncement', { userIds, message });
@@ -158,7 +142,7 @@ Template.accountInfoBasic.events({
       type: 'prompt',
       title: '舉報違規 - ' + accuseUser.profile.name,
       message: `請輸入您要舉報的內容：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           const userId = accuseUser._id;
           Meteor.customCall('accuseUser', userId, message);
@@ -197,7 +181,7 @@ Template.accountInfoBasic.events({
       type: 'prompt',
       title: '違規處理 - ' + accuseUserData.profile.name + ' - ' + banActionText,
       message: `請輸入處理事由：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           const userId = accuseUserData._id;
           Meteor.customCall('banUser', {userId, message, banType});
@@ -212,13 +196,15 @@ Template.accountInfoBasic.events({
       type: 'prompt',
       title: '課以罰金 - ' + accuseUserData.profile.name,
       message: `請輸入處理事由：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           alertDialog.dialog({
             type: 'prompt',
             title: '課以罰金 - ' + accuseUserData.profile.name,
             message: `請輸入罰金數額：`,
-            callback: function(amount) {
+            inputType: 'number',
+            customSetting: `min="0"`,
+            callback: (amount) => {
               amount = parseInt(amount, 10);
               if (amount && amount >= 0) {
                 const userId = accuseUserData._id;
@@ -237,13 +223,15 @@ Template.accountInfoBasic.events({
       type: 'prompt',
       title: '退還罰金 - ' + accuseUserData.profile.name,
       message: `請輸入處理事由：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           alertDialog.dialog({
             type: 'prompt',
             title: '退還罰金 - ' + accuseUserData.profile.name,
             message: `請輸入退還金額：`,
-            callback: function(amount) {
+            inputType: 'number',
+            customSetting: `min="0"`,
+            callback: (amount) => {
               amount = parseInt(amount, 10);
               if (amount && amount > 0) {
                 const userId = accuseUserData._id;
@@ -263,7 +251,7 @@ Template.accountInfoBasic.events({
       type: 'prompt',
       title: '沒收股份 - ' + accuseUserData.profile.name,
       message: `請輸入處理事由：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           const userId = accuseUserData._id;
           Meteor.customCall('confiscateStocks', {userId, message});
@@ -279,13 +267,16 @@ Template.accountInfoBasic.events({
   },
   'click [data-action="startVacation"]'(event) {
     event.preventDefault();
-    alertDialog.confirm('確定要開始渡假嗎？', (result) => {
-      if (result) {
-        Meteor.customCall('startVacation', (err) => {
-          if (! err) {
-            alertDialog.alert('您已進入渡假模式！');
-          }
-        });
+    alertDialog.confirm({
+      message: '確定要開始渡假嗎？',
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('startVacation', (err) => {
+            if (! err) {
+              alertDialog.alert('您已進入渡假模式！');
+            }
+          });
+        }
       }
     });
   },
@@ -296,6 +287,117 @@ Template.accountInfoBasic.events({
         alertDialog.alert(result ? '您已送出收假請求！' : '您已取消收假請求！');
       }
     });
+  }
+});
+
+export const companyTitleView = new ReactiveVar('chairman');
+Template.companyTitleTab.helpers({
+  getClass(type) {
+    if (companyTitleView.get() === type) {
+      return 'nav-link active';
+    }
+    else {
+      return 'nav-link';
+    }
+  }
+});
+Template.companyTitleTab.events({
+  'click [data-type]'(event) {
+    const $target = $(event.currentTarget);
+    companyTitleView.set($target.data('type'));
+  }
+});
+
+Template.accountCompanyTitle.helpers({
+  viewType(type) {
+    return (companyTitleView.get() === type);
+  }
+});
+
+export const chairmanOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.chairmanTitleList);
+Template.chairmanTitleList.onCreated(function() {
+  chairmanOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('accountChairmanTitle', userId, chairmanOffset.get());
+    }
+  });
+});
+Template.chairmanTitleList.helpers({
+  titleList() {
+    return dbCompanies
+      .find({
+        chairman: this._id
+      },
+      {
+        limit: 10
+      });
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfChairmanTitle',
+      dataNumberPerPage: 10,
+      offset: chairmanOffset
+    };
+  }
+});
+Template.chairmanTitleList.events({
+  'click [data-action="changeChairmanTitle"]'() {
+    const companyData = this;
+    changeChairmanTitle(companyData);
+  }
+});
+
+export const managerOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.managerTitleList);
+Template.managerTitleList.onCreated(function() {
+  managerOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('accountManagerTitle', userId, managerOffset.get());
+    }
+  });
+});
+Template.managerTitleList.helpers({
+  titleList() {
+    return dbCompanies
+      .find({
+        manager: this._id
+      },
+      {
+        limit: 10
+      });
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfManagerTitle',
+      dataNumberPerPage: 10,
+      offset: managerOffset
+    };
+  }
+});
+
+Template.employeeTitleList.helpers({
+  employment() {
+    const userId = FlowRouter.getParam('userId');
+    const employed = true;
+
+    return dbEmployees.findOne({userId, employed});
+  },
+  nextSeasonEmployment() {
+    const userId = FlowRouter.getParam('userId');
+    const employed = false;
+
+    return dbEmployees.findOne({userId, employed});
   }
 });
 
@@ -355,7 +457,10 @@ Template.accountInfoTaxList.events({
         type: 'prompt',
         title: '繳納稅金',
         message: `請輸入您要繳納的金額：(1~${currencyFormat(maxPayMoney)})`,
-        callback: function(amount) {
+        inputType: 'number',
+        defaultValue: maxPayMoney,
+        customSetting: `min="1" max="${maxPayMoney}"`,
+        callback: (amount) => {
           amount = parseInt(amount, 10);
           if (amount) {
             Meteor.customCall('payTax', taxId, amount);

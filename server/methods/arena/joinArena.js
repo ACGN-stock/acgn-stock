@@ -2,12 +2,12 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   joinArena(companyId) {

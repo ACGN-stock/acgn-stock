@@ -12,9 +12,24 @@
               <a class="btn btn-warning" href="{{getEditHref this._id}}">
                 修改計劃
               </a>
+              {{#if this.illegalReason}}
+                <a class="btn btn-danger" href="#" data-action="unmarkFoundationIllegal">
+                  解除違規標記
+                </a>
+              {{else}}
+                <a class="btn btn-danger" href="#" data-action="markFoundationIllegal">
+                  標記違規
+                </a>
+              {{/if}}
             {{/if}}
           {{/if}}
         </h1>
+        {{#if this.illegalReason}}
+          <div class="mb-1 text-danger">
+            <i class="fa fa-warning"></i>
+            本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
+          </div>
+        {{/if}}
         {{#if showAllTags this.tags}}
           {{#each tag in this.tags}}
             <span class="badge badge-default">{{tag}}</span>

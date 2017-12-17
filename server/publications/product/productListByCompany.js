@@ -2,9 +2,9 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbProducts } from '/db/dbProducts';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, offset}) {
   debug.log('publish productListByCompany', {companyId, sortBy, sortDir, offset});
@@ -20,7 +20,7 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
     }
   };
 
-  const totalCountObserver = publishTotalCount('totalCountOfProductList', dbProducts.find(filter), this);
+  publishTotalCount('totalCountOfProductList', dbProducts.find(filter), this);
 
   const pageObserver = dbProducts
     .find(filter, {
@@ -47,7 +47,6 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

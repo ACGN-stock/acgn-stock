@@ -51,41 +51,50 @@
 
 <template name="accountInfoBasic">
   <div class="card-block">
-    <h1 class="card-title mb-1">使用者「{{this.profile.name}}」的帳號資訊：</h1>
+    <h1 class="card-title"
+        style="
+          overflow-x: hidden;
+          overflow-y: auto;
+          text-overflow: ellipsis;
+          min-height: 3.5rem;
+          max-height: 8.4rem;
+          word-wrap: break-word;">
+      使用者「{{this.profile.name}}」帳號資訊
+    </h1>
     <hr />
     {{#if currentUser}}
       {{#if currentUser.profile.isAdmin}}
-        <button class="btn btn-info btn-sm" type="button" data-action="fscAnnouncement">金管會通告</button>
+        <button class="btn btn-info btn-sm mt-1" type="button" data-action="fscAnnouncement">金管會通告</button>
         {{#if isBaned 'accuse'}}
-          <button class="btn btn-success btn-sm" type="button" data-ban="accuse">解除舉報禁令</button>
+          <button class="btn btn-success btn-sm mt-1" type="button" data-ban="accuse">解除舉報禁令</button>
         {{else}}
-          <button class="btn btn-warning btn-sm" type="button" data-ban="accuse">禁止舉報</button>
+          <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="accuse">禁止舉報</button>
         {{/if}}
         {{#if isBaned 'deal'}}
-          <button class="btn btn-success btn-sm" type="button" data-ban="deal">解除下單禁令</button>
+          <button class="btn btn-success btn-sm mt-1" type="button" data-ban="deal">解除下單禁令</button>
         {{else}}
-          <button class="btn btn-warning btn-sm" type="button" data-ban="deal">禁止下單</button>
+          <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="deal">禁止下單</button>
         {{/if}}
         {{#if isBaned 'chat'}}
-          <button class="btn btn-success btn-sm" type="button" data-ban="chat">解除聊天禁令</button>
+          <button class="btn btn-success btn-sm mt-1" type="button" data-ban="chat">解除聊天禁令</button>
         {{else}}
-          <button class="btn btn-warning btn-sm" type="button" data-ban="chat">禁止聊天</button>
+          <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="chat">禁止聊天</button>
         {{/if}}
         {{#if isBaned 'advertise'}}
-          <button class="btn btn-success btn-sm" type="button" data-ban="advertise">解除廣告禁令</button>
+          <button class="btn btn-success btn-sm mt-1" type="button" data-ban="advertise">解除廣告禁令</button>
         {{else}}
-          <button class="btn btn-warning btn-sm" type="button" data-ban="advertise">禁止廣告</button>
+          <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="advertise">禁止廣告</button>
         {{/if}}
-        <button class="btn btn-warning btn-sm" type="button" data-action="forfeit">課以罰金</button>
-        <button class="btn btn-warning btn-sm" type="button" data-action="returnForfeit">退還罰金</button>
+        <button class="btn btn-warning btn-sm mt-1" type="button" data-action="forfeit">課以罰金</button>
+        <button class="btn btn-warning btn-sm mt-1" type="button" data-action="returnForfeit">退還罰金</button>
         {{#if isBaned 'manager'}}
-          <button class="btn btn-success btn-sm" type="button" data-ban="manager">解除禁任經理</button>
+          <button class="btn btn-success btn-sm mt-1" type="button" data-ban="manager">解除禁任經理</button>
         {{else}}
-          <button class="btn btn-danger btn-sm" type="button" data-ban="manager">禁任經理</button>
+          <button class="btn btn-danger btn-sm mt-1" type="button" data-ban="manager">禁任經理</button>
         {{/if}}
-        <button class="btn btn-danger btn-sm" type="button" data-action="confiscateStocks">沒收股份</button>
+        <button class="btn btn-danger btn-sm mt-1" type="button" data-action="confiscateStocks">沒收股份</button>
       {{else}}
-        <button class="btn btn-danger btn-sm" type="button" data-action="accuse">舉報違規</button>
+        <button class="btn btn-danger btn-sm mt-1" type="button" data-action="accuse">舉報違規</button>
         {{#if isBaned 'accuse'}}
           <div class="text-danger">目前被禁止舉報違規。</div>
         {{/if}}
@@ -100,12 +109,12 @@
         {{/if}}
       {{/if}}
       {{#if showUnregisterEmployee}}
-        <button class="btn btn-danger btn-sm" type="button" data-action="unregisterEmployee">取消員工報名</button>
+        <button class="btn btn-danger btn-sm mt-1" type="button" data-action="unregisterEmployee">取消員工報名</button>
       {{/if}}
 
       {{#if isCurrentUser}}
         {{#if this.profile.isInVacation}}
-          <button class="btn btn-info btn-sm" type="button" data-action="toggleEndingVacation">
+          <button class="btn btn-info btn-sm mt-1" type="button" data-action="toggleEndingVacation">
             {{#if this.profile.isEndingVacation}}
               取消結束渡假
             {{else}}
@@ -113,7 +122,7 @@
             {{/if}}
           </button>
         {{else}}
-          <button class="btn btn-info btn-sm" type="button" data-action="startVacation">開始渡假</button>
+          <button class="btn btn-info btn-sm mt-1" type="button" data-action="startVacation">開始渡假</button>
         {{/if}}
       {{/if}}
       <hr />
@@ -154,8 +163,8 @@
       {{/if}}
     {{/if}}
     {{#if this.profile.isAdmin}}
-      <div class="text-warning">
-        是金融管理會委員。
+      <div>
+        是<span class="bg-warning text-white">金融管理會委員</span>。
       </div>
     {{/if}}
     {{#if this.profile.revokeQualification}}
@@ -163,43 +172,114 @@
         被撤銷了擔任經理人的資格！
       </div>
     {{/if}}
-    {{#each manageCompanies}}
-      <div class="text-primary">
-        是「{{>companyLink this._id}}」公司的總經理。
+    {{> accountCompanyTitle}}
+  </div>
+</template>
+
+<template name="accountCompanyTitle">
+  {{> companyTitleTab}}
+  <div class="tab-content">
+    <div class="tab-pane active" role="tabpanel">
+      {{#if viewType 'chairman'}}
+        {{> chairmanTitleList}}
+      {{/if}}
+      {{#if viewType 'manager'}}
+        {{> managerTitleList}}
+      {{/if}}
+      {{#if viewType 'employee'}}
+        {{> employeeTitleList}}
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="companyTitleTab">
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="{{getClass 'chairman'}}" href="" data-type="chairman">董事長</a>
+    </li>
+    <li class="nav-item">
+      <a class="{{getClass 'manager'}}" href="" data-type="manager">經理人</a>
+    </li>
+    <li class="nav-item">
+      <a class="{{getClass 'employee'}}" href="" data-type="employee">員工</a>
+    </li>
+  </ul>
+</template>
+
+<template name="chairmanTitleList">
+  {{#each titleList}}
+    <div class="text-primary d-flex flex-nowrap">
+      <div class="text-nowrap">是「</div>
+      <div class="d-inline-block text-truncate" style="min-width: 1rem;">{{>companyLink this._id}}</div>
+      <div class="text-nowrap">」公司的「</div>
+      <div class="d-inline-block text-truncate" style="min-width: 1rem;">
+        <a href="#" data-action="changeChairmanTitle">
+          {{this.chairmanTitle}}
+        </a>
       </div>
-    {{/each}}
-    {{#with employment}}
-      <div class="text-primary">
-        是「{{>companyLink this.companyId}}」公司的員工。
-      </div>
-    {{/with}}
-    {{#with nextSeasonEmployment}}
-      <div class="text-primary">
-        是「{{>companyLink this.companyId}}」公司的儲備員工。
-      </div>
-    {{/with}}
+      <div class="text-nowrap">」</div>
+    </div>
+  {{else}}
+    查無資料！
+  {{/each}}
+  {{#with paginationData}}
+    {{> pagination}}
+  {{/with}}
+</template>
+
+<template name="managerTitleList">
+  {{#each titleList}}
+    {{> companyTitle companyId=this._id title='經理人'}}
+  {{else}}
+    查無資料！
+  {{/each}}
+  {{#with paginationData}}
+    {{> pagination}}
+  {{/with}}
+</template>
+
+<template name="employeeTitleList">
+  {{#with employment}}
+    {{> companyTitle companyId=this.companyId title='員工'}}
+  {{/with}}
+  {{#with nextSeasonEmployment}}
+    {{> companyTitle companyId=this.companyId title='儲備員工'}}
+  {{/with}}
+  {{#unless employment}}
+    {{#unless nextSeasonEmployment}}
+      查無資料！
+    {{/unless}}
+  {{/unless}}
+</template>
+
+<template name="companyTitle">
+  <div class="text-primary d-flex flex-nowrap">
+    <div class="text-nowrap">是「</div>
+    <div class="d-inline-block text-truncate">{{>companyLink companyId}}</div>
+    <div class="text-nowrap">」公司的{{title}}。</div>
   </div>
 </template>
 
 <template name="accountInfoTaxList">
   <div class="col-12 border-grid">
-    <table id="tax-info-table" class="table table-bordered mt-3" style="width: 100%; table-layout: fixed;">
+    <table class="table table-bordered mt-3 account-tax-info" style="width: 100%; table-layout: fixed;">
       <thead>
         <tr>
-          <th class="text-center text-non-break" style="width: 200px">繳稅期限</th>
-          <th class="text-center text-non-break">財稅額</th>
-          <th class="text-center text-non-break">殭屍稅</th>
-          <th class="text-center text-non-break ">逾期罰金</th>
-          <th class="text-center text-non-break">已繳納</th>
+          <th class="text-center text-nowrap" style="width: 160px">繳稅期限</th>
+          <th class="text-center text-nowrap">財稅額</th>
+          <th class="text-center text-nowrap">殭屍稅</th>
+          <th class="text-center text-nowrap ">逾期罰金</th>
+          <th class="text-center text-nowrap">已繳納</th>
           {{#if isCurrentUser}}
-            <th class="text-center text-non-break">繳納稅金</th>
+            <th class="text-center text-nowrap">繳納稅金</th>
           {{/if}}
         </tr>
       </thead>
       <tbody>
         {{#each taxes in taxesList}}
           <tr>
-            <td class="text-center text-truncate" data-title="繳稅期限">
+            <td class="text-right text-truncate" data-title="繳稅期限">
               {{formatDateText taxes.expireDate}}
             </td>
             <td class="text-right text-truncate" data-title="財稅額" title="{{taxes.tax}}">
@@ -223,11 +303,11 @@
             {{/if}}
           </tr>
         {{else}}
-          <tr>
+          <tr class="default-content">
             {{#if isCurrentUser}}
-              <td class="text-center text-truncate" colspan="6">目前沒有任何需要繳納的稅金！</td>
+              <td class="text-center text-truncate" colspan="6">目前沒有需要繳納的稅金！</td>
             {{else}}
-              <td class="text-center text-truncate" colspan="5">目前沒有任何需要繳納的稅金！</td>
+              <td class="text-center text-truncate" colspan="5">目前沒有需要繳納的稅金！</td>
             {{/if}}
           </tr>
         {{/each}}
@@ -238,13 +318,30 @@
 
 <template name="accountInfoOwnStockList">
   <div class="col-12 border-grid">
-    {{#each directorData in directorList}}
-      <div>
-        擁有 「{{>companyLink directorData.companyId}}」公司的{{directorData.stocks}}股股票。
-      </div>
-    {{else}}
-      查無資料！
-    {{/each}}
+    <table class="table table-bordered mt-3" style="width: 100%; table-layout: fixed;">
+      <thead>
+        <tr>
+          <th class="text-center text-nowrap">公司名稱</th>
+          <th class="text-center text-nowrap" style="width: 95px">持股數</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{#each directorData in directorList}}
+        <tr>
+          <td class="text-left text-truncate p-1" data-title="公司名稱">
+            {{>companyLink directorData.companyId}}
+          </td>
+          <td class="text-right text-truncate p-1" data-title="持股數">
+            {{directorData.stocks}} 股
+          </td>
+        </tr>
+      {{else}}
+        <tr>
+          <td class="text-center text-truncate p-1" colspan="2">查無資料！</td>
+        </tr>
+      {{/each}}
+      </tbody>
+    </table>
     {{#with paginationData}}
       {{> pagination}}
     {{/with}}

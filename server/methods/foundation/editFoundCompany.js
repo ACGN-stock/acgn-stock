@@ -3,10 +3,10 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbFoundations } from '/db/dbFoundations';
-import { checkImageUrl } from '/server/imports/checkImageUrl';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { resourceManager } from '/server/imports/resourceManager';
+import { checkImageUrl } from '/server/imports/utils/checkImageUrl';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 
 Meteor.methods({
   editFoundCompany(foundCompanyData) {

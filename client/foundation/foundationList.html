@@ -39,7 +39,7 @@
 </template>
 
 <template name="foundationListFilterForm">
-  <form class="form-inline">
+  <form class="form-inline" style="margin-top: 25px">
     <button class="btn btn-secondary mr-1" type="button" data-action="toggleViewMode">
       <i class="fa {{viewModeBtnClass}}" aria-hidden="true"></i>
     </button>
@@ -56,8 +56,6 @@
   </form>
 </template>
 
-
-
 <template name="foundationListCard">
   <div class="col-12 col-md-6 col-lg-4 col-xl-3" style="margin-bottom: 25px;">
     <div class="company-card {{cardDisplayClass this}}">
@@ -65,7 +63,16 @@
         <div class="row row-info">
           <small>{{getExpireDateText this.createdAt}} 截止</small>
         </div>
-        <hr style="margin: 0px;" />
+        <hr class="m-0"/>
+        {{#if this.illegalReason}}
+          <div class="row text-left illegal-description">
+            <div class="col text-center text-white text-truncate" title="{{sanitizeHtml this.illegalReason}}">
+              <i class="fa fa-warning"></i>
+              {{sanitizeHtml this.illegalReason}}
+            </div>
+          </div>
+          <hr class="m-0"/>
+        {{/if}}
         <div class="row row-cover d-flex justify-content-around">
           <div class="d-flex flex-column align-self-center">
             <div class="picture">
@@ -89,7 +96,7 @@
             </div>
           </div>
         </div>
-        <div class="title-starter">
+        <div class="row title-starter">
           {{>companyLink this._id}}
         </div>
         <div class="row row-info d-flex justify-content-between">
@@ -120,7 +127,7 @@
           </div>
         </div>
         {{#if currentUser}}
-          <hr style="margin: 0px;" />
+          <hr class="m-0">
           <div class="row btn-group">
             {{#if currentUser.profile.isAdmin}}
               <a class="btn btn-tab" href="{{getEditHref this._id}}">
@@ -147,30 +154,36 @@
       {{/if}}
     </div>
     <div class="media-body row border-grid-body">
-      <div class="col-4 col-lg-3 text-right border-grid">角色名稱：</div>
+      {{#if this.illegalReason}}
+        <div class="col-12 text-center text-danger text-truncate border-grid" title="{{showIllegalDescription}}">
+          <i class="fa fa-warning"></i>
+          本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
+        </div>
+      {{/if}}
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">角色名稱：</div>
       <div class="col-8 col-lg-3 text-truncate border-grid" title="{{this.companyName}}">
         {{>companyLink this._id}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">經理人：</div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">經理人：</div>
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>userLink this.manager}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">計劃日期：</div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">計劃日期：</div>
       <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateText this.createdAt}}">
         {{formatDateText this.createdAt}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">截止日期：</div>
-      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{getExpireDateText this.createdAt}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">截止日期：</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid" title="{{getExpireDateText this.createdAt}}">
         {{getExpireDateText this.createdAt}}
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">投資人數：</div>
-      <div class="col-8 col-lg-3 text-right text-truncate border-grid">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">投資人數：</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid">
         <span class="{{investPplsNumberClass this.invest.length}}">
           {{this.invest.length}} / {{foundationNeedUsers}}
         </span>
       </div>
-      <div class="col-4 col-lg-3 text-right border-grid">總投資額：</div>
-      <div class="col-8 col-lg-3 text-right text-right border-grid" title="{{getTotalInvest this.invest}}">
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總投資額：</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid" title="{{getTotalInvest this.invest}}">
         $ {{currencyFormat (getTotalInvest this.invest)}}
       </div>
       <div class="col-12 border-grid company-description"><h4>角色簡介：</h4>{{this.description}}</div>

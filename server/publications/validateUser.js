@@ -1,9 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 
-import { limitSubscription } from '/server/imports/rateLimit';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('validateUser', function(username) {
   debug.log('publish validateUser', username);

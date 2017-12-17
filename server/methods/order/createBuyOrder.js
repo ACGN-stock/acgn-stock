@@ -2,13 +2,13 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbOrders } from '/db/dbOrders';
 import { dbVariables } from '/db/dbVariables';
-import { limitMethod } from '/server/imports/rateLimit';
+import { limitMethod } from '/server/imports/utils/rateLimit';
 import { createOrder } from '/server/imports/createOrder';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   createBuyOrder(orderData) {

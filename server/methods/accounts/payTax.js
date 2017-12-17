@@ -3,11 +3,11 @@ import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check, Match } from 'meteor/check';
 
-import { resourceManager } from '/server/imports/resourceManager';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbLog } from '/db/dbLog';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   payTax(taxId, amount) {

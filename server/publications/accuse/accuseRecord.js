@@ -2,9 +2,9 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbLog, accuseLogTypeList } from '/db/dbLog';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('accuseRecord', function(offset) {
   debug.log('publish accuseRecord', offset);
@@ -14,7 +14,7 @@ Meteor.publish('accuseRecord', function(offset) {
     logType: { $in: accuseLogTypeList }
   };
 
-  const totalCountObserver = publishTotalCount('totalCountOfAccuseRecord', dbLog.find(filter), this);
+  publishTotalCount('totalCountOfAccuseRecord', dbLog.find(filter), this);
 
   const pageObserver = dbLog
     .find(filter, {
@@ -35,7 +35,6 @@ Meteor.publish('accuseRecord', function(offset) {
     });
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

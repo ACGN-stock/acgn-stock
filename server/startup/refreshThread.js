@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { refreshThread } from '/server/imports/thread';
+import { refreshThread } from '/server/imports/threading/thread';
 
 Meteor.startup(function() {
   refreshThread();

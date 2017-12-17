@@ -2,8 +2,8 @@ import { Meteor } from 'meteor/meteor';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbProducts } from '/db/dbProducts';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('companyDataForEdit', function(companyId) {
   debug.log('publish companyDataForEdit', companyId);

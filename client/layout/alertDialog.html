@@ -4,15 +4,15 @@
       <div class="modal-content">
         {{#if showTitle}}
         <div class="modal-header">
-          <h5 class="modal-title">{{alertDialogTitle}}</h5>
+          <h5 class="modal-title" style="word-break: break-all;">{{alertDialogTitle}}</h5>
         </div>
         {{/if}}
         <div class="modal-body">
           <div>
-            <div class="form-group">
-              {{#if showTextInput}}
-                <label for="input-text" class="form-control-label">{{{alertDialogMessage}}}</label>
-                <input id="input-text" class="form-control" type="text" value="{{alertDialogDefaultValue}}" />
+            <div class="form-group" style="word-break: break-all;">
+              {{#if showInput}}
+                <label for="alert-dialog-custom-input" class="form-control-label">{{{alertDialogMessage}}}</label>
+                {{{customInput}}}
               {{else}}
                 <p>{{{alertDialogMessage}}}</p>
               {{/if}}

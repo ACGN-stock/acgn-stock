@@ -2,9 +2,9 @@ import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 
 import { dbLog } from '/db/dbLog';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
   debug.log('publish companyLog', {companyId, onlyShowMine, offset});
@@ -20,7 +20,7 @@ Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
     };
   }
 
-  const totalCountObserver = publishTotalCount('totalCountOfcompanyLog', dbLog.find(filter), this);
+  publishTotalCount('totalCountOfcompanyLog', dbLog.find(filter), this);
 
   const pageObserver = dbLog
     .find(filter, {
@@ -43,7 +43,6 @@ Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });
