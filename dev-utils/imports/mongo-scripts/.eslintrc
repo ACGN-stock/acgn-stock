@@ -1,0 +1,10 @@
+{
+  "globals": {
+    "db": true,
+    "print": true,
+    "quit": true
+  },
+  "rules": {
+     "no-console": "error"
+  }
+}
