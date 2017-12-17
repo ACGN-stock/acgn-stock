@@ -4,10 +4,10 @@ import { check } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import cheerio from 'cheerio';
 
-import { limitGlobalMethod } from '/server/imports/rateLimit';
+import { limitGlobalMethod } from '/server/imports/utils/rateLimit';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVariables } from '/db/dbVariables';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   validatePTTAccount(username) {

@@ -4,7 +4,7 @@ import { _ } from 'meteor/underscore';
 
 import { dbLog } from '/db/dbLog';
 import { dbUserArchive } from '/db/dbUserArchive';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Accounts.onCreateUser((options, user) => {
   debug.log('onCreateUser', options);

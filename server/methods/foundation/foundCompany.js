@@ -7,10 +7,10 @@ import { dbLog } from '/db/dbLog';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
-import { checkImageUrl } from '/server/imports/checkImageUrl';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { resourceManager } from '/server/imports/resourceManager';
+import { checkImageUrl } from '/server/imports/utils/checkImageUrl';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 
 Meteor.methods({
   foundCompany(foundCompanyData) {
@@ -51,7 +51,7 @@ export function foundCompany(user, foundCompanyData) {
     }
   });
   if (Date.now() >= (lastSeasonData.endDate.getTime() - Meteor.settings.public.foundExpireTime - 600000)) {
-    const hours = (Meteor.settings.public.foundExpireTime / 3600000);
+    const hours = Math.ceil(Meteor.settings.public.foundExpireTime / 3600000);
     throw new Meteor.Error(403, '商業季度即將結束前' + hours + '小時，禁止新創計劃！');
   }
   const lastRoundData = dbRound.findOne({}, {

@@ -126,14 +126,17 @@ function tryLogin(username, password, type) {
 }
 
 function confirmResetPassword(username, password, type) {
-  alertDialog.confirm('密碼錯誤，是否嘗試設定新密碼並重新驗證？', (result) => {
-    if (result) {
-      const reset = true;
-      Meteor.customCall('loginOrRegister', {username, password, type, reset}, (error, result) => {
-        if (! error) {
-          onGotValidateCode(result, type);
-        }
-      });
+  alertDialog.confirm({
+    message: '密碼錯誤，是否嘗試設定新密碼並重新驗證？',
+    callback: (result) => {
+      if (result) {
+        const reset = true;
+        Meteor.customCall('loginOrRegister', {username, password, type, reset}, (error, result) => {
+          if (! error) {
+            onGotValidateCode(result, type);
+          }
+        });
+      }
     }
   });
 }

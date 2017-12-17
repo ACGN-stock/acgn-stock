@@ -1,3 +1,14 @@
+@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");html {
+    font-family: sans-serif;
+    line-height: 1.15;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%
+}
+
+body {
+  font-family: "Source Sans Pro", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
 #main > .card {
   margin-bottom: 2rem;
 }
@@ -113,6 +124,13 @@
   text-overflow: ellipsis;
   display: block;
 }
+.company-card .illegal-description {
+  background: #ff0000;
+  background: -webkit-linear-gradient(left, transparent, #ff0000 5%, #ff0000 95%, transparent);
+  background: -o-linear-gradient(left, transparent, #ff0000 5%, #ff0000 95%, transparent);
+  background: -moz-linear-gradient(left, transparent, #ff0000 5%, #ff0000 95%, transparent);
+  background: -linear-gradient(left, transparent, #ff0000 5%, #ff0000 95%, transparent);
+}
 .company-card .row {
   color: #000;
   vertical-align: middle;
@@ -162,7 +180,20 @@
 .company-card div.description {
   font-size: 0.8rem;
   white-space: pre-wrap;
-  word-break: break-all;  
+  word-break: break-all;
+}
+
+@media only screen and (max-width: 525px) {
+  .media.company-summary-item {
+    display: block;
+  }
+}
+
+@media only screen and (max-width: 380px) {
+  .media.company-summary-item .row-title{
+    padding-left: 2px;
+    padding-right: 2px;
+  }
 }
 
 .company-summary-item {
@@ -190,6 +221,10 @@
   width: 300px;
   height: 300px;
   object-fit: scale-down;
+}
+
+.media-body.row {
+  overflow: hidden;
 }
 
 /* 暗色主題 */
@@ -231,60 +266,225 @@
   color: #839496;
 }
 
-.text-non-break {
-  white-space: nowrap;
-}
-
-@media only screen and (max-width: 800px) {
-  /* Force table to not be like tables anymore */
-  #tax-info-table table, 
-  #tax-info-table thead, 
-  #tax-info-table tbody, 
-  #tax-info-table th, 
-  #tax-info-table td, 
-  #tax-info-table tr { 
-    display: block; 
+/* 帳號資訊 > 稅務資訊 移動端排版 */
+@media only screen and (max-width: 768px) {
+  table.account-tax-info,
+  table.account-tax-info thead,
+  table.account-tax-info tbody,
+  table.account-tax-info th,
+  table.account-tax-info td,
+  table.account-tax-info tr {
+    display: block;
   }
- 
-  /* Hide table headers (but not display: none;, for accessibility) */
-  #tax-info-table thead tr { 
+
+  table.account-tax-info thead tr {
     position: absolute;
     top: -9999px;
     left: -9999px;
   }
- 
-  #tax-info-table tr { border: 2px solid #ccc; }
- 
-  #tax-info-table td { 
-    /* Behave  like a "row" */
-    border: none;
-    border-bottom: 1px solid #eee; 
-    position: relative;
-    padding-left: 35%; 
-    white-space: normal;
-    text-align: left !important;
+
+  table.account-tax-info tr {
+    border: 2px solid;
+    border-color: inherit;
   }
 
-  #tax-info-table td:last-child {
+  table.account-tax-info td {
+    border: none;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    position: relative;
+    padding-left: 35%;
+    white-space: normal;
+  }
+
+  table.account-tax-info td:last-child {
     border-bottom: none;
   }
- 
-  #tax-info-table td:before { 
-    /* Now like a table header */
+
+  table.account-tax-info td:before {
     position: absolute;
-    /* Top/left values mimic padding */
-    top: 6px;
-    left: 6px;
-    width: 45%; 
-    padding-right: 10px;
-    padding-bottom: 0px;
+    left: 4px;
     white-space: nowrap;
     text-align: left;
     font-weight: bold;
   }
- 
-  /*
-  Label the data
-  */
-  #tax-info-table td:before { content: attr(data-title); }
+
+  table.account-tax-info td:before { content: attr(data-title); }
+
+  table.account-tax-info tr.default-content {
+    border: none;
+  }
+
+  table.account-tax-info tr.default-content > td {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
+
+/* 廣告中心 移動端排版 */
+@media only screen and (max-width: 768px) {
+  table.advertisement-list,
+  table.advertisement-list thead,
+  table.advertisement-list tbody,
+  table.advertisement-list th,
+  table.advertisement-list td,
+  table.advertisement-list tr {
+    display: block;
+  }
+
+  table.advertisement-list thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  table.advertisement-list tr {
+    border: 2px solid;
+    border-color: inherit;
+  }
+
+  table.advertisement-list td {
+    border: none;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    position: relative;
+    padding-left: 35%;
+    white-space: normal;
+  }
+
+  table.advertisement-list td:last-child {
+    border-bottom: none;
+  }
+
+  table.advertisement-list td:before {
+    position: absolute;
+    left: 4px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  table.advertisement-list td:before { content: attr(data-title); }
+
+  table.advertisement-list td.adv-content {
+    max-height: 100px;
+    overflow-y: auto;
+  }
+
+  table.advertisement-list tr.default-content {
+    border: none;
+  }
+
+  table.advertisement-list tr.default-content > td {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  table.advertisement-list td.ad-content {
+    word-break: break-all;
+    max-height: 9rem;
+    overflow-y: auto;
+  }
+}
+
+@media only screen and (min-width: 769px) {
+  table.advertisement-list td.ad-buyer,
+  table.advertisement-list td.ad-content {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* 經營管理介面 > 角色大圖預覽 */
+.big-picture-preivew.modal {
+  visibility: hidden;
+}
+
+.big-picture-preivew.modal.show {
+  visibility: visible;
+}
+
+.big-picture-preivew.modal.fade {
+  transition: visibility 0s linear .15s, opacity .15s linear;
+}
+
+/* 經營管理介面 > 產品管理 移動端排版 */
+@media only screen and (max-width: 768px) {
+  table.next-season-product,
+  table.next-season-product thead,
+  table.next-season-product tbody,
+  table.next-season-product th,
+  table.next-season-product td,
+  table.next-season-product tr {
+    display: block;
+  }
+
+  table.next-season-product thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  table.next-season-product tr {
+    border: 2px solid;
+    border-color: inherit;
+  }
+
+  table.next-season-product td {
+    border: none;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    position: relative;
+    padding-left: 20%;
+    white-space: normal;
+  }
+
+  table.next-season-product td:last-child {
+    border-bottom: none;
+  }
+
+  table.next-season-product td:before {
+    position: absolute;
+    left: 4px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  table.next-season-product td:before { content: attr(data-title); }
+
+  table.next-season-product td.adv-content {
+    max-height: 100px;
+    overflow-y: auto;
+  }
+
+  table.next-season-product tr.default-content {
+    border: none;
+  }
+
+  table.next-season-product tr.default-content > td {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+table.next-season-product .product-name,
+table.next-season-product .product-description {
+  word-break: break-all;
+  overflow-y: auto;
+}
+
+table.next-season-product .product-name {
+  max-height: 3rem;
+}
+
+table.next-season-product .product-description {
+  max-height: 3.5rem;
+}
+
+[data-required]:after {
+  font-size: 0.75rem;
+  content: '＊';
+  vertical-align: super;
+}
+

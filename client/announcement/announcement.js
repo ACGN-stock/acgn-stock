@@ -173,8 +173,8 @@ Template.systemStatusPanel.helpers({
 
     return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceBonusTime) : null);
   },
-  highPriceCompanyCount() {
-    return dbVariables.get('highPriceCompanyCount');
+  highPriceThreshold() {
+    return currencyFormat(dbVariables.get('highPriceThreshold'));
   },
   lowPriceThreshold() {
     return currencyFormat(dbVariables.get('lowPriceThreshold'));

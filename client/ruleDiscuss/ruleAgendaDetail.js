@@ -76,14 +76,17 @@ Template.ruleAgendaDetail.events({
     event.preventDefault();
     const agendaId = FlowRouter.getParam('agendaId');
     const agendaData = dbRuleAgendas.findOne(agendaId);
-    alertDialog.confirm('確定要撤銷議程「' + agendaData.title + '」？', (result) => {
-      if (result) {
-        Meteor.customCall('takeDownRuleAgenda', agendaId, function(error) {
-          if (! error) {
-            const path = FlowRouter.path('ruleAgendaList');
-            FlowRouter.go(path);
-          }
-        });
+    alertDialog.confirm({
+      message: '確定要撤銷議程「' + agendaData.title + '」？',
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('takeDownRuleAgenda', agendaId, function(error) {
+            if (! error) {
+              const path = FlowRouter.path('ruleAgendaList');
+              FlowRouter.go(path);
+            }
+          });
+        }
       }
     });
   },
@@ -91,13 +94,17 @@ Template.ruleAgendaDetail.events({
     event.preventDefault();
     const agendaId = FlowRouter.getParam('agendaId');
     const message = '請輸入提案人id：';
-    alertDialog.prompt(message, (result) => {
-      if (result) {
-        Meteor.customCall('updateAgendaProposer', agendaId, result, function(error) {
-          if (! error) {
-            alertDialog.alert('修改成功！');
-          }
-        });
+
+    alertDialog.prompt({
+      message,
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('updateAgendaProposer', agendaId, result, function(error) {
+            if (! error) {
+              alertDialog.alert('修改成功！');
+            }
+          });
+        }
       }
     });
   }

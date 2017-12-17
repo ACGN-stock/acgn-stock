@@ -5,7 +5,7 @@ import url from 'url';
 import querystring from 'querystring';
 
 import { dbUserArchive } from '/db/dbUserArchive';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 //以Ajax方式發布使用者名稱
 WebApp.connectHandlers.use(function(req, res, next) {

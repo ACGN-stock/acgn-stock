@@ -4,9 +4,9 @@ import { check } from 'meteor/check';
 import { Accounts } from 'meteor/accounts-base';
 import cheerio from 'cheerio';
 
-import { limitMethod } from '/server/imports/rateLimit';
+import { limitMethod } from '/server/imports/utils/rateLimit';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   validateBahamutAccount(username) {

@@ -1,11 +1,81 @@
 'use strict';
 import { _ } from 'meteor/underscore';
+import { Meteor } from 'meteor/meteor';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters, MAX_MANNER_SIZE, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbArenaLog } from '/db/dbArenaLog';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
+
+// 移除未達成報名門檻的參賽者
+export function removeUnqualifiedArenaFighters(arenaData) {
+  const { _id: arenaId } = arenaData;
+  const { arenaMinInvestedAmount } = Meteor.settings.public;
+
+  const removedArenaFighterIdList = [];
+  const userRefundMap = {};
+  const logDataList = [];
+
+  dbArenaFighters
+    .aggregate([ {
+      $match: { arenaId }
+    }, {
+      $project: {
+        companyId: 1,
+        investors: 1,
+        totalInvestedAmount: { $sum: '$investors.amount' }
+      }
+    }, {
+      $match: {
+        totalInvestedAmount: { $lt: arenaMinInvestedAmount }
+      }
+    } ])
+    .forEach(({ _id: arenaFighterId, companyId, investors }) => {
+      const logCreatedAt = new Date();
+
+      logDataList.push({
+        logType: '亂鬥失格',
+        companyId,
+        createdAt: logCreatedAt
+      });
+      removedArenaFighterIdList.push(arenaFighterId);
+
+      _.each(investors, ({ userId, amount }, i) => {
+        logDataList.push({
+          logType: '亂鬥退款',
+          companyId,
+          userId: [userId],
+          data: { refund: amount },
+          createdAt: new Date(logCreatedAt.getTime() + i + 1)
+        });
+        userRefundMap[userId] = (userRefundMap[userId] || 0) + amount;
+      });
+    });
+
+  dbArenaFighters.remove({ _id: { $in: removedArenaFighterIdList }});
+
+  if (! _.isEmpty(userRefundMap)) {
+    const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+    _.pairs(userRefundMap).forEach(([userId, refund]) => {
+      usersBulk
+        .find({ _id: userId })
+        .updateOne({ $inc: { 'profile.money': refund }});
+    });
+    Meteor.wrapAsync(usersBulk.execute).call(usersBulk);
+  }
+
+  if (logDataList.length > 0) {
+    const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+    logDataList.forEach((logData) => {
+      logBulk.insert(logData);
+    });
+    Meteor.wrapAsync(logBulk.execute).call(logBulk);
+  }
+
+  // 移除（剩下參賽者的）投資人資訊
+  dbArenaFighters.update({ arenaId }, { $unset: { investors: 1 } });
+}
 
 export function startArenaFight() {
   console.log('start arena fight...');
@@ -14,10 +84,19 @@ export function startArenaFight() {
       beginDate: -1
     },
     fields: {
-      _id: 1
+      _id: 1,
+      shuffledFighterCompanyIdList: 1
     }
   });
+
+  // 正式開賽前，先移除未達成報名門檻的參賽者
+  removeUnqualifiedArenaFighters(lastArenaData);
+
   const arenaId = lastArenaData._id;
+
+  // 取得所有參賽者的數值資料與統計總投入金額
+  let allFighterTotalInvest = 0;
+  const fighterHashByCompanyId = {};
   const fighterListBySequence = dbArenaFighters
     .find(
       {
@@ -38,6 +117,7 @@ export function startArenaFight() {
         arenaFighter.def +
         arenaFighter.agi
       );
+      allFighterTotalInvest += arenaFighter.totalInvest;
       arenaFighter.hp = getAttributeNumber('hp', arenaFighter.hp);
       arenaFighter.sp = getAttributeNumber('sp', arenaFighter.sp);
       arenaFighter.atk = getAttributeNumber('atk', arenaFighter.atk);
@@ -45,24 +125,45 @@ export function startArenaFight() {
       arenaFighter.agi = getAttributeNumber('agi', arenaFighter.agi);
       arenaFighter.currentHp = arenaFighter.hp;
       arenaFighter.currentSp = arenaFighter.sp;
+      fighterHashByCompanyId[arenaFighter.companyId] = arenaFighter;
 
       return arenaFighter;
     });
+
+  // 實際參賽人數不足兩人，不開打
+  if (fighterListBySequence.length < 2) {
+    dbArena.update(arenaId, {
+      $set: {
+        winnerList: [],
+        endDate: new Date()
+      }
+    });
+
+    return true;
+  }
+
   debug.log('startArenaFight', fighterListBySequence);
+
+  const shuffledFighterCompanyIdList = lastArenaData.shuffledFighterCompanyIdList;
+
   //輸家companyId陣列，依倒下的順序排列
   const loser = [];
   //獲得收益的紀錄用hash
   const gainProfitHash = {};
-  const arenaLogBulk = dbArenaLog.rawCollection().initializeUnorderedBulkOp();
+  _.each(fighterListBySequence, (fighter) => {
+    gainProfitHash[fighter.companyId] = 0;
+  });
+  const arenaLogBulk = dbArenaLog.getBulk(arenaId);
   //log次序
   let sequence = 0;
   //回合數
   let round = 1;
+  const maximumRound = Meteor.settings.public.arenaMaximumRound;
   //直到戰到剩下一人為止
   while (loser.length < fighterListBySequence.length - 1) {
     //超過十萬回合後自動中止
-    if (round > 500) {
-      console.log('round > 500!');
+    if (round > maximumRound) {
+      console.log(`round > maximum round ${maximumRound}!`);
       break;
     }
     //所有參賽者依序攻擊
@@ -74,7 +175,8 @@ export function startArenaFight() {
       //依此攻擊者的攻擊優先順序取得防禦者
       let defender;
       for (const attackTargetIndex of attacker.attackSequence) {
-        defender = fighterListBySequence[attackTargetIndex];
+        const companyId = shuffledFighterCompanyIdList[attackTargetIndex];
+        defender = fighterHashByCompanyId[companyId];
         if (defender && defender.currentHp > 0) {
           break;
         }
@@ -117,14 +219,10 @@ export function startArenaFight() {
         // hp降到0或0以下則進入loser
         if (defender.currentHp <= 0) {
           loser.push(defender.companyId);
-          //取得擊倒盈利
-          arenaLog.profit = defender.totalInvest;
-          if (_.isNumber(gainProfitHash[attacker.companyId])) {
-            gainProfitHash[attacker.companyId] += defender.totalInvest;
-          }
-          else {
-            gainProfitHash[attacker.companyId] = defender.totalInvest;
-          }
+          //取得擊倒盈利＋擊倒獎勵
+          const reward = defender.totalInvest + 5000;
+          arenaLog.profit = reward;
+          gainProfitHash[attacker.companyId] += reward;
         }
       }
       arenaLog.defenderHp = defender.currentHp;
@@ -143,25 +241,6 @@ export function startArenaFight() {
   if (fighterListBySequence.length > 1) {
     arenaLogBulk.execute();
   }
-  //若有任何擊倒收益，則插入一般紀錄
-  if (_.size(gainProfitHash) > 0) {
-    const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-    _.each(gainProfitHash, (reward, companyId) => {
-      logBulk.insert({
-        logType: '亂鬥營利',
-        companyId: companyId,
-        data: {
-          reward
-        }
-      });
-      dbCompanies.update(companyId, {
-        $inc: {
-          profit: reward
-        }
-      });
-    });
-    logBulk.execute();
-  }
   //取得所有存活者
   const aliveList = _.filter(fighterListBySequence, (fighter) => {
     return fighter.currentHp > 0;
@@ -169,7 +248,32 @@ export function startArenaFight() {
   //取得最後贏家
   const sortedWinnerList = _.sortBy(aliveList, 'currentHp');
   const sortedWinnerIdList = _.pluck(sortedWinnerList, 'companyId');
+  //取的排名列表
   const winnerList = sortedWinnerIdList.concat(loser.reverse());
+  //計算排名獎勵
+  const rankReward = allFighterTotalInvest / (Math.log(winnerList.length) + 0.57722 + (1 / (2 * winnerList.length)));
+  _.each(winnerList, (companyId, index) => {
+    const rank = index + 1;
+    gainProfitHash[companyId] += Math.floor(rankReward / rank);
+  });
+  //將收益紀錄插入dbLog
+  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  _.each(gainProfitHash, (reward, companyId) => {
+    logBulk.insert({
+      logType: '亂鬥營利',
+      companyId: companyId,
+      data: {
+        reward
+      },
+      createdAt: new Date()
+    });
+    dbCompanies.update(companyId, {
+      $inc: {
+        profit: reward
+      }
+    });
+  });
+  logBulk.execute();
   dbArena.update(arenaId, {
     $set: {
       winnerList: winnerList,

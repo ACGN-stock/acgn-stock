@@ -2,9 +2,9 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbOrders } from '/db/dbOrders';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
   debug.log('publish companyOrderExcludeMe', {companyId, type, offset});
@@ -25,7 +25,7 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
 
   const variableId = 'totalCountOfCompanyOrder' + type;
 
-  const totalCountObserver = publishTotalCount(variableId, dbOrders.find(filter), this);
+  publishTotalCount(variableId, dbOrders.find(filter), this);
 
   const pageObserver = dbOrders
     .find(filter, {
@@ -48,7 +48,6 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

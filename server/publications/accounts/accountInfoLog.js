@@ -1,10 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
-import { limitSubscription } from '/server/imports/rateLimit';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { dbLog } from '/db/dbLog';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('accountInfoLog', function(userId, offset) {
   debug.log('publish accountInfoLog', {userId, offset});
@@ -19,7 +19,7 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
     createdAt: { $gte: firstLogDate }
   };
 
-  const totalCountObserver = publishTotalCount('totalCountOfAccountInfoLog', dbLog.find(filter), this);
+  publishTotalCount('totalCountOfAccountInfoLog', dbLog.find(filter), this);
 
   const pageObserver = dbLog
     .find(filter, {
@@ -39,7 +39,6 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
 
   this.ready();
   this.onStop(() => {
-    totalCountObserver.stop();
     pageObserver.stop();
   });
 });

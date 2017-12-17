@@ -7,7 +7,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbArena } from '/db/dbArena';
-import { dbArenaFighters, getAttributeNumber } from '/db/dbArenaFighters';
+import { dbArenaFighters, getAttributeNumber, getTotalInvestedAmount } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
@@ -129,7 +129,7 @@ Template.companyDetail.events({
       title: '公司更名',
       message: `請輸入新的公司名稱：`,
       defaultValue: companyData.companyName,
-      callback: function(companyName) {
+      callback: (companyName) => {
         if (companyName) {
           Meteor.customCall('changeCompanyName', companyId, companyName);
         }
@@ -151,7 +151,7 @@ Template.companyDetail.events({
       type: 'prompt',
       title: title,
       message: `請輸入處理事由：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           Meteor.customCall('sealCompany', {companyId, message});
         }
@@ -172,7 +172,7 @@ Template.companyDetail.events({
       type: 'prompt',
       title: '金管會通告 - 輸入通知訊息',
       message: `請輸入要通告的訊息：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           const userIds = [companyData.manager];
           Meteor.customCall('fscAnnouncement', { userIds, companyId, message });
@@ -188,7 +188,7 @@ Template.companyDetail.events({
       type: 'prompt',
       title: `舉報違規 - 「${companyData.companyName}」公司`,
       message: `請輸入您要舉報的內容：`,
-      callback: function(message) {
+      callback: (message) => {
         if (message) {
           Meteor.customCall('accuseCompany', companyId, message);
         }
@@ -215,13 +215,16 @@ Template.companyDetail.events({
     }
     else {
       const message = '報名後將會被其他公司移出儲備員工名單，您確定要報名嗎？';
-      alertDialog.confirm(message, (result) => {
-        if (result) {
-          Meteor.customCall('registerEmployee', companyId, function(err) {
-            if (! err) {
-              alertDialog.alert('您已報名成功！');
-            }
-          });
+      alertDialog.confirm({
+        message,
+        callback: (result) => {
+          if (result) {
+            Meteor.customCall('registerEmployee', companyId, function(err) {
+              if (! err) {
+                alertDialog.alert('您已報名成功！');
+              }
+            });
+          }
         }
       });
     }
@@ -240,42 +243,50 @@ Template.companyDetail.events({
   'click [data-action="updateSalary"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
-    const message = '請輸入下季員工薪資：(' +
-      currencyFormat(Meteor.settings.public.minimumCompanySalaryPerDay) + '~' +
-      currencyFormat(Meteor.settings.public.maximumCompanySalaryPerDay) + ')';
-    alertDialog.prompt(message, function(salary) {
-      if (salary && salary.length > 0) {
-        salary = parseInt(salary, 10);
-        if (isNaN(salary) ||
-          salary < Meteor.settings.public.minimumCompanySalaryPerDay ||
-          salary > Meteor.settings.public.maximumCompanySalaryPerDay) {
-          alertDialog.alert('不正確的薪資設定！');
+    const minSalary = Meteor.settings.public.minimumCompanySalaryPerDay;
+    const maxSalary = Meteor.settings.public.maximumCompanySalaryPerDay;
+    const message = `請輸入下季員工薪資：(${currencyFormat(minSalary)}~${currencyFormat(maxSalary)})`;
 
-          return false;
+    alertDialog.prompt({
+      message,
+      inputType: 'number',
+      customSetting: `min="${minSalary}" max="${maxSalary}"`,
+      callback: (salary) => {
+        if (salary && salary.length > 0) {
+          salary = parseInt(salary, 10);
+          if (isNaN(salary) || salary < minSalary || salary > maxSalary) {
+            alertDialog.alert('不正確的薪資設定！');
+
+            return false;
+          }
+
+          Meteor.customCall('updateNextSeasonSalary', companyId, salary);
         }
-
-        Meteor.customCall('updateNextSeasonSalary', companyId, salary);
       }
     });
   },
   'click [data-action="updateSeasonalBonus"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
-    const message = '請輸入本季員工分紅占營收百分比：(' +
-      Meteor.settings.public.minimumSeasonalBonusPercent + '~' +
-      Meteor.settings.public.maximumSeasonalBonusPercent + ')';
-    alertDialog.prompt(message, function(percentage) {
-      if (percentage && percentage.length > 0) {
-        percentage = parseInt(percentage, 10);
-        if (isNaN(percentage) ||
-          percentage < Meteor.settings.public.minimumSeasonalBonusPercent ||
-          percentage > Meteor.settings.public.maximumSeasonalBonusPercent) {
-          alertDialog.alert('不正確的分紅設定！');
+    const minBonus = Meteor.settings.public.minimumSeasonalBonusPercent;
+    const maxBonus = Meteor.settings.public.maximumSeasonalBonusPercent;
+    const message = `請輸入本季員工分紅占營收百分比：(${minBonus}~${maxBonus})`;
 
-          return false;
+    alertDialog.prompt({
+      message,
+      inputType: 'number',
+      customSetting: `min="${minBonus}" max="${maxBonus}"`,
+      callback: (percentage) => {
+        if (percentage && percentage.length > 0) {
+          percentage = parseInt(percentage, 10);
+          if (isNaN(percentage) || percentage < minBonus || percentage > maxBonus) {
+            alertDialog.alert('不正確的分紅設定！');
+
+            return false;
+          }
+
+          Meteor.customCall('updateSeasonalBonus', companyId, percentage);
         }
-
-        Meteor.customCall('updateSeasonalBonus', companyId, percentage);
       }
     });
   },
@@ -284,10 +295,54 @@ Template.companyDetail.events({
     const companyId = FlowRouter.getParam('companyId');
     const companyData = dbCompanies.findOne(companyId);
     const companyName = companyData.companyName;
-    const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + companyName + '」以表示確定。';
-    alertDialog.prompt(message, function(confirmMessage) {
-      if (confirmMessage === companyName) {
-        Meteor.customCall('resignManager', companyId);
+    const checkCompanyName = companyName.replace(/\s/g, '');
+    const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + checkCompanyName + '」以表示確定。';
+
+    alertDialog.prompt({
+      message,
+      callback: (confirmMessage) => {
+        if (confirmMessage === checkCompanyName) {
+          Meteor.customCall('resignManager', companyId);
+        }
+      }
+    });
+  },
+  'click [data-action="markCompanyIllegal"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1
+      }
+    });
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '設定違規標記',
+      message: '請輸入違規事由：',
+      defaultValue: companyData.illegalReason,
+      callback: (reason) => {
+        if (! reason) {
+          return;
+        }
+        if (reason.length > 10) {
+          alertDialog.alert('違規標記事由不可大於十個字！');
+
+          return;
+        }
+
+        Meteor.customCall('markCompanyIllegal', companyId, reason);
+      }
+    });
+  },
+  'click [data-action="unmarkCompanyIllegal"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    alertDialog.confirm({
+      message: '是否解除違規標記？',
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('unmarkCompanyIllegal', companyId);
+        }
       }
     });
   }
@@ -916,9 +971,12 @@ Template.companyElectInfo.events({
     event.preventDefault();
     const instanceData = templateInstance.data;
     const companyName = instanceData.companyName;
-    alertDialog.confirm('你確定要參與競爭「' + companyName + '」的經理人職位嗎？', function(result) {
-      if (result) {
-        Meteor.customCall('contendManager', instanceData._id);
+    alertDialog.confirm({
+      message: '你確定要參與競爭「' + companyName + '」的經理人職位嗎？',
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('contendManager', instanceData._id);
+        }
       }
     });
   },
@@ -945,9 +1003,12 @@ Template.companyElectInfo.events({
           alertDialog.alert('你已經正在支持使用者' + userName + '了，無法再次進行支持！');
         }
         else {
-          alertDialog.confirm('你確定要支持候選人「' + userName + '」嗎？', function(result) {
-            if (result) {
-              Meteor.customCall('supportCandidate', instanceData._id, candidate);
+          alertDialog.confirm({
+            message: '你確定要支持候選人「' + userName + '」嗎？',
+            callback: (result) => {
+              if (result) {
+                Meteor.customCall('supportCandidate', instanceData._id, candidate);
+              }
             }
           });
         }
@@ -1077,15 +1138,33 @@ Template.companyArenaInfo.helpers({
   },
   inCanJoinTime() {
     return Date.now() < this.joinEndDate.getTime();
+  },
+  totalInvestedAmount() {
+    return getTotalInvestedAmount(this);
+  },
+  arenaMinInvestedAmount() {
+    return Meteor.settings.public.arenaMinInvestedAmount;
+  },
+  notEnoughInvestedAmount() {
+    return getTotalInvestedAmount(this) < Meteor.settings.public.arenaMinInvestedAmount;
   }
 });
 Template.companyArenaInfo.events({
   'click [data-action="joinArena"]'(event, templateInstance) {
     const {_id, companyName} = templateInstance.data;
-    const message = '你確定要讓「' + companyName + '」報名這一屆的最萌亂鬥大賽嗎？\n報名後將無法取消，請輸入「' + companyName + '」以表示確定。';
-    alertDialog.prompt(message, function(confirmMessage) {
-      if (confirmMessage === companyName) {
-        Meteor.customCall('joinArena', _id);
+    const checkCompanyName = companyName.replace(/\s/g, '');
+    const message = '你確定要讓「' +
+      companyName +
+      '」報名這一屆的最萌亂鬥大賽嗎？\n報名後將無法取消，請輸入「' +
+      checkCompanyName +
+      '」以表示確定。';
+
+    alertDialog.prompt({
+      message,
+      callback: (confirmMessage) => {
+        if (confirmMessage === checkCompanyName) {
+          Meteor.customCall('joinArena', _id);
+        }
       }
     });
   },
@@ -1101,33 +1180,46 @@ Template.companyArenaInfo.events({
     }
     const minimumUnitPrice = 1;
     const maximumUnitPrice = user.profile.money;
+    if (maximumUnitPrice < minimumUnitPrice) {
+      alertDialog.alert('您的金錢不足以投資！');
+
+      return false;
+    }
     const message = (
       '請輸入要您要投資在「' + companyName + '」' +
       '的屬性「' + investTarget.toUpperCase() + '」的金錢：' +
       `(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`
     );
-    alertDialog.prompt(message, function(investMoney) {
-      const intInvestMoney = parseInt(investMoney, 10);
-      if (! intInvestMoney) {
-        return false;
-      }
-      if (intInvestMoney < minimumUnitPrice || intInvestMoney > maximumUnitPrice) {
-        alertDialog.alert('不正確的金額設定！');
 
-        return false;
+    alertDialog.prompt({
+      message,
+      inputType: 'number',
+      customSetting: `min="${minimumUnitPrice}" max="${maximumUnitPrice}"`,
+      callback: (investMoney) => {
+        const intInvestMoney = parseInt(investMoney, 10);
+        if (! intInvestMoney) {
+          return false;
+        }
+        if (intInvestMoney < minimumUnitPrice || intInvestMoney > maximumUnitPrice) {
+          alertDialog.alert('不正確的金額設定！');
+
+          return false;
+        }
+        Meteor.customCall('investArenaFigher', _id, investTarget, intInvestMoney);
       }
-      Meteor.customCall('investArenaFigher', _id, investTarget, intInvestMoney);
     });
   }
 });
 
 inheritUtilForm(Template.arenaStrategyForm);
+const rSortedAttackSequence = new ReactiveVar([]);
 Template.arenaStrategyForm.onCreated(function() {
   this.validateModel = validateStrategyModel;
   this.handleInputChange = handleStrategyInputChange;
   this.saveModel = saveStrategyModel;
   this.model.set(this.data.joinData);
   this.draggingIndex = null;
+  rSortedAttackSequence.set([]);
 });
 Template.arenaStrategyForm.onRendered(function() {
   this.model.set(this.data.joinData);
@@ -1185,7 +1277,8 @@ function handleStrategyInputChange(event) {
   }
 }
 function saveStrategyModel(model) {
-  const submitData = _.pick(model, 'spCost', 'attackSequence', 'normalManner', 'specialManner');
+  const submitData = _.pick(model, 'spCost', 'normalManner', 'specialManner');
+  submitData.attackSequence = rSortedAttackSequence.get();
   Meteor.customCall('decideArenaStrategy', model.companyId, submitData, (error) => {
     if (! error) {
       alertDialog.alert('決策完成！');
@@ -1193,6 +1286,19 @@ function saveStrategyModel(model) {
   });
 }
 Template.arenaStrategyForm.helpers({
+  spForecast() {
+    const model = Template.instance().model.get();
+    const sp = getAttributeNumber('sp', model.sp);
+    const spCost = model.spCost;
+    const tenRoundForecast = Math.floor(Math.min((sp + 1) / spCost, spCost));
+    const maximumRound = Meteor.settings.public.arenaMaximumRound;
+    const maximumForecast = Math.floor(Math.min((sp + Math.floor(maximumRound / 10)) / spCost, spCost / 10 * maximumRound));
+
+
+    return `目前的SP量為 ${sp}
+      ，在 10 回合的戰鬥中估計可以發出 ${tenRoundForecast} 次特殊攻擊，
+      在 ${maximumRound} 回合的戰鬥中估計可以發出 ${maximumForecast} 次特殊攻擊。`;
+  },
   getManner(type, index) {
     const model = Template.instance().model.get();
     const fieldName = type + 'Manner';
@@ -1200,43 +1306,53 @@ Template.arenaStrategyForm.helpers({
     return model[fieldName][index];
   },
   hasEnemy() {
-    return this.fighterSequence.length > 0;
+    return this.shuffledFighterCompanyIdList.length > 0;
   },
   enemyList() {
-    const fighterSequence = this.fighterSequence;
+    const shuffledFighterCompanyIdList = this.shuffledFighterCompanyIdList;
     const model = Template.instance().model.get();
 
     return _.map(model.attackSequence, (attackIndex) => {
-      return fighterSequence[attackIndex];
+      return {
+        _id: attackIndex,
+        companyId: shuffledFighterCompanyIdList[attackIndex]
+      };
+    });
+  },
+  notSorted(index) {
+    return ! _.contains(rSortedAttackSequence.get(), index);
+  },
+  sortedEnemyList() {
+    const shuffledFighterCompanyIdList = this.shuffledFighterCompanyIdList;
+
+    return _.map(rSortedAttackSequence.get(), (attackIndex) => {
+      return {
+        _id: attackIndex,
+        companyId: shuffledFighterCompanyIdList[attackIndex]
+      };
     });
   }
 });
 Template.arenaStrategyForm.events({
-  'dragstart [data-drag]'(event, templateInstance) {
-    templateInstance.draggingIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
+  'click [data-action="sortAll"]'(event, templateInstance) {
+    const model = templateInstance.model.get();
+    const attackSequence = rSortedAttackSequence.get();
+    rSortedAttackSequence.set(_.union(attackSequence, model.attackSequence));
   },
-  'dragover [data-drag]'(event, templateInstance) {
-    const draggingIndex = templateInstance.draggingIndex;
-    const selfDraggingIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
-    if (draggingIndex !== null && draggingIndex !== selfDraggingIndex) {
-      event.preventDefault();
-    }
+  'click [data-add]'(event) {
+    const index = parseFloat($(event.currentTarget).attr('data-add'));
+    const sortedAttackSequence = rSortedAttackSequence.get();
+    rSortedAttackSequence.set(_.union(sortedAttackSequence, [index]));
   },
-  'dragend [data-drag]'(event, templateInstance) {
-    templateInstance.draggingIndex = null;
+  'click [data-remove]'(event) {
+    const index = parseFloat($(event.currentTarget).attr('data-remove'));
+    const sortedAttackSequence = rSortedAttackSequence.get();
+    rSortedAttackSequence.set(_.without(sortedAttackSequence, index));
   },
-  'drop [data-drag]'(event, templateInstance) {
-    const draggingIndex = templateInstance.draggingIndex;
-    if (draggingIndex !== null) {
-      const model = templateInstance.model.get();
-      const attackSequence = model.attackSequence;
-      const draggingItem = attackSequence[draggingIndex];
-      const dropIndex = parseInt($(event.currentTarget).attr('data-drag'), 10);
-      const dropItem = attackSequence[dropIndex];
-      attackSequence[dropIndex] = draggingItem;
-      attackSequence[draggingIndex] = dropItem;
-      templateInstance.model.set(model);
-    }
+  reset(event, templateInstance) {
+    event.preventDefault();
+    templateInstance.model.set(templateInstance.data.joinData);
+    rSortedAttackSequence.set([]);
   }
 });
 

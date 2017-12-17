@@ -3,8 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { UserStatus } from 'meteor/mizzao:user-status';
 
-import { resourceManager } from './imports/resourceManager';
-import { threadId } from './imports/thread';
+import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
@@ -22,124 +21,26 @@ import { dbResourceLock } from '/db/dbResourceLock';
 import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
 import { dbTaxes } from '/db/dbTaxes';
-import { dbThreads } from '/db/dbThreads';
 import { dbUserArchive } from '/db/dbUserArchive';
 import { dbVariables } from '/db/dbVariables';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVoteRecord } from '/db/dbVoteRecord';
+import { updateLowPriceThreshold } from './functions/company/updateLowPriceThreshold';
+import { updateHighPriceThreshold } from './functions/company/updateHighPriceThreshold';
+import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
+import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
+import { countDownReleaseStocksForLowPrice } from './functions/company/releaseStocksForLowPrice';
+import { countDownRecordListPrice } from './functions/company/recordListPrice';
+import { countDownCheckChairman } from './functions/company/checkChairman';
+import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
 import { startArenaFight } from './arena';
-import { checkFoundCompany } from './foundation';
+import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
-import { setLowPriceThreshold } from './lowPriceThreshold';
-import { recordListPriceAndSellFSCStocks, releaseStocksForHighPrice, releaseStocksForNoDeal, releaseStocksForLowPrice, checkChairman } from './company';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
-import { debug } from '/server/imports/debug';
-
-Meteor.startup(function() {
-  Meteor.setInterval(intervalCheck, Meteor.settings.public.intervalTimer);
-});
-
-function intervalCheck() {
-  //先移除所有一分鐘未更新的thread資料
-  dbThreads.remove({
-    refreshTime: {
-      $lt: new Date(Date.now() - 60000)
-    }
-  });
-  //如果現在沒有負責intervalWork的thread
-  if (dbThreads.find({doIntervalWork: true}).count() < 1) {
-    //將第一個thread指派為負責intervalWork工作
-    dbThreads.update({}, {
-      $set: {
-        doIntervalWork: true
-      }
-    });
-  }
-  //取出負責intervalWork的thread資料
-  const threadData = dbThreads.findOne({doIntervalWork: true});
-  if (threadData && threadData._id === threadId) {
-    doLoginObserver();
-    doIntervalWork();
-  }
-  else {
-    stopLoginObserver();
-  }
-}
-
-//開始觀察以處理登入IP紀錄、未登入天數
-let loginObserver;
-export function doLoginObserver() {
-  if (! loginObserver) {
-    console.log('start observer login info at ' + threadId + ' ' + Date.now());
-    loginObserver = Meteor.users
-      .find(
-        {},
-        {
-          fields: {
-            _id: 1,
-            'status.lastLogin.date': 1,
-            'status.lastLogin.ipAddr': 1
-          },
-          disableOplog: true
-        }
-      )
-      .observe({
-        changed: (newUserData, oldUserData) => {
-          const previousLoginData = (oldUserData.status && oldUserData.status.lastLogin) || {
-            date: new Date()
-          };
-          const nextLoginData = (newUserData.status && newUserData.status.lastLogin) || {
-            date: new Date()
-          };
-          if (nextLoginData.ipAddr && nextLoginData.ipAddr !== previousLoginData.ipAddr) {
-            dbLog.insert({
-              logType: '登入紀錄',
-              userId: [newUserData._id],
-              data: { ipAddr: nextLoginData.ipAddr },
-              createdAt: new Date()
-            });
-          }
-          if (nextLoginData.date.getTime() !== previousLoginData.date.getTime()) {
-            let lastSeasonData = dbSeason.findOne({}, {
-              sort: {
-                beginDate: -1
-              }
-            });
-            lastSeasonData = lastSeasonData ? lastSeasonData : {
-              beginDate: new Date()
-            };
-            const seasonBeginTime = lastSeasonData.beginDate.getTime();
-            const nextLoginTime = nextLoginData.date.getTime() - seasonBeginTime;
-            const previousLoginTime = Math.max(previousLoginData.date.getTime(), seasonBeginTime) - seasonBeginTime;
-
-            const noLoginDay = Math.ceil(nextLoginTime / 86400000) - Math.ceil(previousLoginTime / 86400000) - 1;
-            if (noLoginDay > 0) {
-              Meteor.users.update(newUserData._id, {
-                $set: {
-                  'status.lastLogin.date': nextLoginData.date
-                },
-                $inc: {
-                  'profile.noLoginDayCount': Math.min(noLoginDay, 6)
-                }
-              });
-            }
-          }
-        }
-      });
-  }
-}
-
-//停止觀察處理登入IP紀錄、未登入天數
-function stopLoginObserver() {
-  if (loginObserver) {
-    console.log('stop observer login info at ' + threadId + ' ' + Date.now());
-    loginObserver.stop();
-    loginObserver = null;
-  }
-}
+import { debug } from '/server/imports/utils/debug';
 
 //週期檢查工作內容
-function doIntervalWork() {
+export function doIntervalWork() {
   debug.log('doIntervalWork');
   const now = Date.now();
   const lastRoundData = dbRound.findOne({}, {
@@ -169,20 +70,21 @@ function doIntervalWork() {
     doSeasonWorks(lastRoundData, lastSeasonData);
   }
   else {
-    //設定低價位股價門檻
-    setLowPriceThreshold();
+    // 更新高低價位股價門檻
+    updateLowPriceThreshold();
+    updateHighPriceThreshold();
     //檢查所有創立中且投資時間截止的公司是否成功創立
-    checkFoundCompany();
+    checkExpiredFoundations();
     //當發薪時間到時，發給所有驗證通過的使用者薪水，並檢查賦稅、增加滯納罰金與強制繳稅
     paySalaryAndCheckTax();
     //隨機時間讓符合條件的公司釋出股票
-    releaseStocksForHighPrice();
-    releaseStocksForNoDeal();
-    releaseStocksForLowPrice();
+    countDownReleaseStocksForHighPrice();
+    countDownReleaseStocksForNoDeal();
+    countDownReleaseStocksForLowPrice();
     //隨機時間售出金管會股票並紀錄公司的參考價格
-    recordListPriceAndSellFSCStocks();
+    countDownRecordListPrice();
     //檢查並更新各公司的董事長位置
-    checkChairman();
+    countDownCheckChairman();
   }
   //移除所有一分鐘以前的聊天發言紀錄
   dbLog.remove({
@@ -358,6 +260,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     }
     //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
+    // 更新所有公司的評級
+    updateCompanyGrades();
     //為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
     //所有公司當季正營利額歸零
@@ -675,15 +579,15 @@ function generateNewSeason() {
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
   //若上一個商業季度為最萌亂鬥大賽的舉辦季度，則產生新的arena Data
   if (arenaCounter <= 0) {
-    const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSasonNumber);
+    const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber);
     dbArena.insert({
       beginDate: beginDate,
       endDate: arenaEndDate,
       joinEndDate: new Date(arenaEndDate.getTime() - Meteor.settings.public.electManagerTime),
-      fighterSequence: [],
+      shuffledFighterCompanyIdList: [],
       winnerList: []
     });
-    dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSasonNumber);
+    dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
   }
   else {
     //若下一個商業季度為最萌亂鬥大賽的舉辦季度，則以新產生的商業季度結束時間與選舉時間更新最萌亂鬥大賽的時間，以糾正季度更換時的時間偏差
@@ -1075,7 +979,7 @@ function electManager(seasonData) {
                 companyId: companyId,
                 data: {
                   seasonName: electMessage,
-                  amount: winnerData.stocks
+                  stocks: winnerData.stocks
                 },
                 createdAt: new Date()
               });
@@ -1119,12 +1023,8 @@ function electManager(seasonData) {
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
   if (arenaCounter <= 0) {
     if (lastArenaData) {
-      const fighterSequence = dbArenaFighters
+      const fighterCompanyIdList = dbArenaFighters
         .find({arenaId}, {
-          sort: {
-            agi: -1,
-            createdAt: 1
-          },
           fields: {
             companyId: 1
           }
@@ -1132,13 +1032,13 @@ function electManager(seasonData) {
         .map((arenaFighter) => {
           return arenaFighter.companyId;
         });
+      const shuffledFighterCompanyIdList = _.shuffle(fighterCompanyIdList);
       dbArena.update(arenaId, {
         $set: {
-          fighterSequence: fighterSequence
+          shuffledFighterCompanyIdList
         }
       });
-      const attackSequence = _.range(fighterSequence.length);
-      const shuffledAttackSequence = _.shuffle(attackSequence);
+      const attackSequence = _.range(shuffledFighterCompanyIdList.length);
       dbArenaFighters
         .find({}, {
           fields: {
@@ -1147,10 +1047,12 @@ function electManager(seasonData) {
           }
         })
         .forEach((fighter) => {
-          const thisFighterSequence = _.indexOf(fighterSequence, fighter.companyId);
+          const thisFighterIndex = _.indexOf(shuffledFighterCompanyIdList, fighter.companyId);
+          const thisAttackSequence = _.without(attackSequence, thisFighterIndex);
+          const shuffledAttackSequence = _.shuffle(thisAttackSequence);
           dbArenaFighters.update(fighter._id, {
             $set: {
-              attackSequence: _.without(shuffledAttackSequence, thisFighterSequence)
+              attackSequence: shuffledAttackSequence
             }
           });
         });

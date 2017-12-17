@@ -2,9 +2,9 @@ import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 
 import { dbDirectors } from '/db/dbDirectors';
-import { limitSubscription } from '/server/imports/rateLimit';
-import { publishTotalCount } from '/server/imports/publishTotalCount';
-import { debug } from '/server/imports/debug';
+import { limitSubscription } from '/server/imports/utils/rateLimit';
+import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('companyDirector', function(companyId, offset) {
   debug.log('publish companyDirector', {companyId, offset});
@@ -13,12 +13,7 @@ Meteor.publish('companyDirector', function(companyId, offset) {
 
   const filter = { companyId };
 
-  const totalCountObserver = publishTotalCount('totalCountOfCompanyDirector', dbDirectors.find(filter), this);
-
-  // TODO 移進 publishTotalCount 以簡化程式
-  this.onStop(() => {
-    totalCountObserver.stop();
-  });
+  publishTotalCount('totalCountOfCompanyDirector', dbDirectors.find(filter), this);
 
   const directorsCursor = dbDirectors.find(filter, {
     sort: { stocks: -1 },

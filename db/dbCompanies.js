@@ -1,11 +1,14 @@
-'use strict';
 import { Meteor } from 'meteor/meteor';
+import { _ } from 'meteor/underscore';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 //公司資料集
 export const dbCompanies = new Mongo.Collection('companies');
 export default dbCompanies;
+
+// 公司評等名稱
+export const gradeList = ['A', 'B', 'C', 'D'];
 
 const schema = new SimpleSchema({
   //公司名稱
@@ -57,6 +60,23 @@ const schema = new SimpleSchema({
     type: String,
     min: 10,
     max: 3000
+  },
+  // 違規描述
+  illegalReason: {
+    type: String,
+    max: 10,
+    optional: true
+  },
+  // 資本額
+  capital: {
+    type: SimpleSchema.Integer,
+    min: 0
+  },
+  // 公司評等
+  grade: {
+    type: String,
+    allowedValues: gradeList,
+    defaultValue: _.last(gradeList)
   },
   //目前總釋出股份
   totalRelease: {

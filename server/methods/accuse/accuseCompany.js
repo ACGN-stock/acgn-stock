@@ -5,7 +5,7 @@ import { check } from 'meteor/check';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   accuseCompany(companyId, message) {

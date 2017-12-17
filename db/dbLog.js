@@ -290,6 +290,16 @@ export const logTypeList = [
   '解除查封',
 
   /**
+   * 【違規標記】userId0以「data.reason」的理由將「companyId」公司標記為違規！
+   */
+  '違規標記',
+
+  /**
+   * 【違規標記】userId0移除了「companyId」公司的違規標記！
+   */
+  '違規解標',
+
+  /**
    * 【公司更名】userId0將「companyId」公司的名稱由「data.oldCompanyName」改為「data.newCompanyName」。
    */
   '公司更名',
@@ -308,6 +318,16 @@ export const logTypeList = [
    * 【最萌亂鬥】userId0替「companyId」公司報名參加了這一屆的最萌亂鬥大賽！
    */
   '亂鬥報名',
+
+  /**
+   * 【最萌亂鬥】「companyId」公司因為總投資金額未達標，失去了這一屆最萌亂鬥大賽的參賽資格！
+   */
+  '亂鬥失格',
+
+  /**
+   * 【最萌亂鬥】userId0從「companyId」公司收回了$data.refund的投資退款！
+   */
+  '亂鬥退款',
 
   /**
    * 【最萌亂鬥】userId0對這一屆最萌亂鬥大賽參賽者「companyId」公司的data.attrName能力值投資了$data.money的金錢！

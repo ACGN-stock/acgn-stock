@@ -7,6 +7,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
+import { dbRankCompanyCapital } from '/db/dbRankCompanyCapital';
 import { dbRankUserWealth } from '/db/dbRankUserWealth';
 import { dbSeason } from '/db/dbSeason';
 import { dbVariables } from '/db/dbVariables';
@@ -39,7 +40,8 @@ const rShowChart = new ReactiveVar(false);
 const btnHash = {
   companyPriceRankTable: '股票熱門排行榜',
   companyProfitRankTable: '股票營利排行榜',
-  companyValueRankTable: '股票資本排行榜',
+  companyValueRankTable: '股票市值排行榜',
+  companyCapitalRankTable: '公司資本額排行榜',
   userRankTable: '大富翁排行榜'
 };
 Template.seasonalReport.helpers({
@@ -209,6 +211,16 @@ Template.companyValueRankTable.helpers({
   }
 });
 
+Template.companyCapitalRankTable.helpers({
+  rankList() {
+    const seasonId = FlowRouter.getParam('seasonId');
+    const rankList = dbRankCompanyCapital.find({ seasonId }).fetch();
+    const sortedRankList = _.sortBy(rankList, 'capital');
+
+    return sortedRankList.reverse();
+  }
+});
+
 Template.userRankTable.helpers({
   rankList() {
     const seasonId = FlowRouter.getParam('seasonId');
@@ -250,6 +262,10 @@ function drawChart(templateInstance) {
     }
     case 'companyValueRankTable': {
       drawCompanyValueRankTable(templateInstance);
+      break;
+    }
+    case 'companyCapitalRankTable': {
+      drawCompanyCapitalRankTable(templateInstance);
       break;
     }
     case 'userRankTable': {
@@ -361,6 +377,7 @@ function drawCompanyProfitRankTable(templateInstance) {
       data: {
         id: rankData.companyId
       },
+      dataType: 'json',
       success: (companyData) => {
         const companyName = companyData.name;
         if (companyName.length > 8) {
@@ -461,6 +478,7 @@ function drawCompanyValueRankTable(templateInstance) {
       data: {
         id: rankData.companyId
       },
+      dataType: 'json',
       success: (companyData) => {
         const companyName = companyData.name;
         if (companyName.length > 8) {
@@ -486,6 +504,127 @@ function drawCompanyValueRankTable(templateInstance) {
           backgroundColor: 'rgba(119, 179, 0, 1)',
           borderColor: '#aaa',
           data: _.pluck(sortedRankList, 'totalValue')
+        },
+        {
+          label: '總釋股數',
+          xAxisID: 'x-axis-release',
+          backgroundColor: 'rgba(255, 136, 0, 0.2)',
+          borderColor: '#aaa',
+          data: _.pluck(sortedRankList, 'totalRelease')
+        },
+        {
+          label: '收盤股價',
+          xAxisID: 'x-axis-price',
+          backgroundColor: 'rgba(42, 159, 214, 0.2)',
+          borderColor: '#aaa',
+          data: _.pluck(sortedRankList, 'lastPrice')
+        }
+      ]
+    };
+
+    const chartOptions = {
+      responsive: true,
+      scales: {
+        xAxes: [
+          {
+            id: 'x-axis-value',
+            type: 'linear',
+            position: 'top',
+            ticks: {
+              beginAtZero: true
+            },
+            gridLines: {
+              color: '#aaa'
+            }
+          },
+          {
+            id: 'x-axis-release',
+            display: false,
+            type: 'linear',
+            position: 'top',
+            ticks: {
+              beginAtZero: true
+            },
+            gridLines: {
+              color: '#aaa'
+            }
+          },
+          {
+            id: 'x-axis-price',
+            display: false,
+            type: 'linear',
+            position: 'top',
+            ticks: {
+              beginAtZero: true
+            },
+            gridLines: {
+              color: '#aaa'
+            }
+          }
+        ],
+        yAxes: [
+          {
+            gridLines: {
+              color: '#aaa'
+            }
+          }
+        ]
+      }
+    };
+
+    templateInstance.chart = new Chart(templateInstance.ctx, {
+      type: 'horizontalBar',
+      data: chartData,
+      options: chartOptions
+    });
+  });
+}
+
+function drawCompanyCapitalRankTable(templateInstance) {
+  const seasonId = FlowRouter.getParam('seasonId');
+  const rankList = dbRankCompanyCapital.find({seasonId}).map((rankData) => {
+    rankData.totalValue = rankData.lastPrice * rankData.totalRelease;
+
+    return rankData;
+  });
+  if (rankList.length < 1) {
+    return false;
+  }
+  templateInstance.ctx.canvas.height = 14 * rankList.length + 20;
+
+  const companyNameHash = {};
+  const deferredList = _.map(rankList, (rankData) => {
+    return $.ajax({
+      url: '/companyInfo',
+      data: {
+        id: rankData.companyId
+      },
+      dataType: 'json',
+      success: (companyData) => {
+        const companyName = companyData.name;
+        if (companyName.length > 8) {
+          companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
+        }
+        else {
+          companyNameHash[rankData.companyId] = companyName;
+        }
+      }
+    });
+  });
+
+  const sortedRankList = _.sortBy(rankList, 'capital').reverse();
+  $.when(...deferredList).then(function() {
+    const chartData = {
+      labels: _.map(sortedRankList, (rankData) => {
+        return companyNameHash[rankData.companyId];
+      }),
+      datasets: [
+        {
+          label: '資本額',
+          xAxisID: 'x-axis-value',
+          backgroundColor: 'rgba(119, 179, 0, 1)',
+          borderColor: '#aaa',
+          data: _.pluck(sortedRankList, 'capital')
         },
         {
           label: '總釋股數',

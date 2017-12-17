@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-block">
       <h1 class="card-title mb-1">
-        廣告宣傳
+        廣告中心
       </h1>
       {{#if inEditAnnouncementMode}}
         <hr />
@@ -27,32 +27,32 @@
         {{/if}}
       </h3>
       <hr />
-      <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+      <table class="table-bordered advertisement-list" style="width: 100%; table-layout: fixed;">
         <thead>
           <tr>
-            <th class="text-center text-truncate" style="max-width: 60px;" title="購買者">購買者</th>
+            <th class="text-center text-truncate" style="width: 120px;" title="購買者">購買者</th>
             <th class="text-center text-truncate" title="廣告內容">廣告內容</th>
-            <th class="text-center text-truncate" style="max-width: 60px;" title="費用">費用</th>
-            <th class="text-center text-truncate" style="max-width: 160px;" title="終止日期">終止日期</th>
+            <th class="text-center text-truncate" style="width: 120px;" title="費用">費用</th>
+            <th class="text-center text-truncate" style="width: 160px;" title="終止日期">終止日期</th>
             {{#if currentUser.profile.isAdmin}}
-              <th class="text-center" style="max-width: 60px;" title="撤銷">撤銷</th>
+              <th class="text-center" style="width: 120px;" title="管理">管理</th>
             {{/if}}
           </tr>
         </thead>
         <tbody>
           {{#each advertising in advertisingList}}
             <tr class="{{advertisingDisplayClass @index}}">
-              <td class="text-left text-truncate px-2">
+              <td class="text-left text-truncate ad-buyer" data-title="購買者">
                 {{>userLink advertising.userId}}
               </td>
-              <td class="text-left text-truncate px-2">
+              <td class="text-left text-truncate ad-content" data-title="廣告內容" title="{{advertising.message}}">
                 {{#if advertising.url}}
                   <a href="{{advertising.url}}" target="_blank">{{advertising.message}}</a>
                 {{else}}
                   {{advertising.message}}
                 {{/if}}
               </td>
-              <td class="text-center text-truncate">
+              <td class="text-center text-truncate" data-title="費用">
                 {{#if currentUser}}
                   <button class="btn btn-primary btn-sm" type="button" data-add-pay="{{advertising._id}}">
                     $ {{currencyFormat advertising.paid}}
@@ -61,15 +61,23 @@
                   $ {{currencyFormat advertising.paid}}
                 {{/if}}
               </td>
-              <td class="text-center text-truncate">
+              <td class="text-center text-truncate" data-title="終止日期">
                 {{formatExpireDate advertising}}
               </td>
               {{#if currentUser.profile.isAdmin}}
-                <th class="text-center">
+                <td class="text-center" data-title="管理">
                   <button class="btn btn-danger btn-sm" type="button" data-take-down="{{advertising._id}}">
                     撤銷
                   </button>
-                </th>
+                </td>
+              {{/if}}
+            </tr>
+            {{else}}
+            <tr class="default-content">
+              {{#if currentUser.profile.isAdmin}}
+                <td class="text-center text-truncate" colspan="5">目前沒有發布中廣告！</td>
+              {{else}}
+                <td class="text-center text-truncate" colspan="4">目前沒有發布中廣告！</td>
               {{/if}}
             </tr>
           {{/each}}
@@ -82,8 +90,12 @@
 <template name="buyAdvertisingForm">
   <form>
     <h3 class="card-subtitle text-muted">購買廣告</h3>
+    <hr />
+    <div class="small">
+      ＊必須
+    </div>
     <div class="form-group">
-      <label for="message">廣告訊息：</label>
+      <label for="message" data-required>廣告訊息</label>
       <input
         class="form-control"
         type="text"
@@ -94,7 +106,7 @@
       {{{errorHtmlOf 'message'}}}
     </div>
     <div class="form-group">
-      <label for="url">廣告連結：</label>
+      <label for="url">廣告連結</label>
       <input
         class="form-control"
         type="url"
@@ -109,7 +121,7 @@
       目前可立刻顯示的最小廣告費用為： $ {{currencyFormat getDisplayMinimumPaid}}。
     </div>
     <div class="form-group">
-      <label for="extraPaid">追加廣告費用：</label>
+      <label for="extraPaid">追加廣告費用</label>
       <input
         class="form-control"
         type="number"

@@ -3,8 +3,8 @@ import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 
 import { dbPrice } from '/db/dbPrice';
-import { limitMethod } from '/server/imports/rateLimit';
-import { debug } from '/server/imports/debug';
+import { limitMethod } from '/server/imports/utils/rateLimit';
+import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
   queryStocksCandlestick(companyId, options) {

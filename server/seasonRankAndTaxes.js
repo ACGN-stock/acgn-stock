@@ -7,9 +7,10 @@ import { dbLog } from '/db/dbLog';
 import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
+import { dbRankCompanyCapital } from '/db/dbRankCompanyCapital';
 import { dbRankUserWealth } from '/db/dbRankUserWealth';
 import { dbTaxes } from '/db/dbTaxes';
-import { debug } from '/server/imports/debug';
+import { debug } from '/server/imports/utils/debug';
 
 //為所有公司與使用者進行排名結算
 export function generateRankAndTaxesData(seasonData) {
@@ -209,7 +210,9 @@ function rankCompany(seasonData) {
         $project: {
           _id: 1,
           avgPrice: {
-            $divide: ['$totalDealMoney', '$totalDealAmount']
+            $cond: [ { $eq: ['$totalDealAmount', 0] },
+              { $arrayElemAt: ['$companyData.listPrice', 0] },
+              { $divide: ['$totalDealMoney', '$totalDealAmount'] } ]
           },
           isSeal: {
             $arrayElemAt: ['$companyData.isSeal', 0]
@@ -265,6 +268,20 @@ function rankCompany(seasonData) {
       }
     ]);
 
+    const rankCompanyCapitalList = dbCompanies
+      .find({ isSeal: false }, {
+        fields: {
+          _id: 1,
+          capital: 1,
+          totalRelease: 1,
+          totalValue: 1
+        },
+        sort: { capital: -1 },
+        limit: 100,
+        disableOplog: true
+      })
+      .fetch();
+
     const seasonId = seasonData._id;
     if (rankCompanyPriceList.length > 0) {
       const rankCompanyPriceBulk = dbRankCompanyPrice.rawCollection().initializeUnorderedBulkOp();
@@ -306,6 +323,20 @@ function rankCompany(seasonData) {
         });
       });
       rankCompanyProfitBulk.execute();
+    }
+
+    if (rankCompanyCapitalList.length > 0) {
+      const rankCompanyCapitalBulk = dbRankCompanyCapital.rawCollection().initializeUnorderedBulkOp();
+      _.each(rankCompanyCapitalList, (rankData) => {
+        rankCompanyCapitalBulk.insert({
+          seasonId,
+          companyId: rankData._id,
+          capital: rankData.capital,
+          totalRelease: rankData.totalRelease,
+          totalValue: rankData.totalValue
+        });
+      });
+      rankCompanyCapitalBulk.execute();
     }
   }
 }

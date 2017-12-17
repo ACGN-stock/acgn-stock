@@ -3,11 +3,14 @@
     <div class="card-block">
       <h1 class="card-title mb-1">金管會持股</h1>
       <hr />
+      {{#with paginationData}}
+        {{> pagination}}
+      {{/with}}
       <table class="table-bordered" style="max-width: 720px; width: 100%; table-layout: fixed; margin-left: auto; margin-right: auto">
         <thead>
           <tr>
             <th class="text-center text-truncate" title="公司名稱">公司名稱</th>
-            <th class="text-center text-truncate" title="持有股數">持有股數</th>
+            <th class="text-center text-truncate" title="持有股數" style="width: 30%">持有股數</th>
           </tr>
         </thead>
         <tbody>
@@ -19,6 +22,10 @@
               <td class="text-right">
                 {{stockData.stocks}} 股
               </td>
+            </tr>
+          {{else}}
+            <tr>
+              <td class="text-center text-truncate p-1" colspan="2">查無資料！</td>
             </tr>
           {{/each}}
         </tbody>

@@ -202,41 +202,45 @@ function handleInputChange(event) {
 
 function saveModel(model) {
   const message = '議程送出後不可再修改且直接開放投票72小時，確認是否送出？';
-  alertDialog.confirm(message, function(result) {
-    if (result) {
-      const issues = [];
-      const issueList = rIssueList.get();
-      issueList.forEach((issue, index) => {
-        const title = model[getIssueInputName(index + 1)];
-        const multiple = issue.multiple;
 
-        const options = [];
-        const optionList = rIssueOptionList.get()[index];
-        optionList.forEach((option, optionIndex) => {
-          options.push(model[getIssueOptionInputName(index + 1, optionIndex + 1)]);
+  alertDialog.confirm({
+    message,
+    callback: (result) => {
+      if (result) {
+        const issues = [];
+        const issueList = rIssueList.get();
+        issueList.forEach((issue, index) => {
+          const title = model[getIssueInputName(index + 1)];
+          const multiple = issue.multiple;
+
+          const options = [];
+          const optionList = rIssueOptionList.get()[index];
+          optionList.forEach((option, optionIndex) => {
+            options.push(model[getIssueOptionInputName(index + 1, optionIndex + 1)]);
+          });
+
+          issues.push({
+            title: title,
+            multiple: multiple,
+            options: options
+          });
         });
 
-        issues.push({
-          title: title,
-          multiple: multiple,
-          options: options
+        const newModel = {
+          title: model.agendaTitle,
+          proposer: model.proposerId,
+          description: model.description,
+          discussionUrl: model.discussionUrl,
+          issues: issues
+        };
+
+        Meteor.customCall('createAgenda', newModel, (error) => {
+          if (! error) {
+            const path = FlowRouter.path('ruleAgendaList');
+            FlowRouter.go(path);
+          }
         });
-      });
-
-      const newModel = {
-        title: model.agendaTitle,
-        proposer: model.proposerId,
-        description: model.description,
-        discussionUrl: model.discussionUrl,
-        issues: issues
-      };
-
-      Meteor.customCall('createAgenda', newModel, (error) => {
-        if (! error) {
-          const path = FlowRouter.path('ruleAgendaList');
-          FlowRouter.go(path);
-        }
-      });
+      }
     }
   });
 }

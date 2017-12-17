@@ -12,7 +12,7 @@ import { formatDateText } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat } from '../utils/helpers.js';
+import { currencyFormat, sanitizeHtml } from '../utils/helpers.js';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInBuyAdvertisingMode = new ReactiveVar(false);
@@ -70,9 +70,12 @@ Template.advertising.events({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     if (advertisingData) {
       if (advertisingData.userId !== Meteor.user()._id) {
-        alertDialog.confirm('您並非該廣告的初始購買人，確定要在這個廣告上追加廣告金額嗎？', (result) => {
-          if (result) {
-            showAskAddPayDialog(advertisingId);
+        alertDialog.confirm({
+          message: '您並非該廣告的初始購買人，確定要在這個廣告上追加廣告金額嗎？',
+          callback: (result) => {
+            if (result) {
+              showAskAddPayDialog(advertisingId);
+            }
           }
         });
       }
@@ -85,9 +88,17 @@ Template.advertising.events({
     event.preventDefault();
     const advertisingId = $(event.currentTarget).attr('data-take-down');
     const advertisingData = dbAdvertising.findOne(advertisingId);
-    alertDialog.confirm('確定要撤銷廣告「' + advertisingData.message + '」？', (result) => {
-      if (result) {
-        Meteor.customCall('takeDownAdvertising', advertisingId);
+    const message = `
+      <div>確定要撤銷廣告？</div>
+      <div style="max-height: 100px; overflow: scroll;">${sanitizeHtml(advertisingData.message)}</div>
+    `;
+
+    alertDialog.confirm({
+      message,
+      callback: (result) => {
+        if (result) {
+          Meteor.customCall('takeDownAdvertising', advertisingId);
+        }
       }
     });
   }
@@ -97,8 +108,10 @@ function showAskAddPayDialog(advertisingId) {
     type: 'prompt',
     title: '追加廣告金額',
     message: '請輸入要額外追加的廣告金額：',
-    defaultValue: null,
-    callback: function(result) {
+    inputType: 'number',
+    defaultValue: 1,
+    customSetting: `min="1"`,
+    callback: (result) => {
       const addPay = parseInt(result, 10);
       if (addPay) {
         Meteor.customCall('addAdvertisingPay', advertisingId, addPay);
@@ -183,14 +196,18 @@ function saveAdvertisingModel(model) {
   }
   const message = `
     <div>廣告總支出：$${currencyFormat(totalPaid)}</div>
-    <div>廣告內容：${advertisingSample}</div>
+    <div>廣告內容：</div>
+    <div style="max-height: 100px; overflow: scroll;">${sanitizeHtml(advertisingSample)}</div>
     <div>確定發出廣告嗎？</div>
   `;
-  alertDialog.confirm(message, (result) => {
-    if (result) {
-      Meteor.customCall('buyAdvertising', submitData, () => {
-        rInBuyAdvertisingMode.set(false);
-      });
+  alertDialog.confirm({
+    message,
+    callback: (result) => {
+      if (result) {
+        Meteor.customCall('buyAdvertising', submitData, () => {
+          rInBuyAdvertisingMode.set(false);
+        });
+      }
     }
   });
 }
