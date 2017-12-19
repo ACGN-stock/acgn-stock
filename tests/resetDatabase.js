@@ -39,7 +39,7 @@ Meteor.startup(function() {
     {},
     {
       $inc: {
-        'profile.stone': 1
+        'profile.stones.saint': 1
       },
       $set: {
         'profile.money': 10000
@@ -64,7 +64,7 @@ Meteor.startup(function() {
     dbLog.insert({
       logType: '免費得石',
       userId: [userId],
-      amount: user.profile.stone,
+      amount: user.profile.stones.saint,
       message: '之前協助公測累積的石頭總數',
       createdAt: date2
     });

@@ -8,6 +8,7 @@ import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanyStones } from '/db/dbCompanyStones';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
@@ -33,6 +34,8 @@ import { countDownReleaseStocksForLowPrice } from './functions/company/releaseSt
 import { countDownRecordListPrice } from './functions/company/recordListPrice';
 import { countDownCheckChairman } from './functions/company/checkChairman';
 import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
+import { returnCompanyStones } from './functions/miningMachine/returnCompanyStones';
+import { generateMiningProfits } from './functions/miningMachine/generateMiningProfits';
 import { startArenaFight } from './arena';
 import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
@@ -134,6 +137,14 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     backupMongo();
     //當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
+    // 結算挖礦機營利
+    generateMiningProfits();
+    // 賽季結束時歸還所有石頭
+    dbCompanyStones
+      .aggregate([ { $group: { _id: '$companyId' } } ])
+      .forEach(({ _id: companyId }) => {
+        returnCompanyStones(companyId);
+      });
     //若arenaCounter為0，則舉辦最萌亂鬥大賽
     const arenaCounter = dbVariables.get('arenaCounter');
     if (arenaCounter === 0) {
@@ -229,7 +240,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
             name: userData.profile.name,
             validateType: userData.profile.validateType,
             isAdmin: userData.profile.isAdmin,
-            stone: userData.profile.stone,
+            saintStones: userData.profile.stones.saint,
             ban: userData.profile.ban
           }
         }
@@ -258,6 +269,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     backupMongo();
     //當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
+    // 結算挖礦機營利
+    generateMiningProfits();
     //若arenaCounter為0，則舉辦最萌亂鬥大賽
     const arenaCounter = dbVariables.get('arenaCounter');
     if (arenaCounter === 0) {

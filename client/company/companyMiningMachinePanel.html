@@ -1,0 +1,47 @@
+<template name="companyMiningMachine">
+  <div class="mb-2">
+    狀態：
+    {{#if isInOperationTime}}
+      <span class="text-danger">運轉中</span>
+    {{else}}
+      <span class="text-success">閒置中</span>
+    {{/if}}
+  </div>
+
+  <div class="mb-2">
+    目前已經在挖礦機裡的石頭：
+    <div class="d-flex flex-wrap flex-column flex-sm-row justify-content-around">
+      {{#each stoneType in stoneTypeList}}
+      <div class="text-nowrap">
+        <img class="stone-icon-2x" src="{{stoneIconPath stoneType}}" alt="{{stoneDisplayName stoneType}}">
+        {{stoneDisplayName stoneType}} {{stoneCount stoneType}} 個
+      </div>
+      {{/each}}
+    </div>
+    總生產值：{{totalMiningPower}}
+  </div>
+
+  {{#if currentUser}}
+    {{#unless isInOperationTime}}
+      <div class="d-flex flex-wrap align-items-center mb-2">
+        {{#if currentUserPlacedStoneType}}
+          <span>您已經放置<span class="text-info">{{stoneDisplayName currentUserPlacedStoneType}}</span>在本公司的挖礦機。</span>
+          <a class="btn btn-sm btn-warning" href="#" data-action="retriveStone">取回石頭</a>
+        {{else}}
+          <span>您尚未放置任何石頭在本公司的挖礦機。</span>
+          <form class="form-inline align-items-center" name="placeStoneForm" action="#">
+            <select class="form-control form-control-sm" name="stoneType">
+              <option value="" class="d-none" hidden>選擇石頭類型…</option>
+              {{#each stoneType in currentUserAvailableStoneTypeList}}
+                <option value="{{stoneType}}">{{stoneDisplayName stoneType}}</option>
+              {{else}}
+                <option value="" disabled>您沒有任何可放置的石頭！</option>
+              {{/each}}
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary">放置石頭</button>
+          </form>
+        {{/if}}
+      </div>
+    {{/unless}}
+  {{/if}}
+</template>

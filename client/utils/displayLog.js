@@ -2,7 +2,7 @@ import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
-import { currencyFormat, sanitizeHtml } from './helpers.js';
+import { stoneDisplayName, currencyFormat, sanitizeHtml } from './helpers.js';
 
 Template.displayLog.onRendered(function() {
   this.$('[data-user-link]').each((_, elem) => {
@@ -90,6 +90,9 @@ Template.displayLog.helpers({
       }
       case '免費得石': {
         return `【免費得石】因為「${sanitizeHtml(data.reason)}」的理由獲得了${data.stones}顆聖晶石！`;
+      }
+      case '購買得石': {
+        return `【購買得石】${users[0]}花費$${currencyFormat(data.cost)}購買了${data.amount}個${stoneDisplayName(data.stoneType)}！`;
       }
       case '聊天發言': {
         return `${users[0]}說道：「${sanitizeHtml(data.message)}」`;
@@ -377,6 +380,15 @@ Template.displayLog.helpers({
       }
       case '亂鬥營利': {
         return `【最萌亂鬥】「${company}」公司在這一屆最萌亂鬥大賽中表現出眾，獲得了$${currencyFormat(data.reward)}的營利金額！`;
+      }
+      case '礦機放石': {
+        return `【礦機放石】${users[0]}在「${company}」公司的挖礦機放置了一個${stoneDisplayName(data.stoneType)}！`;
+      }
+      case '礦機取石': {
+        return `【礦機取石】${users[0]}從「${company}」公司的挖礦機拿回了一個${stoneDisplayName(data.stoneType)}！`;
+      }
+      case '礦機營利': {
+        return `【礦機營利】「${company}」公司的挖礦機集結眾人之力努力運轉，使其獲得了$${currencyFormat(data.profit)}的營利額！`;
       }
     }
   }

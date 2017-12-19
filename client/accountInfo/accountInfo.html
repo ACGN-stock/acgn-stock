@@ -31,6 +31,11 @@
             {{> accountInfoOwnStockList}}
           {{/if}}
           <div class="col-12 border-grid">
+            {{#panelFolder name='stone' title='石頭資訊' }}
+              {{> accountInfoStonePanel user=lookUser}}
+            {{/panelFolder}}
+          </div>
+          <div class="col-12 border-grid">
             <a class="d-block h4" href="#" data-toggle-panel="log">
               玩家紀錄
               {{#if isDisplayPanel 'log'}}
@@ -152,9 +157,6 @@
     </div>
     <div>
       帳號剩餘推薦票：{{this.profile.vote}}
-    </div>
-    <div>
-      帳號擁有聖晶石：{{this.profile.stone}}
     </div>
     {{#if this.profile.isInVacation}}
       <div class="text-info">目前正在渡假中。</div>

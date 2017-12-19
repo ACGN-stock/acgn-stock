@@ -34,7 +34,7 @@ const schema = new SimpleSchema({
     defaultValue: false
   },
   //聖晶石數量
-  stone: {
+  saintStones: {
     type: SimpleSchema.Integer,
     min: 0,
     defaultValue: 0
