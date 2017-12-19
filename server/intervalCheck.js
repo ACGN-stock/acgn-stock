@@ -123,15 +123,20 @@ export function doIntervalWork() {
 
 //備份mongo資料庫
 function backupMongoAsync(callback) {
-  console.log('backup mongo from ' + process.env.MONGO_URL + '...');
-  const date = new Date();
-  const backupDateText = date.getFullYear() + '-' + padZero(date.getMonth() + 1) + '-' + padZero(date.getDate());
-  backup({
-    uri: process.env.MONGO_URL,
-    root: process.env.BACKUP_DIRECTORY,
-    callback: callback,
-    tar: backupDateText + '.tar.gz'
-  });
+  if (process.env.MONGO_URL && process.env.BACKUP_DIRECTORY) {
+    console.log('backup mongo from ' + process.env.MONGO_URL + '...');
+    const date = new Date();
+    const backupDateText = date.getFullYear() + '-' + padZero(date.getMonth() + 1) + '-' + padZero(date.getDate());
+    backup({
+      uri: process.env.MONGO_URL,
+      root: process.env.BACKUP_DIRECTORY,
+      callback: callback,
+      tar: backupDateText + '.tar.gz'
+    });
+  }
+  else {
+    console.log(`can't backup mongo because no available environment variable given!`);
+  }
 }
 const backupMongoSync = Meteor.wrapAsync(backupMongoAsync);
 
