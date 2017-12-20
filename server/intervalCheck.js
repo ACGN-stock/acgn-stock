@@ -131,7 +131,8 @@ function backupMongoAsync(callback) {
       uri: process.env.MONGO_URL,
       root: process.env.BACKUP_DIRECTORY,
       callback: callback,
-      tar: backupDateText + '.tar.gz'
+      tar: backupDateText + '.tar.gz',
+      metadata: true
     });
   }
   else {
