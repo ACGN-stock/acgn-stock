@@ -28,7 +28,6 @@ export function backupMongo() {
   }
 }
 export default backupMongo;
-backupMongo();
 
 function padZero(n) {
   if (n < 10) {
