@@ -2,7 +2,6 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { UserStatus } from 'meteor/mizzao:user-status';
-import backup from 'mongodb-backup';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbAdvertising } from '/db/dbAdvertising';
@@ -39,6 +38,7 @@ import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
 import { debug } from '/server/imports/utils/debug';
+import { backupMongo } from '/server/imports/utils/backupMongo';
 
 //週期檢查工作內容
 export function doIntervalWork() {
@@ -121,26 +121,6 @@ export function doIntervalWork() {
   });
 }
 
-//備份mongo資料庫
-function backupMongoAsync(callback) {
-  if (process.env.MONGO_URL && process.env.BACKUP_DIRECTORY) {
-    console.log('backup mongo from ' + process.env.MONGO_URL + '...');
-    const date = new Date();
-    const backupDateText = date.getFullYear() + '-' + padZero(date.getMonth() + 1) + '-' + padZero(date.getDate());
-    backup({
-      uri: process.env.MONGO_URL,
-      root: process.env.BACKUP_DIRECTORY,
-      callback: callback,
-      tar: backupDateText + '.tar.gz',
-      metadata: true
-    });
-  }
-  else {
-    console.log(`can't backup mongo because no available environment variable given!`);
-  }
-}
-const backupMongoSync = Meteor.wrapAsync(backupMongoAsync);
-
 //賽季結束工作
 export function doRoundWorks(lastRoundData, lastSeasonData) {
   debug.log('doRoundWorks', lastSeasonData);
@@ -151,7 +131,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
   console.info(new Date().toLocaleString() + ': doRoundWorks');
   resourceManager.request('doRoundWorks', ['season'], (release) => {
     //備份資料庫
-    backupMongoSync();
+    backupMongo();
     //當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     //若arenaCounter為0，則舉辦最萌亂鬥大賽

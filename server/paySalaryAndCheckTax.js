@@ -11,6 +11,7 @@ import { dbOrders } from '/db/dbOrders';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbVariables } from '/db/dbVariables';
 import { debug } from '/server/imports/utils/debug';
+import { backupMongo } from '/server/imports/utils/backupMongo';
 
 const {salaryPerPay} = Meteor.settings.public;
 export function paySalaryAndCheckTax() {
@@ -26,6 +27,7 @@ export function paySalaryAndCheckTax() {
     const thisPayTime = new Date();
     dbVariables.set('lastPayTime', thisPayTime);
     resourceManager.request('paySalaryAndCheckTax', ['season'], (release) => {
+      backupMongo();
       paySystemSalary(thisPayTime);
       paySalaryAndGenerateProfit(thisPayTime);
       checkTax(todayBeginTime);
