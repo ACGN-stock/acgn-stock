@@ -255,7 +255,7 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
   console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
     //備份資料庫
-    backupMongoSync();
+    backupMongo();
     //當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     //若arenaCounter為0，則舉辦最萌亂鬥大賽
