@@ -189,15 +189,15 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="forfeit"]'(event, templateInstance) {
+  'click [data-action="forfeitUserMoney"]'(event, templateInstance) {
     event.preventDefault();
     const accuseUserData = templateInstance.data;
     alertDialog.dialog({
       type: 'prompt',
       title: '課以罰金 - ' + accuseUserData.profile.name,
       message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
+      callback: (reason) => {
+        if (reason) {
           alertDialog.dialog({
             type: 'prompt',
             title: '課以罰金 - ' + accuseUserData.profile.name,
@@ -208,7 +208,7 @@ Template.accountInfoBasic.events({
               amount = parseInt(amount, 10);
               if (amount && amount >= 0) {
                 const userId = accuseUserData._id;
-                Meteor.customCall('forfeit', {userId, message, amount});
+                Meteor.customCall('forfeitUserMoney', { userId, reason, amount });
               }
             }
           });
@@ -216,15 +216,15 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="returnForfeit"]'(event, templateInstance) {
+  'click [data-action="returnForfeitedUserMoney"]'(event, templateInstance) {
     event.preventDefault();
     const accuseUserData = templateInstance.data;
     alertDialog.dialog({
       type: 'prompt',
       title: '退還罰金 - ' + accuseUserData.profile.name,
       message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
+      callback: (reason) => {
+        if (reason) {
           alertDialog.dialog({
             type: 'prompt',
             title: '退還罰金 - ' + accuseUserData.profile.name,
@@ -235,8 +235,7 @@ Template.accountInfoBasic.events({
               amount = parseInt(amount, 10);
               if (amount && amount > 0) {
                 const userId = accuseUserData._id;
-                amount *= -1;
-                Meteor.customCall('forfeit', {userId, message, amount});
+                Meteor.customCall('forfeitUserMoney', { userId, reason, amount: -amount });
               }
             }
           });

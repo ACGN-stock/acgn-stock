@@ -320,10 +320,14 @@ Template.displayLog.helpers({
         return `【解除禁令】${users[0]}以「${sanitizeHtml(data.reason)}」的理由中止了${users[1]}禁任經理人的處置。`;
       }
       case '課以罰款': {
-        return `【違規處理】${users[0]}以「${sanitizeHtml(data.reason)}」的理由向${users[1]}課以總數為$${currencyFormat(data.fine)}的罰金。`;
+        const target = users[1] || `「${company}」公司`;
+
+        return `【違規處理】${users[0]}以「${sanitizeHtml(data.reason)}」的理由向${target}課以總數為$${currencyFormat(data.fine)}的罰金。`;
       }
       case '退還罰款': {
-        return `【退還罰款】${users[0]}以「${sanitizeHtml(data.reason)}」的理由向${users[1]}退還總數為$${currencyFormat(data.fine)}的罰金。`;
+        const target = users[1] || `「${company}」公司`;
+
+        return `【退還罰款】${users[0]}以「${sanitizeHtml(data.reason)}」的理由向${target}退還總數為$${currencyFormat(data.fine)}的罰金。`;
       }
       case '沒收股份': {
         return `【違規處理】${users[0]}以「${sanitizeHtml(data.reason)}」的理由將${users[1]}持有的「${company}」公司股份數量${data.stocks}給沒收了。`;

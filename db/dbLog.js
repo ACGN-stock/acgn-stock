@@ -235,7 +235,7 @@ export const logTypeList = [
   '禁止廣告',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由向userId1課以總數為$data.fine的罰金。
+   * 【違規處理】userId0以「data.reason」的理由向(userId1||「companyId」公司)課以總數為$data.fine的罰金。
    */
   '課以罰款',
 
@@ -270,7 +270,7 @@ export const logTypeList = [
   '解除廣告',
 
   /**
-   * 【退還罰款】userId0以「data.reason」的理由向userId1退還總數為$data.fine的罰金。
+   * 【退還罰款】userId0以「data.reason」的理由向(userId1||「companyId」公司)退還總數為$data.fine的罰金。
    */
   '退還罰款',
 
