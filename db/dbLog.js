@@ -305,7 +305,7 @@ export const logTypeList = [
   '公司更名',
 
   /**
-   * 【產品下架】userId0以「data.reason」的理由將「companyId」公司的產品「data.productId」給下架了(，並追回了因該產品所產生的營利$data.profit)。
+   * 【產品下架】userId0以「data.reason」的理由將「companyId」公司的產品「data.productName」給下架了(，並追回了因該產品所產生的營利$data.profit)。
    */
   '產品下架',
 
