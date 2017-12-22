@@ -141,7 +141,7 @@ Template.companyEditForm.events({
 Template.bigPicturePreviewModal.helpers({
   modalClass() {
     return (previewPictureType.get() === 'pictureBig')
-      ? 'big-picture-preivew modal fade show' : 'big-picture-preivew modal fade';
+      ? 'd-block big-picture-preivew modal fade show' : 'd-block big-picture-preivew modal fade';
   }
 });
 Template.bigPicturePreviewModal.events({
