@@ -42,7 +42,7 @@ function takeDownProduct(user, {productId, message}) {
     companyId: companyId,
     data: {
       reason: message,
-      productId: productId,
+      productName: productData.productName,
       profit: voteProfit
     },
     createdAt: new Date()
