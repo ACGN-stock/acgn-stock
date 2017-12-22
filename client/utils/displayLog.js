@@ -346,7 +346,7 @@ Template.displayLog.helpers({
         return `【公司更名】${users[0]}將「${company}」公司的名稱由「${sanitizeHtml(data.oldCompanyName)}」改為「${sanitizeHtml(data.newCompanyName)}」。`;
       }
       case '產品下架': {
-        let result = `【產品下架】${users[0]}以「${sanitizeHtml(data.reason)}」的理由將「${company}」公司的產品「${productSpan(data.productId)}」給下架了`;
+        let result = `【產品下架】${users[0]}以「${sanitizeHtml(data.reason)}」的理由將「${company}」公司的產品「${sanitizeHtml(data.productName)}」給下架了`;
 
         if (data.profit) {
           result += `，並追回了因該產品所產生的營利$${currencyFormat(data.profit)}`;
