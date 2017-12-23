@@ -44,6 +44,16 @@ Template.companyDetail.onCreated(function() {
       this.subscribe('companyDetail', companyId);
     }
   });
+});
+Template.companyDetail.helpers({
+  companyData() {
+    const companyId = FlowRouter.getParam('companyId');
+
+    return dbCompanies.findOne(companyId);
+  }
+});
+
+Template.companyDetailContentNormal.onCreated(function() {
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
@@ -54,12 +64,7 @@ Template.companyDetail.onCreated(function() {
     }
   });
 });
-Template.companyDetail.helpers({
-  companyData() {
-    const companyId = FlowRouter.getParam('companyId');
-
-    return dbCompanies.findOne(companyId);
-  },
+Template.companyDetailContentNormal.helpers({
   getManageHref(companyId) {
     return FlowRouter.path('editCompany', {companyId});
   },
@@ -115,71 +120,7 @@ Template.companyDetail.helpers({
     return dbEmployees.find({companyId, userId, employed, resigned}).count() > 0;
   }
 });
-Template.companyDetail.events({
-  'click [data-action="changeCompanyName"]'(event) {
-    event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1
-      }
-    });
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '公司更名',
-      message: `請輸入新的公司名稱：`,
-      defaultValue: companyData.companyName,
-      callback: (companyName) => {
-        if (companyName) {
-          Meteor.customCall('changeCompanyName', companyId, companyName);
-        }
-      }
-    });
-  },
-  'click [data-action="seal"]'(event) {
-    event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1,
-        isSeal: 1
-      }
-    });
-    const companyName = companyData.companyName;
-    const title = (companyData.isSeal ? '解除查封 - ' : '查封關停 - ') + companyName;
-    alertDialog.dialog({
-      type: 'prompt',
-      title: title,
-      message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
-          Meteor.customCall('sealCompany', {companyId, message});
-        }
-      }
-    });
-  },
-  'click [data-action="fscAnnouncement"]'(event) {
-    event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1,
-        manager: 1
-      }
-    });
-
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '金管會通告 - 輸入通知訊息',
-      message: `請輸入要通告的訊息：`,
-      callback: (message) => {
-        if (message) {
-          const userIds = [companyData.manager];
-          Meteor.customCall('fscAnnouncement', { userIds, companyId, message });
-        }
-      }
-    });
-  },
+Template.companyDetailContentNormal.events({
   'click [data-action="accuseCompany"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
@@ -345,6 +286,158 @@ Template.companyDetail.events({
         }
       }
     });
+  },
+  'click [data-action="forfeitCompanyProfit"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId);
+
+    const dialogTitle = `課以罰金 - 「${companyData.companyName}」公司`;
+
+    alertDialog.dialog({
+      type: 'prompt',
+      title: dialogTitle,
+      message: '請輸入處理事由：',
+      callback: (reason) => {
+        if (reason) {
+          alertDialog.dialog({
+            type: 'prompt',
+            title: dialogTitle,
+            message: '請輸入罰金數額：',
+            inputType: 'number',
+            customSetting: 'min="0"',
+            callback: (amount) => {
+              amount = parseInt(amount, 10);
+              if (amount && amount >= 0) {
+                Meteor.customCall('forfeitCompanyProfit', { companyId, reason, amount });
+              }
+            }
+          });
+        }
+      }
+    });
+  },
+  'click [data-action="returnForfeitedCompanyProfit"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const { companyName } = dbCompanies.findOne(companyId);
+
+    const dialogTitle = `退還罰金 - 「${companyName}」公司`;
+
+    alertDialog.dialog({
+      type: 'prompt',
+      title: dialogTitle,
+      message: `請輸入處理事由：`,
+      callback: (reason) => {
+        if (reason) {
+          alertDialog.dialog({
+            type: 'prompt',
+            title: dialogTitle,
+            message: `請輸入退還金額：`,
+            inputType: 'number',
+            customSetting: `min="0"`,
+            callback: (amount) => {
+              amount = parseInt(amount, 10);
+              if (amount && amount > 0) {
+                Meteor.customCall('forfeitCompanyProfit', { companyId, reason, amount: -amount });
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+});
+
+Template.companyDetailContentSealed.events({
+  'click [data-action="unseal"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1,
+        isSeal: 1
+      }
+    });
+    const companyName = companyData.companyName;
+    const title = '解除查封 - ' + companyName;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: title,
+      message: `請輸入處理事由：`,
+      callback: (message) => {
+        if (message) {
+          Meteor.customCall('sealCompany', {companyId, message});
+        }
+      }
+    });
+  }
+});
+
+Template.companyDetailAdminPanel.events({
+  'click [data-action="changeCompanyName"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1
+      }
+    });
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '公司更名',
+      message: `請輸入新的公司名稱：`,
+      defaultValue: companyData.companyName,
+      callback: (companyName) => {
+        if (companyName) {
+          Meteor.customCall('changeCompanyName', companyId, companyName);
+        }
+      }
+    });
+  },
+  'click [data-action="seal"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1,
+        isSeal: 1
+      }
+    });
+    const companyName = companyData.companyName;
+    const title = (companyData.isSeal ? '解除查封 - ' : '查封關停 - ') + companyName;
+    alertDialog.dialog({
+      type: 'prompt',
+      title: title,
+      message: `請輸入處理事由：`,
+      callback: (message) => {
+        if (message) {
+          Meteor.customCall('sealCompany', {companyId, message});
+        }
+      }
+    });
+  },
+  'click [data-action="fscAnnouncement"]'(event) {
+    event.preventDefault();
+    const companyId = FlowRouter.getParam('companyId');
+    const companyData = dbCompanies.findOne(companyId, {
+      fields: {
+        companyName: 1,
+        manager: 1
+      }
+    });
+
+    alertDialog.dialog({
+      type: 'prompt',
+      title: '金管會通告 - 輸入通知訊息',
+      message: `請輸入要通告的訊息：`,
+      callback: (message) => {
+        if (message) {
+          const userIds = [companyData.manager];
+          Meteor.customCall('fscAnnouncement', { userIds, companyId, message });
+        }
+      }
+    });
   }
 });
 
@@ -501,6 +594,13 @@ function drawLineChart(templateInstance) {
                 callback: function(value) {
                   return '$' + Math.round(value).toLocaleString();
                 }
+              },
+              afterBuildTicks(axis) {
+                axis.ticks = _.uniq(
+                  axis.ticks.map((n) => {
+                    return Math.round(n);
+                  })
+                );
               }
             }
           ]
@@ -606,6 +706,7 @@ function drawCandleStickChart(templateInstance) {
 
     grid.call(d3.axisLeft().scale(y)
       .tickSize(-width)
+      .ticks(yTickValues.length)
       .tickFormat(''));
 
     svg.selectAll('g.candlestick').datum(data)

@@ -38,6 +38,7 @@ import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
 import { debug } from '/server/imports/utils/debug';
+import { backupMongo } from '/server/imports/utils/backupMongo';
 
 //週期檢查工作內容
 export function doIntervalWork() {
@@ -129,6 +130,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
   }
   console.info(new Date().toLocaleString() + ': doRoundWorks');
   resourceManager.request('doRoundWorks', ['season'], (release) => {
+    //備份資料庫
+    backupMongo();
     //當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     //若arenaCounter為0，則舉辦最萌亂鬥大賽
@@ -251,6 +254,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
   }
   console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
+    //備份資料庫
+    backupMongo();
     //當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     //若arenaCounter為0，則舉辦最萌亂鬥大賽
