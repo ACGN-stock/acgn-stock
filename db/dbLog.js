@@ -128,8 +128,8 @@ export const logTypeList = [
   '支持紀錄',
 
   /**
-   * 【就任經理】userId0在data.seasonName商業季度(以data.stocks數量的支持股份)擊敗了所有競爭對手，
-   *   (成為了公司的經理人。 || 繼續擔任「companyId」公司的經理人職務。 || 取代了userId1成為了「companyId」公司的經理人。)
+   * 【就任經理】userId0在data.seasonName商業季度以data.stocks數量的支持股份勝出，
+   *   (成為了「companyId」公司的經理人。 || 繼續擔任「companyId」公司的經理人職務。 || 取代了userId1成為了「companyId」公司的經理人。)
    */
   '就任經理',
 
