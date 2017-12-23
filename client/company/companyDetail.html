@@ -1,176 +1,180 @@
 <template name="companyDetail">
   <div class="card">
+    <div class="card-block">
     {{#with companyData}}
-      {{#if companyData.isSeal}}
-        <div class="card-block">
-          該公司已被金融管理委員會查封！
-          {{#if currentUser.profile.isAdmin}}
-            <a class="btn btn-danger float-right" href="#" data-action="seal">
-              解除查封
-            </a>
-          {{/if}}
-          {{#if currentUser}}
-            {{#if isFavorite this._id}}
-              <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
-                移除最愛
-              </a>
-            {{/if}}
-          {{/if}}
-          <div class="row border-grid-body" style="margin-top: 30px;">
-            {{> companyLogList}}
-          </div>
-        </div>
+      {{#if this.isSeal}}
+        {{> companyDetailContentSealed}}
       {{else}}
-        <div class="card-block">
-          <h1 class="card-title text-truncate">
-            {{this.companyName}}
-            {{#if currentUser}}
-              {{#if currentUser.profile.isAdmin}}
-                <a class="btn btn-danger float-right" href="#" data-action="seal">
-                  查封關停
-                </a>
-                {{#if this.illegalReason}}
-                  <a class="btn btn-danger float-right" href="#" data-action="unmarkCompanyIllegal">
-                    解除違規標記
-                  </a>
-                {{else}}
-                  <a class="btn btn-danger float-right" href="#" data-action="markCompanyIllegal">
-                    標記違規
-                  </a>
-                {{/if}}
-                <a class="btn btn-warning float-right" href="#" data-action="changeCompanyName">
-                  更名
-                </a>
-                <a class="btn btn-info float-right" href="#" data-action="fscAnnouncement">
-                  金管會通告
-                </a>
-              {{else}}
-                <a class="btn btn-danger float-right" href="#" data-action="accuseCompany">
-                  舉報違規
-                </a>
-              {{/if}}
-              <a class="btn btn-primary float-right" href="#" data-toggle-employ="{{this._id}}">
-                {{#if isEmployee}}
-                  取消員工報名
-                {{else}}
-                  員工報名
-                {{/if}}
-              </a>
-              {{#if isFavorite this._id}}
-                <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
-                  移除最愛
-                </a>
-              {{else}}
-                <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
-                  加入最愛
-                </a>
-              {{/if}}
-            {{/if}}
-          </h1>
-          {{#if this.illegalReason}}
-            <div class="mb-1 text-danger">
-              <i class="fa fa-warning"></i>
-              本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
-            </div>
-          {{/if}}
-          {{#if showAllTags this.tags}}
-            {{#each tag in this.tags}}
-              <span class="badge badge-default">{{tag}}</span>
-            {{/each}}
-          {{else}}
-            {{#each tag in firstFewTags this.tags}}
-              <span class="badge badge-default">{{tag}}</span>
-            {{/each}}
-            <span class="badge badge-primary" style="cursor: pointer;" data-action="showAllTags">顯示全部標籤</span>
-          {{/if}}
-          <hr />
-          <h2 class="card-subtitle mb-2 text-muted">
-            {{this.chairmanTitle}}：
-            {{>userLink this.chairman}}
-            {{#if isChairman this._id}}
-              <a class="btn btn-primary btn-sm" href="#" data-action="changeChairmanTitle">
-                修改頭銜
-              </a>
-            {{/if}}
-          </h2>
-          <h3>
-            經理人：
-            {{>userLink this.manager}}
-            {{#if isUserId this.manager}}
-              <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
-                經營管理
-              </a>
-              {{#if canUpdateSalary}}
-                <a class="btn btn-primary btn-sm" href="#" data-action="updateSalary">
-                  設定薪資
-                </a>
-              {{else}}
-                <a class="btn btn-primary btn-sm disabled" href="#">
-                  設定薪資
-                </a>
-              {{/if}}
-              {{#if canUpdateSeasonalBonus}}
-                <a class="btn btn-primary btn-sm" href="#" data-action="updateSeasonalBonus">
-                  設定分紅
-                </a>
-              {{else}}
-                <a class="btn btn-primary btn-sm disabled" href="#">
-                  設定分紅
-                </a>
-              {{/if}}
-              <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
-                辭去職務
-              </a>
-            {{else}}
-              {{#if currentUser}}
-                {{#if currentUser.profile.isAdmin}}
-                  <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
-                    經營管理
-                  </a>
-                {{/if}}
-              {{/if}}
-            {{/if}}
-          </h3>
-          <hr />
-          <div class="row">
-            <div class="col-12 col-md-6">
-              <div class="text-success this-season-salary" title="{{companyData.salary}}">
-              本季度員工薪資：${{currencyFormat companyData.salary}}
-              </div>
-            </div>
-            <div class="col-12 col-md-6">
-              <div class="text-success next-season-salary" title="{{companyData.nextSeasonSalary}}">
-                下季度員工薪資：${{currencyFormat companyData.nextSeasonSalary}}
-                {{#if canUpdateSalary}}
-                  <span class="badge badge-pill badge-warning">暫定</span>
-                {{/if}}
-              </div>
-            </div>
-            <div class="col-12 col-md-6">
-              <div class="text-success this-season-bonus" title="{{companyData.seasonalBonusPercent}}">
-                本季度員工分紅：{{companyData.seasonalBonusPercent}}%
-                {{#if canUpdateSeasonalBonus}}
-                  <span class="badge badge-pill badge-warning">暫定</span>
-                {{/if}}
-              </div>
-            </div>
-            <div class="col-12 col-md-6">
-              {{#if haveNextSeasonProduct}}
-                <div class="text-success">下季度待上架產品：有</div>
-              {{else}}
-                <div class="text-danger">下季度待上架產品：無</div>
-              {{/if}}
-            </div>
-          </div>
-          <hr />
-          {{> companyDetailTable}}
-        </div>
+        {{> companyDetailContentNormal}}
       {{/if}}
     {{else}}
-      <div class="card-block">
-        Loading...
-      </div>
+      Loading...
     {{/with}}
+    </div>
+  </div>
+</template>
+
+<template name="companyDetailContentSealed">
+  該公司已被金融管理委員會查封！
+  {{#if currentUser.profile.isAdmin}}
+    <a class="btn btn-danger float-right" href="#" data-action="unseal">
+      解除查封
+    </a>
+  {{/if}}
+  {{#if currentUser}}
+    {{#if isFavorite this._id}}
+      <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
+        移除最愛
+      </a>
+    {{/if}}
+  {{/if}}
+  <div class="row border-grid-body" style="margin-top: 30px;">
+    {{> companyLogList}}
+  </div>
+</template>
+
+<template name="companyDetailContentNormal">
+  <h1 class="card-title text-truncate">
+    {{this.companyName}}
+    {{#if currentUser}}
+      {{#unless currentUser.profile.isAdmin}}
+        <a class="btn btn-sm btn-danger float-right" href="#" data-action="accuseCompany">
+          舉報違規
+        </a>
+      {{/unless}}
+      <a class="btn btn-primary float-right" href="#" data-toggle-employ="{{this._id}}">
+        {{#if isEmployee}}
+          取消員工報名
+        {{else}}
+          員工報名
+        {{/if}}
+      </a>
+      {{#if isFavorite this._id}}
+        <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
+          移除最愛
+        </a>
+      {{else}}
+        <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
+          加入最愛
+        </a>
+      {{/if}}
+    {{/if}}
+  </h1>
+  {{#if this.illegalReason}}
+    <div class="mb-1 text-danger">
+      <i class="fa fa-warning"></i>
+      本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
+    </div>
+  {{/if}}
+  {{#if showAllTags this.tags}}
+    {{#each tag in this.tags}}
+      <span class="badge badge-default">{{tag}}</span>
+    {{/each}}
+  {{else}}
+    {{#each tag in firstFewTags this.tags}}
+      <span class="badge badge-default">{{tag}}</span>
+    {{/each}}
+    <span class="badge badge-primary" style="cursor: pointer;" data-action="showAllTags">顯示全部標籤</span>
+  {{/if}}
+  <hr />
+  <h2 class="card-subtitle mb-2 text-muted">
+    {{this.chairmanTitle}}：
+    {{>userLink this.chairman}}
+    {{#if isChairman this._id}}
+      <a class="btn btn-primary btn-sm" href="#" data-action="changeChairmanTitle">
+        修改頭銜
+      </a>
+    {{/if}}
+  </h2>
+  <h3>
+    經理人：
+    {{>userLink this.manager}}
+    {{#if isUserId this.manager}}
+      <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
+        經營管理
+      </a>
+      {{#if canUpdateSalary}}
+        <a class="btn btn-primary btn-sm" href="#" data-action="updateSalary">
+          設定薪資
+        </a>
+      {{else}}
+        <a class="btn btn-primary btn-sm disabled" href="#">
+          設定薪資
+        </a>
+      {{/if}}
+      {{#if canUpdateSeasonalBonus}}
+        <a class="btn btn-primary btn-sm" href="#" data-action="updateSeasonalBonus">
+          設定分紅
+        </a>
+      {{else}}
+        <a class="btn btn-primary btn-sm disabled" href="#">
+          設定分紅
+        </a>
+      {{/if}}
+      <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">
+        辭去職務
+      </a>
+    {{else}}
+      {{#if currentUser}}
+        {{#if currentUser.profile.isAdmin}}
+          <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
+            經營管理
+          </a>
+        {{/if}}
+      {{/if}}
+    {{/if}}
+  </h3>
+  <hr />
+  {{#if currentUser.profile.isAdmin}}
+    {{> companyDetailAdminPanel}}
+    <hr/>
+  {{/if}}
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="text-success this-season-salary" title="{{this.salary}}">
+      本季度員工薪資：${{currencyFormat this.salary}}
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="text-success next-season-salary" title="{{this.nextSeasonSalary}}">
+        下季度員工薪資：${{currencyFormat this.nextSeasonSalary}}
+        {{#if canUpdateSalary}}
+          <span class="badge badge-pill badge-warning">暫定</span>
+        {{/if}}
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="text-success this-season-bonus" title="{{this.seasonalBonusPercent}}">
+        本季度員工分紅：{{this.seasonalBonusPercent}}%
+        {{#if canUpdateSeasonalBonus}}
+          <span class="badge badge-pill badge-warning">暫定</span>
+        {{/if}}
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      {{#if haveNextSeasonProduct}}
+        <div class="text-success">下季度待上架產品：有</div>
+      {{else}}
+        <div class="text-danger">下季度待上架產品：無</div>
+      {{/if}}
+    </div>
+  </div>
+  <hr />
+  {{> companyDetailTable}}
+</template>
+
+<template name="companyDetailAdminPanel">
+  <div class="d-flex">
+    <a class="btn btn-sm btn-info" href="#" data-action="fscAnnouncement">金管會通告</a>
+    {{#if this.illegalReason}}
+      <a class="btn btn-sm btn-warning" href="#" data-action="unmarkCompanyIllegal">解除違規標記</a>
+    {{else}}
+      <a class="btn btn-sm btn-warning" href="#" data-action="markCompanyIllegal">標記違規</a>
+    {{/if}}
+    <a class="btn btn-sm btn-warning" href="#" data-action="changeCompanyName">更名</a>
+    <a class="btn btn-sm btn-warning" href="#" data-action="forfeitCompanyProfit">課以罰金</a>
+    <a class="btn btn-sm btn-warning" href="#" data-action="returnForfeitedCompanyProfit">退還罰金</a>
+    <a class="btn btn-sm btn-danger" href="#" data-action="seal">查封關停</a>
   </div>
 </template>
 
@@ -690,12 +694,12 @@
       <div>報名截止時間為：{{formatDateText currentArenaData.joinEndDate}}</div>
       {{#if this.joinData}}
         <div>
-          {{companyData.companyName}}已經報名參加這一屆的最萌亂鬥大賽。
+          {{this.companyName}}已經報名參加這一屆的最萌亂鬥大賽。
         </div>
       {{else}}
         <div>
-          {{companyData.companyName}}並沒有參加這一屆的最萌亂鬥大賽！
-          {{#if isUserId companyData.manager}}
+          {{this.companyName}}並沒有參加這一屆的最萌亂鬥大賽！
+          {{#if isUserId this.manager}}
             {{#if inCanJoinTime}}
               <button class="btn btn-primary btn-sm" type="button" data-action="joinArena">
                 報名參賽
