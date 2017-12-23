@@ -196,13 +196,13 @@
 <template name="companyTitleTab">
   <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item">
-      <a class="{{getClass 'chairman'}}" href="" data-type="chairman">董事長</a>
+      <a class="{{getClass 'chairman'}}" href="#" data-type="chairman">董事長</a>
     </li>
     <li class="nav-item">
-      <a class="{{getClass 'manager'}}" href="" data-type="manager">經理人</a>
+      <a class="{{getClass 'manager'}}" href="#" data-type="manager">經理人</a>
     </li>
     <li class="nav-item">
-      <a class="{{getClass 'employee'}}" href="" data-type="employee">員工</a>
+      <a class="{{getClass 'employee'}}" href="#" data-type="employee">員工</a>
     </li>
   </ul>
 </template>
@@ -211,9 +211,9 @@
   {{#each titleList}}
     <div class="text-primary d-flex flex-nowrap">
       <div class="text-nowrap">是「</div>
-      <div class="d-inline-block text-truncate" style="min-width: 1rem;">{{>companyLink this._id}}</div>
+      <div class="d-inline-block text-truncate" style="min-width: 3rem;">{{>companyLink this._id}}</div>
       <div class="text-nowrap">」公司的「</div>
-      <div class="d-inline-block text-truncate" style="min-width: 1rem;">
+      <div class="d-inline-block text-truncate" style="min-width: 3rem;">
         <a href="#" data-action="changeChairmanTitle">
           {{this.chairmanTitle}}
         </a>

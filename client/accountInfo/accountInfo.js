@@ -302,6 +302,7 @@ Template.companyTitleTab.helpers({
 });
 Template.companyTitleTab.events({
   'click [data-type]'(event) {
+    event.preventDefault();
     const $target = $(event.currentTarget);
     companyTitleView.set($target.data('type'));
   }

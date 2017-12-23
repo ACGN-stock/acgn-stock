@@ -2,6 +2,7 @@
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { alertDialog } from '../layout/alertDialog';
 
 Template.userLink.onRendered(function() {
   let userId = this.data;
@@ -104,15 +105,42 @@ Template.productLink.onRendered(function() {
         id: productId
       },
       dataType: 'json',
-      success: ({ productName, url }) => {
+      success: ({ productName, url, type }) => {
         $link
           .attr('href', url)
           .attr('title', productName || '???')
+          .data('producttype', type)
           .text(productName || '???');
       },
       error: () => {
         $link.text('???');
       }
     });
+  }
+});
+
+Template.productLink.events({
+  'click a'(event) {
+    const productType = $(event.currentTarget).data('producttype');
+    const targetLink = $(event.currentTarget).attr('href');
+
+    if (productType === '裏物') {
+      event.preventDefault();
+      const message = `
+        <div class="text-warning">
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+          欲開啟之產品，可能有未成年不適宜內容，請問是否繼續？
+        </div>
+      `;
+
+      alertDialog.confirm({
+        message: message,
+        callback: (result) => {
+          if (result) {
+            window.open(targetLink, '_blank');
+          }
+        }
+      });
+    }
   }
 });

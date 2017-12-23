@@ -28,56 +28,68 @@
       </a>
     {{/if}}
   {{/if}}
-  <div class="row border-grid-body" style="margin-top: 30px;">
+  <div class="row border-grid-body mt-5">
     {{> companyLogList}}
   </div>
 </template>
 
 <template name="companyDetailContentNormal">
-  <h1 class="card-title text-truncate">
-    {{this.companyName}}
-    {{#if currentUser}}
-      {{#unless currentUser.profile.isAdmin}}
-        <a class="btn btn-sm btn-danger float-right" href="#" data-action="accuseCompany">
-          舉報違規
+  <h1 class="d-flex flex-wrap justify-content-start">
+    <div class="text-truncate" title="{{this.companyName}}">
+      {{this.companyName}}
+    </div>
+    <div class="d-flex flex-wrap justify-content-end ml-auto mt-1">
+      {{#if currentUser}}
+        {{#unless currentUser.profile.isAdmin}}
+          <a class="btn btn-danger" href="#" data-action="accuseCompany">
+            舉報違規
+          </a>
+        {{/unless}}
+        <a class="btn btn-primary" href="#" data-toggle-employ="{{this._id}}">
+          {{#if isEmployee}}
+            取消員工報名
+          {{else}}
+            員工報名
+          {{/if}}
         </a>
-      {{/unless}}
-      <a class="btn btn-primary float-right" href="#" data-toggle-employ="{{this._id}}">
-        {{#if isEmployee}}
-          取消員工報名
-        {{else}}
-          員工報名
-        {{/if}}
-      </a>
-      {{#if isFavorite this._id}}
-        <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
-          移除最愛
-        </a>
-      {{else}}
-        <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
-          加入最愛
+        <a class="btn btn-primary" href="#" data-action="toggleFavorite" data-toggle-favorite="{{this._id}}">
+          {{#if isFavorite this._id}}
+            移除最愛
+          {{else}}
+            加入最愛
+          {{/if}}
         </a>
       {{/if}}
-    {{/if}}
+    </div>
   </h1>
   {{#if this.illegalReason}}
-    <div class="mb-1 text-danger">
+    <div class="mb-1 bg-danger text-white">
       <i class="fa fa-warning"></i>
       本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
     </div>
   {{/if}}
-  {{#if showAllTags this.tags}}
-    {{#each tag in this.tags}}
-      <span class="badge badge-default">{{tag}}</span>
-    {{/each}}
-  {{else}}
-    {{#each tag in firstFewTags this.tags}}
-      <span class="badge badge-default">{{tag}}</span>
-    {{/each}}
-    <span class="badge badge-primary" style="cursor: pointer;" data-action="showAllTags">顯示全部標籤</span>
-  {{/if}}
+  <div class="col p-0">
+    {{#if showAllTags this.tags}}
+      {{#each tag in this.tags}}
+        <span class="badge badge-default d-inline-flex flex-nowrap" style="max-width: inherit;">
+          <div class="d-inline-block text-truncate">{{tag}}</div>
+        </span>
+      {{/each}}
+    {{else}}
+      {{#each tag in firstFewTags this.tags}}
+        <span class="badge badge-default d-inline-flex flex-nowrap" style="max-width: inherit;">
+          <div class="d-inline-block text-truncate">{{tag}}</div>
+        </span>
+      {{/each}}
+      <span class="badge badge-primary text-nowrap"
+        style="cursor: pointer;"
+        data-action="showAllTags">
+        顯示全部標籤
+      </span>
+    {{/if}}
+  </div>
   <hr />
-  <h2 class="card-subtitle mb-2 text-muted">
+  <h2 class="card-subtitle mb-2 text-muted" style="word-break: break-all;">
     {{this.chairmanTitle}}：
     {{>userLink this.chairman}}
     {{#if isChairman this._id}}
@@ -86,7 +98,7 @@
       </a>
     {{/if}}
   </h2>
-  <h3>
+  <h3 style="word-break: break-all;">
     經理人：
     {{>userLink this.manager}}
     {{#if isUserId this.manager}}
@@ -130,12 +142,12 @@
     <hr/>
   {{/if}}
   <div class="row">
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-sm-6">
       <div class="text-success this-season-salary" title="{{this.salary}}">
       本季度員工薪資：${{currencyFormat this.salary}}
       </div>
     </div>
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-sm-6">
       <div class="text-success next-season-salary" title="{{this.nextSeasonSalary}}">
         下季度員工薪資：${{currencyFormat this.nextSeasonSalary}}
         {{#if canUpdateSalary}}
@@ -143,7 +155,7 @@
         {{/if}}
       </div>
     </div>
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-sm-6">
       <div class="text-success this-season-bonus" title="{{this.seasonalBonusPercent}}">
         本季度員工分紅：{{this.seasonalBonusPercent}}%
         {{#if canUpdateSeasonalBonus}}
@@ -151,7 +163,7 @@
         {{/if}}
       </div>
     </div>
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-sm-6">
       {{#if haveNextSeasonProduct}}
         <div class="text-success">下季度待上架產品：有</div>
       {{else}}
@@ -164,17 +176,17 @@
 </template>
 
 <template name="companyDetailAdminPanel">
-  <div class="d-flex">
-    <a class="btn btn-sm btn-info" href="#" data-action="fscAnnouncement">金管會通告</a>
+  <div class="d-flex flex-wrap">
+    <a class="btn btn-sm btn-info mt-1" href="#" data-action="fscAnnouncement">金管會通告</a>
     {{#if this.illegalReason}}
-      <a class="btn btn-sm btn-warning" href="#" data-action="unmarkCompanyIllegal">解除違規標記</a>
+      <a class="btn btn-sm btn-warning mt-1" href="#" data-action="unmarkCompanyIllegal">解除違規標記</a>
     {{else}}
-      <a class="btn btn-sm btn-warning" href="#" data-action="markCompanyIllegal">標記違規</a>
+      <a class="btn btn-sm btn-warning mt-1" href="#" data-action="markCompanyIllegal">標記違規</a>
     {{/if}}
-    <a class="btn btn-sm btn-warning" href="#" data-action="changeCompanyName">更名</a>
-    <a class="btn btn-sm btn-warning" href="#" data-action="forfeitCompanyProfit">課以罰金</a>
-    <a class="btn btn-sm btn-warning" href="#" data-action="returnForfeitedCompanyProfit">退還罰金</a>
-    <a class="btn btn-sm btn-danger" href="#" data-action="seal">查封關停</a>
+    <a class="btn btn-sm btn-warning mt-1" href="#" data-action="changeCompanyName">更名</a>
+    <a class="btn btn-sm btn-warning mt-1" href="#" data-action="forfeitCompanyProfit">課以罰金</a>
+    <a class="btn btn-sm btn-warning mt-1" href="#" data-action="returnForfeitedCompanyProfit">退還罰金</a>
+    <a class="btn btn-sm btn-danger mt-1" href="#" data-action="seal">查封關停</a>
   </div>
 </template>
 
@@ -188,12 +200,12 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
         {{/if}}
       </div>
-      <div class="media-body hidden-sm-down company-description"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="media-body d-none d-md-block company-description"><h4>角色簡介</h4>{{this.description}}</div>
     </div>
     <div class="row border-grid-body" style="margin-top: 15px;">
-      <div class="col-12 border-grid hidden-md-up company-description"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="col-12 border-grid d-block d-md-none company-description"><h4>角色簡介</h4>{{this.description}}</div>
       <div class="col-12 border-grid stock-price-history">
-        <a class="d-block h4" href="#" data-toggle-panel="chart">
+        <a class="d-block h4 my-1" href="#" data-toggle-panel="chart">
           股價趨勢
           {{#if isDisplayPanel 'chart'}}
             <i class="fa fa-folder-open" aria-hidden="true"></i>
@@ -208,7 +220,7 @@
         </div>
       {{/if}}
       <div class="col-12 border-grid company-statistic">
-        <a class="d-block h4" href="#" data-toggle-panel="numbers">
+        <a class="d-block h4 my-1" href="#" data-toggle-panel="numbers">
           數據資訊
           {{#if isDisplayPanel 'numbers'}}
             <i class="fa fa-folder-open" aria-hidden="true"></i>
@@ -273,7 +285,7 @@
         </div>
       {{/if}}
       <div class="col-12 border-grid">
-        <a class="d-block h4" href="#" data-toggle-panel="order">
+        <a class="d-block h4 my-1" href="#" data-toggle-panel="order">
           交易訂單
           {{#if isDisplayPanel 'order'}}
             <i class="fa fa-folder-open" aria-hidden="true"></i>
@@ -287,7 +299,7 @@
         {{> companySellOrderList}}
       {{/if}}
       <div class="col-12 border-grid">
-        <a class="d-block h4" href="#" data-toggle-panel="product">
+        <a class="d-block h4 my-1" href="#" data-toggle-panel="product">
           產品中心
           {{#if isDisplayPanel 'product'}}
             <i class="fa fa-folder-open" aria-hidden="true"></i>
@@ -301,7 +313,7 @@
         {{> companyAllPrudctList}}
       {{/if}}
       <div class="col-12 border-grid">
-        <a class="d-block h4" href="#" data-toggle-panel="director">
+        <a class="d-block h4 my-1" href="#" data-toggle-panel="director">
           董事會
           {{#if isDisplayPanel 'director'}}
             <i class="fa fa-folder-open" aria-hidden="true"></i>
@@ -315,7 +327,7 @@
         {{> companyElectInfo}}
       {{/if}}
       <div class="col-12 border-grid">
-        <a class="d-block h4" href="#" data-toggle-panel="employee">
+        <a class="d-block h4 my-1" href="#" data-toggle-panel="employee">
           員工名冊
           {{#if isDisplayPanel 'employee'}}
             <i class="fa fa-folder-open" aria-hidden="true"></i>
@@ -328,7 +340,7 @@
         {{> companyEmployeeList}}
       {{/if}}
       <div class="col-12 border-grid">
-        <a class="d-block h4" href="#" data-toggle-panel="arena">
+        <a class="d-block h4 my-1" href="#" data-toggle-panel="arena">
           最萌亂鬥大賽
           {{#if isDisplayPanel 'arena'}}
             <i class="fa fa-folder-open" aria-hidden="true"></i>
@@ -341,7 +353,7 @@
         {{> companyArenaInfo}}
       {{/if}}
       <div class="col-12 border-grid">
-        <a class="d-block h4" href="#" data-toggle-panel="log">
+        <a class="d-block h4 my-1" href="#" data-toggle-panel="log">
           所有紀錄
           {{#if isDisplayPanel 'log'}}
             <i class="fa fa-folder-open" aria-hidden="true"></i>
@@ -358,10 +370,24 @@
 </template>
 
 <template name="companyChart">
-  <div class="row" style="padding-top: 10px;">
-    <div class="col chart" style="overflow: hidden;"></div>
-    <div class="col" style="max-width: 80px;">
-      <div class="btn-group-vertical d-flex" role="group">
+  <div class="row pt-1">
+    <div class="col px-1" style="overflow-x: auto; overflow-y: hidden;">
+      <div class="chart" style="height: 300px; min-width: 425px; ">
+        
+      </div>
+    </div>
+    <div class="col d-none d-sm-flex" style="max-width: 80px;">
+      <div class="btn-group-vertical d-flex company-chart-btn-group" role="group">
+        <button type="button" class="btn btn-secondary btn-sm active" data-chart-type="trend">走勢</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="day">日K</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="12hr">12時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="4hr">4時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="60min">60分</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="30min">30分</button>
+      </div>
+    </div>
+    <div class="col-12 d-sm-none px-0 my-1">
+      <div class="btn-group d-flex justify-content-end company-chart-btn-group" role="group">
         <button type="button" class="btn btn-secondary btn-sm active" data-chart-type="trend">走勢</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="day">日K</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="12hr">12時</button>
@@ -379,7 +405,7 @@
 
 <template name="companyBuyOrderList">
   <div class="col-12 col-md-6 border-grid">
-    <h4>
+    <h4 class="my-1">
       市場買單
       {{#if currentUser}}
         <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">
@@ -388,18 +414,22 @@
       {{/if}}
     </h4>
     {{#each order in myOrderList}}
-      <div>
-        {{>userLink order.userId}}
-        以${{currencyFormat order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
-        <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
-          取消訂單
-        </button>
+      <div class="d-flex flex-nowrap">
+        <div class="d-inline-block text-truncate" style="min-width: 2rem">{{>userLink order.userId}}</div>
+        <div class="text-nowrap">
+          以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
+          <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
     {{/each}}
     {{#each order in orderList}}
-      <div>
-        {{>userLink order.userId}}
-        以${{currencyFormat order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
+      <div class="d-flex flex-nowrap">
+        <div class="d-inline-block text-truncate" style="min-width: 3rem">{{>userLink order.userId}}</div>
+        <div class="text-nowrap">
+          以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
+        </div>
       </div>
     {{/each}}
     {{#with paginationData}}
@@ -410,7 +440,7 @@
 
 <template name="companySellOrderList">
   <div class="col-12 col-md-6 border-grid">
-    <h4>
+    <h4 class="my-1">
       市場賣單
       {{#if getStockAmount this._id}}
         <button class="btn btn-info btn-sm" type="button" data-action="createSellOrder">
@@ -419,18 +449,22 @@
       {{/if}}
     </h4>
     {{#each order in myOrderList}}
-      <div>
-        {{>userLink order.userId}}
-        以${{currencyFormat order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
-        <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
-          取消訂單
-        </button>
+      <div class="d-flex flex-nowrap">
+        <div class="d-inline-block text-truncate" style="min-width: 2rem">{{>userLink order.userId}}</div>
+        <div class="text-nowrap">
+          以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
+          <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
     {{/each}}
     {{#each order in orderList}}
-      <div>
-        {{>userLink order.userId}}
-        以${{currencyFormat order.unitPrice}}單價{{order.orderType}}數量{{minus order.amount order.done}}。
+      <div class="d-flex flex-nowrap">
+        <div class="d-inline-block text-truncate" style="min-width: 2rem">{{>userLink order.userId}}</div>
+        <div class="text-nowrap">
+          以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
+        </div>
       </div>
     {{/each}}
     {{#with paginationData}}
@@ -441,20 +475,21 @@
 
 <template name="companyCurrentProductList">
   <div class="col-12 col-md-6 border-grid">
-    <h4>
+    <h4 class="my-1">
       當季產品
     </h4>
     <div class="row mb-1">
-      <div class="col-9 text-center">產品名稱</div>
-      <div class="col-3 text-center">投票</div>
+      <div class="col-8 col-sm-9 text-center">產品名稱</div>
+      <div class="col-4 col-sm-3 text-center">投票</div>
     </div>
+    <div class="row" style="max-height: 290px; overflow-y: auto;">
     {{#each product in productList}}
-      <div class="row mb-1 align-items-center">
-        <div class="col-9">
+      <div class="d-flex mb-1 align-items-center" style="width: 100%;">
+        <div class="col-8 col-sm-9">
           <div class="text-truncate">{{>productLink product._id}}</div>
           <div class="small text-truncate" title="{{product.description}}">{{product.description}}</div>
         </div>
-        <div class="col-3 text-center">
+        <div class="col-4 col-sm-3 text-center">
           <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
             {{product.votes}}
             <i class="fa fa-money" aria-hidden="true"></i>
@@ -462,29 +497,31 @@
         </div>
       </div>
     {{else}}
-      <div class="text-center">
+      <div class="mx-auto">
         沒有任何產品！
       </div>
     {{/each}}
+    </div>
   </div>
 </template>
 
 <template name="companyAllPrudctList">
   <div class="col-12 col-md-6 border-grid">
-    <h4>
+    <h4 class="my-1">
       暢銷產品排行
     </h4>
     <div class="row mb-1">
-      <div class="col-9 text-center">產品名稱</div>
-      <div class="col-3 text-center">投票</div>
+      <div class="col-8 col-sm-9 text-center">產品名稱</div>
+      <div class="col-4 col-sm-3 text-center">投票</div>
     </div>
+    <div class="row" style="max-height: 290px; overflow-y: auto;">
     {{#each product in productList}}
-      <div class="row mb-1 align-items-center">
-        <div class="col-9">
+      <div class="d-flex mb-1 align-items-center" style="width: 100%;">
+        <div class="col-8 col-sm-9">
           <div class="text-truncate">{{>productLink product._id}}</div>
           <div class="small text-truncate">{{product.description}}</div>
         </div>
-        <div class="col-3 text-center">
+        <div class="col-4 col-sm-3 text-center">
           <button class="btn btn-primary btn-sm" type="button" data-like-product="{{product._id}}">
             {{product.likeCount}}
             <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
@@ -492,10 +529,11 @@
         </div>
       </div>
     {{else}}
-      <div class="text-center">
+      <div class="mx-auto">
         沒有任何產品！
       </div>
     {{/each}}
+    </div>
     <a class="h6 text-info float-right" href="{{productCenterHref}}">
       更多...
     </a>
@@ -503,28 +541,34 @@
 </template>
 
 <template name="companyDirectorList">
-  <div class="col-12 border-grid">
+  <div class="col-12 border-grid company-director-list">
     <div class="row mb-1">
-      <div class="col-md-3 col-4 text-center text-nowrap">使用者帳號</div>
-      <div class="col-md-1 col-3 text-center text-nowrap">股份數</div>
-      <div class="col-md-1 col-3 text-center text-nowrap">比例</div>
-      <div class="col-md-7 col-12 text-center text-nowrap">留言</div>
+      <div class="col-md-3 text-center text-nowrap d-none d-md-block">使用者帳號</div>
+      <div class="col-md-1 text-center text-nowrap d-none d-md-block">股份數</div>
+      <div class="col-md-1 text-center text-nowrap d-none d-md-block">比例</div>
+      <div class="col-md-7 text-center text-nowrap d-none d-md-block">留言</div>
     </div>
     {{#each director in directorList}}
-      <div class="row mb-1">
-        <div class="col-md-3 col-4 text-truncate">
+      <div class="row mb-1 data-row">
+        <div class="hidden-title d-block d-md-none">使用者帳號</div>
+        <div class="col-md-3 text-truncate data-content">
           {{#if isDirectorInVacation director.userId}}
             <small><span class="badge badge-info">渡假中</span></small>
           {{/if}}
           {{>userLink director.userId}}
         </div>
-        <div class="col-md-1 col-3 text-right" title="{{director.stocks}}">
+        <div class="hidden-title d-block d-md-none">股份數</div>
+        <div class="col-md-1 text-right data-content" title="{{director.stocks}}">
           {{director.stocks}}
         </div>
-        <div class="col-md-1 col-3 text-right" title="{{getPercentage director.stocks}}%">
+        <div class="hidden-title d-block d-md-none">比例</div>
+        <div class="col-md-1 text-right data-content" title="{{getPercentage director.stocks}}%">
           {{getPercentage director.stocks}}%
         </div>
-        <div class="col-md-7 col-12 text-left" title="{{getMessage director.message}}">
+        <div class="hidden-title d-block d-md-none">留言</div>
+        <div class="col-md-7 text-left data-content"
+          style="word-break: break-all;"
+          title="{{getMessage director.message}}">
           {{getMessage director.message}}
         </div>
       </div>
@@ -563,7 +607,7 @@
 
 <template name="companyElectInfo">
   <div class="col-12 border-grid">
-    <h4>
+    <h4 class="my-1">
       選舉下個商業季度的負責經理人：
       {{#if canContendManager}}
         <button
@@ -576,60 +620,108 @@
       {{/if}}
     </h4>
     <div class="row mb-1">
-      <div class="col-2 text-center">候選人</div>
-      <div class="col-2 text-center">董事會支持率</div>
-      <div class="col-8 text-center">支持者</div>
+      <div class="col-5 col-sm-7 col-md-8 text-center">候選人</div>
+      <div class="col-3 col-sm-2 col-md-2 text-center p-0">支持率</div>
+      <div class="col-4 col-sm-3 col-md-2 text-center">支持者</div>
     </div>
     {{#each candidate in this.candidateList}}
       <div class="row mb-1">
-        <div class="col-2 text-left text-truncate">
-          {{>userLink candidate}}
-          {{#if getStockAmount}}
-            <button
-              class="btn btn-primary btn-sm float-right"
-              type="button"
-              data-support-candidate="{{@index}}"
-            >
-              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-            </button>
-          {{/if}}
+        <div class="col-5 col-sm-7 col-md-8">
+          <div class="d-flex flex-nowrap justify-content-between">
+            <div class="d-inline-block text-truncate">{{>userLink candidate}}</div>
+            {{#if getStockAmount}}
+              <button
+                class="btn btn-primary btn-sm"
+                type="button"
+                data-support-candidate="{{@index}}"
+              >
+                <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+              </button>
+            {{/if}}
+          </div>
         </div>
-        <div class="col-2 text-right">
+        <div class="col-3 col-sm-2 col-md-2 text-center p-0">
           {{getSupportPercentage @index}} %
         </div>
-        <div class="col-8 text-left text-truncate">
-          {{#each supporter in supportList @index}}
-            {{>userLink supporter}}
+        <div class="col-4 col-sm-3 col-md-2 text-center">
+          {{#if (supportList @index)}}
+            <button
+              class="btn btn-primary btn-sm"
+              type="button"
+              data-show-supporter="{{@index}}"
+            >
+              清單&nbsp;<i class="fa fa-users" aria-hidden="true"></i>
+            </button>
           {{else}}
             無
-          {{/each}}
+          {{/if}}
         </div>
       </div>
     {{/each}}
   </div>
+  {{#if showSupportListDialog}}
+    {{> supporterListDialog}}
+  {{/if}}
+</template>
+
+<template name="supporterListDialog">
+  <form class="modal show d-block" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" style="max-width: 100%;">
+            <div class="d-flex flex-nowrap">
+              <div class="text-nowrap">投給「</div>
+              <div class="d-inline-block text-truncate">{{>userLink candidateId}}</div>
+              <div class="text-nowrap">」的股東</div>
+            </div>
+          </h5>
+        </div>
+        <div class="modal-body">
+          <div style="max-height: 300px; overflow-y: auto;">
+            {{#each userId in supporters}}
+              <div class="text-truncate">{{plus @index 1}}.&nbsp;{{> userLink userId}}</div>
+            {{else}}
+              <p>無</p>
+            {{/each}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary">
+            關閉
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
 </template>
 
 <template name="companyEmployeeList">
-  <div class="col-12 border-grid">
-    <h4>
+  <div class="col-12 border-grid company-employee-list">
+    <h4 class="my-1">
       在職員工
     </h4>
     <div class="row mb-1">
-      <div class="col-2 text-center">使用者帳號</div>
-      <div class="col-3 text-center">報名時間</div>
-      <div class="col-7 text-center">留言</div>
+      <div class="col-md-2 text-center d-sm-none d-md-block">使用者帳號</div>
+      <div class="col-md-3 text-center d-sm-none d-md-block">報名時間</div>
+      <div class="col-md-7 text-center d-sm-none d-md-block">留言</div>
     </div>
 
-    <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
+    <div style="max-height: 240px; overflow-y: auto; margin-left: -15px; margin-right: -15px;">
       {{#each employee in employeeList}}
-        <div class="col-2 text-truncate">
-          {{>userLink employee.userId}}
-        </div>
-        <div class="col-3">
-          {{formatDateText employee.registerAt}}
-        </div>
-        <div class="col-7">
-          {{showMessage employee.message}}
+        <div class="d-flex flex-wrap mb-1 data-row">
+          <div class="hidden-title d-block d-md-none">使用者帳號</div>
+          <div class="col-md-2 text-truncate data-content">
+            {{>userLink employee.userId}}
+          </div>
+          <div class="hidden-title d-block d-md-none">報名時間</div>
+          <div class="col-md-3 data-content" title="{{formatDateText employee.registerAt}}">
+            {{formatDateText employee.registerAt}}
+          </div>
+          <div class="hidden-title d-block d-md-none">留言</div>
+          <div class="col-md-7 data-content" title="{{showMessage employee.message}}" style="word-break: break-all;">
+            {{showMessage employee.message}}
+          </div>
         </div>
       {{else}}
         <div class="col-12 text-center">
@@ -658,22 +750,28 @@
       </form>
     {{/if}}
   </div>
-  <div class="col-12 border-grid">
-    <h4>
+  <div class="col-12 border-grid company-trainee-list">
+    <h4 class="my-1">
       儲備員工
     </h4>
     <div class="row mb-1">
-      <div class="col-2 text-center">使用者帳號</div>
-      <div class="col-10">報名時間</div>
+      <div class="col-md-2 text-center d-none d-md-block">使用者帳號</div>
+      <div class="col-md-3 text-center d-none d-md-block">報名時間</div>
+      <div class="col-md-7 d-none d-md-block"></div>
     </div>
-    <div class="row mb-1" style="overflow-y: auto; max-height: 240px;">
+    <div style="overflow-y: auto; max-height: 240px; margin-left: -15px; margin-right: -15px;">
       {{#each employee in nextSeasonEmployeeList}}
-          <div class="col-2 text-truncate">
+        <div class="d-flex flex-wrap mb-1 data-row">
+          <div class="hidden-title d-block d-md-none">使用者帳號</div>
+          <div class="col-md-2 text-truncate data-content">
             {{>userLink employee.userId}}
           </div>
-          <div class="col-10">
+          <div class="hidden-title d-block d-md-none">報名時間</div>
+          <div class="col-md-3 data-content">
             {{formatDateText employee.registerAt}}
           </div>
+          <div class="col-md-7 d-block d-md-none"></div>
+        </div>
       {{else}}
         <div class="col-12 text-center">
           沒有儲備員工！
@@ -697,8 +795,8 @@
           {{this.companyName}}已經報名參加這一屆的最萌亂鬥大賽。
         </div>
       {{else}}
-        <div>
-          {{this.companyName}}並沒有參加這一屆的最萌亂鬥大賽！
+        <div style="word-break: break-all;">
+          {{companyData.companyName}}並沒有參加這一屆的最萌亂鬥大賽！
           {{#if isUserId this.manager}}
             {{#if inCanJoinTime}}
               <button class="btn btn-primary btn-sm" type="button" data-action="joinArena">
@@ -709,27 +807,29 @@
         </div>
       {{/if}}
       {{#with this.joinData}}
-        <div>
+        <div class="mt-2">
           總投資額：${{currencyFormat totalInvestedAmount}}
           {{#if notEnoughInvestedAmount}}
             <span class="text-danger">（總投資額未達${{currencyFormat arenaMinInvestedAmount}}，大賽開始時將會自動失去參賽資格！）</span>
           {{/if}}
         </div>
         <div>目前的屬性值如下：</div>
-        <div class="mb-1">
-          <a
-            class="d-inline-block d-sm-none"
+        <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+          <button
+            class="d-sm-none mr-auto btn btn-success btn-sm"
             href="#"
             title="投資加點"
             data-invest="hp"
           >
-            HP：
-          </a>
-          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">HP：</span>
-          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            HP
+            <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+          </button>
+          <span class="d-none d-sm-inline-block mr-auto">HP：</span>
+          <span class="d-inline-block">
             {{getAttributeNumber 'hp' this.hp}}
             (已投資${{currencyFormat this.hp}})
           </span>
+          &nbsp;
           <button
             class="btn btn-success btn-sm d-none d-sm-inline-block"
             type="button"
@@ -738,20 +838,22 @@
             投資加點
           </button>
         </div>
-        <div class="mb-1">
-          <a
-            class="d-inline-block d-sm-none"
+        <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+          <button
+            class="d-sm-none mr-auto btn btn-success btn-sm"
             href="#"
             title="投資加點"
             data-invest="sp"
           >
-            SP：
-          </a>
-          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">SP：</span>
-          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            SP
+            <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+          </button>
+          <span class="d-none d-sm-inline-block mr-auto">SP：</span>
+          <span class="d-inline-block">
             {{getAttributeNumber 'sp' this.sp}}
             (已投資${{currencyFormat this.sp}})
           </span>
+          &nbsp;
           <button
             class="btn btn-success btn-sm d-none d-sm-inline-block"
             type="button"
@@ -760,20 +862,22 @@
             投資加點
           </button>
         </div>
-        <div class="mb-1">
-          <a
-            class="d-inline-block d-sm-none"
+        <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+          <button
+            class="d-sm-none mr-auto btn btn-success btn-sm"
             href="#"
             title="投資加點"
             data-invest="atk"
           >
-            ATK：
-          </a>
-          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">ATK：</span>
-          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            ATK
+            <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+          </button>
+          <span class="d-none d-sm-inline-block mr-auto">ATK：</span>
+          <span class="d-inline-block">
             {{getAttributeNumber 'atk' this.atk}}
             (已投資${{currencyFormat this.atk}})
           </span>
+          &nbsp;
           <button
             class="btn btn-success btn-sm d-none d-sm-inline-block"
             type="button"
@@ -782,20 +886,22 @@
             投資加點
           </button>
         </div>
-        <div class="mb-1">
-          <a
-            class="d-inline-block d-sm-none"
+        <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+          <button
+            class="d-sm-none mr-auto btn btn-success btn-sm"
             href="#"
             title="投資加點"
             data-invest="def"
           >
-            DEF：
-          </a>
-          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">DEF：</span>
-          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            DEF
+            <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+          </button>
+          <span class="d-none d-sm-inline-block mr-auto">DEF：</span>
+          <span class="d-inline-block">
             {{getAttributeNumber 'def' this.def}}
             (已投資${{currencyFormat this.def}})
           </span>
+          &nbsp;
           <button
             class="btn btn-success btn-sm d-none d-sm-inline-block"
             type="button"
@@ -804,20 +910,21 @@
             投資加點
           </button>
         </div>
-        <div class="mb-1">
-          <a
-            class="d-inline-block d-sm-none"
+        <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+          <button
+            class="d-sm-none mr-auto btn btn-success btn-sm"
             href="#"
             title="投資加點"
             data-invest="agi"
           >
-            AGI：
-          </a>
-          <span class="d-none d-sm-inline-block text-right" style="width: 3rem;">AGI：</span>
-          <span class="d-inline-block text-right mr-1" style="width: 15rem;">
+            AGI&nbsp;<i class="fa fa-angle-double-up" aria-hidden="true"></i>
+          </button>
+          <span class="d-none d-sm-inline-block mr-auto">AGI：</span>
+          <span class="d-inline-block">
             {{getAttributeNumber 'agi' this.agi}}
             (已投資${{currencyFormat this.agi}})
           </span>
+          &nbsp;
           <button
             class="btn btn-success btn-sm d-none d-sm-inline-block"
             type="button"
@@ -837,70 +944,78 @@
 </template>
 
 <template name="arenaStrategyForm">
-  <form class="row">
-    <h5 class="col-12">決定這一屆大賽的賽場策略：</h5>
-    <div class="form-group col-12 col-lg-6">
-      <label for="spCost">設定特攻消耗數值：</label>
-      <input
-        class="form-control"
-        type="number"
-        name="spCost"
-        value="{{valueOf 'spCost'}}"
-        min="1"
-        max="10"
-      />
+  <form class="row mt-2">
+    <h5 class="col-12">決定這一屆大賽的策略：</h5>
+    <div class="col-12 col-lg-6 form-group">
+      <div class="d-flex">
+        <label class="input-group-addon" for="spCost">設定特攻消耗數值(1~10)</label>
+        <input
+          class="form-control"
+          type="number"
+          name="spCost"
+          value="{{valueOf 'spCost'}}"
+          min="1"
+          max="10"
+        />
+      </div>
       {{{errorHtmlOf 'spCost'}}}
     </div>
-    <div class="col-12 col-lg-6 text-info">
+    <div class="col-12 text-info mb-1">
       <div class="text-warning">特攻消耗數值越高越容易使出特殊攻擊，但也會越快耗盡SP。</div>
       <div>{{spForecast}}</div>
     </div>
     <div class="form-group col-12 col-lg-6">
-      <label for="normalManner">設定普通攻擊招式名：</label>
+      <label>設定普通攻擊招式名：</label>
       <input
         class="form-control"
         type="text"
         name="normalManner"
         value="{{getManner 'normal' 0}}"
-        placeholder="請設定第一招普通攻擊的招式名稱"
+        maxlength="150"
+        placeholder="第一招普通攻擊的招式名稱"
       />
       <input
         class="form-control"
         type="text"
         name="normalManner"
         value="{{getManner 'normal' 1}}"
-        placeholder="請設定第二招普通攻擊的招式名稱"
+        maxlength="150"
+        placeholder="第二招普通攻擊的招式名稱"
       />
       <input
         class="form-control"
         type="text"
         name="normalManner"
         value="{{getManner 'normal' 2}}"
-        placeholder="請設定第三招普通攻擊的招式名稱"
+        maxlength="150"
+        placeholder="第三招普通攻擊的招式名稱"
       />
     </div>
     <div class="form-group col-12 col-lg-6">
-      <label for="specialManner">設定特殊攻擊招式名：</label>
+      <label>設定特殊攻擊招式名：</label>
       <input
         class="form-control"
         type="text"
         name="specialManner"
         value="{{getManner 'special' 0}}"
-        placeholder="請設定第一招特殊攻擊的招式名稱"
+        maxlength="150"
+        placeholder="第一招特殊攻擊的招式名稱"
       />
       <input
         class="form-control"
         type="text"
         name="specialManner"
         value="{{getManner 'special' 1}}"
-        placeholder="請設定第二招特殊攻擊的招式名稱"
+        maxlength="150"
+        placeholder="第二招特殊攻擊的招式名稱"
       />
       <input
         class="form-control"
         type="text"
         name="specialManner"
         value="{{getManner 'special' 2}}"
-        placeholder="請設定第三招特殊攻擊的招式名稱"
+        maxlength="150"
+        placeholder="第三招特殊攻擊的招式名稱"
       />
     </div>
     {{#if hasEnemy}}
@@ -908,19 +1023,20 @@
         <div class="mb-2">
           排列優先攻擊順序：
           <button class="btn btn-success btn-sm float-right" type="button" data-action="sortAll">
-            自動排序<i class="fa fa-angle-double-right" aria-hidden="true"></i>
+            自動排序
+            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
           </button>
         </div>
         <div class="form-control" style="height: 400px; overflow-y: auto; border: 1px solid #999;">
           {{#each enemyList}}
             {{#if notSorted this._id}}
               <div
-                class="px-1 py-1"
+                class="px-1 py-1 d-flex justify-content-end"
                 style="border: 1px solid #ddd; line-height: 1.75rem;"
               >
-                {{>companyLink this.companyId}}
+                <div class="text-truncate mr-auto">{{>companyLink this.companyId}}</div>
                 <button
-                  class="btn btn-success btn-sm float-right"
+                  class="btn btn-success btn-sm"
                   type="button"
                   data-add="{{this._id}}"
                 >
@@ -938,12 +1054,14 @@
         <div class="form-control" style="height: 400px; overflow-y: auto; border: 1px solid #999;">
           {{#each sortedEnemyList}}
             <div
-              class="px-1 py-1"
+              class="px-1 py-1 d-flex justify-content-end"
               style="border: 1px solid #ddd; line-height: 1.75rem;"
             >
-              {{>companyLink this.companyId}}
+              <div class="text-truncate mr-auto">
+                {{>companyLink this.companyId}}
+              </div>
               <button
-                class="btn btn-danger btn-sm float-right"
+                class="btn btn-danger btn-sm"
                 type="button"
                 data-remove="{{this._id}}"
               >
@@ -958,7 +1076,9 @@
     {{/if}}
     <hr />
     <div class="col-12 text-right">
+      {{#if hasEnemy}}
       <button class="btn btn-secondary" type="reset">重設</button>
+      {{/if}}
       <button class="btn btn-primary" type="submit">送出</button>
     </div>
   </form>

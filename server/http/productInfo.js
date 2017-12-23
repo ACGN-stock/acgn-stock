@@ -15,7 +15,8 @@ WebApp.connectHandlers.use(function(req, res, next) {
     const productData = dbProducts.findOne(productId, {
       fields: {
         productName: 1,
-        url: 1
+        url: 1,
+        type: 1
       }
     });
     if (productData) {

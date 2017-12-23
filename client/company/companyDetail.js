@@ -483,10 +483,12 @@ Template.companyChart.onRendered(function() {
 Template.companyChart.events({
   'click [data-chart-type]'(event, templateInstance) {
     event.preventDefault();
-    $(event.currentTarget).blur();
-    $('.company-detail .btn-group-vertical > .active').removeClass('active');
-    $(event.currentTarget).addClass('active');
-    templateInstance.strChartType = $(event.currentTarget).attr('data-chart-type');
+    const chartType = $(event.currentTarget).attr('data-chart-type');
+    $('.company-detail .company-chart-btn-group > .active').removeClass('active');
+    $('.company-detail .company-chart-btn-group')
+      .find('[data-chart-type="' + chartType + '"]')
+      .addClass('active');
+    templateInstance.strChartType = chartType;
     drawChart(templateInstance);
   }
 });
@@ -515,7 +517,7 @@ function drawLineChart(templateInstance) {
     }
     templateInstance.$chart
       .empty()
-      .html('<canvas style="max-height:300px;"></canvas>');
+      .html('<canvas style="height:300px;"></canvas>');
     const ctx = templateInstance.$chart.find('canvas');
     const color = (localStorage.getItem('theme') === 'light') ? '#000000' : '#ffffff';
     templateInstance.chart = new Chart(ctx, {
@@ -533,6 +535,7 @@ function drawLineChart(templateInstance) {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         animation: {
           duration: 0
         },
@@ -591,6 +594,13 @@ function drawLineChart(templateInstance) {
                 callback: function(value) {
                   return '$' + Math.round(value).toLocaleString();
                 }
+              },
+              afterBuildTicks(axis) {
+                axis.ticks = _.uniq(
+                  axis.ticks.map((n) => {
+                    return Math.round(n);
+                  })
+                );
               }
             }
           ]
@@ -609,8 +619,8 @@ function drawCandleStickChart(templateInstance) {
   templateInstance.$chart.empty();
   templateInstance.$chart.find('text').css('fill');
 
-  const margin = { top: 10, right: 10, bottom: 30, left: 50 };
-  const width = templateInstance.$chart.width() - margin.right - margin.left;
+  const margin = { top: 20, right: 10, bottom: 30, left: 45 };
+  const width = Math.max(templateInstance.$chart.width() - margin.right - margin.left, 450);
   const height = 300 - margin.top - margin.bottom;
   const color = localStorage.theme === 'light' ? '#000' : '#fff';
 
@@ -625,7 +635,6 @@ function drawCandleStickChart(templateInstance) {
   const candlestick = techan.plot.candlestick().xScale(x)
     .yScale(y);
   const xAxis = d3.axisBottom().scale(x);
-  const yAxis = d3.axisLeft().scale(y);
 
   const count = 80;
   const unitTime = (templateInstance.strChartType === '30min' ? 1800
@@ -662,19 +671,42 @@ function drawCandleStickChart(templateInstance) {
     content.append('g')
       .attr('class', 'y axis')
       .append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 6)
-      .attr('dy', '.71em')
+      .attr('y', -6)
       .style('text-anchor', 'end')
       .text('價格 ($)');
 
     x.domain(Array.from(new Array(count), (v, i) => {
       return new Date(toTime - unitTime * (count - i));
     }));
+
+    let yDomain = techan.scale.plot.ohlc(data, accessor).domain();
     y.domain(techan.scale.plot.ohlc(data, accessor).domain());
+
+    // 自訂y軸，避免小數情況出現
+    yDomain = yDomain.map((n) => {
+      return Math.round(n);
+    }).sort((a, b) => {
+      return (a - b);
+    });
+
+    const yDomainMin = _.first(yDomain);
+    const yDomainMax = _.last(yDomain);
+    const yTickMaxCount = 10;
+    const yTickStep = Math.max(Math.floor((yDomainMax - yDomainMin) / yTickMaxCount), 1);
+
+    const yTickValues = Array.from(new Array(yTickMaxCount + 1), (v, i) => {
+      return yDomainMax - yTickStep * i;
+    }).filter((n) => {
+      return n >= yDomainMin;
+    });
+
+    const yAxis = d3.axisLeft().scale(y)
+      .tickValues(yTickValues)
+      .tickFormat(d3.format('d'));
 
     grid.call(d3.axisLeft().scale(y)
       .tickSize(-width)
+      .ticks(yTickValues.length)
       .tickFormat(''));
 
     svg.selectAll('g.candlestick').datum(data)
@@ -952,6 +984,7 @@ Template.companyAllPrudctList.events({
 });
 
 const rDirectorOffset = new ReactiveVar(0);
+const rShowSupporterList = new ReactiveVar(null);
 inheritedShowLoadingOnSubscribing(Template.companyDirectorList);
 Template.companyDirectorList.onCreated(function() {
   this.autorun(() => {
@@ -1057,6 +1090,9 @@ Template.companyElectInfo.helpers({
     const instanceData = instance.data;
 
     return getStockAmount(instanceData._id);
+  },
+  showSupportListDialog() {
+    return rShowSupporterList.get() !== null;
   }
 });
 Template.companyElectInfo.events({
@@ -1107,6 +1143,17 @@ Template.companyElectInfo.events({
         }
       }
     });
+  },
+  'click [data-show-supporter]'(event, templateInstance) {
+    event.preventDefault();
+    const instanceData = templateInstance.data;
+    const candidateIndex = parseInt($(event.currentTarget).attr('data-show-supporter'), 10);
+    const option = {
+      candidateId: instanceData.candidateList[candidateIndex],
+      voteList: instanceData.voteList[candidateIndex]
+    };
+
+    rShowSupporterList.set(option);
   }
 });
 
@@ -1123,6 +1170,22 @@ function getStockAmount(companyId) {
     return 0;
   }
 }
+
+Template.supporterListDialog.helpers({
+  candidateId() {
+    return rShowSupporterList.get().candidateId;
+  },
+  supporters() {
+    return rShowSupporterList.get().voteList;
+  }
+});
+
+Template.supporterListDialog.events({
+  'click .btn'(event) {
+    event.preventDefault();
+    rShowSupporterList.set(null);
+  }
+});
 
 inheritedShowLoadingOnSubscribing(Template.companyEmployeeList);
 Template.companyEmployeeList.helpers({
@@ -1319,6 +1382,7 @@ Template.arenaStrategyForm.onRendered(function() {
 });
 function validateStrategyModel(model) {
   const error = {};
+
   if (model.spCost > getAttributeNumber('sp', model.sp)) {
     error.spCost = '特攻消耗數值不可超過角色的SP值！';
   }
@@ -1380,8 +1444,8 @@ function saveStrategyModel(model) {
 }
 Template.arenaStrategyForm.helpers({
   spForecast() {
+    const sp = getAttributeNumber('sp', this.joinData.sp);
     const model = Template.instance().model.get();
-    const sp = getAttributeNumber('sp', model.sp);
     const spCost = model.spCost;
     const tenRoundForecast = Math.floor(Math.min((sp + 1) / spCost, spCost));
     const maximumRound = Meteor.settings.public.arenaMaximumRound;
