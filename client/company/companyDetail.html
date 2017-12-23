@@ -702,9 +702,9 @@
       在職員工
     </h4>
     <div class="row mb-1">
-      <div class="col-md-2 text-center d-sm-none d-md-block">使用者帳號</div>
-      <div class="col-md-3 text-center d-sm-none d-md-block">報名時間</div>
-      <div class="col-md-7 text-center d-sm-none d-md-block">留言</div>
+      <div class="col-md-2 text-center d-none d-md-block">使用者帳號</div>
+      <div class="col-md-3 text-center d-none d-md-block">報名時間</div>
+      <div class="col-md-7 text-center d-none d-md-block">留言</div>
     </div>
 
     <div style="max-height: 240px; overflow-y: auto; margin-left: -15px; margin-right: -15px;">
@@ -792,12 +792,12 @@
       <div>報名截止時間為：{{formatDateText currentArenaData.joinEndDate}}</div>
       {{#if this.joinData}}
         <div>
-          {{this.companyName}}已經報名參加這一屆的最萌亂鬥大賽。
+          {{companyData.companyName}}已經報名參加這一屆的最萌亂鬥大賽。
         </div>
       {{else}}
         <div style="word-break: break-all;">
           {{companyData.companyName}}並沒有參加這一屆的最萌亂鬥大賽！
-          {{#if isUserId this.manager}}
+          {{#if isUserId companyData.manager}}
             {{#if inCanJoinTime}}
               <button class="btn btn-primary btn-sm" type="button" data-action="joinArena">
                 報名參賽
