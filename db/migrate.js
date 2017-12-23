@@ -596,34 +596,40 @@ if (Meteor.isServer) {
     version: 13,
     name: 'arena system',
     up() {
-      dbArena.rawCollection().createIndex({
-        beginDate: 1
-      });
-      dbArenaFighters.rawCollection().createIndex(
-        {
-          arenaId: 1,
-          companyId: 1
-        },
-        {
-          unique: true
-        }
-      );
-      const lastSeasonData = dbSeason.findOne({}, {
-        sort: {
-          beginDate: -1
-        }
-      });
-      if (lastSeasonData) {
-        const {beginDate, endDate} = lastSeasonData;
-        const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber);
-        dbArena.insert({
-          beginDate: beginDate,
-          endDate: arenaEndDate,
-          joinEndDate: new Date(arenaEndDate.getTime() - Meteor.settings.public.electManagerTime),
-          shuffledFighterCompanyIdList: []
-        });
+      dbArena.rawCollection().createIndex({ beginDate: 1 });
+      dbArenaFighters.rawCollection().createIndex({ arenaId: 1, companyId: 1 }, { unique: true });
+
+      // 在有資料的狀況下，用最後一個賽季與該賽季的商業季度總數推導出最近一次亂鬥的資料
+      const lastRound = dbRound.findOne({}, { sort: { beginDate: -1 } });
+      if (! lastRound) {
+        return;
       }
-      dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
+
+      const seasonCount = dbSeason
+        .find({
+          beginDate: { $gte: lastRound.beginDate },
+          endDate: { $lte: lastRound.endDate }
+        }, {
+          sort: { beginDate: -1 }
+        })
+        .count();
+      if (seasonCount < 1) {
+        return;
+      }
+
+      const { seasonTime, arenaIntervalSeasonNumber, electManagerTime } = Meteor.settings.public;
+
+      const lastSeasonData = dbSeason.findOne({}, { sort: { beginDate: -1 }});
+      const {beginDate, endDate} = lastSeasonData;
+      const arenaEndDate = new Date(endDate.getTime() + seasonTime * arenaIntervalSeasonNumber);
+      dbArena.insert({
+        beginDate: beginDate,
+        endDate: arenaEndDate,
+        joinEndDate: new Date(arenaEndDate.getTime() - electManagerTime),
+        shuffledFighterCompanyIdList: []
+      });
+
+      dbVariables.set('arenaCounter', (arenaIntervalSeasonNumber + 1 - seasonCount) % (arenaIntervalSeasonNumber + 1));
     }
   });
 
@@ -633,11 +639,14 @@ if (Meteor.isServer) {
     up() {
       dbLog.rawCollection().createIndex({ logType: 1, createdAt: -1 });
 
-      logTypeList.forEach((logType) => {
-        // console.log(`migrating logType ${logType}...`);
+      const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+      let runBulk = false;
 
-        const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-        let runBulk = false;
+      logTypeList.forEach((logType) => {
+        // 跳過無資料的狀況
+        if (dbLog.find({ logType, data: { $exists: false }}).count() === 0) {
+          return;
+        }
 
         const bulkCursor = logBulk.find({
           logType,
@@ -1013,11 +1022,11 @@ if (Meteor.isServer) {
             runBulk = true;
             break;
         }
-
-        if (runBulk) {
-          Meteor.wrapAsync(logBulk.execute).call(logBulk);
-        }
       });
+
+      if (runBulk) {
+        Meteor.wrapAsync(logBulk.execute).call(logBulk);
+      }
     }
   });
 
