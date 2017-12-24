@@ -353,6 +353,11 @@
         {{> companyArenaInfo}}
       {{/if}}
       <div class="col-12 border-grid">
+        {{#panelFolder name='miningMachine' title='挖礦機'}}
+          {{> companyMiningMachine}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
         <a class="d-block h4 my-1" href="#" data-toggle-panel="log">
           所有紀錄
           {{#if isDisplayPanel 'log'}}
@@ -373,7 +378,7 @@
   <div class="row pt-1">
     <div class="col px-1" style="overflow-x: auto; overflow-y: hidden;">
       <div class="chart" style="height: 300px; min-width: 425px; ">
-        
+
       </div>
     </div>
     <div class="col d-none d-sm-flex" style="max-width: 80px;">

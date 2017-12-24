@@ -3,11 +3,13 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
 import { Migrations } from 'meteor/percolate:migrations';
+
 import { dbAdvertising } from './dbAdvertising';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbCompanies } from './dbCompanies';
 import { dbCompanyArchive } from './dbCompanyArchive';
+import { dbCompanyStones } from './dbCompanyStones';
 import { dbDirectors } from './dbDirectors';
 import { dbFoundations } from './dbFoundations';
 import { dbLog, logTypeList } from './dbLog';
@@ -470,8 +472,8 @@ if (Meteor.isServer) {
     version: 11,
     name: 'rename user.profile.lastReadFscAnnouncementDate to user.profile.lastReadAccuseLogDate',
     up() {
-      Meteor.users.update({
-        lastReadFscAnnouncementDate: 1
+      Meteor.users.rawCollection().update({
+        lastReadFscAnnouncementDate: { $exists: true }
       }, {
         $rename: { lastReadFscAnnouncementDate: 'lastReadAccuseLogDate' }
       });
@@ -560,7 +562,7 @@ if (Meteor.isServer) {
             name: userName,
             validateType: userData.profile.validateType,
             isAdmin: userData.profile.isAdmin,
-            stone: userData.profile.stone,
+            stone: userData.profile.stones.saint,
             ban: userData.profile.ban
           });
         });
@@ -1105,6 +1107,32 @@ if (Meteor.isServer) {
       });
 
       Meteor.wrapAsync(companiesBulk.execute).call(companiesBulk);
+    }
+  });
+
+  Migrations.add({
+    version: 16,
+    name: 'add more stone types & company mining machine mechanism',
+    up() {
+      // 重新命名聖晶石欄位以擴充為多種石頭，並設定既有使用者的各種石頭數量
+      Meteor.users.rawCollection().update({}, {
+        $rename: { 'profile.stone': 'profile.stones.saint' },
+        $set: {
+          'profile.stones.birth': Meteor.settings.public.newUserBirthStones,
+          'profile.stones.rainbow': 0,
+          'profile.stones.rainbowFragment': 0,
+          'profile.stones.quest': 0
+        }
+      }, { multi: true });
+
+      // 重新命名使用者封存的聖晶石欄位（目前只有聖晶石會繼承）
+      dbUserArchive.rawCollection().update({}, { $rename: { stone: 'saintStones' } }, { multi: true });
+
+      // 挖礦機放置石頭資訊的 indexes
+      dbCompanyStones.rawCollection().createIndex({ userId: 1 });
+      dbCompanyStones.rawCollection().createIndex({ companyId: 1 });
+      dbCompanyStones.rawCollection().createIndex({ stoneType: 1 });
+      dbCompanyStones.rawCollection().createIndex({ placedAt: -1 });
     }
   });
 

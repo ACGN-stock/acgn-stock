@@ -3,6 +3,7 @@ import { check } from 'meteor/check';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
+import { returnCompanyStones } from '/server/functions/miningMachine/returnCompanyStones';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
@@ -37,11 +38,7 @@ function sealCompany(user, {companyId, message}) {
       data: { reason: message },
       createdAt: new Date()
     });
-    dbCompanies.update(companyId, {
-      $set: {
-        isSeal: false
-      }
-    });
+    dbCompanies.update(companyId, { $set: { isSeal: false } });
   }
   else {
     dbLog.insert({
@@ -51,10 +48,7 @@ function sealCompany(user, {companyId, message}) {
       data: { reason: message },
       createdAt: new Date()
     });
-    dbCompanies.update(companyId, {
-      $set: {
-        isSeal: true
-      }
-    });
+    dbCompanies.update(companyId, { $set: { isSeal: true } });
+    returnCompanyStones(companyId);
   }
 }

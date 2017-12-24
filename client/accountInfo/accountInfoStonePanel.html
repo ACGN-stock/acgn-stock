@@ -1,0 +1,53 @@
+<template name="accountInfoStonePanel">
+  <div class="row">
+    <div class="col-12 my-2">
+      <h5>帳號擁有石頭</h5>
+      <div class="d-flex flex-wrap flex-column flex-sm-row justify-content-around">
+        {{#each stoneType in stoneTypeList}}
+        <div class="text-nowrap">
+          <img class="stone-icon-2x" src="{{stoneIconPath stoneType}}" alt="{{stoneDisplayName stoneType}}">
+          {{stoneDisplayName stoneType}} {{userStoneCount stoneType}} 個
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    {{#if isCurrentUser}}
+      <div class="col-12 flex-wrap my-2">
+        <h5>購買石頭</h5>
+        {{#each stoneType in buyableStoneTypeList}}
+          <a href="#" class="btn btn-sm btn-info m-1" data-action="buyStone" data-stone-type="{{stoneType}}">
+            購買{{stoneDisplayName stoneType}} (${{currencyFormat (stonePrice stoneType)}})
+          </a>
+        {{/each}}
+      </div>
+    {{/if}}
+    <div class="col-12 my-2">
+      <h5>已放置的石頭</h5>
+      <table class="table table-bordered mt-3 w-100" style="table-layout: fixed;">
+        <thead>
+          <tr>
+            <th class="text-center text-nowrap">公司名稱</th>
+            <th class="text-center text-nowrap" style="width: 95px">石頭類型</th>
+          </tr>
+        </thead>
+        <tbody>
+        {{#each placedStone in placedStones}}
+          <tr>
+            <td class="text-left text-truncate p-1" data-title="公司名稱">
+              {{> companyLink placedStone.companyId}}
+            </td>
+            <td class="text-left text-truncate p-1" data-title="石頭類型">
+              {{stoneDisplayName placedStone.stoneType}}
+            </td>
+          </tr>
+        {{else}}
+          <tr>
+            <td class="text-center text-truncate p-1" colspan="2">查無資料！</td>
+          </tr>
+        {{/each}}
+        </tbody>
+      </table>
+      {{> pagination paginationData}}
+    </div>
+  </div>
+</template>

@@ -7,7 +7,7 @@ import { $ } from 'meteor/jquery';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbVariables } from '/db/dbVariables';
-
+import { stoneDisplayName } from '/db/dbCompanyStones';
 
 Meteor.subscribe('variables');
 
@@ -180,3 +180,24 @@ export function sanitizeHtml(str) {
     .html();
 }
 Template.registerHelper('sanitizeHtml', sanitizeHtml);
+
+export { stoneDisplayName };
+Template.registerHelper('stoneDisplayName', stoneDisplayName);
+
+export function stoneIconPath(stoneType) {
+  switch (stoneType) {
+    case 'saint':
+      return '/stone-saint.png';
+    case 'birth':
+      return '/stone-birth.png';
+    case 'quest':
+      return '/stone-quest.png';
+    case 'rainbow':
+      return '/stone-rainbow.png';
+    case 'rainbowFragment':
+      return '/stone-rainbow-fragment.png';
+    default:
+      return '';
+  }
+}
+Template.registerHelper('stoneIconPath', stoneIconPath);

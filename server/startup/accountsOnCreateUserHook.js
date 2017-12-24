@@ -8,43 +8,37 @@ import { debug } from '/server/imports/utils/debug';
 
 Accounts.onCreateUser((options, user) => {
   debug.log('onCreateUser', options);
+
+  const { newUserInitialMoney, newUserBirthStones } = Meteor.settings.public;
+
   user.profile = _.defaults({}, options.profile, {
-    money: Meteor.settings.public.beginMoney,
+    money: newUserInitialMoney,
     lastSeasonTotalWealth: 0,
     vote: 0,
-    stone: 0,
+    stones: { birth: newUserBirthStones },
     isAdmin: false,
     ban: [],
     noLoginDayCount: 0
   });
-  dbLog.insert({
-    logType: '驗證通過',
-    userId: [user._id],
-    data: {
-      money: Meteor.settings.public.beginMoney
-    },
-    createdAt: new Date()
-  });
+
   if (user.services && user.services.google) {
     const email = user.services.google.email;
     user.profile.validateType = 'Google';
     user.profile.name = email;
   }
-  const existsArchiveUser = dbUserArchive.findOne({
+
+  const existingArchiveUser = dbUserArchive.findOne({
     name: user.profile.name,
     validateType: user.profile.validateType
   });
-  if (existsArchiveUser) {
-    user._id = existsArchiveUser._id;
-    user.profile.name = existsArchiveUser.name;
-    user.profile.isAdmin = existsArchiveUser.isAdmin;
-    user.profile.stone = existsArchiveUser.stone;
-    user.profile.ban = existsArchiveUser.ban;
-    dbUserArchive.update(existsArchiveUser._id, {
-      $set: {
-        status: 'registered'
-      }
-    });
+
+  if (existingArchiveUser) {
+    user._id = existingArchiveUser._id;
+    user.profile.name = existingArchiveUser.name;
+    user.profile.isAdmin = existingArchiveUser.isAdmin;
+    user.profile.stones.saint = existingArchiveUser.saintStones;
+    user.profile.ban = existingArchiveUser.ban;
+    dbUserArchive.update(existingArchiveUser._id, { $set: { status: 'registered' } });
   }
   else {
     if (user.profile.validateType === 'Google') {
@@ -56,10 +50,19 @@ Accounts.onCreateUser((options, user) => {
       name: user.profile.name,
       validateType: user.profile.validateType,
       isAdmin: user.profile.isAdmin,
-      stone: user.profile.stone,
+      saintStones: user.profile.stones.saint,
       ban: user.profile.ban
     });
   }
+
+  dbLog.insert({
+    logType: '驗證通過',
+    userId: [user._id],
+    data: {
+      money: newUserInitialMoney
+    },
+    createdAt: new Date()
+  });
 
   return user;
 });

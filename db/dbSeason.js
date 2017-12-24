@@ -38,3 +38,8 @@ const schema = new SimpleSchema({
   }
 });
 dbSeason.attachSchema(schema);
+
+// 取得目前商業季度
+export function getCurrentSeason() {
+  return dbSeason.findOne({}, { sort: { beginDate: -1 }}); // TODO 以實際開始時間取代對齊的開始時間
+}
