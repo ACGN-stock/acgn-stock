@@ -558,7 +558,7 @@ table.next-season-product .product-description {
     padding-right: 0;
   }
 
-  table.advertisement-list td.ad-content {
+  table.advertisement-list td.anti-block-ad-message {
     word-break: break-all;
     max-height: 9rem;
     overflow-y: auto;
@@ -567,7 +567,7 @@ table.next-season-product .product-description {
 
 @media only screen and (min-width: 768px) {
   table.advertisement-list td.ad-buyer,
-  table.advertisement-list td.ad-content {
+  table.advertisement-list td.anti-block-ad-message {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
