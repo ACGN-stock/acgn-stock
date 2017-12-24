@@ -1,8 +1,9 @@
 'use strict';
 import { Mongo } from 'meteor/mongo';
 import { Match } from 'meteor/check';
-import { banTypeList } from './users';
 import SimpleSchema from 'simpl-schema';
+
+import { banTypeList } from './users';
 
 //使用者保管庫
 export const dbUserArchive = new Mongo.Collection('userArchive');

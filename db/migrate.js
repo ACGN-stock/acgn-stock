@@ -5,8 +5,8 @@ import { MongoInternals } from 'meteor/mongo';
 import { Migrations } from 'meteor/percolate:migrations';
 
 import { dbAdvertising } from './dbAdvertising';
-import { dbArena } from '/db/dbArena';
-import { dbArenaFighters } from '/db/dbArenaFighters';
+import { dbArena } from './dbArena';
+import { dbArenaFighters } from './dbArenaFighters';
 import { dbCompanies } from './dbCompanies';
 import { dbCompanyArchive } from './dbCompanyArchive';
 import { dbCompanyStones } from './dbCompanyStones';
@@ -28,7 +28,7 @@ import { dbSeason } from './dbSeason';
 import { dbTaxes } from './dbTaxes';
 import { dbUserArchive } from './dbUserArchive';
 import { dbValidatingUsers } from './dbValidatingUsers';
-import { dbVariables } from '/db/dbVariables';
+import { dbVariables } from './dbVariables';
 import { dbVoteRecord } from './dbVoteRecord';
 
 if (Meteor.isServer) {

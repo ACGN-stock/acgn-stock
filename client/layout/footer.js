@@ -85,15 +85,13 @@ Template.unreadImportantAccuseLogsNotification.onCreated(function() {
 });
 Template.unreadImportantAccuseLogsNotification.helpers({
   isDisplay() {
-    const instance = Template.instance();
-
-    return instance.rIsDisplay.get();
+    return Template.instance().rIsDisplay.get();
   }
 });
 Template.unreadImportantAccuseLogsNotification.events({
-  'click .btn'(event, instance) {
+  'click .btn'(event, templateInstance) {
     event.preventDefault();
-    instance.rIsDisplay.set(false);
+    templateInstance.rIsDisplay.set(false);
   }
 });
 

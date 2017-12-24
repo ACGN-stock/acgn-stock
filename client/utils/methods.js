@@ -9,8 +9,8 @@ import { dbProductLike } from '/db/dbProductLike';
 import { dbVariables } from '/db/dbVariables';
 import { dbVoteRecord } from '/db/dbVoteRecord';
 import { addTask, resolveTask } from '../layout/loading';
-import { handleError } from './handleError';
 import { alertDialog } from '../layout/alertDialog';
+import { handleError } from './handleError';
 import { currencyFormat } from './helpers';
 
 Meteor.subscribe('isChangingSeason');

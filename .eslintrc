@@ -1,5 +1,8 @@
 {
-  "extends": ["eslint:recommended"],
+  "extends": [
+    "@meteorjs/eslint-config-meteor",
+    "eslint:recommended"
+  ],
   "parser": "babel-eslint",
   "parserOptions": {
     "ecmaVersion": 6,
@@ -18,7 +21,14 @@
     "techan": true
   },
   "plugins": [],
+  "settings": {
+    "import/resolver": "meteor"
+  },
   "rules": {
+    "import/prefer-default-export": "off",
+    "import/order": ["error", {
+      "newlines-between": "ignore",
+    }],
     "no-console": "error",
     "no-debugger": "error",
     "no-unsafe-negation": "error",

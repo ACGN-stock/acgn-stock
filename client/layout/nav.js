@@ -9,10 +9,10 @@ import { dbArena } from '/db/dbArena';
 import { dbSeason } from '/db/dbSeason';
 import { stoneTypeList } from '/db/dbCompanyStones';
 import { pageNameHash } from '/routes';
-import { rAccountDialogMode } from './accountDialog';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 import { handleError } from '../utils/handleError';
+import { rAccountDialogMode } from './accountDialog';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 
