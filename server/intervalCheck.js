@@ -132,6 +132,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
   }
   console.info(new Date().toLocaleString() + ': doRoundWorks');
   resourceManager.request('doRoundWorks', ['season'], (release) => {
+    // TODO 合併處理商業季度結束的 code
     //備份資料庫
     backupMongo();
     //當賽季結束時，取消所有尚未交易完畢的訂單
@@ -151,6 +152,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     }
     //當賽季結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
+    // 更新所有公司的評級
+    updateCompanyGrades();
     //為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
     //移除所有廣告
