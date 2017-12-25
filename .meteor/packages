@@ -31,5 +31,4 @@ accounts-google@1.3.0
 xolvio:cleaner
 meteortesting:mocha
 peerlibrary:reactive-publish
-session
 teamgrid:reactive-interval

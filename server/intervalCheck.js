@@ -1,9 +1,10 @@
-// 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { UserStatus } from 'meteor/mizzao:user-status';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
+import { debug } from '/server/imports/utils/debug';
+import { backupMongo } from '/server/imports/utils/backupMongo';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
@@ -40,8 +41,6 @@ import { startArenaFight } from './arena';
 import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
-import { debug } from '/server/imports/utils/debug';
-import { backupMongo } from '/server/imports/utils/backupMongo';
 
 //週期檢查工作內容
 export function doIntervalWork() {

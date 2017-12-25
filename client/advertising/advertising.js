@@ -8,11 +8,10 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-import { formatDateText } from '../utils/helpers';
+import { formatDateText, currencyFormat, sanitizeHtml } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat, sanitizeHtml } from '../utils/helpers.js';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInBuyAdvertisingMode = new ReactiveVar(false);

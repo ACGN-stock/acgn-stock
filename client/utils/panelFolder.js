@@ -1,20 +1,22 @@
 import { Template } from 'meteor/templating';
-import { Session } from 'meteor/session';
+import { ReactiveDict } from 'meteor/reactive-dict';
+
+const panelFolderStates = new ReactiveDict('panelFolderStates');
 
 function getSessionKey(name) {
   return `panelFolder_${name}_expanded`;
 }
 
 Template.panelFolder.onCreated(function() {
-  Session.setDefault(getSessionKey(this.data.name), false);
+  panelFolderStates.setDefault(getSessionKey(this.data.name), false);
 });
 
 Template.panelFolder.helpers({
   isExpanded() {
-    return Session.get(getSessionKey(this.name));
+    return panelFolderStates.get(getSessionKey(this.name));
   },
   folderIconClass() {
-    return Session.get(getSessionKey(this.name)) ? 'fa-folder-open' : 'fa-folder';
+    return panelFolderStates.get(getSessionKey(this.name)) ? 'fa-folder-open' : 'fa-folder';
   }
 });
 
@@ -30,6 +32,6 @@ Template.panelFolder.events({
     }
 
     const key = getSessionKey(templateInstance.data.name);
-    Session.set(key, ! Session.get(key));
+    panelFolderStates.set(key, ! panelFolderStates.get(key));
   }
 });

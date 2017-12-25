@@ -21,6 +21,7 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat } from '../utils/helpers.js';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
+
 const rShowAllTags = new ReactiveVar(false);
 
 inheritedShowLoadingOnSubscribing(Template.companyDetail);

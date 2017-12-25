@@ -8,6 +8,8 @@ import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('arenaLog', function(arenaId, companyId, offset) {
   debug.log('publish arenaLog', {arenaId, companyId, offset});
+
+  check(arenaId, String);
   check(companyId, String);
   check(offset, Match.Integer);
 

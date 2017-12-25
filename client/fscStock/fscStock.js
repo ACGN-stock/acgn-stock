@@ -1,9 +1,9 @@
 'use strict';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
+import { dbDirectors } from '/db/dbDirectors';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
-import { dbDirectors } from '/db/dbDirectors';
 
 const showListPerPage = 20;
 export const ownStocksOffset = new ReactiveVar(0);
