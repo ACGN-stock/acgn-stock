@@ -169,6 +169,35 @@
       <div class="card">
         <div class="card-header pointer" role="tab">
           <h5 class="mb-0">
+            石頭與挖礦機相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>每間上市公司擁有屬於自己的<span class="text-info">挖礦機</span>，藉由玩家放置的<span class="text-info">石頭</span>計算<span class="text-info">生產值</span>，在商業季度結算前取得<span class="text-info">營利</span>。</li>
+              <li>
+                玩家在遊戲中可以取得不同種類的石頭：
+                <ul>
+                  <li><span class="text-info">{{stoneDisplayName 'saint'}}</span>（生產值 {{stonePower 'saint'}}） - 由系統發給，可繼承至下個賽季。</li>
+                  <li><span class="text-info">{{stoneDisplayName 'birth'}}</span>（生產值 {{stonePower 'saint'}}） - 由系統發給，認證完成的帳號可以取得{{newUserBirthStoneCount}}個。</li>
+                  <li><span class="text-info">{{stoneDisplayName 'rainbow'}}</span>（生產值 {{stonePower 'rainbow'}}） - 可用${{currencyFormat (stonePrice 'rainbow')}}購買取得，在挖礦機結算獲利後將轉換為<span class="text-info">{{stoneDisplayName 'rainbowFragment'}}</span>。</li>
+                  <li><span class="text-info">{{stoneDisplayName 'rainbowFragment'}}</span>（生產值 {{stonePower 'rainbowFragment'}}） - 可用${{currencyFormat (stonePrice 'rainbowFragment')}}購買取得，在挖礦機結算獲利後將會<span class="text-danger">消失</span>。</li>
+                  <li><span class="text-info">{{stoneDisplayName 'quest'}}</span>（生產值 {{stonePower 'quest'}}） - 目前尚無取得手段。</li>
+                </ul>
+              </li>
+              <li>玩家在<span class="text-warning">一間公司中</span>，不論石頭種類，<span class="text-warning">同時只可放置一個石頭</span>。</li>
+              <li>玩家可以隨時放置或取回石頭，但在<span class="text-warning">商業季度結束前的{{miningMachineOperationHours}}小時</span>，為挖礦機的<span class="text-warning">運轉時間</span>，此段時間將<span class="text-danger">禁止放置石頭或取回石頭</span>。</li>
+              <li>在<span class="text-warning">賽季結束時</span>或是<span class="text-warning">公司被查封時</span>，將會歸還挖礦機裡的石頭。</li>
+              <li>依照挖礦機的<span class="text-info">總生產值</span>與<span class="text-info">公司評級</span>，獲利能力也會有所不同。</li>
+
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
             納稅相關
           </h5>
         </div>
