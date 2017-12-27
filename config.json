@@ -7,7 +7,6 @@
     "releaseStocksForHighPriceMaxCounter": 360,
     "releaseStocksForNoDealMinCounter": 1440,
     "releaseStocksForNoDealMaxCounter": 2880,
-    "releaseStocksForLowPriceCounter": 720,
     "recordListPriceMinCounter": 180,
     "recordListPriceMaxCounter": 360,
     "checkChairmanCounter": 10,

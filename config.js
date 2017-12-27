@@ -8,7 +8,6 @@ export const config = {
   releaseStocksForHighPriceMaxCounter: 360, //公司檢查是否要因高股價而釋出股票的最大隨機工作檢查次數
   releaseStocksForNoDealMinCounter: 1440, //公司檢查是否要因無成交而釋出股票的最小隨機工作檢查次數
   releaseStocksForNoDealMaxCounter: 2880, //公司檢查是否要因無成交而釋出股票的最大隨機工作檢查次數
-  releaseStocksForLowPriceCounter: 720, //公司檢查是否要因低股價而釋出股票的工作檢查次數
   recordListPriceMinCounter: 180, //為所有公司紀錄參考價格的最小隨機工作檢查次數
   recordListPriceMaxCounter: 360, //為所有公司紀錄參考價格的最大隨機工作檢查次數
   checkChairmanCounter: 10, //每隔多少次工作檢查，就重新檢查、設定一次各公司的董事長
