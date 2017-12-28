@@ -88,7 +88,7 @@
         <div class="collapse">
           <div class="card-block">
             <ol>
-              <li>除了公司創立時的初始釋股，尚有三種釋股機制會讓一間公司的總釋出股份增多。</li>
+              <li>除了公司創立時的初始釋股，尚有兩種釋股機制會讓一間公司的總釋出股份增多。</li>
               <li>因價格過高而釋股（高價釋股）：</li>
               <ol>
                 <li>每經過<span class="text-info">三到六小時</span>，系統會檢查一次全股市，以全股市最後成交價格作為排序，排位<span class="text-info">前百分之五</span>且當前<span class="text-info">不存在任何釋股賣單</span>在市場上的公司皆會釋出股票到市場上套利。此次釋股的數量上限為<span class="text-info">「該公司總釋股數量的平方根」</span>，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為該公司當時可下買單價格的最高上限。</li>
@@ -98,11 +98,6 @@
               <ol>
                 <li>每經過<span class="text-info">一天到兩天</span>，系統會檢查一次全股市。以買入價格為可下單最高價格」為「高價買單」，若任何一家公司存在尚未交易完畢的「高價買單」，且最近<span class="text-info">一天</span>交易紀錄的<span class="text-info">總成交量之十倍</span>小於<span class="text-info">尚未交易完畢的「高價買單」購買量</span>，該公司將會進行低量釋股。此次釋股的數量上限為<span class="text-info">尚未交易完畢的「高價買單」購買量的一半</span>，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為當時股票可下單的最高價格。</li>
                 <li>舉例而言，若一家公司的股價為$1000，存在以單價$1150購入1000張股票的買單尚未交易完畢，且最近24小時的成交量小於100張，那進行低量釋股時將釋出1(最低釋股下限)到500(尚未交易完畢的「高價買單」購買量的一半)之間的隨機數字。</li>
-              </ol>
-              <li>因股價過低而釋股（低價釋股）：</li>
-              <ol>
-                <li>每經過<span class="text-info">十二小時</span>，系統會檢查一次全股市，以全市場股價的<span class="text-info">第一四分位數</span>作為釋股門檻，以買入價格為可下單最高價格」為「高價買單」。當一家公司的參考股價小於釋股門檻，且<span class="text-info">尚未交易完畢的「高價買單」購買量</span>高於其總釋股數量的<span class="text-info">百分之一</span>時，該公司將會進行低價釋股。此次釋股的數量為<span class="text-info">尚未交易完畢的「高價買單」購買量</span>與<span class="text-info">總釋股數量的百分之五</span>取其低值。釋股價格則為當時股票可下單的最高價格。</li>
-                <li>舉例而言，若一家公司的股價為$10（低於當時的低價股門檻），存在以單價$13購入1000張股票的買單尚未交易完畢，且該公司的總釋股數量為1000，那進行低價釋股時將釋出50(尚未交易完畢的「高價買單」購買量1000與總釋股數量的百分之五取其低值)股。</li>
               </ol>
               <li>所有釋股過程與正常的股票交易過程完全相同，未立刻被購買完畢的釋股會正常的成為市場上的賣單，交易價格會更新該公司的最後成交價格。唯一的不同點在於：釋股過程裡，<span class="text-info">售賣股票獲得的金額</span>將增加至該公司的<span class="text-info">資本額</span>中。</li>
               <li>金融管理委員會會在使用者違反規定、稅金逾期未繳時對股份進行沒收，被沒收的股份將會隨機投放到市場上。這些股份與公司釋股不同，不會增加公司的總釋股數量，也不會增加公司的資本額。</li>
@@ -190,7 +185,6 @@
               <li>玩家可以隨時放置或取回石頭，但在<span class="text-warning">商業季度結束前的{{miningMachineOperationHours}}小時</span>，為挖礦機的<span class="text-warning">運轉時間</span>，此段時間將<span class="text-danger">禁止放置石頭或取回石頭</span>。</li>
               <li>在<span class="text-warning">賽季結束時</span>或是<span class="text-warning">公司被查封時</span>，將會歸還挖礦機裡的石頭。</li>
               <li>依照挖礦機的<span class="text-info">總生產值</span>與<span class="text-info">公司評級</span>，獲利能力也會有所不同。</li>
-
             </ol>
           </div>
         </div>

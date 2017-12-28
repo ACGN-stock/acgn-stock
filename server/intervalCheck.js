@@ -31,7 +31,6 @@ import { updateLowPriceThreshold } from './functions/company/updateLowPriceThres
 import { updateHighPriceThreshold } from './functions/company/updateHighPriceThreshold';
 import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
 import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
-import { countDownReleaseStocksForLowPrice } from './functions/company/releaseStocksForLowPrice';
 import { countDownRecordListPrice } from './functions/company/recordListPrice';
 import { countDownCheckChairman } from './functions/company/checkChairman';
 import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
@@ -83,7 +82,6 @@ export function doIntervalWork() {
     //隨機時間讓符合條件的公司釋出股票
     countDownReleaseStocksForHighPrice();
     countDownReleaseStocksForNoDeal();
-    countDownReleaseStocksForLowPrice();
     //隨機時間售出金管會股票並紀錄公司的參考價格
     countDownRecordListPrice();
     //檢查並更新各公司的董事長位置

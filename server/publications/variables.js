@@ -19,8 +19,6 @@ Meteor.publish('variables', function() {
           'highPriceThreshold',
           'recordListPriceBegin',
           'recordListPriceEnd',
-          'releaseStocksForLowPriceBegin',
-          'releaseStocksForLowPriceEnd',
           'releaseStocksForHighPriceBegin',
           'releaseStocksForHighPriceEnd',
           'releaseStocksForNoDealBegin',
