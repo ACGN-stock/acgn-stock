@@ -10,6 +10,7 @@ import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyStones } from '/db/dbCompanyStones';
+import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbFoundations } from '/db/dbFoundations';
@@ -155,8 +156,10 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     generateRankAndTaxesData(lastSeasonData);
     //移除所有廣告
     dbAdvertising.remove({});
+
     //移除所有公司資料
     dbCompanies.remove({});
+    dbCompanyArchive.remove({});
     //移除所有股份資料
     dbDirectors.remove({});
     //移除所有員工資料
