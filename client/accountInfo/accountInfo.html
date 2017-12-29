@@ -31,6 +31,11 @@
             {{> accountInfoOwnStockList}}
           {{/if}}
           <div class="col-12 border-grid">
+            {{#panelFolder name='stone' title='石頭資訊' }}
+              {{> accountInfoStonePanel user=lookUser}}
+            {{/panelFolder}}
+          </div>
+          <div class="col-12 border-grid">
             <a class="d-block h4" href="#" data-toggle-panel="log">
               玩家紀錄
               {{#if isDisplayPanel 'log'}}
@@ -85,8 +90,8 @@
         {{else}}
           <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="advertise">禁止廣告</button>
         {{/if}}
-        <button class="btn btn-warning btn-sm mt-1" type="button" data-action="forfeit">課以罰金</button>
-        <button class="btn btn-warning btn-sm mt-1" type="button" data-action="returnForfeit">退還罰金</button>
+        <button class="btn btn-warning btn-sm mt-1" type="button" data-action="forfeitUserMoney">課以罰金</button>
+        <button class="btn btn-warning btn-sm mt-1" type="button" data-action="returnForfeitedUserMoney">退還罰金</button>
         {{#if isBaned 'manager'}}
           <button class="btn btn-success btn-sm mt-1" type="button" data-ban="manager">解除禁任經理</button>
         {{else}}
@@ -153,9 +158,6 @@
     <div>
       帳號剩餘推薦票：{{this.profile.vote}}
     </div>
-    <div>
-      帳號擁有聖晶石：{{this.profile.stone}}
-    </div>
     {{#if this.profile.isInVacation}}
       <div class="text-info">目前正在渡假中。</div>
       {{#if this.profile.isEndingVacation}}
@@ -196,13 +198,13 @@
 <template name="companyTitleTab">
   <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item">
-      <a class="{{getClass 'chairman'}}" href="" data-type="chairman">董事長</a>
+      <a class="{{getClass 'chairman'}}" href="#" data-type="chairman">董事長</a>
     </li>
     <li class="nav-item">
-      <a class="{{getClass 'manager'}}" href="" data-type="manager">經理人</a>
+      <a class="{{getClass 'manager'}}" href="#" data-type="manager">經理人</a>
     </li>
     <li class="nav-item">
-      <a class="{{getClass 'employee'}}" href="" data-type="employee">員工</a>
+      <a class="{{getClass 'employee'}}" href="#" data-type="employee">員工</a>
     </li>
   </ul>
 </template>
@@ -211,9 +213,9 @@
   {{#each titleList}}
     <div class="text-primary d-flex flex-nowrap">
       <div class="text-nowrap">是「</div>
-      <div class="d-inline-block text-truncate" style="min-width: 1rem;">{{>companyLink this._id}}</div>
+      <div class="d-inline-block text-truncate" style="min-width: 3rem;">{{>companyLink this._id}}</div>
       <div class="text-nowrap">」公司的「</div>
-      <div class="d-inline-block text-truncate" style="min-width: 1rem;">
+      <div class="d-inline-block text-truncate" style="min-width: 3rem;">
         <a href="#" data-action="changeChairmanTitle">
           {{this.chairmanTitle}}
         </a>

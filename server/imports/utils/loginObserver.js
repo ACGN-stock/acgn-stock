@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 
-import { threadId } from '../threading/thread';
 import { dbLog } from '/db/dbLog';
 import { dbSeason } from '/db/dbSeason';
+import { threadId } from '../threading/thread';
 
 export const loginObserver = {
   //開始觀察以處理登入IP紀錄、未登入天數
@@ -43,7 +43,7 @@ export const loginObserver = {
                   beginDate: -1
                 }
               });
-              lastSeasonData = lastSeasonData ? lastSeasonData : {
+              lastSeasonData = lastSeasonData || {
                 beginDate: new Date()
               };
               const seasonBeginTime = lastSeasonData.beginDate.getTime();

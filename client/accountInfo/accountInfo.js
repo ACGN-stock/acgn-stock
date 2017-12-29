@@ -7,6 +7,7 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+
 import { dbLog, accuseLogTypeList } from '/db/dbLog';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
@@ -17,6 +18,7 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat } from '../utils/helpers';
 import { changeChairmanTitle } from '../utils/methods';
+import { accountInfoCommonHelpers } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
@@ -81,6 +83,7 @@ Template.accountInfo.events({
 });
 
 Template.accountInfoBasic.helpers({
+  ...accountInfoCommonHelpers,
   showValidateType() {
     switch (this.profile.validateType) {
       case 'Google': {
@@ -108,14 +111,6 @@ Template.accountInfoBasic.helpers({
   },
   isEndingVacation() {
     return this.profile.isEndingVacation;
-  },
-  isCurrentUser() { // TODO 和 tax 那邊合併
-    const user = Meteor.user();
-    if (user && user._id === FlowRouter.getParam('userId')) {
-      return true;
-    }
-
-    return false;
   }
 });
 
@@ -189,15 +184,15 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="forfeit"]'(event, templateInstance) {
+  'click [data-action="forfeitUserMoney"]'(event, templateInstance) {
     event.preventDefault();
     const accuseUserData = templateInstance.data;
     alertDialog.dialog({
       type: 'prompt',
       title: '課以罰金 - ' + accuseUserData.profile.name,
       message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
+      callback: (reason) => {
+        if (reason) {
           alertDialog.dialog({
             type: 'prompt',
             title: '課以罰金 - ' + accuseUserData.profile.name,
@@ -208,7 +203,7 @@ Template.accountInfoBasic.events({
               amount = parseInt(amount, 10);
               if (amount && amount >= 0) {
                 const userId = accuseUserData._id;
-                Meteor.customCall('forfeit', {userId, message, amount});
+                Meteor.customCall('forfeitUserMoney', { userId, reason, amount });
               }
             }
           });
@@ -216,15 +211,15 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="returnForfeit"]'(event, templateInstance) {
+  'click [data-action="returnForfeitedUserMoney"]'(event, templateInstance) {
     event.preventDefault();
     const accuseUserData = templateInstance.data;
     alertDialog.dialog({
       type: 'prompt',
       title: '退還罰金 - ' + accuseUserData.profile.name,
       message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
+      callback: (reason) => {
+        if (reason) {
           alertDialog.dialog({
             type: 'prompt',
             title: '退還罰金 - ' + accuseUserData.profile.name,
@@ -235,8 +230,7 @@ Template.accountInfoBasic.events({
               amount = parseInt(amount, 10);
               if (amount && amount > 0) {
                 const userId = accuseUserData._id;
-                amount *= -1;
-                Meteor.customCall('forfeit', {userId, message, amount});
+                Meteor.customCall('forfeitUserMoney', { userId, reason, amount: -amount });
               }
             }
           });
@@ -303,6 +297,7 @@ Template.companyTitleTab.helpers({
 });
 Template.companyTitleTab.events({
   'click [data-type]'(event) {
+    event.preventDefault();
     const $target = $(event.currentTarget);
     companyTitleView.set($target.data('type'));
   }
@@ -416,14 +411,7 @@ Template.accountInfoTaxList.onCreated(function() {
   });
 });
 Template.accountInfoTaxList.helpers({
-  isCurrentUser() {
-    const user = Meteor.user();
-    if (user && user._id === FlowRouter.getParam('userId')) {
-      return true;
-    }
-
-    return false;
-  },
+  ...accountInfoCommonHelpers,
   taxesList() {
     const userId = FlowRouter.getParam('userId');
 

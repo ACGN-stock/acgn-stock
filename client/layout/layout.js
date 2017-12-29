@@ -2,9 +2,9 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { rMainTheme } from '../utils/styles';
 import { rAccountDialogMode } from './accountDialog';
 import { rShowAlertDialog } from './alertDialog';
-import { rMainTheme } from '../utils/styles';
 
 Template.layout.helpers({
   currentPage() {
@@ -24,4 +24,3 @@ Template.layout.helpers({
     return 'container container-dark';
   }
 });
-

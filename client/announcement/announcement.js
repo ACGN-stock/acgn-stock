@@ -123,16 +123,6 @@ Template.systemStatusPanel.helpers({
 
     return formatDateText(time ? new Date(time) : null);
   },
-  lowPriceReleaseBegin() {
-    const time = dbVariables.get('releaseStocksForLowPriceBegin');
-
-    return formatDateText(time ? new Date(time) : null);
-  },
-  lowPriceReleaseEnd() {
-    const time = dbVariables.get('releaseStocksForLowPriceEnd');
-
-    return formatDateText(time ? new Date(time) : null);
-  },
   highPriceReleaseBegin() {
     const time = dbVariables.get('releaseStocksForHighPriceBegin');
 

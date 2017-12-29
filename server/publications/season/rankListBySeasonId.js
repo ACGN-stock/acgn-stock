@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
 
 import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
@@ -10,6 +11,8 @@ import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('rankListBySeasonId', function(seasonId) {
   debug.log('publish rankListBySeasonId', seasonId);
+
+  check(seasonId, String);
 
   dbRankCompanyPrice.find({seasonId}).forEach((doc) => {
     this.added('rankCompanyPrice', doc._id, doc);

@@ -3,11 +3,13 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
 import { Migrations } from 'meteor/percolate:migrations';
+
 import { dbAdvertising } from './dbAdvertising';
-import { dbArena } from '/db/dbArena';
-import { dbArenaFighters } from '/db/dbArenaFighters';
+import { dbArena } from './dbArena';
+import { dbArenaFighters } from './dbArenaFighters';
 import { dbCompanies } from './dbCompanies';
 import { dbCompanyArchive } from './dbCompanyArchive';
+import { dbCompanyStones } from './dbCompanyStones';
 import { dbDirectors } from './dbDirectors';
 import { dbFoundations } from './dbFoundations';
 import { dbLog, logTypeList } from './dbLog';
@@ -26,7 +28,7 @@ import { dbSeason } from './dbSeason';
 import { dbTaxes } from './dbTaxes';
 import { dbUserArchive } from './dbUserArchive';
 import { dbValidatingUsers } from './dbValidatingUsers';
-import { dbVariables } from '/db/dbVariables';
+import { dbVariables } from './dbVariables';
 import { dbVoteRecord } from './dbVoteRecord';
 
 if (Meteor.isServer) {
@@ -470,8 +472,8 @@ if (Meteor.isServer) {
     version: 11,
     name: 'rename user.profile.lastReadFscAnnouncementDate to user.profile.lastReadAccuseLogDate',
     up() {
-      Meteor.users.update({
-        lastReadFscAnnouncementDate: 1
+      Meteor.users.rawCollection().update({
+        lastReadFscAnnouncementDate: { $exists: true }
       }, {
         $rename: { lastReadFscAnnouncementDate: 'lastReadAccuseLogDate' }
       });
@@ -560,7 +562,7 @@ if (Meteor.isServer) {
             name: userName,
             validateType: userData.profile.validateType,
             isAdmin: userData.profile.isAdmin,
-            stone: userData.profile.stone,
+            stone: userData.profile.stones.saint,
             ban: userData.profile.ban
           });
         });
@@ -596,34 +598,40 @@ if (Meteor.isServer) {
     version: 13,
     name: 'arena system',
     up() {
-      dbArena.rawCollection().createIndex({
-        beginDate: 1
-      });
-      dbArenaFighters.rawCollection().createIndex(
-        {
-          arenaId: 1,
-          companyId: 1
-        },
-        {
-          unique: true
-        }
-      );
-      const lastSeasonData = dbSeason.findOne({}, {
-        sort: {
-          beginDate: -1
-        }
-      });
-      if (lastSeasonData) {
-        const {beginDate, endDate} = lastSeasonData;
-        const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber);
-        dbArena.insert({
-          beginDate: beginDate,
-          endDate: arenaEndDate,
-          joinEndDate: new Date(arenaEndDate.getTime() - Meteor.settings.public.electManagerTime),
-          shuffledFighterCompanyIdList: []
-        });
+      dbArena.rawCollection().createIndex({ beginDate: 1 });
+      dbArenaFighters.rawCollection().createIndex({ arenaId: 1, companyId: 1 }, { unique: true });
+
+      // 在有資料的狀況下，用最後一個賽季與該賽季的商業季度總數推導出最近一次亂鬥的資料
+      const lastRound = dbRound.findOne({}, { sort: { beginDate: -1 } });
+      if (! lastRound) {
+        return;
       }
-      dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
+
+      const seasonCount = dbSeason
+        .find({
+          beginDate: { $gte: lastRound.beginDate },
+          endDate: { $lte: lastRound.endDate }
+        }, {
+          sort: { beginDate: -1 }
+        })
+        .count();
+      if (seasonCount < 1) {
+        return;
+      }
+
+      const { seasonTime, arenaIntervalSeasonNumber, electManagerTime } = Meteor.settings.public;
+
+      const lastSeasonData = dbSeason.findOne({}, { sort: { beginDate: -1 }});
+      const {beginDate, endDate} = lastSeasonData;
+      const arenaEndDate = new Date(endDate.getTime() + seasonTime * arenaIntervalSeasonNumber);
+      dbArena.insert({
+        beginDate: beginDate,
+        endDate: arenaEndDate,
+        joinEndDate: new Date(arenaEndDate.getTime() - electManagerTime),
+        shuffledFighterCompanyIdList: []
+      });
+
+      dbVariables.set('arenaCounter', (arenaIntervalSeasonNumber + 1 - seasonCount) % (arenaIntervalSeasonNumber + 1));
     }
   });
 
@@ -633,11 +641,14 @@ if (Meteor.isServer) {
     up() {
       dbLog.rawCollection().createIndex({ logType: 1, createdAt: -1 });
 
-      logTypeList.forEach((logType) => {
-        // console.log(`migrating logType ${logType}...`);
+      const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+      let runBulk = false;
 
-        const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-        let runBulk = false;
+      logTypeList.forEach((logType) => {
+        // 跳過無資料的狀況
+        if (dbLog.find({ logType, data: { $exists: false }}).count() === 0) {
+          return;
+        }
 
         const bulkCursor = logBulk.find({
           logType,
@@ -1013,11 +1024,11 @@ if (Meteor.isServer) {
             runBulk = true;
             break;
         }
-
-        if (runBulk) {
-          Meteor.wrapAsync(logBulk.execute).call(logBulk);
-        }
       });
+
+      if (runBulk) {
+        Meteor.wrapAsync(logBulk.execute).call(logBulk);
+      }
     }
   });
 
@@ -1096,6 +1107,32 @@ if (Meteor.isServer) {
       });
 
       Meteor.wrapAsync(companiesBulk.execute).call(companiesBulk);
+    }
+  });
+
+  Migrations.add({
+    version: 16,
+    name: 'add more stone types & company mining machine mechanism',
+    up() {
+      // 重新命名聖晶石欄位以擴充為多種石頭，並設定既有使用者的各種石頭數量
+      Meteor.users.rawCollection().update({}, {
+        $rename: { 'profile.stone': 'profile.stones.saint' },
+        $set: {
+          'profile.stones.birth': Meteor.settings.public.newUserBirthStones,
+          'profile.stones.rainbow': 0,
+          'profile.stones.rainbowFragment': 0,
+          'profile.stones.quest': 0
+        }
+      }, { multi: true });
+
+      // 重新命名使用者封存的聖晶石欄位（目前只有聖晶石會繼承）
+      dbUserArchive.rawCollection().update({}, { $rename: { stone: 'saintStones' } }, { multi: true });
+
+      // 挖礦機放置石頭資訊的 indexes
+      dbCompanyStones.rawCollection().createIndex({ userId: 1 });
+      dbCompanyStones.rawCollection().createIndex({ companyId: 1 });
+      dbCompanyStones.rawCollection().createIndex({ stoneType: 1 });
+      dbCompanyStones.rawCollection().createIndex({ placedAt: -1 });
     }
   });
 

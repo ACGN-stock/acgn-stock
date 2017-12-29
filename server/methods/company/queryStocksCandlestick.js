@@ -9,9 +9,11 @@ import { debug } from '/server/imports/utils/debug';
 Meteor.methods({
   queryStocksCandlestick(companyId, options) {
     check(companyId, String);
-    check(options.lastTime, Number);
-    check(options.unitTime, Number);
-    check(options.count, Number);
+    check(options, {
+      lastTime: Number,
+      unitTime: Number,
+      count: Number
+    });
 
     return queryStocksCandlestick(companyId, options);
   }

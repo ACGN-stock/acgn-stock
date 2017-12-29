@@ -160,17 +160,17 @@ Template.foundCompanyForm.helpers({
 });
 
 Template.foundCompanyForm.events({
-  'click [data-remove-tag]'(event, templatInstance) {
+  'click [data-remove-tag]'(event, templateInstance) {
     const tag = $(event.currentTarget).attr('data-remove-tag');
-    const model = _.clone(templatInstance.model.get());
+    const model = _.clone(templateInstance.model.get());
     model.tags = _.without(model.tags, tag);
-    templatInstance.model.set(model);
+    templateInstance.model.set(model);
   },
-  'keypress [name="tags"]'(event, templatInstance) {
+  'keypress [name="tags"]'(event, templateInstance) {
     if (event.which === 13) {
       event.preventDefault();
       event.stopPropagation();
-      addNewTag(event, templatInstance);
+      addNewTag(event, templateInstance);
     }
   },
   'click [data-action="addNewTag"]': addNewTag,
@@ -185,9 +185,9 @@ Template.foundCompanyForm.events({
   }
 });
 
-function addNewTag(event, templatInstance) {
-  const $input = templatInstance.$input.filter('[name="tags"]');
-  const model = _.clone(templatInstance.model.get());
+function addNewTag(event, templateInstance) {
+  const $input = templateInstance.$input.filter('[name="tags"]');
+  const model = _.clone(templateInstance.model.get());
   const tag = $input.val().trim();
   if (! tag) {
     alertDialog.alert('請輸入標籤名稱！');
@@ -196,6 +196,6 @@ function addNewTag(event, templatInstance) {
   }
   model.tags.push(tag);
   model.tags = _.unique(model.tags);
-  templatInstance.model.set(model);
+  templateInstance.model.set(model);
   $input.val('');
 }

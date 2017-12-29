@@ -2,9 +2,9 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 
-import { threadId } from './thread';
 import { dbResourceLock } from '/db/dbResourceLock';
 import { debug } from '/server/imports/utils/debug';
+import { threadId } from './thread';
 
 export const resourceManager = {
   request(task, resourceList, callback) {

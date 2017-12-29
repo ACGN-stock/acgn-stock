@@ -41,7 +41,8 @@ function queryInstantMessage() {
 }
 Template.instantMessage.helpers({
   isDontInterruptButtonClass() {
-    return rDontInterrupt.get() ? 'btn btn-sm btn-warning float-right mr-1' : 'btn btn-sm btn-secondary float-right mr-1';
+    return rDontInterrupt.get()
+      ? 'btn btn-sm btn-warning mr-1' : 'btn btn-sm btn-secondary mr-1';
   }
 });
 Template.instantMessage.events({
@@ -144,10 +145,10 @@ Template.instantMessageFilterButton.helpers({
     const btnType = this.type;
     const messageTypeList = messageTypeGroupHash[btnType] || [btnType];
     if (_.contains(rFilterTypeList.get(), messageTypeList[0])) {
-      return 'btn btn-sm btn-primary mt-1';
+      return 'btn btn-sm btn-primary';
     }
     else {
-      return 'btn btn-sm btn-secondary mt-1';
+      return 'btn btn-sm btn-secondary';
     }
   },
   btnText() {

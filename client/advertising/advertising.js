@@ -8,11 +8,10 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-import { formatDateText } from '../utils/helpers';
+import { formatDateText, currencyFormat, sanitizeHtml } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat, sanitizeHtml } from '../utils/helpers.js';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInBuyAdvertisingMode = new ReactiveVar(false);
@@ -90,7 +89,7 @@ Template.advertising.events({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     const message = `
       <div>確定要撤銷廣告？</div>
-      <div style="max-height: 100px; overflow: scroll;">${sanitizeHtml(advertisingData.message)}</div>
+      <div style="max-height: 100px; overflow-y: scroll;">${sanitizeHtml(advertisingData.message)}</div>
     `;
 
     alertDialog.confirm({
@@ -190,14 +189,14 @@ function saveAdvertisingModel(model) {
     totalPaid += 100;
     advertisingSample = `
       <a href="${submitData.url}" target="_blank">
-        ${advertisingSample}
+        ${sanitizeHtml(advertisingSample)}
       </a>
     `;
   }
   const message = `
     <div>廣告總支出：$${currencyFormat(totalPaid)}</div>
     <div>廣告內容：</div>
-    <div style="max-height: 100px; overflow: scroll;">${sanitizeHtml(advertisingSample)}</div>
+    <div style="max-height: 100px; overflow-y: scroll;">${advertisingSample}</div>
     <div>確定發出廣告嗎？</div>
   `;
   alertDialog.confirm({

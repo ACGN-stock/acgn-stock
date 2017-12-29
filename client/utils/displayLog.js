@@ -2,7 +2,7 @@ import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
-import { currencyFormat, sanitizeHtml } from './helpers.js';
+import { stoneDisplayName, currencyFormat, sanitizeHtml } from './helpers.js';
 
 Template.displayLog.onRendered(function() {
   this.$('[data-user-link]').each((_, elem) => {
@@ -90,6 +90,9 @@ Template.displayLog.helpers({
       }
       case '免費得石': {
         return `【免費得石】因為「${sanitizeHtml(data.reason)}」的理由獲得了${data.stones}顆聖晶石！`;
+      }
+      case '購買得石': {
+        return `【購買得石】${users[0]}花費$${currencyFormat(data.cost)}購買了${data.amount}個${stoneDisplayName(data.stoneType)}！`;
       }
       case '聊天發言': {
         return `${users[0]}說道：「${sanitizeHtml(data.message)}」`;
@@ -183,16 +186,10 @@ Template.displayLog.helpers({
         return `【支持紀錄】${users[0]}開始支持${users[1]}擔任「${company}」公司的經理人。`;
       }
       case '就任經理': {
-        let result = `【就任經理】${users[0]}在${data.seasonName}商業季度`;
-
-        if (data.stocks) {
-          result += `以${data.stocks}數量的支持股份`;
-        }
-
-        result += '擊敗了所有競爭對手，';
+        let result = `【就任經理】${users[0]}在${data.seasonName}商業季度以${data.stocks || 0}數量的支持股份勝出，`;
 
         if (! userId[1] || userId[1] === '!none') {
-          result += '成為了公司的經理人。';
+          result += `成為了「${company}」公司的經理人。`;
         }
         else if (userId[0] === userId[1]) {
           result += `繼續擔任「${company}」公司的經理人職務。`;
@@ -320,10 +317,14 @@ Template.displayLog.helpers({
         return `【解除禁令】${users[0]}以「${sanitizeHtml(data.reason)}」的理由中止了${users[1]}禁任經理人的處置。`;
       }
       case '課以罰款': {
-        return `【違規處理】${users[0]}以「${sanitizeHtml(data.reason)}」的理由向${users[1]}課以總數為$${currencyFormat(data.fine)}的罰金。`;
+        const target = users[1] || `「${company}」公司`;
+
+        return `【違規處理】${users[0]}以「${sanitizeHtml(data.reason)}」的理由向${target}課以總數為$${currencyFormat(data.fine)}的罰金。`;
       }
       case '退還罰款': {
-        return `【退還罰款】${users[0]}以「${sanitizeHtml(data.reason)}」的理由向${users[1]}退還總數為$${currencyFormat(data.fine)}的罰金。`;
+        const target = users[1] || `「${company}」公司`;
+
+        return `【退還罰款】${users[0]}以「${sanitizeHtml(data.reason)}」的理由向${target}退還總數為$${currencyFormat(data.fine)}的罰金。`;
       }
       case '沒收股份': {
         return `【違規處理】${users[0]}以「${sanitizeHtml(data.reason)}」的理由將${users[1]}持有的「${company}」公司股份數量${data.stocks}給沒收了。`;
@@ -373,6 +374,15 @@ Template.displayLog.helpers({
       }
       case '亂鬥營利': {
         return `【最萌亂鬥】「${company}」公司在這一屆最萌亂鬥大賽中表現出眾，獲得了$${currencyFormat(data.reward)}的營利金額！`;
+      }
+      case '礦機放石': {
+        return `【礦機放石】${users[0]}在「${company}」公司的挖礦機放置了一個${stoneDisplayName(data.stoneType)}！`;
+      }
+      case '礦機取石': {
+        return `【礦機取石】${users[0]}從「${company}」公司的挖礦機拿回了一個${stoneDisplayName(data.stoneType)}！`;
+      }
+      case '礦機營利': {
+        return `【礦機營利】「${company}」公司的挖礦機集結眾人之力努力運轉，使其獲得了$${currencyFormat(data.profit)}的營利額！`;
       }
     }
   }

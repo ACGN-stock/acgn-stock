@@ -189,14 +189,14 @@ Template.productInfoBySeasonTable.helpers({
   }
 });
 Template.productInfoBySeasonTable.events({
-  'click [data-vote-product]'(event, templatInstance) {
+  'click [data-vote-product]'(event, templateInstance) {
     event.preventDefault();
-    const productData = templatInstance.data;
+    const productData = templateInstance.data;
     voteProduct(productData._id, productData.companyId);
   },
-  'click [data-take-down]'(event, templatInstance) {
+  'click [data-take-down]'(event, templateInstance) {
     event.preventDefault();
-    const productData = templatInstance.data;
+    const productData = templateInstance.data;
     alertDialog.dialog({
       type: 'prompt',
       title: '違規處理 - 產品下架',

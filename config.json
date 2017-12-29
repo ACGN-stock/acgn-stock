@@ -7,7 +7,6 @@
     "releaseStocksForHighPriceMaxCounter": 360,
     "releaseStocksForNoDealMinCounter": 1440,
     "releaseStocksForNoDealMaxCounter": 2880,
-    "releaseStocksForLowPriceCounter": 720,
     "recordListPriceMinCounter": 180,
     "recordListPriceMaxCounter": 360,
     "checkChairmanCounter": 10,
@@ -17,7 +16,8 @@
     "foundationNeedUsers": 10,
     "archiveReviveNeedUsers": 30,
     "minReleaseStock": 1000,
-    "beginMoney": 10000,
+    "newUserInitialMoney": 10000,
+    "newUserBirthStones": 1,
     "salaryPerPay": 1000,
     "seasonNumberInRound": 12,
     "arenaIntervalSeasonNumber": 1,
@@ -46,6 +46,14 @@
     "vacationModeZombieTaxPerDay": 500,
     "minIntervalTimeBetweenVacations": 604800000,
     "taxExpireTime": 259200000,
-    "releaseStocksForNoDealTradeLogLookbackIntervalTime": 86400000
+    "releaseStocksForNoDealTradeLogLookbackIntervalTime": 86400000,
+    "miningMachineOperationTime": 86400000,
+    "stonePrice": {
+      "rainbow": 100000,
+      "rainbowFragment": 10000
+    },
+    "dataNumberPerPage": {
+      "userPlacedStones": 10
+    }
   }
 }

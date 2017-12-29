@@ -1,7 +1,8 @@
-'use strict';
 import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
 import SimpleSchema from 'simpl-schema';
+
+import { stoneTypeList } from './dbCompanyStones';
 
 export const banTypeList = [
   'accuse', //所有舉報違規行為
@@ -50,6 +51,7 @@ const schema = new SimpleSchema({
         type: SimpleSchema.Integer,
         defaultValue: 0
       },
+      // 上季財富額
       lastSeasonTotalWealth: {
         type: SimpleSchema.Integer,
         defaultValue: 0
@@ -60,11 +62,17 @@ const schema = new SimpleSchema({
         min: 0,
         defaultValue: 0
       },
-      //聖晶石數量
-      stone: {
-        type: SimpleSchema.Integer,
-        min: 0,
-        defaultValue: 0
+      // 各類石頭的數量
+      stones: {
+        type: new SimpleSchema(stoneTypeList.reduce((obj, stoneType) => {
+          obj[stoneType] = {
+            type: SimpleSchema.Integer,
+            min: 0,
+            defaultValue: 0
+          };
+
+          return obj;
+        }, {}))
       },
       //是否為金管會委員
       isAdmin: {

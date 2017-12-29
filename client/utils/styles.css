@@ -13,6 +13,52 @@ body {
   margin-bottom: 2rem;
 }
 
+/* 在必要的輸入的label上加上asterisk */
+[data-required]:after {
+  font-size: 0.75rem;
+  content: '＊';
+  vertical-align: super;
+}
+
+/* 暗色主題 */
+.container-dark .bg-info .media-body {
+  color: #ffffff;
+}
+.container-dark .bg-info .media-body a {
+  color: #000000;
+}
+.container-dark .table-success a {
+  color: #000000;
+}
+.container-dark .modal-content {
+  border: 1px solid #dddddd;
+}
+.container-dark .modal-header {
+  border-bottom: 1px solid #dddddd;
+}
+.container-dark .modal-footer {
+  border-top: 1px solid #dddddd;
+}
+.container-dark .company-card {
+  border: 1px solid #000;
+  box-shadow: 6px 6px 6px rgba(0,0,0,1);
+}
+.container-dark .company-card-default {
+  background: rgb(0, 43, 54);
+}
+.container-dark .company-card-default .row {
+  color: #839496;
+}
+.container-dark .company-card-default .row-info p {
+  color: #839496;
+}
+.container-dark .company-card-default .row-info small {
+  color: #839496;
+}
+.container-dark .company-card-default .btn-tab {
+  color: #839496;
+}
+
 .btn {
   cursor: pointer;
 }
@@ -189,10 +235,10 @@ body {
   }
 }
 
-@media only screen and (max-width: 380px) {
-  .media.company-summary-item .row-title{
-    padding-left: 2px;
-    padding-right: 2px;
+@media only screen and (max-width: 525px) {
+  .media.company-summary-item .row-title {
+    padding-left: 0px;
+    padding-right: 8px;
   }
 }
 
@@ -211,187 +257,99 @@ body {
   object-fit: cover;
 }
 
+/* 公司資訊頁大圖 */
 .company-detail .picture {
-  width: 315px;
-  height: 300px;
-  padding-right: 15px;
-  text-align: center;
-}
-.company-detail .picture img {
   width: 300px;
   height: 300px;
+  margin-right: 15px;
+  text-align: center;
+}
+
+@media only screen and (max-width: 767.5px) {
+  .company-detail .picture {
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+}
+
+/* 公司資訊頁大圖在螢幕寬度過小情況下，隨著螢幕寬度作等比縮小 */
+@media only screen and (max-width: 341px) {
+  .company-detail .media {
+    margin-right: -30px;
+  }
+  .company-detail .picture {
+    position: relative;
+    width: 100%;
+  }
+  .company-detail .picture:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
+  }
+  .company-detail .picture img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+.company-detail .picture img {
+  width: 100%;
+  height: 100%;
   object-fit: scale-down;
 }
 
-.media-body.row {
-  overflow: hidden;
-}
-
-/* 暗色主題 */
-.container-dark .bg-info .media-body {
-  color: #ffffff;
-}
-.container-dark .bg-info .media-body a {
-  color: #000000;
-}
-.container-dark .table-success a {
-  color: #000000;
-}
-.container-dark .modal-content {
-  border: 1px solid #dddddd;
-}
-.container-dark .modal-header {
-  border-bottom: 1px solid #dddddd;
-}
-.container-dark .modal-footer {
-  border-top: 1px solid #dddddd;
-}
-.container-dark .company-card {
-  border: 1px solid #000;
-  box-shadow: 6px 6px 6px rgba(0,0,0,1);
-}
-.container-dark .company-card-default {
-  background: rgb(0, 43, 54);
-}
-.container-dark .company-card-default .row {
-  color: #839496;
-}
-.container-dark .company-card-default .row-info p {
-  color: #839496;
-}
-.container-dark .company-card-default .row-info small {
-  color: #839496;
-}
-.container-dark .company-card-default .btn-tab {
-  color: #839496;
-}
-
-/* 帳號資訊 > 稅務資訊 移動端排版 */
-@media only screen and (max-width: 768px) {
-  table.account-tax-info,
-  table.account-tax-info thead,
-  table.account-tax-info tbody,
-  table.account-tax-info th,
-  table.account-tax-info td,
-  table.account-tax-info tr {
-    display: block;
+/* 公司資訊頁 > 董事會 */
+@media only screen and (max-width: 767.5px) {
+  div.company-director-list .hidden-title {
+    padding-left: 15px;
+    width: 35%;
   }
-
-  table.account-tax-info thead tr {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
+  div.company-director-list .data-content {
+    width: 65%;
   }
-
-  table.account-tax-info tr {
-    border: 2px solid;
-    border-color: inherit;
+  div.company-director-list .data-row {
+    border-bottom: 1px dashed;
   }
-
-  table.account-tax-info td {
-    border: none;
-    border-bottom: 1px solid;
-    border-color: inherit;
-    position: relative;
-    padding-left: 35%;
-    white-space: normal;
-  }
-
-  table.account-tax-info td:last-child {
+  div.company-director-list .data-row:first-of-type,
+  div.company-director-list .data-row:last-of-type {
     border-bottom: none;
   }
-
-  table.account-tax-info td:before {
-    position: absolute;
-    left: 4px;
-    white-space: nowrap;
-    text-align: left;
-    font-weight: bold;
-  }
-
-  table.account-tax-info td:before { content: attr(data-title); }
-
-  table.account-tax-info tr.default-content {
-    border: none;
-  }
-
-  table.account-tax-info tr.default-content > td {
-    padding-left: 0;
-    padding-right: 0;
-  }
 }
 
-/* 廣告中心 移動端排版 */
-@media only screen and (max-width: 768px) {
-  table.advertisement-list,
-  table.advertisement-list thead,
-  table.advertisement-list tbody,
-  table.advertisement-list th,
-  table.advertisement-list td,
-  table.advertisement-list tr {
-    display: block;
+/* 公司資訊頁 > 員工名冊 > 在職員工 */
+@media only screen and (max-width: 767.5px) {
+  div.company-employee-list .data-row {
+    border-bottom: 1px dashed;
   }
-
-  table.advertisement-list thead tr {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-  }
-
-  table.advertisement-list tr {
-    border: 2px solid;
-    border-color: inherit;
-  }
-
-  table.advertisement-list td {
-    border: none;
-    border-bottom: 1px solid;
-    border-color: inherit;
-    position: relative;
-    padding-left: 35%;
-    white-space: normal;
-  }
-
-  table.advertisement-list td:last-child {
+  div.company-employee-list .data-row:last-of-type {
     border-bottom: none;
   }
-
-  table.advertisement-list td:before {
-    position: absolute;
-    left: 4px;
-    white-space: nowrap;
-    text-align: left;
-    font-weight: bold;
+  div.company-employee-list .hidden-title {
+    padding-left: 15px;
+    width: 35%;
   }
-
-  table.advertisement-list td:before { content: attr(data-title); }
-
-  table.advertisement-list td.adv-content {
-    max-height: 100px;
-    overflow-y: auto;
-  }
-
-  table.advertisement-list tr.default-content {
-    border: none;
-  }
-
-  table.advertisement-list tr.default-content > td {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  table.advertisement-list td.ad-content {
-    word-break: break-all;
-    max-height: 9rem;
-    overflow-y: auto;
+  div.company-employee-list .data-content {
+    width: 65%;
   }
 }
 
-@media only screen and (min-width: 769px) {
-  table.advertisement-list td.ad-buyer,
-  table.advertisement-list td.ad-content {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+/* 公司資訊頁 > 員工名冊 > 儲備員工 */
+@media only screen and (max-width: 767.5px) {
+  div.company-trainee-list .data-row {
+    border-bottom: 1px dashed;
+  }
+  div.company-trainee-list .data-row:last-of-type {
+    border-bottom: none;
+  }
+  div.company-trainee-list .hidden-title {
+    padding-left: 15px;
+    width: 35%;
+  }
+  div.company-trainee-list .data-content {
+    width: 65%;
   }
 }
 
@@ -409,7 +367,7 @@ body {
 }
 
 /* 經營管理介面 > 產品管理 移動端排版 */
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 767.5px) {
   table.next-season-product,
   table.next-season-product thead,
   table.next-season-product tbody,
@@ -482,9 +440,152 @@ table.next-season-product .product-description {
   max-height: 3.5rem;
 }
 
-[data-required]:after {
-  font-size: 0.75rem;
-  content: '＊';
-  vertical-align: super;
+.media-body.row {
+  overflow: hidden;
 }
 
+/* 帳號資訊 > 稅務資訊 移動端排版 */
+@media only screen and (max-width: 767.5px) {
+  table.account-tax-info,
+  table.account-tax-info thead,
+  table.account-tax-info tbody,
+  table.account-tax-info th,
+  table.account-tax-info td,
+  table.account-tax-info tr {
+    display: block;
+  }
+
+  table.account-tax-info thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  table.account-tax-info tr {
+    border: 2px solid;
+    border-color: inherit;
+  }
+
+  table.account-tax-info td {
+    border: none;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    position: relative;
+    padding-left: 35%;
+    white-space: normal;
+  }
+
+  table.account-tax-info td:last-child {
+    border-bottom: none;
+  }
+
+  table.account-tax-info td:before {
+    position: absolute;
+    left: 4px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  table.account-tax-info td:before { content: attr(data-title); }
+
+  table.account-tax-info tr.default-content {
+    border: none;
+  }
+
+  table.account-tax-info tr.default-content > td {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* 廣告中心 移動端排版 */
+@media only screen and (max-width: 767.5px) {
+  table.advertisement-list,
+  table.advertisement-list thead,
+  table.advertisement-list tbody,
+  table.advertisement-list th,
+  table.advertisement-list td,
+  table.advertisement-list tr {
+    display: block;
+  }
+
+  table.advertisement-list thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  table.advertisement-list tr {
+    border: 2px solid;
+    border-color: inherit;
+  }
+
+  table.advertisement-list td {
+    border: none;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    position: relative;
+    padding-left: 35%;
+    white-space: normal;
+  }
+
+  table.advertisement-list td:last-child {
+    border-bottom: none;
+  }
+
+  table.advertisement-list td:before {
+    position: absolute;
+    left: 4px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+
+  table.advertisement-list td:before { content: attr(data-title); }
+
+  table.advertisement-list td.adv-content {
+    max-height: 100px;
+    overflow-y: auto;
+  }
+
+  table.advertisement-list tr.default-content {
+    border: none;
+  }
+
+  table.advertisement-list tr.default-content > td {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  table.advertisement-list td.anti-block-ad-message {
+    word-break: break-all;
+    max-height: 9rem;
+    overflow-y: auto;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  table.advertisement-list td.ad-buyer,
+  table.advertisement-list td.anti-block-ad-message {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* 修正 IE 上顯示 */
+/*@media screen and (min-width:0\0) {
+  .input-group-btn > .btn {
+    flex-basis: auto !important;
+  }
+}*/
+
+.stone-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.stone-icon-2x {
+  width: 2rem;
+  height: 2rem;
+}

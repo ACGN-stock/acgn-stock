@@ -9,8 +9,8 @@ import { dbProductLike } from '/db/dbProductLike';
 import { dbVariables } from '/db/dbVariables';
 import { dbVoteRecord } from '/db/dbVoteRecord';
 import { addTask, resolveTask } from '../layout/loading';
-import { handleError } from './handleError';
 import { alertDialog } from '../layout/alertDialog';
+import { handleError } from './handleError';
 import { currencyFormat } from './helpers';
 
 Meteor.subscribe('isChangingSeason');
@@ -198,8 +198,7 @@ export function retrieveOrder(orderData) {
   const companyData = dbCompanies.findOne(orderData.companyId);
   if (companyData) {
     const message = '' +
-      '確定要取消「以$' + orderData.unitPrice +
-      '單價' + orderData.orderType + '數量' + orderData.amount + '的「' +
+      '確定要取消「以$' + orderData.unitPrice + orderData.orderType + orderData.amount + '股的「' +
       companyData.companyName + '」公司股份」這筆訂單嗎？（將付出手續費$1）';
     alertDialog.confirm({
       message,

@@ -7,11 +7,12 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbArena } from '/db/dbArena';
 import { dbSeason } from '/db/dbSeason';
+import { stoneTypeList } from '/db/dbCompanyStones';
 import { pageNameHash } from '/routes';
-import { rAccountDialogMode } from './accountDialog';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 import { handleError } from '../utils/handleError';
+import { rAccountDialogMode } from './accountDialog';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
 
@@ -142,6 +143,12 @@ Template.nav.helpers({
   },
   getLinkText(page) {
     return pageNameHash[page];
+  },
+  stoneTypeList() {
+    return stoneTypeList;
+  },
+  userStoneCount(user, stoneType) {
+    return user.profile.stones[stoneType];
   }
 });
 Template.nav.events({
