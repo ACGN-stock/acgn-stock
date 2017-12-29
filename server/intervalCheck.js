@@ -10,7 +10,6 @@ import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyStones } from '/db/dbCompanyStones';
-import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbFoundations } from '/db/dbFoundations';
@@ -156,55 +155,6 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     generateRankAndTaxesData(lastSeasonData);
     //移除所有廣告
     dbAdvertising.remove({});
-    //保管所有未被查封的公司的狀態
-    dbCompanies
-      .find({}, {
-        fields: {
-          _id: 1,
-          companyName: 1,
-          tags: 1,
-          pictureSmall: 1,
-          pictureBig: 1,
-          description: 1,
-          isSeal: 1
-        }
-      })
-      .forEach((companyData) => {
-        if (companyData.isSeal) {
-          dbCompanyArchive.remove(companyData._id);
-        }
-        else {
-          dbCompanyArchive.upsert(
-            {
-              _id: companyData._id
-            },
-            {
-              $set: {
-                status: 'archived',
-                name: companyData.companyName,
-                tags: companyData.tags,
-                pictureSmall: companyData.pictureSmall,
-                pictureBig: companyData.pictureBig,
-                description: companyData.description,
-                invest: []
-              }
-            }
-          );
-        }
-      });
-    //重置所有保管庫資料
-    dbCompanyArchive.update(
-      {},
-      {
-        $set: {
-          status: 'archived',
-          invest: []
-        }
-      },
-      {
-        multi: true
-      }
-    );
     //移除所有公司資料
     dbCompanies.remove({});
     //移除所有股份資料
