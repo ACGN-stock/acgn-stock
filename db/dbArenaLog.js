@@ -39,6 +39,15 @@ export const dbArenaLog = {
   },
   find(arenaId, filter = {}, options = {}) {
     return this.getCollection(arenaId).find(filter, options);
+  },
+  removeAll() {
+    Object.keys(collectionHash).forEach((key) => {
+      const collection = collectionHash[key];
+
+      collection.rawCollection().drop();
+      collectionHash[key] = null;
+      delete collectionHash[key];
+    });
   }
 };
 
