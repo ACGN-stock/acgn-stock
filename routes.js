@@ -153,47 +153,6 @@ foundationRoute.route('/edit/:foundationId', {
   }
 });
 
-const archiveRoute = FlowRouter.group({
-  prefix: '/companyArchive',
-  name: 'companyArchiveRoute'
-});
-archiveRoute.route('/', {
-  name: 'companyArchiveRedirect',
-  triggersEnter: [
-    (context, redirect) => {
-      redirect('/companyArchive/1');
-    }
-  ]
-});
-archiveRoute.route('/:page', {
-  name: 'companyArchiveList',
-  action(params) {
-    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 公司保管庫');
-    if (Meteor.isClient) {
-      const { rArchiveOffset } = require('/client/companyArchive/companyArchiveList');
-      const page = window.parseInt(params.page, 10) || 1;
-      const offset = (page - 1) * 12;
-      rArchiveOffset.set(offset);
-    }
-  }
-});
-archiveRoute.route('/view/:companyId', {
-  name: 'companyArchiveDetail',
-  action(params) {
-    if (Meteor.isServer) {
-      const companyArchiveData = dbCompanyArchive.findOne(params.companyId, {
-        fields: {
-          companyName: 1
-        }
-      });
-      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + companyArchiveData.companyName + '」保管庫公司資訊');
-    }
-    else {
-      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 保管庫資訊');
-    }
-  }
-});
-
 const productCenterRoute = FlowRouter.group({
   prefix: '/productCenter',
   name: 'productCenterRoute'
