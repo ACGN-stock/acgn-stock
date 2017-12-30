@@ -27,7 +27,7 @@ export function paySalaryAndCheckTax() {
     const thisPayTime = new Date();
     dbVariables.set('lastPayTime', thisPayTime);
     resourceManager.request('paySalaryAndCheckTax', ['season'], (release) => {
-      backupMongo();
+      backupMongo('-salaryBefore');
       paySystemSalary(thisPayTime);
       paySalaryAndGenerateProfit(thisPayTime);
       checkTax(todayBeginTime);
