@@ -1,6 +1,7 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
+import { dbArena } from './dbArena';
 // import SimpleSchema from 'simpl-schema';
 
 //最萌亂鬥大賽紀錄資料集
@@ -40,13 +41,13 @@ export const dbArenaLog = {
   find(arenaId, filter = {}, options = {}) {
     return this.getCollection(arenaId).find(filter, options);
   },
-  removeAll() {
-    Object.keys(collectionHash).forEach((key) => {
-      const collection = collectionHash[key];
+  dropAll() {
+    dbArena.find().forEach((arenaData) => {
+      const arenaId = arenaData._id;
+      const collection = this.getCollection(arenaId);
 
       collection.rawCollection().drop();
-      collectionHash[key] = null;
-      delete collectionHash[key];
+      collectionHash[arenaId] = null;
     });
   }
 };

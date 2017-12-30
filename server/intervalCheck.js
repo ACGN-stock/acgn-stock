@@ -187,9 +187,9 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
       }
     });
     //移除所有最萌亂鬥大賽資料
-    dbArena.remove({});
+    dbArenaLog.dropAll();
     dbArenaFighters.remove({});
-    dbArenaLog.removeAll();
+    dbArena.remove({});
     //移除所有排名資訊
     dbRankCompanyCapital.remove();
     dbRankCompanyPrice.remove();
