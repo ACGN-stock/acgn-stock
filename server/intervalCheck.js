@@ -132,7 +132,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
   resourceManager.request('doRoundWorks', ['season'], (release) => {
     // TODO 合併處理商業季度結束的 code
     //備份資料庫
-    backupMongo();
+    backupMongo('-roundBefore');
     //當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利
@@ -154,6 +154,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     updateCompanyGrades();
     //為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
+    backupMongo('-roundAfter');
     //移除所有廣告
     dbAdvertising.remove({});
     //保管所有未被查封的公司的狀態
@@ -266,7 +267,7 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
   console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
     //備份資料庫
-    backupMongo();
+    backupMongo('-season');
     //當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利
