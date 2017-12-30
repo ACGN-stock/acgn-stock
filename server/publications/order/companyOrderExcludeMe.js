@@ -16,12 +16,6 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
     companyId: companyId,
     orderType: type
   };
-  const userId = this.userId;
-  if (userId) {
-    filter.userId = {
-      $ne: userId
-    };
-  }
 
   const variableId = 'totalCountOfCompanyOrder' + type;
 

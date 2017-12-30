@@ -45,7 +45,7 @@
               <td class="text-left text-truncate ad-buyer" data-title="購買者">
                 {{>userLink advertising.userId}}
               </td>
-              <td class="text-left text-truncate ad-content" data-title="廣告內容" title="{{advertising.message}}">
+              <td class="text-left text-truncate anti-block-ad-message" data-title="廣告內容" title="{{advertising.message}}">
                 {{#if advertising.url}}
                   <a href="{{advertising.url}}" target="_blank">{{advertising.message}}</a>
                 {{else}}

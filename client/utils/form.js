@@ -2,6 +2,7 @@
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
+import { alertDialog } from '../layout/alertDialog';
 
 export function inheritUtilForm(template) {
   template.onCreated(function() {
@@ -30,6 +31,7 @@ export function handleInputChange(event) {
 }
 
 export function handleModelError(error) {
+  alertDialog.alert('輸入有錯誤，請修正');
   this.error.set(error);
 }
 
@@ -56,14 +58,15 @@ export const utilFormHelpers = {
           </div>
         `;
       }
-      else {
-        templateInstance.$input.filter(`[name="${fieldName}"]`)
-          .closest('.form-group')
-          .removeClass('has-danger')
-          .removeAttr('title');
+    }
 
-        return '';
-      }
+    if (templateInstance.$input) {
+      templateInstance.$input.filter(`[name="${fieldName}"]`)
+        .closest('.form-group')
+        .removeClass('has-danger')
+        .removeAttr('title');
+
+      return '';
     }
   }
 };

@@ -11,6 +11,7 @@ import { dbRuleIssueOptions } from '/db/dbRuleIssueOptions';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+
 const rShowOptionVoteDetail = new ReactiveVar(null);
 
 inheritedShowLoadingOnSubscribing(Template.ruleAgendaDetail);

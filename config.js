@@ -8,7 +8,6 @@ export const config = {
   releaseStocksForHighPriceMaxCounter: 360, //公司檢查是否要因高股價而釋出股票的最大隨機工作檢查次數
   releaseStocksForNoDealMinCounter: 1440, //公司檢查是否要因無成交而釋出股票的最小隨機工作檢查次數
   releaseStocksForNoDealMaxCounter: 2880, //公司檢查是否要因無成交而釋出股票的最大隨機工作檢查次數
-  releaseStocksForLowPriceCounter: 720, //公司檢查是否要因低股價而釋出股票的工作檢查次數
   recordListPriceMinCounter: 180, //為所有公司紀錄參考價格的最小隨機工作檢查次數
   recordListPriceMaxCounter: 360, //為所有公司紀錄參考價格的最大隨機工作檢查次數
   checkChairmanCounter: 10, //每隔多少次工作檢查，就重新檢查、設定一次各公司的董事長
@@ -18,7 +17,8 @@ export const config = {
   foundationNeedUsers: 10, //創立公司所需要的投資人數量
   archiveReviveNeedUsers: 30, //公司保管庫中的公司復活所需要的投資人數量
   minReleaseStock: 1000, //公司初創時的最小釋出股份數量(可能會有些微誤差)
-  beginMoney: 10000, //所有使用者驗證通過後的起始資金數量
+  newUserInitialMoney: 10000, //所有使用者驗證通過後的起始資金數量
+  newUserBirthStones: 1, //所有使用者驗證通過後的誕生石數量
   salaryPerPay: 1000, //所有驗證通過的使用者每隔一段時間可以固定領取的薪資數量
   seasonNumberInRound: 12, //一個賽季有幾個商業季度
   arenaIntervalSeasonNumber: 1, //最萌亂鬥大賽的舉行會間隔多少個商業季度，0為每個商業季度都會舉辦一次
@@ -47,6 +47,14 @@ export const config = {
   vacationModeZombieTaxPerDay: 500, // 渡假當季的殭屍稅率 (每天)
   minIntervalTimeBetweenVacations: 604800000, // 收假後再次放假所需間隔 (ms)
   taxExpireTime: 259200000, // 稅單的繳費期限 (ms)
-  releaseStocksForNoDealTradeLogLookbackIntervalTime: 86400000 // 低量釋股的成交量統計區間 (ms)
+  releaseStocksForNoDealTradeLogLookbackIntervalTime: 86400000, // 低量釋股的成交量統計區間 (ms)
+  miningMachineOperationTime: 86400000, // 挖礦機的運作時間 (ms)
+  stonePrice: { // 可供購買的石頭價格
+    rainbow: 100000, // 彩虹石
+    rainbowFragment: 10000 // 彩虹石碎片
+  },
+  dataNumberPerPage: { // 分頁時每個分頁有多少資料
+    userPlacedStones: 10
+  }
 };
 export default config;

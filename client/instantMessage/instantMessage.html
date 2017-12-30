@@ -9,30 +9,32 @@
       {{/if}}
       <form>
         <div class="form-group">
-          <span style="display: inline-block; float: left; padding-top: 4px; margin-top: 4px;">篩選器：</span>
-          {{> instantMessageFilterButton type='聊天發言'}}
-          {{> instantMessageFilterButton type='交易相關'}}
-          {{> instantMessageFilterButton type='新創相關'}}
-          {{> instantMessageFilterButton type='競選相關'}}
-          {{> instantMessageFilterButton type='經理管理'}}
-          {{> instantMessageFilterButton type='推薦產品'}}
-          {{> instantMessageFilterButton type='最萌亂鬥'}}
-          <button
-            class="btn btn-sm btn-danger float-right"
-            style="margin-top: 4px;"
-            type="button"
-            data-action="clearMessage"
-          >
-            清除舊訊息
-          </button>
-          <button
-            class="{{isDontInterruptButtonClass}}"
-            style="margin-top: 4px;"
-            type="button"
-            data-action="dontInterrupt"
-          >
-            勿擾模式
-          </button>
+          <span class="d-inline-block mt-1 float-left" style="line-height: 2.3rem;">篩選器：</span>
+          <span class="d-inline-block mt-1" style="line-height: 2rem;">
+            {{> instantMessageFilterButton type='聊天發言'}}
+            {{> instantMessageFilterButton type='交易相關'}}
+            {{> instantMessageFilterButton type='新創相關'}}
+            {{> instantMessageFilterButton type='競選相關'}}
+            {{> instantMessageFilterButton type='經理管理'}}
+            {{> instantMessageFilterButton type='推薦產品'}}
+            {{> instantMessageFilterButton type='最萌亂鬥'}}
+          </span>
+          <span class="d-inline-block mt-1 float-right" style="line-height: 2rem;">
+            <button
+              class="btn btn-sm btn-danger"
+              type="button"
+              data-action="clearMessage"
+            >
+              清除舊訊息
+            </button>
+            <button
+              class="{{isDontInterruptButtonClass}}"
+              type="button"
+              data-action="dontInterrupt"
+            >
+              勿擾模式
+            </button>
+          </span>
         </div>
         {{> instantMessageFilterById}}
       </form>
@@ -110,8 +112,8 @@
     <div class="d-inline-block text-truncate">{{> userLink id=this class="text-white"}}</div>
     <div class="text-nowrap">
       <i
-        class="fa fa-times"
-        style="cursor: pointer; margin: 0 6px 0 6px"
+        class="fa fa-times ml-2 mr-1 pl-1 pr-1"
+        style="cursor: pointer;"
         data-action="remove"
       >
       </i>
@@ -124,8 +126,8 @@
     <div class="d-inline-block text-truncate">{{> companyLink id=this class="text-white"}}</div>
     <div class="text-nowrap">
       <i
-        class="fa fa-times"
-        style="cursor: pointer; margin: 0 6px 0 6px"
+        class="fa fa-times ml-2 mr-1 pl-1 pr-1"
+        style="cursor: pointer;"
         data-action="remove"
       >
       </i>

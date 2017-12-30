@@ -1,13 +1,15 @@
-// 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { UserStatus } from 'meteor/mizzao:user-status';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
+import { debug } from '/server/imports/utils/debug';
+import { backupMongo } from '/server/imports/utils/backupMongo';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanyStones } from '/db/dbCompanyStones';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
@@ -29,15 +31,15 @@ import { updateLowPriceThreshold } from './functions/company/updateLowPriceThres
 import { updateHighPriceThreshold } from './functions/company/updateHighPriceThreshold';
 import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
 import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
-import { countDownReleaseStocksForLowPrice } from './functions/company/releaseStocksForLowPrice';
 import { countDownRecordListPrice } from './functions/company/recordListPrice';
 import { countDownCheckChairman } from './functions/company/checkChairman';
 import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
+import { returnCompanyStones } from './functions/miningMachine/returnCompanyStones';
+import { generateMiningProfits } from './functions/miningMachine/generateMiningProfits';
 import { startArenaFight } from './arena';
 import { checkExpiredFoundations } from './foundation';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
-import { debug } from '/server/imports/utils/debug';
 
 //週期檢查工作內容
 export function doIntervalWork() {
@@ -80,7 +82,6 @@ export function doIntervalWork() {
     //隨機時間讓符合條件的公司釋出股票
     countDownReleaseStocksForHighPrice();
     countDownReleaseStocksForNoDeal();
-    countDownReleaseStocksForLowPrice();
     //隨機時間售出金管會股票並紀錄公司的參考價格
     countDownRecordListPrice();
     //檢查並更新各公司的董事長位置
@@ -129,8 +130,19 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
   }
   console.info(new Date().toLocaleString() + ': doRoundWorks');
   resourceManager.request('doRoundWorks', ['season'], (release) => {
+    // TODO 合併處理商業季度結束的 code
+    //備份資料庫
+    backupMongo();
     //當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
+    // 結算挖礦機營利
+    generateMiningProfits();
+    // 賽季結束時歸還所有石頭
+    dbCompanyStones
+      .aggregate([ { $group: { _id: '$companyId' } } ])
+      .forEach(({ _id: companyId }) => {
+        returnCompanyStones(companyId);
+      });
     //若arenaCounter為0，則舉辦最萌亂鬥大賽
     const arenaCounter = dbVariables.get('arenaCounter');
     if (arenaCounter === 0) {
@@ -138,6 +150,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     }
     //當賽季結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
+    // 更新所有公司的評級
+    updateCompanyGrades();
     //為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
     //移除所有廣告
@@ -226,7 +240,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
             name: userData.profile.name,
             validateType: userData.profile.validateType,
             isAdmin: userData.profile.isAdmin,
-            stone: userData.profile.stone,
+            saintStones: userData.profile.stones.saint,
             ban: userData.profile.ban
           }
         }
@@ -251,8 +265,12 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
   }
   console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
+    //備份資料庫
+    backupMongo();
     //當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
+    // 結算挖礦機營利
+    generateMiningProfits();
     //若arenaCounter為0，則舉辦最萌亂鬥大賽
     const arenaCounter = dbVariables.get('arenaCounter');
     if (arenaCounter === 0) {

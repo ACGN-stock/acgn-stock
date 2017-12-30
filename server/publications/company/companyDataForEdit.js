@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbProducts } from '/db/dbProducts';
@@ -7,6 +8,9 @@ import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('companyDataForEdit', function(companyId) {
   debug.log('publish companyDataForEdit', companyId);
+
+  check(companyId, String);
+
   if (typeof this.userId !== 'string') {
     return [];
   }

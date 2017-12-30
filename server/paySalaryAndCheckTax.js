@@ -11,6 +11,7 @@ import { dbOrders } from '/db/dbOrders';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbVariables } from '/db/dbVariables';
 import { debug } from '/server/imports/utils/debug';
+import { backupMongo } from '/server/imports/utils/backupMongo';
 
 const {salaryPerPay} = Meteor.settings.public;
 export function paySalaryAndCheckTax() {
@@ -26,6 +27,7 @@ export function paySalaryAndCheckTax() {
     const thisPayTime = new Date();
     dbVariables.set('lastPayTime', thisPayTime);
     resourceManager.request('paySalaryAndCheckTax', ['season'], (release) => {
+      backupMongo();
       paySystemSalary(thisPayTime);
       paySalaryAndGenerateProfit(thisPayTime);
       checkTax(todayBeginTime);
@@ -97,7 +99,32 @@ function paySalaryAndGenerateProfit(thisPayTime) {
       createdAt: thisPayTime
     });
 
-    const totalProfit = Meteor.settings.public.votePricePerTicket * employees.length;
+    // 根據公司評級計算當日總營利額
+    let gradeFactor = 0;
+    if (company.grade === 'A') {
+      gradeFactor = 0.4;
+    }
+    else if (company.grade === 'B') {
+      gradeFactor = 0.3;
+    }
+    else if (company.grade === 'C') {
+      gradeFactor = 0.2;
+    }
+    else if (company.grade === 'D') {
+      gradeFactor = 0.1;
+    }
+
+    // 基礎營利額
+    const baseProfit = 3000 * (0.9 + gradeFactor) * employees.length;
+
+    // 爆肝營利額
+    const explosionProb = Math.min(0.3, 0.01 * employees.length);
+    const explosionCount = employees.reduce((count) => {
+      return (Math.random() < explosionProb) ? count + 1 : count;
+    }, 0);
+    const explosiveProfit = 3000 * (0.9 + gradeFactor) * gradeFactor * explosionCount;
+
+    const totalProfit = baseProfit + explosiveProfit;
     const totalSalary = company.salary * employees.length;
     companyBulk.find({
       _id: company._id

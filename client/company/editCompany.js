@@ -6,9 +6,9 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbProducts, productTypeList } from '/db/dbProducts';
+import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -112,17 +112,17 @@ Template.companyEditForm.helpers({
 });
 
 Template.companyEditForm.events({
-  'click [data-remove-tag]'(event, templatInstance) {
+  'click [data-remove-tag]'(event, templateInstance) {
     const tag = $(event.currentTarget).attr('data-remove-tag');
-    const model = _.clone(templatInstance.model.get());
+    const model = _.clone(templateInstance.model.get());
     model.tags = _.without(model.tags, tag);
-    templatInstance.model.set(model);
+    templateInstance.model.set(model);
   },
-  'keypress [name="tags"]'(event, templatInstance) {
+  'keypress [name="tags"]'(event, templateInstance) {
     if (event.which === 13) {
       event.preventDefault();
       event.stopPropagation();
-      addNewTag(event, templatInstance);
+      addNewTag(event, templateInstance);
     }
   },
   'click [data-action="addNewTag"]': addNewTag,
@@ -141,7 +141,7 @@ Template.companyEditForm.events({
 Template.bigPicturePreviewModal.helpers({
   modalClass() {
     return (previewPictureType.get() === 'pictureBig')
-      ? 'big-picture-preivew modal fade show' : 'big-picture-preivew modal fade';
+      ? 'd-block big-picture-preivew modal fade show' : 'd-block big-picture-preivew modal fade';
   }
 });
 Template.bigPicturePreviewModal.events({
@@ -151,9 +151,9 @@ Template.bigPicturePreviewModal.events({
 });
 
 
-function addNewTag(event, templatInstance) {
-  const $input = templatInstance.$input.filter('[name="tags"]');
-  const model = _.clone(templatInstance.model.get());
+function addNewTag(event, templateInstance) {
+  const $input = templateInstance.$input.filter('[name="tags"]');
+  const model = _.clone(templateInstance.model.get());
   const tag = $input.val().trim();
   if (! tag) {
     alertDialog.alert('請輸入標籤名稱！');
@@ -162,7 +162,7 @@ function addNewTag(event, templatInstance) {
   }
   model.tags.push(tag);
   model.tags = _.unique(model.tags);
-  templatInstance.model.set(model);
+  templateInstance.model.set(model);
   $input.val('');
 }
 

@@ -1,5 +1,6 @@
 'use strict';
 import { Meteor } from 'meteor/meteor';
+import { Blaze } from 'meteor/blaze';
 import { Tracker } from 'meteor/tracker';
 import { UserStatus } from 'meteor/mizzao:user-status';
 import { TimeSync } from 'meteor/mizzao:timesync';
@@ -34,3 +35,13 @@ export function shouldStopSubscribe() {
 
   return false;
 }
+
+Blaze.TemplateInstance.prototype.autorunWithIdleSupport = function(callback) {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return;
+    }
+
+    callback();
+  });
+};

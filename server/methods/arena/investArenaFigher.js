@@ -5,7 +5,7 @@ import { check, Match } from 'meteor/check';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbArena } from '/db/dbArena';
-import { dbArenaFighters } from '/db/dbArenaFighters';
+import { dbArenaFighters, arenaFighterAttributeNameList } from '/db/dbArenaFighters';
 import { dbLog } from '/db/dbLog';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbVariables } from '/db/dbVariables';
@@ -15,6 +15,8 @@ Meteor.methods({
   investArenaFigher(companyId, attribute, investMoney) {
     check(this.userId, String);
     check(companyId, String);
+    check(attribute, new Match.OneOf(...arenaFighterAttributeNameList));
+    check(investMoney, Match.Integer);
     const user = Meteor.user();
     investArenaFigher({user, companyId, attribute, investMoney});
 

@@ -12,6 +12,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { formatDateTimeText } from '../utils/helpers';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+
 const rShowAllTags = new ReactiveVar(false);
 
 inheritedShowLoadingOnSubscribing(Template.foundationDetail);

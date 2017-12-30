@@ -1,0 +1,15 @@
+<template name="panelFolder">
+  <div class="row">
+    <div class="col-12">
+      <a class="d-block h4 my-1" href="#" data-toggle-panel-folder="{{name}}">
+        {{title}}
+        <i class="fa {{folderIconClass}}" aria-hidden="true"></i>
+      </a>
+    </div>
+    {{#if isExpanded}}
+      <div class="col-12">
+        {{> Template.contentBlock}}
+      </div>
+    {{/if}}
+  </div>
+</template>

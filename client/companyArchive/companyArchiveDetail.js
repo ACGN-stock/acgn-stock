@@ -11,6 +11,7 @@ import { dbLog } from '/db/dbLog';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
 import { investArchiveCompany } from '../utils/methods';
+
 const rShowAllTags = new ReactiveVar(false);
 
 inheritedShowLoadingOnSubscribing(Template.companyArchiveDetail);

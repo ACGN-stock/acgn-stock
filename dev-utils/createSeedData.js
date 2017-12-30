@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 
-import { pttUserFactory, companyFactory } from './factories';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
@@ -23,6 +22,7 @@ import { dbTaxes } from '/db/dbTaxes';
 import { dbUserArchive } from '/db/dbUserArchive';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVoteRecord } from '/db/dbVoteRecord';
+import { pttUserFactory, companyFactory } from './factories';
 
 function resetDatabase() {
   dbAdvertising.remove({});

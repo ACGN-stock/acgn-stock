@@ -26,6 +26,11 @@ export const logTypeList = [
   '免費得石',
 
   /**
+   * 【購買得石】userId0花費$data.cost購買了data.amount個data.stoneType！
+   */
+  '購買得石',
+
+  /**
    * userId0說道：「data.message」
    */
   '聊天發言',
@@ -235,7 +240,7 @@ export const logTypeList = [
   '禁止廣告',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由向userId1課以總數為$data.fine的罰金。
+   * 【違規處理】userId0以「data.reason」的理由向(userId1||「companyId」公司)課以總數為$data.fine的罰金。
    */
   '課以罰款',
 
@@ -270,7 +275,7 @@ export const logTypeList = [
   '解除廣告',
 
   /**
-   * 【退還罰款】userId0以「data.reason」的理由向userId1退還總數為$data.fine的罰金。
+   * 【退還罰款】userId0以「data.reason」的理由向(userId1||「companyId」公司)退還總數為$data.fine的罰金。
    */
   '退還罰款',
 
@@ -337,7 +342,22 @@ export const logTypeList = [
   /**
    * 【最萌亂鬥】「companyId」公司在這一屆最萌亂鬥大賽中表現出眾，獲得了$data.reward的營利金額！
    */
-  '亂鬥營利'
+  '亂鬥營利',
+
+  /**
+   * 【礦機放石】userId0在「companyId」公司的挖礦機放置了一個data.stoneType！
+   */
+  '礦機放石',
+
+  /**
+   * 【礦機取石】userId0從「companyId」公司的挖礦機拿回了一個data.stoneType！
+   */
+  '礦機取石',
+
+  /**
+   * 【礦機營利】「companyId」公司的挖礦機集結眾人之力努力運轉，使其獲得了$data.profit的營利額！
+   */
+  '礦機營利'
 ];
 
 // 金管會相關紀錄

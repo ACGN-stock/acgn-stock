@@ -12,6 +12,7 @@ import { debug } from '/server/imports/utils/debug';
 Meteor.methods({
   decideArenaStrategy(companyId, strategyData) {
     check(this.userId, String);
+    check(companyId, String);
     check(strategyData, {
       spCost: Match.Integer,
       attackSequence: [Match.Integer],

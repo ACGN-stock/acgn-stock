@@ -2,8 +2,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { handleError } from '../utils/handleError';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
+import { handleError } from '../utils/handleError';
 import { addTask, resolveTask } from '../layout/loading';
 import { regUsername } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';

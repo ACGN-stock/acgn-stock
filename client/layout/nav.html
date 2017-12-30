@@ -13,23 +13,25 @@
             </span>
             {{getLinkText 'accountInfo' accountInfoParams}}
           </a>
-          <li title="現有資金：${{currentUser.profile.money}}">
+          <div title="現有資金：${{currentUser.profile.money}}">
             <span class="float-left">
               <i class="fa fa-usd" aria-hidden="true"></i>
             </span>
             {{currencyFormat currentUser.profile.money}}
-          </li>
-          <li title="現有推薦票：{{currentUser.profile.vote}}張">
+          </div>
+          <div title="現有推薦票：{{currentUser.profile.vote}}張">
             <span class="float-left">
               <i class="fa fa-money" aria-hidden="true"></i>
             </span>
             {{currentUser.profile.vote}}
-          </li>
-          <li title="現有聖晶石：{{currentUser.profile.stone}}顆">
-            <img class="float-left" style="margin-top: 5px; width: 1rem; height: 1rem;" src="/stone.jpeg" title="聖晶石" />
-            {{currentUser.profile.stone}}
-          </li>
-          <li class="dropdown-divider"></li>
+          </div>
+          {{#each stoneType in stoneTypeList}}
+            <div class="d-flex align-items-center justify-content-between" title="現有{{stoneDisplayName stoneType}}：{{userStoneCount currentUser stoneType}}個">
+              <img class="stone-icon" src="{{stoneIconPath stoneType}}" title="{{stoneDisplayName stoneType}}" />
+              {{userStoneCount currentUser stoneType}}
+            </div>
+          {{/each}}
+          <div class="dropdown-divider"></div>
           <a class="d-block" href="#" title="登出" data-action="logout">
             <span class="float-left">
               <i class="fa fa-sign-out" aria-hidden="true"></i>
