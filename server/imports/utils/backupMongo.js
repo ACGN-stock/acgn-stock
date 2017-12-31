@@ -2,7 +2,7 @@
 import shell from 'shelljs';
 
 //備份mongo資料庫
-export function backupMongo() {
+export function backupMongo(suffix = '') {
   const url = process.env.MONGO_URL;
   const path = process.env.BACKUP_DIRECTORY;
   if (url && path) {
@@ -13,8 +13,8 @@ export function backupMongo() {
       console.log(command1);
       shell.exec(command1);
       const now = new Date();
-      const todayString = now.getFullYear() + '-' + padZero(now.getMonth() + 1) + '-' + padZero(now.getDate());
-      const command2 = 'tar zcvf ' + path + '/' + todayString + '.tar.gz ' + path + '/dump';
+      const nowString = now.getFullYear() + '-' + padZero(now.getMonth() + 1) + '-' + padZero(now.getDate()) + suffix;
+      const command2 = 'tar zcvf ' + path + '/' + nowString + '.tar.gz ' + path + '/dump';
       console.log(command2);
       shell.exec(command2);
       shell.rm('-rf', path + '/dump');

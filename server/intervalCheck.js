@@ -8,6 +8,7 @@ import { backupMongo } from '/server/imports/utils/backupMongo';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
+import { dbArenaLog } from '/db/dbArenaLog';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyStones } from '/db/dbCompanyStones';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
@@ -27,6 +28,11 @@ import { dbUserArchive } from '/db/dbUserArchive';
 import { dbVariables } from '/db/dbVariables';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVoteRecord } from '/db/dbVoteRecord';
+import { dbRankCompanyCapital } from '/db/dbRankCompanyCapital';
+import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
+import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
+import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
+import { dbRankUserWealth } from '/db/dbRankUserWealth';
 import { updateLowPriceThreshold } from './functions/company/updateLowPriceThreshold';
 import { updateHighPriceThreshold } from './functions/company/updateHighPriceThreshold';
 import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
@@ -132,7 +138,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
   resourceManager.request('doRoundWorks', ['season'], (release) => {
     // TODO 合併處理商業季度結束的 code
     //備份資料庫
-    backupMongo();
+    backupMongo('-roundBefore');
     //當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利
@@ -154,12 +160,14 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     updateCompanyGrades();
     //為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
+    backupMongo('-roundAfter');
     //移除所有廣告
     dbAdvertising.remove({});
 
     //移除所有公司資料
     dbCompanies.remove({});
     dbCompanyArchive.remove({});
+    dbCompanyStones.remove({});
     //移除所有股份資料
     dbDirectors.remove({});
     //移除所有員工資料
@@ -172,6 +180,22 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
         $nin: accuseLogTypeList
       }
     });
+    //移除所有與金管會相關且與公司相關的紀錄資料
+    dbLog.remove({
+      companyId: {
+        $exists: true
+      }
+    });
+    //移除所有最萌亂鬥大賽資料
+    dbArenaLog.dropAll();
+    dbArenaFighters.remove({});
+    dbArena.remove({});
+    //移除所有排名資訊
+    dbRankCompanyCapital.remove();
+    dbRankCompanyPrice.remove();
+    dbRankCompanyProfit.remove();
+    dbRankCompanyValue.remove();
+    dbRankUserWealth.remove();
     //移除所有訂單資料
     dbOrders.remove({});
     //移除所有價格資料
@@ -201,6 +225,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     });
     //移除所有使用者資料
     Meteor.users.remove({});
+    //清除所有賽季資訊
+    dbSeason.remove({});
     //產生新的賽季
     generateNewRound();
     //產生新的商業季度
@@ -219,7 +245,7 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
   console.info(new Date().toLocaleString() + ': doSeasonWorks');
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
     //備份資料庫
-    backupMongo();
+    backupMongo('-season');
     //當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利

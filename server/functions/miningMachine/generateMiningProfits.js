@@ -8,10 +8,10 @@ import { debug } from '/server/imports/utils/debug';
 
 // 公司等級參數
 const gradeFactorTable = {
-  A: 0,
-  B: 0.1,
-  C: 0.2,
-  D: 0.3
+  A: 0.3,
+  B: 0.2,
+  C: 0.1,
+  D: 0
 };
 
 // 對全股市公司結算挖礦機營利
