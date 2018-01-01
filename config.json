@@ -13,7 +13,7 @@
     "founderEarnestMoney": 1024,
     "foundExpireTime": 43200000,
     "maximumInvest": 4096,
-    "foundationNeedUsers": 10,
+    "foundationNeedUsers": 20,
     "archiveReviveNeedUsers": 30,
     "minReleaseStock": 1000,
     "newUserInitialMoney": 10000,
