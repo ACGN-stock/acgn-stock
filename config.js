@@ -14,7 +14,7 @@ export const config = {
   founderEarnestMoney: 1024, //創立公司者需付出的保證金
   foundExpireTime: 43200000, //創立公司的投資時間期限，單位為微秒
   maximumInvest: 4096, //每個人對單一新創計劃的最大投資上限
-  foundationNeedUsers: 10, //創立公司所需要的投資人數量
+  foundationNeedUsers: 20, //創立公司所需要的投資人數量
   archiveReviveNeedUsers: 30, //公司保管庫中的公司復活所需要的投資人數量
   minReleaseStock: 1000, //公司初創時的最小釋出股份數量(可能會有些微誤差)
   newUserInitialMoney: 10000, //所有使用者驗證通過後的起始資金數量

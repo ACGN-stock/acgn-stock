@@ -5,6 +5,7 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { dbRound } from '/db/dbRound';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { dbRuleIssues } from '/db/dbRuleIssues';
 import { dbRuleIssueOptions } from '/db/dbRuleIssueOptions';
@@ -30,6 +31,7 @@ Template.ruleAgendaDetail.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
+    this.subscribe('currentRound');
     if (Meteor.user()) {
       this.subscribe('userCreatedAt');
     }
@@ -50,13 +52,24 @@ Template.ruleAgendaDetail.helpers({
     if (expireDate < Date.now()) {
       return false;
     }
-    const userId = Meteor.userId();
-    if (Meteor.user().profile.ban.length > 0) {
+    const user = Meteor.user();
+    if (user.profile.ban.length > 0) {
       return false;
     }
-    if (! Meteor.user().createdAt || Date.now() - Meteor.user().createdAt.getTime() < Meteor.settings.public.voteUserNeedCreatedIn) {
-      return false;
+    const now = Date.now();
+    const voteUserNeedCreatedIn = Meteor.settings.public.voteUserNeedCreatedIn;
+    const currentRound = dbRound.findOne({}, {
+      sort: {
+        beginDate: -1
+      }
+    });
+    if ((now - currentRound.beginDate.getTime()) > (voteUserNeedCreatedIn * 2)) {
+      const userCreatedAt = user.createdAt;
+      if (! userCreatedAt || ((now - userCreatedAt.getTime()) < voteUserNeedCreatedIn)) {
+        return false;
+      }
     }
+    const userId = user._id;
     if (agendaData.votes.indexOf(userId) >= 0) {
       return false;
     }
