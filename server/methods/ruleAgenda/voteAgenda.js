@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-
+import { dbRound } from '/db/dbRound';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { dbRuleIssueOptions } from '/db/dbRuleIssueOptions';
 import { limitMethod } from '/server/imports/utils/rateLimit';
@@ -30,8 +30,18 @@ function voteAgenda(user, voteData) {
   if (user.profile.notPayTax) {
     throw new Meteor.Error(403, '有逾期稅單未繳納者不可投票！');
   }
-  if (Date.now() - user.createdAt.getTime() < Meteor.settings.public.voteUserNeedCreatedIn) {
-    throw new Meteor.Error(403, '註冊未滿七日不可投票！');
+  const now = Date.now();
+  const voteUserNeedCreatedIn = Meteor.settings.public.voteUserNeedCreatedIn;
+  const currentRound = dbRound.findOne({}, {
+    sort: {
+      beginDate: -1
+    }
+  });
+  if ((now - currentRound.beginDate.getTime()) > (voteUserNeedCreatedIn * 2)) {
+    const userCreatedAt = user.createdAt;
+    if (! userCreatedAt || ((now - userCreatedAt.getTime()) < voteUserNeedCreatedIn)) {
+      throw new Meteor.Error(403, '註冊未滿七日不可投票！');
+    }
   }
 
   const agendaId = voteData.agendaId;
