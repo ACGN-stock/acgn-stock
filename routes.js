@@ -18,7 +18,6 @@ export const pageNameHash = {
   instantMessage: '即時訊息',
   companyList: '股市總覽',
   foundationList: '新創計劃',
-  companyArchiveList: '公司保管庫',
   advertising: '廣告宣傳',
   productCenterBySeason: '產品中心',
   productCenterByCompany: '產品中心',
