@@ -15,7 +15,6 @@ export const config = {
   foundExpireTime: 43200000, //創立公司的投資時間期限，單位為微秒
   maximumInvest: 4096, //每個人對單一新創計劃的最大投資上限
   foundationNeedUsers: 20, //創立公司所需要的投資人數量
-  archiveReviveNeedUsers: 30, //公司保管庫中的公司復活所需要的投資人數量
   minReleaseStock: 1000, //公司初創時的最小釋出股份數量(可能會有些微誤差)
   newUserInitialMoney: 10000, //所有使用者驗證通過後的起始資金數量
   newUserBirthStones: 1, //所有使用者驗證通過後的誕生石數量
@@ -26,7 +25,6 @@ export const config = {
   arenaMinInvestedAmount: 10000, //最萌亂鬥大賽的參賽所需最小總投資金額
   seasonTime: 604800000, //每個商業季度的持續時間，單位為微秒
   electManagerTime: 86400000, //每個商業季度結束前多久時間會進行經理競選，單位為微秒
-  seasonProfitPerUser: 140000, //每個商業季度、每個驗證的使用者的「所有推薦票加總」將產生多少可能營利額
   managerProfitPercent: 0.05, //經理人獲得公司營利分紅的比例
   costFromProfit: 0.15, //系統將扣除多少公司的營利做為公司營運成本
   displayAdvertisingNumber: 5, //同時最多顯示的廣告筆數
