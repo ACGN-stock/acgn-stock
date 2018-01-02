@@ -11,6 +11,7 @@ Meteor.publish('companyArenaInfo', function(companyId) {
   debug.log('publish companyArenaInfo', companyId);
   check(companyId, String);
 
+  const userId = this.userId;
   const arenaFightersObserverHash = {};
   const arenaObserver = dbArena
     .find({}, {
@@ -28,17 +29,25 @@ Meteor.publish('companyArenaInfo', function(companyId) {
         }
         arenaFightersObserverHash[arenaId] = dbArenaFighters
           .find({ arenaId, companyId }, {
-            fields: { investors: 0 }
+            fields: {
+              investors: 0
+            }
           })
           .observeChanges({
             added: (id, fields) => {
-              this.added('arenaFighters', id, fields);
+              if (userId === fields.manager) {
+                this.added('arenaFighters', id, fields);
+              }
+              else {
+                const publishFields = _.omit(fields, 'attackSequence', 'spCost');
+                this.added('arenaFighters', id, publishFields);
+              }
             },
             changed: (id, fields) => {
-              this.changed('arenaFighters', id, fields);
-            },
-            removed: (id) => {
-              this.removed('arenaFighters', id);
+              const publishFields = _.omit(fields, 'attackSequence', 'spCost');
+              if (_.size(publishFields) > 0) {
+                this.changed('arenaFighters', id, publishFields);
+              }
             }
           });
       },
