@@ -69,10 +69,6 @@ Template.companyLink.onRendered(function() {
         const companyName = companyData.name;
         let path;
         switch (companyData.status) {
-          case 'archived': {
-            path = FlowRouter.path('companyArchiveDetail', {companyId});
-            break;
-          }
           case 'foundation': {
             path = FlowRouter.path('foundationDetail', {
               foundationId: companyId
