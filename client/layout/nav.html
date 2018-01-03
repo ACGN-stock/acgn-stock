@@ -19,11 +19,11 @@
             </span>
             {{currencyFormat currentUser.profile.money}}
           </div>
-          <div title="現有推薦票：{{currentUser.profile.vote}}張">
+          <div title="現有推薦票：{{currentUser.profile.voteTickets}}張">
             <span class="float-left">
               <i class="fa fa-money" aria-hidden="true"></i>
             </span>
-            {{currentUser.profile.vote}}
+            {{currentUser.profile.voteTickets}}
           </div>
           {{#each stoneType in stoneTypeList}}
             <div class="d-flex align-items-center justify-content-between" title="現有{{stoneDisplayName stoneType}}：{{userStoneCount currentUser stoneType}}個">

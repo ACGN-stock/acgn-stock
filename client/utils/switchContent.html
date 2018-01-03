@@ -1,0 +1,8 @@
+<template name="switchContent">
+  <div class="nav nav-pills mb-2">
+    {{#each view in views}}
+      <a href="#" class="nav-link {{activeIfViewSelected view.name}}" data-view="{{view.name}}">{{view.displayName}}</a>
+    {{/each}}
+  </div>
+  {{> Template.dynamic template=contentTemplateName data=data}}
+</template>

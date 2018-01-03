@@ -33,7 +33,6 @@
     "maximumFavorite": 60,
     "maximumRuleIssue": 10,
     "maximumRuleIssueOption": 10,
-    "votePricePerTicket": 3000,
     "voteUserNeedCreatedIn": 604800000,
     "maximumCompanySalaryPerDay": 2000,
     "minimumCompanySalaryPerDay": 500,
@@ -54,7 +53,12 @@
       "rainbowFragment": 10000
     },
     "dataNumberPerPage": {
-      "userPlacedStones": 10
-    }
+      "userPlacedStones": 10,
+      "userOwnedProducts": 10
+    },
+    "productFinalSaleTime": 43200000,
+    "productProfitFactor": 2.00,
+    "systemProductVotingReward": 4096,
+    "employeeProductVotingRewardFactor": 0.01
   }
 }

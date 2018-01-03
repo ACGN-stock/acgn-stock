@@ -35,6 +35,7 @@
     "image-type": "3.0.0",
     "meteor-node-stubs": "0.2.11",
     "opencollective": "^1.0.3",
+    "probability-distributions": "^0.9.1",
     "rosie": "^1.6.0",
     "shelljs": "^0.7.8",
     "simpl-schema": "0.3.2"

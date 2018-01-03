@@ -1,0 +1,32 @@
+<template name="companyProductCenterPanel">
+  <div class="my-3">
+    下季度待上架產品：
+    {{#if planningProductCount}}
+      <span class="text-success">有</span>
+    {{else}}
+      <span class="text-danger">無</span>
+    {{/if}}
+  </div>
+  <hr class="m-0">
+  <div class="row my-3">
+    <div class="col-12 d-flex flex-wrap align-items-baseline">
+      <h4 class="mr-2">當季產品販賣區</h4>
+      {{#if currentUser}}
+        <div>您的剩餘購買額度：${{currencyFormat currentUserTradeQuota}}</div>
+      {{/if}}
+    </div>
+    {{#each product in marketingProducts}}
+      <div class="col-12 col-lg-6">
+        {{> productCard product=product}}
+      </div>
+    {{else}}
+      <div class="col-12 my-2">
+        <em>哦不！本季沒有推出任何產品！</em>
+      </div>
+    {{/each}}
+  </div>
+  <hr class="m-0">
+  <div class="my-3 text-right">
+    <a href="{{productCenterByCompanyPath company._id}}">觀看所有推出過的產品…</a>
+  </div>
+</template>

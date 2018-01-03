@@ -6,19 +6,14 @@ import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
-Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, offset}) {
-  debug.log('publish productListBySeasonId', {seasonId, sortBy, sortDir, offset});
+Meteor.publish('productListBySeasonId', function({ seasonId, sortBy, sortDir, offset }) {
+  debug.log('publish productListBySeasonId', { seasonId, sortBy, sortDir, offset });
   check(seasonId, String);
-  check(sortBy, new Match.OneOf('votes', 'type', 'companyName'));
+  check(sortBy, new Match.OneOf('voteCount', 'type', 'companyName'));
   check(sortDir, new Match.OneOf(1, -1));
   check(offset, Match.Integer);
 
-  const filter = {
-    seasonId: seasonId,
-    overdue: {
-      $gt: 0
-    }
-  };
+  const filter = { seasonId, state: { $ne: 'planning' } };
 
   publishTotalCount('totalCountOfProductList', dbProducts.find(filter), this);
 
@@ -50,5 +45,5 @@ Meteor.publish('productListBySeasonId', function({seasonId, sortBy, sortDir, off
     pageObserver.stop();
   });
 });
-//一分鐘最多重複訂閱10次
+// 一分鐘最多重複訂閱10次
 limitSubscription('allAdvertising', 10);

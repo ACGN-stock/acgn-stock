@@ -13,7 +13,7 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.productCenterBySeason);
-const rProductSortBy = new ReactiveVar('votes');
+const rProductSortBy = new ReactiveVar('voteCount');
 const rProductSortDir = new ReactiveVar(-1);
 const rProductOffset = new ReactiveVar(0);
 Template.productCenterBySeason.onCreated(function() {
@@ -74,7 +74,7 @@ Template.productSeasonNav.helpers({
           else {
             return {
               'class': 'btn btn-info btn-sm float-left disabled',
-              'href': FlowRouter.path('productCenterBySeason', {seasonId})
+              'href': FlowRouter.path('productCenterBySeason', { seasonId })
             };
           }
         }
@@ -102,7 +102,7 @@ Template.productSeasonNav.helpers({
           else {
             return {
               'class': 'btn btn-info btn-sm float-right disabled',
-              'href': FlowRouter.path('productCenterBySeason', {seasonId})
+              'href': FlowRouter.path('productCenterBySeason', { seasonId })
             };
           }
         }
@@ -173,19 +173,14 @@ Template.productListBySeasonTable.events({
 });
 
 Template.productInfoBySeasonTable.onCreated(function() {
-  this.subscribe('queryMyLikeProduct', this.data.companyId);
+  this.subscribe('currentUserVoteRecord', this.data.companyId);
 });
 Template.productInfoBySeasonTable.helpers({
   cannotVote() {
-    const companyId = this.companyId;
-    const user = Meteor.user();
-    const userId = user ? user._id : false;
+    const userId = Meteor.userId();
+    const { companyId, state } = Template.currentData();
 
-    return ! (
-      this.overdue === 1 &&
-      userId &&
-      dbVoteRecord.find({companyId, userId}).count() < 1
-    );
+    return ! userId || state !== 'marketing' || dbVoteRecord.find({ companyId, userId }).count() > 0;
   }
 });
 Template.productInfoBySeasonTable.events({
@@ -194,7 +189,7 @@ Template.productInfoBySeasonTable.events({
     const productData = templateInstance.data;
     voteProduct(productData._id, productData.companyId);
   },
-  'click [data-take-down]'(event, templateInstance) {
+  'click [data-ban-product]'(event, templateInstance) {
     event.preventDefault();
     const productData = templateInstance.data;
     alertDialog.dialog({
@@ -204,7 +199,7 @@ Template.productInfoBySeasonTable.events({
       callback: function(message) {
         if (message) {
           const productId = productData._id;
-          Meteor.customCall('takeDownProduct', {productId, message});
+          Meteor.customCall('banProduct', { productId, message });
         }
       }
     });
