@@ -49,9 +49,9 @@
           </button>
         </span>
       </div>
-      <span class="form-text text-info">
-        建議在搜索標籤中加入日文原名、中國大陸及香港等各地譯名以便搜索。
-      </span>
+      <small class="form-text text-warning">
+        請務必包含：角色名稱、角色名稱原文、登場作品名稱、登場作品名稱原文、角色暱稱、其他方便辨識搜索之名稱。
+      </small>
       {{{errorHtmlOf 'tags'}}}
     </div>
     <div class="form-group">
@@ -82,7 +82,7 @@
           {{/if}}
         {{/if}}
       </div>
-      <small class="form-text text-warning">展示大小為100x100的角色圖片。</small>
+      <small class="form-text">大小為100x100。</small>
       {{{errorHtmlOf 'pictureSmall'}}}
     </div>
     <div class="form-group">
@@ -104,7 +104,7 @@
           {{> bigPicturePreviewModal src=(valueOf 'pictureBig') }}
         {{/if}}
       </div>
-      <small class="form-text text-warning">展示大小為300x300的角色圖片。</small>
+      <small class="form-text">大小為300x300。</small>
       {{{errorHtmlOf 'pictureBig'}}}
     </div>
     <div class="form-group">
@@ -117,6 +117,7 @@
         maxlength="3000"
         placeholder="最少10字，最多3000字">{{valueOf 'description'}}
       </textarea>
+      <small class="form-text text-warning">必須包括角色名稱以及原作品名稱，其餘內容由經理人自己增修，但不得有任何貶低角色的字眼出現。</small>
       {{{errorHtmlOf 'description'}}}
     </div>
     <div class="text-right">
