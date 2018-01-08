@@ -204,7 +204,10 @@ Template.displayLog.helpers({
         return `【經理管理】${users[0]}修改了「${company}」公司的資訊！`;
       }
       case '推薦產品': {
-        return `【推薦產品】${users[0]}向「${company}」公司的產品「${productSpan(data.productId)}」投了一張推薦票，使其獲得了$${currencyFormat(data.profit)}的營利額！`;
+        return `【推薦產品】${users[0]}向「${company}」公司的產品「${productSpan(data.productId)}」投了一張推薦票！`;
+      }
+      case '購買產品': {
+        return `【購買產品】${users[0]}花費$${currencyFormat(data.cost)}買了「${company}」公司的產品「${productSpan(data.productId)}」共${data.amount}個，使該公司獲得了$${currencyFormat(data.profit)}的營利額！`;
       }
       case '員工營利': {
         return `【員工營利】${users.join('、')}等人努力工作，使「${company}」公司獲得了$${currencyFormat(data.profit)}的營利額！`;
@@ -214,6 +217,9 @@ Template.displayLog.helpers({
       }
       case '營利分紅': {
         return `【營利分紅】${users[0]}得到了「${company}」公司的分紅$${currencyFormat(data.bonus)}！`;
+      }
+      case '推薦回饋': {
+        return `【推薦回饋】系統發給了${users[0]}產品投票回饋金$${currencyFormat(data.reward)}！`;
       }
       case '季度賦稅': {
         return `【季度賦稅】${users[0]}在此次商業季度中產生了$${currencyFormat(data.assetTax)}的財富稅與$${currencyFormat(data.zombieTax)}的殭屍稅！`;

@@ -10,7 +10,6 @@ import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
 import { dbPrice } from '/db/dbPrice';
 import { dbProducts } from '/db/dbProducts';
-import { dbProductLike } from '/db/dbProductLike';
 import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
 import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
@@ -34,7 +33,6 @@ function resetDatabase() {
   dbOrders.remove({});
   dbPrice.remove({});
   dbProducts.remove({});
-  dbProductLike.remove({});
   dbRankCompanyPrice.remove({});
   dbRankCompanyProfit.remove({});
   dbRankCompanyValue.remove({});

@@ -4,31 +4,12 @@ import { Meteor } from 'meteor/meteor';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
-import { dbProducts } from '/db/dbProducts';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('companyDetail', function(companyId) {
   debug.log('publish companyDetail', companyId);
   check(companyId, String);
-  const nextSeasonProductData = dbProducts.findOne(
-    {
-      companyId: companyId,
-      overdue: 0
-    },
-    {
-      fields: {
-        _id: 1,
-        overdue: 1
-      }
-    }
-  );
-  if (nextSeasonProductData) {
-    this.added('products', nextSeasonProductData._id, {
-      companyId: companyId,
-      overdue: nextSeasonProductData.overdue
-    });
-  }
 
   const observer = dbCompanies
     .find(companyId, {
@@ -52,7 +33,7 @@ Meteor.publish('companyDetail', function(companyId) {
     observer.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('companyDetail');
 
 function addSupportStocksListField(companyId, fields = {}) {

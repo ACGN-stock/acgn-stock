@@ -46,6 +46,12 @@ export const companyFactory = new Factory()
   })
   .attr('capital', ['totalRelease', 'listPrice'], (totalRelease, listPrice) => {
     return totalRelease * listPrice;
+  })
+  .attr('productionFund', ['capital'], (capital) => {
+    return Math.round(capital * 0.7);
+  })
+  .attr('productPriceLimit', ['listPrice'], (listPrice) => {
+    return listPrice;
   });
 
 export const foundationFactory = new Factory()
@@ -79,6 +85,8 @@ export const productFactory = new Factory()
     description() {
       return faker.lorem.sentence(20);
     },
+    price: 1,
+    totalAmount: 1,
     createdAt() {
       return new Date();
     }

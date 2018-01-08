@@ -14,7 +14,7 @@ Accounts.onCreateUser((options, user) => {
   user.profile = _.defaults({}, options.profile, {
     money: newUserInitialMoney,
     lastSeasonTotalWealth: 0,
-    vote: 0,
+    voteTickets: 0,
     stones: { birth: newUserBirthStones },
     isAdmin: false,
     ban: [],

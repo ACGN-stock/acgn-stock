@@ -1,12 +1,8 @@
 <template name="productCenterByCompany">
   <div class="card">
     <div class="card-block">
-      <h1 class="card-title mb-1">
-        產品中心 -
-        {{#with companyId}}
-          {{>companyLink}}
-        {{/with}}
-      </h1>
+      <h1 class="card-title mb-1">產品中心</h1>
+      <h2 class="card-subtitle mb-2 text-muted">{{> companyLink companyId}}</h2>
       <hr />
       {{> productListByCompanyTable}}
     </div>
@@ -22,9 +18,9 @@
           類別
           {{{getSortIcon 'type'}}}
         </th>
-        <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="股東評價" data-sort="likeCount">
-          股東評價
-          {{{getSortIcon 'likeCount'}}}
+        <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="股東評價" data-sort="voteCount">
+          推薦數
+          {{{getSortIcon 'voteCount'}}}
         </th>
         {{#if currentUser.profile.isAdmin}}
           <th class="text-center" style="width: 70px;" title="下架">
@@ -47,10 +43,10 @@
             <button
               class="btn btn-primary btn-sm"
               type="button"
-              data-like-product="{{product._id}}"
+              data-vote-product="{{product._id}}"
             >
-              {{product.likeCount}}
-              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+              {{product.voteCount}}
+              <i class="fa fa-money" aria-hidden="true"></i>
             </button>
           </td>
           {{#if currentUser.profile.isAdmin}}
@@ -58,7 +54,7 @@
               <button
                 class="btn btn-danger btn-sm"
                 type="button"
-                data-take-down="{{product._id}}"
+                data-ban-product="{{product._id}}"
               >
                 下架
               </button>

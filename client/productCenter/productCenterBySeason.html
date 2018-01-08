@@ -37,9 +37,9 @@
           類別
           {{{getSortIcon 'type'}}}
         </th>
-        <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="得票數" data-sort="votes">
+        <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="得票數" data-sort="voteCount">
           得票數
-          {{{getSortIcon 'votes'}}}
+          {{{getSortIcon 'voteCount'}}}
         </th>
         {{#if currentUser.profile.isAdmin}}
           <th class="text-center" style="width: 70px;" title="下架">
@@ -86,7 +86,7 @@
         data-vote-product="{{this._id}}"
         disabled={{cannotVote}}
       >
-        {{this.votes}}
+        {{this.voteCount}}
         <i class="fa fa-money" aria-hidden="true"></i>
       </button>
     </td>
@@ -95,7 +95,7 @@
         <button
           class="btn btn-danger btn-sm"
           type="button"
-          data-take-down="{{this._id}}"
+          data-ban-product="{{this._id}}"
         >
           下架
         </button>

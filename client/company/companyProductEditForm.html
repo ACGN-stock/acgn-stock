@@ -1,0 +1,85 @@
+<template name="companyProductEditForm">
+
+  {{> companyProductEditFormInner product}}
+</template>
+
+<template name="companyProductEditFormInner">
+  <form>
+    <div class="small">
+      ＊必須
+    </div>
+    <div class="form-group">
+      <label for="productName" data-required>產品名稱</label>
+      <input
+        class="form-control"
+        type="text"
+        name="productName"
+        value="{{valueOf 'productName'}}"
+        minlength="4"
+        maxlength="255"
+        placeholder="最少4字，最多255字"
+      />
+      {{{errorHtmlOf 'productName'}}}
+    </div>
+    <div class="form-group">
+      <label for="type" data-required>產品類別</label>
+      <select class="form-control" name="type">
+        {{#each type in productTypeList}}
+          <option value="{{type}}">{{type}}</option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'type'}}}
+    </div>
+    <div class="form-group">
+      <label for="url" data-required>產品連結</label>
+      <input
+        class="form-control"
+        type="url"
+        name="url"
+        value="{{valueOf 'url'}}"
+        placeholder="http://"
+      />
+      {{{errorHtmlOf 'url'}}}
+    </div>
+    <div class="form-group">
+      <label for="description">產品描述</label>
+      <input
+        class="form-control"
+        type="text"
+        name="description"
+        value="{{valueOf 'description'}}"
+        maxlength="500"
+        placeholder="最多500字"
+      />
+      {{{errorHtmlOf 'description'}}}
+    </div>
+    <div class="form-group">
+      <label for="price" data-required>產品價格</label>
+      <input
+        class="form-control"
+        type="number"
+        name="price"
+        value="{{valueOf 'price'}}"
+        min="1" />
+      {{{errorHtmlOf 'price'}}}
+    </div>
+    <div class="form-group">
+      <label for="totalAmount" data-required>產品數量</label>
+      <input
+        class="form-control"
+        type="number"
+        name="totalAmount"
+        value="{{valueOf 'totalAmount'}}"
+        min="1" />
+      {{{errorHtmlOf 'totalAmount'}}}
+      <div class="mr-auto">花費生產資金：${{currencyFormat requiredProductionFund}}</div>
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-end">
+      <div>
+        <button class="btn btn-primary" type="submit">送出</button>
+        <button class="btn btn-secondary" type="reset">取消</button>
+      </div>
+    </div>
+  </form>
+</template>
