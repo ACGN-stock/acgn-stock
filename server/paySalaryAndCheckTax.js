@@ -124,7 +124,7 @@ function paySalaryAndGenerateProfit(thisPayTime) {
     }, 0);
     const explosiveProfit = 3000 * (0.9 + gradeFactor) * gradeFactor * explosionCount;
 
-    const totalProfit = baseProfit + explosiveProfit;
+    const totalProfit = Math.round(baseProfit + explosiveProfit);
     const totalSalary = company.salary * employees.length;
     companyBulk.find({
       _id: company._id
