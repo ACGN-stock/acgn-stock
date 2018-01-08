@@ -19,7 +19,7 @@ Meteor.publish('userOwnedProducts', function({ userId, offset }) {
   const dataNumberPerPage = Meteor.settings.public.dataNumberPerPage.userOwnedProducts;
 
   return dbUserOwnedProducts.find(filter, {
-    sort: { placedAt: 1 },
+    sort: { createdAt: 1 },
     skip: offset,
     limit: dataNumberPerPage
   });
