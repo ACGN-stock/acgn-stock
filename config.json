@@ -54,7 +54,8 @@
     },
     "dataNumberPerPage": {
       "userPlacedStones": 10,
-      "userOwnedProducts": 10
+      "userOwnedProducts": 10,
+      "companyMarketingProducts": 10
     },
     "productFinalSaleTime": 43200000,
     "productProfitFactor": 2.00,

@@ -55,7 +55,8 @@ export const config = {
   },
   dataNumberPerPage: { // 分頁時每個分頁有多少資料
     userPlacedStones: 10,
-    userOwnedProducts: 10
+    userOwnedProducts: 10,
+    companyMarketingProducts: 10
   },
   productFinalSaleTime: 43200000, // 產品最後出清時間 (ms)
   productProfitFactor: 2.00, // 產品售出的營利乘數

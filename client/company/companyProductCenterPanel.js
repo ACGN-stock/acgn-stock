@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
+import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbCompanies } from '/db/dbCompanies';
@@ -12,6 +13,8 @@ inheritedShowLoadingOnSubscribing(Template.companyProductCenterPanel);
 Template.companyProductCenterPanel.onCreated(function() {
   const companyId = FlowRouter.getParam('companyId');
 
+  this.companyMarketingProductsOffset = new ReactiveVar(0);
+
   this.getCompany = () => {
     return dbCompanies.findOne(companyId);
   };
@@ -22,7 +25,11 @@ Template.companyProductCenterPanel.onCreated(function() {
 
   this.autorunWithIdleSupport(() => {
     this.subscribe('companyProductCenterInfo', companyId);
-    this.subscribe('companyMarketingProducts', companyId);
+  });
+
+  this.autorunWithIdleSupport(() => {
+    const offset = this.companyMarketingProductsOffset.get();
+    this.subscribe('companyMarketingProducts', { companyId, offset });
   });
 
   this.autorunWithIdleSupport(() => {
@@ -51,5 +58,12 @@ Template.companyProductCenterPanel.helpers({
   },
   hasPlanningProducts() {
     return Template.instance().getCompany().productCenterInfo.planningProductCount > 0;
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfCompanyMarketingProducts',
+      dataNumberPerPage: Meteor.settings.public.dataNumberPerPage.companyMarketingProducts,
+      offset: Template.instance().companyMarketingProductsOffset
+    };
   }
 });

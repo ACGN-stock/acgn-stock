@@ -15,6 +15,9 @@
         <div>您的剩餘購買額度：${{currencyFormat currentUserTradeQuota}}</div>
       {{/if}}
     </div>
+    <div class="col-12">
+      {{> pagination paginationData}}
+    </div>
     {{#each product in marketingProducts}}
       <div class="col-12 col-lg-6">
         {{> productCard product=product}}
@@ -24,6 +27,9 @@
         <em>哦不！本季沒有推出任何產品！</em>
       </div>
     {{/each}}
+    <div class="col-12">
+      {{> pagination paginationData}}
+    </div>
   </div>
   <hr class="m-0">
   <div class="my-3 text-right">
