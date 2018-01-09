@@ -12,6 +12,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { formatDateTimeText } from '../utils/helpers';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { investFoundCompany } from '../utils/methods';
 
 const rShowAllTags = new ReactiveVar(false);
 
@@ -121,6 +122,11 @@ Template.foundationDetail.events({
         }
       }
     });
+  },
+  'click [data-action="invest"]'(event) {
+    event.preventDefault();
+    const foundationId = FlowRouter.getParam('foundationId');
+    investFoundCompany(foundationId);
   }
 });
 

@@ -2,6 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbCompanies } from '/db/dbCompanies';
+import { dbFoundations } from '/db/dbFoundations';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbOrders } from '/db/dbOrders';
 import { dbProducts } from '/db/dbProducts';
@@ -335,6 +336,51 @@ export function investArchiveCompany(companyData) {
     callback: (result) => {
       if (result) {
         Meteor.customCall('investArchiveCompany', companyData._id);
+      }
+    }
+  });
+}
+
+export function investFoundCompany(companyId) {
+  const foundationData = dbFoundations.find(companyId);
+  const user = Meteor.user();
+  if (! user) {
+    alertDialog.alert('您尚未登入！');
+
+    return false;
+  }
+  const userId = user._id;
+  const minimumInvest = Math.ceil(Meteor.settings.public.minReleaseStock / Meteor.settings.public.foundationNeedUsers);
+  const alreadyInvest = _.findWhere(foundationData.invest, {userId});
+  const alreadyInvestAmount = alreadyInvest ? alreadyInvest.amount : 0;
+  const maximumInvest = Math.min(Meteor.user().profile.money, Meteor.settings.public.maximumInvest - alreadyInvestAmount);
+  if (minimumInvest > maximumInvest) {
+    alertDialog.alert('您的投資已達上限或剩餘金錢不足以進行投資！');
+
+    return false;
+  }
+
+  alertDialog.dialog({
+    type: 'prompt',
+    title: '投資',
+    message: `
+      要投資多少金額？(${currencyFormat(minimumInvest)}~${currencyFormat(maximumInvest)})
+      <div class="text-danger">
+        投資理財有賺有賠，請先確認您要投資的公司是否符合
+        <a href="${dbVariables.get('fscRuleURL')}" target="_blank">金管會的規定</a>。
+      </div>
+    `,
+    defaultValue: null,
+    callback: function(result) {
+      const amount = parseInt(result, 10);
+      if (! amount) {
+        return false;
+      }
+      if (amount >= minimumInvest && amount <= maximumInvest) {
+        Meteor.customCall('investFoundCompany', companyId, amount);
+      }
+      else {
+        alertDialog.alert('不正確的金額數字！');
       }
     }
   });
