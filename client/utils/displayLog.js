@@ -165,7 +165,7 @@ Template.displayLog.helpers({
         }
       }
       case '公司釋股': {
-        return `【公司釋股】「${company}」公司以$${currencyFormat(data.price)}的價格釋出了${data.amount}數量的股票到市場上套取利潤！`;
+        return `【公司釋股】「${company}」公司以$${currencyFormat(data.price)}的價格釋出了${data.amount}數量的股票到市場上！`;
       }
       case '交易紀錄': {
         const buyer = users[0];
