@@ -3,7 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, gradeFactorTable } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbLog } from '/db/dbLog';
@@ -100,19 +100,7 @@ function paySalaryAndGenerateProfit(thisPayTime) {
     });
 
     // 根據公司評級計算當日總營利額
-    let gradeFactor = 0;
-    if (company.grade === 'A') {
-      gradeFactor = 0.4;
-    }
-    else if (company.grade === 'B') {
-      gradeFactor = 0.3;
-    }
-    else if (company.grade === 'C') {
-      gradeFactor = 0.2;
-    }
-    else if (company.grade === 'D') {
-      gradeFactor = 0.1;
-    }
+    const gradeFactor = gradeFactorTable.dailyProfit[company.grade] || 0;
 
     // 基礎營利額
     const baseProfit = 3000 * (0.9 + gradeFactor) * employees.length;

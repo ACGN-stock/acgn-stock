@@ -15,7 +15,9 @@
       </form>
       <hr />
       <h3 class="card-title mb-1">{{displayTableTitle}}</h3>
-      {{> Template.dynamic template=showTableType}}
+      <div class="w-100" style="overflow-y: scroll">
+        {{> Template.dynamic template=showTableType}}
+      </div>
     </div>
   </div>
 </template>
@@ -50,19 +52,19 @@
 </template>
 
 <template name="rankChart">
-  <canvas></canvas>
+  <div class="chart-container" style="min-width: 648px;"></div>
 </template>
 
 <template name="companyPriceRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
-        <th class="text-center text-truncate" title="公司名稱">公司名稱</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="季成交量">季成交量</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="季成交額">季成交額</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="產品營利">產品營利</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="季金流額">
+        <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
+        <th class="text-center text-nowrap" title="公司名稱">公司名稱</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="季成交量">季成交量</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="季成交額">季成交額</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="產品營利">產品營利</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="季金流額">
           季金流額
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
@@ -71,22 +73,22 @@
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center text-truncate">
+          <td class="text-center text-nowrap">
             {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-truncate company-deal-amount" title="{{rankData.totalDealAmount}}">
+          <td class="text-right text-nowrap company-deal-amount" title="{{rankData.totalDealAmount}}">
             {{currencyFormat rankData.totalDealAmount}}
           </td>
-          <td class="text-right text-truncate company-deal-money" title="{{rankData.totalDealMoney}}">
+          <td class="text-right text-nowrap company-deal-money" title="{{rankData.totalDealMoney}}">
             $ {{currencyFormat rankData.totalDealMoney}}
           </td>
-          <td class="text-right text-truncate company-profit" title="{{rankData.productProfit}}">
+          <td class="text-right text-nowrap company-profit" title="{{rankData.productProfit}}">
             $ {{currencyFormat rankData.productProfit}}
           </td>
-          <td class="text-right text-truncate company-total-money" title="{{rankData.totalMoney}}">
+          <td class="text-right text-nowrap company-total-money" title="{{rankData.totalMoney}}">
             $ {{currencyFormat rankData.totalMoney}}
           </td>
         </tr>
@@ -96,15 +98,15 @@
 </template>
 
 <template name="companyProfitRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
-        <th class="text-center text-truncate">公司名稱</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="季營利額">季營利額</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="總釋股數">總釋股數</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="平均股價">平均股價</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="益本比">
+        <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
+        <th class="text-center text-nowrap">公司名稱</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="季營利額">季營利額</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="總釋股數">總釋股數</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="平均股價">平均股價</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="益本比">
           益本比
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
@@ -113,22 +115,22 @@
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center text-truncate">
+          <td class="text-center text-nowrap">
             {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-truncate company-profit" title="{{rankData.profit}}">
+          <td class="text-right text-nowrap company-profit" title="{{rankData.profit}}">
             $ {{currencyFormat rankData.profit}}
           </td>
-          <td class="text-right text-truncate company-stock-relase" title="{{rankData.totalRelease}}">
+          <td class="text-right text-nowrap company-stock-relase" title="{{rankData.totalRelease}}">
             {{rankData.totalRelease}}
           </td>
-          <td class="text-right text-truncate company-stock-avg-price" title="{{rankData.avgPrice}}">
+          <td class="text-right text-nowrap company-stock-avg-price" title="{{rankData.avgPrice}}">
             $ {{currencyFormat rankData.avgPrice}}
           </td>
-          <td class="text-right text-truncate company-stock-PERatio" title="{{rankData.priceToEarn}}">
+          <td class="text-right text-nowrap company-stock-PERatio" title="{{rankData.priceToEarn}}">
             {{rankData.priceToEarn}}
           </td>
         </tr>
@@ -138,14 +140,14 @@
 </template>
 
 <template name="companyValueRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
-        <th class="text-center text-truncate" title="公司名稱">公司名稱</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="收盤股價">收盤股價</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="總釋股數">總釋股數</th>
-        <th class="text-center text-truncate" style="max-width: 240px;" title="總市值">
+        <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
+        <th class="text-center text-nowrap" title="公司名稱">公司名稱</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="收盤股價">收盤股價</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="總釋股數">總釋股數</th>
+        <th class="text-center text-nowrap" style="max-width: 240px;" title="總市值">
           總市值
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
@@ -154,19 +156,19 @@
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center text-truncate">
+          <td class="text-center text-nowrap">
             {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-truncate company-stock-last-price" title="{{rankData.lastPrice}}">
+          <td class="text-right text-nowrap company-stock-last-price" title="{{rankData.lastPrice}}">
             $ {{currencyFormat rankData.lastPrice}}
           </td>
-          <td class="text-right text-truncate company-stock-relase" title="{{rankData.totalRelease}}">
+          <td class="text-right text-nowrap company-stock-relase" title="{{rankData.totalRelease}}">
             {{rankData.totalRelease}}
           </td>
-          <td class="text-right text-truncate company-asset" title="{{rankData.totalValue}}">
+          <td class="text-right text-nowrap company-asset" title="{{rankData.totalValue}}">
             $ {{currencyFormat rankData.totalValue}}
           </td>
         </tr>
@@ -176,14 +178,14 @@
 </template>
 
 <template name="companyCapitalRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
-        <th class="text-center text-truncate" title="公司名稱">公司名稱</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="總釋股數">總釋股數</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="總市值">總市值</th>
-        <th class="text-center text-truncate" style="max-width: 240px;" title="資本額">
+        <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
+        <th class="text-center text-nowrap" title="公司名稱">公司名稱</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="總釋股數">總釋股數</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="總市值">總市值</th>
+        <th class="text-center text-nowrap" style="max-width: 240px;" title="資本額">
           資本額
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
@@ -192,19 +194,19 @@
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center text-truncate">
+          <td class="text-center text-nowrap">
             {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-truncate company-stock-last-price" title="{{rankData.totalRelease}}">
+          <td class="text-right text-nowrap company-stock-last-price" title="{{rankData.totalRelease}}">
             {{rankData.totalRelease}}
           </td>
-          <td class="text-right text-truncate company-stock-relase" title="{{rankData.totalValue}}">
+          <td class="text-right text-nowrap company-stock-relase" title="{{rankData.totalValue}}">
             $ {{currencyFormat rankData.totalValue}}
           </td>
-          <td class="text-right text-truncate company-asset" title="{{rankData.capital}}">
+          <td class="text-right text-nowrap company-asset" title="{{rankData.capital}}">
             $ {{currencyFormat rankData.capital}}
           </td>
         </tr>
@@ -214,14 +216,14 @@
 </template>
 
 <template name="userRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="排名">排名</th>
-        <th class="text-center text-truncate" title="使用者名稱">使用者名稱</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="持有現金">持有現金</th>
-        <th class="text-center text-truncate" style="max-width: 120px;" title="持股總值">持股總值</th>
-        <th class="text-center text-truncate" style="max-width: 240px;" title="總財富">
+        <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
+        <th class="text-center text-nowrap" title="使用者名稱">使用者名稱</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="持有現金">持有現金</th>
+        <th class="text-center text-nowrap" style="max-width: 120px;" title="持股總值">持股總值</th>
+        <th class="text-center text-nowrap" style="max-width: 240px;" title="總財富">
           總財富
           <i class="fa fa-sort-amount-desc" aria-hidden="true"></i>
         </th>
@@ -230,19 +232,19 @@
     <tbody>
       {{#each rankData in rankList}}
         <tr>
-          <td class="text-center text-truncate">
+          <td class="text-center text-nowrap">
             {{plus @index 1}}
           </td>
           <td class="text-left text-truncate">
             {{>userLink rankData.userId}}
           </td>
-          <td class="text-right text-truncate user-money" title="{{rankData.money}}">
+          <td class="text-right text-nowrap user-money" title="{{rankData.money}}">
             $ {{currencyFormat rankData.money}}
           </td>
-          <td class="text-right text-truncate user-stock-value" title="{{rankData.stocksValue}}">
+          <td class="text-right text-nowrap user-stock-value" title="{{rankData.stocksValue}}">
             $ {{currencyFormat rankData.stocksValue}}
           </td>
-          <td class="text-right text-truncate user-wealth" title="{{rankData.totalWealth}}">
+          <td class="text-right text-nowrap user-wealth" title="{{rankData.totalWealth}}">
             $ {{currencyFormat rankData.totalWealth}}
           </td>
         </tr>

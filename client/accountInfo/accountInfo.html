@@ -221,9 +221,13 @@
       <div class="d-inline-block text-truncate" style="min-width: 3rem;">{{>companyLink this._id}}</div>
       <div class="text-nowrap">」公司的「</div>
       <div class="d-inline-block text-truncate" style="min-width: 3rem;">
-        <a href="#" data-action="changeChairmanTitle">
+        {{#if isCurrentUser}}
+          <a href="#" data-action="changeChairmanTitle">
+            {{this.chairmanTitle}}
+          </a>
+        {{else}}
           {{this.chairmanTitle}}
-        </a>
+        {{/if}}
       </div>
       <div class="text-nowrap">」</div>
     </div>
@@ -270,7 +274,7 @@
 
 <template name="accountInfoTaxList">
   <div class="col-12 border-grid">
-    <table class="table table-bordered mt-3 account-tax-info" style="width: 100%; table-layout: fixed;">
+    <table class="table table-bordered mt-3 account-tax-info w-100" style="table-layout: fixed;">
       <thead>
         <tr>
           <th class="text-center text-nowrap" style="width: 160px">繳稅期限</th>
@@ -325,7 +329,7 @@
 
 <template name="accountInfoOwnStockList">
   <div class="col-12 border-grid">
-    <table class="table table-bordered mt-3" style="width: 100%; table-layout: fixed;">
+    <table class="table table-bordered mt-3 w-100" style="table-layout: fixed;">
       <thead>
         <tr>
           <th class="text-center text-nowrap">公司名稱</th>

@@ -8,6 +8,7 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbVariables } from '/db/dbVariables';
 import { stoneDisplayName } from '/db/dbCompanyStones';
+import '../layout/highcharts-themes';
 
 Meteor.subscribe('variables');
 
@@ -182,6 +183,28 @@ export function stoneIconPath(stoneType) {
 }
 Template.registerHelper('stoneIconPath', stoneIconPath);
 
+export function setChartTheme(name) {
+  if (Highcharts.theme[name]) {
+    const themeOptions = Highcharts.theme[name];
+    const defaultOptions = Highcharts.getOptions();
+
+    for (const prop in defaultOptions) {
+      if (typeof defaultOptions[prop] !== 'function') {
+        delete defaultOptions[prop];
+      }
+    }
+
+    Highcharts.setOptions(Highcharts.theme.default);
+    Highcharts.setOptions(themeOptions);
+    Highcharts.setOptions({
+      global: {
+        useUTC: false,
+        timezoneOffset: new Date().getTimezoneOffset()
+      }
+    });
+  }
+}
+Template.registerHelper('setChartTheme', setChartTheme);
 export function productCenterByCompanyPath(companyId) {
   return FlowRouter.path('productCenterByCompany', { companyId });
 }

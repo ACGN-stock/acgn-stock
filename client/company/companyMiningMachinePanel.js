@@ -3,7 +3,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { wrapFunction } from 'meteor/teamgrid:reactive-interval';
 
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, gradeFactorTable } from '/db/dbCompanies';
 import { dbCompanyStones, stonePowerTable, stoneTypeList } from '/db/dbCompanyStones';
 import { getCurrentSeason } from '/db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
@@ -49,6 +49,9 @@ Template.companyMiningMachine.helpers({
 
     return miningMachineInfo.stoneCount[stoneType] || 0;
   },
+  stonePower(stoneType) {
+    return stonePowerTable[stoneType];
+  },
   totalMiningPower() {
     const companyId = FlowRouter.getParam('companyId');
     const { miningMachineInfo } = dbCompanies.findOne(companyId);
@@ -60,6 +63,13 @@ Template.companyMiningMachine.helpers({
     return Object.entries(miningMachineInfo.stoneCount).reduce((sum, [stoneType, count]) => {
       return sum + (stonePowerTable[stoneType] || 0) * count;
     }, 0);
+  },
+  totalMiningProfit(totalPower) {
+    const companyId = FlowRouter.getParam('companyId');
+    const { grade } = dbCompanies.findOne(companyId);
+    const gradeFactor = gradeFactorTable.miningMachine[grade];
+
+    return Math.round(6300 * Math.log10(totalPower + 1) * Math.pow(totalPower, gradeFactor));
   },
   currentUserPlacedStoneType() {
     const companyId = FlowRouter.getParam('companyId');

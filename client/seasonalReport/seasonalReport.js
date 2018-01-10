@@ -1,6 +1,7 @@
 'use strict';
 import { $ } from 'meteor/jquery';
 import { _ } from 'meteor/underscore';
+import { Session as GlobalStorage } from 'meteor/session';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -13,6 +14,7 @@ import { dbSeason } from '/db/dbSeason';
 import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
+import { currencyFormat, setChartTheme } from '../utils/helpers.js';
 
 inheritedShowLoadingOnSubscribing(Template.seasonalReport);
 Template.seasonalReport.onCreated(function() {
@@ -236,21 +238,30 @@ Template.userRankTable.helpers({
 });
 
 Template.rankChart.onRendered(function() {
-  this.chart = null;
-  this.ctx = this.$('canvas')[0].getContext('2d');
+  this.chart = this.$('.chart-container');
   this.autorun(() => {
     drawChart(this);
   });
 });
 Template.rankChart.onDestroyed(function() {
   if (this.chart) {
-    this.chart.destroy();
+    this.chart.empty();
   }
 });
 function drawChart(templateInstance) {
   if (templateInstance.chart) {
-    templateInstance.chart.destroy();
+    templateInstance.chart.empty();
   }
+
+  switch (GlobalStorage.get('themeName')) {
+    case 'dark':
+      setChartTheme('gray');
+      break;
+    default:
+      setChartTheme('gridLight');
+      break;
+  }
+
   switch (rShowTableType.get()) {
     case 'companyPriceRankTable': {
       drawCompanyPriceRankTable(templateInstance);
@@ -281,94 +292,11 @@ function drawCompanyPriceRankTable(templateInstance) {
 
     return rankData;
   });
+
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.ctx.canvas.height = 14 * rankList.length + 20;
-
-  const companyNameHash = {};
-  const deferredList = _.map(rankList, (rankData) => {
-    return $.ajax({
-      url: '/companyInfo',
-      data: {
-        id: rankData.companyId
-      },
-      success: (companyData) => {
-        const companyName = companyData.name;
-        if (companyName.length > 8) {
-          companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
-        }
-        else {
-          companyNameHash[rankData.companyId] = companyName;
-        }
-      }
-    });
-  });
-
-  const sortedRankList = _.sortBy(rankList, 'totalMoney').reverse();
-  $.when(...deferredList).then(function() {
-    const chartData = {
-      labels: _.map(sortedRankList, (rankData) => {
-        return companyNameHash[rankData.companyId];
-      }),
-      datasets: [
-        {
-          label: '產品營利',
-          backgroundColor: '#ff8800',
-          borderColor: '#aaa',
-          data: _.pluck(sortedRankList, 'productProfit')
-        },
-        {
-          label: '季成交額',
-          backgroundColor: '#77b300',
-          borderColor: '#aaa',
-          data: _.pluck(sortedRankList, 'totalDealMoney')
-        }
-      ]
-    };
-
-    const chartOptions = {
-      responsive: true,
-      scales: {
-        xAxes: [
-          {
-            display: true,
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          }
-        ],
-        yAxes: [
-          {
-            stacked: true,
-            gridLines: {
-              color: '#aaa'
-            },
-            barPercentage: 0.6
-          }
-        ]
-      }
-    };
-
-    templateInstance.chart = new Chart(templateInstance.ctx, {
-      type: 'horizontalBar',
-      data: chartData,
-      options: chartOptions
-    });
-  });
-}
-function drawCompanyProfitRankTable(templateInstance) {
-  const seasonId = FlowRouter.getParam('seasonId');
-  const rankList = dbRankCompanyProfit.find({seasonId}).fetch();
-  if (rankList.length < 1) {
-    return false;
-  }
-  templateInstance.ctx.canvas.height = 14 * rankList.length + 20;
+  templateInstance.chart.height(20 * rankList.length);
 
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
@@ -381,7 +309,114 @@ function drawCompanyProfitRankTable(templateInstance) {
       success: (companyData) => {
         const companyName = companyData.name;
         if (companyName.length > 8) {
-          companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
+          companyNameHash[rankData.companyId] = companyName.slice(0, 7) + '...';
+        }
+        else {
+          companyNameHash[rankData.companyId] = companyName;
+        }
+      }
+    });
+  });
+
+  const sortedRankList = _.sortBy(rankList, 'totalMoney').reverse();
+  $.when(...deferredList).then(function() {
+    const xAxisLabel = _.map(sortedRankList, (rankData) => {
+      return companyNameHash[rankData.companyId];
+    });
+
+    Highcharts.chart({
+      chart: {
+        type: 'bar',
+        renderTo: templateInstance.chart[0]
+      },
+      title: {
+        text: null
+      },
+      xAxis: {
+        categories: xAxisLabel,
+        gridLineWidth: 1
+      },
+      yAxis: [
+        {
+          allowDecimals: false,
+          min: 0,
+          opposite: true,
+          title: {
+            text: null
+          }
+        },
+        {
+          allowDecimals: false,
+          min: 0,
+          title: {
+            text: null
+          },
+          linkedTo: 0
+        }
+      ],
+      legend: {
+        verticalAlign: 'top',
+        reversed: true
+      },
+      credits: {
+        enabled: false
+      },
+      plotOptions: {
+        series: {
+          stacking: 'normal'
+        },
+        bar: {
+          borderWidth: 0,
+          groupPadding: 0.1
+        }
+      },
+      tooltip: {
+        valueDecimals: 0,
+        pointFormatter: function() {
+          return '<span style="color:' +
+            this.color +
+            '">\u25CF</span> ' +
+            this.series.name +
+            ': <b>$' +
+            currencyFormat(this.y) +
+            '</b><br/>';
+        }
+      },
+      series: [
+        {
+          name: '產品營利',
+          color: '#ff8800',
+          data: _.pluck(sortedRankList, 'productProfit')
+        },
+        {
+          name: '季成交額',
+          color: '#77b300',
+          data: _.pluck(sortedRankList, 'totalDealMoney')
+        }
+      ]
+    });
+  });
+}
+function drawCompanyProfitRankTable(templateInstance) {
+  const seasonId = FlowRouter.getParam('seasonId');
+  const rankList = dbRankCompanyProfit.find({seasonId}).fetch();
+  if (rankList.length < 1) {
+    return false;
+  }
+  templateInstance.chart.height(40 * rankList.length);
+
+  const companyNameHash = {};
+  const deferredList = _.map(rankList, (rankData) => {
+    return $.ajax({
+      url: '/companyInfo',
+      data: {
+        id: rankData.companyId
+      },
+      dataType: 'json',
+      success: (companyData) => {
+        const companyName = companyData.name;
+        if (companyName.length > 8) {
+          companyNameHash[rankData.companyId] = companyName.slice(0, 7) + '...';
         }
         else {
           companyNameHash[rankData.companyId] = companyName;
@@ -392,70 +427,78 @@ function drawCompanyProfitRankTable(templateInstance) {
 
   const sortedRankList = _.sortBy(rankList, 'priceToEarn').reverse();
   $.when(...deferredList).then(function() {
-    const chartData = {
-      labels: _.map(sortedRankList, (rankData) => {
-        return companyNameHash[rankData.companyId];
-      }),
-      datasets: [
+    const xAxisLabel = _.map(sortedRankList, (rankData) => {
+      return companyNameHash[rankData.companyId];
+    });
+
+    Highcharts.chart({
+      chart: {
+        type: 'bar',
+        renderTo: templateInstance.chart[0]
+      },
+      title: {
+        text: null
+      },
+      xAxis: {
+        categories: xAxisLabel,
+        gridLineWidth: 1
+      },
+      yAxis: [
         {
-          label: '益本比',
-          xAxisID: 'x-axis-ratio',
-          backgroundColor: 'rgba(255, 136, 0, 1)',
-          borderColor: '#aaa',
+          id: 'x-axis-peratio',
+          min: 0,
+          opposite: true,
+          title: {
+            text: null
+          }
+        },
+        {
+          id: 'x-axis-profit',
+          allowDecimals: false,
+          min: 0,
+          title: {
+            text: null
+          }
+        }
+      ],
+      legend: {
+        verticalAlign: 'top'
+      },
+      credits: {
+        enabled: false
+      },
+      plotOptions: {
+        bar: {
+          borderWidth: 0,
+          groupPadding: 0.1
+        }
+      },
+      series: [
+        {
+          name: '益本比',
+          color: 'rgba(255, 136, 0, 1)',
+          yAxis: 'x-axis-peratio',
           data: _.pluck(sortedRankList, 'priceToEarn')
         },
         {
-          label: '季營利額',
-          xAxisID: 'x-axis-profit',
-          backgroundColor: 'rgba(119, 179, 0, 0.2)',
-          borderColor: '#aaa',
-          data: _.pluck(sortedRankList, 'profit')
+          name: '季營利額',
+          color: 'rgba(119, 179, 0, 0.4)',
+          yAxis: 'x-axis-profit',
+          data: _.pluck(sortedRankList, 'profit'),
+          tooltip: {
+            valueDecimals: 0,
+            pointFormatter: function() {
+              return '<span style="color:' +
+                this.color +
+                '">\u25CF</span> ' +
+                this.series.name +
+                ': <b>$' +
+                currencyFormat(this.y) +
+                '</b><br/>';
+            }
+          }
         }
       ]
-    };
-
-    const chartOptions = {
-      responsive: true,
-      scales: {
-        xAxes: [
-          {
-            id: 'x-axis-ratio',
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          },
-          {
-            id: 'x-axis-profit',
-            display: false,
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          }
-        ],
-        yAxes: [
-          {
-            gridLines: {
-              color: '#aaa'
-            }
-          }
-        ]
-      }
-    };
-
-    templateInstance.chart = new Chart(templateInstance.ctx, {
-      type: 'horizontalBar',
-      data: chartData,
-      options: chartOptions
     });
   });
 }
@@ -469,7 +512,7 @@ function drawCompanyValueRankTable(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.ctx.canvas.height = 14 * rankList.length + 20;
+  templateInstance.chart.height(60 * rankList.length);
 
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
@@ -482,7 +525,7 @@ function drawCompanyValueRankTable(templateInstance) {
       success: (companyData) => {
         const companyName = companyData.name;
         if (companyName.length > 8) {
-          companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
+          companyNameHash[rankData.companyId] = companyName.slice(0, 7) + '...';
         }
         else {
           companyNameHash[rankData.companyId] = companyName;
@@ -493,104 +536,119 @@ function drawCompanyValueRankTable(templateInstance) {
 
   const sortedRankList = _.sortBy(rankList, 'totalValue').reverse();
   $.when(...deferredList).then(function() {
-    const chartData = {
-      labels: _.map(sortedRankList, (rankData) => {
-        return companyNameHash[rankData.companyId];
-      }),
-      datasets: [
+    const xAxisLabel = _.map(sortedRankList, (rankData) => {
+      return companyNameHash[rankData.companyId];
+    });
+
+    Highcharts.chart({
+      chart: {
+        type: 'bar',
+        renderTo: templateInstance.chart[0]
+      },
+      title: {
+        text: null
+      },
+      xAxis: {
+        categories: xAxisLabel,
+        gridLineWidth: 1
+      },
+      yAxis: [
         {
-          label: '總市值',
-          xAxisID: 'x-axis-value',
-          backgroundColor: 'rgba(119, 179, 0, 1)',
-          borderColor: '#aaa',
-          data: _.pluck(sortedRankList, 'totalValue')
+          id: 'x-axis-value',
+          allowDecimals: false,
+          min: 0,
+          opposite: true,
+          title: {
+            text: null
+          }
         },
         {
-          label: '總釋股數',
-          xAxisID: 'x-axis-release',
-          backgroundColor: 'rgba(255, 136, 0, 0.2)',
-          borderColor: '#aaa',
+          id: 'x-axis-release',
+          allowDecimals: false,
+          min: 0,
+          opposite: true,
+          title: {
+            text: null
+          },
+          visible: false
+        },
+        {
+          id: 'x-axis-price',
+          allowDecimals: false,
+          min: 0,
+          title: {
+            text: null
+          }
+        }
+      ],
+      legend: {
+        verticalAlign: 'top'
+      },
+      credits: {
+        enabled: false
+      },
+      plotOptions: {
+        bar: {
+          borderWidth: 0,
+          groupPadding: 0.1
+        }
+      },
+      series: [
+        {
+          name: '總市值',
+          color: 'rgba(119, 179, 0, 1)',
+          yAxis: 'x-axis-value',
+          data: _.pluck(sortedRankList, 'totalValue'),
+          tooltip: {
+            valueDecimals: 0,
+            pointFormatter: function() {
+              return '<span style="color:' +
+                this.color +
+                '">\u25CF</span> ' +
+                this.series.name +
+                ': <b>$' +
+                currencyFormat(this.y) +
+                '</b><br/>';
+            }
+          }
+        },
+        {
+          name: '總釋股數',
+          color: 'rgba(255, 136, 0, 0.4)',
+          yAxis: 'x-axis-release',
           data: _.pluck(sortedRankList, 'totalRelease')
         },
         {
-          label: '收盤股價',
-          xAxisID: 'x-axis-price',
-          backgroundColor: 'rgba(42, 159, 214, 0.2)',
-          borderColor: '#aaa',
-          data: _.pluck(sortedRankList, 'lastPrice')
+          name: '收盤股價',
+          color: 'rgba(42, 159, 214, 0.4)',
+          data: _.pluck(sortedRankList, 'lastPrice'),
+          yAxis: 'x-axis-price',
+          tooltip: {
+            valueDecimals: 0,
+            pointFormatter: function() {
+              return '<span style="color:' +
+                this.color +
+                '">\u25CF</span> ' +
+                this.series.name +
+                ': <b>$' +
+                currencyFormat(this.y) +
+                '</b><br/>';
+            }
+          }
         }
       ]
-    };
-
-    const chartOptions = {
-      responsive: true,
-      scales: {
-        xAxes: [
-          {
-            id: 'x-axis-value',
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          },
-          {
-            id: 'x-axis-release',
-            display: false,
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          },
-          {
-            id: 'x-axis-price',
-            display: false,
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          }
-        ],
-        yAxes: [
-          {
-            gridLines: {
-              color: '#aaa'
-            }
-          }
-        ]
-      }
-    };
-
-    templateInstance.chart = new Chart(templateInstance.ctx, {
-      type: 'horizontalBar',
-      data: chartData,
-      options: chartOptions
     });
   });
 }
 
 function drawCompanyCapitalRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
-  const rankList = dbRankCompanyCapital.find({seasonId}).map((rankData) => {
-    rankData.totalValue = rankData.lastPrice * rankData.totalRelease;
+  const rankList = dbRankCompanyCapital.find({seasonId}).fetch();
 
-    return rankData;
-  });
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.ctx.canvas.height = 14 * rankList.length + 20;
+  templateInstance.chart.height(60 * rankList.length);
 
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
@@ -603,7 +661,7 @@ function drawCompanyCapitalRankTable(templateInstance) {
       success: (companyData) => {
         const companyName = companyData.name;
         if (companyName.length > 8) {
-          companyNameHash[rankData.companyId] = companyName.slice(0, 5) + '...';
+          companyNameHash[rankData.companyId] = companyName.slice(0, 7) + '...';
         }
         else {
           companyNameHash[rankData.companyId] = companyName;
@@ -614,89 +672,108 @@ function drawCompanyCapitalRankTable(templateInstance) {
 
   const sortedRankList = _.sortBy(rankList, 'capital').reverse();
   $.when(...deferredList).then(function() {
-    const chartData = {
-      labels: _.map(sortedRankList, (rankData) => {
-        return companyNameHash[rankData.companyId];
-      }),
-      datasets: [
+    const xAxisLabel = _.map(sortedRankList, (rankData) => {
+      return companyNameHash[rankData.companyId];
+    });
+
+    Highcharts.chart({
+      chart: {
+        type: 'bar',
+        renderTo: templateInstance.chart[0]
+      },
+      title: {
+        text: null
+      },
+      xAxis: {
+        categories: xAxisLabel,
+        gridLineWidth: 1
+      },
+      yAxis: [
         {
-          label: '資本額',
-          xAxisID: 'x-axis-value',
-          backgroundColor: 'rgba(119, 179, 0, 1)',
-          borderColor: '#aaa',
-          data: _.pluck(sortedRankList, 'capital')
+          id: 'x-axis-capital',
+          allowDecimals: false,
+          min: 0,
+          opposite: true,
+          title: {
+            text: null
+          }
         },
         {
-          label: '總釋股數',
-          xAxisID: 'x-axis-release',
-          backgroundColor: 'rgba(255, 136, 0, 0.2)',
-          borderColor: '#aaa',
-          data: _.pluck(sortedRankList, 'totalRelease')
+          id: 'x-axis-value',
+          allowDecimals: false,
+          min: 0,
+          opposite: true,
+          title: {
+            text: null
+          },
+          visible: false
         },
         {
-          label: '收盤股價',
-          xAxisID: 'x-axis-price',
-          backgroundColor: 'rgba(42, 159, 214, 0.2)',
-          borderColor: '#aaa',
-          data: _.pluck(sortedRankList, 'lastPrice')
+          id: 'x-axis-release',
+          allowDecimals: false,
+          min: 0,
+          title: {
+            text: null
+          }
+        }
+      ],
+      legend: {
+        verticalAlign: 'top',
+        reversed: true
+      },
+      credits: {
+        enabled: false
+      },
+      plotOptions: {
+        bar: {
+          borderWidth: 0,
+          groupPadding: 0.1
+        }
+      },
+      series: [
+        {
+          name: '資本額',
+          color: 'rgba(119, 179, 0, 1)',
+          yAxis: 'x-axis-capital',
+          data: _.pluck(sortedRankList, 'capital'),
+          tooltip: {
+            valueDecimals: 0,
+            pointFormatter: function() {
+              return '<span style="color:' +
+                this.color +
+                '">\u25CF</span> ' +
+                this.series.name +
+                ': <b>$' +
+                currencyFormat(this.y) +
+                '</b><br/>';
+            }
+          }
+        },
+        {
+          name: '總市值',
+          color: 'rgba(255, 136, 0, 0.4)',
+          yAxis: 'x-axis-value',
+          data: _.pluck(sortedRankList, 'totalValue'),
+          tooltip: {
+            valueDecimals: 0,
+            pointFormatter: function() {
+              return '<span style="color:' +
+                this.color +
+                '">\u25CF</span> ' +
+                this.series.name +
+                ': <b>$' +
+                currencyFormat(this.y) +
+                '</b><br/>';
+            }
+          }
+        },
+        {
+          name: '總釋股數',
+          color: 'rgba(42, 159, 214, 0.4)',
+          data: _.pluck(sortedRankList, 'totalRelease'),
+          yAxis: 'x-axis-release'
         }
       ]
-    };
-
-    const chartOptions = {
-      responsive: true,
-      scales: {
-        xAxes: [
-          {
-            id: 'x-axis-value',
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          },
-          {
-            id: 'x-axis-release',
-            display: false,
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          },
-          {
-            id: 'x-axis-price',
-            display: false,
-            type: 'linear',
-            position: 'top',
-            ticks: {
-              beginAtZero: true
-            },
-            gridLines: {
-              color: '#aaa'
-            }
-          }
-        ],
-        yAxes: [
-          {
-            gridLines: {
-              color: '#aaa'
-            }
-          }
-        ]
-      }
-    };
-
-    templateInstance.chart = new Chart(templateInstance.ctx, {
-      type: 'horizontalBar',
-      data: chartData,
-      options: chartOptions
     });
   });
 }
@@ -710,7 +787,7 @@ function drawUserRankChart(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.ctx.canvas.height = 8 * rankList.length + 20;
+  templateInstance.chart.height(20 * rankList.length);
   const userNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
@@ -722,7 +799,7 @@ function drawUserRankChart(templateInstance) {
       success: (userData) => {
         const userName = userData.name;
         if (userName.length > 13) {
-          userNameHash[rankData.userId] = userName.slice(0, 10) + '...';
+          userNameHash[rankData.userId] = userName.slice(0, 12) + '...';
         }
         else {
           userNameHash[rankData.userId] = userName;
@@ -733,56 +810,80 @@ function drawUserRankChart(templateInstance) {
 
   const sortedRankList = _.sortBy(rankList, 'totalWealth').reverse();
   $.when(...deferredList).then(() => {
-    const chartData = {
-      labels: _.map(sortedRankList, (rankData) => {
-        return userNameHash[rankData.userId];
-      }),
-      datasets: [
+    const xAxisLabel = _.map(sortedRankList, (rankData) => {
+      return userNameHash[rankData.userId];
+    });
+
+    Highcharts.chart({
+      chart: {
+        type: 'bar',
+        renderTo: templateInstance.chart[0]
+      },
+      title: {
+        text: null
+      },
+      xAxis: {
+        categories: xAxisLabel,
+        gridLineWidth: 1
+      },
+      yAxis: [
         {
-          label: '持有現金',
-          backgroundColor: '#ff8800',
-          borderColor: '#aaa',
+          allowDecimals: false,
+          min: 0,
+          opposite: true,
+          title: {
+            text: null
+          }
+        },
+        {
+          allowDecimals: false,
+          min: 0,
+          title: {
+            text: null
+          },
+          linkedTo: 0
+        }
+      ],
+      legend: {
+        verticalAlign: 'top',
+        reversed: true
+      },
+      credits: {
+        enabled: false
+      },
+      plotOptions: {
+        series: {
+          stacking: 'normal'
+        },
+        bar: {
+          borderWidth: 0,
+          groupPadding: 0.1
+        }
+      },
+      tooltip: {
+        valueDecimals: 0,
+        pointFormatter: function() {
+          return '<span style="color:' +
+            this.color +
+            '">\u25CF</span> ' +
+            this.series.name +
+            ': <b>$' +
+            currencyFormat(this.y) +
+            '</b><br/>';
+        }
+      },
+      series: [
+        {
+          name: '持有現金',
+          color: '#ff8800',
           data: _.pluck(sortedRankList, 'money')
         },
         {
-          label: '持股總值',
-          backgroundColor: '#77b300',
-          borderColor: '#aaa',
+          name: '持股總值',
+          color: '#77b300',
           data: _.pluck(sortedRankList, 'stocksValue')
         }
       ]
-    };
-
-    templateInstance.chart = new Chart(templateInstance.ctx, {
-      type: 'horizontalBar',
-      data: chartData,
-      options: {
-        responsive: true,
-        tooltips: {
-          mode: 'y',
-          intersect: false
-        },
-        scales: {
-          xAxes: [
-            {
-              position: 'top',
-              stacked: true,
-              gridLines: {
-                color: '#aaa'
-              }
-            }
-          ],
-          yAxes: [
-            {
-              stacked: true,
-              gridLines: {
-                color: '#aaa'
-              },
-              barPercentage: 0.6
-            }
-          ]
-        }
-      }
     });
   });
 }

@@ -13,6 +13,21 @@ body {
   margin-bottom: 2rem;
 }
 
+/* navbar 使用者ID顯示 */
+#nav > .navbar-brand.dropdown:first-of-type {
+  max-width: calc(100% - 4rem);
+}
+@media only screen and (min-width: 992px) {
+  #nav > .navbar-brand.dropdown:first-of-type {
+    max-width: calc(100% - 36rem);
+  }
+}
+@media only screen and (max-width: 991px) {
+  #nav > .navbar-brand.dropdown:first-of-type {
+    max-width: calc(100% - 4rem);
+  }
+}
+
 /* 在必要的輸入的label上加上asterisk */
 [data-required]:after {
   font-size: 0.75rem;

@@ -45,10 +45,6 @@ Template.displayLog.onRendered(function() {
         let path;
         // TODO write a helper
         switch (status) {
-          case 'archived': {
-            path = FlowRouter.path('companyArchiveDetail', { companyId });
-            break;
-          }
           case 'foundation': {
             path = FlowRouter.path('foundationDetail', { foundationId: companyId });
             break;
