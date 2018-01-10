@@ -61,25 +61,15 @@ export function formatDateText(date) {
   }
 
   return (
-    date.getFullYear() +
-    '/' +
-    padZero(date.getMonth() + 1) +
-    '/' +
-    padZero(date.getDate()) +
-    ' ' +
-    padZero(date.getHours()) +
-    ':' +
-    padZero(date.getMinutes()) +
-    ':' +
-    padZero(date.getSeconds())
+    `${date.getFullYear()}/${padZero(date.getMonth() + 1)}/${padZero(date.getDate())} ${padZero(date.getHours())}:${padZero(date.getMinutes())}:${padZero(date.getSeconds())}`
   );
 }
 function padZero(n) {
   if (n < 10) {
-    return '0' + n;
+    return `0${n}`;
   }
   else {
-    return '' + n;
+    return `${n}`;
   }
 }
 Template.registerHelper('formatDateText', formatDateText);
@@ -90,15 +80,7 @@ export function formatDateTimeText(date) {
   }
 
   return (
-    padZero(date.getMonth() + 1) +
-    '/' +
-    padZero(date.getDate()) +
-    ' ' +
-    padZero(date.getHours()) +
-    ':' +
-    padZero(date.getMinutes()) +
-    ':' +
-    padZero(date.getSeconds())
+    `${padZero(date.getMonth() + 1)}/${padZero(date.getDate())} ${padZero(date.getHours())}:${padZero(date.getMinutes())}:${padZero(date.getSeconds())}`
   );
 }
 Template.registerHelper('formatDateTimeText', formatDateTimeText);
@@ -113,9 +95,7 @@ export function formatTimeText(time) {
   time = Math.floor(time / timeBase);
 
   return (
-    padZero(Math.floor(time / 60)) +
-    ':' +
-    padZero(time % 60)
+    `${padZero(Math.floor(time / 60))}:${padZero(time % 60)}`
   );
 }
 
@@ -225,3 +205,7 @@ export function setChartTheme(name) {
   }
 }
 Template.registerHelper('setChartTheme', setChartTheme);
+export function productCenterByCompanyPath(companyId) {
+  return FlowRouter.path('productCenterByCompany', { companyId });
+}
+Template.registerHelper('productCenterByCompanyPath', productCenterByCompanyPath);

@@ -1,0 +1,100 @@
+import { Meteor } from 'meteor/meteor';
+import { _ } from 'meteor/underscore';
+import { resetDatabase } from 'meteor/xolvio:cleaner';
+import faker from 'faker';
+import expect from 'must';
+import mustSinon from 'must-sinon';
+
+import { dbFoundations } from '/db/dbFoundations';
+import { dbCompanyArchive } from '/db/dbCompanyArchive';
+import { dbLog } from '/db/dbLog';
+import { foundationFactory } from '/dev-utils/factories';
+import { doOnFoundationFailure } from '/server/functions/foundation/doOnFoundationFailure';
+
+mustSinon(expect);
+
+describe('function doOnFoundationFailure', function() {
+  const investors = [
+    { userId: 'aUser', amount: 1 },
+    { userId: 'someUser', amount: 1234 },
+    { userId: 'anotherUser', amount: 4321 }
+  ];
+
+  let companyId;
+
+  beforeEach(function() {
+    resetDatabase();
+
+    companyId = dbFoundations.insert(foundationFactory.build({
+      pictureSmall: faker.image.imageUrl(),
+      pictureLarge: faker.image.imageUrl(),
+      illegalReason: '一二三四五六七八九十',
+      invest: investors
+    }));
+
+    dbCompanyArchive.rawCollection().insert({ _id: companyId });
+    dbLog.rawCollection().insert({ companyId });
+  });
+
+  it('should remove the foundation data', function() {
+    const foundationData = dbFoundations.findOne(companyId);
+    doOnFoundationFailure(foundationData);
+
+    expect(dbFoundations.findOne(companyId)).to.not.exist();
+    expect(dbCompanyArchive.findOne(companyId)).to.not.exist();
+    expect(dbLog.findOne({ companyId })).to.not.exist();
+  });
+
+  it('should write a 創立失敗 log', function() {
+    const foundationData = dbFoundations.findOne(companyId);
+    doOnFoundationFailure(foundationData);
+
+    const logData = dbLog.findOne({ logType: '創立失敗' });
+    expect(logData).to.exist();
+    logData.userId.must.be.eql(_.union([foundationData.manager], _.pluck(investors, 'userId')));
+    logData.data.companyName.must.be.equal(foundationData.companyName);
+  });
+
+  it('should return fund to the investors', function() {
+    investors.forEach(({ userId }) => {
+      Meteor.users.rawCollection().insert({ _id: userId, profile: { money: 0 }});
+    });
+
+    const foundationData = dbFoundations.findOne(companyId);
+    doOnFoundationFailure(foundationData);
+
+    investors.forEach(({ userId, amount }) => {
+      const refundLog = dbLog.findOne({ logType: '創立退款', userId });
+      const { refund } = refundLog.data;
+      const { money } = Meteor.users.findOne(userId).profile;
+
+      refund.must.be.equal(amount);
+      money.must.be.equal(amount);
+    });
+  });
+
+  it('should return only fund except "founderEarnestMoney" if the investor is the manager', function() {
+    const extraAmount = 1000;
+    const managerUserId = 'manager';
+
+    const managerInvestor = {
+      userId: managerUserId,
+      amount: Meteor.settings.public.founderEarnestMoney + extraAmount
+    };
+
+    Meteor.users.rawCollection().insert({ _id: managerUserId, profile: { money: 0 }});
+
+    dbFoundations.update(companyId, {
+      $set: { manager: managerUserId },
+      $push: { invest: managerInvestor }
+    });
+    const foundationData = dbFoundations.findOne(companyId);
+    doOnFoundationFailure(foundationData);
+
+    const { refund } = dbLog.findOne({ logType: '創立退款', userId: managerUserId }).data;
+    const { money } = Meteor.users.findOne(managerUserId).profile;
+
+    refund.must.be.equal(extraAmount);
+    money.must.be.equal(extraAmount);
+  });
+});

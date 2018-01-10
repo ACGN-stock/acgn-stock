@@ -120,6 +120,16 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 0
   },
+  // 生產資金
+  productionFund: {
+    type: SimpleSchema.Integer,
+    min: 0
+  },
+  // 產品的售價上限
+  productPriceLimit: {
+    type: SimpleSchema.Integer,
+    min: 0
+  },
   //選舉經理時的候選者userId列表
   candidateList: {
     type: Array
@@ -159,3 +169,13 @@ const schema = new SimpleSchema({
   }
 });
 dbCompanies.attachSchema(schema);
+
+dbCompanies.findByIdOrThrow = function(id, options) {
+  const result = dbCompanies.findOne(id, options);
+
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的公司！`);
+  }
+
+  return result;
+};

@@ -1,0 +1,39 @@
+<template name="productCard">
+  <div class="card my-2">
+    <div class="card-header d-flex flex-wrap py-2">
+      <div class="mr-3">價格：${{currencyFormat product.price}}</div>
+      <div>
+        {{#if product.availableAmount}}
+          尚餘：{{product.availableAmount}}
+        {{else}}
+          {{#if product.stockAmount}}
+            <span class="text-warning">補貨中</span>
+          {{else}}
+            <span class="text-danger">已完售</span>
+          {{/if}}
+        {{/if}}
+      </div>
+    </div>
+    <div class="card-block">
+      <h5 class="card-title text-truncate">
+        <div class="badge badge-default">{{product.type}}</div>
+        {{> productLink product._id}}
+      </h5>
+      <div class="card-subtitle">{{product.description}}</div>
+    </div>
+    <div class="card-footer d-flex flex-wrap">
+      <div>
+        {{#if product.availableAmount}}
+          <button class="btn btn-sm btn-primary" title="購買產品" data-buy-product="{{product._id}}">購買</button>
+        {{/if}}
+        <button class="btn btn-sm btn-primary" title="推薦產品" data-vote-product="{{product._id}}">
+          <i class="fa fa-money" aria-hidden="true"></i>
+          {{product.voteCount}}
+        </button>
+      </div>
+      {{#if isAdmin}}
+        <button class="btn btn-sm btn-danger ml-auto" title="下架" data-ban-product="{{product._id}}">下架</button>
+      {{/if}}
+    </div>
+  </div>
+</template>

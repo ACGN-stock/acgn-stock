@@ -18,11 +18,10 @@ import { dbFoundations } from '/db/dbFoundations';
 import { dbLog, accuseLogTypeList } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
 import { dbPrice } from '/db/dbPrice';
-import { dbProductLike } from '/db/dbProductLike';
 import { dbProducts } from '/db/dbProducts';
 import { dbResourceLock } from '/db/dbResourceLock';
 import { dbRound } from '/db/dbRound';
-import { dbSeason } from '/db/dbSeason';
+import { dbSeason, getCurrentSeason, getInitialVoteTicketCount } from '/db/dbSeason';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbUserArchive } from '/db/dbUserArchive';
 import { dbVariables } from '/db/dbVariables';
@@ -35,19 +34,23 @@ import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
 import { dbRankUserWealth } from '/db/dbRankUserWealth';
 import { updateLowPriceThreshold } from './functions/company/updateLowPriceThreshold';
 import { updateHighPriceThreshold } from './functions/company/updateHighPriceThreshold';
+import { updateCompanyProductionFunds } from './functions/company/updateCompanyProductionFunds';
 import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
 import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
 import { countDownRecordListPrice } from './functions/company/recordListPrice';
 import { countDownCheckChairman } from './functions/company/checkChairman';
 import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
+import { deliverProductVotingRewards } from './functions/season/deliverProductVotingRewards';
 import { returnCompanyStones } from './functions/miningMachine/returnCompanyStones';
 import { generateMiningProfits } from './functions/miningMachine/generateMiningProfits';
+import { rotateProducts } from './functions/product/rotateProducts';
 import { startArenaFight } from './arena';
-import { checkExpiredFoundations } from './foundation';
+import { checkExpiredFoundations } from './functions/foundation/checkExpiredFoundations';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
+import { eventScheduler } from './imports/utils/eventScheduler';
 
-//週期檢查工作內容
+// 週期檢查工作內容
 export function doIntervalWork() {
   debug.log('doIntervalWork');
   const now = Date.now();
@@ -62,51 +65,53 @@ export function doIntervalWork() {
     }
   });
   if (! lastSeasonData) {
-    //產生新的商業季度
+    // 產生新的商業季度
     generateNewSeason();
   }
   if (now >= lastRoundData.endDate.getTime()) {
-    //賽季結束工作
+    // 賽季結束工作
     doRoundWorks(lastRoundData, lastSeasonData);
   }
   else if (now >= lastSeasonData.electTime) {
-    //若有正在競選經理人的公司，則計算出選舉結果。
+    // 若有正在競選經理人的公司，則計算出選舉結果。
     electManager(lastSeasonData);
   }
   else if (now >= lastSeasonData.endDate.getTime()) {
-    //商業季度結束工作
+    // 商業季度結束工作
     doSeasonWorks(lastRoundData, lastSeasonData);
   }
   else {
     // 更新高低價位股價門檻
     updateLowPriceThreshold();
     updateHighPriceThreshold();
-    //檢查所有創立中且投資時間截止的公司是否成功創立
+    // 檢查所有創立中且投資時間截止的公司是否成功創立
     checkExpiredFoundations();
-    //當發薪時間到時，發給所有驗證通過的使用者薪水，並檢查賦稅、增加滯納罰金與強制繳稅
+    // 當發薪時間到時，發給所有驗證通過的使用者薪水，並檢查賦稅、增加滯納罰金與強制繳稅
     paySalaryAndCheckTax();
-    //隨機時間讓符合條件的公司釋出股票
+    // 隨機時間讓符合條件的公司釋出股票
     countDownReleaseStocksForHighPrice();
     countDownReleaseStocksForNoDeal();
-    //隨機時間售出金管會股票並紀錄公司的參考價格
+    // 隨機時間售出金管會股票並紀錄公司的參考價格
     countDownRecordListPrice();
-    //檢查並更新各公司的董事長位置
+    // 檢查並更新各公司的董事長位置
     countDownCheckChairman();
+    // 觸發所有到期的排程事件
+    eventScheduler.triggerOverdueEvents();
   }
-  //移除所有一分鐘以前的聊天發言紀錄
+  // 移除所有一分鐘以前的聊天發言紀錄
   dbLog.remove({
     logType: '聊天發言',
     createdAt: {
       $lt: new Date(Date.now() - 60000)
     }
   });
-  //移除所有到期的廣告
+  // 移除所有到期的廣告
   dbAdvertising.remove({
     createdAt: {
       $lt: new Date(Date.now() - Meteor.settings.public.advertisingExpireTime)
     }
   });
-  //移除5分鐘以上的resource lock
+  // 移除5分鐘以上的resource lock
   // dbResourceLock
   //   .find({
   //     time: {
@@ -117,9 +122,9 @@ export function doIntervalWork() {
   //     console.log(JSON.stringify(lockData) + ' locked time over 5 min...automatic release!');
   //     dbResourceLock.remove(lockData._id);
   //   });
-  //移除所有debug紀錄
+  // 移除所有debug紀錄
   debug.clean();
-  //移除沒有IP地址的user connections
+  // 移除沒有IP地址的user connections
   UserStatus.connections.remove({
     ipAddr: {
       $exists: false
@@ -127,19 +132,19 @@ export function doIntervalWork() {
   });
 }
 
-//賽季結束工作
+// 賽季結束工作
 export function doRoundWorks(lastRoundData, lastSeasonData) {
   debug.log('doRoundWorks', lastSeasonData);
-  //避免執行時間過長導致重複進行賽季結算
+  // 避免執行時間過長導致重複進行賽季結算
   if (dbResourceLock.findOne('season')) {
     return false;
   }
-  console.info(new Date().toLocaleString() + ': doRoundWorks');
+  console.info(`${new Date().toLocaleString()}: doRoundWorks`);
   resourceManager.request('doRoundWorks', ['season'], (release) => {
     // TODO 合併處理商業季度結束的 code
-    //備份資料庫
+    // 備份資料庫
     backupMongo('-roundBefore');
-    //當賽季結束時，取消所有尚未交易完畢的訂單
+    // 當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利
     generateMiningProfits();
@@ -149,63 +154,66 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
       .forEach(({ _id: companyId }) => {
         returnCompanyStones(companyId);
       });
-    //若arenaCounter為0，則舉辦最萌亂鬥大賽
+    // 若arenaCounter為0，則舉辦最萌亂鬥大賽
     const arenaCounter = dbVariables.get('arenaCounter');
     if (arenaCounter === 0) {
       startArenaFight();
     }
-    //當賽季結束時，結算所有公司的營利額並按照股權分給股東。
+    // 當賽季結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
+    // 發放推薦票回饋金
+    deliverProductVotingRewards();
     // 更新所有公司的評級
     updateCompanyGrades();
-    //為所有公司與使用者進行排名結算
+    // 更新所有公司的生產資金
+    updateCompanyProductionFunds();
+    // 為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
     backupMongo('-roundAfter');
-    //移除所有廣告
+    // 移除所有廣告
     dbAdvertising.remove({});
 
-    //移除所有公司資料
+    // 移除所有公司資料
     dbCompanies.remove({});
     dbCompanyArchive.remove({});
     dbCompanyStones.remove({});
-    //移除所有股份資料
+    // 移除所有股份資料
     dbDirectors.remove({});
-    //移除所有員工資料
+    // 移除所有員工資料
     dbEmployees.remove({});
-    //移除所有新創資料
+    // 移除所有新創資料
     dbFoundations.remove({});
-    //移除所有除了金管會相關以外的紀錄資料
+    // 移除所有除了金管會相關以外的紀錄資料
     dbLog.remove({
       logType: {
         $nin: accuseLogTypeList
       }
     });
-    //移除所有與金管會相關且與公司相關的紀錄資料
+    // 移除所有與金管會相關且與公司相關的紀錄資料
     dbLog.remove({
       companyId: {
         $exists: true
       }
     });
-    //移除所有最萌亂鬥大賽資料
+    // 移除所有最萌亂鬥大賽資料
     dbArenaLog.dropAll();
     dbArenaFighters.remove({});
     dbArena.remove({});
-    //移除所有排名資訊
+    // 移除所有排名資訊
     dbRankCompanyCapital.remove();
     dbRankCompanyPrice.remove();
     dbRankCompanyProfit.remove();
     dbRankCompanyValue.remove();
     dbRankUserWealth.remove();
-    //移除所有訂單資料
+    // 移除所有訂單資料
     dbOrders.remove({});
-    //移除所有價格資料
+    // 移除所有價格資料
     dbPrice.remove({});
-    //移除所有產品資料
-    dbProductLike.remove({});
+    // 移除所有產品資料
     dbProducts.remove({});
-    //移除所有稅金料
+    // 移除所有稅金料
     dbTaxes.remove({});
-    //保管所有使用者的狀態
+    // 保管所有使用者的狀態
     Meteor.users.find({}).forEach((userData) => {
       dbUserArchive.upsert(
         {
@@ -223,45 +231,49 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
         }
       );
     });
-    //移除所有使用者資料
+    // 移除所有使用者資料
     Meteor.users.remove({});
-    //清除所有賽季資訊
+    // 清除所有賽季資訊
     dbSeason.remove({});
-    //產生新的賽季
+    // 產生新的賽季
     generateNewRound();
-    //產生新的商業季度
+    // 產生新的商業季度
     generateNewSeason();
     release();
   });
 }
 
-//商業季度結束工作
+// 商業季度結束工作
 export function doSeasonWorks(lastRoundData, lastSeasonData) {
   debug.log('doSeasonWorks', { lastRoundData, lastSeasonData });
-  //避免執行時間過長導致重複進行季節結算
+  // 避免執行時間過長導致重複進行季節結算
   if (dbResourceLock.findOne('season')) {
     return false;
   }
-  console.info(new Date().toLocaleString() + ': doSeasonWorks');
+  console.info(`${new Date().toLocaleString()}: doSeasonWorks`);
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
-    //備份資料庫
+    // 備份資料庫
     backupMongo('-season');
-    //當商業季度結束時，取消所有尚未交易完畢的訂單
+    // 當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利
     generateMiningProfits();
-    //若arenaCounter為0，則舉辦最萌亂鬥大賽
+    // 若arenaCounter為0，則舉辦最萌亂鬥大賽
     const arenaCounter = dbVariables.get('arenaCounter');
     if (arenaCounter === 0) {
       startArenaFight();
     }
-    //當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
+    // 當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
     giveBonusByStocksFromProfit();
+    // 發放推薦票回饋金
+    deliverProductVotingRewards();
     // 更新所有公司的評級
     updateCompanyGrades();
-    //為所有公司與使用者進行排名結算
+    // 更新所有公司的生產資金
+    updateCompanyProductionFunds();
+    // 為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
-    //所有公司當季正營利額歸零
+    // 所有公司當季正營利額歸零
     dbCompanies.update(
       {
         profit: {
@@ -277,7 +289,7 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
         multi: true
       }
     );
-    //遣散所有在職員工
+    // 遣散所有在職員工
     dbEmployees.update(
       {
         employed: true
@@ -292,19 +304,19 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
         multi: true
       }
     );
-    //產生新的商業季度
+    // 產生新的商業季度
     generateNewSeason();
-    //移除所有七天前的股價紀錄
+    // 移除所有七天前的股價紀錄
     dbPrice.remove({
       createdAt: {
         $lt: new Date(Date.now() - 604800000)
       }
     });
-    //移除所有待驗證註冊資料
+    // 移除所有待驗證註冊資料
     dbValidatingUsers.remove({});
-    //移除所有推薦票投票紀錄
+    // 移除所有推薦票投票紀錄
     dbVoteRecord.remove({});
-    //本季度未登入天數歸0
+    // 本季度未登入天數歸0
     Meteor.users.update(
       {},
       {
@@ -364,7 +376,7 @@ export function postponeInVacationTaxes() {
     });
 }
 
-//取消所有尚未交易完畢的訂單
+// 取消所有尚未交易完畢的訂單
 function cancelAllOrder() {
   debug.log('cancelAllOrder');
   const now = new Date();
@@ -374,9 +386,9 @@ function cancelAllOrder() {
     const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
     const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
     const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
-    //紀錄整個取消過程裡金錢有增加的userId及增加量
+    // 紀錄整個取消過程裡金錢有增加的userId及增加量
     const increaseMoneyHash = {};
-    //紀錄整個取消過程裡股份有增加的userId及增加公司及增加量
+    // 紀錄整個取消過程裡股份有增加的userId及增加公司及增加量
     const increaseStocksHash = {};
     userOrdersCursor.forEach((orderData) => {
       const orderType = orderData.orderType;
@@ -423,7 +435,7 @@ function cancelAllOrder() {
     });
     let index = 0;
     _.each(increaseStocksHash, (stocksHash, userId) => {
-      //若撤銷的是系統賣單，則降低該公司的總釋股量
+      // 若撤銷的是系統賣單，則降低該公司的總釋股量
       if (userId === '!system') {
         _.each(stocksHash, (stocks, companyId) => {
           companiesBulk
@@ -441,10 +453,10 @@ function cancelAllOrder() {
         const createdAt = new Date(now.getTime() + index);
         index += 1;
         _.each(stocksHash, (stocks, companyId) => {
-          if (dbDirectors.find({companyId, userId}).count() > 0) {
-            //由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
+          if (dbDirectors.find({ companyId, userId }).count() > 0) {
+            // 由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
             directorsBulk
-              .find({companyId, userId})
+              .find({ companyId, userId })
               .updateOne({
                 $inc: {
                   stocks: stocks
@@ -471,7 +483,7 @@ function cancelAllOrder() {
         companiesBulk.execute = Meteor.wrapAsync(companiesBulk.execute);
         companiesBulk.execute();
       }
-      //不是只有系統釋股單時
+      // 不是只有系統釋股單時
       if (! (_.size(increaseStocksHash) === 1 && increaseStocksHash['!system'])) {
         directorsBulk.execute = Meteor.wrapAsync(directorsBulk.execute);
         directorsBulk.execute();
@@ -483,69 +495,39 @@ function cancelAllOrder() {
   }
 }
 
-//產生新的賽季
+// 產生新的賽季
 function generateNewRound() {
   debug.log('generateNewRound');
   const beginDate = new Date();
   const roundTime = Meteor.settings.public.seasonTime * Meteor.settings.public.seasonNumberInRound;
   const endDate = new Date(beginDate.setMinutes(0, 0, 0) + roundTime);
-  const roundId = dbRound.insert({beginDate, endDate});
+  const roundId = dbRound.insert({ beginDate, endDate });
 
   return roundId;
 }
 
-//產生新的商業季度
+// 產生新的商業季度
 function generateNewSeason() {
   debug.log('generateNewSeason');
   const beginDate = new Date();
   const endDate = new Date(beginDate.setMinutes(0, 0, 0) + Meteor.settings.public.seasonTime);
   const electTime = endDate.getTime() - Meteor.settings.public.electManagerTime;
   const userCount = Meteor.users.find().count();
-  const productCount = dbProducts.find({overdue: 0}).count();
-  const companiesCount = dbCompanies.find({isSeal: false}).count();
-  //本季度每個使用者可以得到多少推薦票
-  const vote = Math.max(Math.floor(Math.log10(companiesCount) * 18), 0);
-  const votePrice = Meteor.settings.public.votePricePerTicket;
-  const seasonId = dbSeason.insert({beginDate, endDate, electTime, userCount, companiesCount, productCount, votePrice});
-  Meteor.users.update(
-    {},
-    {
-      $set: {
-        'profile.vote': vote
-      }
-    },
-    {
-      multi: true
-    }
-  );
-  dbProducts.update(
-    {
-      overdue: 1
-    },
-    {
-      $set: {
-        overdue: 2
-      }
-    },
-    {
-      multi: true
-    }
-  );
-  dbProducts.update(
-    {
-      overdue: 0
-    },
-    {
-      $set: {
-        overdue: 1,
-        seasonId: seasonId
-      }
-    },
-    {
-      multi: true
-    }
-  );
-  //雇用所有上季報名的使用者
+  const productCount = dbProducts.find({ state: 'planning' }).count();
+  const companiesCount = dbCompanies.find({ isSeal: false }).count();
+
+  const seasonId = dbSeason.insert({ beginDate, endDate, electTime, userCount, companiesCount, productCount });
+
+  // TODO 分離「產生新商業季度」與「新商業季度開始的動作」
+  const seasonData = getCurrentSeason();
+  const voteTickets = getInitialVoteTicketCount(seasonData);
+
+  Meteor.users.update({}, { $set: { 'profile.voteTickets': voteTickets } }, { multi: true });
+  // 產品輪替
+  rotateProducts();
+  // 排程最後出清時間
+  eventScheduler.scheduleEvent('product.finalSale', endDate.getTime() - Meteor.settings.public.productFinalSaleTime);
+  // 雇用所有上季報名的使用者
   dbEmployees.update(
     {
       resigned: false,
@@ -562,7 +544,7 @@ function generateNewSeason() {
       multi: true
     }
   );
-  //更新所有公司員工薪資
+  // 更新所有公司員工薪資
   dbCompanies.find().forEach((companyData) => {
     dbCompanies.update(
       companyData,
@@ -574,7 +556,7 @@ function generateNewSeason() {
     );
   });
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
-  //若上一個商業季度為最萌亂鬥大賽的舉辦季度，則產生新的arena Data
+  // 若上一個商業季度為最萌亂鬥大賽的舉辦季度，則產生新的arena Data
   if (arenaCounter <= 0) {
     const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber);
     dbArena.insert({
@@ -587,7 +569,7 @@ function generateNewSeason() {
     dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
   }
   else {
-    //若下一個商業季度為最萌亂鬥大賽的舉辦季度，則以新產生的商業季度結束時間與選舉時間更新最萌亂鬥大賽的時間，以糾正季度更換時的時間偏差
+    // 若下一個商業季度為最萌亂鬥大賽的舉辦季度，則以新產生的商業季度結束時間與選舉時間更新最萌亂鬥大賽的時間，以糾正季度更換時的時間偏差
     if (arenaCounter === 1) {
       const lastArenaData = dbArena.findOne({}, {
         sort: {
@@ -610,7 +592,7 @@ function generateNewSeason() {
   return seasonId;
 }
 
-//當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
+// 當商業季度結束時，結算所有公司的營利額並按照股權分給股東。
 export function giveBonusByStocksFromProfit() {
   debug.log('giveBonusByStocksFromProfit');
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
@@ -647,7 +629,7 @@ export function giveBonusByStocksFromProfit() {
         createdAt: new Date(now)
       });
       needExecuteLogBulk = true;
-      //經理人分紅
+      // 經理人分紅
       if (companyData.manager !== '!none') {
         const userData = Meteor.users.findOne(companyData.manager, {
           fields: {
@@ -660,9 +642,9 @@ export function giveBonusByStocksFromProfit() {
         if (
           // 非當季開始放假者不分紅
           userData.profile && (! userData.profile.isInVacation || now - userData.profile.lastVacationStartDate.getTime() <= Meteor.settings.public.seasonTime) &&
-          //被禁止交易者不分紅
+          // 被禁止交易者不分紅
           userData.profile && ! _.contains(userData.profile.ban, 'deal') &&
-          //七天未動作者不分紅
+          // 七天未動作者不分紅
           userData.status && now - userData.status.lastLogin.date.getTime() <= 604800000
         ) {
           const managerProfit = Math.ceil(leftProfit * Meteor.settings.public.managerProfitPercent);
@@ -686,7 +668,7 @@ export function giveBonusByStocksFromProfit() {
           leftProfit -= managerProfit;
         }
       }
-      //員工分紅
+      // 員工分紅
       const employeeList = [];
       dbEmployees.find({
         companyId: companyId,
@@ -710,12 +692,12 @@ export function giveBonusByStocksFromProfit() {
           return;
         }
 
-        //被禁止交易者不分紅
+        // 被禁止交易者不分紅
         if (_.contains(userData.profile.ban, 'deal')) {
           return true;
         }
 
-        //七天未動作者不分紅
+        // 七天未動作者不分紅
         if (now - userData.status.lastLogin.date.getTime() > 604800000) {
           return true;
         }
@@ -746,14 +728,14 @@ export function giveBonusByStocksFromProfit() {
         leftProfit -= bonus * employeeList.length;
         needExecuteUserBulk = true;
       }
-      //剩餘收益先扣去公司營運成本
+      // 剩餘收益先扣去公司營運成本
       leftProfit -= Math.ceil(companyData.profit * Meteor.settings.public.costFromProfit);
       const forDirectorProfit = leftProfit;
-      //取得所有能夠領取紅利的董事userId與股份比例
+      // 取得所有能夠領取紅利的董事userId與股份比例
       let canReceiveProfitStocks = 0;
       const canReceiveProfitDirectorList = [];
       dbDirectors
-        .find({companyId}, {
+        .find({ companyId }, {
           sort: {
             stocks: -1,
             createdAt: 1
@@ -764,7 +746,7 @@ export function giveBonusByStocksFromProfit() {
           }
         })
         .forEach((directorData) => {
-          //系統及金管會不分紅
+          // 系統及金管會不分紅
           if (directorData.userId === '!system' || directorData.userId === '!FSC') {
             return true;
           }
@@ -793,12 +775,12 @@ export function giveBonusByStocksFromProfit() {
             return;
           }
 
-          //被禁止交易者不分紅
+          // 被禁止交易者不分紅
           if (_.contains(userProfile.ban, 'deal')) {
             return true;
           }
 
-          //七天未動作者不分紅
+          // 七天未動作者不分紅
           if (noLoginTime > 7 * oneDayMs) {
             return true;
           }
@@ -850,7 +832,7 @@ export function giveBonusByStocksFromProfit() {
   }
 }
 
-//選舉新的經理人與計算最萌亂鬥大賽所有報名者的攻擊次序
+// 選舉新的經理人與計算最萌亂鬥大賽所有報名者的攻擊次序
 function electManager(seasonData) {
   console.log('start elect manager...');
   debug.log('electManager');
@@ -864,9 +846,9 @@ function electManager(seasonData) {
   });
   const arenaId = lastArenaData._id;
   const electMessage = (
-    convertDateToText(seasonData.beginDate) +
-    '～' +
-    convertDateToText(seasonData.endDate)
+    `${convertDateToText(seasonData.beginDate)
+    }～${
+      convertDateToText(seasonData.endDate)}`
   );
   dbSeason.update(seasonData._id, {
     $unset: {
@@ -874,7 +856,7 @@ function electManager(seasonData) {
     }
   });
   resourceManager.request('electManager', ['elect'], (release) => {
-    if (dbCompanies.find({isSeal: false}).count() > 0) {
+    if (dbCompanies.find({ isSeal: false }).count() > 0) {
       const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
       const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
       const arenaFightersBulk = dbArenaFighters.rawCollection().initializeUnorderedBulkOp();
@@ -898,11 +880,11 @@ function electManager(seasonData) {
         .forEach((companyData) => {
           const companyId = companyData._id;
           switch (companyData.candidateList.length) {
-            //沒有候選人的狀況下，不進行處理
+            // 沒有候選人的狀況下，不進行處理
             case 0: {
               return false;
             }
-            //只有一位候選人，只有在原經理與現任經理不同的狀況下才需要處理
+            // 只有一位候選人，只有在原經理與現任經理不同的狀況下才需要處理
             case 1: {
               const newManager = companyData.candidateList[0];
               if (companyData.manager !== newManager) {
@@ -938,12 +920,12 @@ function electManager(seasonData) {
               }
               break;
             }
-            //多位候選人的狀況下
+            // 多位候選人的狀況下
             default: {
               needExecuteBulk = true;
               const voteList = companyData.voteList;
               const directorList = dbDirectors
-                .find({companyId}, {
+                .find({ companyId }, {
                   fields: {
                     userId: 1,
                     stocks: 1
@@ -955,7 +937,7 @@ function electManager(seasonData) {
               const voteStocksList = _.map(companyData.candidateList, (candidate, index) => {
                 const voteDirectorList = voteList[index];
                 const stocks = _.reduce(voteDirectorList, (stocks, userId) => {
-                  const directorData = _.findWhere(directorList, {userId});
+                  const directorData = _.findWhere(directorList, { userId });
 
                   return stocks + (directorData ? directorData.stocks : 0);
                 }, 0);
@@ -1016,12 +998,12 @@ function electManager(seasonData) {
     }
   });
 
-  //若本商業季度為最萌亂鬥大賽的舉辦季度，則計算出所有報名者的攻擊次序
+  // 若本商業季度為最萌亂鬥大賽的舉辦季度，則計算出所有報名者的攻擊次序
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
   if (arenaCounter <= 0) {
     if (lastArenaData) {
       const fighterCompanyIdList = dbArenaFighters
-        .find({arenaId}, {
+        .find({ arenaId }, {
           fields: {
             companyId: 1
           }
@@ -1060,16 +1042,16 @@ function convertDateToText(date) {
   const dateInTimeZone = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 * -1);
 
   return (
-    dateInTimeZone.getFullYear() + '/' +
-    padZero(dateInTimeZone.getMonth() + 1) + '/' +
-    padZero(dateInTimeZone.getDate()) + ' ' +
-    padZero(dateInTimeZone.getHours()) + ':' +
-    padZero(dateInTimeZone.getMinutes())
+    `${dateInTimeZone.getFullYear()}/${
+      padZero(dateInTimeZone.getMonth() + 1)}/${
+      padZero(dateInTimeZone.getDate())} ${
+      padZero(dateInTimeZone.getHours())}:${
+      padZero(dateInTimeZone.getMinutes())}`
   );
 }
 function padZero(n) {
   if (n < 10) {
-    return '0' + n;
+    return `0${n}`;
   }
   else {
     return n;

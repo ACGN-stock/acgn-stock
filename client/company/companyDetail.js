@@ -14,10 +14,9 @@ import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
-import { dbProducts } from '/db/dbProducts';
 import { dbSeason } from '/db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct, toggleFavorite } from '../utils/methods';
+import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, toggleFavorite } from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat, setChartTheme } from '../utils/helpers.js';
@@ -68,7 +67,7 @@ Template.companyDetailContentNormal.onCreated(function() {
 });
 Template.companyDetailContentNormal.helpers({
   getManageHref(companyId) {
-    return FlowRouter.path('editCompany', {companyId});
+    return FlowRouter.path('editCompany', { companyId });
   },
   showAllTags(tags) {
     if (tags && tags.length <= 4) {
@@ -79,13 +78,6 @@ Template.companyDetailContentNormal.helpers({
   },
   firstFewTags(tags) {
     return tags && tags.slice(0, 3);
-  },
-  haveNextSeasonProduct() {
-    const companyId = this._id;
-    const overdue = 0;
-    window.dbProducts = dbProducts;
-
-    return dbProducts.find({companyId, overdue}).count() > 0;
   },
   canUpdateSalary() {
     const seasonData = dbSeason
@@ -119,7 +111,7 @@ Template.companyDetailContentNormal.helpers({
     const employed = false;
     const resigned = false;
 
-    return dbEmployees.find({companyId, userId, employed, resigned}).count() > 0;
+    return dbEmployees.find({ companyId, userId, employed, resigned }).count() > 0;
   }
 });
 Template.companyDetailContentNormal.events({
@@ -148,7 +140,7 @@ Template.companyDetailContentNormal.events({
     const companyId = $(event.currentTarget).attr('data-toggle-employ');
     const employed = false;
     const resigned = false;
-    const employData = dbEmployees.findOne({companyId, userId, employed, resigned});
+    const employData = dbEmployees.findOne({ companyId, userId, employed, resigned });
     if (employData) {
       Meteor.customCall('unregisterEmployee', function(err) {
         if (! err) {
@@ -369,7 +361,7 @@ Template.companyDetailContentSealed.events({
       message: `請輸入處理事由：`,
       callback: (message) => {
         if (message) {
-          Meteor.customCall('sealCompany', {companyId, message});
+          Meteor.customCall('sealCompany', { companyId, message });
         }
       }
     });
@@ -414,7 +406,7 @@ Template.companyDetailAdminPanel.events({
       message: `請輸入處理事由：`,
       callback: (message) => {
         if (message) {
-          Meteor.customCall('sealCompany', {companyId, message});
+          Meteor.customCall('sealCompany', { companyId, message });
         }
       }
     });
@@ -897,89 +889,6 @@ Template.companySellOrderList.events({
   }
 });
 
-inheritedShowLoadingOnSubscribing(Template.companyCurrentProductList);
-Template.companyCurrentProductList.onCreated(function() {
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    if (Meteor.user()) {
-      const companyId = FlowRouter.getParam('companyId');
-      if (companyId) {
-        this.subscribe('queryMyLikeProduct', companyId);
-      }
-    }
-  });
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const companyId = FlowRouter.getParam('companyId');
-    if (companyId) {
-      this.subscribe('companyCurrentProduct', companyId);
-      this.subscribe('productListByCompany', {
-        companyId: companyId,
-        sortBy: 'likeCount',
-        sortDir: -1,
-        offset: 0
-      });
-    }
-  });
-});
-Template.companyCurrentProductList.helpers({
-  productList() {
-    const companyId = this._id;
-    const overdue = 1;
-
-    return dbProducts.find({companyId, overdue}, {
-      sort: {
-        createdAt: -1
-      }
-    });
-  }
-});
-Template.companyCurrentProductList.events({
-  'click [data-vote-product]'(event, templateInstance) {
-    event.preventDefault();
-    const productId = $(event.currentTarget).attr('data-vote-product');
-    const companyId = templateInstance.data._id;
-    voteProduct(productId, companyId);
-  }
-});
-
-Template.companyAllPrudctList.helpers({
-  productCenterHref() {
-    return FlowRouter.path('productCenterByCompany', {
-      companyId: this._id
-    });
-  },
-  productList() {
-    const companyId = this._id;
-
-    return dbProducts.find(
-      {
-        companyId: companyId,
-        overdue: {
-          $gt: 0
-        }
-      },
-      {
-        sort: {
-          likeCount: -1,
-          createdAt: -1
-        },
-        limit: 10
-      });
-  }
-});
-Template.companyAllPrudctList.events({
-  'click [data-like-product]'(event) {
-    event.preventDefault();
-    const productId = $(event.currentTarget).attr('data-like-product');
-    likeProduct(productId);
-  }
-});
-
 const rDirectorOffset = new ReactiveVar(0);
 const rShowSupporterList = new ReactiveVar(null);
 inheritedShowLoadingOnSubscribing(Template.companyDirectorList);
@@ -1007,7 +916,7 @@ Template.companyDirectorList.helpers({
   directorList() {
     const companyId = this._id;
 
-    return dbDirectors.find({companyId}, {
+    return dbDirectors.find({ companyId }, {
       sort: {
         stocks: -1,
         createdAt: 1
@@ -1035,7 +944,7 @@ Template.companyDirectorList.helpers({
   getMyMessage(companyId) {
     const userId = Meteor.user()._id;
 
-    return dbDirectors.findOne({companyId, userId}).message;
+    return dbDirectors.findOne({ companyId, userId }).message;
   },
   isDirectorInVacation(userId) {
     const user = Meteor.users.findOne(userId);
@@ -1159,7 +1068,7 @@ function getStockAmount(companyId) {
   const user = Meteor.user();
   if (user) {
     const userId = user._id;
-    const ownStockData = dbDirectors.findOne({companyId, userId});
+    const ownStockData = dbDirectors.findOne({ companyId, userId });
 
     return ownStockData ? ownStockData.stocks : 0;
   }
@@ -1190,7 +1099,7 @@ Template.companyEmployeeList.helpers({
     const companyId = FlowRouter.getParam('companyId');
     const employed = true;
 
-    return dbEmployees.find({companyId, employed}, {
+    return dbEmployees.find({ companyId, employed }, {
       sort: {
         registerAt: 1
       }
@@ -1200,7 +1109,7 @@ Template.companyEmployeeList.helpers({
     const companyId = FlowRouter.getParam('companyId');
     const employed = false;
 
-    return dbEmployees.find({companyId, employed}, {
+    return dbEmployees.find({ companyId, employed }, {
       sort: {
         registerAt: 1
       }
@@ -1265,7 +1174,7 @@ Template.companyArenaInfo.helpers({
     });
     const arenaId = arenaData._id;
 
-    return FlowRouter.path('arenaInfo', {arenaId});
+    return FlowRouter.path('arenaInfo', { arenaId });
   },
   currentArenaData() {
     const arenaData = dbArena.findOne({}, {
@@ -1304,7 +1213,7 @@ Template.companyArenaInfo.helpers({
 });
 Template.companyArenaInfo.events({
   'click [data-action="joinArena"]'(event, templateInstance) {
-    const {_id, companyName} = templateInstance.data;
+    const { _id, companyName } = templateInstance.data;
     const checkCompanyName = companyName.replace(/\s/g, '');
     const message = '你確定要讓「' +
       companyName +
@@ -1323,7 +1232,7 @@ Template.companyArenaInfo.events({
   },
   'click [data-invest]'(event, templateInstance) {
     event.preventDefault();
-    const {_id, companyName} = templateInstance.data;
+    const { _id, companyName } = templateInstance.data;
     const investTarget = $(event.currentTarget).attr('data-invest');
     const user = Meteor.user();
     if (! user) {
@@ -1532,7 +1441,7 @@ Template.companyLogList.helpers({
   logList() {
     const companyId = FlowRouter.getParam('companyId');
 
-    return dbLog.find({companyId}, {
+    return dbLog.find({ companyId }, {
       sort: {
         createdAt: -1
       },

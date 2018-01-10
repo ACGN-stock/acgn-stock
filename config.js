@@ -1,5 +1,5 @@
 'use strict';
-//真正的設定檔請寫在config.json，這邊只是註解用。
+// 真正的設定檔請寫在config.json，這邊只是註解用。
 export const config = {
   debugMode: false, //是否為debug mode(紀錄一分鐘內的所有方法與訂閱動作，以備crash查看)
   websiteName: 'ACGN股票交易市場', //網站名稱
@@ -53,7 +53,13 @@ export const config = {
     rainbowFragment: 10000 // 彩虹石碎片
   },
   dataNumberPerPage: { // 分頁時每個分頁有多少資料
-    userPlacedStones: 10
-  }
+    userPlacedStones: 10,
+    userOwnedProducts: 10,
+    companyMarketingProducts: 10
+  },
+  productFinalSaleTime: 43200000, // 產品最後出清時間 (ms)
+  productProfitFactor: 2.00, // 產品售出的營利乘數
+  systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
+  employeeProductVotingRewardFactor: 0.01 // 員工投推薦票的回饋金比例
 };
 export default config;

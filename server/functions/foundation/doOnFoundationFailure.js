@@ -1,0 +1,55 @@
+import { _ } from 'meteor/underscore';
+import { Meteor } from 'meteor/meteor';
+
+import { dbFoundations } from '/db/dbFoundations';
+import { dbLog } from '/db/dbLog';
+import { dbCompanyArchive } from '/db/dbCompanyArchive';
+
+// 新創公司失敗之處理
+export function doOnFoundationFailure(foundationData) {
+  const { _id: companyId, invest, companyName, manager } = foundationData;
+
+  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+
+  const createdAt = new Date();
+
+  logBulk.insert({
+    logType: '創立失敗',
+    userId: _.union([manager], _.pluck(invest, 'userId')),
+    data: { companyName },
+    createdAt: createdAt
+  });
+
+  invest.forEach(({ userId, amount }, index) => {
+    if (userId === foundationData.manager) {
+      amount -= Meteor.settings.public.founderEarnestMoney;
+    }
+
+    logBulk.insert({
+      logType: '創立退款',
+      userId: [userId],
+      data: {
+        companyName: foundationData.companyName,
+        refund: amount
+      },
+      createdAt: new Date(createdAt.getTime() + index + 1)
+    });
+
+    usersBulk
+      .find({_id: userId})
+      .updateOne({ $inc: { 'profile.money': amount } });
+  });
+
+  dbFoundations.remove(companyId);
+  dbCompanyArchive.remove(companyId);
+
+  logBulk
+    .find({ companyId })
+    .update({ $unset: { companyId: 1 } });
+
+  Meteor.wrapAsync(logBulk.execute).call(logBulk);
+  if (foundationData.invest.length > 0) {
+    Meteor.wrapAsync(usersBulk.execute).call(usersBulk);
+  }
+}

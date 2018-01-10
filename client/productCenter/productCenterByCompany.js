@@ -7,27 +7,15 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbProducts } from '/db/dbProducts';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { likeProduct } from '../utils/methods';
-import { shouldStopSubscribe } from '../utils/idle';
+import { voteProduct } from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
 
 inheritedShowLoadingOnSubscribing(Template.productCenterByCompany);
-const rProductSortBy = new ReactiveVar('likeCount');
+const rProductSortBy = new ReactiveVar('voteCount');
 const rProductSortDir = new ReactiveVar(-1);
 const rProductOffset = new ReactiveVar(0);
 Template.productCenterByCompany.onCreated(function() {
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    if (Meteor.user()) {
-      this.subscribe('queryOwnStocks');
-    }
-  });
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
+  this.autorunWithIdleSupport(() => {
     const companyId = FlowRouter.getParam('companyId');
     if (companyId) {
       this.subscribe('productListByCompany', {
@@ -37,7 +25,7 @@ Template.productCenterByCompany.onCreated(function() {
         offset: rProductOffset.get()
       });
       if (Meteor.user()) {
-        this.subscribe('queryMyLikeProduct', companyId);
+        this.subscribe('currentUserVoteRecord', companyId);
       }
     }
   });
@@ -95,21 +83,21 @@ Template.productListByCompanyTable.events({
       rProductSortDir.set(-1);
     }
   },
-  'click [data-like-product]'(event) {
+  'click [data-vote-product]'(event) {
     event.preventDefault();
-    const productId = $(event.currentTarget).attr('data-like-product');
-    likeProduct(productId);
+    const productId = $(event.currentTarget).attr('data-vote-product');
+    voteProduct(productId);
   },
-  'click [data-take-down]'(event) {
+  'click [data-ban-product]'(event) {
     event.preventDefault();
-    const productId = $(event.currentTarget).attr('data-take-down');
+    const productId = $(event.currentTarget).attr('data-ban-product');
     alertDialog.dialog({
       type: 'prompt',
       title: '違規處理 - 產品下架',
       message: `請輸入處理事由：`,
       callback: function(message) {
         if (message) {
-          Meteor.customCall('takeDownProduct', { productId, message });
+          Meteor.customCall('banProduct', { productId, message });
         }
       }
     });

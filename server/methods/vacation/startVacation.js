@@ -46,11 +46,11 @@ export function startVacation(userId) {
     throw new Meteor.Error(403, '您有擔任公司經理職務，無法進行渡假！');
   }
 
-  if (dbCompanies.find({ candidateList: userId }).count()) {
+  if (dbCompanies.find({ candidateList: userId, isSeal: false }).count()) {
     throw new Meteor.Error(403, '您正在競選公司經理人，無法進行渡假！');
   }
 
-  if (dbCompanies.find({ chairman: userId }).count()) {
+  if (dbCompanies.find({ chairman: userId, isSeal: false }).count()) {
     throw new Meteor.Error(403, '您有擔任公司董事長，無法進行渡假！');
   }
 

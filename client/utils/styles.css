@@ -588,6 +588,59 @@ table.next-season-product .product-description {
   }
 }
 
+/* 行動裝置的表格排版工具 */
+@media only screen and (max-width: 767.9px) { /* size md */
+  table.custom-responsive-table-md,
+  table.custom-responsive-table-md thead,
+  table.custom-responsive-table-md tbody,
+  table.custom-responsive-table-md th,
+  table.custom-responsive-table-md td,
+  table.custom-responsive-table-md tr {
+    display: block;
+  }
+
+  table.custom-responsive-table-md thead tr {
+    display: none;
+  }
+
+  table.custom-responsive-table-md tr {
+    border: 2px solid;
+    border-color: inherit;
+  }
+
+  table.custom-responsive-table-md td {
+    border: none;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    position: relative;
+    padding-left: 35%;
+    white-space: normal;
+  }
+
+  table.custom-responsive-table-md td:last-child {
+    border-bottom: none;
+  }
+
+  table.custom-responsive-table-md td:before {
+    content: attr(data-title);
+    display: block;
+    float: left;
+    margin-right: 1rem;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+/*
+  table.custom-responsive-table-md tr.default-content {
+    border: none;
+  }
+
+  table.custom-responsive-table-md tr.default-content > td {
+    padding-left: 0;
+    padding-right: 0;
+  } */
+}
+
 /* 修正 IE 上顯示 */
 /*@media screen and (min-width:0\0) {
   .input-group-btn > .btn {

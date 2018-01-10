@@ -36,6 +36,11 @@
             {{/panelFolder}}
           </div>
           <div class="col-12 border-grid">
+            {{#panelFolder name='ownedProducts' title='持有產品' }}
+              {{> accountInfoOwnedProductsPanel user=lookUser}}
+            {{/panelFolder}}
+          </div>
+          <div class="col-12 border-grid">
             <a class="d-block h4" href="#" data-toggle-panel="log">
               玩家紀錄
               {{#if isDisplayPanel 'log'}}
@@ -156,7 +161,7 @@
       帳號當前餘額：{{currencyFormat this.profile.money}}
     </div>
     <div>
-      帳號剩餘推薦票：{{this.profile.vote}}
+      帳號剩餘推薦票：{{this.profile.voteTickets}}
     </div>
     {{#if this.profile.isInVacation}}
       <div class="text-info">目前正在渡假中。</div>
