@@ -47,6 +47,7 @@ export const config = {
   taxExpireTime: 259200000, // 稅單的繳費期限 (ms)
   releaseStocksForNoDealTradeLogLookbackIntervalTime: 86400000, // 低量釋股的成交量統計區間 (ms)
   miningMachineOperationTime: 86400000, // 挖礦機的運作時間 (ms)
+  miningMachineSaintStoneLimit: 7,
   stonePrice: { // 可供購買的石頭價格
     rainbow: 100000, // 彩虹石
     rainbowFragment: 10000 // 彩虹石碎片
