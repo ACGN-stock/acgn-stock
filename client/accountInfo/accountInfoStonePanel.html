@@ -7,6 +7,7 @@
         <div class="text-nowrap">
           <img class="stone-icon-2x" src="{{stoneIconPath stoneType}}" alt="{{stoneDisplayName stoneType}}">
           {{stoneDisplayName stoneType}} {{userStoneCount stoneType}} 個
+          <small class="align-text-top">(生產值 {{stonePower stoneType}}／個)</small>
         </div>
         {{/each}}
       </div>
@@ -36,7 +37,7 @@
             <td class="text-left text-truncate p-1" data-title="公司名稱">
               {{> companyLink placedStone.companyId}}
             </td>
-            <td class="text-left text-truncate p-1" data-title="石頭類型">
+            <td class="text-center text-truncate p-1" data-title="石頭類型">
               {{stoneDisplayName placedStone.stoneType}}
             </td>
           </tr>

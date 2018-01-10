@@ -3,7 +3,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
-import { dbCompanyStones, stoneTypeList } from '/db/dbCompanyStones';
+import { dbCompanyStones, stoneTypeList, stonePowerTable } from '/db/dbCompanyStones';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { stoneDisplayName } from '../utils/helpers';
@@ -33,6 +33,9 @@ Template.accountInfoStonePanel.helpers({
   },
   stoneTypeList() {
     return stoneTypeList;
+  },
+  stonePower(stoneType) {
+    return stonePowerTable[stoneType];
   },
   buyableStoneTypeList() {
     return Object.keys(Meteor.settings.public.stonePrice);

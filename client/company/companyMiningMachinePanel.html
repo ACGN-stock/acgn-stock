@@ -15,10 +15,12 @@
       <div class="text-nowrap">
         <img class="stone-icon-2x" src="{{stoneIconPath stoneType}}" alt="{{stoneDisplayName stoneType}}">
         {{stoneDisplayName stoneType}} {{stoneCount stoneType}} 個
+        <small class="align-text-top">(生產值 {{stonePower stoneType}}／個)</small>
       </div>
       {{/each}}
     </div>
-    總生產值：{{totalMiningPower}}
+    總生產值：{{totalMiningPower}}<br />
+    礦機營利：{{totalMiningProfit totalMiningPower}}
   </div>
 
   {{#if currentUser}}

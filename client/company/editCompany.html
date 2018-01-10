@@ -22,7 +22,7 @@
       </label>
       <div class="col p-0 mb-1">
         {{#each tag in valueOf 'tags'}}
-          <span class="badge badge-default d-inline-flex flex-nowrap" style="max-width: 100%;">
+          <span class="badge badge-default d-inline-flex flex-nowrap mw-100">
             <div class="d-inline-block text-truncate">{{tag}}</div>
             <div class="text-nowrap">
               <i
@@ -75,7 +75,8 @@
               class="d-block"
               style="position: absolute; top: -100px; right: 0; width: 100px; height: 100px; z-index: 5;">
               <img
-                style="width: 100%; height: 100%; object-fit: scale-down;"
+                class="w-100 h-100"
+                style="object-fit: scale-down;"
                 src="{{valueOf 'pictureSmall'}}"
               />
             </div>
@@ -132,7 +133,7 @@
       <div class="modal-content border-0 mx-0 my-auto"
         style="background: transparent;">
         <div class="modal-body p-0" style="width: 300px; height: 300px;">
-          <img style="width: 100%; height: 100%; object-fit: scale-down;" src="{{src}}"/>
+          <img class="w-100 h-100" style="object-fit: scale-down;" src="{{src}}"/>
         </div>
       </div>
     </div>

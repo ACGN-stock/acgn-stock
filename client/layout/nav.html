@@ -2,7 +2,7 @@
   <nav id="nav" class="navbar navbar-toggleable-md navbar-light bg-faded">
     {{#if currentUser}}
       <span class="navbar-brand dropdown" title="當前登入使用者：{{currentUser.profile.name}}">
-        <a class="dropdown-toggle d-inline-block text-truncate" style="max-width: 15rem; margin-bottom: -5px;" href="#">
+        <a class="dropdown-toggle d-inline-block text-truncate mw-100" href="#">
           <i class="fa fa-user-o" aria-hidden="true"></i>
           {{currentUser.profile.name}}
         </a>
@@ -61,7 +61,7 @@
     </button>
     <div class="{{getNavLinkListClassList}}">
       <ul class="navbar-nav">
-        <li class="nav-item">
+        <li class="nav-item text-nowrap">
           <a class="nav-link" href="{{getHref 'announcement'}}">{{getLinkText 'announcement'}}</a>
         </li>
         {{#navLinkGroup text='交易大廳'}}
@@ -94,7 +94,7 @@
             <a class="nav-link" href="#" data-theme="dark" data-action="switch-theme">暗色</a>
           </li>
         {{/navLinkGroup}}
-        <li class="nav-item">
+        <li class="nav-item text-nowrap">
           <a class="nav-link" href="https://opencollective.com/acgn-stock" target="_blank">捐款贊助</a>
         </li>
       </ul>
@@ -104,7 +104,7 @@
 
 <template name="navLinkGroup">
   <div class="note">
-    <li class="nav-item dropdown">
+    <li class="nav-item dropdown text-nowrap">
       <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
         {{{this.text}}}
       </a>

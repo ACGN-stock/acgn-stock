@@ -10,6 +10,22 @@ export default dbCompanies;
 // 公司評等名稱
 export const gradeList = ['A', 'B', 'C', 'D'];
 
+// 公司評等係數
+export const gradeFactorTable = {
+  'miningMachine': {
+    A: 0.3,
+    B: 0.2,
+    C: 0.1,
+    D: 0
+  },
+  'dailyProfit': {
+    A: 0.4,
+    B: 0.3,
+    C: 0.2,
+    D: 0.1
+  }
+};
+
 const schema = new SimpleSchema({
   //公司名稱
   companyName: {

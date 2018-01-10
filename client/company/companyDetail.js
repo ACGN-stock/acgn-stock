@@ -2,6 +2,7 @@
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
+import { Session as GlobalStorage } from 'meteor/session';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -19,7 +20,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, voteProduct, likeProduct, toggleFavorite } from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat } from '../utils/helpers.js';
+import { currencyFormat, setChartTheme } from '../utils/helpers.js';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 
 const rShowAllTags = new ReactiveVar(false);
@@ -473,10 +474,13 @@ Template.companyDetailTable.events({
   }
 });
 
+Template.companyChart.onCreated(function() {
+  this.strChartType = '';
+  this.$chart = null;
+});
 Template.companyChart.onRendered(function() {
   this.strChartType = 'trend';
   this.$chart = this.$('.chart');
-  this.chart = null;
   this.autorun(() => {
     drawChart(this);
   });
@@ -493,7 +497,17 @@ Template.companyChart.events({
     drawChart(templateInstance);
   }
 });
+
 function drawChart(templateInstance) {
+  switch (GlobalStorage.get('themeName')) {
+    case 'dark':
+      setChartTheme('gray');
+      break;
+    default:
+      setChartTheme('gridLight');
+      break;
+  }
+
   if (templateInstance.strChartType === 'trend') {
     drawLineChart(templateInstance);
   }
@@ -501,225 +515,207 @@ function drawChart(templateInstance) {
     drawCandleStickChart(templateInstance);
   }
 }
+
 function drawLineChart(templateInstance) {
   if (! Meteor.status().connected) {
     return false;
   }
-  if (templateInstance.chart) {
-    templateInstance.chart.destroy();
+  if (templateInstance.$chart) {
+    templateInstance.$chart.empty();
   }
+
+  const toTime = Date.now();
+  const fromTime = toTime - 1000 * 60 * 60 * 24;
   const companyId = FlowRouter.getParam('companyId');
-  Meteor.call('queryStocksPrice', companyId, (error, result) => {
+  Meteor.call('queryStocksPrice', companyId, { begin: fromTime }, (error, result) => {
     if (error) {
       return false;
     }
-    if (! result.length) {
-      return false;
-    }
-    templateInstance.$chart
-      .empty()
-      .html('<canvas style="height:300px;"></canvas>');
-    const ctx = templateInstance.$chart.find('canvas');
-    const color = (localStorage.getItem('theme') === 'light') ? '#000000' : '#ffffff';
-    templateInstance.chart = new Chart(ctx, {
-      type: 'scatter',
-      data: {
-        datasets: [
-          {
-            label: '一日股價走勢',
-            lineTension: 0,
-            data: _.sortBy(result, 'x'),
-            borderColor: color,
-            fill: false
-          }
-        ]
+
+    Highcharts.chart({
+      chart: {
+        type: 'line',
+        renderTo: templateInstance.$chart[0]
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: {
-          duration: 0
+      title: {
+        text: '一日股價走勢',
+        margin: 0
+      },
+      yAxis: {
+        title: {
+          text: null
         },
-        legend: {
-          onClick: $.noop,
-          labels: {
-            fontColor: color
+        labels: {
+          x: -4,
+          formatter: function() {
+            return '$' + currencyFormat(this.value);
           }
         },
-        scales: {
-          xAxes: [
-            {
-              type: 'time',
-              position: 'bottom',
-              gridLines: {
-                drawTicks: true
-              },
-              scaleLabel: {
-                display: false
-              },
-              ticks: {
-                autoSkip: true,
-                autoSkipPadding: 10,
-                round: true,
-                maxRotation: 0,
-                padding: 5,
-                fontColor: color
-              },
-              time: {
-                parser: 'x',
-                tooltipFormat: 'YYYY/MM/DD HH:mm:ss',
-                displayFormats: {
-                  year: 'YYYY',
-                  quarter: 'YYYY Qo',
-                  month: 'YYYY/MM',
-                  week: 'YYYY/MM/DD',
-                  day: 'YYYY/MM/DD',
-                  hour: 'MM/DD HH:mm',
-                  minute: 'MM/DD HH:mm',
-                  second: 'HH:mm:ss',
-                  millisecond: 'mm:ss.SSS'
-                }
-              }
+        allowDecimals: false,
+        min: 0,
+        minTickInterval: 1,
+        tickPixelInterval: 50
+      },
+      xAxis: {
+        type: 'datetime',
+        min: fromTime,
+        max: toTime,
+        gridLineWidth: 1,
+        tickWidth: 0,
+        tickPixelInterval: 75
+      },
+      legend: {
+        enabled: false
+      },
+      credits: {
+        enabled: false
+      },
+      series: [
+        {
+          name: '價格',
+          data: _.sortBy(result, 'x'),
+          marker: {
+            enabled: true
+          },
+          tooltip: {
+            valueDecimals: 0,
+            xDateFormat: '%H:%M:%S',
+            pointFormatter: function() {
+              return '<span style="color:' +
+                this.color +
+                '">\u25CF</span> ' +
+                this.series.name +
+                ': <b>$' +
+                currencyFormat(this.y) +
+                '</b><br/>';
             }
-          ],
-          yAxes: [
-            {
-              type: 'linear',
-              position: 'left',
-              gridLines: {
-                drawTicks: true
-              },
-              ticks: {
-                fontColor: color,
-                beginAtZero: true,
-                callback: function(value) {
-                  return '$' + Math.round(value).toLocaleString();
-                }
-              },
-              afterBuildTicks(axis) {
-                axis.ticks = _.uniq(
-                  axis.ticks.map((n) => {
-                    return Math.round(n);
-                  })
-                );
-              }
-            }
-          ]
+          }
         }
-      }
+      ]
     });
   });
 }
+
 function drawCandleStickChart(templateInstance) {
   if (! Meteor.status().connected) {
     return false;
   }
-  if (templateInstance.chart) {
-    templateInstance.chart.destroy();
+  if (templateInstance.$chart) {
+    templateInstance.$chart.empty();
   }
-  templateInstance.$chart.empty();
-  templateInstance.$chart.find('text').css('fill');
 
-  const margin = { top: 20, right: 10, bottom: 30, left: 45 };
-  const width = Math.max(templateInstance.$chart.width() - margin.right - margin.left, 450);
-  const height = 300 - margin.top - margin.bottom;
-  const color = localStorage.theme === 'light' ? '#000' : '#fff';
-
-  const svg = d3.select(templateInstance.$chart.get(0)).append('svg')
-    .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-  const x = techan.scale.financetime().range([0, width]);
-  const y = d3.scaleLinear().range([height, 0]);
-  const candlestick = techan.plot.candlestick().xScale(x)
-    .yScale(y);
-  const xAxis = d3.axisBottom().scale(x);
-
-  const count = 80;
-  const unitTime = (templateInstance.strChartType === '30min' ? 1800
-    : templateInstance.strChartType === '60min' ? 3600
+  const unitTime = (templateInstance.strChartType === '1hr' ? 3600
+    : templateInstance.strChartType === '2hr' ? 7200
       : templateInstance.strChartType === '4hr' ? 14400
         : templateInstance.strChartType === '12hr' ? 43200 : 86400) * 1000;
+
+  const count = Math.min(Math.floor((1000 * 86400 * 14) / unitTime) - 1, 40);
+
   const toTime = Math.floor(Date.now() / unitTime) * unitTime;
+  const fromTime = toTime - unitTime * (count - 1);
 
   const companyId = FlowRouter.getParam('companyId');
   Meteor.call('queryStocksCandlestick', companyId, { lastTime: toTime, unitTime: unitTime, count: count }, (error, result) => {
     if (error) {
       return false;
     }
-    const data = result.map(function(x) {
-      return {
-        date: new Date(x.time),
-        open: x.open,
-        close: x.close,
-        high: x.high,
-        low: x.low
+
+    const data = _.map(result, (val) => {
+      const newVal = {
+        x: val.time,
+        open: val.open,
+        high: val.high,
+        low: val.low,
+        close: val.close
       };
-    });
-    const accessor = candlestick.accessor();
-    const grid = svg.append('g').attr('class', 'grid');
-    const content = svg.append('g').attr('class', 'content');
 
-    content.append('g')
-      .attr('class', 'candlestick');
-
-    content.append('g')
-      .attr('class', 'x axis')
-      .attr('transform', 'translate(0,' + height + ')');
-
-    content.append('g')
-      .attr('class', 'y axis')
-      .append('text')
-      .attr('y', -6)
-      .style('text-anchor', 'end')
-      .text('價格 ($)');
-
-    x.domain(Array.from(new Array(count), (v, i) => {
-      return new Date(toTime - unitTime * (count - i));
-    }));
-
-    let yDomain = techan.scale.plot.ohlc(data, accessor).domain();
-    y.domain(techan.scale.plot.ohlc(data, accessor).domain());
-
-    // 自訂y軸，避免小數情況出現
-    yDomain = yDomain.map((n) => {
-      return Math.round(n);
-    }).sort((a, b) => {
-      return (a - b);
+      return newVal;
     });
 
-    const yDomainMin = _.first(yDomain);
-    const yDomainMax = _.last(yDomain);
-    const yTickMaxCount = 10;
-    const yTickStep = Math.max(Math.floor((yDomainMax - yDomainMin) / yTickMaxCount), 1);
-
-    const yTickValues = Array.from(new Array(yTickMaxCount + 1), (v, i) => {
-      return yDomainMax - yTickStep * i;
-    }).filter((n) => {
-      return n >= yDomainMin;
+    Highcharts.stockChart({
+      chart: {
+        renderTo: templateInstance.$chart[0]
+      },
+      title: {
+        text: null
+      },
+      rangeSelector: {
+        enabled: false
+      },
+      scrollbar: {
+        enabled: false
+      },
+      navigator: {
+        enabled: false
+      },
+      yAxis: {
+        title: {
+          text: null
+        },
+        labels: {
+          x: -4,
+          y: 3,
+          align: 'right',
+          formatter: function() {
+            return '$' + currencyFormat(this.value);
+          }
+        },
+        allowDecimals: false,
+        opposite: false,
+        showLastLabel: true,
+        minTickInterval: 1,
+        tickPixelInterval: 50
+      },
+      xAxis: {
+        type: 'datetime',
+        min: fromTime,
+        max: toTime,
+        startOnTick: true,
+        gridLineWidth: 1,
+        minTickInterval: 1,
+        tickWidth: 0,
+        tickPixelInterval: 75,
+        ordinal: false
+      },
+      legend: {
+        enabled: false
+      },
+      credits: {
+        enabled: false
+      },
+      series: [
+        {
+          name: '成交價',
+          type: 'candlestick',
+          data: data,
+          cropThreshold: count,
+          maxPointWidth: 10,
+          lineColor: '#449d44',
+          upLineColor: '#d9534f',
+          upColor: '#d9534f',
+          tooltip: {
+            valueDecimals: 0,
+            xDateFormat: '%m/%d %H:%M',
+            pointFormatter: function() {
+              return (
+                'Open: <b>$' +
+                currencyFormat(this.options.open) +
+                '</b><br/>' +
+                'High: <b>$' +
+                currencyFormat(this.options.high) +
+                '</b><br/>' +
+                'Low: <b>$' +
+                currencyFormat(this.options.low) +
+                '</b><br/>' +
+                'Close: <b>$' +
+                currencyFormat(this.options.close) +
+                '</b><br/>'
+              );
+            }
+          }
+        }
+      ]
     });
-
-    const yAxis = d3.axisLeft().scale(y)
-      .tickValues(yTickValues)
-      .tickFormat(d3.format('d'));
-
-    grid.call(d3.axisLeft().scale(y)
-      .tickSize(-width)
-      .ticks(yTickValues.length)
-      .tickFormat(''));
-
-    svg.selectAll('g.candlestick').datum(data)
-      .call(candlestick);
-    svg.selectAll('g.x.axis').call(xAxis);
-    svg.selectAll('g.y.axis').call(yAxis);
-    svg.select('.content').selectAll('line')
-      .style('stroke', color);
-    svg.select('.content').selectAll('path')
-      .style('stroke', color);
-    svg.selectAll('text').style('fill', color);
-    svg.selectAll('path.candle').style('stroke', color);
   });
 }
 
