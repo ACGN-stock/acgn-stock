@@ -215,7 +215,9 @@ Template.displayLog.helpers({
         return `【營利分紅】${users[0]}得到了「${company}」公司的分紅$${currencyFormat(data.bonus)}！`;
       }
       case '推薦回饋': {
-        return `【推薦回饋】系統發給了${users[0]}產品投票回饋金$${currencyFormat(data.reward)}！`;
+        const source = companyId ? `「${company}」公司` : '系統';
+
+        return `【推薦回饋】${source}向${users[0]}發給了產品投票回饋金$${currencyFormat(data.reward)}！`;
       }
       case '季度賦稅': {
         return `【季度賦稅】${users[0]}在此次商業季度中產生了$${currencyFormat(data.assetTax)}的財富稅與$${currencyFormat(data.zombieTax)}的殭屍稅！`;

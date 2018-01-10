@@ -169,7 +169,7 @@ export const logTypeList = [
   '營利分紅',
 
   /**
-   * 【推薦回饋】系統發給了userId0產品投票回饋金$data.reward！
+   * 【推薦回饋】(「companyId」公司 || 系統)發給了userId0產品投票回饋金$data.reward！
    */
   '推薦回饋',
 
