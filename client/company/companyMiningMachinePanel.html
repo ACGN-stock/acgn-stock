@@ -20,7 +20,7 @@
       {{/each}}
     </div>
     總生產值：{{totalMiningPower}}<br />
-    礦機營利：{{totalMiningProfit totalMiningPower}}
+    礦機營利：$ {{currencyFormat (totalMiningProfit (totalMiningPower))}}
   </div>
 
   {{#if currentUser}}

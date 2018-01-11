@@ -53,6 +53,9 @@
       <button class="{{sortByBtnClass 'totalValue'}}" value="totalValue" type="button" data-action="sortBy">
         依總市值排序
       </button>
+      <button class="{{sortByBtnClass 'capital'}}" value="capital" type="button" data-action="sortBy">
+        依資本額排序
+      </button>
       <button class="{{sortByBtnClass 'createdAt'}}" value="createdAt" type="button" data-action="sortBy">
         依上市日期排序
       </button>
@@ -133,22 +136,25 @@
       </div>
       <div class="row row-info d-flex justify-content-between">
         <p>股票價格</p>
-        <p class="stock-price {{priceDisplayClass this.lastPrice this.listPrice}}"
-          title="{{this.lastPrice}}({{this.listPrice}})">
+        <p class="{{priceDisplayClass this.lastPrice this.listPrice}}">
           $ {{currencyFormat this.lastPrice}}({{currencyFormat this.listPrice}})
         </p>
       </div>
       <div class="row row-info d-flex justify-content-between">
+        <p>資本額</p>
+        <p>$ {{currencyFormat this.capital}}</p>
+      </div>
+      <div class="row row-info d-flex justify-content-between">
         <p>總市值</p>
-        <p class="company-asset" title="{{this.totalValue}}">$ {{currencyFormat this.totalValue}}</p>
+        <p>$ {{currencyFormat this.totalValue}}</p>
       </div>
       <div class="row row-info d-flex justify-content-between">
         <p>總釋股量</p>
-        <p class="stock-release" title="{{this.totalRelease}}">{{this.totalRelease}}</p>
+        <p>{{this.totalRelease}}</p>
       </div>
       <div class="row row-info d-flex justify-content-between">
         <p>每股盈餘</p>
-        <p class="stock-EPS" title="{{getCompanyEPS this}}">{{currencyFormat(getCompanyEPS this)}}</p>
+        <p>{{currencyFormat(getCompanyEPS this)}}</p>
       </div>
       {{#if currentUser}}
         <div class="row row-info d-flex justify-content-between">
@@ -215,13 +221,8 @@
         </div>
       {{/if}}
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">角色名稱</div>
-    
-      <div class="col-8 col-lg-3 text-truncate border-grid">
+      <div class="col-8 col-lg-9 text-truncate border-grid">
         {{>companyLink this._id}}
-      </div>
-      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">經理人</div>
-      <div class="col-8 col-lg-3 text-truncate border-grid">
-        {{>userLink this.manager}}
       </div>
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">創立日期</div>
       <div class="col-8 col-lg-3 text-truncate text-right border-grid" title="{{formatDateText this.createdAt}}">
@@ -239,24 +240,32 @@
       <div class="col-8 col-lg-3 text-truncate border-grid">
         {{>userLink this.chairman}}
       </div>
-      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總市值</div>
-      <div class="col-8 col-lg-3 text-truncate text-right border-grid company-asset" title="{{this.totalValue}}">
-        $ {{currencyFormat this.totalValue}}
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">經理人</div>
+      <div class="col-8 col-lg-3 text-truncate border-grid">
+        {{>userLink this.manager}}
       </div>
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">股票價格</div>
-      <div class="col-8 col-lg-3 text-truncate text-right border-grid stock-price" title="{{this.lastPrice}}({{this.listPrice}})">
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid">
         <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
           $ {{currencyFormat this.lastPrice}}({{currencyFormat this.listPrice}})
         </span>
       </div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">資本額</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid">
+        $ {{currencyFormat this.capital}}
+      </div>
+      <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總市值</div>
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid">
+        $ {{currencyFormat this.totalValue}}
+      </div>
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總釋股量</div>
-      <div class="col-8 col-lg-3 text-truncate text-right border-grid stock-release" title="{{this.totalRelease}}">
+      <div class="col-8 col-lg-3 text-truncate text-right border-grid">
         <span class="{{priceDisplayClass this.lastPrice this.listPrice}}">
           {{this.totalRelease}}
         </span>
       </div>
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">每股盈餘</div>
-      <div class="col-8 col-lg-3 text-right border-grid stock-EPS" title="{{getCompanyEPS this}}">
+      <div class="col-8 col-lg-3 text-right border-grid">
         <span class="text-truncate {{priceDisplayClass this.lastPrice this.listPrice}}">
           {{currencyFormat(getCompanyEPS this)}}
         </span>
