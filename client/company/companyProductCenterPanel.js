@@ -57,7 +57,13 @@ Template.companyProductCenterPanel.helpers({
     return Template.instance().getMarketingProducts();
   },
   hasPlanningProducts() {
-    return Template.instance().getCompany().productCenterInfo.planningProductCount > 0;
+    const { productCenterInfo } = Template.instance().getCompany();
+
+    if (! productCenterInfo) {
+      return false;
+    }
+
+    return productCenterInfo.planningProductCount > 0;
   },
   paginationData() {
     return {
