@@ -1,7 +1,6 @@
 'use strict';
 import { $ } from 'meteor/jquery';
 import { _ } from 'meteor/underscore';
-import { Session as GlobalStorage } from 'meteor/session';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -15,6 +14,7 @@ import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat, setChartTheme } from '../utils/helpers.js';
+import { globalVariable } from '../utils/globalVariable';
 
 inheritedShowLoadingOnSubscribing(Template.seasonalReport);
 Template.seasonalReport.onCreated(function() {
@@ -253,7 +253,7 @@ function drawChart(templateInstance) {
     templateInstance.chart.empty();
   }
 
-  switch (GlobalStorage.get('themeName')) {
+  switch (globalVariable.get('theme')) {
     case 'dark':
       setChartTheme('gray');
       break;
@@ -296,7 +296,8 @@ function drawCompanyPriceRankTable(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.chart.height(20 * rankList.length);
+  const chartHeight = 20 * rankList.length + 125;
+  templateInstance.chart.height(chartHeight);
 
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
@@ -403,7 +404,8 @@ function drawCompanyProfitRankTable(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.chart.height(40 * rankList.length);
+  const chartHeight = 40 * rankList.length + 125;
+  templateInstance.chart.height(chartHeight);
 
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
@@ -512,7 +514,8 @@ function drawCompanyValueRankTable(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.chart.height(60 * rankList.length);
+  const chartHeight = 60 * rankList.length + 125;
+  templateInstance.chart.height(chartHeight);
 
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
@@ -648,7 +651,8 @@ function drawCompanyCapitalRankTable(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.chart.height(60 * rankList.length);
+  const chartHeight = 60 * rankList.length + 125;
+  templateInstance.chart.height(chartHeight);
 
   const companyNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
@@ -787,7 +791,9 @@ function drawUserRankChart(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  templateInstance.chart.height(20 * rankList.length);
+  const chartHeight = 20 * rankList.length + 125;
+  templateInstance.chart.height(chartHeight);
+
   const userNameHash = {};
   const deferredList = _.map(rankList, (rankData) => {
     return $.ajax({
