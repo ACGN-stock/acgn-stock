@@ -23,14 +23,14 @@
 </template>
 
 <template name="reportSeasonNav">
-  <div class="text-center">
+  <div class="d-flex justify-content-between align-items-center text-center">
     <a {{seasonLinkAttrs 'prev'}}>
       <span aria-hidden="true">&laquo;</span>
     </a>
-    商業季度：
-    {{formatDateText seasonBegin}}
-    ～
-    {{formatDateText seasonEnd}}
+    <div>
+      <div class="d-inline-block text-nowrap">{{formatDateText seasonBegin}}～</div>
+      <div class="d-inline-block text-nowrap">{{formatDateText seasonEnd}}</div>
+    </div>
     <a  {{seasonLinkAttrs 'next'}}>
       <span aria-hidden="true">&raquo;</span>
     </a>

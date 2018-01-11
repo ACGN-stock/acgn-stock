@@ -42,7 +42,9 @@ Highcharts.theme.gray = {
   xAxis: {
     gridLineWidth: 0,
     lineColor: '#999',
-    tickColor: '#999',
+    tickColor: 'rgba(255,255,255,0.07)',
+    gridLineColor: 'rgba(255, 255, 255, .1)',
+    minorGridLineColor: 'rgba(255,255,255,0.07)',
     labels: {
       style: {
         color: '#999',
@@ -111,7 +113,10 @@ Highcharts.theme.gray = {
 
   plotOptions: {
     series: {
-      nullColor: '#444444'
+      nullColor: '#444444',
+      dataLabels: {
+        color: '#CCC'
+      }
     },
     line: {
       dataLabels: {
