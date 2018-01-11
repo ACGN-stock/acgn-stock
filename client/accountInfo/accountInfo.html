@@ -274,7 +274,7 @@
 
 <template name="accountInfoTaxList">
   <div class="col-12 border-grid">
-    <table class="table table-bordered mt-3 account-tax-info w-100" style="table-layout: fixed;">
+    <table class="table table-bordered mt-3 custom-responsive-table-md account-tax-list w-100" style="table-layout: fixed;">
       <thead>
         <tr>
           <th class="text-center text-nowrap" style="width: 160px">繳稅期限</th>
@@ -290,19 +290,19 @@
       <tbody>
         {{#each taxes in taxesList}}
           <tr>
-            <td class="text-right text-truncate" data-title="繳稅期限">
+            <td class="text-right text-truncate text-nowrap" data-title="繳稅期限">
               {{formatDateText taxes.expireDate}}
             </td>
-            <td class="text-right text-truncate" data-title="財稅額" title="{{taxes.tax}}">
+            <td class="text-right text-truncate text-nowrap" data-title="財稅額" title="{{taxes.tax}}">
               $ {{currencyFormat taxes.tax}}
             </td>
-            <td class="text-right text-truncate" data-title="殭屍稅" title="{{taxes.zombie}}">
+            <td class="text-right text-truncate text-nowrap" data-title="殭屍稅" title="{{taxes.zombie}}">
               $ {{currencyFormat taxes.zombie}}
             </td>
-            <td class="text-right text-truncate" data-title="逾期罰金" title="{{taxes.fine}}">
+            <td class="text-right text-truncate text-nowrap" data-title="逾期罰金" title="{{taxes.fine}}">
               $ {{currencyFormat taxes.fine}}
             </td>
-            <td class="text-right text-truncate" data-title="已繳納" title="{{taxes.paid}}">
+            <td class="text-right text-truncate text-nowrap" data-title="已繳納" title="{{taxes.paid}}">
               $ {{currencyFormat taxes.paid}}
             </td>
             {{#if isCurrentUser}}
@@ -316,9 +316,9 @@
         {{else}}
           <tr class="default-content">
             {{#if isCurrentUser}}
-              <td class="text-center text-truncate" colspan="6">目前沒有需要繳納的稅金！</td>
+              <td class="text-center text-truncate p-1" colspan="6">目前沒有需要繳納的稅金！</td>
             {{else}}
-              <td class="text-center text-truncate" colspan="5">目前沒有需要繳納的稅金！</td>
+              <td class="text-center text-truncate p-1" colspan="5">目前沒有需要繳納的稅金！</td>
             {{/if}}
           </tr>
         {{/each}}
