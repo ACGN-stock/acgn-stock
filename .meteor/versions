@@ -90,7 +90,6 @@ reload@1.1.11
 retry@1.0.9
 routepolicy@1.0.12
 service-configuration@1.0.11
-session@1.1.7
 sha@1.0.9
 shell-server@0.3.0
 spacebars@1.0.15
