@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-block">
         <h1 class="card-title mb-1">經營管理介面</h1>
-        <h2 class="card-subtitle mb-2 text-truncate">{{company.companyName}}</h2>
+        <h2 class="card-subtitle mb-2 text-truncate">{{> companyLink company._id}}</h2>
         {{> switchContent switchContentArgs}}
       </div>
     </div>

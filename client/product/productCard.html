@@ -1,6 +1,6 @@
 <template name="productCard">
-  <div class="card my-2">
-    <div class="card-header d-flex flex-wrap py-2">
+  <div class="card my-2 product-card">
+    <div class="card-header d-flex flex-wrap py-2 px-3">
       <div class="mr-3">價格：${{currencyFormat product.price}}</div>
       <div>
         {{#if product.availableAmount}}
@@ -14,14 +14,14 @@
         {{/if}}
       </div>
     </div>
-    <div class="card-block">
+    <div class="card-block p-3">
       <h5 class="card-title text-truncate">
         <div class="badge badge-default">{{product.type}}</div>
         {{> productLink product._id}}
       </h5>
-      <div class="card-subtitle">{{product.description}}</div>
+      <div class="card-subtitle product-description">{{product.description}}</div>
     </div>
-    <div class="card-footer d-flex flex-wrap">
+    <div class="card-footer d-flex flex-wrap px-3">
       <div>
         {{#if product.availableAmount}}
           <button class="btn btn-sm btn-primary" title="購買產品" data-buy-product="{{product._id}}">購買</button>

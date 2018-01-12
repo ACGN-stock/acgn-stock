@@ -749,7 +749,7 @@ function drawCompanyCapitalRankTable(templateInstance) {
           title: {
             text: null
           },
-          visible: false,
+          visible: false
         },
         {
           id: 'x-axis-value',

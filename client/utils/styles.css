@@ -434,22 +434,59 @@ body {
 
 /* 經營管理介面 > 產品管理 移動端排版 */
 @media only screen and (max-width: 767.9px) {
-  table.next-season-product td {
+  table.company-next-season-product td {
     padding-left: 20%;
   }
 }
 
-table.next-season-product .product-name,
-table.next-season-product .product-description {
+table.company-next-season-product .product-name,
+table.company-next-season-product .product-description {
   word-break: break-all;
   overflow-y: auto;
 }
 
-table.next-season-product .product-name {
+table.company-next-season-product .product-name {
   max-height: 3rem;
 }
 
-table.next-season-product .product-description {
+table.company-next-season-product .product-description {
+  max-height: 3.5rem;
+}
+
+/* 產品卡 */
+.product-card .product-description {
+  word-break: break-all;
+  overflow-y: auto;
+  max-height: 3.5rem;
+}
+
+/* 產品中心 (賽季) */
+table.product-list-by-season .product-name,
+table.product-list-by-season .product-description {
+  word-break: break-all;
+  overflow-y: auto;
+}
+
+table.product-list-by-season .product-name {
+  max-height: 3rem;
+}
+
+table.product-list-by-season .product-description {
+  max-height: 3.5rem;
+}
+
+/* 產品中心 (公司) */
+table.product-list-by-company .product-name,
+table.product-list-by-company .product-description {
+  word-break: break-all;
+  overflow-y: auto;
+}
+
+table.product-list-by-company .product-name {
+  max-height: 3rem;
+}
+
+table.product-list-by-company .product-description {
   max-height: 3.5rem;
 }
 
