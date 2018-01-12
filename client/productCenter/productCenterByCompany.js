@@ -52,6 +52,14 @@ Template.productListByCompanyTable.helpers({
       }
     );
   },
+  getSortButtonClass(fieldName) {
+    if (fieldName === rProductSortBy.get()) {
+      return 'active';
+    }
+    else {
+      return '';
+    }
+  },
   getSortIcon(fieldName) {
     if (fieldName === rProductSortBy.get()) {
       if (rProductSortDir.get() === -1) {

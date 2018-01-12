@@ -29,6 +29,16 @@
   {{#with paginationData}}
     {{> pagination}}
   {{/with}}
+  <div class="d-md-none">
+      <button class="btn btn-sm btn-secondary {{getSortButtonClass 'type'}}" data-sort="type">
+        類別
+        {{{getSortIcon 'type'}}}
+      </button>
+      <button class="btn btn-sm btn-secondary {{getSortButtonClass 'voteCount'}}" data-sort="voteCount">
+        推薦數
+        {{{getSortIcon 'voteCount'}}}
+      </button>
+    </div>
   <table class="table-bordered custom-responsive-table-md product-list-by-season w-100" style="table-layout: fixed;">
     <thead>
       <tr>
