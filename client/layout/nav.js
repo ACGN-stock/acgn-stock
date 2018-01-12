@@ -4,7 +4,6 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { Session as GlobalStorage } from 'meteor/session';
 
 import { dbArena } from '/db/dbArena';
 import { dbSeason } from '/db/dbSeason';
@@ -13,6 +12,7 @@ import { pageNameHash } from '/routes';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 import { handleError } from '../utils/handleError';
+import { globalVariable } from '../utils/globalVariable';
 import { rAccountDialogMode } from './accountDialog';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
@@ -34,7 +34,7 @@ function updateTheme() {
       .addClass('navbar-inverse');
   }
 
-  GlobalStorage.set('themeName', theme);
+  globalVariable.set('theme', theme);
 }
 
 Template.nav.onCreated(function() {

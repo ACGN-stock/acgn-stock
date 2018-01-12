@@ -2,7 +2,6 @@
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
-import { Session as GlobalStorage } from 'meteor/session';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -21,6 +20,7 @@ import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat, setChartTheme } from '../utils/helpers.js';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
+import { globalVariable } from '../utils/globalVariable';
 
 const rShowAllTags = new ReactiveVar(false);
 
@@ -491,7 +491,7 @@ Template.companyChart.events({
 });
 
 function drawChart(templateInstance) {
-  switch (GlobalStorage.get('themeName')) {
+  switch (globalVariable.get('theme')) {
     case 'dark':
       setChartTheme('gray');
       break;
