@@ -32,3 +32,4 @@ xolvio:cleaner
 meteortesting:mocha
 peerlibrary:reactive-publish
 teamgrid:reactive-interval
+reactive-dict

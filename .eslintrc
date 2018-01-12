@@ -17,8 +17,7 @@
     "node": true
   },
   "globals": {
-    "d3": true,
-    "techan": true
+    "Highcharts": true
   },
   "plugins": [],
   "settings": {
@@ -27,7 +26,7 @@
   "rules": {
     "import/prefer-default-export": "off",
     "import/order": ["error", {
-      "newlines-between": "ignore",
+      "newlines-between": "ignore"
     }],
     "no-console": "error",
     "no-debugger": "error",

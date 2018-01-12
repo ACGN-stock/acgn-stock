@@ -324,6 +324,7 @@ Template.chairmanTitleList.onCreated(function() {
   });
 });
 Template.chairmanTitleList.helpers({
+  ...accountInfoCommonHelpers,
   titleList() {
     return dbCompanies
       .find({

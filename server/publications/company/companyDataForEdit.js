@@ -14,40 +14,33 @@ Meteor.publish('companyDataForEdit', function(companyId) {
   if (typeof this.userId !== 'string') {
     return [];
   }
-  const user = Meteor.users.findOne(this.userId, {
-    fields: {
-      'profile.isAdmin': true
-    }
-  });
-  const companyData = dbCompanies.findOne(companyId, {
-    fields: {
-      manager: 1
-    }
-  });
-  if (
-    companyData &&
-    (
-      companyData.manager === this.userId ||
-      user.profile.isAdmin
-    )
-  ) {
-    const overdue = 0;
 
+  const user = Meteor.users.findOne(this.userId, { fields: { 'profile.isAdmin': true } });
+  const companyData = dbCompanies.findOne(companyId, { fields: { manager: 1 } });
+
+  if (! companyData) {
+    return [];
+  }
+
+  if (companyData.manager === this.userId || user.profile.isAdmin) {
     return [
       dbCompanies.find(companyId, {
         fields: {
+          companyName: 1,
           tags: 1,
           pictureSmall: 1,
           pictureBig: 1,
-          description: 1
+          description: 1,
+          productionFund: 1,
+          productPriceLimit: 1
         }
       }),
-      dbProducts.find({companyId, overdue})
+      dbProducts.find({ companyId, state: 'planning' })
     ];
   }
   else {
     return [];
   }
 });
-//一分鐘最多10次
+// 一分鐘最多10次
 limitSubscription('companyDataForEdit', 10);

@@ -163,13 +163,6 @@
         {{/if}}
       </div>
     </div>
-    <div class="col-12 col-sm-6">
-      {{#if haveNextSeasonProduct}}
-        <div class="text-success">下季度待上架產品：有</div>
-      {{else}}
-        <div class="text-danger">下季度待上架產品：無</div>
-      {{/if}}
-    </div>
   </div>
   <hr />
   {{> companyDetailTable}}
@@ -299,19 +292,10 @@
         {{> companySellOrderList}}
       {{/if}}
       <div class="col-12 border-grid">
-        <a class="d-block h4 my-1" href="#" data-toggle-panel="product">
-          產品中心
-          {{#if isDisplayPanel 'product'}}
-            <i class="fa fa-folder-open" aria-hidden="true"></i>
-          {{else}}
-            <i class="fa fa-folder" aria-hidden="true"></i>
-          {{/if}}
-        </a>
+        {{#panelFolder name='productCenter' title='產品中心'}}
+          {{> companyProductCenterPanel company=this}}
+        {{/panelFolder}}
       </div>
-      {{#if isDisplayPanel 'product'}}
-        {{> companyCurrentProductList}}
-        {{> companyAllPrudctList}}
-      {{/if}}
       <div class="col-12 border-grid">
         <a class="d-block h4 my-1" href="#" data-toggle-panel="director">
           董事會
@@ -354,7 +338,7 @@
       {{/if}}
       <div class="col-12 border-grid">
         {{#panelFolder name='miningMachine' title='挖礦機'}}
-          {{> companyMiningMachine}}
+          {{> companyMiningMachine company=this}}
         {{/panelFolder}}
       </div>
       <div class="col-12 border-grid">
@@ -377,28 +361,28 @@
 <template name="companyChart">
   <div class="row pt-1">
     <div class="col px-1" style="overflow-x: auto; overflow-y: hidden;">
-      <div class="chart" style="height: 300px; min-width: 425px; ">
+      <div class="chart w-100" style="height: 300px; min-width: 590px; ">
 
       </div>
     </div>
-    <div class="col d-none d-sm-flex" style="max-width: 80px;">
+    <div class="col d-none d-md-flex" style="max-width: 80px;">
       <div class="btn-group-vertical d-flex company-chart-btn-group" role="group">
         <button type="button" class="btn btn-secondary btn-sm active" data-chart-type="trend">走勢</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="day">日K</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="12hr">12時</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="4hr">4時</button>
-        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="60min">60分</button>
-        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="30min">30分</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="2hr">2時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="1hr">1時</button>
       </div>
     </div>
-    <div class="col-12 d-sm-none px-0 my-1">
+    <div class="col-12 d-md-none px-0 my-1">
       <div class="btn-group d-flex justify-content-end company-chart-btn-group" role="group">
         <button type="button" class="btn btn-secondary btn-sm active" data-chart-type="trend">走勢</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="day">日K</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="12hr">12時</button>
         <button type="button" class="btn btn-secondary btn-sm" data-chart-type="4hr">4時</button>
-        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="60min">60分</button>
-        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="30min">30分</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="2hr">2時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="1hr">1時</button>
       </div>
     </div>
   </div>
@@ -420,7 +404,7 @@
     </h4>
     {{#each order in myOrderList}}
       <div class="d-flex flex-nowrap">
-        <div class="d-inline-block text-truncate" style="min-width: 2rem">{{>userLink order.userId}}</div>
+        <div class="d-inline-block text-truncate" style="min-width: 3rem">{{>userLink order.userId}}</div>
         <div class="text-nowrap">
           以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
           <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
@@ -455,7 +439,7 @@
     </h4>
     {{#each order in myOrderList}}
       <div class="d-flex flex-nowrap">
-        <div class="d-inline-block text-truncate" style="min-width: 2rem">{{>userLink order.userId}}</div>
+        <div class="d-inline-block text-truncate" style="min-width: 3rem">{{>userLink order.userId}}</div>
         <div class="text-nowrap">
           以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
           <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
@@ -466,7 +450,7 @@
     {{/each}}
     {{#each order in orderList}}
       <div class="d-flex flex-nowrap">
-        <div class="d-inline-block text-truncate" style="min-width: 2rem">{{>userLink order.userId}}</div>
+        <div class="d-inline-block text-truncate" style="min-width: 3rem">{{>userLink order.userId}}</div>
         <div class="text-nowrap">
           以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
         </div>
@@ -475,73 +459,6 @@
     {{#with paginationData}}
       {{> pagination}}
     {{/with}}
-  </div>
-</template>
-
-<template name="companyCurrentProductList">
-  <div class="col-12 col-md-6 border-grid">
-    <h4 class="my-1">
-      當季產品
-    </h4>
-    <div class="row mb-1">
-      <div class="col-8 col-sm-9 text-center">產品名稱</div>
-      <div class="col-4 col-sm-3 text-center">投票</div>
-    </div>
-    <div class="row" style="max-height: 290px; overflow-y: auto;">
-    {{#each product in productList}}
-      <div class="d-flex mb-1 align-items-center" style="width: 100%;">
-        <div class="col-8 col-sm-9">
-          <div class="text-truncate">{{>productLink product._id}}</div>
-          <div class="small text-truncate" title="{{product.description}}">{{product.description}}</div>
-        </div>
-        <div class="col-4 col-sm-3 text-center">
-          <button class="btn btn-primary btn-sm" type="button" data-vote-product="{{product._id}}">
-            {{product.votes}}
-            <i class="fa fa-money" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-    {{else}}
-      <div class="mx-auto">
-        沒有任何產品！
-      </div>
-    {{/each}}
-    </div>
-  </div>
-</template>
-
-<template name="companyAllPrudctList">
-  <div class="col-12 col-md-6 border-grid">
-    <h4 class="my-1">
-      暢銷產品排行
-    </h4>
-    <div class="row mb-1">
-      <div class="col-8 col-sm-9 text-center">產品名稱</div>
-      <div class="col-4 col-sm-3 text-center">投票</div>
-    </div>
-    <div class="row" style="max-height: 290px; overflow-y: auto;">
-    {{#each product in productList}}
-      <div class="d-flex mb-1 align-items-center" style="width: 100%;">
-        <div class="col-8 col-sm-9">
-          <div class="text-truncate">{{>productLink product._id}}</div>
-          <div class="small text-truncate">{{product.description}}</div>
-        </div>
-        <div class="col-4 col-sm-3 text-center">
-          <button class="btn btn-primary btn-sm" type="button" data-like-product="{{product._id}}">
-            {{product.likeCount}}
-            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-    {{else}}
-      <div class="mx-auto">
-        沒有任何產品！
-      </div>
-    {{/each}}
-    </div>
-    <a class="h6 text-info float-right" href="{{productCenterHref}}">
-      更多...
-    </a>
   </div>
 </template>
 
@@ -674,7 +591,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" style="max-width: 100%;">
+          <h5 class="modal-title mw-100">
             <div class="d-flex flex-nowrap">
               <div class="text-nowrap">投給「</div>
               <div class="d-inline-block text-truncate">{{>userLink candidateId}}</div>

@@ -6,13 +6,16 @@ import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
-  queryStocksPrice(companyId) {
+  queryStocksPrice(companyId, options) {
     check(companyId, String);
+    check(options, {
+      begin: Number
+    });
 
-    return queryStocksPrice(companyId);
+    return queryStocksPrice(companyId, options);
   }
 });
-function queryStocksPrice(companyId) {
+function queryStocksPrice(companyId, options) {
   debug.log('queryStocksPrice', companyId);
 
   return dbPrice
@@ -20,7 +23,7 @@ function queryStocksPrice(companyId) {
       {
         companyId: companyId,
         createdAt: {
-          $gt: new Date(Date.now() - 86400000)
+          $gt: new Date(options.begin)
         }
       },
       {

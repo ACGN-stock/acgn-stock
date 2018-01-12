@@ -5,24 +5,41 @@ import SimpleSchema from 'simpl-schema';
 import { stoneTypeList } from './dbCompanyStones';
 
 export const banTypeList = [
-  'accuse', //所有舉報違規行為
-  'deal', //所有下達訂單行為
-  'chat', //所有聊天發言行為
-  'advertise', //所有廣告宣傳行為
-  'manager' //擔任經理資格
+  'accuse', // 所有舉報違規行為
+  'deal', // 所有投資下單行為
+  'chat', // 所有聊天發言行為
+  'advertise', // 所有廣告宣傳行為
+  'manager' // 擔任經理人的資格
 ];
 
+export function banTypeDescription(banType) {
+  switch (banType) {
+    case 'accuse':
+      return '所有舉報違規行為';
+    case 'deal':
+      return '所有投資下單行為';
+    case 'chat':
+      return '所有聊天發言行為';
+    case 'advertise':
+      return '所有廣告宣傳行為';
+    case 'manager':
+      return '擔任經理人的資格';
+    default:
+      return `未知的行為(${banType})`;
+  }
+}
+
 const schema = new SimpleSchema({
-  //使用者PTT帳號名稱
+  // 使用者PTT帳號名稱
   username: {
     type: String,
     optional: true
   },
-  //驗證成功日期
+  // 驗證成功日期
   createdAt: {
     type: Date
   },
-  //登入token紀錄
+  // 登入token紀錄
   services: {
     type: Object,
     optional: true,
@@ -37,16 +54,16 @@ const schema = new SimpleSchema({
   },
   profile: {
     type: new SimpleSchema({
-      //驗證類別
+      // 驗證類別
       validateType: {
         type: String,
         allowedValues: ['Google', 'PTT', 'Bahamut']
       },
-      //使用者名稱
+      // 使用者名稱
       name: {
         type: String
       },
-      //金錢數量
+      // 金錢數量
       money: {
         type: SimpleSchema.Integer,
         defaultValue: 0
@@ -56,8 +73,8 @@ const schema = new SimpleSchema({
         type: SimpleSchema.Integer,
         defaultValue: 0
       },
-      //推薦票數量
-      vote: {
+      // 推薦票數量
+      voteTickets: {
         type: SimpleSchema.Integer,
         min: 0,
         defaultValue: 0
@@ -74,17 +91,17 @@ const schema = new SimpleSchema({
           return obj;
         }, {}))
       },
-      //是否為金管會委員
+      // 是否為金管會委員
       isAdmin: {
         type: Boolean,
         defaultValue: false
       },
-      //是否處於繳稅逾期的狀態
+      // 是否處於繳稅逾期的狀態
       notPayTax: {
         type: Boolean,
         defaultValue: false
       },
-      //被禁止的權限
+      // 被禁止的權限
       ban: {
         type: Array,
         defaultValue: []
@@ -92,12 +109,12 @@ const schema = new SimpleSchema({
       'ban.$': {
         type: new Match.OneOf(...banTypeList)
       },
-      //未登入天數次數紀錄
+      // 未登入天數次數紀錄
       noLoginDayCount: {
         type: SimpleSchema.Integer,
         defaultValue: 0
       },
-      //最後閱讀的金管會相關訊息時間
+      // 最後閱讀的金管會相關訊息時間
       lastReadAccuseLogDate: {
         type: Date,
         optional: true
@@ -126,35 +143,35 @@ const schema = new SimpleSchema({
   },
   status: {
     type: new SimpleSchema({
-      //是否為上線狀態
+      // 是否為上線狀態
       online: {
         type: Boolean,
         optional: true
       },
-      //是否發呆中
+      // 是否發呆中
       idle: {
         type: Boolean,
         optional: true
       },
-      //最後活動時間
+      // 最後活動時間
       lastActivity: {
         type: Date,
         optional: true
       },
-      //最後上線資訊
+      // 最後上線資訊
       lastLogin: {
         type: new SimpleSchema({
-          //日期
+          // 日期
           date: {
             type: Date,
             optional: true
           },
-          //IP地址
+          // IP地址
           ipAddr: {
             type: String,
             optional: true
           },
-          //使用瀏覽器
+          // 使用瀏覽器
           userAgent: {
             type: String,
             optional: true
@@ -172,3 +189,12 @@ const schema = new SimpleSchema({
   }
 });
 Meteor.users.attachSchema(schema);
+
+Meteor.users.findByIdOrThrow = function(id, options) {
+  const result = this.findOne(id, options);
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的使用者！`);
+  }
+
+  return result;
+};

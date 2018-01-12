@@ -6,19 +6,14 @@ import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
-Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, offset}) {
-  debug.log('publish productListByCompany', {companyId, sortBy, sortDir, offset});
+Meteor.publish('productListByCompany', function({ companyId, sortBy, sortDir, offset }) {
+  debug.log('publish productListByCompany', { companyId, sortBy, sortDir, offset });
   check(companyId, String);
-  check(sortBy, new Match.OneOf('likeCount', 'votes', 'type'));
+  check(sortBy, new Match.OneOf('voteCount', 'type'));
   check(sortDir, new Match.OneOf(1, -1));
   check(offset, Match.Integer);
 
-  const filter = {
-    companyId: companyId,
-    overdue: {
-      $gt: 0
-    }
-  };
+  const filter = { companyId, state: { $ne: 'planning' } };
 
   publishTotalCount('totalCountOfProductList', dbProducts.find(filter), this);
 
@@ -50,5 +45,5 @@ Meteor.publish('productListByCompany', function({companyId, sortBy, sortDir, off
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('productListByCompany');
