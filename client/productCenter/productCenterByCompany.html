@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-block">
       <h1 class="card-title mb-1">產品中心</h1>
-      <h2 class="card-subtitle mb-2 text-muted">{{> companyLink companyId}}</h2>
+      <h2 class="card-subtitle mb-2 text-truncate">{{> companyLink companyId}}</h2>
       <hr />
       {{> productListByCompanyTable}}
     </div>
@@ -10,7 +10,10 @@
 </template>
 
 <template name="productListByCompanyTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+  {{#with paginationData}}
+    {{> pagination}}
+  {{/with}}
+  <table class="table-bordered custom-responsive-table-md product-list-by-company w-100" style="table-layout: fixed;">
     <thead>
       <tr>
         <th class="text-center text-truncate" title="產品名稱">產品名稱</th>
@@ -23,8 +26,8 @@
           {{{getSortIcon 'voteCount'}}}
         </th>
         {{#if currentUser.profile.isAdmin}}
-          <th class="text-center" style="width: 70px;" title="下架">
-            下架
+          <th class="text-center" style="width: 70px;" title="管理">
+            管理
           </th>
         {{/if}}
       </tr>
@@ -32,14 +35,14 @@
     <tbody>
       {{#each product in productList}}
         <tr>
-          <td class="text-left px-2">
-            <div>{{>productLink product._id}}</div>
-            <div class="small">{{product.description}}</div>
+          <td class="text-left px-md-1" data-title="產品名稱">
+            <div class="product-name">{{>productLink product._id}}</div>
+            <div class="small product-description">{{product.description}}</div>
           </td>
-          <td class="text-center text-truncate">
+          <td class="text-center text-truncate" data-title="類別">
             {{product.type}}
           </td>
-          <td class="text-center text-truncate px-2">
+          <td class="text-center text-truncate" data-title="得票數">
             <button
               class="btn btn-primary btn-sm"
               type="button"
@@ -50,7 +53,7 @@
             </button>
           </td>
           {{#if currentUser.profile.isAdmin}}
-            <td class="text-center px-2">
+            <td class="text-center" data-title="管理">
               <button
                 class="btn btn-danger btn-sm"
                 type="button"
@@ -62,7 +65,7 @@
           {{/if}}
         </tr>
       {{else}}
-        <tr>
+        <tr class="default-content">
           <td class="text-center text-truncate" colspan="4">這家公司尚未推出任何產品！</td>
         </tr>
       {{/each}}

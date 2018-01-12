@@ -285,6 +285,8 @@ function drawChart(templateInstance) {
     }
   }
 }
+
+// 股票熱門排行榜圖表
 function drawCompanyPriceRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
   const rankList = dbRankCompanyPrice.find({seasonId}).map((rankData) => {
@@ -398,13 +400,15 @@ function drawCompanyPriceRankTable(templateInstance) {
     });
   });
 }
+
+// 股票營利排行榜圖表
 function drawCompanyProfitRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
   const rankList = dbRankCompanyProfit.find({seasonId}).fetch();
   if (rankList.length < 1) {
     return false;
   }
-  const chartHeight = 40 * rankList.length + 125;
+  const chartHeight = 40 * rankList.length + 80;
   templateInstance.chart.height(chartHeight);
 
   const companyNameHash = {};
@@ -452,7 +456,8 @@ function drawCompanyProfitRankTable(templateInstance) {
           opposite: true,
           title: {
             text: null
-          }
+          },
+          visible: false
         },
         {
           id: 'x-axis-profit',
@@ -460,7 +465,8 @@ function drawCompanyProfitRankTable(templateInstance) {
           min: 0,
           title: {
             text: null
-          }
+          },
+          visible: false
         }
       ],
       legend: {
@@ -473,6 +479,17 @@ function drawCompanyProfitRankTable(templateInstance) {
         bar: {
           borderWidth: 0,
           groupPadding: 0.1
+        },
+        series: {
+          dataLabels: {
+            enabled: true,
+            style: {
+              textOutline: 'none'
+            }
+          }
+        },
+        yAxis: {
+          gridLineWidth: 0
         }
       },
       series: [
@@ -487,6 +504,11 @@ function drawCompanyProfitRankTable(templateInstance) {
           color: 'rgba(119, 179, 0, 0.4)',
           yAxis: 'x-axis-profit',
           data: _.pluck(sortedRankList, 'profit'),
+          dataLabels: {
+            formatter: function() {
+              return '$' + currencyFormat(this.y);
+            }
+          },
           tooltip: {
             valueDecimals: 0,
             pointFormatter: function() {
@@ -504,6 +526,8 @@ function drawCompanyProfitRankTable(templateInstance) {
     });
   });
 }
+
+// 股票市值排行榜圖表
 function drawCompanyValueRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
   const rankList = dbRankCompanyValue.find({seasonId}).map((rankData) => {
@@ -514,7 +538,7 @@ function drawCompanyValueRankTable(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  const chartHeight = 60 * rankList.length + 125;
+  const chartHeight = 60 * rankList.length + 80;
   templateInstance.chart.height(chartHeight);
 
   const companyNameHash = {};
@@ -563,7 +587,8 @@ function drawCompanyValueRankTable(templateInstance) {
           opposite: true,
           title: {
             text: null
-          }
+          },
+          visible: false
         },
         {
           id: 'x-axis-release',
@@ -581,7 +606,8 @@ function drawCompanyValueRankTable(templateInstance) {
           min: 0,
           title: {
             text: null
-          }
+          },
+          visible: false
         }
       ],
       legend: {
@@ -594,6 +620,17 @@ function drawCompanyValueRankTable(templateInstance) {
         bar: {
           borderWidth: 0,
           groupPadding: 0.1
+        },
+        series: {
+          dataLabels: {
+            enabled: true,
+            style: {
+              textOutline: 'none'
+            }
+          }
+        },
+        yAxis: {
+          gridLineWidth: 0
         }
       },
       series: [
@@ -602,6 +639,11 @@ function drawCompanyValueRankTable(templateInstance) {
           color: 'rgba(119, 179, 0, 1)',
           yAxis: 'x-axis-value',
           data: _.pluck(sortedRankList, 'totalValue'),
+          dataLabels: {
+            formatter: function() {
+              return '$' + currencyFormat(this.y);
+            }
+          },
           tooltip: {
             valueDecimals: 0,
             pointFormatter: function() {
@@ -625,6 +667,11 @@ function drawCompanyValueRankTable(templateInstance) {
           name: '收盤股價',
           color: 'rgba(42, 159, 214, 0.4)',
           data: _.pluck(sortedRankList, 'lastPrice'),
+          dataLabels: {
+            formatter: function() {
+              return '$' + currencyFormat(this.y);
+            }
+          },
           yAxis: 'x-axis-price',
           tooltip: {
             valueDecimals: 0,
@@ -644,6 +691,7 @@ function drawCompanyValueRankTable(templateInstance) {
   });
 }
 
+// 公司資本額排行榜圖表
 function drawCompanyCapitalRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
   const rankList = dbRankCompanyCapital.find({seasonId}).fetch();
@@ -700,7 +748,8 @@ function drawCompanyCapitalRankTable(templateInstance) {
           opposite: true,
           title: {
             text: null
-          }
+          },
+          visible: false
         },
         {
           id: 'x-axis-value',
@@ -718,7 +767,8 @@ function drawCompanyCapitalRankTable(templateInstance) {
           min: 0,
           title: {
             text: null
-          }
+          },
+          visible: false
         }
       ],
       legend: {
@@ -732,6 +782,17 @@ function drawCompanyCapitalRankTable(templateInstance) {
         bar: {
           borderWidth: 0,
           groupPadding: 0.1
+        },
+        series: {
+          dataLabels: {
+            enabled: true,
+            style: {
+              textOutline: 'none'
+            }
+          }
+        },
+        yAxis: {
+          gridLineWidth: 0
         }
       },
       series: [
@@ -740,6 +801,11 @@ function drawCompanyCapitalRankTable(templateInstance) {
           color: 'rgba(119, 179, 0, 1)',
           yAxis: 'x-axis-capital',
           data: _.pluck(sortedRankList, 'capital'),
+          dataLabels: {
+            formatter: function() {
+              return '$' + currencyFormat(this.y);
+            }
+          },
           tooltip: {
             valueDecimals: 0,
             pointFormatter: function() {
@@ -758,6 +824,11 @@ function drawCompanyCapitalRankTable(templateInstance) {
           color: 'rgba(255, 136, 0, 0.4)',
           yAxis: 'x-axis-value',
           data: _.pluck(sortedRankList, 'totalValue'),
+          dataLabels: {
+            formatter: function() {
+              return '$' + currencyFormat(this.y);
+            }
+          },
           tooltip: {
             valueDecimals: 0,
             pointFormatter: function() {
@@ -781,6 +852,8 @@ function drawCompanyCapitalRankTable(templateInstance) {
     });
   });
 }
+
+// 大富翁排行榜圖表
 function drawUserRankChart(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
   const rankList = dbRankUserWealth.find({seasonId}).map((rankData) => {
@@ -791,7 +864,7 @@ function drawUserRankChart(templateInstance) {
   if (rankList.length < 1) {
     return false;
   }
-  const chartHeight = 20 * rankList.length + 125;
+  const chartHeight = 20 * rankList.length + 80;
   templateInstance.chart.height(chartHeight);
 
   const userNameHash = {};

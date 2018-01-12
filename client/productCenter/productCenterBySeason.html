@@ -11,14 +11,14 @@
 </template>
 
 <template name="productSeasonNav">
-  <div class="text-center">
+  <div class="d-flex justify-content-between align-items-center text-center">
     <a {{seasonLinkAttrs 'prev'}}>
       <span aria-hidden="true">&laquo;</span>
     </a>
-    商業季度：
-    {{formatDateText seasonBegin}}
-    ～
-    {{formatDateText seasonEnd}}
+    <div>
+      <div class="d-inline-block text-nowrap">{{formatDateText seasonBegin}}～</div>
+      <div class="d-inline-block text-nowrap">{{formatDateText seasonEnd}}</div>
+    </div>
     <a  {{seasonLinkAttrs 'next'}}>
       <span aria-hidden="true">&raquo;</span>
     </a>
@@ -26,7 +26,10 @@
 </template>
 
 <template name="productListBySeasonTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+  {{#with paginationData}}
+    {{> pagination}}
+  {{/with}}
+  <table class="table-bordered custom-responsive-table-md product-list-by-season w-100" style="table-layout: fixed;">
     <thead>
       <tr>
         <th class="text-center text-truncate">產品</th>
@@ -42,8 +45,8 @@
           {{{getSortIcon 'voteCount'}}}
         </th>
         {{#if currentUser.profile.isAdmin}}
-          <th class="text-center" style="width: 70px;" title="下架">
-            下架
+          <th class="text-center" style="width: 70px;" title="管理">
+            管理
           </th>
         {{/if}}
       </tr>
@@ -52,7 +55,7 @@
       {{#each productList}}
         {{> productInfoBySeasonTable}}
       {{else}}
-        <tr>
+        <tr class="default-content">
           {{#if currentUser.profile.isAdmin}}
             <td class="text-center" colspan="5">當季度沒有任何產品上架！</td>
           {{else}}
@@ -69,17 +72,17 @@
 
 <template name="productInfoBySeasonTable">
   <tr>
-    <td class="text-left px-2">
-      <div>{{>productLink this._id}}</div>
-      <div class="small">{{this.description}}</div>
+    <td class="text-left px-md-1" data-title="產品">
+      <div class="product-name">{{>productLink this._id}}</div>
+      <div class="small product-description">{{this.description}}</div>
     </td>
-    <td class="text-left text-truncate px-2">
+    <td class="text-left text-truncate text-nowrap px-md-1" data-title="公司名稱">
       {{>companyLink this.companyId}}
     </td>
-    <td class="text-center text-truncate">
+    <td class="text-center text-truncate text-nowrap" data-title="類別">
       {{this.type}}
     </td>
-    <td class="text-center text-truncate px-2">
+    <td class="text-center text-truncate text-nowrap" data-title="得票數">
       <button
         class="btn btn-primary btn-sm"
         type="button"
@@ -91,7 +94,7 @@
       </button>
     </td>
     {{#if currentUser.profile.isAdmin}}
-      <td class="text-center px-2">
+      <td class="text-center text-nowrap" data-title="管理">
         <button
           class="btn btn-danger btn-sm"
           type="button"

@@ -23,14 +23,14 @@
 </template>
 
 <template name="reportSeasonNav">
-  <div class="text-center">
+  <div class="d-flex justify-content-between align-items-center text-center">
     <a {{seasonLinkAttrs 'prev'}}>
       <span aria-hidden="true">&laquo;</span>
     </a>
-    商業季度：
-    {{formatDateText seasonBegin}}
-    ～
-    {{formatDateText seasonEnd}}
+    <div>
+      <div class="d-inline-block text-nowrap">{{formatDateText seasonBegin}}～</div>
+      <div class="d-inline-block text-nowrap">{{formatDateText seasonEnd}}</div>
+    </div>
     <a  {{seasonLinkAttrs 'next'}}>
       <span aria-hidden="true">&raquo;</span>
     </a>
@@ -79,16 +79,16 @@
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-nowrap company-deal-amount" title="{{rankData.totalDealAmount}}">
+          <td class="text-right text-nowrap">
             {{currencyFormat rankData.totalDealAmount}}
           </td>
-          <td class="text-right text-nowrap company-deal-money" title="{{rankData.totalDealMoney}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.totalDealMoney}}
           </td>
-          <td class="text-right text-nowrap company-profit" title="{{rankData.productProfit}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.productProfit}}
           </td>
-          <td class="text-right text-nowrap company-total-money" title="{{rankData.totalMoney}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.totalMoney}}
           </td>
         </tr>
@@ -121,16 +121,16 @@
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-nowrap company-profit" title="{{rankData.profit}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.profit}}
           </td>
-          <td class="text-right text-nowrap company-stock-relase" title="{{rankData.totalRelease}}">
+          <td class="text-right text-nowrap">
             {{rankData.totalRelease}}
           </td>
-          <td class="text-right text-nowrap company-stock-avg-price" title="{{rankData.avgPrice}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.avgPrice}}
           </td>
-          <td class="text-right text-nowrap company-stock-PERatio" title="{{rankData.priceToEarn}}">
+          <td class="text-right text-nowrap">
             {{rankData.priceToEarn}}
           </td>
         </tr>
@@ -162,13 +162,13 @@
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-nowrap company-stock-last-price" title="{{rankData.lastPrice}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.lastPrice}}
           </td>
-          <td class="text-right text-nowrap company-stock-relase" title="{{rankData.totalRelease}}">
+          <td class="text-right text-nowrap">
             {{rankData.totalRelease}}
           </td>
-          <td class="text-right text-nowrap company-asset" title="{{rankData.totalValue}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.totalValue}}
           </td>
         </tr>
@@ -200,13 +200,13 @@
           <td class="text-left text-truncate">
             {{>companyLink rankData.companyId}}
           </td>
-          <td class="text-right text-nowrap company-stock-last-price" title="{{rankData.totalRelease}}">
+          <td class="text-right text-nowrap">
             {{rankData.totalRelease}}
           </td>
-          <td class="text-right text-nowrap company-stock-relase" title="{{rankData.totalValue}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.totalValue}}
           </td>
-          <td class="text-right text-nowrap company-asset" title="{{rankData.capital}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.capital}}
           </td>
         </tr>
@@ -238,13 +238,13 @@
           <td class="text-left text-truncate">
             {{>userLink rankData.userId}}
           </td>
-          <td class="text-right text-nowrap user-money" title="{{rankData.money}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.money}}
           </td>
-          <td class="text-right text-nowrap user-stock-value" title="{{rankData.stocksValue}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.stocksValue}}
           </td>
-          <td class="text-right text-nowrap user-wealth" title="{{rankData.totalWealth}}">
+          <td class="text-right text-nowrap">
             $ {{currencyFormat rankData.totalWealth}}
           </td>
         </tr>

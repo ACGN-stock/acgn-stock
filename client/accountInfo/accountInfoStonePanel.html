@@ -24,7 +24,7 @@
     {{/if}}
     <div class="col-12 my-2">
       <h5>已放置的石頭</h5>
-      <table class="table table-bordered mt-3 w-100 custom-responsive-table-md">
+      <table class="table table-bordered mt-3 w-100 custom-responsive-table-md" style="table-layout: fixed;">
         <thead>
           <tr>
             <th class="text-center text-nowrap">公司名稱</th>
@@ -34,15 +34,15 @@
         <tbody>
         {{#each placedStone in placedStones}}
           <tr>
-            <td class="text-left text-truncate p-1" data-title="公司名稱">
+            <td class="text-left text-truncate text-nowrap px-md-1 py-1" data-title="公司名稱">
               {{> companyLink placedStone.companyId}}
             </td>
-            <td class="text-center text-truncate p-1" data-title="石頭類型">
+            <td class="text-center text-truncate text-nowrap px-md-1 py-1" data-title="石頭類型">
               {{stoneDisplayName placedStone.stoneType}}
             </td>
           </tr>
         {{else}}
-          <tr>
+          <tr class="default-content">
             <td class="text-center text-truncate p-1" colspan="2">查無資料！</td>
           </tr>
         {{/each}}
