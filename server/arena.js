@@ -130,8 +130,8 @@ export function startArenaFight() {
       return arenaFighter;
     });
 
-  // 實際參賽人數不足兩人，不開打
-  if (fighterListBySequence.length < 2) {
+  // 實際參賽人數不足一人，直接結束大賽運算
+  if (fighterListBySequence.length < 1) {
     dbArena.update(arenaId, {
       $set: {
         winnerList: [],
@@ -251,7 +251,7 @@ export function startArenaFight() {
   //取的排名列表
   const winnerList = sortedWinnerIdList.concat(loser.reverse());
   //計算排名獎勵
-  const rankReward = allFighterTotalInvest / (Math.log(winnerList.length) + 0.57722 + (1 / (2 * winnerList.length)));
+  const rankReward = 0.177 * allFighterTotalInvest / (Math.log(winnerList.length) + 0.57722 + (1 / (2 * winnerList.length)));
   _.each(winnerList, (companyId, index) => {
     const rank = index + 1;
     gainProfitHash[companyId] += Math.floor(rankReward / rank);
