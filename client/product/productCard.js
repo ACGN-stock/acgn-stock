@@ -3,6 +3,7 @@ import { Template } from 'meteor/templating';
 import { $ } from 'meteor/jquery';
 
 import { dbProducts } from '/db/dbProducts';
+import { getAvailableProductTradeQuota } from '/db/dbUserOwnedProducts';
 import { voteProduct } from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
 
@@ -39,9 +40,35 @@ Template.productCard.events({
     event.preventDefault();
     const productId = $(event.currentTarget).attr('data-buy-product');
 
-    const { price, availableAmount } = dbProducts.findOne(productId);
+    const { companyId, price, availableAmount } = dbProducts.findOne(productId);
 
-    const maxAmount = Math.min(availableAmount, Math.floor(Meteor.user().profile.money / price));
+    const tradeQuota = getAvailableProductTradeQuota({
+      userId: Meteor.userId(),
+      companyId
+    });
+
+    if (tradeQuota < price) {
+      alertDialog.alert('您的剩餘購買額度不足！');
+
+      return;
+    }
+
+    if (Meteor.user().profile.money < price) {
+      alertDialog.alert('您的剩餘現金不足！');
+
+      return;
+    }
+
+    if (availableAmount <= 0) {
+      alertDialog.alerg('該產品已無剩餘數量！');
+
+      return;
+    }
+
+    const maxAmount = Math.min(
+      availableAmount,
+      Math.floor(Meteor.user().profile.money / price),
+      Math.floor(tradeQuota / price));
 
     alertDialog.dialog({
       type: 'prompt',

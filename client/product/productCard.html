@@ -23,11 +23,17 @@
     </div>
     <div class="card-footer d-flex flex-wrap px-3">
       <div>
-        {{#if product.availableAmount}}
-          <button class="btn btn-sm btn-primary" title="購買產品" data-buy-product="{{product._id}}">購買</button>
+        {{#if currentUser}}
+          {{#if product.availableAmount}}
+          <button class="btn btn-sm btn-primary" title="購買產品" data-buy-product="{{product._id}}">
+            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+            購買
+          </button>
+          {{/if}}
         {{/if}}
         <button class="btn btn-sm btn-primary" title="推薦產品" data-vote-product="{{product._id}}">
-          <i class="fa fa-money" aria-hidden="true"></i>
+          <i class="fa fa-ticket" aria-hidden="true"></i>
+          推薦
           {{product.voteCount}}
         </button>
       </div>
