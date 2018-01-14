@@ -1,5 +1,5 @@
 'use strict';
-//真正的設定檔請寫在config.json，這邊只是註解用。
+// 真正的設定檔請寫在config.json，這邊只是註解用。
 export const config = {
   debugMode: false, //是否為debug mode(紀錄一分鐘內的所有方法與訂閱動作，以備crash查看)
   websiteName: 'ACGN股票交易市場', //網站名稱
@@ -15,7 +15,6 @@ export const config = {
   foundExpireTime: 43200000, //創立公司的投資時間期限，單位為微秒
   maximumInvest: 4096, //每個人對單一新創計劃的最大投資上限
   foundationNeedUsers: 20, //創立公司所需要的投資人數量
-  archiveReviveNeedUsers: 30, //公司保管庫中的公司復活所需要的投資人數量
   minReleaseStock: 1000, //公司初創時的最小釋出股份數量(可能會有些微誤差)
   newUserInitialMoney: 10000, //所有使用者驗證通過後的起始資金數量
   newUserBirthStones: 1, //所有使用者驗證通過後的誕生石數量
@@ -26,7 +25,6 @@ export const config = {
   arenaMinInvestedAmount: 10000, //最萌亂鬥大賽的參賽所需最小總投資金額
   seasonTime: 604800000, //每個商業季度的持續時間，單位為微秒
   electManagerTime: 86400000, //每個商業季度結束前多久時間會進行經理競選，單位為微秒
-  seasonProfitPerUser: 140000, //每個商業季度、每個驗證的使用者的「所有推薦票加總」將產生多少可能營利額
   managerProfitPercent: 0.05, //經理人獲得公司營利分紅的比例
   costFromProfit: 0.15, //系統將扣除多少公司的營利做為公司營運成本
   displayAdvertisingNumber: 5, //同時最多顯示的廣告筆數
@@ -49,12 +47,19 @@ export const config = {
   taxExpireTime: 259200000, // 稅單的繳費期限 (ms)
   releaseStocksForNoDealTradeLogLookbackIntervalTime: 86400000, // 低量釋股的成交量統計區間 (ms)
   miningMachineOperationTime: 86400000, // 挖礦機的運作時間 (ms)
+  miningMachineSaintStoneLimit: 7,
   stonePrice: { // 可供購買的石頭價格
     rainbow: 100000, // 彩虹石
     rainbowFragment: 10000 // 彩虹石碎片
   },
   dataNumberPerPage: { // 分頁時每個分頁有多少資料
-    userPlacedStones: 10
-  }
+    userPlacedStones: 10,
+    userOwnedProducts: 10,
+    companyMarketingProducts: 10
+  },
+  productFinalSaleTime: 43200000, // 產品最後出清時間 (ms)
+  productProfitFactor: 2.00, // 產品售出的營利乘數
+  systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
+  employeeProductVotingRewardFactor: 0.01 // 員工投推薦票的回饋金比例
 };
 export default config;

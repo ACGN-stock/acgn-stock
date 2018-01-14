@@ -70,9 +70,19 @@ describe('method startVacation', function() {
     startVacation.bind(null, userId).must.throw(Meteor.Error, '您正在競選公司經理人，無法進行渡假！ [403]');
   });
 
+  it('should fail if the user is contending manager of a sealed company', function() {
+    dbCompanies.insert(companyFactory.build({ candidateList: [userId], isSeal: true }));
+    startVacation.bind(null, userId).must.not.throw();
+  });
+
   it('should fail if the user is a chairman of a company', function() {
     dbCompanies.insert(companyFactory.build({ chairman: userId }));
     startVacation.bind(null, userId).must.throw(Meteor.Error, '您有擔任公司董事長，無法進行渡假！ [403]');
+  });
+
+  it('should success if the user is a chairman of a sealed company', function() {
+    dbCompanies.insert(companyFactory.build({ chairman: userId, isSeal: true }));
+    startVacation.bind(null, userId).must.not.throw();
   });
 
   it('should fail if the user has any unfulfilled orders', function() {

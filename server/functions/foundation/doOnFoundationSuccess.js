@@ -1,51 +1,14 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 
-import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbPrice } from '/db/dbPrice';
-import { debug } from '/server/imports/utils/debug';
 
-const { foundExpireTime, foundationNeedUsers, minReleaseStock } = Meteor.settings.public;
-
-// 檢查所有已截止的新創公司
-export function checkExpiredFoundations() {
-  debug.log('checkExpiredFoundations');
-
-  const expiredFoundationCreatedAt = new Date(Date.now() - foundExpireTime);
-
-  dbFoundations
-    .find({
-      createdAt: { $lt: expiredFoundationCreatedAt }
-    }, {
-      fields: { _id: 1 },
-      disableOplog: true
-    })
-    .forEach(({ _id: companyId }) => {
-      //先鎖定資源，再重新讀取一次資料進行運算
-      resourceManager.request('checkExpiredFoundations', [`foundation${companyId}`], (release) => {
-        const foundationData = dbFoundations.findOne(companyId);
-        if (! foundationData) {
-          release();
-
-          return;
-        }
-
-        if (foundationData.invest.length >= foundationNeedUsers) {
-          doOnFoundationSuccess(foundationData);
-        }
-        else {
-          doOnFoundationFailure(foundationData);
-        }
-
-        release();
-      });
-    });
-}
+const { minReleaseStock } = Meteor.settings.public;
 
 // 由投資狀況計算初始股價
 function calculateInitialPrice(investors) {
@@ -133,6 +96,8 @@ export function doOnFoundationSuccess(foundationData) {
     return [];
   });
 
+  const totalFund = totalRelease * price;
+
   const companySchema = dbCompanies.simpleSchema();
   const newCompanyData = companySchema.clean({
     companyName: foundationData.companyName,
@@ -144,11 +109,13 @@ export function doOnFoundationSuccess(foundationData) {
     pictureBig: foundationData.pictureBig,
     description: foundationData.description,
     illegalReason: foundationData.illegalReason,
-    capital: totalRelease * price,
+    capital: totalFund,
     totalRelease: totalRelease,
     lastPrice: price,
     listPrice: price,
-    totalValue: totalRelease * price,
+    totalValue: totalFund,
+    productionFund: Math.round(totalFund * 0.7),
+    productPriceLimit: price,
     candidateList: candidateList,
     voteList: voteList,
     createdAt: basicCreatedAt
@@ -216,53 +183,4 @@ export function doOnFoundationSuccess(foundationData) {
 
   dbFoundations.remove(companyId);
   dbCompanyArchive.update(companyId, { $set: { status: 'market' } });
-}
-
-// 新創公司失敗之處理
-export function doOnFoundationFailure(foundationData) {
-  const { _id: companyId, invest, companyName, manager } = foundationData;
-
-  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-  const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
-
-  const createdAt = new Date();
-
-  logBulk.insert({
-    logType: '創立失敗',
-    userId: _.union([manager], _.pluck(invest, 'userId')),
-    data: { companyName },
-    createdAt: createdAt
-  });
-
-  invest.forEach(({ userId, amount }, index) => {
-    if (userId === foundationData.manager) {
-      amount -= Meteor.settings.public.founderEarnestMoney;
-    }
-
-    logBulk.insert({
-      logType: '創立退款',
-      userId: [userId],
-      data: {
-        companyName: foundationData.companyName,
-        refund: amount
-      },
-      createdAt: new Date(createdAt.getTime() + index + 1)
-    });
-
-    usersBulk
-      .find({_id: userId})
-      .updateOne({ $inc: { 'profile.money': amount } });
-  });
-
-  dbFoundations.remove(companyId);
-  dbCompanyArchive.remove(companyId);
-
-  logBulk
-    .find({ companyId })
-    .update({ $unset: { companyId: 1 } });
-
-  Meteor.wrapAsync(logBulk.execute).call(logBulk);
-  if (foundationData.invest.length > 0) {
-    Meteor.wrapAsync(usersBulk.execute).call(usersBulk);
-  }
 }

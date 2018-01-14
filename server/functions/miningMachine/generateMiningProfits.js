@@ -1,18 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { _ } from 'meteor/underscore';
 
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, gradeFactorTable } from '/db/dbCompanies';
 import { dbCompanyStones, stonePowerTable } from '/db/dbCompanyStones';
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
-
-// 公司等級參數
-const gradeFactorTable = {
-  A: 0.3,
-  B: 0.2,
-  C: 0.1,
-  D: 0
-};
 
 // 對全股市公司結算挖礦機營利
 export function generateMiningProfits() {
@@ -29,7 +21,7 @@ export function generateMiningProfits() {
         .reduce((sum, { stoneType }) => {
           return sum + (stonePowerTable[stoneType] || 0);
         }, 0);
-      const gradeFactor = gradeFactorTable[grade] || 0;
+      const gradeFactor = gradeFactorTable.miningMachine[grade] || 0;
       const profitIncrease = Math.round(6300 * Math.log10(totalPower + 1) * Math.pow(totalPower, gradeFactor));
 
       if (profitIncrease > 0) {

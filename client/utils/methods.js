@@ -2,10 +2,11 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbCompanies } from '/db/dbCompanies';
+import { dbFoundations } from '/db/dbFoundations';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbOrders } from '/db/dbOrders';
+import { dbProducts } from '/db/dbProducts';
 import { dbResourceLock } from '/db/dbResourceLock';
-import { dbProductLike } from '/db/dbProductLike';
 import { dbVariables } from '/db/dbVariables';
 import { dbVoteRecord } from '/db/dbVoteRecord';
 import { addTask, resolveTask } from '../layout/loading';
@@ -119,7 +120,7 @@ export function createBuyOrder(user, companyData) {
 
             return false;
           }
-          Meteor.customCall('createBuyOrder', {companyId, unitPrice, amount});
+          Meteor.customCall('createBuyOrder', { companyId, unitPrice, amount });
         }
       });
     }
@@ -169,7 +170,7 @@ export function createSellOrder(user, companyData) {
 
         return false;
       }
-      const directorData = dbDirectors.findOne({userId, companyId});
+      const directorData = dbDirectors.findOne({ userId, companyId });
       const maximumAmount = directorData.stocks;
       alertDialog.dialog({
         type: 'prompt',
@@ -187,7 +188,7 @@ export function createSellOrder(user, companyData) {
 
             return false;
           }
-          Meteor.customCall('createSellOrder', {companyId, unitPrice, amount});
+          Meteor.customCall('createSellOrder', { companyId, unitPrice, amount });
         }
       });
     }
@@ -241,7 +242,7 @@ export function changeChairmanTitle(companyData) {
   });
 }
 
-export function voteProduct(productId, companyId) {
+export function voteProduct(productId) {
   const user = Meteor.user();
   if (! user) {
     alertDialog.alert('您尚未登入，無法向產品投推薦票！');
@@ -255,55 +256,28 @@ export function voteProduct(productId, companyId) {
     return false;
   }
 
-  if (user.profile.vote < 1) {
+  if (user.profile.voteTickets < 1) {
     alertDialog.alert('您的推薦票數量不足，無法繼續推薦產品！');
 
     return false;
   }
   const userId = user._id;
-  if (dbVoteRecord.find({companyId, userId}).count() > 0) {
+
+  const { companyId } = dbProducts.findOne(productId);
+
+  if (dbVoteRecord.find({ companyId, userId }).count() > 0) {
     alertDialog.alert('您已在本季度對該公司的產品投過推薦票，無法繼續對同一家公司的產品投推薦票！');
 
     return false;
   }
   alertDialog.confirm({
-    message: '您的推薦票剩餘' + user.profile.vote + '張，確定要向產品投出推薦票嗎？',
+    message: `您的推薦票剩餘${user.profile.voteTickets}張，確定要向產品投出推薦票嗎？`,
     callback: (result) => {
       if (result) {
         Meteor.customCall('voteProduct', productId);
       }
     }
   });
-}
-
-export function likeProduct(productId) {
-  const user = Meteor.user();
-  if (! user) {
-    alertDialog.alert('您尚未登入，無法對產品進行推薦！');
-
-    return false;
-  }
-
-  if (user.profile.isInVacation) {
-    alertDialog.alert('您現在正在渡假中，請好好放鬆！');
-
-    return false;
-  }
-
-  const userId = user._id;
-  if (dbProductLike.find({productId, userId}).count() > 0) {
-    alertDialog.confirm({
-      message: '您已經對此產品做出過正面評價，要收回評價嗎？',
-      callback: (result) => {
-        if (result) {
-          Meteor.customCall('likeProduct', productId);
-        }
-      }
-    });
-  }
-  else {
-    Meteor.customCall('likeProduct', productId);
-  }
 }
 
 export function toggleFavorite(companyId) {
@@ -321,47 +295,46 @@ export function toggleFavorite(companyId) {
   }
 }
 
-export function investArchiveCompany(companyData) {
+export function investFoundCompany(companyId) {
+  const foundationData = dbFoundations.find(companyId);
   const user = Meteor.user();
   if (! user) {
     alertDialog.alert('您尚未登入！');
 
     return false;
   }
-
-  if (user.profile.isInVacation) {
-    alertDialog.alert('您現在正在渡假中，請好好放鬆！');
-
-    return false;
-  }
-
   const userId = user._id;
-  if (_.contains(companyData.invest, userId)) {
-    alertDialog.alert('您已經投資過此保管庫公司了！');
+  const minimumInvest = Math.ceil(Meteor.settings.public.minReleaseStock / Meteor.settings.public.foundationNeedUsers);
+  const alreadyInvest = _.findWhere(foundationData.invest, {userId});
+  const alreadyInvestAmount = alreadyInvest ? alreadyInvest.amount : 0;
+  const maximumInvest = Math.min(Meteor.user().profile.money, Meteor.settings.public.maximumInvest - alreadyInvestAmount);
+  if (minimumInvest > maximumInvest) {
+    alertDialog.alert('您的投資已達上限或剩餘金錢不足以進行投資！');
 
     return false;
   }
-  const minimumInvest = Meteor.settings.public.founderEarnestMoney;
-  if (minimumInvest > Meteor.user().profile.money) {
-    alertDialog.alert('您的剩餘金錢不足以進行投資！');
-
-    return false;
-  }
-  const archiveReviveNeedUsers = Meteor.settings.public.archiveReviveNeedUsers;
 
   alertDialog.dialog({
-    type: 'confirm',
-    title: '投資保管庫公司',
+    type: 'prompt',
+    title: '投資',
     message: `
-      確定要花費$${currencyFormat(minimumInvest)}來投資保管庫公司「${companyData.name}」嗎？
+      要投資多少金額？(${currencyFormat(minimumInvest)}~${currencyFormat(maximumInvest)})
       <div class="text-danger">
-        對保管庫公司進行投資時，除非總投資人數成功抵達${archiveReviveNeedUsers}人門檻，否則投資永遠無法收回！
+        投資理財有賺有賠，請先確認您要投資的公司是否符合
+        <a href="${dbVariables.get('fscRuleURL')}" target="_blank">金管會的規定</a>。
       </div>
     `,
     defaultValue: null,
-    callback: (result) => {
-      if (result) {
-        Meteor.customCall('investArchiveCompany', companyData._id);
+    callback: function(result) {
+      const amount = parseInt(result, 10);
+      if (! amount) {
+        return false;
+      }
+      if (amount >= minimumInvest && amount <= maximumInvest) {
+        Meteor.customCall('investFoundCompany', companyId, amount);
+      }
+      else {
+        alertDialog.alert('不正確的金額數字！');
       }
     }
   });

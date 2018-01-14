@@ -10,6 +10,22 @@ export default dbCompanies;
 // 公司評等名稱
 export const gradeList = ['A', 'B', 'C', 'D'];
 
+// 公司評等係數
+export const gradeFactorTable = {
+  'miningMachine': {
+    A: 0.3,
+    B: 0.2,
+    C: 0.1,
+    D: 0
+  },
+  'dailyProfit': {
+    A: 0.4,
+    B: 0.3,
+    C: 0.2,
+    D: 0.1
+  }
+};
+
 const schema = new SimpleSchema({
   //公司名稱
   companyName: {
@@ -104,6 +120,16 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 0
   },
+  // 生產資金
+  productionFund: {
+    type: SimpleSchema.Integer,
+    min: 0
+  },
+  // 產品的售價上限
+  productPriceLimit: {
+    type: SimpleSchema.Integer,
+    min: 0
+  },
   //選舉經理時的候選者userId列表
   candidateList: {
     type: Array
@@ -143,3 +169,13 @@ const schema = new SimpleSchema({
   }
 });
 dbCompanies.attachSchema(schema);
+
+dbCompanies.findByIdOrThrow = function(id, options) {
+  const result = dbCompanies.findOne(id, options);
+
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的公司！`);
+  }
+
+  return result;
+};

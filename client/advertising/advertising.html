@@ -27,7 +27,7 @@
         {{/if}}
       </h3>
       <hr />
-      <table class="table-bordered advertisement-list" style="width: 100%; table-layout: fixed;">
+      <table class="table-bordered custom-responsive-table-md advertisement-list w-100" style="table-layout: fixed;">
         <thead>
           <tr>
             <th class="text-center text-truncate" style="width: 120px;" title="購買者">購買者</th>
@@ -42,17 +42,17 @@
         <tbody>
           {{#each advertising in advertisingList}}
             <tr class="{{advertisingDisplayClass @index}}">
-              <td class="text-left text-truncate ad-buyer" data-title="購買者">
+              <td class="text-left text-truncate text-nowrap px-md-1" data-title="購買者">
                 {{>userLink advertising.userId}}
               </td>
-              <td class="text-left text-truncate anti-block-ad-message" data-title="廣告內容" title="{{advertising.message}}">
+              <td class="text-left text-truncate anti-block-ad-message px-md-1" data-title="廣告內容" title="{{advertising.message}}">
                 {{#if advertising.url}}
                   <a href="{{advertising.url}}" target="_blank">{{advertising.message}}</a>
                 {{else}}
                   {{advertising.message}}
                 {{/if}}
               </td>
-              <td class="text-center text-truncate" data-title="費用">
+              <td class="text-center text-truncate text-nowrap" data-title="費用">
                 {{#if currentUser}}
                   <button class="btn btn-primary btn-sm" type="button" data-add-pay="{{advertising._id}}">
                     $ {{currencyFormat advertising.paid}}
@@ -61,11 +61,11 @@
                   $ {{currencyFormat advertising.paid}}
                 {{/if}}
               </td>
-              <td class="text-center text-truncate" data-title="終止日期">
+              <td class="text-center text-truncate text-nowrap" data-title="終止日期">
                 {{formatExpireDate advertising}}
               </td>
               {{#if currentUser.profile.isAdmin}}
-                <td class="text-center" data-title="管理">
+                <td class="text-center text-nowrap" data-title="管理">
                   <button class="btn btn-danger btn-sm" type="button" data-take-down="{{advertising._id}}">
                     撤銷
                   </button>
@@ -75,9 +75,9 @@
             {{else}}
             <tr class="default-content">
               {{#if currentUser.profile.isAdmin}}
-                <td class="text-center text-truncate" colspan="5">目前沒有發布中廣告！</td>
+                <td class="text-center text-truncate p-1" colspan="5">目前沒有發布中廣告！</td>
               {{else}}
-                <td class="text-center text-truncate" colspan="4">目前沒有發布中廣告！</td>
+                <td class="text-center text-truncate p-1" colspan="4">目前沒有發布中廣告！</td>
               {{/if}}
             </tr>
           {{/each}}

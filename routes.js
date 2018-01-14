@@ -14,7 +14,7 @@ FlowRouter.route('/', {
 
 export const pageNameHash = {
   announcement: '系統公告',
-  tutorial: '教學導覽',
+  tutorial: '遊戲規則',
   instantMessage: '即時訊息',
   companyList: '股市總覽',
   foundationList: '新創計劃',
@@ -39,7 +39,7 @@ FlowRouter.route('/fscStock', {
 FlowRouter.route('/tutorial', {
   name: 'tutorial',
   action() {
-    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 教學導覽');
+    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 遊戲規則');
   }
 });
 

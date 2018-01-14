@@ -3,7 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, gradeFactorTable } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbLog } from '/db/dbLog';
@@ -100,19 +100,7 @@ function paySalaryAndGenerateProfit(thisPayTime) {
     });
 
     // 根據公司評級計算當日總營利額
-    let gradeFactor = 0;
-    if (company.grade === 'A') {
-      gradeFactor = 0.4;
-    }
-    else if (company.grade === 'B') {
-      gradeFactor = 0.3;
-    }
-    else if (company.grade === 'C') {
-      gradeFactor = 0.2;
-    }
-    else if (company.grade === 'D') {
-      gradeFactor = 0.1;
-    }
+    const gradeFactor = gradeFactorTable.dailyProfit[company.grade] || 0;
 
     // 基礎營利額
     const baseProfit = 3000 * (0.9 + gradeFactor) * employees.length;
@@ -124,7 +112,7 @@ function paySalaryAndGenerateProfit(thisPayTime) {
     }, 0);
     const explosiveProfit = 3000 * (0.9 + gradeFactor) * gradeFactor * explosionCount;
 
-    const totalProfit = baseProfit + explosiveProfit;
+    const totalProfit = Math.round(baseProfit + explosiveProfit);
     const totalSalary = company.salary * employees.length;
     companyBulk.find({
       _id: company._id
@@ -186,7 +174,7 @@ function checkTax(todayBeginTime) {
       const createdAtBasicTime = Date.now();
       //增加稅單罰金
       if (overdueDay < 7) {
-        const amount = Math.ceil((taxData.tax + taxData.zombie) * 0.1);
+        const amount = Math.ceil(taxData.tax * 0.1);
         taxesBulk
           .find({
             _id: taxId

@@ -31,5 +31,20 @@ Template.tutorial.helpers({
   },
   miningMachineOperationHours() {
     return Math.floor(Meteor.settings.public.miningMachineOperationTime / 1000 / 60 / 60);
+  },
+  miningMachineSaintStoneLimit() {
+    return Meteor.settings.public.miningMachineSaintStoneLimit;
+  },
+  productProfitFactor() {
+    return Meteor.settings.public.productProfitFactor;
+  },
+  productFinalSaleHours() {
+    return Math.floor(Meteor.settings.public.productFinalSaleTime / 1000 / 60 / 60);
+  },
+  systemProductVotingReward() {
+    return Meteor.settings.public.systemProductVotingReward;
+  },
+  employeeProductVotingRewardPercentage() {
+    return Meteor.settings.public.employeeProductVotingRewardFactor * 100;
   }
 });

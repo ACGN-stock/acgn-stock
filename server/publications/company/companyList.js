@@ -14,7 +14,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
   check(keyword, String);
   check(matchType, new Match.OneOf('exact', 'fuzzy', 'regexp'));
   check(onlyShow, new Match.OneOf('none', 'mine', 'favorite', 'order'));
-  check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'createdAt'));
+  check(sortBy, new Match.OneOf('lastPrice', 'totalValue', 'capital', 'createdAt'));
   check(offset, Match.Integer);
 
   const filter = {
@@ -98,6 +98,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
     lastPrice: 1,
     listPrice: 1,
     profit: 1,
+    capital: 1,
     totalValue: 1,
     createdAt: 1,
     seasonalBonusPercent: 1

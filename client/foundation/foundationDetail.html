@@ -5,6 +5,9 @@
         <h1 class="card-title text-truncate">
           {{this.companyName}}
           {{#if currentUser}}
+            <button class="btn btn-primary" type="button" data-action="invest">
+              投資
+            </button>
             {{#if currentUser.profile.isAdmin}}
               <a class="btn btn-warning float-right" href="#" data-action="changeCompanyName">
                 更名

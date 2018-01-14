@@ -12,6 +12,7 @@ import { pageNameHash } from '/routes';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 import { handleError } from '../utils/handleError';
+import { globalVariable } from '../utils/globalVariable';
 import { rAccountDialogMode } from './accountDialog';
 
 const rNavLinkListCollapsed = new ReactiveVar(true);
@@ -32,6 +33,8 @@ function updateTheme() {
       .removeClass('navbar-light')
       .addClass('navbar-inverse');
   }
+
+  globalVariable.set('theme', theme);
 }
 
 Template.nav.onCreated(function() {

@@ -1,0 +1,31 @@
+<template name="accountInfoOwnedProductsPanel">
+  <table class="table table-bordered mt-3 w-100 custom-responsive-table-md" style="table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center text-nowrap" style="width: 200px">公司名稱</th>
+        <th class="text-center text-nowrap">產品名稱</th>
+        <th class="text-center text-nowrap" style="width: 95px">持有數量</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{#each ownedProduct in ownedProducts}}
+      <tr>
+        <td class="text-truncate text-nowrap px-md-1 py-1" data-title="公司名稱">
+          {{> companyLink ownedProduct.companyId}}
+        </td>
+        <td class="text-truncate text-nowrap px-md-1 py-1" data-title="產品名稱">
+          {{> productLink ownedProduct.productId}}
+        </td>
+        <td class="text-md-center text-truncate text-nowrap px-md-1 py-1" data-title="持有數量">
+          {{ownedProduct.amount}} 個
+        </td>
+      </tr>
+    {{else}}
+      <tr class="default-content">
+        <td class="text-center text-truncate p-1" colspan="3">查無資料！</td>
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+  {{> pagination paginationData}}
+</template>

@@ -130,15 +130,55 @@
         <div class="collapse">
           <div class="card-block">
             <ol>
-              <li>當公司創立後，最初申請創立計劃的人即為該公司的經理人。經理人可以為負責的公司推出產品，為了避免儲存空間不夠的問題，系統內只存放「通往真正作品網頁」的連結，產品可以是同人圖、ANSI、同人文等等，產品的原作者不一定會是經理人，但請經理人在發布產品時務必通過原作者的同意，一但被原作者舉報，情節嚴重者將會被金融管理會取消經理人資格。</li>
+              <li>當公司創立後，最初申請創立計劃的人即為該公司的經理人。</li>
               <li>除了申請創立公司成為經理人，使用者還競爭已存在公司的經理人位置，一但有驗證通過的使用者競爭經理人，在下個商業季度開始後，所有持有該公司股票的股東便可以對所有競爭者進行投票，各股東的票權與其持股比率相當，在下個商業季度結束時，所得票權最高的參選人便可成為經理人。</li>
               <li>除此之外，公司的經理人隨時可以辭職不幹。</li>
-              <li>一週為一個商業季度。每個商業季度結束時，上個商業季度推出的產品將會進入投票榜，所有通過驗證的使用者將會得到與當季公司數量成正比的推薦票張數，可以向自己喜愛公司的產品投票推薦，每張推薦票都可以令產品公司獲得<span class="text-info">$3000</span>的營利額。</li>
               <li>經理人可以在商業季度結束前<span class="text-info">72</span>小時調整下個商業季度的員工薪資，調整範圍為<span class="text-info">$500~$2000</span>，以及在商業季度結束前<span class="text-info">24</span>小時調整本商業季度的員工分紅，調整範圍為總盈利額的<span class="text-info">1%~5%</span>。</li>
               <li>商業季度結束後，公司的收益金額將分出<span class="text-info">5%</span>作為經理人的薪水、<span class="text-info">15%</span>作為營運成本、<span class="text-info">1%~5%</span>作為員工分紅。剩餘的收益金額作為董事會分紅，依照董事會成員個人之持股數量對所有董事的總持股數量之比例來分配。</li>
               <li>商業季度中<span class="text-danger">未曾上線</span>、<span class="text-danger">被禁止交易權限</span>的使用者將<span class="text-danger">無法</span>得到公司的季度分紅；計算董事會分紅時，持數數量也將以<span class="text-danger">0%</span>計算。</li>
               <li>商業季度中，若是未登入天數達到<span class="text-danger">四天</span>，則在計算董事會分紅時，該董事的持股數量將以<span class="text-danger">50%</span>計算，因此會拿到與比原本少的董事會分紅。</li>
               <li>商業季度中，若是未登入天數達到<span class="text-danger">五天以上</span>，則在計算董事會分紅時，該董事的持股數量將以<span class="text-danger">0%</span>計算，也就是說，拿不到董事會分紅！</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
+            產品與推薦票相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>經理可為負責的公司推出產品到市場上販售，為公司賺取營利。</li>
+              <li>為了避免儲存空間不夠的問題，系統內只存放「通往真正作品網頁」的連結，產品可以是同人圖、ANSI、同人文等等，產品的原作者不一定會是經理人，但請經理人在發布產品時務必通過原作者的同意，一但被原作者舉報，情節嚴重者將會被金融管理會取消經理人資格。</li>
+              <li>產品的新增：
+                <ul>
+                  <li>公司在每個商業季度會得到<span class="text-info">產品生產資金</span>，約為<span class="text-info">資本額的70%加上前一個季度的營利額的10%</span>。</li>
+                  <li>經理在新增產品時，需要指定<span class="text-info">價格</span>與<span class="text-info">數量</span>，兩者相乘為<span class="text-info">生產成本</span>。</li>
+                  <li>產品的價格不能超過前一商業季度結算時的參考價格。數量則沒有限制，但所有產品的生產成本不得超過公司的生產資金。</li>
+                  <li>新增的產品，將在下一個商業季度之內進行販售。</li>
+                </ul>
+              </li>
+              <li>產品的販售：
+                <ul>
+                  <li>產品販售期間，在參考價格變動時，會隨機上架補充一定數量供人購買；在商業季度結束前{{productFinalSaleHours}}小時，進行最後出清，把所有可上架的數量全部上架。</li>
+                  <li>玩家只能購買有剩餘數量的產品，若是數量不足則需等待下次補貨。</li>
+                  <li>玩家可在自己的帳號資訊下，檢視自己持有哪些產品。</li>
+                  <li>使用者在同一商業季度的同一間公司裡，購買的總額度不得超過公司資本額的10%。</li>
+                  <li>產品售出時，公司將得到產品成本的{{productProfitFactor}}倍作為營利額。</li>
+                  <li>在進入下一個商業季度時，產品將停止販售。</li>
+                </ul>
+              </li>
+              <li>每個商業季度開始時，玩家會得到與公司總數成正比的推薦票，讓玩家投票選出自己所喜愛的產品。</li>
+              <li>為鼓勵玩家投下推薦票，特別設置了回饋金的機制：
+                <ul>
+                  <li>若是玩家將手上的推薦票全數投完，商業季度結算時，系統將會發放${{currencyFormat systemProductVotingReward}}的回饋金。</li>
+                  <li>若是玩家並未將手上的推薦票全數投完，商業季度結算時，每投一張票，系統將會發放上述回饋金的1%。</li>
+                  <li>公司將會額外再發放總量為總營利{{employeeProductVotingRewardPercentage}}%的回饋金給該公司的任職員工，依照「該員工使用的推薦票數」與「該公司員工全部使用的推薦票數」的比例來發放。</li>
+                </ul>
+              </li>
             </ol>
           </div>
         </div>
@@ -174,7 +214,7 @@
               <li>
                 玩家在遊戲中可以取得不同種類的石頭：
                 <ul>
-                  <li><span class="text-info">{{stoneDisplayName 'saint'}}</span>（生產值 {{stonePower 'saint'}}） - 由系統發給，可繼承至下個賽季。</li>
+                  <li><span class="text-info">{{stoneDisplayName 'saint'}}</span>（生產值 {{stonePower 'saint'}}） - 由系統發給，可繼承至下個賽季，但一次最多只能同時使用{{miningMachineSaintStoneLimit}}個。</li>
                   <li><span class="text-info">{{stoneDisplayName 'birth'}}</span>（生產值 {{stonePower 'birth'}}） - 由系統發給，認證完成的帳號可以取得{{newUserBirthStoneCount}}個。</li>
                   <li><span class="text-info">{{stoneDisplayName 'rainbow'}}</span>（生產值 {{stonePower 'rainbow'}}） - 可用${{currencyFormat (stonePrice 'rainbow')}}購買取得，在挖礦機結算獲利後將轉換為<span class="text-info">{{stoneDisplayName 'rainbowFragment'}}</span>。</li>
                   <li><span class="text-info">{{stoneDisplayName 'rainbowFragment'}}</span>（生產值 {{stonePower 'rainbowFragment'}}） - 可用${{currencyFormat (stonePrice 'rainbowFragment')}}購買取得，在挖礦機結算獲利後將會<span class="text-danger">消失</span>。</li>

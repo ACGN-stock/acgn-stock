@@ -6,6 +6,7 @@ import { countdownManager } from '/server/imports/utils/countdownManager';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
 import { debug } from '/server/imports/utils/debug';
+import { replenishProducts } from '../product/replenishProducts';
 import { sellFscStocks } from './sellFscStocks';
 
 const counterBase = 1000 * 60;
@@ -51,6 +52,7 @@ export function countDownRecordListPrice() {
 
   recordListPrice();
   sellFscStocks(); // 參考價更新同時賣出金管會持股
+  replenishProducts(); // 參考價更新同時補貨
 }
 
 // 更新參考價（與參考市值）

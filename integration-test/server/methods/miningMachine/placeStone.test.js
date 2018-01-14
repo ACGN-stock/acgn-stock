@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { _ } from 'meteor/underscore';
 import { Accounts } from 'meteor/accounts-base';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import expect from 'must';
@@ -20,7 +21,7 @@ describe('method placeStone', function() {
   const companyId = 'someCompany';
   const stoneType = 'saint';
   const stoneCount = 10;
-  const { miningMachineOperationTime } = Meteor.settings.public;
+  const { miningMachineOperationTime, miningMachineSaintStoneLimit } = Meteor.settings.public;
 
   beforeEach(function() {
     resetDatabase();
@@ -57,5 +58,12 @@ describe('method placeStone', function() {
   it('should fail if the user tries to retrive a stone when the mining machine is in operation', function() {
     dbSeason.update(seasonId, { $set: { endDate: new Date(Date.now() + miningMachineOperationTime) } });
     placeStone.bind(null, { userId, companyId, stoneType }).must.throw(Meteor.Error, '現在是挖礦機運轉時間，無法放石！ [403]');
+  });
+
+  it(`should fail if the user has already placed ${miningMachineSaintStoneLimit} saint stones in total`, function() {
+    _.range(0, miningMachineSaintStoneLimit).forEach((i) => {
+      dbCompanyStones.insert({ userId, companyId: `company${i}`, stoneType: 'saint', placedAt: new Date() });
+    });
+    placeStone.bind(null, { userId, companyId, stoneType: 'saint' }).must.throw(Meteor.Error, `${stoneDisplayName('saint')}最多只能同時使用${miningMachineSaintStoneLimit}個！ [403]`);
   });
 });

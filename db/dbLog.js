@@ -2,7 +2,7 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//紀錄資料集
+// 紀錄資料集
 export const dbLog = new Mongo.Collection('log', {
   idGeneration: 'MONGO'
 });
@@ -144,9 +144,14 @@ export const logTypeList = [
   '經理管理',
 
   /**
-   * 【推薦產品】userId0向「companyId」公司的產品「data.productId」投了一張推薦票，使其獲得了$data.profit的營利額！
+   * 【推薦產品】userId0向「companyId」公司的產品「data.productId」投了一張推薦票(，使其獲得了$data.profit的營利額)！
    */
   '推薦產品',
+
+  /**
+   * 【購買產品】userId0花費$data.cost買了「companyId」公司的產品「data.productId」共data.amount個，使該公司獲得了$data.profit的營利額！`;
+   */
+  '購買產品',
 
   /**
    * 【員工營利】users.join('、')等人努力工作，使「companyId」公司獲得了$data.profit的營利額！
@@ -162,6 +167,11 @@ export const logTypeList = [
    * 【營利分紅】userId0得到了「companyId」公司的分紅$data.bonus！
    */
   '營利分紅',
+
+  /**
+   * 【推薦回饋】(「companyId」公司 || 系統)發給了userId0產品投票回饋金$data.reward！
+   */
+  '推薦回饋',
 
   /**
    * 【季度賦稅】userId0在此次商業季度中產生了$data.assetTax的財富稅與$data.zombieTax的殭屍稅！
