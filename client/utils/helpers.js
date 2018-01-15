@@ -209,3 +209,16 @@ export function productCenterByCompanyPath(companyId) {
   return FlowRouter.path('productCenterByCompany', { companyId });
 }
 Template.registerHelper('productCenterByCompanyPath', productCenterByCompanyPath);
+
+export function isCompanyManager({ hash: { company, user } }) {
+  if (typeof company === 'string') {
+    return isCompanyManager({ hash: { company: dbCompanies.findOne(company), user } });
+  }
+
+  if (typeof user === 'string') {
+    return isCompanyManager({ hash: { company, user: Meteor.users.findOne(user) } });
+  }
+
+  return company.manager === user._id;
+}
+Template.registerHelper('isCompanyManager', isCompanyManager);
