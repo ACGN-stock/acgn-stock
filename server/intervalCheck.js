@@ -233,6 +233,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     });
     // 移除所有使用者資料
     Meteor.users.remove({});
+    // 移除所有推薦票投票紀錄
+    dbVoteRecord.remove({});
     // 清除所有賽季資訊
     dbSeason.remove({});
     // 產生新的賽季
