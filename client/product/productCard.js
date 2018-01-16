@@ -12,9 +12,14 @@ Template.productCard.helpers({
     const user = Meteor.user();
 
     return user && user.profile.isAdmin;
+  },
+  soldAmount() {
+    const { product } = Template.currentData();
+    const { totalAmount, stockAmount, availableAmount } = product;
+
+    return totalAmount - stockAmount - availableAmount;
   }
 });
-
 
 Template.productCard.events({
   'click [data-vote-product]'(event) {
