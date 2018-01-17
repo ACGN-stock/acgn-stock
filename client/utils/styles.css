@@ -591,3 +591,20 @@ table.arena-fighter-body tr td:nth-child(8) {
 .tutorial-main ol {
   padding-left: 1rem;
 }
+
+.footer-message-container {
+  position: relative;
+  word-break: break-all;
+}
+
+.footer-message {
+  margin-right: 32px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.footer-message-close-button {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+}

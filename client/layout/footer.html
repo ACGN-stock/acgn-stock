@@ -1,11 +1,13 @@
 <template name="footer">
   <div class="fixed-bottom">
     <div class={{containerClass}}>
-      {{> unreadImportantAccuseLogsNotification}}
-      {{> displayAnnouncement}}
-      {{#each advertisingList}}
-        {{> displayAdvertising}}
-      {{/each}}
+      <div class="snackbar-container">
+        {{> unreadImportantAccuseLogsNotification}}
+        {{> displayAnnouncement}}
+        {{#each advertisingList}}
+          {{> displayAdvertising}}
+        {{/each}}
+      </div>
       <div class="bg-faded text-primary text-right px-3 py-1 rounded">
         <a
           class="text-danger float-left"
@@ -22,12 +24,12 @@
 
 <template name="unreadImportantAccuseLogsNotification">
   {{#if isDisplay}}
-    <div class="media bg-danger text-white px-2 py-1 my-2 rounded" style="word-break: break-all;">
-      <div class="media-body">
+    <div class="media bg-danger text-white px-2 py-1 my-2 rounded footer-message-container">
+      <div class="media-body footer-message">
         <strong style="color: yellow">【注意】</strong>
         您有未讀的重要金管會相關訊息！請至您的<a style="color: yellow" href="{{accountInfoLink currentUserId}}">帳號資訊</a>頁面查看。
       </div>
-      <div class="d-flex">
+      <div class="d-flex footer-message-close-button">
         <a class="btn btn-danger btn-sm" href="#">
           <i class="fa fa-times" aria-hidden="true"></i>
         </a>
@@ -38,12 +40,12 @@
 
 <template name="displayAnnouncement">
   {{#if isDisplay}}
-    <div class="media bg-info text px-2 py-1 my-2 rounded" style="word-break: break-all;">
-      <div class="media-body">
+    <div class="media bg-info px-2 py-1 my-2 rounded footer-message-container">
+      <div class="media-body footer-message">
         【系統公告】：
         {{{announcement}}}
       </div>
-      <div class="d-flex">
+      <div class="d-flex footer-message-close-button">
         <a class="btn btn-danger btn-sm" href="#">
           <i class="fa fa-times" aria-hidden="true"></i>
         </a>
@@ -53,8 +55,8 @@
 </template>
 
 <template name="displayAdvertising">
-  <div class="media bg-info text px-2 py-1 my-2 rounded" style="word-break: break-all;">
-    <div class="media-body">
+  <div class="media bg-info px-2 py-1 my-2 rounded footer-message-container">
+    <div class="media-body footer-message">
       來自
       {{>userLink this.userId}}
       的廣告：「
@@ -65,7 +67,7 @@
       {{/if}}
       」
     </div>
-    <div class="d-flex">
+    <div class="d-flex footer-message-close-button">
       <a class="btn btn-danger btn-sm" href="#">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>

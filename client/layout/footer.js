@@ -7,6 +7,7 @@ import { dbAdvertising } from '/db/dbAdvertising';
 import { dbVariables } from '/db/dbVariables';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
+import { externalLinkAlert } from '../utils/externalLinkAlert';
 
 Template.footer.onCreated(function() {
   this.autorun(() => {
@@ -111,6 +112,7 @@ Template.displayAnnouncement.helpers({
   }
 });
 Template.displayAnnouncement.events({
+  ...externalLinkAlert,
   'click .btn'(event) {
     event.preventDefault();
     rIsDisplayAnnouncement.set(false);
@@ -118,6 +120,7 @@ Template.displayAnnouncement.events({
 });
 
 Template.displayAdvertising.events({
+  ...externalLinkAlert,
   'click .btn'(event, templateInstance) {
     event.preventDefault();
     const closedAdvertisingIdList = rClosedAdvertisingIdList.get().slice();
