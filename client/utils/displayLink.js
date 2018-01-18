@@ -115,6 +115,4 @@ Template.productLink.onRendered(function() {
   }
 });
 
-Template.productLink.events({
-  ...externalLinkAlert
-});
+Template.productLink.events(externalLinkAlert);

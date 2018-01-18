@@ -111,19 +111,20 @@ Template.displayAnnouncement.helpers({
     return dbVariables.get('announcement');
   }
 });
-Template.displayAnnouncement.events({
-  ...externalLinkAlert,
+
+const displayAnnouncementEvents = Object.assign({
   'click .btn'(event) {
     event.preventDefault();
     rIsDisplayAnnouncement.set(false);
   }
-});
+}, externalLinkAlert);
+Template.displayAnnouncement.events(displayAnnouncementEvents);
 
-Template.displayAdvertising.events({
-  ...externalLinkAlert,
+const displayAdvertisingEvents = Object.assign({
   'click .btn'(event, templateInstance) {
     event.preventDefault();
     const closedAdvertisingIdList = rClosedAdvertisingIdList.get().slice();
     rClosedAdvertisingIdList.set(_.union(closedAdvertisingIdList, templateInstance.data._id));
   }
-});
+}, externalLinkAlert);
+Template.displayAdvertising.events(displayAdvertisingEvents);

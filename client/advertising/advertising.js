@@ -59,8 +59,8 @@ Template.advertising.helpers({
     return formatDateText(expireTime);
   }
 });
-Template.advertising.events({
-  ...externalLinkAlert,
+
+const advertisingEvents = Object.assign({
   'click [data-action="buyAdvertising"]'(event) {
     event.preventDefault();
     rInBuyAdvertisingMode.set(true);
@@ -103,7 +103,9 @@ Template.advertising.events({
       }
     });
   }
-});
+}, externalLinkAlert);
+Template.advertising.events(advertisingEvents);
+
 function showAskAddPayDialog(advertisingId) {
   alertDialog.dialog({
     type: 'prompt',
