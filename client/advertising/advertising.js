@@ -12,6 +12,7 @@ import { formatDateText, currencyFormat, sanitizeHtml } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
+import { externalLinkAlert } from '../utils/externalLinkAlert';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInBuyAdvertisingMode = new ReactiveVar(false);
@@ -58,7 +59,8 @@ Template.advertising.helpers({
     return formatDateText(expireTime);
   }
 });
-Template.advertising.events({
+
+const advertisingEvents = Object.assign({
   'click [data-action="buyAdvertising"]'(event) {
     event.preventDefault();
     rInBuyAdvertisingMode.set(true);
@@ -101,7 +103,9 @@ Template.advertising.events({
       }
     });
   }
-});
+}, externalLinkAlert);
+Template.advertising.events(advertisingEvents);
+
 function showAskAddPayDialog(advertisingId) {
   alertDialog.dialog({
     type: 'prompt',
