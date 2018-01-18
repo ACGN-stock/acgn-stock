@@ -19,5 +19,5 @@ Meteor.publish('accountInfo', function(userId) {
     }
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('accountInfo');

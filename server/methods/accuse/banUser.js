@@ -9,18 +9,18 @@ import { banTypeList } from '/db/users';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
-  banUser({userId, message, banType}) {
+  banUser({ userId, message, banType }) {
     check(this.userId, String);
     check(userId, String);
     check(message, String);
     check(banType, new Match.OneOf(...banTypeList));
-    banUser(Meteor.user(), {userId, message, banType});
+    banUser(Meteor.user(), { userId, message, banType });
 
     return true;
   }
 });
-function banUser(user, {userId, message, banType}) {
-  debug.log('banUser', {user, userId, message, banType});
+function banUser(user, { userId, message, banType }) {
+  debug.log('banUser', { user, userId, message, banType });
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }

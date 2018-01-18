@@ -1,7 +1,7 @@
 'use strict';
 import { Mongo } from 'meteor/mongo';
 
-//任意變數資料集
+// 任意變數資料集
 export const dbVariables = new Mongo.Collection('variables');
 export default dbVariables;
 
@@ -14,5 +14,5 @@ dbVariables.get = function get(variableName) {
   return variableData ? variableData.value : null;
 };
 dbVariables.set = function set(variableName, value) {
-  this.upsert(variableName, {value});
+  this.upsert(variableName, { value });
 };

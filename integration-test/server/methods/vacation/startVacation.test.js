@@ -35,18 +35,18 @@ describe('method startVacation', function() {
   });
 
   it('should fail if the user is already in vacation', function() {
-    Meteor.users.update({ _id: userId }, { $set: { 'profile.isInVacation': true }});
+    Meteor.users.update({ _id: userId }, { $set: { 'profile.isInVacation': true } });
     startVacation.bind(null, userId).must.throw(Meteor.Error, '您已經處於渡假狀態！ [403]');
   });
 
   const roundRemainingTimeLimit = Meteor.settings.public.seasonTime * 2;
   it(`should fail if the remaining time of the current round is less than ${roundRemainingTimeLimit} ms`, function() {
-    dbRound.update({ _id: roundId }, { $set: { endDate: new Date(Date.now() + roundRemainingTimeLimit - 1)}});
+    dbRound.update({ _id: roundId }, { $set: { endDate: new Date(Date.now() + roundRemainingTimeLimit - 1) } });
     startVacation.bind(null, userId).must.throw(Meteor.Error, '賽季結束前兩週禁止渡假！ [403]');
   });
 
   it('should fail if the time passed since the last vacation is too short', function() {
-    Meteor.users.update({ _id: userId }, { $set: { 'profile.lastVacationEndDate': new Date() }});
+    Meteor.users.update({ _id: userId }, { $set: { 'profile.lastVacationEndDate': new Date() } });
     startVacation.bind(null, userId).must.throw(Meteor.Error, '距離上次收假時間過短，無法再次渡假！ [403]');
   });
 

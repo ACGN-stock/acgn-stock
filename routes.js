@@ -4,7 +4,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 
-//default route
+// default route
 FlowRouter.route('/', {
   name: 'announcement',
   action() {

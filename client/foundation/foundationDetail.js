@@ -45,7 +45,7 @@ Template.foundationDetail.helpers({
     return dbFoundations.findOne(foundationId);
   },
   getEditHref(foundationId) {
-    return FlowRouter.path('editFoundationPlan', {foundationId});
+    return FlowRouter.path('editFoundationPlan', { foundationId });
   },
   showAllTags(tags) {
     if (tags.length <= 4) {
@@ -130,7 +130,7 @@ Template.foundationDetail.events({
   }
 });
 
-//是否展開面板
+// 是否展開面板
 const rDisplayPanelList = new ReactiveVar([]);
 const getTotalInvest = function(investList) {
   return _.reduce(investList, (totalInvest, investData) => {
@@ -250,7 +250,7 @@ Template.foundationLogList.helpers({
   logList() {
     const companyId = FlowRouter.getParam('foundationId');
 
-    return dbLog.find({companyId}, {
+    return dbLog.find({ companyId }, {
       sort: {
         createdAt: -1
       },

@@ -50,7 +50,7 @@ Template.accountInfo.onCreated(function() {
     }
   });
 });
-//是否展開面板
+// 是否展開面板
 const rDisplayPanelList = new ReactiveVar([]);
 Template.accountInfo.helpers({
   lookUser() {
@@ -101,7 +101,7 @@ Template.accountInfoBasic.helpers({
     const userId = FlowRouter.getParam('userId');
     const employed = false;
 
-    return userId === Meteor.userId() && dbEmployees.findOne({userId, employed});
+    return userId === Meteor.userId() && dbEmployees.findOne({ userId, employed });
   },
   isBaned(type) {
     return _.contains(this.profile.ban, type);
@@ -179,7 +179,7 @@ Template.accountInfoBasic.events({
       callback: (message) => {
         if (message) {
           const userId = accuseUserData._id;
-          Meteor.customCall('banUser', {userId, message, banType});
+          Meteor.customCall('banUser', { userId, message, banType });
         }
       }
     });
@@ -248,7 +248,7 @@ Template.accountInfoBasic.events({
       callback: (message) => {
         if (message) {
           const userId = accuseUserData._id;
-          Meteor.customCall('confiscateStocks', {userId, message});
+          Meteor.customCall('confiscateStocks', { userId, message });
         }
       }
     });
@@ -387,13 +387,13 @@ Template.employeeTitleList.helpers({
     const userId = FlowRouter.getParam('userId');
     const employed = true;
 
-    return dbEmployees.findOne({userId, employed});
+    return dbEmployees.findOne({ userId, employed });
   },
   nextSeasonEmployment() {
     const userId = FlowRouter.getParam('userId');
     const employed = false;
 
-    return dbEmployees.findOne({userId, employed});
+    return dbEmployees.findOne({ userId, employed });
   }
 });
 
@@ -416,7 +416,7 @@ Template.accountInfoTaxList.helpers({
   taxesList() {
     const userId = FlowRouter.getParam('userId');
 
-    return dbTaxes.find({userId}, {
+    return dbTaxes.find({ userId }, {
       limit: 10,
       sort: {
         expireDate: 1
@@ -478,7 +478,7 @@ Template.accountInfoOwnStockList.helpers({
   directorList() {
     const userId = FlowRouter.getParam('userId');
 
-    return dbDirectors.find({userId}, {
+    return dbDirectors.find({ userId }, {
       limit: 10
     });
   },

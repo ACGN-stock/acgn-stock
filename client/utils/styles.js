@@ -18,7 +18,7 @@ export const rCompanyListViewMode = new ReactiveVar('card', function(oldValue, n
   return false;
 });
 
-//每次開啟網頁時只確認一次預設theme
+// 每次開啟網頁時只確認一次預設theme
 if (! localStorage.getItem('theme')) {
   localStorage.setItem('theme', 'light');
 }

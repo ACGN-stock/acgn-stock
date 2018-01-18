@@ -37,7 +37,7 @@ export function doOnFoundationFailure(foundationData) {
     });
 
     usersBulk
-      .find({_id: userId})
+      .find({ _id: userId })
       .updateOne({ $inc: { 'profile.money': amount } });
   });
 

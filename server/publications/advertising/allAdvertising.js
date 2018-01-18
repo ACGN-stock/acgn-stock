@@ -11,5 +11,5 @@ Meteor.publish('allAdvertising', function() {
     disableOplog: true
   });
 });
-//一分鐘最多重複訂閱10次
+// 一分鐘最多重複訂閱10次
 limitSubscription('allAdvertising', 10);

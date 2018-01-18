@@ -27,5 +27,5 @@ Meteor.methods({
     });
   }
 });
-//5秒鐘最多2次
+// 5秒鐘最多2次
 limitMethod('instantMessageChat', 2, 5000);

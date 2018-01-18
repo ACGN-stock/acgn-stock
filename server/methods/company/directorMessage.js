@@ -15,9 +15,9 @@ Meteor.methods({
   }
 });
 function directorMessage(user, companyId, message) {
-  debug.log('directorMessage', {user, companyId, message});
+  debug.log('directorMessage', { user, companyId, message });
   const userId = user._id;
-  const directorData = dbDirectors.findOne({companyId, userId}, {
+  const directorData = dbDirectors.findOne({ companyId, userId }, {
     fields: {
       _id: 1
     }

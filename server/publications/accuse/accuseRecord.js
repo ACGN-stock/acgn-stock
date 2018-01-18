@@ -38,5 +38,5 @@ Meteor.publish('accuseRecord', function(offset) {
     pageObserver.stop();
   });
 });
-//一分鐘最多重複訂閱10次
+// 一分鐘最多重複訂閱10次
 limitSubscription('accuseRecord', 10);

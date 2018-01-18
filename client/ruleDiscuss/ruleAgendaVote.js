@@ -95,7 +95,7 @@ Template.ruleAgendaVote.events({
         if (result) {
           Meteor.customCall('voteAgenda', model, function(error) {
             if (! error) {
-              const path = FlowRouter.path('ruleAgendaDetail', {agendaId});
+              const path = FlowRouter.path('ruleAgendaDetail', { agendaId });
               FlowRouter.go(path);
             }
           });
@@ -120,7 +120,7 @@ Template.ruleAgendaVoteForm.helpers({
   getBackHref() {
     const agendaId = FlowRouter.getParam('agendaId');
 
-    return FlowRouter.path('ruleAgendaDetail', {agendaId});
+    return FlowRouter.path('ruleAgendaDetail', { agendaId });
   }
 });
 

@@ -17,7 +17,7 @@ Meteor.methods({
   }
 });
 function takeDownRuleAgenda(user, agendaId) {
-  debug.log('takeDownRuleAgenda', {user, agendaId});
+  debug.log('takeDownRuleAgenda', { user, agendaId });
   const agenda = dbRuleAgendas.findOne(agendaId, {
     fields: {
       issues: 1
@@ -50,5 +50,5 @@ function takeDownRuleAgenda(user, agendaId) {
   });
   dbRuleAgendas.remove(agendaId);
 }
-//二十秒鐘最多一次
+// 二十秒鐘最多一次
 limitMethod('takeDownRuleAgenda', 1, 20000);

@@ -90,7 +90,7 @@ Template.reportSeasonNav.helpers({
           else {
             return {
               'class': 'btn btn-info btn-sm float-left disabled',
-              'href': FlowRouter.path('seasonalReport', {seasonId})
+              'href': FlowRouter.path('seasonalReport', { seasonId })
             };
           }
         }
@@ -118,7 +118,7 @@ Template.reportSeasonNav.helpers({
           else {
             return {
               'class': 'btn btn-info btn-sm float-right disabled',
-              'href': FlowRouter.path('seasonalReport', {seasonId})
+              'href': FlowRouter.path('seasonalReport', { seasonId })
             };
           }
         }
@@ -178,7 +178,7 @@ Template.switchViewTypeButton.events({
 Template.companyPriceRankTable.helpers({
   rankList() {
     const seasonId = FlowRouter.getParam('seasonId');
-    const rankList = dbRankCompanyPrice.find({seasonId}).map((rankData) => {
+    const rankList = dbRankCompanyPrice.find({ seasonId }).map((rankData) => {
       rankData.totalMoney = rankData.totalDealMoney + rankData.productProfit;
 
       return rankData;
@@ -192,7 +192,7 @@ Template.companyPriceRankTable.helpers({
 Template.companyProfitRankTable.helpers({
   rankList() {
     const seasonId = FlowRouter.getParam('seasonId');
-    const rankList = dbRankCompanyProfit.find({seasonId}).fetch();
+    const rankList = dbRankCompanyProfit.find({ seasonId }).fetch();
     const sortedRankList = _.sortBy(rankList, 'priceToEarn');
 
     return sortedRankList.reverse();
@@ -202,7 +202,7 @@ Template.companyProfitRankTable.helpers({
 Template.companyValueRankTable.helpers({
   rankList() {
     const seasonId = FlowRouter.getParam('seasonId');
-    const rankList = dbRankCompanyValue.find({seasonId}).map((rankData) => {
+    const rankList = dbRankCompanyValue.find({ seasonId }).map((rankData) => {
       rankData.totalValue = rankData.lastPrice * rankData.totalRelease;
 
       return rankData;
@@ -226,7 +226,7 @@ Template.companyCapitalRankTable.helpers({
 Template.userRankTable.helpers({
   rankList() {
     const seasonId = FlowRouter.getParam('seasonId');
-    const rankList = dbRankUserWealth.find({seasonId}).map((rankData) => {
+    const rankList = dbRankUserWealth.find({ seasonId }).map((rankData) => {
       rankData.totalWealth = rankData.money + rankData.stocksValue;
 
       return rankData;
@@ -289,7 +289,7 @@ function drawChart(templateInstance) {
 // 股票熱門排行榜圖表
 function drawCompanyPriceRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
-  const rankList = dbRankCompanyPrice.find({seasonId}).map((rankData) => {
+  const rankList = dbRankCompanyPrice.find({ seasonId }).map((rankData) => {
     rankData.totalMoney = rankData.totalDealMoney + rankData.productProfit;
 
     return rankData;
@@ -404,7 +404,7 @@ function drawCompanyPriceRankTable(templateInstance) {
 // 股票營利排行榜圖表
 function drawCompanyProfitRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
-  const rankList = dbRankCompanyProfit.find({seasonId}).fetch();
+  const rankList = dbRankCompanyProfit.find({ seasonId }).fetch();
   if (rankList.length < 1) {
     return false;
   }
@@ -530,7 +530,7 @@ function drawCompanyProfitRankTable(templateInstance) {
 // 股票市值排行榜圖表
 function drawCompanyValueRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
-  const rankList = dbRankCompanyValue.find({seasonId}).map((rankData) => {
+  const rankList = dbRankCompanyValue.find({ seasonId }).map((rankData) => {
     rankData.totalValue = rankData.lastPrice * rankData.totalRelease;
 
     return rankData;
@@ -694,7 +694,7 @@ function drawCompanyValueRankTable(templateInstance) {
 // 公司資本額排行榜圖表
 function drawCompanyCapitalRankTable(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
-  const rankList = dbRankCompanyCapital.find({seasonId}).fetch();
+  const rankList = dbRankCompanyCapital.find({ seasonId }).fetch();
 
   if (rankList.length < 1) {
     return false;
@@ -856,7 +856,7 @@ function drawCompanyCapitalRankTable(templateInstance) {
 // 大富翁排行榜圖表
 function drawUserRankChart(templateInstance) {
   const seasonId = FlowRouter.getParam('seasonId');
-  const rankList = dbRankUserWealth.find({seasonId}).map((rankData) => {
+  const rankList = dbRankUserWealth.find({ seasonId }).map((rankData) => {
     rankData.totalWealth = rankData.money + rankData.stocksValue;
 
     return rankData;

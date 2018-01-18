@@ -65,7 +65,7 @@ Template.accountDialog.events({
         rPassword.set(password);
         const type = dialogMode.replace('login', '');
         const reset = false;
-        Meteor.customCall('loginOrRegister', {username, password, type, reset}, (error, result) => {
+        Meteor.customCall('loginOrRegister', { username, password, type, reset }, (error, result) => {
           if (result === true) {
             tryLogin(username, password, type);
           }
@@ -131,7 +131,7 @@ function confirmResetPassword(username, password, type) {
     callback: (result) => {
       if (result) {
         const reset = true;
-        Meteor.customCall('loginOrRegister', {username, password, type, reset}, (error, result) => {
+        Meteor.customCall('loginOrRegister', { username, password, type, reset }, (error, result) => {
           if (! error) {
             onGotValidateCode(result, type);
           }

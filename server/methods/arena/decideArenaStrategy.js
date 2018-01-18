@@ -20,13 +20,13 @@ Meteor.methods({
       specialManner: [String]
     });
     const user = Meteor.user();
-    decideArenaStrategy({user, companyId, strategyData});
+    decideArenaStrategy({ user, companyId, strategyData });
 
     return true;
   }
 });
-function decideArenaStrategy({user, companyId, strategyData}) {
-  debug.log('decideArenaStrategy', {user, companyId, strategyData});
+function decideArenaStrategy({ user, companyId, strategyData }) {
+  debug.log('decideArenaStrategy', { user, companyId, strategyData });
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,
@@ -80,7 +80,7 @@ function decideArenaStrategy({user, companyId, strategyData}) {
   }
 
   const arenaId = lastArenaData._id;
-  const fighterData = dbArenaFighters.findOne({arenaId, companyId}, {
+  const fighterData = dbArenaFighters.findOne({ arenaId, companyId }, {
     fields: {
       _id: 1,
       sp: 1
