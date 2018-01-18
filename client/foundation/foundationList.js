@@ -124,14 +124,14 @@ const foundationListHelpers = {
     return formatDateText(expireDate);
   },
   getEditHref(foundationId) {
-    return FlowRouter.path('editFoundationPlan', {foundationId});
+    return FlowRouter.path('editFoundationPlan', { foundationId });
   },
   alreadyInvest() {
     const user = Meteor.user();
     if (user) {
       const userId = user._id;
       const invest = this.invest;
-      const investData = _.findWhere(invest, {userId});
+      const investData = _.findWhere(invest, { userId });
       if (investData) {
         return investData.amount;
       }
@@ -148,7 +148,7 @@ const foundationListHelpers = {
     }
     const invest = this.invest;
     const userId = Meteor.user()._id;
-    const investData = _.findWhere(invest, {userId});
+    const investData = _.findWhere(invest, { userId });
     if (investData) {
       return 'company-card-holder';
     }

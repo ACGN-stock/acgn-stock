@@ -7,7 +7,7 @@ import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('accountAccuseLog', function(userId, offset) {
-  debug.log('publish accountAccuseLog', {userId, offset});
+  debug.log('publish accountAccuseLog', { userId, offset });
   check(userId, String);
   check(offset, Match.Integer);
 
@@ -47,5 +47,5 @@ Meteor.publish('accountAccuseLog', function(userId, offset) {
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('accountInfoLog');

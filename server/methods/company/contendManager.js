@@ -18,7 +18,7 @@ Meteor.methods({
   }
 });
 export function contendManager(user, companyId) {
-  debug.log('contendManager', {user, companyId});
+  debug.log('contendManager', { user, companyId });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -51,7 +51,7 @@ export function contendManager(user, companyId) {
     throw new Meteor.Error(403, '使用者已經是該公司的經理人候選者了！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'elect', 'elect' + companyId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('resignManager', ['elect' + companyId], (release) => {
     const companyData = dbCompanies.findOne(companyId, {
       fields: {

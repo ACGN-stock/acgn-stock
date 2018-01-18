@@ -57,7 +57,7 @@ describe('function doOnFoundationFailure', function() {
 
   it('should return fund to the investors', function() {
     investors.forEach(({ userId }) => {
-      Meteor.users.rawCollection().insert({ _id: userId, profile: { money: 0 }});
+      Meteor.users.rawCollection().insert({ _id: userId, profile: { money: 0 } });
     });
 
     const foundationData = dbFoundations.findOne(companyId);
@@ -82,7 +82,7 @@ describe('function doOnFoundationFailure', function() {
       amount: Meteor.settings.public.founderEarnestMoney + extraAmount
     };
 
-    Meteor.users.rawCollection().insert({ _id: managerUserId, profile: { money: 0 }});
+    Meteor.users.rawCollection().insert({ _id: managerUserId, profile: { money: 0 } });
 
     dbFoundations.update(companyId, {
       $set: { manager: managerUserId },

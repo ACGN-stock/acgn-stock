@@ -4,7 +4,7 @@ import { Mongo } from 'meteor/mongo';
 import { dbArena } from './dbArena';
 // import SimpleSchema from 'simpl-schema';
 
-//最萌亂鬥大賽紀錄資料集
+// 最萌亂鬥大賽紀錄資料集
 const collectionHash = {};
 export const dbArenaLog = {
   getCollectionName(arenaId) {

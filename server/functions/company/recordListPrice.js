@@ -67,7 +67,7 @@ export function recordListPrice() {
       disableOplog: true
     })
     .forEach(({ _id: companyId }) => {
-      //先鎖定資源，再重新讀取一次資料進行運算
+      // 先鎖定資源，再重新讀取一次資料進行運算
       resourceManager.request('recordListPrice', [`companyOrder${companyId}`], (release) => {
         const { lastPrice, listPrice, totalRelease } = dbCompanies.findOne(companyId, {
           fields: {

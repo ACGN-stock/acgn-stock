@@ -15,14 +15,14 @@ Template.fscStock.onCreated(function() {
       return false;
     }
     const userId = '!FSC';
-    this.subscribe('accountOwnStocks', userId, ownStocksOffset.get(), {limit: showListPerPage, includeSeal: false});
+    this.subscribe('accountOwnStocks', userId, ownStocksOffset.get(), { limit: showListPerPage, includeSeal: false });
   });
 });
 Template.fscStock.helpers({
   stockList() {
     const userId = '!FSC';
 
-    return dbDirectors.find({userId}, {
+    return dbDirectors.find({ userId }, {
       limit: showListPerPage
     });
   },

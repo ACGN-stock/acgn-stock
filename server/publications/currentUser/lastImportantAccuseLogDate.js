@@ -32,5 +32,5 @@ Meteor.publish('lastImportantAccuseLogDate', function() {
     observer.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('lastImportantAccuseLogDate');

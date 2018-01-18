@@ -9,5 +9,5 @@ Meteor.publish('announcementDetail', function() {
 
   return dbVariables.find({ _id: 'announcementDetail' }, { disableOplog: true });
 });
-//一分鐘最多重複訂閱5次
+// 一分鐘最多重複訂閱5次
 limitSubscription('announcementDetail', 5);

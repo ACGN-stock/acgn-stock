@@ -20,7 +20,7 @@ Meteor.methods({
   }
 });
 function payTax(user, taxId, amount) {
-  debug.log('payTax', {user, taxId, amount});
+  debug.log('payTax', { user, taxId, amount });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -40,7 +40,7 @@ function payTax(user, taxId, amount) {
   }
   const userId = user._id;
   resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('payTax', ['user' + userId], (release) => {
     const user = Meteor.users.findOne(userId, {
       fields: {
@@ -59,7 +59,7 @@ function payTax(user, taxId, amount) {
       throw new Meteor.Error(403, '繳納金額與應納金額不相符！');
     }
     const createdAt = new Date();
-    //若在上次發薪後的繳稅紀錄，則併為同一筆紀錄
+    // 若在上次發薪後的繳稅紀錄，則併為同一筆紀錄
     const existsLogData = dbLog.findOne({
       userId: userId,
       createdAt: {
@@ -103,7 +103,7 @@ function payTax(user, taxId, amount) {
         }
       })
       .count();
-    //如果還有逾期未繳的稅單，扣錢就好
+    // 如果還有逾期未繳的稅單，扣錢就好
     if (expiredTaxesCount > 0) {
       Meteor.users.update(userId, {
         $inc: {
@@ -111,7 +111,7 @@ function payTax(user, taxId, amount) {
         }
       });
     }
-    //所有逾期未繳的稅單都繳納完畢後，取消繳稅逾期狀態
+    // 所有逾期未繳的稅單都繳納完畢後，取消繳稅逾期狀態
     else {
       Meteor.users.update(userId, {
         $inc: {

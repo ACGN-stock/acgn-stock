@@ -36,7 +36,7 @@ Meteor.methods({
       throw new Meteor.Error(403, `無法查詢到驗證碼，請確定驗證碼[${validateCode}]是否輸入正確，且有出現在您的訪客留言頁面上！`);
     }
 
-    const existingUser = Meteor.users.findOne({username: checkUsername}, { fields: { _id: 1 } });
+    const existingUser = Meteor.users.findOne({ username: checkUsername }, { fields: { _id: 1 } });
 
     if (existingUser) { // 既有帳號通過認證 → 重設密碼
       Accounts.setPassword(existingUser._id, password, { logout: true });
@@ -57,7 +57,7 @@ Meteor.methods({
     return true;
   }
 });
-//一分鐘最多1次
+// 一分鐘最多1次
 limitMethod('validateBahamutAccount', 1);
 
 // 檢查巴哈小屋是否有通過手機認證的資訊

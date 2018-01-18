@@ -7,17 +7,17 @@ import { returnCompanyStones } from '/server/functions/miningMachine/returnCompa
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
-  sealCompany({companyId, message}) {
+  sealCompany({ companyId, message }) {
     check(this.userId, String);
     check(companyId, String);
     check(message, String);
-    sealCompany(Meteor.user(), {companyId, message});
+    sealCompany(Meteor.user(), { companyId, message });
 
     return true;
   }
 });
-function sealCompany(user, {companyId, message}) {
-  debug.log('sealCompany', {user, companyId, message});
+function sealCompany(user, { companyId, message }) {
+  debug.log('sealCompany', { user, companyId, message });
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }

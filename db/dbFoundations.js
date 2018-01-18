@@ -2,22 +2,22 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-//新創公司資料集
+// 新創公司資料集
 export const dbFoundations = new Mongo.Collection('foundations');
 export default dbFoundations;
 
 const schema = new SimpleSchema({
-  //公司名稱
+  // 公司名稱
   companyName: {
     type: String,
     min: 1,
     max: 100
   },
-  //創立人userId
+  // 創立人userId
   manager: {
     type: String
   },
-  //相關搜索用Tag
+  // 相關搜索用Tag
   tags: {
     type: Array,
     maxCount: 50
@@ -27,21 +27,21 @@ const schema = new SimpleSchema({
     min: 1,
     max: 50
   },
-  //小圖
+  // 小圖
   pictureSmall: {
     type: String,
     regEx: SimpleSchema.RegEx.Url,
     max: 1000,
     optional: true
   },
-  //大圖
+  // 大圖
   pictureBig: {
     type: String,
     regEx: SimpleSchema.RegEx.Url,
     max: 1000,
     optional: true
   },
-  //介紹描述
+  // 介紹描述
   description: {
     type: String,
     min: 10,
@@ -53,7 +53,7 @@ const schema = new SimpleSchema({
     max: 10,
     optional: true
   },
-  //投資人列表
+  // 投資人列表
   invest: {
     type: Array,
     defaultValue: []
@@ -69,7 +69,7 @@ const schema = new SimpleSchema({
       }
     })
   },
-  //創立計劃開始日期
+  // 創立計劃開始日期
   createdAt: {
     type: Date
   }

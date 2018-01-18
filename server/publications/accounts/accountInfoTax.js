@@ -7,7 +7,7 @@ import { dbTaxes } from '/db/dbTaxes';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('accountInfoTax', function(userId, offset) {
-  debug.log('publish accountInfoTax', {userId, offset});
+  debug.log('publish accountInfoTax', { userId, offset });
   check(userId, String);
   check(offset, Match.Integer);
 
@@ -38,5 +38,5 @@ Meteor.publish('accountInfoTax', function(userId, offset) {
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('accountInfoTax');

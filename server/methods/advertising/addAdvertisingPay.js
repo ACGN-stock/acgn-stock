@@ -18,7 +18,7 @@ Meteor.methods({
   }
 });
 function addAdvertisingPay(user, advertisingId, addPay) {
-  debug.log('addAdvertisingPay', {user, advertisingId, addPay});
+  debug.log('addAdvertisingPay', { user, advertisingId, addPay });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -44,7 +44,7 @@ function addAdvertisingPay(user, advertisingId, addPay) {
   }
   const userId = user._id;
   resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('addAdvertisingPay', ['user' + userId], (release) => {
     const user = Meteor.users.findOne(userId, {
       fields: {

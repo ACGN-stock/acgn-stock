@@ -23,7 +23,7 @@ Meteor.methods({
     const validatingUser = dbValidatingUsers.findOne({ username: checkUsername });
     if (validatingUser) {
       if (validatingUser.password !== password) {
-        dbValidatingUsers.update({ _id: validatingUser._id }, { $set: { password }});
+        dbValidatingUsers.update({ _id: validatingUser._id }, { $set: { password } });
       }
 
       return validatingUser.validateCode;
@@ -41,7 +41,7 @@ Meteor.methods({
     return validateCode;
   }
 });
-//一分鐘最多五次
+// 一分鐘最多五次
 limitMethod('loginOrRegister', 5);
 
 const randomStringList = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

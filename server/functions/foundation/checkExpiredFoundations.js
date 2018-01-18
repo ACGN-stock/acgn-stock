@@ -23,7 +23,7 @@ export function checkExpiredFoundations() {
       disableOplog: true
     })
     .forEach(({ _id: companyId }) => {
-      //先鎖定資源，再重新讀取一次資料進行運算
+      // 先鎖定資源，再重新讀取一次資料進行運算
       resourceManager.request('checkExpiredFoundations', [`foundation${companyId}`], (release) => {
         const foundationData = dbFoundations.findOne(companyId);
         if (! foundationData) {

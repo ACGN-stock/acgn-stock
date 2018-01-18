@@ -11,11 +11,11 @@ Meteor.publish('currentUserVoteRecord', function(companyId) {
   const userId = this.userId;
 
   if (userId) {
-    return dbVoteRecord.find({companyId, userId});
+    return dbVoteRecord.find({ companyId, userId });
   }
   else {
     return [];
   }
 });
-//十秒中最多30次(產品中心)
+// 十秒中最多30次(產品中心)
 limitSubscription('currentUserVoteRecord', 30, 10000);

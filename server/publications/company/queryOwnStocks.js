@@ -13,5 +13,5 @@ Meteor.publish('queryOwnStocks', function() {
 
   return [];
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('queryOwnStocks');

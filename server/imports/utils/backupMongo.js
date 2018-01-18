@@ -1,7 +1,7 @@
 'use strict';
 import shell from 'shelljs';
 
-//備份mongo資料庫
+// 備份mongo資料庫
 export function backupMongo(suffix = '') {
   const url = process.env.MONGO_URL;
   const path = process.env.BACKUP_DIRECTORY;

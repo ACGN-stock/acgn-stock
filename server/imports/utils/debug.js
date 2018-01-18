@@ -8,7 +8,7 @@ export const dbDebugCrash = new Mongo.Collection('debugCrash');
 
 function log(work, detail) {
   const time = new Date();
-  debug.insert({work, detail, time});
+  debug.insert({ work, detail, time });
 }
 function clean() {
   debug.remove({});
@@ -18,7 +18,7 @@ if (Meteor.settings.public.debugMode) {
   debug.clean = clean;
   Meteor.startup(function() {
     const crashTime = new Date();
-    //everytime start server, insert dbDebugTemporary into dbDebugCrash
+    // everytime start server, insert dbDebugTemporary into dbDebugCrash
     debug.find().forEach((doc) => {
       doc = _.omit(doc, '_id');
       doc.crashTime = crashTime;

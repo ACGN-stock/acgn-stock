@@ -8,7 +8,7 @@ import { threadId } from './thread';
 
 export const resourceManager = {
   request(task, resourceList, callback) {
-    debug.log('request resource', {task, resourceList});
+    debug.log('request resource', { task, resourceList });
     // let requestTime = 0;
     const resourceLock = this.getResourceLock(resourceList);
     if (resourceLock) {
@@ -31,20 +31,20 @@ export const resourceManager = {
       const time = new Date();
       const release = () => {
         _.each(resourceList, (_id) => {
-          dbResourceLock.remove({_id, task, threadId, time});
+          dbResourceLock.remove({ _id, task, threadId, time });
         });
         // const message = 'thread[' + threadId + '] already release resource' + JSON.stringify(resourceList) + ' for task[' + task + ']!';
         // console.info(new Date(), message);
       };
       try {
         _.each(resourceList, (_id) => {
-          dbResourceLock.insert({_id, task, threadId, time});
+          dbResourceLock.insert({ _id, task, threadId, time });
         });
         callback(release);
       }
       catch (e) {
         release();
-        console.error('error happens while requesting resources, automatic release resources lock' + JSON.stringify({resourceList, task, threadId, time}) + '!');
+        console.error('error happens while requesting resources, automatic release resources lock' + JSON.stringify({ resourceList, task, threadId, time }) + '!');
 
         throw e;
       }

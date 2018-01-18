@@ -19,7 +19,7 @@ Meteor.methods({
   }
 });
 export function investFoundCompany(user, companyId, amount) {
-  debug.log('investFoundCompany', {user, companyId, amount});
+  debug.log('investFoundCompany', { user, companyId, amount });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -46,11 +46,11 @@ export function investFoundCompany(user, companyId, amount) {
   }
   const userId = user._id;
   const invest = foundCompanyData.invest;
-  const existsInvest = _.findWhere(invest, {userId});
+  const existsInvest = _.findWhere(invest, { userId });
   if (existsInvest && (existsInvest.amount + amount) > maximumInvest) {
     throw new Meteor.Error(403, '您已經投資了$' + existsInvest.amount + '，最高追加投資為$' + (maximumInvest - existsInvest.amount) + '！');
   }
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.throwErrorIsResourceIsLock(['foundation' + companyId, 'user' + userId]);
   resourceManager.request('investFoundCompany', ['foundation' + companyId, 'user' + userId], (release) => {
     const user = Meteor.users.findOne(userId, {
@@ -72,7 +72,7 @@ export function investFoundCompany(user, companyId, amount) {
       throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
     }
     const invest = foundCompanyData.invest;
-    const existsInvest = _.findWhere(invest, {userId});
+    const existsInvest = _.findWhere(invest, { userId });
     if (existsInvest) {
       if ((existsInvest.amount + amount) > maximumInvest) {
         throw new Meteor.Error(403, '您已經投資了$' + existsInvest.amount + '，最高追加投資為$' + (maximumInvest - existsInvest.amount) + '！');
@@ -80,7 +80,7 @@ export function investFoundCompany(user, companyId, amount) {
       existsInvest.amount += amount;
     }
     else {
-      invest.push({userId, amount});
+      invest.push({ userId, amount });
     }
     dbLog.insert({
       logType: '參與投資',
@@ -105,5 +105,5 @@ export function investFoundCompany(user, companyId, amount) {
     release();
   });
 }
-//兩秒鐘最多一次
+// 兩秒鐘最多一次
 limitMethod('investFoundCompany', 1, 2000);

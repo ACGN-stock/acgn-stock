@@ -16,7 +16,7 @@ Meteor.methods({
   }
 });
 function markFoundationIllegal(user, companyId, reason) {
-  debug.log('markFoundationIllegal', {user, companyId, reason});
+  debug.log('markFoundationIllegal', { user, companyId, reason });
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }

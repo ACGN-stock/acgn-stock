@@ -21,7 +21,7 @@ Meteor.methods({
   }
 });
 function buyAdvertising(user, advertisingData) {
-  debug.log('buyAdvertising', {user, advertisingData});
+  debug.log('buyAdvertising', { user, advertisingData });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -46,7 +46,7 @@ function buyAdvertising(user, advertisingData) {
   }
   const userId = user._id;
   resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('buyAdvertising', ['user' + userId], (release) => {
     const user = Meteor.users.findOne(userId, {
       fields: {

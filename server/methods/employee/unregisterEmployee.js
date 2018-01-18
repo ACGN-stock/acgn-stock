@@ -14,10 +14,10 @@ Meteor.methods({
   }
 });
 export function unregisterEmployee(user) {
-  debug.log('unregisterEmployee', {user});
+  debug.log('unregisterEmployee', { user });
   const userId = user._id;
   const employed = false;
   const resigned = false;
-  dbEmployees.remove({userId, employed, resigned});
+  dbEmployees.remove({ userId, employed, resigned });
 }
 limitMethod('unregisterEmployee');

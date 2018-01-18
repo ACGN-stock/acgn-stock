@@ -19,7 +19,7 @@ Meteor.methods({
   }
 });
 function joinArena(user, companyId) {
-  debug.log('joinArena', {user, companyId});
+  debug.log('joinArena', { user, companyId });
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,
@@ -54,13 +54,13 @@ function joinArena(user, companyId) {
     throw new Meteor.Error(403, '這一屆最萌亂鬥大賽的報名時間已過，下回請早！');
   }
   const arenaId = lastArenaData._id;
-  if (dbArenaFighters.findOne({arenaId, companyId})) {
+  if (dbArenaFighters.findOne({ arenaId, companyId })) {
     throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已經報名參加這一屆最萌亂鬥大賽了，無法重複報名！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'arena' + companyId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('joinArena', ['arena' + companyId], (release) => {
-    if (dbArenaFighters.findOne({arenaId, companyId})) {
+    if (dbArenaFighters.findOne({ arenaId, companyId })) {
       throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已經報名參加這一屆最萌亂鬥大賽了，無法重複報名！');
     }
     dbLog.insert({
@@ -72,7 +72,7 @@ function joinArena(user, companyId) {
     const manager = userId;
     const createdAt = companyData.createdAt;
     const attackSequence = [];
-    dbArenaFighters.insert({arenaId, companyId, manager, createdAt, attackSequence});
+    dbArenaFighters.insert({ arenaId, companyId, manager, createdAt, attackSequence });
     release();
   });
 }
