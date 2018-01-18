@@ -24,6 +24,7 @@
     "import/resolver": "meteor"
   },
   "rules": {
+    "meteor/eventmap-params": "off",
     "import/prefer-default-export": "off",
     "import/order": ["error", {
       "newlines-between": "ignore"
