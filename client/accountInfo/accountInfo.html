@@ -251,23 +251,26 @@
 </template>
 
 <template name="employeeTitleList">
-  {{#with employment}}
-    {{> companyTitle companyId=this.companyId title='員工'}}
-  {{/with}}
-  {{#with nextSeasonEmployment}}
-    {{> companyTitle companyId=this.companyId title='儲備員工'}}
-  {{/with}}
-  {{#unless employment}}
-    {{#unless nextSeasonEmployment}}
-      查無資料！
-    {{/unless}}
-  {{/unless}}
+  {{#each employment}}
+    {{#if this.employed}}
+      {{> companyTitle companyId=this.companyId isSeal=(isSeal this.companyId) title='員工'}}
+    {{else}}
+      {{> companyTitle companyId=this.companyId isSeal=(isSeal this.companyId) title='儲備員工'}}
+    {{/if}}
+  {{else}}
+    查無資料！
+  {{/each}}
 </template>
 
 <template name="companyTitle">
   <div class="text-primary d-flex flex-nowrap">
     <div class="text-nowrap">是「</div>
-    <div class="d-inline-block text-truncate">{{>companyLink companyId}}</div>
+    <div class="d-inline-block text-truncate">
+      {{#if isSeal}}
+        <span class="badge badge-pill badge-danger">已查封</span>
+      {{/if}}
+      {{>companyLink companyId}}
+    </div>
     <div class="text-nowrap">」公司的{{title}}。</div>
   </div>
 </template>
