@@ -32,7 +32,7 @@ Meteor.methods({
   }
 });
 function createAgenda(user, agendaData) {
-  debug.log('createAgenda', {user, agendaData});
+  debug.log('createAgenda', { user, agendaData });
   const userId = user._id;
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '非金管委員不得建立議程！');
@@ -93,5 +93,5 @@ function createAgenda(user, agendaData) {
     issues: issueIds
   });
 }
-//二十秒鐘最多一次
+// 二十秒鐘最多一次
 limitMethod('createAgenda', 1, 20000);

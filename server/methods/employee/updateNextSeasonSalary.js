@@ -17,7 +17,7 @@ Meteor.methods({
   }
 });
 export function updateNextSeasonSalary(user, companyId, salary) {
-  debug.log('updateNextSeasonSalary', {user, companyId, salary});
+  debug.log('updateNextSeasonSalary', { user, companyId, salary });
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,

@@ -40,5 +40,5 @@ function queryStocksPrice(companyId, options) {
       };
     });
 }
-//一分鐘最多10次
+// 一分鐘最多10次
 limitMethod('queryStocksPrice');

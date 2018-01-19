@@ -28,7 +28,7 @@ Template.arenaInfo.helpers({
   arenaData() {
     const arenaId = FlowRouter.getParam('arenaId');
     const arenaData = dbArena.findOne(arenaId);
-    //更換大賽資訊，自動依據大賽是否已過期來重設選手排列依據
+    // 更換大賽資訊，自動依據大賽是否已過期來重設選手排列依據
     if (arenaData) {
       if (Date.now() > arenaData.endDate) {
         rFighterSortBy.set('index');
@@ -96,7 +96,7 @@ Template.arenaInfoNav.helpers({
           else {
             return {
               'class': 'btn btn-info btn-sm float-left disabled',
-              'href': FlowRouter.path('arenaInfo', {arenaId})
+              'href': FlowRouter.path('arenaInfo', { arenaId })
             };
           }
         }
@@ -124,7 +124,7 @@ Template.arenaInfoNav.helpers({
           else {
             return {
               'class': 'btn btn-info btn-sm float-right disabled',
-              'href': FlowRouter.path('arenaInfo', {arenaId})
+              'href': FlowRouter.path('arenaInfo', { arenaId })
             };
           }
         }
@@ -145,7 +145,7 @@ Template.arenaInfoNav.helpers({
   }
 });
 
-//auto load company/fighter name info
+// auto load company/fighter name info
 const rFighterIdList = new ReactiveVar([]);
 const rFighterUrlHash = new ReactiveVar({});
 const rFighterNameHash = new ReactiveVar({});
@@ -157,7 +157,7 @@ Template.arenaInfo.onCreated(function() {
     const arenaId = FlowRouter.getParam('arenaId');
     const fighterIdList = new Set();
     const managerIdList = new Set();
-    dbArenaFighters.find({arenaId}).forEach((fighter) => {
+    dbArenaFighters.find({ arenaId }).forEach((fighter) => {
       fighterIdList.add(fighter.companyId);
       managerIdList.add(fighter.manager);
     });
@@ -171,7 +171,7 @@ Template.arenaInfo.onCreated(function() {
     const fighterUrlHash = {};
     const fighterNameHash = {};
     _.each(rFighterIdList.get(), (companyId) => {
-      fighterUrlHash[companyId] = FlowRouter.path('companyDetail', {companyId});
+      fighterUrlHash[companyId] = FlowRouter.path('companyDetail', { companyId });
       const ajaxResult = $.ajax({
         url: '/companyInfo',
         data: {
@@ -199,7 +199,7 @@ Template.arenaInfo.onCreated(function() {
     const managerUrlHash = {};
     const managerNameHash = {};
     _.each(rManagerIdList.get(), (userId) => {
-      managerUrlHash[userId] = FlowRouter.path('accountInfo', {userId});
+      managerUrlHash[userId] = FlowRouter.path('accountInfo', { userId });
       const ajaxResult = $.ajax({
         url: '/userInfo',
         data: {
@@ -258,7 +258,7 @@ Template.arenaFighterTable.helpers({
     const winnerList = this.winnerList;
 
     const fighterList = dbArenaFighters
-      .find({arenaId})
+      .find({ arenaId })
       .map((figher) => {
         if (winnerList.length) {
           figher.index = _.indexOf(winnerList, figher.companyId) + 1;
@@ -277,7 +277,7 @@ Template.arenaFighterTable.helpers({
         case 'agi': {
           const agi1 = fighter1.agi;
           const agi2 = fighter2.agi;
-          //agi相等時比較createdAt的逆序
+          // agi相等時比較createdAt的逆序
           if (agi1 === agi2) {
             return (fighter1.createdAt.getTime() - fighter2.createdAt.getTime()) * sortDir * -1;
           }
@@ -366,7 +366,7 @@ Template.arenaLogList.helpers({
     else {
       const arenaId = log.arenaId;
       const companyId = log.attackerId;
-      const attacker = dbArenaFighters.findOne({arenaId, companyId});
+      const attacker = dbArenaFighters.findOne({ arenaId, companyId });
 
       return `(SP:${log.attackerSp}<span class="text-danger">-${attacker.spCost}</span>)`;
     }
@@ -375,7 +375,7 @@ Template.arenaLogList.helpers({
     let result = '';
     const arenaId = log.arenaId;
     const companyId = log.attackerId;
-    const attacker = dbArenaFighters.findOne({arenaId, companyId});
+    const attacker = dbArenaFighters.findOne({ arenaId, companyId });
     if (attacker) {
       if (log.attackManner > 0) {
         result += '普通攻擊';

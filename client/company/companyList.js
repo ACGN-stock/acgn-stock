@@ -29,7 +29,7 @@ Template.companyList.onCreated(function() {
     const onlyShow = rFilterBy.get();
     const sortBy = rSortBy.get();
     const offset = rCompanyOffset.get();
-    this.subscribe('companyList', {keyword, matchType, onlyShow, sortBy, offset});
+    this.subscribe('companyList', { keyword, matchType, onlyShow, sortBy, offset });
   });
   this.autorun(() => {
     if (shouldStopSubscribe()) {
@@ -183,17 +183,17 @@ const companyListHelpers = {
     }
   },
   getManageHref(companyId) {
-    return FlowRouter.path('editCompany', {companyId});
+    return FlowRouter.path('editCompany', { companyId });
   },
   getStockAmount(companyId) {
     const userId = Meteor.user()._id;
-    const ownStockData = dbDirectors.findOne({companyId, userId});
+    const ownStockData = dbDirectors.findOne({ companyId, userId });
 
     return ownStockData ? ownStockData.stocks : 0;
   },
   getStockPercentage(companyId, totalRelease) {
     const userId = Meteor.user()._id;
-    const ownStockData = dbDirectors.findOne({companyId, userId});
+    const ownStockData = dbDirectors.findOne({ companyId, userId });
 
     if (ownStockData) {
       return Math.round(ownStockData.stocks / totalRelease * 10000) / 100;
@@ -204,12 +204,12 @@ const companyListHelpers = {
   existOwnOrder(companyId) {
     const userId = Meteor.user()._id;
 
-    return ! ! dbOrders.findOne({companyId, userId});
+    return ! ! dbOrders.findOne({ companyId, userId });
   },
   ownOrderList(companyId) {
     const userId = Meteor.user()._id;
 
-    return dbOrders.find({companyId, userId});
+    return dbOrders.find({ companyId, userId });
   }
 };
 const companyListEvents = {

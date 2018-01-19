@@ -61,7 +61,7 @@ export function placeStone({ userId, companyId, stoneType }, resourceLocked = fa
 
   const nowDate = new Date();
   dbCompanyStones.insert({ userId, companyId, stoneType, placedAt: nowDate });
-  Meteor.users.update(userId, { $inc: { [`profile.stones.${stoneType}`]: -1 }});
+  Meteor.users.update(userId, { $inc: { [`profile.stones.${stoneType}`]: -1 } });
   dbLog.insert({
     logType: '礦機放石',
     userId: [userId],

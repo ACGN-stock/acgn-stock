@@ -8,11 +8,11 @@ import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('accountChairmanTitle', function(userId, offset) {
-  debug.log('publish accountChairmanTitle', {userId, offset});
+  debug.log('publish accountChairmanTitle', { userId, offset });
   check(userId, String);
   check(offset, Match.Integer);
 
-  const filter = {chairman: userId, isSeal: false};
+  const filter = { chairman: userId, isSeal: false };
 
   publishTotalCount('totalCountOfChairmanTitle', dbCompanies.find(filter), this);
 
@@ -39,15 +39,15 @@ Meteor.publish('accountChairmanTitle', function(userId, offset) {
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('accountChairmanTitle');
 
 Meteor.publish('accountManagerTitle', function(userId, offset) {
-  debug.log('publish accountManagerTitle', {userId, offset});
+  debug.log('publish accountManagerTitle', { userId, offset });
   check(userId, String);
   check(offset, Match.Integer);
 
-  const filter = {manager: userId, isSeal: false};
+  const filter = { manager: userId, isSeal: false };
 
   publishTotalCount('totalCountOfManagerTitle', dbCompanies.find(filter), this);
 
@@ -74,14 +74,14 @@ Meteor.publish('accountManagerTitle', function(userId, offset) {
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('accountManagerTitle');
 
 Meteor.publish('accounEmployeeTitle', function(userId) {
-  debug.log('publish accounEmployeeTitle', {userId});
+  debug.log('publish accounEmployeeTitle', { userId });
   check(userId, String);
 
-  const filter = {userId, resigned: false};
+  const filter = { userId, resigned: false };
 
   return [
     dbEmployees.find(filter),
@@ -94,5 +94,5 @@ Meteor.publish('accounEmployeeTitle', function(userId) {
     })
   ];
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('accounEmployeeTitle');

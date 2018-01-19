@@ -74,7 +74,7 @@ Template.instantMessageChatForm.events({
   }
 });
 
-//不能篩掉、永遠顯示的紀錄類別
+// 不能篩掉、永遠顯示的紀錄類別
 const alwaysDisplayLogTypeList = [
   '發薪紀錄',
   '舉報違規',
@@ -96,7 +96,7 @@ const alwaysDisplayLogTypeList = [
   '產品下架',
   '撤銷廣告'
 ];
-//篩選器可以選擇的紀錄類別
+// 篩選器可以選擇的紀錄類別
 const messageTypeGroupHash = {
   '聊天發言': [
     '聊天發言'
@@ -254,27 +254,27 @@ Template.instantMessageList.helpers({
     const userId = user ? user._id : '';
     const filterTypeList = rFilterTypeList.get();
     const displayLogList = _.filter(rInstantMessageList.get(), (logData) => {
-      //發布給所有使用者的紀錄一定要顯示
+      // 發布給所有使用者的紀錄一定要顯示
       if (logData.userId === '!all') {
         return true;
       }
-      //登入使用者自身有關的紀錄一定要顯示
+      // 登入使用者自身有關的紀錄一定要顯示
       if (userId && logData.userId && _.contains(logData.userId, userId)) {
         return true;
       }
-      //如果有點擊「只看指定使用者或公司」篩選按鈕
+      // 如果有點擊「只看指定使用者或公司」篩選按鈕
       if (_.contains(filterTypeList, '只看指定使用者或公司')) {
         const filterUserId = rFilterUserId.get();
         const filterCompanyId = rFilterCompanyId.get();
 
-        //只顯示按鈕篩選器有啟動的訊息且有相符使用者識別碼或公司識別碼的紀錄
+        // 只顯示按鈕篩選器有啟動的訊息且有相符使用者識別碼或公司識別碼的紀錄
         return _.contains(filterTypeList, logData.logType) && (
           (logData.userId && _.intersection(filterUserId, logData.userId).length > 0) ||
           logData.companyId && _.contains(filterCompanyId, logData.companyId)
         );
       }
 
-      //只顯示按鈕篩選器有啟動的紀錄
+      // 只顯示按鈕篩選器有啟動的紀錄
       return _.contains(filterTypeList, logData.logType);
     });
 

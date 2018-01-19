@@ -67,5 +67,5 @@ Meteor.publish('adjacentArena', function(arenaId) {
   }
   this.ready();
 });
-//一分鐘最多重複訂閱20次
+// 一分鐘最多重複訂閱20次
 limitSubscription('adjacentArena');

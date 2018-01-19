@@ -23,7 +23,7 @@ Object.keys(profitIncreaseMap).forEach((companyId) => {
   const profitIncrease = profitIncreaseMap[companyId];
   companyBulk
     .find({ _id: companyId })
-    .updateOne({ $inc: { profit: profitIncrease }});
+    .updateOne({ $inc: { profit: profitIncrease } });
 });
 
 print(companyBulk.execute());

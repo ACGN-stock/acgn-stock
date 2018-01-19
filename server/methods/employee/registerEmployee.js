@@ -17,7 +17,7 @@ Meteor.methods({
   }
 });
 export function registerEmployee(user, companyId) {
-  debug.log('registerEmployee', {user, companyId});
+  debug.log('registerEmployee', { user, companyId });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -41,7 +41,7 @@ export function registerEmployee(user, companyId) {
   const employed = false;
   const resigned = false;
   const registerAt = new Date();
-  dbEmployees.remove({userId, employed, resigned});
-  dbEmployees.insert({companyId, userId, registerAt});
+  dbEmployees.remove({ userId, employed, resigned });
+  dbEmployees.insert({ companyId, userId, registerAt });
 }
 limitMethod('registerEmployee');

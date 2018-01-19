@@ -9,5 +9,5 @@ Meteor.publish('isChangingSeason', function() {
 
   return dbResourceLock.find({ _id: 'season' }, { fields: { _id: 1 } });
 });
-//一分鐘最多重複訂閱5次
+// 一分鐘最多重複訂閱5次
 limitSubscription('isChangingSeason', 5);

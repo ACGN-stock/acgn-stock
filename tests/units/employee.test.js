@@ -38,13 +38,13 @@ test('Register employee test', function(t) {
     registerEmployee(user, companyId);
   }, Meteor.Error, 'User can\'t register as an employee of the company which doesn\'t exist');
 
-  dbCompanies.findOne.returns({companyName: companyId, isSeal: true});
+  dbCompanies.findOne.returns({ companyName: companyId, isSeal: true });
 
   t.throws(function() {
     registerEmployee(user, companyId);
   }, Meteor.Error, 'User can\'t register as an employee of the sealed company');
 
-  dbCompanies.findOne.returns({companyName: companyId, isSeal: false});
+  dbCompanies.findOne.returns({ companyName: companyId, isSeal: false });
 
   const curDate = new Date();
   const clock = sinon.useFakeTimers(curDate);

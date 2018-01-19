@@ -24,7 +24,7 @@ Meteor.methods({
   }
 });
 export function editFoundCompany(user, foundCompanyData) {
-  debug.log('foundCompany', {user, foundCompanyData});
+  debug.log('foundCompany', { user, foundCompanyData });
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }
@@ -47,7 +47,7 @@ export function editFoundCompany(user, foundCompanyData) {
     checkImageUrl(foundCompanyData.pictureSmall);
   }
   resourceManager.throwErrorIsResourceIsLock(['foundation' + companyId]);
-  //先鎖定資源，再更新
+  // 先鎖定資源，再更新
   resourceManager.request('editFoundCompany', ['foundation' + companyId], (release) => {
     dbFoundations.update(companyId, {
       $set: _.omit(foundCompanyData, '_id')
@@ -55,5 +55,5 @@ export function editFoundCompany(user, foundCompanyData) {
     release();
   });
 }
-//一分鐘最多三次
+// 一分鐘最多三次
 limitMethod('editFoundCompany', 3);

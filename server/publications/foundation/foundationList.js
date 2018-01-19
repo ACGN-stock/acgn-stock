@@ -7,8 +7,8 @@ import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { buildSearchRegExp } from '/server/imports/utils/buildSearchRegExp';
 
-Meteor.publish('foundationList', function({keyword, matchType, offset}) {
-  debug.log('publish foundationPlan', {keyword, matchType, offset});
+Meteor.publish('foundationList', function({ keyword, matchType, offset }) {
+  debug.log('publish foundationPlan', { keyword, matchType, offset });
   check(keyword, String);
   check(matchType, new Match.OneOf('exact', 'fuzzy'));
   check(offset, Match.Integer);
@@ -53,5 +53,5 @@ Meteor.publish('foundationList', function({keyword, matchType, offset}) {
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('foundationList');

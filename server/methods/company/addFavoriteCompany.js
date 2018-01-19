@@ -14,7 +14,7 @@ Meteor.methods({
   }
 });
 function addFavoriteCompany(user, companyId) {
-  debug.log('addFavoriteCompany', {user, companyId});
+  debug.log('addFavoriteCompany', { user, companyId });
   if (user.favorite.length >= Meteor.settings.public.maximumFavorite) {
     throw new Meteor.Error(403, '您的最愛已達上限!');
   }

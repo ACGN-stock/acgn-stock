@@ -31,7 +31,7 @@ Template.userLink.onRendered(function() {
       success: (userData) => {
         const userName = userData.name;
         if (userData.status === 'registered') {
-          const path = FlowRouter.path('accountInfo', {userId});
+          const path = FlowRouter.path('accountInfo', { userId });
           $link
             .attr('href', path)
             .text(('' + userName).trim() || '???');
@@ -76,7 +76,7 @@ Template.companyLink.onRendered(function() {
             break;
           }
           case 'market': {
-            path = FlowRouter.path('companyDetail', {companyId});
+            path = FlowRouter.path('companyDetail', { companyId });
             break;
           }
         }

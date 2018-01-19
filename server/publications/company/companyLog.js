@@ -7,7 +7,7 @@ import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
-  debug.log('publish companyLog', {companyId, onlyShowMine, offset});
+  debug.log('publish companyLog', { companyId, onlyShowMine, offset });
   check(companyId, String);
   check(onlyShowMine, Boolean);
   check(offset, Match.Integer);
@@ -46,5 +46,5 @@ Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('companyLog');

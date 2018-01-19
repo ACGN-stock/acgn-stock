@@ -31,7 +31,7 @@ export function startVacation(userId) {
     throw new Meteor.Error(403, '您已經處於渡假狀態！');
   }
 
-  const lastRoundData = dbRound.findOne({}, { sort: { beginDate: -1 }});
+  const lastRoundData = dbRound.findOne({}, { sort: { beginDate: -1 } });
 
   if (lastRoundData.endDate.getTime() - Date.now() < Meteor.settings.public.seasonTime * 2) {
     throw new Meteor.Error(403, '賽季結束前兩週禁止渡假！');

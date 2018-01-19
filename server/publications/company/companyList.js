@@ -9,8 +9,8 @@ import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { buildSearchRegExp } from '/server/imports/utils/buildSearchRegExp';
 
-Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, offset}) {
-  debug.log('publish companyList', {keyword, matchType, onlyShow, sortBy, offset});
+Meteor.publish('companyList', function({ keyword, matchType, onlyShow, sortBy, offset }) {
+  debug.log('publish companyList', { keyword, matchType, onlyShow, sortBy, offset });
   check(keyword, String);
   check(matchType, new Match.OneOf('exact', 'fuzzy', 'regexp'));
   check(onlyShow, new Match.OneOf('none', 'mine', 'favorite', 'order'));
@@ -37,7 +37,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
   if (userId) {
     if (onlyShow === 'mine') {
       const seeCompanyIdList = dbDirectors
-        .find({userId}, {
+        .find({ userId }, {
           fields: {
             companyId: 1
           }
@@ -47,7 +47,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
         });
       const seeCompanyIdSet = new Set(seeCompanyIdList);
       dbOrders
-        .find({userId}, {
+        .find({ userId }, {
           fields: {
             companyId: 1
           }
@@ -67,7 +67,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
     }
     else if (onlyShow === 'order') {
       const seeCompanyIdList = dbOrders
-        .find({userId}, {
+        .find({ userId }, {
           fields: {
             companyId: 1
           }
@@ -107,7 +107,7 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
 
   publishTotalCount('totalCountOfCompanyList', dbCompanies.find(filter), this);
   const pageObserver = dbCompanies
-    .find(filter, {sort, skip, limit, fields, disableOplog})
+    .find(filter, { sort, skip, limit, fields, disableOplog })
     .observeChanges({
       added: (id, fields) => {
         this.added('companies', id, fields);
@@ -125,5 +125,5 @@ Meteor.publish('companyList', function({keyword, matchType, onlyShow, sortBy, of
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('companyList');

@@ -23,7 +23,7 @@ Meteor.methods({
   }
 });
 function editCompany(user, companyId, newCompanyData) {
-  debug.log('editCompany', {user, companyId, newCompanyData});
+  debug.log('editCompany', { user, companyId, newCompanyData });
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,
