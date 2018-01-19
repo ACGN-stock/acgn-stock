@@ -46,5 +46,14 @@ Template.tutorial.helpers({
   },
   employeeProductVotingRewardPercentage() {
     return Meteor.settings.public.employeeProductVotingRewardFactor * 100;
+  },
+  productVoucherAmount() {
+    return Meteor.settings.public.productVoucherAmount;
+  },
+  productRebateDivisorAmount() {
+    return Meteor.settings.public.productRebates.divisorAmount;
+  },
+  productRebateDeliverAmount() {
+    return Meteor.settings.public.productRebates.deliverAmount;
   }
 });

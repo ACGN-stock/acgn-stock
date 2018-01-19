@@ -60,6 +60,11 @@ export const config = {
   productFinalSaleTime: 43200000, // 產品最後出清時間 (ms)
   productProfitFactor: 2.00, // 產品售出的營利乘數
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
-  employeeProductVotingRewardFactor: 0.01 // 員工投推薦票的回饋金比例
+  employeeProductVotingRewardFactor: 0.01, // 員工投推薦票的回饋金比例
+  productVoucherAmount: 7000, // 產品消費券的數量
+  productRebates: { // 產品滿額回饋設定
+    divisorAmount: 3500, // 滿額條件
+    deliverAmount: 100 // 每達成一次滿額條件可得回饋
+  }
 };
 export default config;
