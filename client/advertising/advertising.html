@@ -17,13 +17,17 @@
         <hr />
       {{/if}}
       <hr />
-      <h3 class="card-subtitle text-muted">
-        進行中的廣告
+      <h3 class="d-flex flex-wrap justify-content-start align-items-center">
+        <div class="text-nowrap text-muted">
+          進行中的廣告
+        </div>
         {{#if currentUser}}
-          <button class="btn btn-primary btn-sm float-right" type="button" data-action="buyAdvertising">
-            <i class="fa fa-plus" aria-hidden="true"></i>
-            購買廣告
-          </button>
+          <div class="d-flex flex-wrap justify-content-end ml-auto mt-1">
+            <button class="btn btn-primary btn-sm" type="button" data-action="buyAdvertising">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              購買廣告
+            </button>
+          </div>
         {{/if}}
       </h3>
       <hr />

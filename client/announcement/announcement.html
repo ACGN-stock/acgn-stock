@@ -1,13 +1,17 @@
 <template name="announcement">
   <div class="card">
     <div class="card-block">
-      <h1 class="card-title mb-1">
-        系統公告
+      <h1 class="d-flex flex-wrap justify-content-start align-items-center mb-1">
+        <div class="text-nowrap">
+          系統公告
+        </div>
         {{#if currentUser.profile.isAdmin}}
-          <button class="btn btn-warning btn-sm float-right" type="button" data-action="editAnnouncement">
-            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-            修改系統公告
-          </button>
+          <div class="d-flex flex-wrap justify-content-end ml-auto mt-1">
+            <button class="btn btn-warning btn-sm" type="button" data-action="editAnnouncement">
+              <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+              修改系統公告
+            </button>
+          </div>
         {{/if}}
       </h1>
       {{#if inEditAnnouncementMode}}
