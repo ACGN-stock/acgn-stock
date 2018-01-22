@@ -328,7 +328,8 @@ Template.chairmanTitleList.helpers({
   titleList() {
     return dbCompanies
       .find({
-        chairman: this._id
+        chairman: this._id,
+        isSeal: false
       },
       {
         limit: 10
@@ -367,7 +368,8 @@ Template.managerTitleList.helpers({
   titleList() {
     return dbCompanies
       .find({
-        manager: this._id
+        manager: this._id,
+        isSeal: false
       },
       {
         limit: 10
@@ -382,18 +384,27 @@ Template.managerTitleList.helpers({
   }
 });
 
+Template.employeeTitleList.onCreated(function() {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = FlowRouter.getParam('userId');
+    if (userId) {
+      this.subscribe('accounEmployeeTitle', userId);
+    }
+  });
+});
 Template.employeeTitleList.helpers({
   employment() {
     const userId = FlowRouter.getParam('userId');
-    const employed = true;
 
-    return dbEmployees.findOne({ userId, employed });
+    return dbEmployees.find({ userId }, { sort: { employed: -1 } });
   },
-  nextSeasonEmployment() {
-    const userId = FlowRouter.getParam('userId');
-    const employed = false;
+  isSeal(companyId) {
+    const companyData = dbCompanies.findOne(companyId);
 
-    return dbEmployees.findOne({ userId, employed });
+    return companyData ? companyData.isSeal : false;
   }
 });
 

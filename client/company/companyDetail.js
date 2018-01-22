@@ -682,6 +682,7 @@ function drawCandleStickChart(templateInstance) {
           data: data,
           cropThreshold: count,
           maxPointWidth: 10,
+          color: '#449d44',
           lineColor: '#449d44',
           upLineColor: '#d9534f',
           upColor: '#d9534f',
