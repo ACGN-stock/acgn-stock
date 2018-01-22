@@ -218,9 +218,9 @@
   {{#each titleList}}
     <div class="text-primary d-flex flex-nowrap">
       <div class="text-nowrap">是「</div>
-      <div class="d-inline-block text-truncate" style="min-width: 3rem;">{{>companyLink this._id}}</div>
+      <div class="d-inline-block text-truncate" style="max-width: calc(100% - 11rem);">{{>companyLink this._id}}</div>
       <div class="text-nowrap">」公司的「</div>
-      <div class="d-inline-block text-truncate" style="min-width: 3rem;">
+      <div class="d-inline-block text-truncate" style="max-width: calc(100% - 11rem);">
         {{#if isCurrentUser}}
           <a href="#" data-action="changeChairmanTitle">
             {{this.chairmanTitle}}

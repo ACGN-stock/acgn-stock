@@ -402,7 +402,9 @@ Template.employeeTitleList.helpers({
     return dbEmployees.find({ userId }, { sort: { employed: -1 } });
   },
   isSeal(companyId) {
-    return dbCompanies.findOne(companyId).isSeal;
+    const companyData = dbCompanies.findOne(companyId);
+
+    return companyData ? companyData.isSeal : false;
   }
 });
 
