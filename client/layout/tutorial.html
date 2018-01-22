@@ -164,11 +164,13 @@
               <li>產品的販售：
                 <ul>
                   <li>產品販售期間，在參考價格變動時，會隨機上架補充一定數量供人購買；在商業季度結束前{{productFinalSaleHours}}小時，進行最後出清，把所有可上架的數量全部上架。</li>
+                  <li>除了使用現金之外，在每個商業季度中，每位玩家會有${{currencyFormat productVoucherAmount}}額度的消費券供產品購買使用，購買產品時將優先使用消費券。</li>
                   <li>玩家只能購買有剩餘數量的產品，若是數量不足則需等待下次補貨。</li>
                   <li>玩家可在自己的帳號資訊下，檢視自己持有哪些產品。</li>
                   <li>使用者在同一商業季度的同一間公司裡，購買的總額度不得超過公司資本額的10%。</li>
                   <li>產品售出時，公司將得到產品成本的{{productProfitFactor}}倍作為營利額。</li>
                   <li>在進入下一個商業季度時，產品將停止販售。</li>
+                  <li>玩家在一間公司消費每滿${{currencyFormat productRebateDivisorAmount}}，在商業季度結算時，可得${{currencyFormat productRebateDeliverAmount}}的產品消費回饋。</li>
                 </ul>
               </li>
               <li>每個商業季度開始時，玩家會得到與公司總數成正比的推薦票，讓玩家投票選出自己所喜愛的產品。</li>

@@ -48,12 +48,15 @@ export function buyProduct({ userId, productId, amount }, resourceLocked = false
 
   guardCompany(company).checkNotSealed();
 
-  const cost = product.price * amount;
-  guardUser(user).checkHasMoney(cost);
+  const totalCost = product.price * amount;
+  const voucherCost = Math.min(totalCost, user.profile.vouchers);
+  const moneyCost = totalCost - voucherCost;
+
+  guardUser(user).checkHasMoney(moneyCost);
 
   const availableQuota = getAvailableProductTradeQuota({ userId, companyId });
 
-  if (availableQuota < cost) {
+  if (availableQuota < totalCost) {
     throw new Meteor.Error(403, '剩餘購買額度不足！');
   }
 
@@ -70,17 +73,20 @@ export function buyProduct({ userId, productId, amount }, resourceLocked = false
   }
 
   const nowTime = Date.now();
-  const profit = Math.round(cost * productProfitFactor);
+  const profit = Math.round(totalCost * productProfitFactor);
 
   dbLog.insert({
     logType: '購買產品',
     userId: [userId],
     companyId,
-    data: { productId, amount, cost, profit },
+    data: { productId, amount, voucherCost, moneyCost, profit },
     createdAt: nowTime
   });
 
-  Meteor.users.update(userId, { $inc: { 'profile.money': -cost } });
+  Meteor.users.update(userId, { $inc: {
+    'profile.vouchers': -voucherCost,
+    'profile.money': -moneyCost
+  } });
   dbProducts.update(productId, { $inc: { availableAmount: -amount, profit } });
   dbCompanies.update(companyId, { $inc: { profit } });
 

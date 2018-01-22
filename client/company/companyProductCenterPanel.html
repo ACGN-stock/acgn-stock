@@ -12,7 +12,14 @@
     <div class="col-12 d-flex flex-wrap align-items-baseline">
       <h4 class="mr-2">當季產品販賣區</h4>
       {{#if currentUser}}
-        <div>您的剩餘購買額度：${{currencyFormat currentUserTradeQuota}}</div>
+        <div>
+          <span>您的購買額度：</span>
+          <div class="d-inline-flex flex-wrap">
+            <span>已用 ${{currencyFormat currentUserSpentTradeQuota}}</span>
+            <span class="mx-2">/</span>
+            <span>剩餘 ${{currencyFormat currentUserAvailableTradeQuota}}</span>
+          </div>
+        </div>
       {{/if}}
     </div>
     <div class="col-12">

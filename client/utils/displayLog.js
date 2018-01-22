@@ -203,7 +203,17 @@ Template.displayLog.helpers({
         return `【推薦產品】${users[0]}向「${company}」公司的產品「${productSpan(data.productId)}」投了一張推薦票！`;
       }
       case '購買產品': {
-        return `【購買產品】${users[0]}花費$${currencyFormat(data.cost)}買了「${company}」公司的產品「${productSpan(data.productId)}」共${data.amount}個，使該公司獲得了$${currencyFormat(data.profit)}的營利額！`;
+        const { voucherCost, moneyCost } = data;
+        const costMessageList = [];
+
+        if (voucherCost > 0) {
+          costMessageList.push(`消費券$${currencyFormat(voucherCost)}`);
+        }
+        if (moneyCost > 0) {
+          costMessageList.push(`現金$${currencyFormat(moneyCost)}`);
+        }
+
+        return `【購買產品】${users[0]}花費${costMessageList.join('以及')}買了「${company}」公司的產品「${productSpan(data.productId)}」共${data.amount}個，使該公司獲得了$${currencyFormat(data.profit)}的營利額！`;
       }
       case '員工營利': {
         return `【員工營利】${users.join('、')}等人努力工作，使「${company}」公司獲得了$${currencyFormat(data.profit)}的營利額！`;
@@ -218,6 +228,9 @@ Template.displayLog.helpers({
         const source = companyId ? `「${company}」公司` : '系統';
 
         return `【推薦回饋】${source}向${users[0]}發給了產品投票回饋金$${currencyFormat(data.reward)}！`;
+      }
+      case '消費回饋': {
+        return `【消費回饋】${users[0]}得到了「${company}」公司的產品消費回饋金$${currencyFormat(data.rebate)}！`;
       }
       case '季度賦稅': {
         return `【季度賦稅】${users[0]}在此次商業季度中產生了$${currencyFormat(data.assetTax)}的財富稅與$${currencyFormat(data.zombieTax)}的殭屍稅！`;

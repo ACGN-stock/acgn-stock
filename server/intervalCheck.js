@@ -41,6 +41,7 @@ import { countDownRecordListPrice } from './functions/company/recordListPrice';
 import { countDownCheckChairman } from './functions/company/checkChairman';
 import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
 import { deliverProductVotingRewards } from './functions/season/deliverProductVotingRewards';
+import { deliverProductRebates } from './functions/product/deliverProductRebates';
 import { returnCompanyStones } from './functions/miningMachine/returnCompanyStones';
 import { generateMiningProfits } from './functions/miningMachine/generateMiningProfits';
 import { rotateProducts } from './functions/product/rotateProducts';
@@ -163,6 +164,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     giveBonusByStocksFromProfit();
     // 發放推薦票回饋金
     deliverProductVotingRewards();
+    // 發放產品購買回饋金
+    deliverProductRebates();
     // 更新所有公司的評級
     updateCompanyGrades();
     // 更新所有公司的生產資金
@@ -269,6 +272,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     giveBonusByStocksFromProfit();
     // 發放推薦票回饋金
     deliverProductVotingRewards();
+    // 發放產品購買回饋金
+    deliverProductRebates();
     // 更新所有公司的評級
     updateCompanyGrades();
     // 更新所有公司的生產資金
@@ -524,7 +529,12 @@ function generateNewSeason() {
   const seasonData = getCurrentSeason();
   const voteTickets = getInitialVoteTicketCount(seasonData);
 
-  Meteor.users.update({}, { $set: { 'profile.voteTickets': voteTickets } }, { multi: true });
+  Meteor.users.update({}, {
+    $set: {
+      'profile.vouchers': Meteor.settings.public.productVoucherAmount,
+      'profile.voteTickets': voteTickets
+    }
+  }, { multi: true });
   // 產品輪替
   rotateProducts();
   // 排程最後出清時間
