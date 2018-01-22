@@ -35,7 +35,7 @@ const schema = new SimpleSchema({
   },
   // 當季營利額
   profit: {
-    type: SimpleSchema.Integer
+    type: Number
   }
 });
 dbRankCompanyValue.attachSchema(schema);

@@ -111,7 +111,7 @@ const schema = new SimpleSchema({
   },
   // 當季已營利
   profit: {
-    type: SimpleSchema.Integer,
+    type: Number,
     min: 0,
     defaultValue: 0
   },

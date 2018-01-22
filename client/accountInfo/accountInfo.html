@@ -175,6 +175,9 @@
       {{#if viewType 'employee'}}
         {{> employeeTitleList}}
       {{/if}}
+      {{#if viewType 'vip'}}
+        {{> vipTitleList}}
+      {{/if}}
     </div>
   </div>
 </template>
@@ -189,6 +192,9 @@
     </li>
     <li class="nav-item">
       <a class="{{getClass 'employee'}}" href="#" data-type="employee">員工</a>
+    </li>
+    <li class="nav-item">
+      <a class="{{getClass 'vip'}}" href="#" data-type="vip">VIP</a>
     </li>
   </ul>
 </template>
@@ -239,6 +245,15 @@
   {{else}}
     查無資料！
   {{/each}}
+</template>
+
+<template name="vipTitleList">
+  {{#each vip in vips}}
+    {{> companyTitle companyId=vip.companyId title=(getTitle vip)}}
+  {{else}}
+    查無資料！
+  {{/each}}
+  {{> pagination paginationData}}
 </template>
 
 <template name="companyTitle">

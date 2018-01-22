@@ -86,7 +86,7 @@ export const dbArenaLog = {
 //   },
 //   //紀錄若防禦者被擊倒，攻擊者得到的收益
 //   profit: {
-//     type: SimpleSchema.Integer,
+//     type: Number,
 //     optional: true
 //   }
 // });

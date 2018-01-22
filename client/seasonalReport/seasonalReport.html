@@ -122,7 +122,7 @@
             {{>companyLink rankData.companyId}}
           </td>
           <td class="text-right text-nowrap">
-            $ {{currencyFormat rankData.profit}}
+            $ {{currencyFormat (round rankData.profit)}}
           </td>
           <td class="text-right text-nowrap">
             {{rankData.totalRelease}}

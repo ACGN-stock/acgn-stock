@@ -135,6 +135,14 @@
               <li>除此之外，公司的經理人隨時可以辭職不幹。</li>
               <li>經理人可以在商業季度結束前<span class="text-info">72</span>小時調整下個商業季度的員工薪資，調整範圍為<span class="text-info">$500~$2000</span>，以及在商業季度結束前<span class="text-info">24</span>小時調整本商業季度的員工分紅，調整範圍為總盈利額的<span class="text-info">1%~5%</span>。</li>
               <li>商業季度結束後，公司的收益金額將分出<span class="text-info">5%</span>作為經理人的薪水、<span class="text-info">15%</span>作為營運成本、<span class="text-info">1%~5%</span>作為員工分紅。剩餘的收益金額作為董事會分紅，依照董事會成員個人之持股數量對所有董事的總持股數量之比例來分配。</li>
+              <li>
+                若該董事為公司的 VIP，持股數量將依據 VIP 等級來加成計算：
+                <ul>
+                  {{#each vipParameter in vipParameters}}
+                    <li>Level {{vipParameter.level}}：{{vipParameter.stockBonusFactorPercent}}%</li>
+                  {{/each}}
+                </ul>
+              </li>
               <li>商業季度中<span class="text-danger">未曾上線</span>、<span class="text-danger">被禁止交易權限</span>的使用者將<span class="text-danger">無法</span>得到公司的季度分紅；計算董事會分紅時，持數數量也將以<span class="text-danger">0%</span>計算。</li>
               <li>商業季度中，若是未登入天數達到<span class="text-danger">四天</span>，則在計算董事會分紅時，該董事的持股數量將以<span class="text-danger">50%</span>計算，因此會拿到與比原本少的董事會分紅。</li>
               <li>商業季度中，若是未登入天數達到<span class="text-danger">五天以上</span>，則在計算董事會分紅時，該董事的持股數量將以<span class="text-danger">0%</span>計算，也就是說，拿不到董事會分紅！</li>
@@ -168,7 +176,14 @@
                   <li>玩家只能購買有剩餘數量的產品，若是數量不足則需等待下次補貨。</li>
                   <li>玩家可在自己的帳號資訊下，檢視自己持有哪些產品。</li>
                   <li>使用者在同一商業季度的同一間公司裡，購買的總額度不得超過公司資本額的10%。</li>
-                  <li>產品售出時，公司將得到產品成本的{{productProfitFactor}}倍作為營利額。</li>
+                  <li>
+                    每個售出的產品，售價乘上倍數後，將成為公司的營利額，其倍數由買入玩家的 VIP 等級決定：
+                    <ul>
+                      {{#each vipParameter in vipParameters}}
+                        <li>Level {{vipParameter.level}}：{{vipParameter.productProfitFactorPercent}}%</li>
+                      {{/each}}
+                    </ul>
+                  </li>
                   <li>在進入下一個商業季度時，產品將停止販售。</li>
                   <li>玩家在一間公司消費每滿${{currencyFormat productRebateDivisorAmount}}，在商業季度結算時，可得${{currencyFormat productRebateDeliverAmount}}的產品消費回饋。</li>
                 </ul>
@@ -188,6 +203,26 @@
       <div class="card">
         <div class="card-header pointer" role="tab">
           <h5 class="mb-0">
+            公司 VIP 相關
+          </h5>
+        </div>
+        <div class="collapse">
+          <div class="card-block">
+            <ol>
+              <li>玩家在一間公司購買產品之後，即可成為該公司的 VIP，名列在公司的 VIP 名冊中。</li>
+              <li>VIP 共分 5 級，由低至高為 Level 0 至 Level 5，系統將間隔固定時間，由 VIP 分數的高低來評定。</li>
+              <li>玩家可藉由持續購買產品，以增加自己的 VIP 分數。購買單價較高的產品，可以提升較多的分數。</li>
+              <li>在 Level 0 至 Level 4，玩家得到的 VIP 分數只要大於等於每個等級的門檻分數，即可升級至對應等級。</li>
+              <li>在 VIP 名冊中，將取最多 {{vipLevel5MaxCount}} 位分數大於等於 Level 5 門檻的玩家作為 Level 5 VIP，其餘則評定為 Level 4。</li>
+              <li>在商業季度結束時，若是玩家的 VIP 分數低於其所在等級的門檻分數，則有 {{vipLevelDownChancePercent}}% 機率降低一級。</li>
+              <li>在新的商業季度開始時，玩家在上季度所得的 VIP 分數，將乘上 {{vipPreviousSeasonScoreWeightPercent}}% 後，加入本季度的分數計算之中。</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header pointer" role="tab">
+          <h5 class="mb-0">
             員工相關
           </h5>
         </div>
@@ -195,7 +230,7 @@
           <div class="card-block">
             <ol>
               <li>玩家可以在任意時間向已創立的公司報名成為儲備員工，每次商業季度更替時儲備員工將轉為正職員工，員工任期為一個商業季度，不得中途轉任或離任。</li>
-              <li>每位正職員工在系統配發薪資時將從公司領取該公司指定的薪資，同時使公司產生與一張推薦票等價的營利額。所有正職員工將不會再從系統領取薪資。</li>
+              <li>每位正職員工在系統配發薪資時將從公司領取該公司指定的薪資，同時使公司產生營利。所有正職員工將不會再從系統領取薪資。</li>
               <li>玩家在一個商業季度內只能選擇一間公司報名，若再次報名則會自動從上次報名公司的儲備員工名單中刪除。</li>
               <li>商業季度結束後，所有正職員工將均分經理人設定的員工分紅，分紅額非整數時無條件退位。</li>
               <li>玩家可以在帳號資訊與公司資訊頁面確認是否正確報名或取消報名為儲備員工。</li>
