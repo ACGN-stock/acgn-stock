@@ -2,29 +2,33 @@
   <div class="card">
     {{#with foundationData}}
       <div class="card-block">
-        <h1 class="card-title text-truncate">
-          {{this.companyName}}
+        <h1 class="d-flex flex-wrap justify-content-start">
+          <div class="text-truncate" title="{{this.companyName}}">
+            {{this.companyName}}
+          </div>
           {{#if currentUser}}
-            <button class="btn btn-primary" type="button" data-action="invest">
-              投資
-            </button>
-            {{#if currentUser.profile.isAdmin}}
-              <a class="btn btn-warning float-right" href="#" data-action="changeCompanyName">
-                更名
-              </a>
-              <a class="btn btn-warning" href="{{getEditHref this._id}}">
-                修改計劃
-              </a>
-              {{#if this.illegalReason}}
-                <a class="btn btn-danger" href="#" data-action="unmarkFoundationIllegal">
-                  解除違規標記
+            <div class="d-flex flex-wrap justify-content-end ml-auto mt-1">
+              <button class="btn btn-primary" type="button" data-action="invest">
+                投資
+              </button>
+              {{#if currentUser.profile.isAdmin}}
+                <a class="btn btn-warning" href="#" data-action="changeCompanyName">
+                  更名
                 </a>
-              {{else}}
-                <a class="btn btn-danger" href="#" data-action="markFoundationIllegal">
-                  標記違規
+                <a class="btn btn-warning" href="{{getEditHref this._id}}">
+                  修改計劃
                 </a>
+                {{#if this.illegalReason}}
+                  <a class="btn btn-danger" href="#" data-action="unmarkFoundationIllegal">
+                    解除違規標記
+                  </a>
+                {{else}}
+                  <a class="btn btn-danger" href="#" data-action="markFoundationIllegal">
+                    標記違規
+                  </a>
+                {{/if}}
               {{/if}}
-            {{/if}}
+            </div>
           {{/if}}
         </h1>
         {{#if this.illegalReason}}
@@ -69,10 +73,10 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
         {{/if}}
       </div>
-      <div class="media-body hidden-sm-down company-description"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="media-body d-none d-md-block company-description"><h4>角色簡介</h4>{{this.description}}</div>
     </div>
     <div class="row border-grid-body" style="margin-top: 15px;">
-      <div class="col-12 border-grid hidden-md-up company-description"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="col-12 border-grid d-block d-md-none company-description"><h4>角色簡介</h4>{{this.description}}</div>
       <div class="col-12 border-grid">
         <a class="d-block h4" href="#" data-toggle-panel="numbers">
           數據資訊
@@ -84,29 +88,29 @@
         </a>
       </div>
       {{#if isDisplayPanel 'numbers'}}
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">總投資額：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid px-1">總投資額</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid" title="{{getTotalInvest this.invest}}">
           $ {{currencyFormat (getTotalInvest this.invest)}}
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">預計價格：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid px-1">預計價格</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           $ {{currencyFormat (getStockPrice this.invest)}}
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">預計釋股：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid px-1">預計釋股</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           {{getStockRelease this.invest}}股
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">投資人數：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid px-1">投資人數</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           <span class="{{investPplsNumberClass this.invest.length}}">
             {{this.invest.length}} / {{foundationNeedUsers}}
           </span>
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">計劃日期：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid px-1">計劃日期</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           {{formatDateTimeText this.createdAt}}
         </div>
-        <div class="col-4 col-md-2 col-lg-2 text-right border-grid">截止日期：</div>
+        <div class="col-4 col-md-2 col-lg-2 text-right border-grid px-1">截止日期</div>
         <div class="col-8 col-md-4 col-lg-2 text-right border-grid">
           {{getExpireDateText this.createdAt}}
         </div>
@@ -144,27 +148,29 @@
 <template name="foundationFounderList">
   <div class="col-12 border-grid">
     <div class="row mb-1">
-      <div class="col-6 text-left">使用者帳號</div>
-      <div class="col-3 text-right">投資額</div>
-      <div class="col-3 text-right">比例</div>
+      <div class="col-6 text-left px-2">使用者帳號</div>
+      <div class="col-3 text-right px-2">投資額</div>
+      <div class="col-3 text-right pl-0 pr-2">比例</div>
     </div>
-    {{#each invest in orderedInvestList}}
-      <div class="row mb-1">
-        <div class="col-6 text-left text-truncate">
-          {{>userLink invest.userId}}
+    <div style="max-height: 240px; overflow-y: auto; margin-left: -15px; margin-right: -15px;">
+      {{#each invest in orderedInvestList}}
+        <div class="d-flex mb-1">
+          <div class="col-6 text-left text-truncate px-2">
+            {{>userLink invest.userId}}
+          </div>
+          <div class="col-3 text-right px-2" title="{{invest.amount}}">
+            {{currencyFormat invest.amount}}
+          </div>
+          <div class="col-3 text-right pl-0 pr-2" title="{{getPercentage invest.amount this.invest}} %">
+            {{getPercentage invest.amount}} %
+          </div>
         </div>
-        <div class="col-3 text-right" title="{{invest.amount}}">
-          {{currencyFormat invest.amount}}
+      {{else}}
+        <div class="text-center">
+          沒有任何投資人！
         </div>
-        <div class="col-3 text-right" title="{{getPercentage invest.amount this.invest}} %">
-          {{getPercentage invest.amount}} %
-        </div>
-      </div>
-    {{else}}
-      <div class="text-center">
-        沒有任何投資人！
-      </div>
-    {{/each}}
+      {{/each}}
+    </div>
   </div>
 </template>
 

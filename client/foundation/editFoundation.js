@@ -11,6 +11,7 @@ import { dbVariables } from '/db/dbVariables';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
+import { bigPicturePreviewModal } from '../layout/bigPicturePreviewModal';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat } from '../utils/helpers.js';
 
@@ -181,6 +182,13 @@ Template.foundCompanyForm.events({
     }
     else {
       previewPictureType.set(type);
+
+      if (type === 'pictureBig') {
+        bigPicturePreviewModal.show({
+          'src': this.pictureBig,
+          'switch': previewPictureType
+        });
+      }
     }
   }
 });

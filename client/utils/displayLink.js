@@ -2,7 +2,6 @@
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { externalLinkAlert } from './externalLinkAlert';
 
 Template.userLink.onRendered(function() {
   let userId = this.data;
@@ -115,4 +114,3 @@ Template.productLink.onRendered(function() {
   }
 });
 
-Template.productLink.events(externalLinkAlert);

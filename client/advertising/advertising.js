@@ -12,7 +12,6 @@ import { formatDateText, currencyFormat, sanitizeHtml } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { externalLinkAlert } from '../utils/externalLinkAlert';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInBuyAdvertisingMode = new ReactiveVar(false);
@@ -60,7 +59,7 @@ Template.advertising.helpers({
   }
 });
 
-const advertisingEvents = Object.assign({
+Template.advertising.events({
   'click [data-action="buyAdvertising"]'(event) {
     event.preventDefault();
     rInBuyAdvertisingMode.set(true);
@@ -103,8 +102,7 @@ const advertisingEvents = Object.assign({
       }
     });
   }
-}, externalLinkAlert);
-Template.advertising.events(advertisingEvents);
+});
 
 function showAskAddPayDialog(advertisingId) {
   alertDialog.dialog({

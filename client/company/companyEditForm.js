@@ -8,6 +8,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { alertDialog } from '../layout/alertDialog';
+import { bigPicturePreviewModal } from '../layout/bigPicturePreviewModal';
 
 inheritUtilForm(Template.companyEditForm);
 
@@ -110,19 +111,14 @@ Template.companyEditForm.events({
     }
     else {
       previewPictureType.set(type);
-    }
-  }
-});
 
-Template.bigPicturePreviewModal.helpers({
-  modalClass() {
-    return (previewPictureType.get() === 'pictureBig')
-      ? 'd-block big-picture-preivew modal fade show' : 'd-block big-picture-preivew modal fade';
-  }
-});
-Template.bigPicturePreviewModal.events({
-  'click div.modal'() {
-    previewPictureType.set('');
+      if (type === 'pictureBig') {
+        bigPicturePreviewModal.show({
+          'src': this.pictureBig,
+          'switch': previewPictureType
+        });
+      }
+    }
   }
 });
 
