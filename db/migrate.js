@@ -1254,9 +1254,9 @@ if (Meteor.isServer) {
     version: 18,
     name: 'add product vouchers',
     up() {
-      // 配給現有使用者消費券數量
+      // 設定所有現有使用者的消費券為 0
       Meteor.users.rawCollection().update({}, {
-        $set: { 'profile.vouchers': Meteor.settings.public.productVoucherAmount }
+        $set: { 'profile.vouchers': 0 }
       }, { multi: true });
 
       // 購買產品紀錄的花費欄位擴增為現金與消費券兩個
