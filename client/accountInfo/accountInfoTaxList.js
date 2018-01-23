@@ -8,7 +8,7 @@ import { dbTaxes } from '/db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { currencyFormat } from '../utils/helpers';
-import { accountInfoCommonHelpers } from './helpers';
+import { accountInfoCommonHelpers, paramUserId, paramUser } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfoTaxList);
 
@@ -16,7 +16,7 @@ Template.accountInfoTaxList.onCreated(function() {
   this.taxListOffset = new ReactiveVar(0);
 
   this.autorunWithIdleSupport(() => {
-    const { user: { _id: userId } } = Template.instance().data;
+    const userId = paramUserId();
 
     if (userId) {
       const offset = this.taxListOffset.get();
@@ -27,7 +27,7 @@ Template.accountInfoTaxList.onCreated(function() {
 Template.accountInfoTaxList.helpers({
   ...accountInfoCommonHelpers,
   taxesList() {
-    const { user: { _id: userId } } = Template.instance().data;
+    const userId = paramUserId();
 
     return dbTaxes.find({ userId }, {
       limit: 10,
@@ -49,7 +49,7 @@ Template.accountInfoTaxList.events({
     const taxId = new Mongo.ObjectID($(event.currentTarget).attr('data-pay'));
     const taxData = dbTaxes.findOne(taxId);
     if (taxData) {
-      const { user } = Template.instance().data;
+      const user = paramUser();
       const totalNeedPay = taxData.tax + taxData.zombie + taxData.fine - taxData.paid;
       const maxPayMoney = Math.min(user.profile.money, totalNeedPay);
       if (maxPayMoney < 1) {

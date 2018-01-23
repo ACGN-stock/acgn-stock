@@ -1,32 +1,32 @@
 <template name="accountInfo">
   <div class="card">
-    {{#with lookUser}}
+    {{#with paramUser}}
       {{> accountInfoBasic}}
       <div class="card-block">
         <div class="row border-grid-body">
           <div class="col-12 border-grid">
             {{#panelFolder name='tax' title='稅務資訊' }}
-              {{> accountInfoTaxList user=this}}
+              {{> accountInfoTaxList}}
             {{/panelFolder}}
           </div>
           <div class="col-12 border-grid">
             {{#panelFolder name='ownStock' title='持股資訊' }}
-              {{> accountInfoOwnStockList user=this}}
+              {{> accountInfoOwnStockList}}
             {{/panelFolder}}
           </div>
           <div class="col-12 border-grid">
             {{#panelFolder name='stone' title='石頭資訊' }}
-              {{> accountInfoStonePanel user=this}}
+              {{> accountInfoStonePanel}}
             {{/panelFolder}}
           </div>
           <div class="col-12 border-grid">
             {{#panelFolder name='ownedProducts' title='持有產品' }}
-              {{> accountInfoOwnedProductsPanel user=this}}
+              {{> accountInfoOwnedProductsPanel}}
             {{/panelFolder}}
           </div>
           <div class="col-12 border-grid">
             {{#panelFolder name='log' title='玩家紀錄' }}
-              {{> accountLogViewer user=this}}
+              {{> accountLogViewer}}
             {{/panelFolder}}
           </div>
         </div>
