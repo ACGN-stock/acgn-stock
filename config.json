@@ -58,6 +58,11 @@
     "productFinalSaleTime": 43200000,
     "productProfitFactor": 2.00,
     "systemProductVotingReward": 4096,
-    "employeeProductVotingRewardFactor": 0.01
+    "employeeProductVotingRewardFactor": 0.01,
+    "productVoucherAmount": 7000,
+    "productRebates": {
+      "divisorAmount": 3500,
+      "deliverAmount": 100
+    }
   }
 }

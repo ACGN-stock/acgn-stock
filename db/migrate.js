@@ -1250,6 +1250,23 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 18,
+    name: 'add product vouchers',
+    up() {
+      // 配給現有使用者消費券數量
+      Meteor.users.rawCollection().update({}, {
+        $set: { 'profile.vouchers': Meteor.settings.public.productVoucherAmount }
+      }, { multi: true });
+
+      // 購買產品紀錄的花費欄位擴增為現金與消費券兩個
+      dbLog.rawCollection().update({ logType: '購買產品', cost: { $exists: true } }, {
+        $rename: { 'data.cost': 'data.moneyCost' },
+        $set: { 'data.voucherCost': 0 }
+      });
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });
