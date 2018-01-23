@@ -1,0 +1,52 @@
+<template name="accountInfoTaxList">
+  <table class="table table-bordered mt-3 custom-responsive-table-md account-tax-list w-100" style="table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center text-nowrap" style="width: 160px">繳稅期限</th>
+        <th class="text-center text-nowrap">財稅額</th>
+        <th class="text-center text-nowrap">殭屍稅</th>
+        <th class="text-center text-nowrap ">逾期罰金</th>
+        <th class="text-center text-nowrap">已繳納</th>
+        {{#if isCurrentUser}}
+          <th class="text-center text-nowrap">繳納稅金</th>
+        {{/if}}
+      </tr>
+      </thead>
+    <tbody>
+    {{#each taxes in taxesList}}
+      <tr>
+        <td class="text-right text-truncate text-nowrap" data-title="繳稅期限">
+            {{formatDateText taxes.expireDate}}
+        </td>
+        <td class="text-right text-truncate text-nowrap" data-title="財稅額" title="{{taxes.tax}}">
+            $ {{currencyFormat taxes.tax}}
+        </td>
+        <td class="text-right text-truncate text-nowrap" data-title="殭屍稅" title="{{taxes.zombie}}">
+            $ {{currencyFormat taxes.zombie}}
+        </td>
+        <td class="text-right text-truncate text-nowrap" data-title="逾期罰金" title="{{taxes.fine}}">
+            $ {{currencyFormat taxes.fine}}
+        </td>
+        <td class="text-right text-truncate text-nowrap" data-title="已繳納" title="{{taxes.paid}}">
+            $ {{currencyFormat taxes.paid}}
+        </td>
+        {{#if isCurrentUser}}
+            <td class="text-center" data-title="繳納稅金">
+            <button class="btn btn-success btn-sm" type="button" data-pay="{{taxes._id._str}}">
+                繳納稅金
+            </button>
+            </td>
+        {{/if}}
+      </tr>
+    {{else}}
+      <tr class="default-content">
+        {{#if isCurrentUser}}
+          <td class="text-center text-truncate p-1" colspan="6">目前沒有需要繳納的稅金！</td>
+        {{else}}
+          <td class="text-center text-truncate p-1" colspan="5">目前沒有需要繳納的稅金！</td>
+        {{/if}}
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+</template>

@@ -2,21 +2,16 @@
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
-import { dbLog, accuseLogTypeList } from '/db/dbLog';
 import { dbCompanies } from '/db/dbCompanies';
-import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
-import { dbTaxes } from '/db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat } from '../utils/helpers';
 import { changeChairmanTitle } from '../utils/methods';
 import { accountInfoCommonHelpers } from './helpers';
 
@@ -405,205 +400,5 @@ Template.employeeTitleList.helpers({
     const companyData = dbCompanies.findOne(companyId);
 
     return companyData ? companyData.isSeal : false;
-  }
-});
-
-export const taxesOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.accountInfoTaxList);
-Template.accountInfoTaxList.onCreated(function() {
-  taxesOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountInfoTax', userId, taxesOffset.get());
-    }
-  });
-});
-Template.accountInfoTaxList.helpers({
-  ...accountInfoCommonHelpers,
-  taxesList() {
-    const userId = FlowRouter.getParam('userId');
-
-    return dbTaxes.find({ userId }, {
-      limit: 10,
-      sort: {
-        expireDate: 1
-      }
-    });
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfAccountInfoTax',
-      dataNumberPerPage: 10,
-      offset: taxesOffset
-    };
-  }
-});
-Template.accountInfoTaxList.events({
-  'click [data-pay]'(event) {
-    const taxId = new Mongo.ObjectID($(event.currentTarget).attr('data-pay'));
-    const taxData = dbTaxes.findOne(taxId);
-    if (taxData) {
-      const user = Meteor.user();
-      const totalNeedPay = taxData.tax + taxData.zombie + taxData.fine - taxData.paid;
-      const maxPayMoney = Math.min(user.profile.money, totalNeedPay);
-      if (maxPayMoney < 1) {
-        alertDialog.alert('您的金錢不足以繳納稅金！');
-      }
-      alertDialog.dialog({
-        type: 'prompt',
-        title: '繳納稅金',
-        message: `請輸入您要繳納的金額：(1~${currencyFormat(maxPayMoney)})`,
-        inputType: 'number',
-        defaultValue: maxPayMoney,
-        customSetting: `min="1" max="${maxPayMoney}"`,
-        callback: (amount) => {
-          amount = parseInt(amount, 10);
-          if (amount) {
-            Meteor.customCall('payTax', taxId, amount);
-          }
-        }
-      });
-    }
-  }
-});
-
-export const ownStocksOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.accountInfoOwnStockList);
-Template.accountInfoOwnStockList.onCreated(function() {
-  ownStocksOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountOwnStocks', userId, ownStocksOffset.get());
-    }
-  });
-});
-Template.accountInfoOwnStockList.helpers({
-  directorList() {
-    const userId = FlowRouter.getParam('userId');
-
-    return dbDirectors.find({ userId }, {
-      limit: 10
-    });
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfAccountOwnStocks',
-      dataNumberPerPage: 10,
-      offset: ownStocksOffset
-    };
-  }
-});
-
-
-export const accountLogViewerMode = new ReactiveVar('accuse');
-Template.accountLogViewer.helpers({
-  onlyViewAccuse() {
-    return accountLogViewerMode.get() === 'accuse';
-  }
-});
-
-export const accuseOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.accountAccuseLogList);
-Template.accountAccuseLogList.onCreated(function() {
-  accuseOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountAccuseLog', userId, accuseOffset.get());
-    }
-  });
-});
-Template.accountAccuseLogList.helpers({
-  accuseList() {
-    const userId = FlowRouter.getParam('userId');
-
-    return dbLog.find(
-      {
-        userId: userId,
-        logType: {
-          $in: accuseLogTypeList
-        }
-      },
-      {
-        sort: {
-          createdAt: -1
-        },
-        limit: 10
-      }
-    );
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfAccountAccuseLog',
-      dataNumberPerPage: 10,
-      offset: accuseOffset
-    };
-  }
-});
-Template.accountAccuseLogList.events({
-  'click button'(event) {
-    event.preventDefault();
-    accountLogViewerMode.set('all');
-  }
-});
-
-export const logOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.accountInfoLogList);
-Template.accountInfoLogList.onCreated(function() {
-  logOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountInfoLog', userId, logOffset.get());
-    }
-  });
-});
-Template.accountInfoLogList.helpers({
-  logList() {
-    const userId = FlowRouter.getParam('userId');
-
-    return dbLog.find(
-      {
-        userId: {
-          $in: [userId, '!all']
-        },
-        logType: {
-          $ne: '聊天發言'
-        }
-      },
-      {
-        sort: {
-          createdAt: -1
-        },
-        limit: 30
-      }
-    );
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfAccountInfoLog',
-      dataNumberPerPage: 30,
-      offset: logOffset
-    };
-  }
-});
-Template.accountInfoLogList.events({
-  'click button'(event) {
-    event.preventDefault();
-    accountLogViewerMode.set('accuse');
   }
 });
