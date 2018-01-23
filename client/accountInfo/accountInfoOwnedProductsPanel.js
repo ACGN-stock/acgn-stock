@@ -1,7 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbUserOwnedProducts } from '/db/dbUserOwnedProducts';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
@@ -13,7 +12,7 @@ Template.accountInfoOwnedProductsPanel.onCreated(function() {
   this.ownedProductsOffset = new ReactiveVar(0);
 
   this.autorunWithIdleSupport(() => {
-    const userId = FlowRouter.getParam('userId');
+    const { user: { _id: userId } } = Template.instance().data;
 
     if (userId) {
       const offset = this.ownedProductsOffset.get();

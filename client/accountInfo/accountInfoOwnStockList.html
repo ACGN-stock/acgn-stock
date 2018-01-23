@@ -1,0 +1,29 @@
+<template name="accountInfoOwnStockList">
+  <table class="table table-bordered mt-3 w-100" style="table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center text-nowrap">公司名稱</th>
+        <th class="text-center text-nowrap" style="width: 95px">持股數</th>
+      </tr>
+    </thead>
+    <tbody>
+    {{#each directorData in directorList}}
+      <tr>
+        <td class="text-left text-truncate p-1" data-title="公司名稱">
+          {{>companyLink directorData.companyId}}
+        </td>
+        <td class="text-right text-truncate p-1" data-title="持股數">
+          {{directorData.stocks}} 股
+        </td>
+      </tr>
+    {{else}}
+      <tr>
+        <td class="text-center text-truncate p-1" colspan="2">查無資料！</td>
+      </tr>
+    {{/each}}
+    </tbody>
+  </table>
+  {{#with paginationData}}
+    {{> pagination}}
+  {{/with}}
+</template>

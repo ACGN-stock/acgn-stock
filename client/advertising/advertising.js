@@ -12,7 +12,6 @@ import { formatDateText, currencyFormat, sanitizeHtml } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { externalLinkAlert } from '../utils/externalLinkAlert';
 
 inheritedShowLoadingOnSubscribing(Template.advertising);
 const rInBuyAdvertisingMode = new ReactiveVar(false);
@@ -60,7 +59,7 @@ Template.advertising.helpers({
   }
 });
 
-const advertisingEvents = Object.assign({
+Template.advertising.events({
   'click [data-action="buyAdvertising"]'(event) {
     event.preventDefault();
     rInBuyAdvertisingMode.set(true);
@@ -91,7 +90,7 @@ const advertisingEvents = Object.assign({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     const message = `
       <div>確定要撤銷廣告？</div>
-      <div style="max-height: 100px; overflow-y: scroll;">${sanitizeHtml(advertisingData.message)}</div>
+      <div style="max-height: 100px; overflow-y: auto;">${sanitizeHtml(advertisingData.message)}</div>
     `;
 
     alertDialog.confirm({
@@ -103,8 +102,7 @@ const advertisingEvents = Object.assign({
       }
     });
   }
-}, externalLinkAlert);
-Template.advertising.events(advertisingEvents);
+});
 
 function showAskAddPayDialog(advertisingId) {
   alertDialog.dialog({
@@ -200,7 +198,7 @@ function saveAdvertisingModel(model) {
   const message = `
     <div>廣告總支出：$${currencyFormat(totalPaid)}</div>
     <div>廣告內容：</div>
-    <div style="max-height: 100px; overflow-y: scroll;">${advertisingSample}</div>
+    <div style="max-height: 100px; overflow-y: auto;">${advertisingSample}</div>
     <div>確定發出廣告嗎？</div>
   `;
   alertDialog.confirm({
