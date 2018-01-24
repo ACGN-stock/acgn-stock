@@ -9,14 +9,14 @@ import { debug } from '/server/imports/utils/debug';
 Accounts.onCreateUser((options, user) => {
   debug.log('onCreateUser', options);
 
-  const { newUserInitialMoney, newUserBirthStones, productVouchers } = Meteor.settings.public;
+  const { newUserInitialMoney, newUserBirthStones } = Meteor.settings.public;
 
   // TODO: 使用 SimpleSchema 的 clean 自動取得預設值
   user.profile = _.defaults({}, options.profile, {
     money: newUserInitialMoney,
     lastSeasonTotalWealth: 0,
     voteTickets: 0,
-    productVouchers,
+    vouchers: 0,
     stones: { birth: newUserBirthStones },
     isAdmin: false,
     ban: [],
