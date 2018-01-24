@@ -3,6 +3,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 
 import { dbLog, accuseLogTypeList } from '/db/dbLog';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
+import { paramUserId } from './helpers';
 
 const accountLogViewerMode = new ReactiveVar('accuse');
 Template.accountLogViewer.helpers({
@@ -16,7 +17,7 @@ Template.accountAccuseLogList.onCreated(function() {
   this.accuseOffset = new ReactiveVar(0);
 
   this.autorun(() => {
-    const { user: { _id: userId } } = Template.instance().data;
+    const userId = paramUserId();
 
     if (userId) {
       const offset = this.accuseOffset.get();
@@ -26,7 +27,7 @@ Template.accountAccuseLogList.onCreated(function() {
 });
 Template.accountAccuseLogList.helpers({
   accuseList() {
-    const { user: { _id: userId } } = Template.instance().data;
+    const userId = paramUserId();
 
     return dbLog.find(
       {
@@ -63,7 +64,7 @@ Template.accountInfoLogList.onCreated(function() {
   this.logOffset = new ReactiveVar(0);
 
   this.autorun(() => {
-    const { user: { _id: userId } } = Template.instance().data;
+    const userId = paramUserId();
 
     if (userId) {
       const offset = this.logOffset.get();
@@ -73,7 +74,7 @@ Template.accountInfoLogList.onCreated(function() {
 });
 Template.accountInfoLogList.helpers({
   logList() {
-    const { user: { _id: userId } } = Template.instance().data;
+    const userId = paramUserId();
 
     return dbLog.find(
       {

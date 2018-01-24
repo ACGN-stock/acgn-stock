@@ -5,7 +5,6 @@ import { Meteor } from 'meteor/meteor';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
@@ -13,50 +12,36 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { changeChairmanTitle } from '../utils/methods';
-import { accountInfoCommonHelpers } from './helpers';
+import { accountInfoCommonHelpers, paramUserId, paramUser, isCurrentUser } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
+
 Template.accountInfo.onCreated(function() {
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
+  this.autorunWithIdleSupport(() => {
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('accountInfo', userId);
     }
   });
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
+
+  this.autorunWithIdleSupport(() => {
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('employeeListByUser', userId);
     }
   });
+
   this.autorun(() => {
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      const user = Meteor.users.findOne(userId);
-      if (user) {
-        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
-      }
+    const user = paramUser();
+    if (user) {
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
     }
   });
 });
 // 是否展開面板
 const rDisplayPanelList = new ReactiveVar([]);
 Template.accountInfo.helpers({
-  lookUser() {
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      return Meteor.users.findOne(userId);
-    }
-    else {
-      return null;
-    }
-  },
+  ...accountInfoCommonHelpers,
   isDisplayPanel(panelType) {
     return _.contains(rDisplayPanelList.get(), panelType);
   }
@@ -64,8 +49,7 @@ Template.accountInfo.helpers({
 Template.accountInfo.events({
   'click [data-toggle-panel]'(event) {
     event.preventDefault();
-    const $emitter = $(event.currentTarget);
-    const panelType = $emitter.attr('data-toggle-panel');
+    const panelType = $(event.currentTarget).attr('data-toggle-panel');
     const displayPanelList = rDisplayPanelList.get();
     if (_.contains(displayPanelList, panelType)) {
       rDisplayPanelList.set(_.without(displayPanelList, panelType));
@@ -93,10 +77,10 @@ Template.accountInfoBasic.helpers({
     }
   },
   showUnregisterEmployee() {
-    const userId = FlowRouter.getParam('userId');
+    const userId = paramUserId();
     const employed = false;
 
-    return userId === Meteor.userId() && dbEmployees.findOne({ userId, employed });
+    return isCurrentUser() && dbEmployees.findOne({ userId, employed });
   },
   isBaned(type) {
     return _.contains(this.profile.ban, type);
@@ -110,12 +94,12 @@ Template.accountInfoBasic.helpers({
 });
 
 Template.accountInfoBasic.events({
-  'click [data-action="fscAnnouncement"]'(event, templateInstance) {
+  'click [data-action="fscAnnouncement"]'(event) {
     event.preventDefault();
-    const accuseUser = templateInstance.data;
+    const accuseUser = paramUser();
     alertDialog.dialog({
       type: 'prompt',
-      title: '金管會通告 - 輸入通知訊息',
+      title: `金管會通告 - ${accuseUser.profile.name}`,
       message: `請輸入要通告的訊息：`,
       callback: (message) => {
         if (message) {
@@ -125,9 +109,9 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="accuse"]'(event, templateInstance) {
+  'click [data-action="accuse"]'(event) {
     event.preventDefault();
-    const accuseUser = templateInstance.data;
+    const accuseUser = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '舉報違規 - ' + accuseUser.profile.name,
@@ -140,7 +124,7 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-ban]'(event, templateInstance) {
+  'click [data-ban]'(event) {
     event.preventDefault();
     const banType = $(event.currentTarget).attr('data-ban');
     let banActionText;
@@ -166,7 +150,7 @@ Template.accountInfoBasic.events({
         break;
       }
     }
-    const accuseUserData = templateInstance.data;
+    const accuseUserData = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '違規處理 - ' + accuseUserData.profile.name + ' - ' + banActionText,
@@ -179,9 +163,9 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="forfeitUserMoney"]'(event, templateInstance) {
+  'click [data-action="forfeitUserMoney"]'(event) {
     event.preventDefault();
-    const accuseUserData = templateInstance.data;
+    const accuseUserData = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '課以罰金 - ' + accuseUserData.profile.name,
@@ -206,9 +190,9 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="returnForfeitedUserMoney"]'(event, templateInstance) {
+  'click [data-action="returnForfeitedUserMoney"]'(event) {
     event.preventDefault();
-    const accuseUserData = templateInstance.data;
+    const accuseUserData = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '退還罰金 - ' + accuseUserData.profile.name,
@@ -233,9 +217,9 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="confiscateStocks"]'(event, templateInstance) {
+  'click [data-action="confiscateStocks"]'(event) {
     event.preventDefault();
-    const accuseUserData = templateInstance.data;
+    const accuseUserData = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '沒收股份 - ' + accuseUserData.profile.name,
@@ -312,7 +296,7 @@ Template.chairmanTitleList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const userId = FlowRouter.getParam('userId');
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('accountChairmanTitle', userId, chairmanOffset.get());
     }
@@ -353,7 +337,7 @@ Template.managerTitleList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const userId = FlowRouter.getParam('userId');
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('accountManagerTitle', userId, managerOffset.get());
     }
@@ -384,7 +368,7 @@ Template.employeeTitleList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const userId = FlowRouter.getParam('userId');
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('accounEmployeeTitle', userId);
     }
@@ -392,7 +376,7 @@ Template.employeeTitleList.onCreated(function() {
 });
 Template.employeeTitleList.helpers({
   employment() {
-    const userId = FlowRouter.getParam('userId');
+    const userId = paramUserId();
 
     return dbEmployees.find({ userId }, { sort: { employed: -1 } });
   },

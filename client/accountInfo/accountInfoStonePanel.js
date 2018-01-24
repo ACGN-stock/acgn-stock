@@ -6,7 +6,7 @@ import { dbCompanyStones, stoneTypeList, stonePowerTable } from '/db/dbCompanySt
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { stoneDisplayName } from '../utils/helpers';
-import { accountInfoCommonHelpers } from './helpers';
+import { accountInfoCommonHelpers, paramUserId, paramUser } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfoStonePanel);
 
@@ -14,8 +14,7 @@ Template.accountInfoStonePanel.onCreated(function() {
   this.placedStonesOffset = new ReactiveVar(0);
 
   this.autorunWithIdleSupport(() => {
-    const { user: { _id: userId } } = Template.instance().data;
-
+    const userId = paramUserId();
     if (userId) {
       const offset = this.placedStonesOffset.get();
       this.subscribe('userPlacedStones', { userId, offset });
@@ -26,9 +25,7 @@ Template.accountInfoStonePanel.onCreated(function() {
 Template.accountInfoStonePanel.helpers({
   ...accountInfoCommonHelpers,
   placedStones() {
-    const { user: { _id: userId } } = Template.instance().data;
-
-    return dbCompanyStones.find({ userId });
+    return dbCompanyStones.find({ userId: paramUserId() });
   },
   stoneTypeList() {
     return stoneTypeList;
@@ -43,9 +40,7 @@ Template.accountInfoStonePanel.helpers({
     return Meteor.settings.public.stonePrice[stoneType];
   },
   userStoneCount(stoneType) {
-    const { user } = Template.instance().data;
-
-    return user.profile.stones[stoneType] || 0;
+    return paramUser().profile.stones[stoneType] || 0;
   },
   paginationData() {
     return {
