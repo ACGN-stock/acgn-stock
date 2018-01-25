@@ -10,8 +10,11 @@ Meteor.publish('companyCurrentUserPlacedStones', function(companyId) {
 
   check(companyId, new Match.Optional(String));
 
-  const { userId } = this;
-  const filter = { userId, companyId };
+  if (! this.userId) {
+    return [];
+  }
+
+  const filter = { userId: this.userId, companyId };
   if (! companyId) {
     delete filter.companyId;
   }

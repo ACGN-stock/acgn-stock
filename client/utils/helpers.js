@@ -210,7 +210,13 @@ export function productCenterByCompanyPath(companyId) {
 }
 Template.registerHelper('productCenterByCompanyPath', productCenterByCompanyPath);
 
-export function isCompanyManager({ hash: { company, user } }) {
+export function isCompanyManager(kwargs) {
+  const { company, user } = kwargs.hash;
+
+  if (! company || ! user) {
+    return false;
+  }
+
   if (typeof company === 'string') {
     return isCompanyManager({ hash: { company: dbCompanies.findOne(company), user } });
   }
