@@ -52,7 +52,7 @@ function deliverSystemProductVotingRewards() {
 }
 
 // 發放公司員工的推薦票回饋金
-export function deliverEmployeeProductVotingRewards() {
+function deliverEmployeeProductVotingRewards() {
   const { employeeProductVotingRewardFactor } = Meteor.settings.public;
   const userRewardMap = {};
 
@@ -85,7 +85,8 @@ export function deliverEmployeeProductVotingRewards() {
       $unwind: '$companyData'
     }, {
       $match: {
-        'companyData.isSeal': false
+        'companyData.isSeal': false,
+        'companyData.profit': { $gt: 0 }
       }
     }, {
       $group: {

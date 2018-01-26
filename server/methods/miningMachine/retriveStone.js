@@ -62,4 +62,5 @@ export function retriveStone({ userId, companyId }, resourceLocked = false) {
   });
 }
 
-limitMethod('retriveStone');
+// 每一小時最多 5 次
+limitMethod('retriveStone', 5, 60 * 60 * 1000);
