@@ -20,7 +20,7 @@ Template.ruleAgendaList.helpers({
     return FlowRouter.path('createRuleAgenda');
   },
   getAgendaHref(agendaId) {
-    return FlowRouter.path('ruleAgendaDetail', {agendaId});
+    return FlowRouter.path('ruleAgendaDetail', { agendaId });
   },
   processingAgendaList() {
     const currentDate = Date.now();

@@ -11,10 +11,12 @@ Accounts.onCreateUser((options, user) => {
 
   const { newUserInitialMoney, newUserBirthStones } = Meteor.settings.public;
 
+  // TODO: 使用 SimpleSchema 的 clean 自動取得預設值
   user.profile = _.defaults({}, options.profile, {
     money: newUserInitialMoney,
     lastSeasonTotalWealth: 0,
     voteTickets: 0,
+    vouchers: 0,
     stones: { birth: newUserBirthStones },
     isAdmin: false,
     ban: [],

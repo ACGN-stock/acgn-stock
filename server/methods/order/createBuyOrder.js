@@ -24,7 +24,7 @@ Meteor.methods({
   }
 });
 export function createBuyOrder(user, orderData) {
-  debug.log('createBuyOrder', {user, orderData});
+  debug.log('createBuyOrder', { user, orderData });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -81,7 +81,7 @@ export function createBuyOrder(user, orderData) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('createBuyOrder', ['companyOrder' + companyId, 'user' + userId], (release) => {
     const user = Meteor.users.findOne(userId, {
       fields: {
@@ -131,5 +131,5 @@ export function createBuyOrder(user, orderData) {
     release();
   });
 }
-//兩秒鐘最多一次
+// 兩秒鐘最多一次
 limitMethod('createBuyOrder', 1, 2000);

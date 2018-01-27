@@ -15,7 +15,7 @@
       </form>
       <hr />
       <h3 class="card-title mb-1">{{displayTableTitle}}</h3>
-      <div class="w-100" style="overflow-y: scroll">
+      <div class="w-100" style="overflow-x: auto">
         {{> Template.dynamic template=showTableType}}
       </div>
     </div>
@@ -56,7 +56,7 @@
 </template>
 
 <template name="companyPriceRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
+  <table class="table-bordered w-100" style="table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
         <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
@@ -98,7 +98,7 @@
 </template>
 
 <template name="companyProfitRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
+  <table class="table-bordered w-100" style="table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
         <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
@@ -140,7 +140,7 @@
 </template>
 
 <template name="companyValueRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
+  <table class="table-bordered w-100" style="table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
         <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
@@ -178,7 +178,7 @@
 </template>
 
 <template name="companyCapitalRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
+  <table class="table-bordered w-100" style="table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
         <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>
@@ -216,7 +216,7 @@
 </template>
 
 <template name="userRankTable">
-  <table class="table-bordered" style="width: 100%; table-layout: fixed; min-width: 648px;">
+  <table class="table-bordered w-100" style="table-layout: fixed; min-width: 648px;">
     <thead>
       <tr>
         <th class="text-center text-nowrap" style="width: 50px;" title="排名">排名</th>

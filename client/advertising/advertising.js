@@ -58,6 +58,7 @@ Template.advertising.helpers({
     return formatDateText(expireTime);
   }
 });
+
 Template.advertising.events({
   'click [data-action="buyAdvertising"]'(event) {
     event.preventDefault();
@@ -89,7 +90,7 @@ Template.advertising.events({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     const message = `
       <div>確定要撤銷廣告？</div>
-      <div style="max-height: 100px; overflow-y: scroll;">${sanitizeHtml(advertisingData.message)}</div>
+      <div style="max-height: 100px; overflow-y: auto;">${sanitizeHtml(advertisingData.message)}</div>
     `;
 
     alertDialog.confirm({
@@ -102,6 +103,7 @@ Template.advertising.events({
     });
   }
 });
+
 function showAskAddPayDialog(advertisingId) {
   alertDialog.dialog({
     type: 'prompt',
@@ -196,7 +198,7 @@ function saveAdvertisingModel(model) {
   const message = `
     <div>廣告總支出：$${currencyFormat(totalPaid)}</div>
     <div>廣告內容：</div>
-    <div style="max-height: 100px; overflow-y: scroll;">${advertisingSample}</div>
+    <div style="max-height: 100px; overflow-y: auto;">${advertisingSample}</div>
     <div>確定發出廣告嗎？</div>
   `;
   alertDialog.confirm({

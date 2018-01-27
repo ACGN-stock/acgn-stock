@@ -52,7 +52,7 @@ export function retriveStone({ userId, companyId }, resourceLocked = false) {
   const { _id: companyStoneId, stoneType } = companyStoneData;
 
   dbCompanyStones.remove(companyStoneId);
-  Meteor.users.update(userId, { $inc: { [`profile.stones.${stoneType}`]: 1 }});
+  Meteor.users.update(userId, { $inc: { [`profile.stones.${stoneType}`]: 1 } });
   dbLog.insert({
     logType: '礦機取石',
     userId: [userId],

@@ -17,7 +17,7 @@ Meteor.methods({
   }
 });
 export function retrieveOrder(user, orderId) {
-  debug.log('retrieveOrder', {user, orderId});
+  debug.log('retrieveOrder', { user, orderId });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -34,7 +34,7 @@ export function retrieveOrder(user, orderId) {
   }
   const companyId = orderData.companyId;
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('retrieveOrder', ['companyOrder' + companyId, 'user' + userId], (release) => {
     const user = Meteor.users.findOne(userId, {
       fields: {
@@ -66,7 +66,7 @@ export function retrieveOrder(user, orderId) {
       increaseMoney += (orderData.unitPrice * (orderData.amount - orderData.done));
     }
     else {
-      const existsDirectorsData = dbDirectors.findOne({companyId, userId}, {
+      const existsDirectorsData = dbDirectors.findOne({ companyId, userId }, {
         fields: {
           _id: 1
         }

@@ -19,7 +19,7 @@ Meteor.methods({
   }
 });
 function voteAgenda(user, voteData) {
-  debug.log('voteAgenda', {user, voteData});
+  debug.log('voteAgenda', { user, voteData });
   const userId = user._id;
   if (user.profile.ban.length > 0) {
     throw new Meteor.Error(403, '你已被禁止投票！');

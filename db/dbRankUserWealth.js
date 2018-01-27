@@ -2,26 +2,26 @@
 import SimpleSchema from 'simpl-schema';
 import { Mongo } from 'meteor/mongo';
 
-//使用者財富排行榜
+// 使用者財富排行榜
 export const dbRankUserWealth = new Mongo.Collection('rankUserWealth', {
   idGeneration: 'MONGO'
 });
 export default dbRankUserWealth;
 
 const schema = new SimpleSchema({
-  //商業季度
+  // 商業季度
   seasonId: {
     type: String
   },
-  //使用者ID
+  // 使用者ID
   userId: {
     type: String
   },
-  //擁有現金
+  // 擁有現金
   money: {
     type: SimpleSchema.Integer
   },
-  //持股總價值
+  // 持股總價值
   stocksValue: {
     type: SimpleSchema.Integer
   }

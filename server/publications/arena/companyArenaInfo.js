@@ -73,5 +73,5 @@ Meteor.publish('companyArenaInfo', function(companyId) {
     });
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('companyArenaInfo');

@@ -5,7 +5,7 @@ import { dbSeason } from '/db/dbSeason';
 import { threadId } from '../threading/thread';
 
 export const loginObserver = {
-  //開始觀察以處理登入IP紀錄、未登入天數
+  // 開始觀察以處理登入IP紀錄、未登入天數
   start() {
     if (! this._observer) {
       console.log('start observer login info at ' + threadId + ' ' + Date.now());
@@ -66,7 +66,7 @@ export const loginObserver = {
         });
     }
   },
-  //停止觀察處理登入IP紀錄、未登入天數
+  // 停止觀察處理登入IP紀錄、未登入天數
   stop() {
     if (this._observer) {
       console.log('stop observer login info at ' + threadId + ' ' + Date.now());

@@ -6,7 +6,7 @@ import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('foundationDataForEdit', function(foundationId) {
-  debug.log('publish foundationDataForEdit', {foundationId});
+  debug.log('publish foundationDataForEdit', { foundationId });
   check(foundationId, String);
 
   return dbFoundations.find(foundationId, {
@@ -18,5 +18,5 @@ Meteor.publish('foundationDataForEdit', function(foundationId) {
     }
   });
 });
-//一分鐘最多10次
+// 一分鐘最多10次
 limitSubscription('foundationDataForEdit', 10);

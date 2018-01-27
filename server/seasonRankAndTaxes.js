@@ -3,6 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
+import { dbProducts } from '/db/dbProducts';
 import { dbLog } from '/db/dbLog';
 import { dbRankCompanyPrice } from '/db/dbRankCompanyPrice';
 import { dbRankCompanyProfit } from '/db/dbRankCompanyProfit';
@@ -12,7 +13,7 @@ import { dbRankUserWealth } from '/db/dbRankUserWealth';
 import { dbTaxes } from '/db/dbTaxes';
 import { debug } from '/server/imports/utils/debug';
 
-//為所有公司與使用者進行排名結算
+// 為所有公司與使用者進行排名結算
 export function generateRankAndTaxesData(seasonData) {
   debug.log('generateRankAndTaxesData', seasonData);
   rankCompany(seasonData);
@@ -40,7 +41,31 @@ export function generateRankAndTaxesData(seasonData) {
 
 function rankCompany(seasonData) {
   if (dbCompanies.find().count() > 0) {
-    const rankCompanyPriceList = dbLog.aggregate([
+    const productProfitMap = {};
+
+    dbProducts.aggregate([
+      {
+        $match: {
+          seasonId: seasonData._id
+        }
+      },
+      {
+        $group: {
+          _id: '$companyId',
+          totalProfit: {
+            $sum: '$profit'
+          }
+        }
+      }
+    ]).forEach((profitData) => {
+      const { _id: companyId, totalProfit } = profitData;
+
+      productProfitMap[companyId] = totalProfit;
+    });
+
+    const rankCompanyPriceList = [];
+
+    dbLog.aggregate([
       {
         $match: {
           logType: '交易紀錄',
@@ -91,61 +116,35 @@ function rankCompany(seasonData) {
         $match: {
           isSeal: false
         }
-      },
-      {
-        $project: {
-          _id: 1,
-          totalDealAmount: 1,
-          totalDealMoney: 1
-        }
-      },
-      {
-        $lookup: {
-          from: 'voteRecord',
-          localField: '_id',
-          foreignField: 'companyId',
-          as: 'voteData'
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          totalDealAmount: 1,
-          totalDealMoney: 1,
-          productProfit: {
-            $multiply: [
-              {
-                $size: '$voteData'
-              },
-              seasonData.votePrice
-            ]
-          }
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          totalDealAmount: 1,
-          totalDealMoney: 1,
-          productProfit: 1,
-          totalMoney: {
-            $add: [
-              '$totalDealMoney',
-              '$productProfit'
-            ]
-          }
-        }
-      },
-      {
-        $sort: {
-          totalMoney: -1,
-          totalDealMoney: -1
-        }
-      },
-      {
-        $limit: 100
       }
-    ]);
+    ]).forEach((dealData) => {
+      const companyId = dealData._id;
+
+      dealData.productProfit = productProfitMap[companyId] || 0;
+      dealData.totalMoney = dealData.productProfit + dealData.totalDealMoney;
+
+      rankCompanyPriceList.push(dealData);
+    });
+
+    rankCompanyPriceList.sort((prev, next) => {
+      if (next.totalMoney > prev.totalMoney) {
+        return 1;
+      }
+      else if (next.totalMoney === prev.totalMoney) {
+        if (next.productProfit > prev.productProfit) {
+          return 1;
+        }
+        else if (next.productProfit === prev.productProfit) {
+          return 0;
+        }
+        else {
+          return -1;
+        }
+      }
+      else {
+        return -1;
+      }
+    }).splice(100);
 
     const rankCompanyValueList = dbCompanies
       .find(

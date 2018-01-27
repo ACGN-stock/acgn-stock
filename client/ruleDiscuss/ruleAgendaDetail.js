@@ -79,7 +79,7 @@ Template.ruleAgendaDetail.helpers({
   getVoteHref() {
     const agendaId = FlowRouter.getParam('agendaId');
 
-    return FlowRouter.path('ruleAgendaVote', {agendaId});
+    return FlowRouter.path('ruleAgendaVote', { agendaId });
   },
   showVoteDetailDialog() {
     return rShowOptionVoteDetail.get() !== null;

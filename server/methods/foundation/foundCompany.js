@@ -28,7 +28,7 @@ Meteor.methods({
   }
 });
 export function foundCompany(user, foundCompanyData) {
-  debug.log('foundCompany', {user, foundCompanyData});
+  debug.log('foundCompany', { user, foundCompanyData });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -45,7 +45,7 @@ export function foundCompany(user, foundCompanyData) {
     throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
   }
   const userId = user._id;
-  if (dbFoundations.find({manager: userId}).count() > 0) {
+  if (dbFoundations.find({ manager: userId }).count() > 0) {
     throw new Meteor.Error(403, '您現在已經有一家新創公司正在申請中，無法同時發起第二家新創公司！');
   }
   const lastSeasonData = dbSeason.findOne({}, {
@@ -66,7 +66,7 @@ export function foundCompany(user, foundCompanyData) {
     throw new Meteor.Error(403, '賽季度結束前的最後一個商業季度，禁止新創計劃！');
   }
   const companyName = foundCompanyData.companyName;
-  if (dbCompanyArchive.find({name: companyName}).count() > 0) {
+  if (dbCompanyArchive.find({ name: companyName }).count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
   }
   if (foundCompanyData.pictureBig) {
@@ -75,7 +75,7 @@ export function foundCompany(user, foundCompanyData) {
   if (foundCompanyData.pictureSmall) {
     checkImageUrl(foundCompanyData.pictureSmall);
   }
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.throwErrorIsResourceIsLock(['user' + userId]);
   resourceManager.request('foundCompany', ['user' + userId], (release) => {
     const user = Meteor.users.findOne(userId, {
@@ -86,10 +86,10 @@ export function foundCompany(user, foundCompanyData) {
     if (user.profile.money < Meteor.settings.public.founderEarnestMoney) {
       throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
     }
-    if (dbFoundations.find({manager: userId}).count() > 0) {
+    if (dbFoundations.find({ manager: userId }).count() > 0) {
       throw new Meteor.Error(403, '您現在已經有一家新創公司正在籌備中，無法同時發起第二家新創公司！');
     }
-    //存放進archive中並取得_id
+    // 存放進archive中並取得_id
     foundCompanyData._id = dbCompanyArchive.insert({
       status: 'foundation',
       name: foundCompanyData.companyName,
@@ -133,5 +133,5 @@ export function foundCompany(user, foundCompanyData) {
     release();
   });
 }
-//二十秒鐘最多一次
+// 二十秒鐘最多一次
 limitMethod('foundCompany', 1, 20000);

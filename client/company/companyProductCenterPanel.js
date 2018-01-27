@@ -5,7 +5,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbProducts } from '/db/dbProducts';
-import { getAvailableProductTradeQuota } from '/db/dbUserOwnedProducts';
+import { getAvailableProductTradeQuota, getSpentProductTradeQuota } from '/db/dbUserOwnedProducts';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 
 inheritedShowLoadingOnSubscribing(Template.companyProductCenterPanel);
@@ -44,7 +44,16 @@ Template.companyProductCenterPanel.helpers({
   company() {
     return Template.instance().getCompany();
   },
-  currentUserTradeQuota() {
+  currentUserSpentTradeQuota() {
+    const templateInstance = Template.instance();
+    const { _id: companyId } = templateInstance.getCompany();
+
+    return getSpentProductTradeQuota({
+      userId: Meteor.userId(),
+      companyId
+    });
+  },
+  currentUserAvailableTradeQuota() {
     const templateInstance = Template.instance();
     const { _id: companyId } = templateInstance.getCompany();
 

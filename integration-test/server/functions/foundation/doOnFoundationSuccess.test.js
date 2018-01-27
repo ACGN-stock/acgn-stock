@@ -123,7 +123,7 @@ describe('function doOnFoundationSuccess', function() {
 
   it('should return excess fund to the investors', function() {
     investors.forEach(({ userId }) => {
-      Meteor.users.rawCollection().insert({ _id: userId, profile: { money: 0 }});
+      Meteor.users.rawCollection().insert({ _id: userId, profile: { money: 0 } });
     });
 
     const foundationData = dbFoundations.findOne(companyId);

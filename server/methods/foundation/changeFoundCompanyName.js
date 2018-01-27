@@ -18,7 +18,7 @@ Meteor.methods({
   }
 });
 function changeFoundCompanyName(user, companyId, newCompanyName) {
-  debug.log('changeFoundCompanyName', {user, companyId, newCompanyName});
+  debug.log('changeFoundCompanyName', { user, companyId, newCompanyName });
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }

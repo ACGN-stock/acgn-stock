@@ -1,11 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbUserOwnedProducts } from '/db/dbUserOwnedProducts';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { accountInfoCommonHelpers } from './helpers';
+import { accountInfoCommonHelpers, paramUserId } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfoOwnedProductsPanel);
 
@@ -13,8 +12,7 @@ Template.accountInfoOwnedProductsPanel.onCreated(function() {
   this.ownedProductsOffset = new ReactiveVar(0);
 
   this.autorunWithIdleSupport(() => {
-    const userId = FlowRouter.getParam('userId');
-
+    const userId = paramUserId();
     if (userId) {
       const offset = this.ownedProductsOffset.get();
       this.subscribe('userOwnedProducts', { userId, offset });
@@ -25,9 +23,7 @@ Template.accountInfoOwnedProductsPanel.onCreated(function() {
 Template.accountInfoOwnedProductsPanel.helpers({
   ...accountInfoCommonHelpers,
   ownedProducts() {
-    const { user: { _id: userId } } = Template.instance().data;
-
-    return dbUserOwnedProducts.find({ userId });
+    return dbUserOwnedProducts.find({ userId: paramUserId() });
   },
   paginationData() {
     return {

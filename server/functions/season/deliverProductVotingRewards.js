@@ -60,7 +60,7 @@ function deliverEmployeeProductVotingRewards() {
   const employeeCompanyMap = {};
 
   const companyProfitMap = dbCompanies
-    .find({ isSeal: false }, { fields: { profit: 1 }})
+    .find({ isSeal: false }, { fields: { profit: 1 } })
     .fetch()
     .reduce((obj, { _id, profit }) => {
       obj[_id] = profit;

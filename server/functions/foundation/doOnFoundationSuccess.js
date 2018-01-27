@@ -30,7 +30,7 @@ function calculateInitialPrice(investors) {
 
 // 以指定股價計算投資人的配股與退款
 function calculateDirectors(investors, price) {
-  return _.map(investors, ({userId, amount}) => {
+  return _.map(investors, ({ userId, amount }) => {
     const stocks = Math.floor(amount / price);
     const refund = amount - (price * stocks);
 
@@ -165,7 +165,7 @@ export function doOnFoundationSuccess(foundationData) {
       });
       needExecuteUserBulk = true;
       usersBulk
-        .find({_id: userId})
+        .find({ _id: userId })
         .updateOne({ $inc: { 'profile.money': refund } });
     }
   });

@@ -5,17 +5,21 @@
         規則討論
       </h1>
       <hr />
-      <h3 class="card-subtitle text-muted">
-        進行中的議程
+      <h3 class="d-flex flex-wrap justify-content-start align-items-center">
+        <div class="text-nowrap text-muted">
+          進行中的議程
+        </div>
         {{#if currentUser.profile.isAdmin}}
-          <a class="btn btn-primary float-right" href="{{getNewAgendaHref}}">
-            <i class="fa fa-plus" aria-hidden="true"></i>
-            建立新議程
-          </a>
+          <div class="d-flex flex-wrap justify-content-end ml-auto">
+            <a class="btn btn-primary" href="{{getNewAgendaHref}}">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              建立新議程
+            </a>
+          </div>
         {{/if}}
       </h3>
       <hr />
-      <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+      <table class="table-bordered custom-responsive-table-md w-100" style="table-layout: fixed;">
         <thead>
           <tr>
             <th class="text-center text-truncate" style="width: 60%;" title="議程主題">議程主題</th>
@@ -26,21 +30,21 @@
         <tbody>
           {{#each agenda in processingAgendaList}}
             <tr>
-              <td class="text-left text-truncate px-2">
+              <td class="text-left text-truncate px-md-2" data-title="議程主題">
                 <a href="{{getAgendaHref agenda._id}}">{{agenda.title}}</a>
               </td>
-              <td class="text-center text-truncate">
+              <td class="text-center text-truncate" data-title="結束日期">
                 {{formatExpireDate agenda}}
               </td>
-              <td class="text-center">
+              <td class="text-center" data-title="相關討論">
                 <a class="btn btn-primary btn-sm" href="{{agenda.discussionUrl}}" target="_blank">
                   連結
                 </a>
               </td>
             </tr>
           {{else}}
-            <tr>
-              <td class="text-center" colspan=3>沒有進行中的議程！</td>
+            <tr class="default-content">
+              <td class="text-center p-1" colspan=3>沒有進行中的議程！</td>
             </tr>
           {{/each}}
         </tbody>
@@ -50,7 +54,7 @@
         已結束的議程
       </h3>
       <hr />
-      <table class="table-bordered" style="width: 100%; table-layout: fixed;">
+      <table class="table-bordered custom-responsive-table-md w-100" style="table-layout: fixed;">
         <thead>
           <tr>
             <th class="text-center text-truncate" style="width: 60%;" title="議程主題">議程主題</th>
@@ -61,21 +65,21 @@
         <tbody>
           {{#each agenda in finishAgendaList}}
             <tr>
-              <td class="text-left text-truncate px-2">
+              <td class="text-left text-truncate px-md-2" data-title="議程主題">
                 <a href="{{getAgendaHref agenda._id}}">{{agenda.title}}</a>
               </td>
-              <td class="text-center text-truncate">
+              <td class="text-center text-truncate" data-title="結束日期">
                 {{formatExpireDate agenda}}
               </td>
-              <td class="text-center">
+              <td class="text-center" data-title="相關討論">
                 <a class="btn btn-primary btn-sm" href="{{agenda.discussionUrl}}" target="_blank">
                   連結
                 </a>
               </td>
             </tr>
           {{else}}
-            <tr>
-              <td class="text-center" colspan=3>沒有已結束的議程！</td>
+            <tr class="default-content">
+              <td class="text-center p-1" colspan=3>沒有已結束的議程！</td>
             </tr>
           {{/each}}
         </tbody>

@@ -14,7 +14,7 @@ Meteor.methods({
   }
 });
 function removeFavoriteCompany(user, companyId) {
-  debug.log('removeFavoriteCompany', {user, companyId});
+  debug.log('removeFavoriteCompany', { user, companyId });
   const index = user.favorite.indexOf(companyId);
   if (index >= 0) {
     const newFavorite = user.favorite.slice();

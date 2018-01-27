@@ -435,7 +435,7 @@ Template.companyDetailAdminPanel.events({
   }
 });
 
-//是否展開面板
+// 是否展開面板
 const rDisplayPanelList = new ReactiveVar([]);
 Template.companyDetailTable.helpers({
   isDisplayPanel(panelType) {
@@ -682,6 +682,7 @@ function drawCandleStickChart(templateInstance) {
           data: data,
           cropThreshold: count,
           maxPointWidth: 10,
+          color: '#449d44',
           lineColor: '#449d44',
           upLineColor: '#d9534f',
           upColor: '#d9534f',
@@ -711,7 +712,7 @@ function drawCandleStickChart(templateInstance) {
   });
 }
 
-//定時呼叫取得今日交易量資料
+// 定時呼叫取得今日交易量資料
 const rTodayDealAmount = new ReactiveVar(0);
 Template.companyTodayDealAmount.onCreated(function() {
   if (! Meteor.status().connected) {
@@ -1063,7 +1064,7 @@ Template.companyElectInfo.events({
   }
 });
 
-//取得當前使用者持有指定公司的股份數量
+// 取得當前使用者持有指定公司的股份數量
 function getStockAmount(companyId) {
   const user = Meteor.user();
   if (user) {

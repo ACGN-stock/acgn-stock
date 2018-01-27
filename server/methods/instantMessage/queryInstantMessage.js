@@ -35,8 +35,8 @@ Meteor.methods({
         };
       });
 
-    return {lastTime, list};
+    return { lastTime, list };
   }
 });
-//一分鐘最多24次
+// 一分鐘最多24次
 limitMethod('queryInstantMessage', 24);

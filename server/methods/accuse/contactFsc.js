@@ -15,7 +15,7 @@ Meteor.methods({
   }
 });
 function contactFsc(user, message) {
-  debug.log('contactFsc', {user, message});
+  debug.log('contactFsc', { user, message });
   if (_.contains(user.profile.ban, 'accuse')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有舉報違規行為！');
   }

@@ -24,10 +24,13 @@
     "import/resolver": "meteor"
   },
   "rules": {
+    "meteor/eventmap-params": "off",
     "import/prefer-default-export": "off",
     "import/order": ["error", {
       "newlines-between": "ignore"
     }],
+    "spaced-comment": ["error", "always"],
+    "object-curly-spacing": ["error", "always"],
     "no-console": "error",
     "no-debugger": "error",
     "no-unsafe-negation": "error",

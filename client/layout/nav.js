@@ -230,7 +230,7 @@ Template.navCompanyLink.onRendered(function() {
       },
       dataType: 'json',
       success: (companyData) => {
-        const path = FlowRouter.path('companyDetail', {companyId});
+        const path = FlowRouter.path('companyDetail', { companyId });
         $link
           .attr('href', path)
           .text(companyData.name);

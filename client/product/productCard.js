@@ -5,6 +5,7 @@ import { $ } from 'meteor/jquery';
 import { dbProducts } from '/db/dbProducts';
 import { getAvailableProductTradeQuota } from '/db/dbUserOwnedProducts';
 import { voteProduct } from '../utils/methods';
+import { currencyFormat } from '../utils/helpers';
 import { alertDialog } from '../layout/alertDialog';
 
 Template.productCard.helpers({
@@ -12,9 +13,14 @@ Template.productCard.helpers({
     const user = Meteor.user();
 
     return user && user.profile.isAdmin;
+  },
+  soldAmount() {
+    const { product } = Template.currentData();
+    const { totalAmount, stockAmount, availableAmount } = product;
+
+    return totalAmount - stockAmount - availableAmount;
   }
 });
-
 
 Template.productCard.events({
   'click [data-vote-product]'(event) {
@@ -53,7 +59,9 @@ Template.productCard.events({
       return;
     }
 
-    if (Meteor.user().profile.money < price) {
+    const { money, vouchers } = Meteor.user().profile;
+    const spendables = money + vouchers;
+    if (spendables < price) {
       alertDialog.alert('您的剩餘現金不足！');
 
       return;
@@ -67,15 +75,15 @@ Template.productCard.events({
 
     const maxAmount = Math.min(
       availableAmount,
-      Math.floor(Meteor.user().profile.money / price),
+      Math.floor(spendables / price),
       Math.floor(tradeQuota / price));
 
     alertDialog.dialog({
       type: 'prompt',
       inputType: 'number',
-      title: '購買產品',
+      title: '購買產品 - 輸入數量',
       message: `請輸入數量：(1~${maxAmount})`,
-      callback: function(result) {
+      callback: (result) => {
         if (! result) {
           return;
         }
@@ -88,7 +96,29 @@ Template.productCard.events({
           return;
         }
 
-        Meteor.customCall('buyProduct', { productId, amount });
+        const totalCost = amount * price;
+        const voucherCost = Math.min(totalCost, vouchers);
+        const moneyCost = totalCost - voucherCost;
+
+        const costMessageList = [];
+        if (voucherCost > 0) {
+          costMessageList.push(`消費券$${currencyFormat(voucherCost)}`);
+        }
+        if (moneyCost > 0) {
+          costMessageList.push(`現金$${currencyFormat(moneyCost)}`);
+        }
+
+        alertDialog.confirm({
+          title: '購買產品 - 確認花費',
+          message: `確定要花費${costMessageList.join('以及')}來購買產品？`,
+          callback: (confirmResult) => {
+            if (! confirmResult) {
+              return;
+            }
+
+            Meteor.customCall('buyProduct', { productId, amount });
+          }
+        });
       }
     });
   }

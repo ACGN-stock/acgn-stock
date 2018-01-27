@@ -110,6 +110,7 @@ Template.displayAnnouncement.helpers({
     return dbVariables.get('announcement');
   }
 });
+
 Template.displayAnnouncement.events({
   'click .btn'(event) {
     event.preventDefault();

@@ -7,7 +7,7 @@ import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 
 Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
-  debug.log('publish companyOrderExcludeMe', {companyId, type, offset});
+  debug.log('publish companyOrderExcludeMe', { companyId, type, offset });
   check(companyId, String);
   check(type, new Match.OneOf('購入', '賣出'));
   check(offset, Match.Integer);
@@ -45,5 +45,5 @@ Meteor.publish('companyOrderExcludeMe', function(companyId, type, offset) {
     pageObserver.stop();
   });
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('companyOrderExcludeMe');

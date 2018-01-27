@@ -25,7 +25,7 @@ Meteor.methods({
   }
 });
 export function createSellOrder(user, orderData) {
-  debug.log('createSellOrder', {user, orderData});
+  debug.log('createSellOrder', { user, orderData });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -48,7 +48,7 @@ export function createSellOrder(user, orderData) {
   if (existsBuyOrderCursor.count() > 0) {
     throw new Meteor.Error(403, '有買入該公司股票的訂單正在執行中，無法同時下達賣出的訂單！');
   }
-  const directorData = dbDirectors.findOne({companyId, userId}, {
+  const directorData = dbDirectors.findOne({ companyId, userId }, {
     fields: {
       stocks: 1
     }
@@ -83,9 +83,9 @@ export function createSellOrder(user, orderData) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('createSellOrder', ['companyOrder' + companyId, 'user' + userId], (release) => {
-    const directorData = dbDirectors.findOne({companyId, userId}, {
+    const directorData = dbDirectors.findOne({ companyId, userId }, {
       fields: {
         stocks: 1
       }
@@ -133,5 +133,5 @@ export function createSellOrder(user, orderData) {
     release();
   });
 }
-//兩秒鐘最多一次
+// 兩秒鐘最多一次
 limitMethod('createSellOrder', 1, 2000);

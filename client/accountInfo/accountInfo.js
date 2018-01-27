@@ -2,66 +2,46 @@
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { FlowRouter } from 'meteor/kadira:flow-router';
 
-import { dbLog, accuseLogTypeList } from '/db/dbLog';
 import { dbCompanies } from '/db/dbCompanies';
-import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
-import { dbTaxes } from '/db/dbTaxes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat } from '../utils/helpers';
 import { changeChairmanTitle } from '../utils/methods';
-import { accountInfoCommonHelpers } from './helpers';
+import { accountInfoCommonHelpers, paramUserId, paramUser, isCurrentUser } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
+
 Template.accountInfo.onCreated(function() {
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
+  this.autorunWithIdleSupport(() => {
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('accountInfo', userId);
     }
   });
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
+
+  this.autorunWithIdleSupport(() => {
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('employeeListByUser', userId);
     }
   });
+
   this.autorun(() => {
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      const user = Meteor.users.findOne(userId);
-      if (user) {
-        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
-      }
+    const user = paramUser();
+    if (user) {
+      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
     }
   });
 });
-//是否展開面板
+// 是否展開面板
 const rDisplayPanelList = new ReactiveVar([]);
 Template.accountInfo.helpers({
-  lookUser() {
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      return Meteor.users.findOne(userId);
-    }
-    else {
-      return null;
-    }
-  },
+  ...accountInfoCommonHelpers,
   isDisplayPanel(panelType) {
     return _.contains(rDisplayPanelList.get(), panelType);
   }
@@ -69,8 +49,7 @@ Template.accountInfo.helpers({
 Template.accountInfo.events({
   'click [data-toggle-panel]'(event) {
     event.preventDefault();
-    const $emitter = $(event.currentTarget);
-    const panelType = $emitter.attr('data-toggle-panel');
+    const panelType = $(event.currentTarget).attr('data-toggle-panel');
     const displayPanelList = rDisplayPanelList.get();
     if (_.contains(displayPanelList, panelType)) {
       rDisplayPanelList.set(_.without(displayPanelList, panelType));
@@ -98,10 +77,10 @@ Template.accountInfoBasic.helpers({
     }
   },
   showUnregisterEmployee() {
-    const userId = FlowRouter.getParam('userId');
+    const userId = paramUserId();
     const employed = false;
 
-    return userId === Meteor.userId() && dbEmployees.findOne({userId, employed});
+    return isCurrentUser() && dbEmployees.findOne({ userId, employed });
   },
   isBaned(type) {
     return _.contains(this.profile.ban, type);
@@ -115,12 +94,12 @@ Template.accountInfoBasic.helpers({
 });
 
 Template.accountInfoBasic.events({
-  'click [data-action="fscAnnouncement"]'(event, templateInstance) {
+  'click [data-action="fscAnnouncement"]'(event) {
     event.preventDefault();
-    const accuseUser = templateInstance.data;
+    const accuseUser = paramUser();
     alertDialog.dialog({
       type: 'prompt',
-      title: '金管會通告 - 輸入通知訊息',
+      title: `金管會通告 - ${accuseUser.profile.name}`,
       message: `請輸入要通告的訊息：`,
       callback: (message) => {
         if (message) {
@@ -130,9 +109,9 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="accuse"]'(event, templateInstance) {
+  'click [data-action="accuse"]'(event) {
     event.preventDefault();
-    const accuseUser = templateInstance.data;
+    const accuseUser = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '舉報違規 - ' + accuseUser.profile.name,
@@ -145,7 +124,7 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-ban]'(event, templateInstance) {
+  'click [data-ban]'(event) {
     event.preventDefault();
     const banType = $(event.currentTarget).attr('data-ban');
     let banActionText;
@@ -171,7 +150,7 @@ Template.accountInfoBasic.events({
         break;
       }
     }
-    const accuseUserData = templateInstance.data;
+    const accuseUserData = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '違規處理 - ' + accuseUserData.profile.name + ' - ' + banActionText,
@@ -179,14 +158,14 @@ Template.accountInfoBasic.events({
       callback: (message) => {
         if (message) {
           const userId = accuseUserData._id;
-          Meteor.customCall('banUser', {userId, message, banType});
+          Meteor.customCall('banUser', { userId, message, banType });
         }
       }
     });
   },
-  'click [data-action="forfeitUserMoney"]'(event, templateInstance) {
+  'click [data-action="forfeitUserMoney"]'(event) {
     event.preventDefault();
-    const accuseUserData = templateInstance.data;
+    const accuseUserData = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '課以罰金 - ' + accuseUserData.profile.name,
@@ -211,9 +190,9 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="returnForfeitedUserMoney"]'(event, templateInstance) {
+  'click [data-action="returnForfeitedUserMoney"]'(event) {
     event.preventDefault();
-    const accuseUserData = templateInstance.data;
+    const accuseUserData = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '退還罰金 - ' + accuseUserData.profile.name,
@@ -238,9 +217,9 @@ Template.accountInfoBasic.events({
       }
     });
   },
-  'click [data-action="confiscateStocks"]'(event, templateInstance) {
+  'click [data-action="confiscateStocks"]'(event) {
     event.preventDefault();
-    const accuseUserData = templateInstance.data;
+    const accuseUserData = paramUser();
     alertDialog.dialog({
       type: 'prompt',
       title: '沒收股份 - ' + accuseUserData.profile.name,
@@ -248,7 +227,7 @@ Template.accountInfoBasic.events({
       callback: (message) => {
         if (message) {
           const userId = accuseUserData._id;
-          Meteor.customCall('confiscateStocks', {userId, message});
+          Meteor.customCall('confiscateStocks', { userId, message });
         }
       }
     });
@@ -317,7 +296,7 @@ Template.chairmanTitleList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const userId = FlowRouter.getParam('userId');
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('accountChairmanTitle', userId, chairmanOffset.get());
     }
@@ -328,7 +307,8 @@ Template.chairmanTitleList.helpers({
   titleList() {
     return dbCompanies
       .find({
-        chairman: this._id
+        chairman: this._id,
+        isSeal: false
       },
       {
         limit: 10
@@ -357,7 +337,7 @@ Template.managerTitleList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const userId = FlowRouter.getParam('userId');
+    const userId = paramUserId();
     if (userId) {
       this.subscribe('accountManagerTitle', userId, managerOffset.get());
     }
@@ -367,7 +347,8 @@ Template.managerTitleList.helpers({
   titleList() {
     return dbCompanies
       .find({
-        manager: this._id
+        manager: this._id,
+        isSeal: false
       },
       {
         limit: 10
@@ -382,217 +363,26 @@ Template.managerTitleList.helpers({
   }
 });
 
+Template.employeeTitleList.onCreated(function() {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = paramUserId();
+    if (userId) {
+      this.subscribe('accounEmployeeTitle', userId);
+    }
+  });
+});
 Template.employeeTitleList.helpers({
   employment() {
-    const userId = FlowRouter.getParam('userId');
-    const employed = true;
+    const userId = paramUserId();
 
-    return dbEmployees.findOne({userId, employed});
+    return dbEmployees.find({ userId }, { sort: { employed: -1 } });
   },
-  nextSeasonEmployment() {
-    const userId = FlowRouter.getParam('userId');
-    const employed = false;
+  isSeal(companyId) {
+    const companyData = dbCompanies.findOne(companyId);
 
-    return dbEmployees.findOne({userId, employed});
-  }
-});
-
-export const taxesOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.accountInfoTaxList);
-Template.accountInfoTaxList.onCreated(function() {
-  taxesOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountInfoTax', userId, taxesOffset.get());
-    }
-  });
-});
-Template.accountInfoTaxList.helpers({
-  ...accountInfoCommonHelpers,
-  taxesList() {
-    const userId = FlowRouter.getParam('userId');
-
-    return dbTaxes.find({userId}, {
-      limit: 10,
-      sort: {
-        expireDate: 1
-      }
-    });
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfAccountInfoTax',
-      dataNumberPerPage: 10,
-      offset: taxesOffset
-    };
-  }
-});
-Template.accountInfoTaxList.events({
-  'click [data-pay]'(event) {
-    const taxId = new Mongo.ObjectID($(event.currentTarget).attr('data-pay'));
-    const taxData = dbTaxes.findOne(taxId);
-    if (taxData) {
-      const user = Meteor.user();
-      const totalNeedPay = taxData.tax + taxData.zombie + taxData.fine - taxData.paid;
-      const maxPayMoney = Math.min(user.profile.money, totalNeedPay);
-      if (maxPayMoney < 1) {
-        alertDialog.alert('您的金錢不足以繳納稅金！');
-      }
-      alertDialog.dialog({
-        type: 'prompt',
-        title: '繳納稅金',
-        message: `請輸入您要繳納的金額：(1~${currencyFormat(maxPayMoney)})`,
-        inputType: 'number',
-        defaultValue: maxPayMoney,
-        customSetting: `min="1" max="${maxPayMoney}"`,
-        callback: (amount) => {
-          amount = parseInt(amount, 10);
-          if (amount) {
-            Meteor.customCall('payTax', taxId, amount);
-          }
-        }
-      });
-    }
-  }
-});
-
-export const ownStocksOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.accountInfoOwnStockList);
-Template.accountInfoOwnStockList.onCreated(function() {
-  ownStocksOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountOwnStocks', userId, ownStocksOffset.get());
-    }
-  });
-});
-Template.accountInfoOwnStockList.helpers({
-  directorList() {
-    const userId = FlowRouter.getParam('userId');
-
-    return dbDirectors.find({userId}, {
-      limit: 10
-    });
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfAccountOwnStocks',
-      dataNumberPerPage: 10,
-      offset: ownStocksOffset
-    };
-  }
-});
-
-
-export const accountLogViewerMode = new ReactiveVar('accuse');
-Template.accountLogViewer.helpers({
-  onlyViewAccuse() {
-    return accountLogViewerMode.get() === 'accuse';
-  }
-});
-
-export const accuseOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.accountAccuseLogList);
-Template.accountAccuseLogList.onCreated(function() {
-  accuseOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountAccuseLog', userId, accuseOffset.get());
-    }
-  });
-});
-Template.accountAccuseLogList.helpers({
-  accuseList() {
-    const userId = FlowRouter.getParam('userId');
-
-    return dbLog.find(
-      {
-        userId: userId,
-        logType: {
-          $in: accuseLogTypeList
-        }
-      },
-      {
-        sort: {
-          createdAt: -1
-        },
-        limit: 10
-      }
-    );
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfAccountAccuseLog',
-      dataNumberPerPage: 10,
-      offset: accuseOffset
-    };
-  }
-});
-Template.accountAccuseLogList.events({
-  'click button'(event) {
-    event.preventDefault();
-    accountLogViewerMode.set('all');
-  }
-});
-
-export const logOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.accountInfoLogList);
-Template.accountInfoLogList.onCreated(function() {
-  logOffset.set(0);
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const userId = FlowRouter.getParam('userId');
-    if (userId) {
-      this.subscribe('accountInfoLog', userId, logOffset.get());
-    }
-  });
-});
-Template.accountInfoLogList.helpers({
-  logList() {
-    const userId = FlowRouter.getParam('userId');
-
-    return dbLog.find(
-      {
-        userId: {
-          $in: [userId, '!all']
-        },
-        logType: {
-          $ne: '聊天發言'
-        }
-      },
-      {
-        sort: {
-          createdAt: -1
-        },
-        limit: 30
-      }
-    );
-  },
-  paginationData() {
-    return {
-      useVariableForTotalCount: 'totalCountOfAccountInfoLog',
-      dataNumberPerPage: 30,
-      offset: logOffset
-    };
-  }
-});
-Template.accountInfoLogList.events({
-  'click button'(event) {
-    event.preventDefault();
-    accountLogViewerMode.set('accuse');
+    return companyData ? companyData.isSeal : false;
   }
 });

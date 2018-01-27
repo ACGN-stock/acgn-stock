@@ -149,7 +149,7 @@ export const logTypeList = [
   '推薦產品',
 
   /**
-   * 【購買產品】userId0花費$data.cost買了「companyId」公司的產品「data.productId」共data.amount個，使該公司獲得了$data.profit的營利額！`;
+   * 【購買產品】userId0花費(消費券$data.voucherCost)?(以及)?(現金$data.moneyCost)?買了「companyId」公司的產品「data.productId」共data.amount個，使該公司獲得了$data.profit的營利額！`;
    */
   '購買產品',
 
@@ -172,6 +172,11 @@ export const logTypeList = [
    * 【推薦回饋】(「companyId」公司 || 系統)發給了userId0產品投票回饋金$data.reward！
    */
   '推薦回饋',
+
+  /**
+   * 【消費回饋】userId0得到了「companyId」公司的產品消費回饋金$data.rebate！
+   */
+  '消費回饋',
 
   /**
    * 【季度賦稅】userId0在此次商業季度中產生了$data.assetTax的財富稅與$data.zombieTax的殭屍稅！

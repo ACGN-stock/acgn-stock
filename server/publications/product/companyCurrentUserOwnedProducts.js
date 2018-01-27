@@ -9,8 +9,11 @@ import { debug } from '/server/imports/utils/debug';
 Meteor.publish('companyCurrentUserOwnedProducts', function(companyId) {
   debug.log('publish companyCurrentUserOwnedProducts', { companyId });
 
-  check(this.userId, String);
   check(companyId, String);
+
+  if (! this.userId) {
+    return [];
+  }
 
   const { _id: seasonId } = getCurrentSeason();
 

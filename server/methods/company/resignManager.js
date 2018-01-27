@@ -18,7 +18,7 @@ Meteor.methods({
   }
 });
 export function resignManager(user, companyId) {
-  debug.log('resignManager', {user, companyId});
+  debug.log('resignManager', { user, companyId });
   const companyData = dbCompanies.findOne(companyId, {
     fields: {
       companyName: 1,
@@ -37,7 +37,7 @@ export function resignManager(user, companyId) {
     throw new Meteor.Error(401, '使用者並非該公司的經理人！');
   }
   resourceManager.throwErrorIsResourceIsLock(['season', 'elect', 'elect' + companyId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('resignManager', ['elect' + companyId], (release) => {
     const companyData = dbCompanies.findOne(companyId, {
       fields: {
@@ -49,7 +49,7 @@ export function resignManager(user, companyId) {
     if (userId !== companyData.manager) {
       throw new Meteor.Error(401, '使用者並非該公司的經理人！');
     }
-    const {candidateList, voteList} = companyData;
+    const { candidateList, voteList } = companyData;
     const candidateIndex = _.indexOf(candidateList, userId);
     if (candidateIndex !== -1) {
       candidateList.splice(candidateIndex, 1);

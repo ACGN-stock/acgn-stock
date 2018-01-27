@@ -1,13 +1,25 @@
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
-export const accountInfoCommonHelpers = {
-  isCurrentUser() {
-    const user = Meteor.user();
-    if (user && user._id === FlowRouter.getParam('userId')) {
-      return true;
-    }
+export function paramUserId() {
+  return FlowRouter.getParam('userId');
+}
 
-    return false;
+export function paramUser() {
+  const userId = paramUserId();
+
+  return userId ? Meteor.users.findOne(userId) : null;
+}
+
+export function isCurrentUser() {
+  const currentUserId = Meteor.userId();
+  if (currentUserId && currentUserId === paramUserId()) {
+    return true;
   }
+}
+
+export const accountInfoCommonHelpers = {
+  paramUserId,
+  paramUser,
+  isCurrentUser
 };
