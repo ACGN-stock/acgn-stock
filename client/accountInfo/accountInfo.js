@@ -8,6 +8,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
+import { dbVips } from '/db/dbVips';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -384,5 +385,31 @@ Template.employeeTitleList.helpers({
     const companyData = dbCompanies.findOne(companyId);
 
     return companyData ? companyData.isSeal : false;
+  }
+});
+
+Template.vipTitleList.onCreated(function() {
+  this.offset = new ReactiveVar(0);
+
+  this.autorunWithIdleSupport(() => {
+    const userId = paramUserId();
+    if (userId) {
+      this.subscribe('accountVipTitle', userId, this.offset.get());
+    }
+  });
+});
+Template.vipTitleList.helpers({
+  vips() {
+    return dbVips.find({ userId: paramUserId }, { sort: { level: -1 } });
+  },
+  getTitle(vip) {
+    return `Level ${vip.level} VIP`;
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfVipTitle',
+      dataNumberPerPage: 10,
+      offset: Template.instance().offset
+    };
   }
 });

@@ -228,3 +228,5 @@ export function isCompanyManager(kwargs) {
   return company.manager === user._id;
 }
 Template.registerHelper('isCompanyManager', isCompanyManager);
+
+Template.registerHelper('round', Math.round);
