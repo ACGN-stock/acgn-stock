@@ -6,7 +6,7 @@
         {{#if product.availableAmount}}
           尚餘：{{product.availableAmount}}
         {{else}}
-          {{#if product.stockAmount}}
+          {{#if product.hasStockAmount}}
             <span class="text-warning">補貨中</span>
           {{else}}
             <span class="text-danger">已完售</span>
