@@ -296,7 +296,7 @@ export function toggleFavorite(companyId) {
 }
 
 export function investFoundCompany(companyId) {
-  const foundationData = dbFoundations.find(companyId);
+  const foundationData = dbFoundations.findOne(companyId);
   const user = Meteor.user();
   if (! user) {
     alertDialog.alert('您尚未登入！');
