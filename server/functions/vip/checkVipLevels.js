@@ -23,31 +23,35 @@ function adjustVipLevelsByScore() {
 
       return obj;
     }, {});
+  const unsealedCompanyIds = Object.keys(companyVipThresholdsMap);
+
   const vipModifyList = [];
 
-  dbVips.find().forEach(({ userId, companyId, score, level }) => {
-    const vipThresholds = companyVipThresholdsMap[companyId];
+  dbVips
+    .find({ companyId: { $in: unsealedCompanyIds } })
+    .forEach(({ userId, companyId, score, level }) => {
+      const vipThresholds = companyVipThresholdsMap[companyId];
 
-    const index = [...vipThresholds, Infinity].findIndex((threshold) => {
-      return threshold > score;
+      const index = [...vipThresholds, Infinity].findIndex((threshold) => {
+        return threshold > score;
+      });
+
+      if (index === -1) {
+        return;
+      }
+
+      const maxLevel = index - 1;
+
+      // 低於 level 5 者不降級
+      if (maxLevel <= level && level < 5) {
+        return;
+      }
+
+      vipModifyList.push({
+        query: { userId, companyId },
+        update: { $set: { level: maxLevel } }
+      });
     });
-
-    if (index === -1) {
-      return;
-    }
-
-    const maxLevel = index - 1;
-
-    // 低於 level 5 者不降級
-    if (maxLevel <= level && level < 5) {
-      return;
-    }
-
-    vipModifyList.push({
-      query: { userId, companyId },
-      update: { $set: { level: maxLevel } }
-    });
-  });
 
   if (vipModifyList.length > 0) {
     const vipBulk = dbVips.rawCollection().initializeUnorderedBulkOp();
@@ -60,12 +64,17 @@ function adjustVipLevelsByScore() {
 
 // 降級超過人數的 level 5 VIP
 function levelDownExcessiveLevel5Vips() {
+  const unsealedCompanyIds = _.pluck(dbCompanies.find({ isSeal: false }, { fields: { _id: 1 } }).fetch(), '_id');
+
   const vipModifyList = [];
 
   // 若是 level 5 超過人數，將剩餘的退級回 level 4
   dbVips
     .aggregate([ {
-      $match: { level: 5 }
+      $match: {
+        companyId: { $in: unsealedCompanyIds },
+        level: 5
+      }
     }, {
       $sort: { score: -1, createdAt: 1 }
     }, {
