@@ -13,7 +13,7 @@ import { dbVariables } from '/db/dbVariables';
 import { debug } from '/server/imports/utils/debug';
 import { backupMongo } from '/server/imports/utils/backupMongo';
 
-const {salaryPerPay} = Meteor.settings.public;
+const { salaryPerPay } = Meteor.settings.public;
 export function paySalaryAndCheckTax() {
   debug.log('paySalary');
   const todayBeginTime = new Date().setHours(0, 0, 0, 0);
@@ -153,15 +153,15 @@ function checkTax(todayBeginTime) {
     let needExecuteDirectorBulk = false;
     const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
     const taxesBulk = dbTaxes.rawCollection().initializeUnorderedBulkOp();
-    //逾期繳稅狀態可能在過程裡變來變去，因此需要有序的Bulk op
+    // 逾期繳稅狀態可能在過程裡變來變去，因此需要有序的Bulk op
     const usersBulk = Meteor.users.rawCollection().initializeOrderedBulkOp();
-    //紀錄各公司徵收到的股票
+    // 紀錄各公司徵收到的股票
     const imposedStocksHash = {};
     expireTaxesCursor.forEach((taxData) => {
       const taxId = new ObjectID(taxData._id._str);
       const userId = taxData.userId;
       const overdueDay = Math.ceil((todayBeginTime - taxData.expireDate.getTime()) / 86400000);
-      //將使用者設為繳稅逾期狀態
+      // 將使用者設為繳稅逾期狀態
       usersBulk
         .find({
           _id: userId
@@ -172,7 +172,7 @@ function checkTax(todayBeginTime) {
           }
         });
       const createdAtBasicTime = Date.now();
-      //增加稅單罰金
+      // 增加稅單罰金
       if (overdueDay < 7) {
         const amount = Math.ceil(taxData.tax * 0.1);
         taxesBulk
@@ -191,11 +191,11 @@ function checkTax(todayBeginTime) {
           createdAt: new Date(createdAtBasicTime)
         });
       }
-      //開始強制徵收
+      // 開始強制徵收
       else {
         const needPay = taxData.tax + taxData.zombie - taxData.paid + taxData.fine;
         let imposedMoney = 0;
-        //先徵收使用者的現金
+        // 先徵收使用者的現金
         const userData = Meteor.users.findOne(userId, {
           fields: {
             'profile.money': 1
@@ -220,7 +220,7 @@ function checkTax(todayBeginTime) {
           });
           imposedMoney += directPayMoney;
         }
-        //撤銷所有買入訂單
+        // 撤銷所有買入訂單
         const buyOrderCursor = dbOrders.find({
           userId: userId,
           orderType: '購入'
@@ -239,8 +239,8 @@ function checkTax(todayBeginTime) {
             orderType: '購入'
           });
         }
-        //依參考價格依序沒收持有股票
-        if (imposedMoney < needPay && dbDirectors.find({userId}).count() > 0) {
+        // 依參考價格依序沒收持有股票
+        if (imposedMoney < needPay && dbDirectors.find({ userId }).count() > 0) {
           const ownStockList = dbDirectors.aggregate([
             {
               $match: {
@@ -286,9 +286,9 @@ function checkTax(todayBeginTime) {
             if (! imposedStocksHash[stockData.companyId]) {
               imposedStocksHash[stockData.companyId] = 0;
             }
-            //需要徵收多少股票才足以支付餘下稅金
+            // 需要徵收多少股票才足以支付餘下稅金
             const imposedStocks = Math.ceil((needPay - imposedMoney) / stockData.listPrice);
-            //全部徵收
+            // 全部徵收
             if (imposedStocks >= stockData.stocks) {
               logBulk.insert({
                 logType: '繳稅沒收',
@@ -300,7 +300,7 @@ function checkTax(todayBeginTime) {
                 },
                 createdAt: new Date(createdAtBasicTime + index + 2)
               });
-              //因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
+              // 因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
               directorsBulk
                 .find({
                   _id: stockData._id
@@ -309,7 +309,7 @@ function checkTax(todayBeginTime) {
               imposedMoney += stockData.stocks * stockData.listPrice;
               imposedStocksHash[stockData.companyId] += stockData.stocks;
             }
-            //部份徵收
+            // 部份徵收
             else {
               logBulk.insert({
                 logType: '繳稅沒收',
@@ -321,7 +321,7 @@ function checkTax(todayBeginTime) {
                 },
                 createdAt: new Date(createdAtBasicTime + index + 2)
               });
-              //因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
+              // 因為aggregate取出的_id是真正的Mongo ObjectID，此處不需經過MongoInternals.NpmModule.ObjectID也可以丟進Bulk執行
               directorsBulk
                 .find({
                   _id: stockData._id
@@ -338,7 +338,7 @@ function checkTax(todayBeginTime) {
             return imposedMoney < needPay;
           });
         }
-        //若最後徵收的稅金不恰好等於需繳納的稅金，調整剩餘金錢
+        // 若最後徵收的稅金不恰好等於需繳納的稅金，調整剩餘金錢
         if (imposedMoney !== needPay) {
           usersBulk
             .find({
@@ -350,8 +350,8 @@ function checkTax(todayBeginTime) {
               }
             });
         }
-        //移除稅單並將使用者的繳稅逾期狀態取消
-        //(如果使用者有多於一張的逾期稅單未繳，那檢查到下一張逾期稅單時狀態又會再設回來)
+        // 移除稅單並將使用者的繳稅逾期狀態取消
+        // (如果使用者有多於一張的逾期稅單未繳，那檢查到下一張逾期稅單時狀態又會再設回來)
         taxesBulk
           .find({
             _id: taxId
@@ -371,7 +371,7 @@ function checkTax(todayBeginTime) {
     if (needExecuteDirectorBulk) {
       const createdAt = new Date();
       _.each(imposedStocksHash, (stocks, companyId) => {
-        if (dbDirectors.find({companyId, userId: '!FSC'}).count() > 0) {
+        if (dbDirectors.find({ companyId, userId: '!FSC' }).count() > 0) {
           directorsBulk
             .find({
               companyId: companyId,

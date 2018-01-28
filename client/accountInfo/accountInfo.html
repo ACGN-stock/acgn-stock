@@ -1,58 +1,34 @@
 <template name="accountInfo">
   <div class="card">
-    {{#with lookUser}}
+    {{#with paramUser}}
       {{> accountInfoBasic}}
       <div class="card-block">
-        <div class="row border-grid-body" style="margin-top: 15px;">
+        <div class="row border-grid-body">
           <div class="col-12 border-grid">
-            <a class="d-block h4" href="#" data-toggle-panel="tax">
-              稅務資訊
-              {{#if isDisplayPanel 'tax'}}
-                <i class="fa fa-folder-open" aria-hidden="true"></i>
-              {{else}}
-                <i class="fa fa-folder" aria-hidden="true"></i>
-              {{/if}}
-            </a>
+            {{#panelFolder name='tax' title='稅務資訊' }}
+              {{> accountInfoTaxList}}
+            {{/panelFolder}}
           </div>
-          {{#if isDisplayPanel 'tax'}}
-            {{> accountInfoTaxList}}
-          {{/if}}
           <div class="col-12 border-grid">
-            <a class="d-block h4" href="#" data-toggle-panel="stock">
-              持股資訊
-              {{#if isDisplayPanel 'stock'}}
-                <i class="fa fa-folder-open" aria-hidden="true"></i>
-              {{else}}
-                <i class="fa fa-folder" aria-hidden="true"></i>
-              {{/if}}
-            </a>
+            {{#panelFolder name='ownStock' title='持股資訊' }}
+              {{> accountInfoOwnStockList}}
+            {{/panelFolder}}
           </div>
-          {{#if isDisplayPanel 'stock'}}
-            {{> accountInfoOwnStockList}}
-          {{/if}}
           <div class="col-12 border-grid">
             {{#panelFolder name='stone' title='石頭資訊' }}
-              {{> accountInfoStonePanel user=lookUser}}
+              {{> accountInfoStonePanel}}
             {{/panelFolder}}
           </div>
           <div class="col-12 border-grid">
             {{#panelFolder name='ownedProducts' title='持有產品' }}
-              {{> accountInfoOwnedProductsPanel user=lookUser}}
+              {{> accountInfoOwnedProductsPanel}}
             {{/panelFolder}}
           </div>
           <div class="col-12 border-grid">
-            <a class="d-block h4" href="#" data-toggle-panel="log">
-              玩家紀錄
-              {{#if isDisplayPanel 'log'}}
-                <i class="fa fa-folder-open" aria-hidden="true"></i>
-              {{else}}
-                <i class="fa fa-folder" aria-hidden="true"></i>
-              {{/if}}
-            </a>
+            {{#panelFolder name='log' title='玩家紀錄' }}
+              {{> accountLogViewer}}
+            {{/panelFolder}}
           </div>
-          {{#if isDisplayPanel 'log'}}
-            {{> accountLogViewer}}
-          {{/if}}
         </div>
       </div>
     {{/with}}
@@ -161,6 +137,9 @@
       帳號當前餘額：{{currencyFormat this.profile.money}}
     </div>
     <div>
+      帳號剩餘消費券：{{currencyFormat this.profile.vouchers}}
+    </div>
+    <div>
       帳號剩餘推薦票：{{this.profile.voteTickets}}
     </div>
     {{#if this.profile.isInVacation}}
@@ -218,9 +197,9 @@
   {{#each titleList}}
     <div class="text-primary d-flex flex-nowrap">
       <div class="text-nowrap">是「</div>
-      <div class="d-inline-block text-truncate" style="min-width: 3rem;">{{>companyLink this._id}}</div>
+      <div class="d-inline-block text-truncate" style="max-width: calc(100% - 11rem);">{{>companyLink this._id}}</div>
       <div class="text-nowrap">」公司的「</div>
-      <div class="d-inline-block text-truncate" style="min-width: 3rem;">
+      <div class="d-inline-block text-truncate" style="max-width: calc(100% - 11rem);">
         {{#if isCurrentUser}}
           <a href="#" data-action="changeChairmanTitle">
             {{this.chairmanTitle}}
@@ -251,146 +230,26 @@
 </template>
 
 <template name="employeeTitleList">
-  {{#with employment}}
-    {{> companyTitle companyId=this.companyId title='員工'}}
-  {{/with}}
-  {{#with nextSeasonEmployment}}
-    {{> companyTitle companyId=this.companyId title='儲備員工'}}
-  {{/with}}
-  {{#unless employment}}
-    {{#unless nextSeasonEmployment}}
-      查無資料！
-    {{/unless}}
-  {{/unless}}
+  {{#each employment}}
+    {{#if this.employed}}
+      {{> companyTitle companyId=this.companyId isSeal=(isSeal this.companyId) title='員工'}}
+    {{else}}
+      {{> companyTitle companyId=this.companyId isSeal=(isSeal this.companyId) title='儲備員工'}}
+    {{/if}}
+  {{else}}
+    查無資料！
+  {{/each}}
 </template>
 
 <template name="companyTitle">
   <div class="text-primary d-flex flex-nowrap">
     <div class="text-nowrap">是「</div>
-    <div class="d-inline-block text-truncate">{{>companyLink companyId}}</div>
+    <div class="d-inline-block text-truncate">
+      {{#if isSeal}}
+        <span class="badge badge-pill badge-danger">已查封</span>
+      {{/if}}
+      {{>companyLink companyId}}
+    </div>
     <div class="text-nowrap">」公司的{{title}}。</div>
-  </div>
-</template>
-
-<template name="accountInfoTaxList">
-  <div class="col-12 border-grid">
-    <table class="table table-bordered mt-3 custom-responsive-table-md account-tax-list w-100" style="table-layout: fixed;">
-      <thead>
-        <tr>
-          <th class="text-center text-nowrap" style="width: 160px">繳稅期限</th>
-          <th class="text-center text-nowrap">財稅額</th>
-          <th class="text-center text-nowrap">殭屍稅</th>
-          <th class="text-center text-nowrap ">逾期罰金</th>
-          <th class="text-center text-nowrap">已繳納</th>
-          {{#if isCurrentUser}}
-            <th class="text-center text-nowrap">繳納稅金</th>
-          {{/if}}
-        </tr>
-      </thead>
-      <tbody>
-        {{#each taxes in taxesList}}
-          <tr>
-            <td class="text-right text-truncate text-nowrap" data-title="繳稅期限">
-              {{formatDateText taxes.expireDate}}
-            </td>
-            <td class="text-right text-truncate text-nowrap" data-title="財稅額" title="{{taxes.tax}}">
-              $ {{currencyFormat taxes.tax}}
-            </td>
-            <td class="text-right text-truncate text-nowrap" data-title="殭屍稅" title="{{taxes.zombie}}">
-              $ {{currencyFormat taxes.zombie}}
-            </td>
-            <td class="text-right text-truncate text-nowrap" data-title="逾期罰金" title="{{taxes.fine}}">
-              $ {{currencyFormat taxes.fine}}
-            </td>
-            <td class="text-right text-truncate text-nowrap" data-title="已繳納" title="{{taxes.paid}}">
-              $ {{currencyFormat taxes.paid}}
-            </td>
-            {{#if isCurrentUser}}
-              <td class="text-center" data-title="繳納稅金">
-                <button class="btn btn-success btn-sm" type="button" data-pay="{{taxes._id._str}}">
-                  繳納稅金
-                </button>
-              </td>
-            {{/if}}
-          </tr>
-        {{else}}
-          <tr class="default-content">
-            {{#if isCurrentUser}}
-              <td class="text-center text-truncate p-1" colspan="6">目前沒有需要繳納的稅金！</td>
-            {{else}}
-              <td class="text-center text-truncate p-1" colspan="5">目前沒有需要繳納的稅金！</td>
-            {{/if}}
-          </tr>
-        {{/each}}
-      </tbody>
-    </table>
-  </div>
-</template>
-
-<template name="accountInfoOwnStockList">
-  <div class="col-12 border-grid">
-    <table class="table table-bordered mt-3 w-100" style="table-layout: fixed;">
-      <thead>
-        <tr>
-          <th class="text-center text-nowrap">公司名稱</th>
-          <th class="text-center text-nowrap" style="width: 95px">持股數</th>
-        </tr>
-      </thead>
-      <tbody>
-      {{#each directorData in directorList}}
-        <tr>
-          <td class="text-left text-truncate p-1" data-title="公司名稱">
-            {{>companyLink directorData.companyId}}
-          </td>
-          <td class="text-right text-truncate p-1" data-title="持股數">
-            {{directorData.stocks}} 股
-          </td>
-        </tr>
-      {{else}}
-        <tr>
-          <td class="text-center text-truncate p-1" colspan="2">查無資料！</td>
-        </tr>
-      {{/each}}
-      </tbody>
-    </table>
-    {{#with paginationData}}
-      {{> pagination}}
-    {{/with}}
-  </div>
-</template>
-
-<template name="accountLogViewer">
-  {{#if onlyViewAccuse}}
-    {{> accountAccuseLogList}}
-  {{else}}
-    {{> accountInfoLogList}}
-  {{/if}}
-</template>
-
-<template name="accountAccuseLogList">
-  <div class="col-12 border-grid">
-    <button class="btn btn-outline-info btn-sm mt-1">檢視所有紀錄</button>
-    {{#each accuseList}}
-      {{> displayLog}}
-    {{else}}
-      查無資料！
-    {{/each}}
-    {{#with paginationData}}
-      {{> pagination}}
-    {{/with}}
-  </div>
-</template>
-
-<template name="accountInfoLogList">
-  <div class="col-12 border-grid">
-    <button class="btn btn-outline-info btn-sm mt-1">只檢視金管會相關紀錄</button>
-    {{#each logList}}
-      {{> displayLog}}
-    {{else}}
-      查無資料！
-    {{/each}}
-    {{#with paginationData}}
-      {{> pagination}}
-    {{/with}}
   </div>
 </template>

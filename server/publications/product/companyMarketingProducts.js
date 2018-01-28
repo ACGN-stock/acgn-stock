@@ -1,6 +1,8 @@
 import { Meteor } from 'meteor/meteor';
+import { _ } from 'meteor/underscore';
 import { check, Match } from 'meteor/check';
 
+import { dbCompanies } from '/db/dbCompanies';
 import { dbProducts } from '/db/dbProducts';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
@@ -11,6 +13,19 @@ Meteor.publish('companyMarketingProducts', function({ companyId, offset }) {
   check(companyId, String);
   check(offset, Match.Integer);
 
+  const company = dbCompanies.findOne(companyId);
+
+  const transformFields = (fields) => {
+    const result = Object.assign({}, fields, {
+      hasStockAmount: fields.stockAmount > 0
+    });
+
+    if (! this.userId || this.userId !== company.manager) {
+      return _.omit(result, 'stockAmount', 'totalAmount');
+    }
+
+    return result;
+  };
 
   const filter = { companyId, state: 'marketing' };
 
@@ -18,11 +33,29 @@ Meteor.publish('companyMarketingProducts', function({ companyId, offset }) {
 
   const { companyMarketingProducts: dataNumberPerPage } = Meteor.settings.public.dataNumberPerPage;
 
-  return dbProducts.find(filter, {
-    sort: { voteCount: -1 },
-    skip: offset,
-    limit: dataNumberPerPage
+  const pageObserver = dbProducts
+    .find(filter, {
+      sort: { voteCount: -1 },
+      skip: offset,
+      limit: dataNumberPerPage
+    })
+    .observeChanges({
+      added: (id, fields) => {
+        this.added('products', id, transformFields(fields));
+      },
+      changed: (id, fields) => {
+        this.changed('products', id, transformFields(fields));
+      },
+      removed: (id) => {
+        this.removed('products', id);
+      }
+    });
+
+  this.onStop(() => {
+    pageObserver.stop();
   });
+
+  this.ready();
 });
 // 一分鐘最多20次
 limitSubscription('companyMarketingProducts');

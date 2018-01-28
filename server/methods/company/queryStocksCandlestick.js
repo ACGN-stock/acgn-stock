@@ -19,7 +19,7 @@ Meteor.methods({
   }
 });
 function queryStocksCandlestick(companyId, options) {
-  debug.log('queryStocksCandlestick', {companyId, options});
+  debug.log('queryStocksCandlestick', { companyId, options });
   const list = dbPrice
     .find(
       {
@@ -64,5 +64,5 @@ function queryStocksCandlestick(companyId, options) {
     return candlestick.open > 0;
   });
 }
-//一分鐘最多20次
+// 一分鐘最多20次
 limitMethod('queryStocksCandlestick');

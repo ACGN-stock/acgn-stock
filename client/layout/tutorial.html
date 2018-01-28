@@ -1,7 +1,7 @@
 <template name="tutorial">
   <div class="card">
-    <div class="card-block">
-      <h1 class="card-title">教學導覽</h1>
+    <div class="card-block tutorial-main">
+      <h1 class="card-title">遊戲規則</h1>
       <hr />
       <div class="card">
         <div class="card-header pointer" role="tab">
@@ -55,7 +55,7 @@
               <li>當有任何交易成功進行時，該公司的「最後成交價格」會立刻更新。</li>
               <li>每隔<span class="text-info">三到六小時</span>的隨機時間，系統會以股票的最後交易價格取代其參考價格。</li>
               <li>參考價格低於全市場股價的<span class="text-info">第一四分位數</span>的股票將被視為低價股。</li>
-              <li>購買低價股時，最高單價可為參考股價的<span class="text-info">130%</span>，而非<span class="text-info">115%</span>。此外，低價股會有更多的釋股機會。</li>
+              <li>購買低價股時，最高單價可為參考股價的<span class="text-info">130%</span>，而非<span class="text-info">115%</span></li>
             </ol>
           </div>
         </div>
@@ -71,7 +71,7 @@
             <ol>
               <li>任何通過驗證的使用者皆可以在繳交<span class="text-info">$1024</span>的保證投資金後，申請為某個ACGN作品的角色創立公司，做法是在「新創計劃」頁面底下點擊「建立新角色」。</li>
               <li>新創計劃申請之後會有十二個小時的投資期限，使用者在同一時間只能有一個申請中的新創計劃。</li>
-              <li>在投資期限內，任何通過驗證的使用者皆可對此新創計劃進行投資，最低投資金額為<span class="text-info">$50</span>，最高投資金額為<span class="text-info">$4096</span>。一但投資成功，金錢就會立刻從使用者帳戶中扣除。只要期限到達且最終的投資人數在<span class="text-info">10人以上</span>，公司便會創立。若投資期限到達後投資人數仍未達<span class="text-info">10人</span>，則新創失敗，投資將退款給投資人，但申請人的投資保證金<span class="text-info">$1024</span>將會被沒收。</li>
+              <li>在投資期限內，任何通過驗證的使用者皆可對此新創計劃進行投資，最低投資金額為<span class="text-info">$50</span>，最高投資金額為<span class="text-info">$4096</span>。一但投資成功，金錢就會立刻從使用者帳戶中扣除。只要期限到達且最終的投資人數在<span class="text-info">10人以上</span>，公司便會創立。若投資期限到達後投資人數仍未達<span class="text-info">20人</span>，則新創失敗，投資將退款給投資人，但申請人的投資保證金<span class="text-info">$1024</span>將會被沒收。</li>
               <li><span class="text-danger">金融管理會嚴禁任何人創立不合法的公司</span>（以重複創立為大宗）。一經發現，公司將會被查封，所有投資也無法收回。請在投資之前詳細閱讀<a href="{{fscRuleURL}}" target="_blank">金管會規定</a>以避免風險。</li>
               <li>新創公司創立成功後，初始股價將定為<span class="text-info">$1</span>，投資人以當初的投資額兌換為同等價格的股份。然而若釋出的初始股份數量因此<span class="text-info">大於2000</span>，那初始股價則會乘以<span class="text-info">2</span>，直到釋出股份數量<span class="text-info">小於等於2000</span>為止。當初始股價在$1元以上時，投資額當初投資金額不足購買1股股份的額度將會退款給投資人。但這個退款動作也可能導致釋出的初始股份小於1000，此時股價則會除以2回來，在此情況下，初始釋出股份會大於2000。</li>
               <li><a href="/foundation_stocks.png" target="_blank">投資額與初始股份股價對照表</a></li>
@@ -164,11 +164,13 @@
               <li>產品的販售：
                 <ul>
                   <li>產品販售期間，在參考價格變動時，會隨機上架補充一定數量供人購買；在商業季度結束前{{productFinalSaleHours}}小時，進行最後出清，把所有可上架的數量全部上架。</li>
+                  <li>除了使用現金之外，在每個商業季度中，每位玩家會有${{currencyFormat productVoucherAmount}}額度的消費券供產品購買使用，購買產品時將優先使用消費券。</li>
                   <li>玩家只能購買有剩餘數量的產品，若是數量不足則需等待下次補貨。</li>
                   <li>玩家可在自己的帳號資訊下，檢視自己持有哪些產品。</li>
                   <li>使用者在同一商業季度的同一間公司裡，購買的總額度不得超過公司資本額的10%。</li>
                   <li>產品售出時，公司將得到產品成本的{{productProfitFactor}}倍作為營利額。</li>
                   <li>在進入下一個商業季度時，產品將停止販售。</li>
+                  <li>玩家在一間公司消費每滿${{currencyFormat productRebateDivisorAmount}}，在商業季度結算時，可得${{currencyFormat productRebateDeliverAmount}}的產品消費回饋。</li>
                 </ul>
               </li>
               <li>每個商業季度開始時，玩家會得到與公司總數成正比的推薦票，讓玩家投票選出自己所喜愛的產品。</li>
@@ -278,8 +280,7 @@
                   <li>投資新創</li>
                   <li>員工報名</li>
                   <li>參選與支持經理人</li>
-                  <li>推薦產品</li>
-                  <li>修改董事長頭銜</li>
+                  <li>推薦與購買產品</li>
                 </ul>
               </li>
               <li>渡假時，玩家仍然會收到<span class="text-info">渡假開始之商業季度的分紅與稅金</span>，唯稅金之<span class="text-info">殭屍稅以一天 $500 計</span>，且<span class="text-info">延長繳稅期限至結束渡假後三天</span>。除此之外，<span class="text-danger">渡假期間不會再產生新的稅金，也無法取得任何分紅</span>。</li>
@@ -316,7 +317,7 @@
                 <li>股價趨勢區塊可以讓使用者觀看該公司一段時間內的股價曲線圖或K線圖。</li>
                 <li>數據資訊區塊可以讓使用者查閱該公司的各種數字資訊。</li>
                 <li>交易訂單區塊可以讓使用者查閱該公司目前的買賣單情況，並進行下單操作。</li>
-                <li>產品中心區塊可以讓使用者查看該公司的當季產品、投推薦票。在暢銷產品排行區塊中顯示的則是該公司曾經發布的所有產品的使用者按讚排行，按讚並不需要推薦票，且隨時可以取消。</li>
+                <li>產品中心區塊可以讓使用者查看該公司的當季產品、購買當季產品與投推薦票。</li>
                 <li>所有紀錄區塊可以讓使用者查閱該公司過去的所有紀錄。</li>
               </ol>
               <li>新創計劃頁面：</li>
@@ -436,12 +437,8 @@
         <div class="collapse">
           <div class="card-block">
             <ol>
-              <li>每<span class="text-info">十三個商業季度</span>為一個賽季，每個賽季結束時將會清空大部份的系統資料與使用者財產資訊。</li>
-              <li>所有的紀錄日誌會全數清除，但排行榜資料會全部保留。</li>
-              <li>所有使用者資料會保留其識別碼、註冊方式、禁止權限與當時使用的使用者名稱，使用者名稱將會顯示在排行榜上。當新的賽季有人以同樣的註冊方式註冊相同帳號時，會繼承前一個賽季所使用的識別碼。</li>
-              <li>所有公司資料會保留其識別碼、公司名稱、大小圖、搜索標籤與公司介紹，公司名稱將會顯示在排行榜上。</li>
-              <li>被保留的公司資料將顯示於「股票保管庫」頁面中，任何人皆可以向保管庫中的股票公司投資<span class="text-info">$1024</span>作為上市基金，一但投資人數抵達<span class="text-info">30</span>人門檻，該公司就會重新進入「新創計劃」中，經理則會由已投資者中隨機抽選出一位擔任。</li>
-              <li>與新創計劃不同，向「股票保管庫」的公司投資不會有投資失敗期限，只要投資人數無法抵達門檻，投資金額就永遠<span class="text-danger">無法回收</span>。</li>
+              <li>每<span class="text-info">十三個商業季度</span>為一個賽季，每個賽季結束時，將會進行資料備份，並將資料轉移至<span class="text-info">博物館</span>做歷史呈現，接著清空大部份的系統資料與使用者財產資訊。</li>
+              <li>所有使用者資料會保留其識別碼、註冊方式、禁止權限與當時使用的使用者名稱。當新的賽季有人以同樣的註冊方式註冊相同帳號時，會繼承前一個賽季所使用的識別碼。</li>
             </ol>
           </div>
         </div>

@@ -2,17 +2,25 @@
   <div class="card my-2 product-card">
     <div class="card-header d-flex flex-wrap py-2 px-3">
       <div class="mr-3">價格：${{currencyFormat product.price}}</div>
-      <div>
+      <div class="mr-auto">
         {{#if product.availableAmount}}
           尚餘：{{product.availableAmount}}
         {{else}}
-          {{#if product.stockAmount}}
+          {{#if product.hasStockAmount}}
             <span class="text-warning">補貨中</span>
           {{else}}
             <span class="text-danger">已完售</span>
           {{/if}}
         {{/if}}
       </div>
+      {{#if isCompanyManager company=product.companyId user=currentUser}}
+        <div class="mr-3 text-info">
+          庫存：{{product.stockAmount}}
+        </div>
+        <div class="mr-3 text-info">
+          賣出：{{soldAmount}}
+        </div>
+      {{/if}}
     </div>
     <div class="card-block p-3">
       <h5 class="card-title text-truncate">

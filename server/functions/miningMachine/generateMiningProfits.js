@@ -36,7 +36,7 @@ export function generateMiningProfits() {
     const logSchema = dbLog.simpleSchema();
 
     Object.entries(companyProfitIncreaseMap).forEach(([companyId, profitIncrease]) => {
-      companyBulk.find({ _id: companyId }).updateOne({ $inc: { profit: profitIncrease }});
+      companyBulk.find({ _id: companyId }).updateOne({ $inc: { profit: profitIncrease } });
 
       const logData = logSchema.clean({
         logType: '礦機營利',

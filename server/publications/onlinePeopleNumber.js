@@ -22,7 +22,7 @@ Meteor.publish('onlinePeopleNumber', function() {
     Meteor.clearInterval(intervalId);
   });
 });
-//一分鐘最多重複訂閱5次
+// 一分鐘最多重複訂閱5次
 limitSubscription('onlinePeopleNumber', 5);
 function countAndPublishOnlinePeopleNumber(publisher) {
   debug.log('countAndPublishOnlinePeopleNumber');

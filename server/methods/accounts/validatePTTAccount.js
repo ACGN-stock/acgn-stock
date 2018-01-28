@@ -46,7 +46,7 @@ function validateAllPTTAccounts() {
       return;
     }
 
-    const existingUser = Meteor.users.findOne({username}, { fields: { _id: 1 } });
+    const existingUser = Meteor.users.findOne({ username }, { fields: { _id: 1 } });
 
     if (existingUser) { // 既有帳號通過認證 → 重設密碼
       Accounts.setPassword(existingUser._id, password, { logout: true });

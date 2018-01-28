@@ -18,13 +18,13 @@ Meteor.methods({
     check(attribute, new Match.OneOf(...arenaFighterAttributeNameList));
     check(investMoney, Match.Integer);
     const user = Meteor.user();
-    investArenaFigher({user, companyId, attribute, investMoney});
+    investArenaFigher({ user, companyId, attribute, investMoney });
 
     return true;
   }
 });
-function investArenaFigher({user, companyId, attribute, investMoney}) {
-  debug.log('investArenaFigher', {user, companyId, investMoney});
+function investArenaFigher({ user, companyId, attribute, investMoney }) {
+  debug.log('investArenaFigher', { user, companyId, investMoney });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }
@@ -38,7 +38,7 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
     throw new Meteor.Error(403, '剩餘金錢不足！');
   }
   const userId = user._id;
-  if (dbTaxes.find({userId}).count() > 0) {
+  if (dbTaxes.find({ userId }).count() > 0) {
     throw new Meteor.Error(403, '要先繳清稅單，才能在最萌亂鬥大賽中進行投注！');
   }
   const lastArenaData = dbArena.findOne({}, {
@@ -57,14 +57,14 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
     throw new Meteor.Error(403, '這一屆最萌亂鬥大賽的報名時間已過，下回請早！');
   }
   const arenaId = lastArenaData._id;
-  const fighterData = dbArenaFighters.findOne({arenaId, companyId});
+  const fighterData = dbArenaFighters.findOne({ arenaId, companyId });
   if (! fighterData) {
     throw new Meteor.Error(404, '這家公司尚未報名參加這一屆最萌亂鬥大賽！');
   }
-  //避免總投資額出現太誇張的數字
+  // 避免總投資額出現太誇張的數字
   check(fighterData[attribute] + investMoney, Match.Integer);
   resourceManager.throwErrorIsResourceIsLock(['season', 'arena' + companyId, 'user' + userId]);
-  //先鎖定資源，再重新讀取一次資料進行運算
+  // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('investArenaFigher', ['arena' + companyId, 'user' + userId], (release) => {
     const user = Meteor.users.findOne(userId, {
       fields: {
@@ -74,8 +74,8 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
     if (user.profile.money < investMoney) {
       throw new Meteor.Error(403, '剩餘金錢不足！');
     }
-    const fighterData = dbArenaFighters.findOne({arenaId, companyId});
-    //避免總投資額出現太誇張的數字
+    const fighterData = dbArenaFighters.findOne({ arenaId, companyId });
+    // 避免總投資額出現太誇張的數字
     check(fighterData[attribute] + investMoney, Match.Integer);
 
     const investors = fighterData.investors || [];
@@ -102,7 +102,7 @@ function investArenaFigher({user, companyId, attribute, investMoney}) {
     });
     const attrName = attribute.toUpperCase();
     const createdAt = new Date();
-    //若有上次發薪後的亂鬥加強紀錄，則併為同一筆紀錄
+    // 若有上次發薪後的亂鬥加強紀錄，則併為同一筆紀錄
     const existsLogData = dbLog.findOne({
       userId: userId,
       createdAt: {

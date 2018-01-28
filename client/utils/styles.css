@@ -515,3 +515,96 @@ table.product-list-by-company .product-description {
   width: 2rem;
   height: 2rem;
 }
+
+/* 最萌亂鬥大賽列表 */
+.arena-fighter-table-container {
+  width: calc(100% - 5rem);
+  overflow-x: scroll;
+  margin-left: 5rem;
+  overflow-y: visible;
+  padding: 0;
+}
+
+.arena-fighter-outer {
+  overflow: visible;
+  height: 300px;
+}
+
+.arena-fighter-inner {
+  position: relative;
+}
+
+.arena-fighter-header-outer {
+  overflow: hidden;
+}
+
+.arena-fighter-body-outer {
+  width: inherit;
+  overflow-y: scroll;
+}
+
+.arena-fighter-header-outer {
+  width: calc(100% - 16px);
+}
+
+@media (-moz-touch-enabled), (pointer:coarse) {
+  .arena-fighter-header-outer {
+    width: 100%;
+  }
+}
+
+table.arena-fighter-header th {
+  height: 35px;
+}
+
+table.arena-fighter-header tr th:nth-child(1),
+table.arena-fighter-body tr td:nth-child(1),
+table.arena-fighter-header tr th:nth-child(2),
+table.arena-fighter-body tr td:nth-child(2) {
+  min-width: 8rem;
+  width: 8rem;
+  max-width: 8rem;
+}
+
+table.arena-fighter-header tr th:nth-child(3),
+table.arena-fighter-body tr td:nth-child(3),
+table.arena-fighter-header tr th:nth-child(4),
+table.arena-fighter-body tr td:nth-child(4),
+table.arena-fighter-header tr th:nth-child(5),
+table.arena-fighter-body tr td:nth-child(5),
+table.arena-fighter-header tr th:nth-child(6),
+table.arena-fighter-body tr td:nth-child(6),
+table.arena-fighter-header tr th:nth-child(7),
+table.arena-fighter-body tr td:nth-child(7) {
+  width: 90px;
+  min-width: 90px;
+}
+
+table.arena-fighter-header tr th:nth-child(8),
+table.arena-fighter-body tr td:nth-child(8) {
+  width: 80px;
+  min-width: 80px;
+}
+
+/* 遊戲規則 */
+.tutorial-main ul,
+.tutorial-main ol {
+  padding-left: 1rem;
+}
+
+.footer-message-container {
+  position: relative;
+  word-break: break-all;
+}
+
+.footer-message {
+  margin-right: 32px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.footer-message-close-button {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+}

@@ -6,7 +6,7 @@
       </label>
       <div class="col p-0 mb-1">
         {{#each tag in valueOf 'tags'}}
-          <span class="badge badge-default d-inline-flex flex-nowrap" style="max-width: 100%;">
+          <span class="badge badge-default d-inline-flex flex-nowrap mw-100">
             <div class="d-inline-block text-truncate">{{tag}}</div>
             <div class="text-nowrap">
               <i
@@ -59,7 +59,8 @@
               class="d-block"
               style="position: absolute; top: -100px; right: 0; width: 100px; height: 100px; z-index: 5;">
               <img
-                style="width: 100%; height: 100%; object-fit: scale-down;"
+                class="w-100 h-100"
+                style="object-fit: scale-down;"
                 src="{{valueOf 'pictureSmall'}}"
               />
             </div>
@@ -85,7 +86,6 @@
               預覽
             </button>
           </span>
-          {{> bigPicturePreviewModal src=(valueOf 'pictureBig') }}
         {{/if}}
       </div>
       <small class="form-text">大小為300x300。</small>
@@ -99,7 +99,7 @@
         rows="5"
         minlength="10"
         maxlength="3000"
-        placeholder="最少10字，最多3000字">{{valueOf 'description'}}
+        placeholder="請輸入對這個角色的完整介紹 (最少10字，最多3000字)">{{valueOf 'description'}}
       </textarea>
       <small class="form-text text-warning">必須包括角色名稱以及原作品名稱，其餘內容由經理人自己增修，但不得有任何貶低角色的字眼出現。</small>
       {{{errorHtmlOf 'description'}}}
@@ -109,17 +109,4 @@
       <a class="btn btn-secondary" href="{{getCompanyHref this._id}}">取消</a>
     </div>
   </form>
-</template>
-
-<template name="bigPicturePreviewModal">
-  <div class="{{modalClass}}" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.4)">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content border-0 mx-0 my-auto"
-        style="background: transparent;">
-        <div class="modal-body p-0" style="width: 300px; height: 300px;">
-          <img style="width: 100%; height: 100%; object-fit: scale-down;" src="{{src}}"/>
-        </div>
-      </div>
-    </div>
-  </div>
 </template>

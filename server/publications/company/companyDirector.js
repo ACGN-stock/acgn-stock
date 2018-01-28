@@ -7,7 +7,7 @@ import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.publish('companyDirector', function(companyId, offset) {
-  debug.log('publish companyDirector', {companyId, offset});
+  debug.log('publish companyDirector', { companyId, offset });
   check(companyId, String);
   check(offset, Match.Integer);
 
@@ -36,5 +36,5 @@ Meteor.publish('companyDirector', function(companyId, offset) {
 
   return [directorsCursor, usersCursor];
 });
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('companyDirector');

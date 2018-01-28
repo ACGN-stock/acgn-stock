@@ -6,8 +6,8 @@ import { dbDirectors } from '/db/dbDirectors';
 import { dbCompanies } from '/db/dbCompanies';
 import { debug } from '/server/imports/utils/debug';
 
-Meteor.publish('accountOwnStocks', function(userId, offset, {limit = 10, includeSeal = true} = {}) {
-  debug.log('publish accountOwnStocks', {userId, offset, limit, includeSeal});
+Meteor.publish('accountOwnStocks', function(userId, offset, { limit = 10, includeSeal = true } = {}) {
+  debug.log('publish accountOwnStocks', { userId, offset, limit, includeSeal });
   check(userId, String);
   check(offset, Match.Integer);
   check(limit, Match.Integer);
@@ -17,7 +17,7 @@ Meteor.publish('accountOwnStocks', function(userId, offset, {limit = 10, include
     let filter;
 
     if (! includeSeal) {
-      const companyList = dbCompanies.find({isSeal: false})
+      const companyList = dbCompanies.find({ isSeal: false })
         .map((company) => {
           return company._id;
         });
@@ -44,5 +44,5 @@ Meteor.publish('accountOwnStocks', function(userId, offset, {limit = 10, include
   });
 });
 
-//一分鐘最多20次
+// 一分鐘最多20次
 limitSubscription('accountOwnStocks');

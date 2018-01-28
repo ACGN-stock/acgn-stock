@@ -79,6 +79,12 @@ const schema = new SimpleSchema({
         min: 0,
         defaultValue: 0
       },
+      // 消費券的數量
+      vouchers: {
+        type: SimpleSchema.Integer,
+        min: 0,
+        defaultValue: Meteor.settings.public.productVoucherAmount
+      },
       // 各類石頭的數量
       stones: {
         type: new SimpleSchema(stoneTypeList.reduce((obj, stoneType) => {

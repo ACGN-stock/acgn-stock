@@ -40,26 +40,30 @@
       {{{errorHtmlOf 'companyName'}}}
     </div>
     <div class="form-group">
-      <label for="tags">
+      <label class="mb-0" for="tags">
         已建立搜索標籤：
+      </label>
+      <div class="col p-0 mb-1">
         {{#each tag in valueOf 'tags'}}
-          <span class="badge badge-default">
-            {{tag}}
-            <i
-              class="fa fa-times"
-              style="cursor: pointer;"
-              data-remove-tag="{{tag}}"
-            >
-            </i>
+          <span class="badge badge-default d-inline-flex flex-nowrap mw-100">
+            <div class="d-inline-block text-truncate">{{tag}}</div>
+            <div class="text-nowrap">
+              <i
+                class="fa fa-times"
+                style="cursor: pointer; margin: 0 6px 0 6px"
+                data-remove-tag="{{tag}}"
+              >
+              </i>
+            </div>
           </span>
         {{/each}}
-      </label>
+      </div>
       <div class="input-group">
         <input
           class="form-control"
           type="text"
           name="tags"
-          placeholder="請輸入要新增的搜索標籤"
+          placeholder="最多50個標籤，每個標籤最多50字"
         />
         <span class="input-group-btn">
           <button class="btn btn-primary" type="button" data-action="addNewTag">
@@ -75,7 +79,7 @@
     </div>
     <div class="form-group">
       <label for="pictureSmall">角色小圖：</label>
-      <div class="input-group" style="position: relative;">
+      <div class="input-group">
         <input
           class="form-control"
           type="text"
@@ -90,9 +94,11 @@
             </button>
           </span>
           {{#if isPreview 'pictureSmall'}}
-            <div style="display: block; position: absolute; top: -100px; right: 0; width: 100px; height: 100px; z-index: 5;">
+            <div class="d-block"
+              style="position: absolute; top: -100px; right: 0; width: 100px; height: 100px; z-index: 5;">
               <img
-                style="width: 100%; height: 100%"
+                class="w-100 h-100"
+                style="object-fit: scale-down;"
                 src="{{valueOf 'pictureSmall'}}"
               />
             </div>
@@ -104,7 +110,7 @@
     </div>
     <div class="form-group">
       <label for="pictureBig">角色大圖：</label>
-      <div class="input-group" style="position: relative;">
+      <div class="input-group">
         <input
           class="form-control"
           type="text"
@@ -118,14 +124,6 @@
               預覽
             </button>
           </span>
-          {{#if isPreview 'pictureBig'}}
-            <div style="display: block; position: absolute; top: -300px; right: 0; width: 300px; height: 300px; z-index: 5;">
-              <img
-                style="width: 100%; height: 100%"
-                src="{{valueOf 'pictureBig'}}"
-              />
-            </div>
-          {{/if}}
         {{/if}}
       </div>
       <small class="form-text">大小為300x300。</small>
@@ -133,7 +131,11 @@
     </div>
     <div class="form-group">
       <label for="description">角色介紹：</label>
-      <textarea class="form-control" name="description" rows="5" placeholder="請輸入對這個角色的完整介紹">{{valueOf 'description'}}</textarea>
+      <textarea
+        class="form-control"
+        name="description"
+        rows="5"
+        placeholder="請輸入對這個角色的完整介紹 (最少10字，最多3000字)">{{valueOf 'description'}}</textarea>
       <small class="form-text text-warning">必須包括角色名稱以及原作品名稱，其餘內容由經理人自己增修，但不得有任何貶低角色的字眼出現。</small>
       {{{errorHtmlOf 'description'}}}
     </div>

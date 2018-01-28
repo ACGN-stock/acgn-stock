@@ -16,7 +16,7 @@ Meteor.methods({
   }
 });
 function updateAgendaProposer(user, agendaId, proposerId) {
-  debug.log('updateAgendaProposer', {user, agendaId, proposerId});
+  debug.log('updateAgendaProposer', { user, agendaId, proposerId });
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '非金管委員不得修改提案人！');
   }

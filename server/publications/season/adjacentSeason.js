@@ -48,5 +48,5 @@ Meteor.publish('adjacentSeason', function(seasonId) {
   }
   this.ready();
 });
-//一分鐘最多重複訂閱20次
+// 一分鐘最多重複訂閱20次
 limitSubscription('adjacentSeason');

@@ -26,7 +26,7 @@ describe('method toggleEndingVacation', function() {
   });
 
   it('should fail if the user is not in vacation', function() {
-    Meteor.users.update({ _id: userId }, { $set: { 'profile.isInVacation': false }});
+    Meteor.users.update({ _id: userId }, { $set: { 'profile.isInVacation': false } });
     toggleEndingVacation.bind(null, userId).must.throw(Meteor.Error, '您並非處於渡假狀態！ [403]');
   });
 

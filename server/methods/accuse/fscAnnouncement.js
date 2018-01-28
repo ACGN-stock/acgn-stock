@@ -5,18 +5,18 @@ import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
 
 Meteor.methods({
-  fscAnnouncement({userIds, companyId, message}) {
+  fscAnnouncement({ userIds, companyId, message }) {
     check(this.userId, String);
     check(userIds, [String]);
     check(companyId, new Match.Maybe(String));
     check(message, String);
-    fscAnnouncement(Meteor.user(), {userIds, companyId, message});
+    fscAnnouncement(Meteor.user(), { userIds, companyId, message });
 
     return true;
   }
 });
-function fscAnnouncement(user, {userIds, companyId, message}) {
-  debug.log('fscAnnouncement', {user, userIds, message});
+function fscAnnouncement(user, { userIds, companyId, message }) {
+  debug.log('fscAnnouncement', { user, userIds, message });
   if (! user.profile.isAdmin) {
     throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
   }

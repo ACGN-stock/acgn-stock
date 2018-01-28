@@ -19,6 +19,12 @@
             </span>
             {{currencyFormat currentUser.profile.money}}
           </div>
+          <div title="現有消費券：{{currentUser.profile.vouchers}}張">
+            <span class="float-left">
+              <i class="fa fa-money" aria-hidden="true"></i>
+            </span>
+            {{currencyFormat currentUser.profile.vouchers}}
+          </div>
           <div title="現有推薦票：{{currentUser.profile.voteTickets}}張">
             <span class="float-left">
               <i class="fa fa-ticket" aria-hidden="true"></i>

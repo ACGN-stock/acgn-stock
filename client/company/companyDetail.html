@@ -404,7 +404,7 @@
     </h4>
     {{#each order in myOrderList}}
       <div class="d-flex flex-nowrap">
-        <div class="d-inline-block text-truncate" style="min-width: 3rem">{{>userLink order.userId}}</div>
+        <div class="d-inline-block text-truncate" style="max-width: calc(100% - 220px);">{{>userLink order.userId}}</div>
         <div class="text-nowrap">
           以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
           <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
@@ -415,7 +415,7 @@
     {{/each}}
     {{#each order in orderList}}
       <div class="d-flex flex-nowrap">
-        <div class="d-inline-block text-truncate" style="min-width: 3rem">{{>userLink order.userId}}</div>
+        <div class="d-inline-block text-truncate" style="max-width: calc(100% - 220px);">{{>userLink order.userId}}</div>
         <div class="text-nowrap">
           以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
         </div>
@@ -439,7 +439,7 @@
     </h4>
     {{#each order in myOrderList}}
       <div class="d-flex flex-nowrap">
-        <div class="d-inline-block text-truncate" style="min-width: 3rem">{{>userLink order.userId}}</div>
+        <div class="d-inline-block text-truncate" style="max-width: calc(100% - 220px);">{{>userLink order.userId}}</div>
         <div class="text-nowrap">
           以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
           <button class="btn btn-danger btn-sm" type="button" data-cancel-order="{{order._id}}">
@@ -450,7 +450,7 @@
     {{/each}}
     {{#each order in orderList}}
       <div class="d-flex flex-nowrap">
-        <div class="d-inline-block text-truncate" style="min-width: 3rem">{{>userLink order.userId}}</div>
+        <div class="d-inline-block text-truncate" style="max-width: calc(100% - 220px);">{{>userLink order.userId}}</div>
         <div class="text-nowrap">
           以${{currencyFormat order.unitPrice}}{{order.orderType}}{{minus order.amount order.done}}股。
         </div>

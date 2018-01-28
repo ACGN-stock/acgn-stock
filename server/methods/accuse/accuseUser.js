@@ -16,7 +16,7 @@ Meteor.methods({
   }
 });
 function accuseUser(user, userId, message) {
-  debug.log('accuseUser', {user, userId, message});
+  debug.log('accuseUser', { user, userId, message });
   if (_.contains(user.profile.ban, 'accuse')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有舉報違規行為！');
   }

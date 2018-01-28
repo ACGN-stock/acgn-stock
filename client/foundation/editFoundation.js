@@ -11,6 +11,7 @@ import { dbVariables } from '/db/dbVariables';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
+import { bigPicturePreviewModal } from '../layout/bigPicturePreviewModal';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat } from '../utils/helpers.js';
 
@@ -108,7 +109,7 @@ function saveModel(model) {
     const submitData = _.pick(model, '_id', 'tags', 'pictureSmall', 'pictureBig', 'description');
     Meteor.customCall('editFoundCompany', submitData, (error) => {
       if (! error) {
-        const path = FlowRouter.path('foundationDetail', {foundationId});
+        const path = FlowRouter.path('foundationDetail', { foundationId });
         FlowRouter.go(path);
       }
     });
@@ -152,7 +153,7 @@ Template.foundCompanyForm.helpers({
     const templateInstance = Template.instance();
     const foundationId = templateInstance.model.get()._id;
     if (foundationId) {
-      return FlowRouter.path('foundationDetail', {foundationId});
+      return FlowRouter.path('foundationDetail', { foundationId });
     }
 
     return FlowRouter.path('foundationList');
@@ -181,6 +182,13 @@ Template.foundCompanyForm.events({
     }
     else {
       previewPictureType.set(type);
+
+      if (type === 'pictureBig') {
+        bigPicturePreviewModal.show({
+          'src': this.pictureBig,
+          'switch': previewPictureType
+        });
+      }
     }
   }
 });

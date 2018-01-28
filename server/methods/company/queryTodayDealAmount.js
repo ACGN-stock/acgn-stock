@@ -37,5 +37,5 @@ function queryTodayDealAmount(companyId) {
 
   return data;
 }
-//一分鐘最多20次
+// 一分鐘最多20次
 limitMethod('queryTodayDealAmount');

@@ -3,13 +3,17 @@
     <div class="card-block">
       <h1 class="card-title mb-1">新創計劃</h1>
       <hr />
-      <h3 class="card-subtitle mb-2 text-muted">
-        募資計劃列表：
+      <h3 class="d-flex flex-wrap justify-content-start align-items-center">
+        <div class="text-nowrap text-muted">
+          募資計劃列表：
+        </div>
         {{#if currentUser}}
-          <button class="btn btn-primary float-right" data-action="createFoundation">
-            <i class="fa fa-plus-square" aria-hidden="true"></i>
-            建立新角色
-          </button>
+          <div class="d-flex flex-wrap justify-content-end ml-auto">
+            <button class="btn btn-primary" data-action="createFoundation">
+              <i class="fa fa-plus-square" aria-hidden="true"></i>
+              建立新角色
+            </button>
+          </div>
         {{/if}}
       </h3>
       <hr />
@@ -86,7 +90,7 @@
           <div class="d-flex flex-column align-self-center">
             <div class="d-flex flex-row-reverse">
               <div class="member-panel">
-                <div class="d-flex flex-row-reverse" style="margin-top: 0.5rem;">
+                <div class="d-flex flex-row-reverse mt-2">
                   <small>經理人</small>
                 </div>
                 <div class="d-flex flex-row-reverse">
@@ -123,7 +127,7 @@
         <div class="row">
           <button class="btn btn-tab accordion dropdown-toggle" data-expand-order="1">角色資訊</button>
           <div class="order-panel">
-            <div class="description">{{this.description}}</div>
+            <div class="description" style="max-height: 100px; overflow-y: auto">{{this.description}}</div>
           </div>
         </div>
         {{#if currentUser}}
@@ -186,11 +190,13 @@
       <div class="col-8 col-lg-3 text-truncate text-right border-grid" title="{{getTotalInvest this.invest}}">
         $ {{currencyFormat (getTotalInvest this.invest)}}
       </div>
-      <div class="col-12 border-grid company-description"><h4>角色簡介：</h4>{{this.description}}</div>
+      <div class="col-12 border-grid"><h4>角色簡介：</h4>
+        <div class="px-0 py-1 company-description">{{this.description}}</div>
+      </div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
           {{#if currentUser.profile.isAdmin}}
-            <a class="btn btn-warning" href="{{getEditHref this._id}}">
+            <a class="btn btn-warning btn-sm" href="{{getEditHref this._id}}">
               修改計劃
             </a>
           {{/if}}
