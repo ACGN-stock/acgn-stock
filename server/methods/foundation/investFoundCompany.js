@@ -40,7 +40,7 @@ export function investFoundCompany(user, companyId, amount) {
   if (user.profile.money < amount) {
     throw new Meteor.Error(403, '金錢不足，無法投資！');
   }
-  const foundCompanyData = dbFoundations.find(companyId).count();
+  const foundCompanyData = dbFoundations.findOne(companyId, { fields: { invest: 1 } });
   if (foundCompanyData.length < 1) {
     throw new Meteor.Error(404, '創立計劃並不存在，可能已經上市或被撤銷！');
   }
