@@ -581,25 +581,29 @@ table.arena-fighter-body tr td:nth-child(8) {
   min-width: 80px;
 }
 
+table.arena-fighter-header tr th:nth-child(9),
+table.arena-fighter-body tr td:nth-child(9) {
+  width: 110px;
+  min-width: 110px;
+}
+
 /* 遊戲規則 */
 .tutorial-main ul,
 .tutorial-main ol {
   padding-left: 1rem;
 }
 
+/* 置底廣告 */
 .footer-message-container {
   position: relative;
   word-break: break-all;
 }
 
 .footer-message {
-  margin-right: 32px;
   max-height: 200px;
   overflow-y: auto;
 }
 
 .footer-message-close-button {
-  position: absolute;
-  right: 4px;
-  bottom: 4px;
+  margin-top: auto;
 }

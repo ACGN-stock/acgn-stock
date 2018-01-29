@@ -1,6 +1,7 @@
 'use strict';
 import { $ } from 'meteor/jquery';
 import { _ } from 'meteor/underscore';
+import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -259,15 +260,17 @@ Template.arenaFighterTable.helpers({
 
     const fighterList = dbArenaFighters
       .find({ arenaId })
-      .map((figher) => {
+      .map((fighter) => {
         if (winnerList.length) {
-          figher.index = _.indexOf(winnerList, figher.companyId) + 1;
+          fighter.index = _.indexOf(winnerList, fighter.companyId) + 1;
         }
         else {
-          figher.index = '';
+          fighter.index = '';
         }
 
-        return figher;
+        fighter.amount = fighter.hp + fighter.sp + fighter.atk + fighter.def + fighter.agi;
+
+        return fighter;
       });
     const sortBy = rFighterSortBy.get();
     const sortDir = rFighterSortDir.get();
@@ -305,6 +308,9 @@ Template.arenaFighterTable.helpers({
   },
   getAttributeNumber(fighter, attributeName) {
     return getAttributeNumber(attributeName, fighter[attributeName]);
+  },
+  investAmountClass(amount) {
+    return (amount >= Meteor.settings.public.arenaMinInvestedAmount) ? 'text-success' : 'text-danger';
   }
 });
 Template.arenaFighterTable.events({
