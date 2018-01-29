@@ -9,7 +9,6 @@ import mustSinon from 'must-sinon';
 import { pttUserFactory } from '/dev-utils/factories';
 import { dbCompanyStones, stoneDisplayName } from '/db/dbCompanyStones';
 import { dbSeason } from '/db/dbSeason';
-import { dbLog } from '/db/dbLog';
 import { placeStone } from '/server/methods/miningMachine/placeStone';
 
 mustSinon(expect);
@@ -41,8 +40,6 @@ describe('method placeStone', function() {
     placeStone({ userId, companyId, stoneType });
     dbCompanyStones.findOne({ userId, companyId, stoneType }).must.be.exist();
     Meteor.users.findOne(userId).profile.stones[stoneType].must.be.equal(stoneCount - 1);
-    const logData = dbLog.findOne({ logType: '礦機放石', 'userId.0': userId, companyId });
-    logData.data.must.be.eql({ stoneType });
   });
 
   it('should fail if the user has already placed a stone in the specified company', function() {
@@ -55,7 +52,7 @@ describe('method placeStone', function() {
     placeStone.bind(null, { userId, companyId, stoneType }).must.throw(Meteor.Error, `${stoneDisplayName(stoneType)}的數量不足！ [403]`);
   });
 
-  it('should fail if the user tries to retrive a stone when the mining machine is in operation', function() {
+  it('should fail if the user tries to retrieve a stone when the mining machine is in operation', function() {
     dbSeason.update(seasonId, { $set: { endDate: new Date(Date.now() + miningMachineOperationTime) } });
     placeStone.bind(null, { userId, companyId, stoneType }).must.throw(Meteor.Error, '現在是挖礦機運轉時間，無法放石！ [403]');
   });

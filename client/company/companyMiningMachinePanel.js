@@ -1,14 +1,16 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
-import { FlowRouter } from 'meteor/kadira:flow-router';
+import { ReactiveVar } from 'meteor/reactive-var';
 import { wrapFunction } from 'meteor/teamgrid:reactive-interval';
 
-import { dbCompanies, gradeFactorTable } from '/db/dbCompanies';
+import { gradeFactorTable } from '/db/dbCompanies';
 import { dbCompanyStones, stonePowerTable, stoneTypeList } from '/db/dbCompanyStones';
 import { getCurrentSeason } from '/db/dbSeason';
+import { wrapScopeKey } from '/common/imports/utils/wrapScopeKey';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { stoneDisplayName } from '../utils/helpers';
+import { paramCompany, paramCompanyId } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.companyMiningMachine);
 
@@ -17,17 +19,22 @@ const reactiveTimeToSeasonEnd = wrapFunction(() => {
 }, 1000);
 
 Template.companyMiningMachine.onCreated(function() {
-  const companyId = FlowRouter.getParam('companyId');
+  this.companyStonesOffset = new ReactiveVar(0);
 
   this.autorunWithIdleSupport(() => {
-    if (companyId) {
-      this.subscribe('companyMiningMachineInfo', companyId);
-    }
+    this.subscribe('companyMiningMachineInfo', paramCompanyId());
+  });
+
+  this.autorunWithIdleSupport(() => {
+    this.subscribe('companyStones', {
+      companyId: paramCompanyId(),
+      offset: this.companyStonesOffset.get()
+    });
   });
 
   this.autorunWithIdleSupport(() => {
     if (Meteor.userId()) {
-      this.subscribe('companyCurrentUserPlacedStones', companyId);
+      this.subscribe('companyCurrentUserPlacedStones', paramCompanyId());
     }
   });
 });
@@ -40,8 +47,7 @@ Template.companyMiningMachine.helpers({
     return stoneTypeList;
   },
   stoneCount(stoneType) {
-    const companyId = FlowRouter.getParam('companyId');
-    const { miningMachineInfo } = dbCompanies.findOne(companyId);
+    const { miningMachineInfo } = paramCompany();
 
     if (! miningMachineInfo || ! miningMachineInfo.stoneCount) {
       return 0;
@@ -53,8 +59,7 @@ Template.companyMiningMachine.helpers({
     return stonePowerTable[stoneType];
   },
   totalMiningPower() {
-    const companyId = FlowRouter.getParam('companyId');
-    const { miningMachineInfo } = dbCompanies.findOne(companyId);
+    const { miningMachineInfo } = paramCompany();
 
     if (! miningMachineInfo || ! miningMachineInfo.stoneCount) {
       return 0;
@@ -65,14 +70,13 @@ Template.companyMiningMachine.helpers({
     }, 0);
   },
   totalMiningProfit(totalPower) {
-    const companyId = FlowRouter.getParam('companyId');
-    const { grade } = dbCompanies.findOne(companyId);
+    const { grade } = paramCompany();
     const gradeFactor = gradeFactorTable.miningMachine[grade];
 
     return Math.round(6300 * Math.log10(totalPower + 1) * Math.pow(totalPower, gradeFactor));
   },
   currentUserPlacedStoneType() {
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     const userId = Meteor.userId();
     const { stoneType } = dbCompanyStones.findOne({ companyId, userId }) || {};
 
@@ -91,6 +95,16 @@ Template.companyMiningMachine.helpers({
       .map(([key]) => {
         return key;
       });
+  },
+  companyStones() {
+    return dbCompanyStones.find({ [wrapScopeKey('companyStones')]: 1 }, { sort: { placedAt: -1 } });
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfCompanyStones',
+      dataNumberPerPage: Meteor.settings.public.dataNumberPerPage.companyStones,
+      offset: Template.instance().companyStonesOffset
+    };
   }
 });
 
@@ -98,7 +112,7 @@ Template.companyMiningMachine.events({
   'submit form[name="placeStoneForm"]'(event, templateInstance) {
     event.preventDefault();
 
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     const stoneType = templateInstance.$('select[name="stoneType"]').val();
 
     if (! stoneTypeList.includes(stoneType)) {
@@ -117,10 +131,10 @@ Template.companyMiningMachine.events({
       }
     });
   },
-  'click [data-action="retriveStone"]'(event) {
+  'click [data-action="retrieveStone"]'(event) {
     event.preventDefault();
 
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     const userId = Meteor.userId();
     const { stoneType } = dbCompanyStones.findOne({ companyId, userId }) || {};
 
@@ -136,7 +150,7 @@ Template.companyMiningMachine.events({
           return;
         }
 
-        Meteor.customCall('retriveStone', { companyId });
+        Meteor.customCall('retrieveStone', { companyId });
       }
     });
   }

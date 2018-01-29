@@ -2,24 +2,23 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 
 import { dbCompanyStones } from '/db/dbCompanyStones';
-import { dbLog } from '/db/dbLog';
 import { dbSeason } from '/db/dbSeason';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 import { resourceManager } from '/server/imports/threading/resourceManager';
 
 Meteor.methods({
-  retriveStone({ companyId }) {
+  retrieveStone({ companyId }) {
     check(this.userId, String);
     check(companyId, String);
-    retriveStone({ userId: this.userId, companyId });
+    retrieveStone({ userId: this.userId, companyId });
 
     return true;
   }
 });
 
-export function retriveStone({ userId, companyId }, resourceLocked = false) {
-  debug.log('retriveStone', { userId, companyId });
+export function retrieveStone({ userId, companyId }, resourceLocked = false) {
+  debug.log('retrieveStone', { userId, companyId });
 
   const { miningMachineOperationTime } = Meteor.settings.public;
 
@@ -42,7 +41,7 @@ export function retriveStone({ userId, companyId }, resourceLocked = false) {
   if (! resourceLocked) {
     // 先鎖定資源，再重新跑一次 function 進行運算
     resourceManager.request('placeStone', [`company${companyId}`, `user${userId}`], (release) => {
-      retriveStone({ userId, companyId }, true);
+      retrieveStone({ userId, companyId }, true);
       release();
     });
 
@@ -53,14 +52,6 @@ export function retriveStone({ userId, companyId }, resourceLocked = false) {
 
   dbCompanyStones.remove(companyStoneId);
   Meteor.users.update(userId, { $inc: { [`profile.stones.${stoneType}`]: 1 } });
-  dbLog.insert({
-    logType: '礦機取石',
-    userId: [userId],
-    companyId,
-    data: { stoneType },
-    createdAt: new Date()
-  });
 }
 
-// 每一小時最多 5 次
-limitMethod('retriveStone', 5, 60 * 60 * 1000);
+limitMethod('retrieveStone');

@@ -360,16 +360,6 @@ export const logTypeList = [
   '亂鬥營利',
 
   /**
-   * 【礦機放石】userId0在「companyId」公司的挖礦機放置了一個data.stoneType！
-   */
-  '礦機放石',
-
-  /**
-   * 【礦機取石】userId0從「companyId」公司的挖礦機拿回了一個data.stoneType！
-   */
-  '礦機取石',
-
-  /**
    * 【礦機營利】「companyId」公司的挖礦機集結眾人之力努力運轉，使其獲得了$data.profit的營利額！
    */
   '礦機營利'
