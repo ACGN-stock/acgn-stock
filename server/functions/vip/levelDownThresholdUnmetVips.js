@@ -14,39 +14,42 @@ export function levelDownThresholdUnmetVips() {
 
       return obj;
     }, {});
+  const unsealedCompanyIds = Object.keys(companyVipThresholdsMap);
 
   const { vipLevelDownChance } = Meteor.settings.public;
   const vipModifyList = [];
 
-  dbVips.find().forEach(({ userId, companyId, score, level }) => {
-    const vipThresholds = companyVipThresholdsMap[companyId];
+  dbVips
+    .find({ companyId: { $in: unsealedCompanyIds } })
+    .forEach(({ userId, companyId, score, level }) => {
+      const vipThresholds = companyVipThresholdsMap[companyId];
 
-    const index = [...vipThresholds, Infinity].findIndex((threshold) => {
-      return threshold > score;
+      const index = [...vipThresholds, Infinity].findIndex((threshold) => {
+        return threshold > score;
+      });
+
+      if (index === -1) {
+        return;
+      }
+
+      const maxLevel = index - 1;
+
+      // 不處理升級或同級
+      if (maxLevel >= level) {
+        return;
+      }
+
+      // 機率性降級
+      if (Math.random() > vipLevelDownChance) {
+        return;
+      }
+
+      // 符合條件的 VIP，調降一級
+      vipModifyList.push({
+        query: { userId, companyId },
+        update: { $set: { level: level - 1 } }
+      });
     });
-
-    if (index === -1) {
-      return;
-    }
-
-    const maxLevel = index - 1;
-
-    // 不處理升級或同級
-    if (maxLevel >= level) {
-      return;
-    }
-
-    // 機率性降級
-    if (Math.random() > vipLevelDownChance) {
-      return;
-    }
-
-    // 符合條件的 VIP，調降一級
-    vipModifyList.push({
-      query: { userId, companyId },
-      update: { $set: { level: level - 1 } }
-    });
-  });
 
   if (vipModifyList.length > 0) {
     const vipBulk = dbVips.rawCollection().initializeUnorderedBulkOp();
