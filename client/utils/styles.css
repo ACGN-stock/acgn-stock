@@ -367,56 +367,51 @@ body {
   object-fit: scale-down;
 }
 
-/* 公司資訊頁 > 董事會 */
+/* grid system 風格的表格排版 */
+@media only screen and (min-width: 768px) {
+  .grid-table .grid-table-hidden-title {
+    display: none !important;
+  }
+}
+
 @media only screen and (max-width: 767.9px) {
-  div.company-director-list .hidden-title {
+  .grid-table .grid-table-head {
+    display: none !important;
+  }
+  .grid-table .grid-table-hidden-title {
     padding-left: 15px;
     width: 35%;
   }
-  div.company-director-list .data-content {
+  .grid-table .grid-table-content {
     width: 65%;
   }
-  div.company-director-list .data-row {
+  .grid-table .grid-table-row {
     border-bottom: 1px dashed;
   }
-  div.company-director-list .data-row:first-of-type,
-  div.company-director-list .data-row:last-of-type {
+  .grid-table .grid-table-row:last-of-type {
     border-bottom: none;
   }
 }
 
-/* 公司資訊頁 > 員工名冊 > 在職員工 */
-@media only screen and (max-width: 767.9px) {
-  div.company-employee-list .data-row {
-    border-bottom: 1px dashed;
-  }
-  div.company-employee-list .data-row:last-of-type {
-    border-bottom: none;
-  }
-  div.company-employee-list .hidden-title {
-    padding-left: 15px;
-    width: 35%;
-  }
-  div.company-employee-list .data-content {
-    width: 65%;
-  }
+/* 公司資訊 > VIP 名冊 的 VIP 表格樣式*/
+.container-dark .company-vip-table .vip-level-5 {
+  background-color: rgba(192, 96, 96, 0.5);
+  color: white;
+  font-weight: bold;
 }
 
-/* 公司資訊頁 > 員工名冊 > 儲備員工 */
-@media only screen and (max-width: 767.9px) {
-  div.company-trainee-list .data-row {
-    border-bottom: 1px dashed;
-  }
-  div.company-trainee-list .data-row:last-of-type {
-    border-bottom: none;
-  }
-  div.company-trainee-list .hidden-title {
-    padding-left: 15px;
-    width: 35%;
-  }
-  div.company-trainee-list .data-content {
-    width: 65%;
-  }
+.container-dark .company-vip-table .vip-level-5 a {
+  color: yellow;
+}
+
+.container-light .company-vip-table .vip-level-5 {
+  background-color: rgba(255, 175, 175, 0.5);
+  color: black;
+  font-weight: bold;
+}
+
+.container-light .company-vip-table .vip-level-5 a {
+  color: rgb(2, 117, 215);
 }
 
 /* 經營管理介面 > 角色大圖預覽 */

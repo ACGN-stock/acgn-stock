@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 
 import { dbVariables } from '/db/dbVariables';
+import { VIP_LEVEL5_MAX_COUNT } from '/db/dbVips';
 import { importantAccuseLogTypeList } from '/db/dbLog';
 import { stonePowerTable } from '/db/dbCompanyStones';
 
@@ -35,9 +36,6 @@ Template.tutorial.helpers({
   miningMachineSaintStoneLimit() {
     return Meteor.settings.public.miningMachineSaintStoneLimit;
   },
-  productProfitFactor() {
-    return Meteor.settings.public.productProfitFactor;
-  },
   productFinalSaleHours() {
     return Math.floor(Meteor.settings.public.productFinalSaleTime / 1000 / 60 / 60);
   },
@@ -55,5 +53,23 @@ Template.tutorial.helpers({
   },
   productRebateDeliverAmount() {
     return Meteor.settings.public.productRebates.deliverAmount;
+  },
+  vipLevelDownChancePercent() {
+    return Math.round(Meteor.settings.public.vipLevelDownChance * 100);
+  },
+  vipPreviousSeasonScoreWeightPercent() {
+    return Math.round(Meteor.settings.public.vipPreviousSeasonScoreWeight * 100);
+  },
+  vipLevel5MaxCount() {
+    return VIP_LEVEL5_MAX_COUNT;
+  },
+  vipParameters() {
+    return Object.entries(Meteor.settings.public.vipParameters).map(([level, parameters]) => {
+      return {
+        level,
+        productProfitFactorPercent: Math.round(parameters.productProfitFactor * 100),
+        stockBonusFactorPercent: Math.round(parameters.stockBonusFactor * 100)
+      };
+    });
   }
 });
