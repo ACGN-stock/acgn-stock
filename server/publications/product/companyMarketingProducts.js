@@ -16,9 +16,11 @@ Meteor.publish('companyMarketingProducts', function({ companyId, offset }) {
   const company = dbCompanies.findOne(companyId);
 
   const transformFields = (fields) => {
-    const result = Object.assign({}, fields, {
-      hasStockAmount: fields.stockAmount > 0
-    });
+    const result = { ...fields };
+
+    if (fields.stockAmount) {
+      result.hasStockAmount = fields.stockAmount > 0;
+    }
 
     if (! this.userId || this.userId !== company.manager) {
       return _.omit(result, 'stockAmount', 'totalAmount');
