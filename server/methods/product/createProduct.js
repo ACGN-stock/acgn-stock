@@ -78,10 +78,10 @@ export function createProduct(userId, productData) {
 
   resourceManager.throwErrorIsResourceIsLock(['season']);
 
-  dbCompanies.update(companyId, { $inc: { productionFund: -totalCost } });
   dbProducts.insert({
     ...productData,
     state: 'planning',
     createdAt: new Date()
   });
+  dbCompanies.update(companyId, { $inc: { productionFund: -totalCost } });
 }

@@ -22,35 +22,38 @@ Template.companyProductEditFormInner.onCreated(function() {
   this.validateModel = (model) => {
     const error = {};
 
-    if (! model.productName) {
+    const schema = dbProducts.simpleSchema().pick('companyId', 'productName', 'type', 'url', 'description', 'price', 'totalAmount');
+    const cleanedModel = schema.clean(model);
+
+    if (! cleanedModel.productName) {
       error.productName = '缺少產品名稱！';
     }
-    else if (model.productName.length < 4) {
+    else if (cleanedModel.productName.length < 4) {
       error.productName = '產品名稱字數過短，至少需要 4 個字！';
     }
-    else if (model.productName.length > 255) {
+    else if (cleanedModel.productName.length > 255) {
       error.productName = '產品名稱字數過長，最多不超過 255 字！';
     }
 
-    if (! SimpleSchema.RegEx.Url.test(model.url)) {
+    if (! SimpleSchema.RegEx.Url.test(cleanedModel.url)) {
       error.url = '連結格式錯誤！';
     }
 
-    if (model.description && model.description.length > 500) {
+    if (cleanedModel.description && cleanedModel.description.length > 500) {
       error.productName = '產品描述字數過長，最多不超過 500 字！';
     }
 
-    if (! model.price) {
+    if (! cleanedModel.price) {
       error.price = '缺少產品價格！';
     }
-    else if (model.price > parentData.company.productPriceLimit) {
+    else if (cleanedModel.price > parentData.company.productPriceLimit) {
       error.price = '產品售價超過上限！';
     }
 
-    if (! model.totalAmount) {
+    if (! cleanedModel.totalAmount) {
       error.totalAmount = '缺少產品數量！';
     }
-    else if (model.price && model.price * model.totalAmount > parentData.company.productionFund) {
+    else if (cleanedModel.price && cleanedModel.price * cleanedModel.totalAmount > parentData.company.productionFund) {
       error.totalAmount = '生產資金不足！';
     }
 
