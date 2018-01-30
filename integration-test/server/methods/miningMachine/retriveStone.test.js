@@ -8,12 +8,11 @@ import mustSinon from 'must-sinon';
 import { pttUserFactory } from '/dev-utils/factories';
 import { dbCompanyStones } from '/db/dbCompanyStones';
 import { dbSeason } from '/db/dbSeason';
-import { dbLog } from '/db/dbLog';
-import { retriveStone } from '/server/methods/miningMachine/retriveStone';
+import { retrieveStone } from '/server/methods/miningMachine/retrieveStone';
 
 mustSinon(expect);
 
-describe('method retriveStone', function() {
+describe('method retrieveStone', function() {
   let clock;
   let userId;
   let seasonId;
@@ -36,21 +35,19 @@ describe('method retriveStone', function() {
     clock.restore();
   });
 
-  it('should let the user retrive a stone placed in the specified company', function() {
+  it('should let the user retrieve a stone placed in the specified company', function() {
     const companyStonesId = dbCompanyStones.insert({ userId, companyId, stoneType, placedAt: new Date() });
-    retriveStone({ userId, companyId });
+    retrieveStone({ userId, companyId });
     expect(dbCompanyStones.findOne(companyStonesId)).to.not.exist();
     Meteor.users.findOne(userId).profile.stones[stoneType].must.equal(stoneCount + 1);
-    const logData = dbLog.findOne({ logType: '礦機取石', 'userId.0': userId, companyId });
-    logData.data.must.be.eql({ stoneType });
   });
 
   it('should fail if the user has not placed a stone in the specified company', function() {
-    retriveStone.bind(null, { userId, companyId }).must.throw(Meteor.Error, '您並未在此公司放置石頭！ [403]');
+    retrieveStone.bind(null, { userId, companyId }).must.throw(Meteor.Error, '您並未在此公司放置石頭！ [403]');
   });
 
-  it('should fail if the user tries to retrive a stone when the mining machine is in operation', function() {
+  it('should fail if the user tries to retrieve a stone when the mining machine is in operation', function() {
     dbSeason.update(seasonId, { $set: { endDate: new Date(Date.now() + miningMachineOperationTime) } });
-    retriveStone.bind(null, { userId, companyId }).must.throw(Meteor.Error, '現在是挖礦機運轉時間，無法放石！ [403]');
+    retrieveStone.bind(null, { userId, companyId }).must.throw(Meteor.Error, '現在是挖礦機運轉時間，無法放石！ [403]');
   });
 });

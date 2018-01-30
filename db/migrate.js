@@ -1378,6 +1378,15 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 20,
+    name: 'log - remove place/retrieve stone log',
+    up() {
+      // 移除礦機的放石 / 取石 log
+      dbLog.rawCollection().remove({ logType: { $in: ['礦機放石', '礦機取石'] } });
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });

@@ -54,6 +54,7 @@ export const config = {
   },
   dataNumberPerPage: { // 分頁時每個分頁有多少資料
     userPlacedStones: 10,
+    companyStones: 10,
     userOwnedProducts: 10,
     companyMarketingProducts: 10,
     companyVips: 10

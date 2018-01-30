@@ -52,6 +52,7 @@
     },
     "dataNumberPerPage": {
       "userPlacedStones": 10,
+      "companyStones": 10,
       "userOwnedProducts": 10,
       "companyMarketingProducts": 10,
       "companyVips": 10
