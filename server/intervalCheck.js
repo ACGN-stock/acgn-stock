@@ -266,8 +266,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
   }
   console.info(`${new Date().toLocaleString()}: doSeasonWorks`);
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
-    // 備份資料庫
-    backupMongo('-season');
+    // 換季開始前的資料備份
+    backupMongo('-seasonBefore');
     // 當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利
@@ -358,6 +358,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     processEndVacationRequests();
     // 延後放假中使用者的繳稅期限
     postponeInVacationTaxes();
+    // 換季完成後的資料備份
+    backupMongo('-seasonAfter');
     release();
   });
 }
