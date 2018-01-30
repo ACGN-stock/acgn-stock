@@ -648,11 +648,12 @@ export function giveBonusByStocksFromProfit() {
     .forEach((companyData) => {
       const now = Date.now();
       const companyId = companyData._id;
-      let leftProfit = companyData.profit;
+      const totalProfit = Math.round(companyData.profit);
+      let leftProfit = totalProfit;
       logBulk.insert({
         logType: '公司營利',
         companyId: companyId,
-        data: { profit: leftProfit },
+        data: { profit: totalProfit },
         createdAt: new Date(now)
       });
       needExecuteLogBulk = true;
@@ -732,7 +733,7 @@ export function giveBonusByStocksFromProfit() {
         employeeList.push(employee.userId);
       });
       if (employeeList.length > 0) {
-        const totalBonus = companyData.profit * companyData.seasonalBonusPercent * 0.01;
+        const totalBonus = totalProfit * companyData.seasonalBonusPercent * 0.01;
         const bonus = Math.floor(totalBonus / employeeList.length);
         _.each(employeeList, (userId, index) => {
           logBulk.insert({
@@ -756,7 +757,7 @@ export function giveBonusByStocksFromProfit() {
         needExecuteUserBulk = true;
       }
       // 剩餘收益先扣去公司營運成本
-      leftProfit -= Math.ceil(companyData.profit * Meteor.settings.public.costFromProfit);
+      leftProfit -= Math.ceil(totalProfit * Meteor.settings.public.costFromProfit);
       const forDirectorProfit = leftProfit;
       // 取得所有能夠領取紅利的董事userId與股份比例
       let canReceiveProfitStocks = 0;
@@ -835,7 +836,7 @@ export function giveBonusByStocksFromProfit() {
           });
         });
       _.each(canReceiveProfitDirectorList, (directorData, index) => {
-        const directorProfit = Math.min(Math.ceil(forDirectorProfit * directorData.stocks / canReceiveProfitStocks), leftProfit);
+        const directorProfit = Math.ceil(Math.min(forDirectorProfit * directorData.stocks / canReceiveProfitStocks, leftProfit));
         if (directorProfit > 0) {
           logBulk.insert({
             logType: '營利分紅',
