@@ -21,7 +21,11 @@ Meteor.publish('productListByCompany', function({ companyId, sortBy, sortDir, of
     .find(filter, {
       fields: {
         productName: 0,
-        url: 0
+        url: 0,
+        price: 0,
+        stockAmount: 0,
+        totalAmount: 0,
+        availableAmount: 0
       },
       sort: { [sortBy]: sortDir },
       skip: offset,
