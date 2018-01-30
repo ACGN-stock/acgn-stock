@@ -107,6 +107,10 @@
                 名次
                 {{{getSortIcon 'index'}}}
               </th>
+              <th class="text-center text-truncate" style="cursor: pointer;" title="投資額" data-sort="amount">
+                投資額
+                {{{getSortIcon 'amount'}}}
+              </th>
             </tr>
           </thead>
         </table>
@@ -140,6 +144,9 @@
                 </td>
                 <td class="text-center px-1 text-truncate">
                   {{fighter.index}}
+                </td>
+                <td class="text-right px-1 text-truncate {{investAmountClass fighter.amount}}">
+                  {{currencyFormat fighter.amount}}
                 </td>
               </tr>
             {{else}}
