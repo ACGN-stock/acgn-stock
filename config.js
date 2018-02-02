@@ -93,7 +93,7 @@ export const config = {
       stockBonusFactor: 1.05
     }
   },
-  vipLevelCheckInterval: 3600000, // VIP 等級更新時間 (ms)
+  vipLevelCheckInterval: 1800000, // VIP 等級更新時間 (ms)
   vipLevelDownChance: 0.05, // VIP 掉級的機率
   vipPreviousSeasonScoreWeight: 0.80 // VIP 上季分數的權重
 };
