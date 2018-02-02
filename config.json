@@ -91,7 +91,7 @@
         "stockBonusFactor": 1.05
       }
     },
-    "vipLevelCheckInterval": 3600000,
+    "vipLevelCheckInterval": 1800000,
     "vipLevelDownChance": 0.05,
     "vipPreviousSeasonScoreWeight": 0.80
   }
