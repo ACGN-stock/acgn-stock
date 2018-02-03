@@ -92,7 +92,7 @@ function levelDownExcessiveLevel5Vips() {
       const winners = _.take(candidates, VIP_LEVEL5_MAX_COUNT);
 
       vipModifyList.push({
-        query: { companyId, userId: { $nin: winners } },
+        query: { companyId, userId: { $nin: winners }, level: 5 },
         update: { $set: { level: 4 } }
       });
     });
