@@ -52,17 +52,47 @@
     },
     "dataNumberPerPage": {
       "userPlacedStones": 10,
+      "companyStones": 10,
       "userOwnedProducts": 10,
-      "companyMarketingProducts": 10
+      "companyMarketingProducts": 10,
+      "companyVips": 10
     },
     "productFinalSaleTime": 43200000,
-    "productProfitFactor": 2.00,
     "systemProductVotingReward": 4096,
     "employeeProductVotingRewardFactor": 0.01,
     "productVoucherAmount": 7000,
     "productRebates": {
       "divisorAmount": 3500,
       "deliverAmount": 100
-    }
+    },
+    "vipParameters": {
+      "0": {
+        "productProfitFactor": 2.00,
+        "stockBonusFactor": 1.00
+      },
+      "1": {
+        "productProfitFactor": 2.05,
+        "stockBonusFactor": 1.01
+      },
+      "2": {
+        "productProfitFactor": 2.20,
+        "stockBonusFactor": 1.02
+      },
+      "3": {
+        "productProfitFactor": 2.50,
+        "stockBonusFactor": 1.03
+      },
+      "4": {
+        "productProfitFactor": 3.00,
+        "stockBonusFactor": 1.04
+      },
+      "5": {
+        "productProfitFactor": 4.00,
+        "stockBonusFactor": 1.05
+      }
+    },
+    "vipLevelCheckInterval": 1800000,
+    "vipLevelDownChance": 0.05,
+    "vipPreviousSeasonScoreWeight": 0.80
   }
 }

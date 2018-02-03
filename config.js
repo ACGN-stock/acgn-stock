@@ -54,17 +54,47 @@ export const config = {
   },
   dataNumberPerPage: { // 分頁時每個分頁有多少資料
     userPlacedStones: 10,
+    companyStones: 10,
     userOwnedProducts: 10,
-    companyMarketingProducts: 10
+    companyMarketingProducts: 10,
+    companyVips: 10
   },
   productFinalSaleTime: 43200000, // 產品最後出清時間 (ms)
-  productProfitFactor: 2.00, // 產品售出的營利乘數
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
   employeeProductVotingRewardFactor: 0.01, // 員工投推薦票的回饋金比例
   productVoucherAmount: 7000, // 產品消費券的數量
   productRebates: { // 產品滿額回饋設定
     divisorAmount: 3500, // 滿額條件
     deliverAmount: 100 // 每達成一次滿額條件可得回饋
-  }
+  },
+  vipParameters: { // VIP 各等級的參數
+    0: {
+      productProfitFactor: 2.00, // 產品營利乘數
+      stockBonusFactor: 1.00 // 分紅股權乘數
+    },
+    1: {
+      productProfitFactor: 2.05,
+      stockBonusFactor: 1.01
+    },
+    2: {
+      productProfitFactor: 2.20,
+      stockBonusFactor: 1.02
+    },
+    3: {
+      productProfitFactor: 2.50,
+      stockBonusFactor: 1.03
+    },
+    4: {
+      productProfitFactor: 3.00,
+      stockBonusFactor: 1.04
+    },
+    5: {
+      productProfitFactor: 4.00,
+      stockBonusFactor: 1.05
+    }
+  },
+  vipLevelCheckInterval: 1800000, // VIP 等級更新時間 (ms)
+  vipLevelDownChance: 0.05, // VIP 掉級的機率
+  vipPreviousSeasonScoreWeight: 0.80 // VIP 上季分數的權重
 };
 export default config;

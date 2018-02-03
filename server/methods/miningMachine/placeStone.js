@@ -2,7 +2,6 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbCompanyStones, stoneTypeList, stoneDisplayName } from '/db/dbCompanyStones';
-import { dbLog } from '/db/dbLog';
 import { dbSeason } from '/db/dbSeason';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
@@ -59,16 +58,8 @@ export function placeStone({ userId, companyId, stoneType }, resourceLocked = fa
     return;
   }
 
-  const nowDate = new Date();
-  dbCompanyStones.insert({ userId, companyId, stoneType, placedAt: nowDate });
+  dbCompanyStones.insert({ userId, companyId, stoneType, placedAt: new Date() });
   Meteor.users.update(userId, { $inc: { [`profile.stones.${stoneType}`]: -1 } });
-  dbLog.insert({
-    logType: '礦機放石',
-    userId: [userId],
-    companyId,
-    data: { stoneType },
-    createdAt: nowDate
-  });
 }
 
 limitMethod('placeStone');
