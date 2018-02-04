@@ -456,7 +456,7 @@
                 <li>亂鬥中，第一位陣亡者為最後一名，第二位陣亡者為倒數第二名，依此類推。</li>
                 <li>當存活者<span class="text-info">剩下一位</span>時，存活者為第一名，且大賽結束。</li>
                 <li>若存活者剩下多位但戰鬥已超過<span class="text-info">1000</span>回合時，大賽也會結束，剩餘存活者將依據殘餘HP進行排名，HP相同者將以行動順序決定先後。</li>
-                <li>所有參賽者除了各自的擊倒獎勵之外，亦將依照存活排名獲得排名獎勵。存活獎勵變數為<span class="text-info">所有參賽者的總投入金額</span>除以<span class="text-info">log(所有參賽者數量)</span>乘以<span class="text-info">0.177</span>。第一名可以獲得獎勵變數除以一的排名獎勵金，第二名可以獲得獎勵變數除以二的排名獎勵金，依此類推。</li>
+                <li>所有參賽者除了各自的擊倒獎勵之外，亦將依照存活排名獲得排名獎勵。存活獎勵變數為<span class="text-info">0.177</span>×<span class="text-info">所有參賽者的總投入金額</span>÷（<span class="text-info">ln(所有參賽者數量)</span>＋<span class="text-info">0.57722</span>＋（1÷<span class="text-info">兩倍參賽者數量</span>））。第一名可以獲得獎勵變數除以一的排名獎勵金，第二名可以獲得獎勵變數除以二的排名獎勵金，依此類推。</li>
                 <li>參賽者的參賽總收益將直接算入該公司在當季度的本季營利中，並在之後的商業季度結算依照規則對經理人與董事分紅。跟投注者<span class="text-danger">沒有</span>直接關係。</li>
               </ol>
             </ol>
