@@ -28,7 +28,7 @@
       <div class="d-flex flex-wrap align-items-center mb-2">
         {{#if currentUserPlacedStoneType}}
           <span>您已經放置<span class="text-info">{{stoneDisplayName currentUserPlacedStoneType}}</span>在本公司的挖礦機。</span>
-          <a class="btn btn-sm btn-warning" href="#" data-action="retriveStone">取回石頭</a>
+          <a class="btn btn-sm btn-warning" href="#" data-action="retrieveStone">取回石頭</a>
         {{else}}
           <span>您尚未放置任何石頭在本公司的挖礦機。</span>
           <form class="form-inline align-items-center" name="placeStoneForm" action="#">
@@ -46,4 +46,44 @@
       </div>
     {{/unless}}
   {{/if}}
+
+  <hr class="my-2">
+  <h5>石頭放置名冊</h5>
+
+  <div class="row">
+    <div class="col-12 grid-table company-placed-stone-table">
+      <div class="row mb-1 grid-table-head">
+        <div class="col-md-6 text-center text-nowrap">使用者帳號</div>
+        <div class="col-md-3 text-center text-nowrap">石頭類型</div>
+        <div class="col-md-3 text-center text-nowrap">放置時間</div>
+      </div>
+      <div>
+        {{#each companyStone in companyStones}}
+          <div class="row mb-1 grid-table-row">
+            <div class="grid-table-hidden-title">使用者帳號</div>
+            <div class="col-md-6 text-truncate grid-table-content">
+              {{>userLink companyStone.userId}}
+            </div>
+            <div class="grid-table-hidden-title">石頭類型</div>
+            <div class="col-md-3 text-md-center grid-table-content" title="{{stoneDisplayName companyStone.stoneType}}">
+              <img class="stone-icon" src="{{stoneIconPath companyStone.stoneType}}" alt="{{stoneDisplayName companyStone.stoneType}}">
+              {{stoneDisplayName companyStone.stoneType}}
+            </div>
+            <div class="grid-table-hidden-title">放置時間</div>
+            <div class="col-md-3 text-md-center grid-table-content" title="{{formatDateText companyStone.placedAt}}">
+              {{formatDateText companyStone.placedAt}}
+            </div>
+          </div>
+        {{else}}
+          <div class="text-center">
+            <em>查無資料！</em>
+          </div>
+        {{/each}}
+      </div>
+      <div class="justify-content-center mb-1">
+        {{>pagination paginationData}}
+      </div>
+    </div>
+  </div>
+
 </template>

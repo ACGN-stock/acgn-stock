@@ -22,8 +22,10 @@ import { dbProducts } from '/db/dbProducts';
 import { dbResourceLock } from '/db/dbResourceLock';
 import { dbRound } from '/db/dbRound';
 import { dbSeason, getCurrentSeason, getInitialVoteTicketCount } from '/db/dbSeason';
+import { dbVips } from '/db/dbVips';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbUserArchive } from '/db/dbUserArchive';
+import { dbUserOwnedProducts } from '/db/dbUserOwnedProducts';
 import { dbVariables } from '/db/dbVariables';
 import { dbValidatingUsers } from '/db/dbValidatingUsers';
 import { dbVoteRecord } from '/db/dbVoteRecord';
@@ -45,6 +47,8 @@ import { deliverProductRebates } from './functions/product/deliverProductRebates
 import { returnCompanyStones } from './functions/miningMachine/returnCompanyStones';
 import { generateMiningProfits } from './functions/miningMachine/generateMiningProfits';
 import { rotateProducts } from './functions/product/rotateProducts';
+import { adjustPreviousSeasonVipScores } from './functions/vip/adjustPreviousSeasonVipScores';
+import { levelDownThresholdUnmetVips } from './functions/vip/levelDownThresholdUnmetVips';
 import { startArenaFight } from './arena';
 import { checkExpiredFoundations } from './functions/foundation/checkExpiredFoundations';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
@@ -166,6 +170,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     deliverProductVotingRewards();
     // 發放產品購買回饋金
     deliverProductRebates();
+    // 機率性降級沒有達成門檻的 VIP
+    levelDownThresholdUnmetVips();
     // 更新所有公司的評級
     updateCompanyGrades();
     // 更新所有公司的生產資金
@@ -214,6 +220,9 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     dbPrice.remove({});
     // 移除所有產品資料
     dbProducts.remove({});
+    dbUserOwnedProducts.remove({});
+    // 移除所有 VIP 資訊
+    dbVips.remove({});
     // 移除所有稅金料
     dbTaxes.remove({});
     // 保管所有使用者的狀態
@@ -257,8 +266,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
   }
   console.info(`${new Date().toLocaleString()}: doSeasonWorks`);
   resourceManager.request('doSeasonWorks', ['season'], (release) => {
-    // 備份資料庫
-    backupMongo('-season');
+    // 換季開始前的資料備份
+    backupMongo('-seasonBefore');
     // 當商業季度結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利
@@ -278,6 +287,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     updateCompanyGrades();
     // 更新所有公司的生產資金
     updateCompanyProductionFunds();
+    // 機率性降級沒有達成門檻的 VIP
+    levelDownThresholdUnmetVips();
     // 為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
     // 所有公司當季正營利額歸零
@@ -347,6 +358,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     processEndVacationRequests();
     // 延後放假中使用者的繳稅期限
     postponeInVacationTaxes();
+    // 換季完成後的資料備份
+    backupMongo('-seasonAfter');
     release();
   });
 }
@@ -537,6 +550,8 @@ function generateNewSeason() {
   }, { multi: true });
   // 產品輪替
   rotateProducts();
+  // 調整 VIP 分數
+  adjustPreviousSeasonVipScores();
   // 排程最後出清時間
   eventScheduler.scheduleEvent('product.finalSale', endDate.getTime() - Meteor.settings.public.productFinalSaleTime);
   // 雇用所有上季報名的使用者
@@ -633,11 +648,12 @@ export function giveBonusByStocksFromProfit() {
     .forEach((companyData) => {
       const now = Date.now();
       const companyId = companyData._id;
-      let leftProfit = companyData.profit;
+      const totalProfit = Math.round(companyData.profit);
+      let leftProfit = totalProfit;
       logBulk.insert({
         logType: '公司營利',
         companyId: companyId,
-        data: { profit: leftProfit },
+        data: { profit: totalProfit },
         createdAt: new Date(now)
       });
       needExecuteLogBulk = true;
@@ -717,7 +733,7 @@ export function giveBonusByStocksFromProfit() {
         employeeList.push(employee.userId);
       });
       if (employeeList.length > 0) {
-        const totalBonus = companyData.profit * companyData.seasonalBonusPercent * 0.01;
+        const totalBonus = totalProfit * companyData.seasonalBonusPercent * 0.01;
         const bonus = Math.floor(totalBonus / employeeList.length);
         _.each(employeeList, (userId, index) => {
           logBulk.insert({
@@ -741,7 +757,7 @@ export function giveBonusByStocksFromProfit() {
         needExecuteUserBulk = true;
       }
       // 剩餘收益先扣去公司營運成本
-      leftProfit -= Math.ceil(companyData.profit * Meteor.settings.public.costFromProfit);
+      leftProfit -= Math.ceil(totalProfit * Meteor.settings.public.costFromProfit);
       const forDirectorProfit = leftProfit;
       // 取得所有能夠領取紅利的董事userId與股份比例
       let canReceiveProfitStocks = 0;
@@ -771,7 +787,7 @@ export function giveBonusByStocksFromProfit() {
               'status.lastLogin.date': 1
             }
           });
-          const { profile: userProfile, status: userStatus } = userData;
+          const { _id: userId, profile: userProfile, status: userStatus } = userData;
           if (! userProfile || ! userStatus || ! userStatus.lastLogin || ! userStatus.lastLogin.date) {
             return true;
           }
@@ -803,7 +819,14 @@ export function giveBonusByStocksFromProfit() {
           }
 
           // 未上線天數 4 天者，持有股份以 50% 計，其餘則以 100% 計
-          const effectiveStocksFactor = noLoginDayCount === 4 ? 0.5 : 1;
+          const noLoginDayBonusFactor = noLoginDayCount === 4 ? 0.5 : 1;
+
+          // VIP 分紅加成
+          const { level: vipLevel = 0 } = dbVips.findOne({ userId, companyId }, { fields: { level: 1 } }) || {};
+          const { stockBonusFactor: vipBonusFactor } = Meteor.settings.public.vipParameters[vipLevel];
+
+          // 根據各項加成計算有效持股數
+          const effectiveStocksFactor = noLoginDayBonusFactor * vipBonusFactor;
           const effectiveStocks = Math.round(effectiveStocksFactor * directorData.stocks);
 
           canReceiveProfitStocks += effectiveStocks;
@@ -813,7 +836,7 @@ export function giveBonusByStocksFromProfit() {
           });
         });
       _.each(canReceiveProfitDirectorList, (directorData, index) => {
-        const directorProfit = Math.min(Math.ceil(forDirectorProfit * directorData.stocks / canReceiveProfitStocks), leftProfit);
+        const directorProfit = Math.ceil(Math.min(forDirectorProfit * directorData.stocks / canReceiveProfitStocks, leftProfit));
         if (directorProfit > 0) {
           logBulk.insert({
             logType: '營利分紅',

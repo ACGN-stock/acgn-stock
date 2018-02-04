@@ -1,0 +1,78 @@
+<template name="companyVipListPanel">
+  <div class="row">
+    <div class="col-12 col-md-8 col-lg-9 grid-table company-vip-table">
+      <div class="form-inline my-2">
+        <div class="input-group input-group-sm">
+          <div class="input-group-addon">顯示等級</div>
+          <select class="form-control" name="displayVipLevel">
+            {{#each option in displayVipLevelOptions}}
+              <option value="{{option.value}}" {{displayVipLevelOptionSelectedAttr option.value}}>
+                {{option.text}}
+              </option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+      <div class="row mb-1 grid-table-head">
+        <div class="col-md-6 text-center text-nowrap">使用者帳號</div>
+        <div class="col-md-3 text-center text-nowrap">VIP 等級</div>
+        <div class="col-md-3 text-center text-nowrap">分數</div>
+      </div>
+      <div>
+        {{#each vip in companyVips}}
+          <div class="row mb-1 grid-table-row {{vipLevelClass vip}}">
+            <div class="grid-table-hidden-title">使用者帳號</div>
+            <div class="col-md-6 text-truncate grid-table-content">{{>userLink vip.userId}}</div>
+            <div class="grid-table-hidden-title">VIP 等級</div>
+            <div class="col-md-3 text-md-center grid-table-content" title="Level {{vip.level}}">Level {{vip.level}}</div>
+            <div class="grid-table-hidden-title">分數</div>
+            <div class="col-md-3 text-md-center grid-table-content" title="{{vip.score}}">{{vip.score}}</div>
+          </div>
+        {{else}}
+          <div class="text-center">
+            <em>查無資料！</em>
+          </div>
+        {{/each}}
+      </div>
+      <div class="justify-content-center mb-1">
+        {{>pagination paginationData}}
+      </div>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+      <h5>分級門檻一覽</h5>
+      <table class="table table-bordered table-sm">
+        <thead>
+          <tr>
+            <th class="text-center">VIP 等級</th>
+            <th class="text-center">門檻分數</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each threshold in vipThresholds}}
+            <tr>
+              <td class="text-center">Level {{threshold.level}}</td>
+              <td class="text-center">{{threshold.score}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+      {{#if currentUser}}
+        <hr class="my-2">
+        <h5>我的 VIP 資訊</h5>
+        <div class="mb-2">
+          {{#if currentUserVipData}}
+            <div>
+              VIP 等級：<span class="text-info">Level {{currentUserVipData.level}}</span>
+            </div>
+            <div>
+              分數：<span class="{{vipScoreClass currentUserVipData}}">{{currentUserVipData.score}}</span>
+            </div>
+          {{else}}
+            <em>您並非此公司的 VIP！</em>
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</template>

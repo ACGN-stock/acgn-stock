@@ -95,7 +95,7 @@ const schema = new SimpleSchema({
   },
   // 產品所貢獻的營利
   profit: {
-    type: SimpleSchema.Integer,
+    type: Number,
     min: 0,
     defaultValue: 0
   },

@@ -4,6 +4,7 @@ import { check, Match } from 'meteor/check';
 import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbProducts } from '/db/dbProducts';
 import { dbUserOwnedProducts, getAvailableProductTradeQuota } from '/db/dbUserOwnedProducts';
+import { dbVips, roundVipScore } from '/db/dbVips';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
 import { limitMethod } from '/server/imports/utils/rateLimit';
@@ -23,8 +24,6 @@ Meteor.methods({
 
 export function buyProduct({ userId, productId, amount }, resourceLocked = false) {
   debug.log('buyProduct', { userId, productId, amount });
-
-  const { productProfitFactor } = Meteor.settings.public;
 
   const user = Meteor.users.findByIdOrThrow(userId);
 
@@ -73,7 +72,24 @@ export function buyProduct({ userId, productId, amount }, resourceLocked = false
   }
 
   const nowTime = Date.now();
-  const profit = Math.round(totalCost * productProfitFactor);
+
+  // 取得使用者目前 VIP 狀態
+  if (dbVips.find({ companyId, userId }).count() === 0) {
+    dbVips.insert({ companyId, userId, createdAt: nowTime });
+  }
+  const { level: vipLevel, score: oldVipScore } = dbVips.findOne({ companyId, userId });
+
+  // VIP 分數加分
+  const { price: priceMin } = dbProducts.findOne({ companyId, seasonId }, { sort: { price: 1 } }, { fields: { price: 1 } });
+  const { price: priceMax } = dbProducts.findOne({ companyId, seasonId }, { sort: { price: -1 } }, { fields: { price: 1 } });
+  const scoreFactor = priceMin === priceMax ? 1 : 1 + 0.2 * (price - priceMin) / (priceMax - priceMin);
+  const scoreIncrease = totalCost * scoreFactor;
+  const newVipScore = roundVipScore(oldVipScore + scoreIncrease);
+  dbVips.update({ companyId, userId }, { $set: { score: newVipScore } });
+
+  // 購買產品
+  const { productProfitFactor } = Meteor.settings.public.vipParameters[vipLevel];
+  const profit = totalCost * productProfitFactor;
 
   dbLog.insert({
     logType: '購買產品',
