@@ -4,8 +4,10 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
+import { getAvailableProductionFund } from '/db/dbCompanies';
 import { dbProducts, productTypeList } from '/db/dbProducts';
 import { inheritUtilForm, handleInputChange as baseHandleInputChange } from '../utils/form';
+import { paramCompany } from './helpers';
 
 Template.companyProductEditForm.events({
   reset(event, templateInstance) {
@@ -53,7 +55,10 @@ Template.companyProductEditFormInner.onCreated(function() {
     if (! cleanedModel.totalAmount) {
       error.totalAmount = '缺少產品數量！';
     }
-    else if (cleanedModel.price && cleanedModel.price * cleanedModel.totalAmount > parentData.company.productionFund) {
+
+    const availableProductionFund = getAvailableProductionFund(paramCompany());
+    const requiredProductionFund = cleanedModel.price * cleanedModel.totalAmount;
+    if (requiredProductionFund && availableProductionFund < requiredProductionFund) {
       error.totalAmount = '生產資金不足！';
     }
 

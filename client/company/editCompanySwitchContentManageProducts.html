@@ -9,7 +9,13 @@
     </button>
   </div>
   <div class="my-2 d-flex flex-wrap">
-    <div class="mr-3">剩餘生產資金：${{currencyFormat company.productionFund}}</div>
+    <div class="mr-3">生產資金：
+      <div class="d-inline-flex flex-wrap">
+        <span>已用 ${{currencyFormat usedProductionFund}}</span>
+        <span class="mx-2">/</span>
+        <span>剩餘 ${{currencyFormat availableProductionFund}}</span>
+      </div>
+    </div>
     <div class="mr-auto">產品價格上限：${{currencyFormat company.productPriceLimit}}</div>
   </div>
 

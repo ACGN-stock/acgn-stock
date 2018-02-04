@@ -114,7 +114,6 @@ export function doOnFoundationSuccess(foundationData) {
     lastPrice: price,
     listPrice: price,
     totalValue: totalFund,
-    productionFund: Math.round(totalFund * 0.7),
     productPriceLimit: price,
     candidateList: candidateList,
     voteList: voteList,

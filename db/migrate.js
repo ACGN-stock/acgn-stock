@@ -3,6 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
 import { Migrations } from 'meteor/percolate:migrations';
+import { Promise } from 'meteor/promise';
 
 import { dbAdvertising } from './dbAdvertising';
 import { dbArena } from './dbArena';
@@ -1384,6 +1385,44 @@ if (Meteor.isServer) {
     up() {
       // 移除礦機的放石 / 取石 log
       dbLog.rawCollection().remove({ logType: { $in: ['礦機放石', '礦機取石'] } });
+    }
+  });
+
+  Migrations.add({
+    version: 21,
+    name: 'product - refine production fund computation',
+    up() {
+      // 將生產資金欄位重新命名為基礎生產資金
+      Promise.await(dbCompanies.rawCollection().update({}, { $rename: { productionFund: 'baseProductionFund' } }, { multi: true }));
+
+      // 歸零所有公司的基礎生產資金
+      dbCompanies.update({}, { $set: { baseProductionFund: 0 } }, { multi: true });
+
+      // 更新所有公司的基礎生產資金為最近一季營利額之 10%
+      const baseProductionFundMap = {};
+
+      dbLog
+        .aggregate([ {
+          $match: { logType: '公司營利' }
+        }, {
+          $sort: { createdAt: -1 }
+        }, {
+          $group: {
+            _id: '$companyId',
+            previousSeasonProfit: { $first: '$data.profit' }
+          }
+        } ])
+        .forEach(({ _id: companyId, previousSeasonProfit }) => {
+          baseProductionFundMap[companyId] = Math.round(previousSeasonProfit * 0.1);
+        });
+
+      if (! _.isEmpty(baseProductionFundMap)) {
+        const companyBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
+        Object.entries(baseProductionFundMap).forEach(([companyId, baseProductionFund]) => {
+          companyBulk.find({ _id: companyId }).updateOne({ $set: { baseProductionFund } });
+        });
+        Meteor.wrapAsync(companyBulk.execute, companyBulk)();
+      }
     }
   });
 

@@ -30,9 +30,6 @@ export function removeProduct(user, productId) {
 
   guardCompany(company).checkIsManagableByUser(user);
 
-  const totalCost = product.price * product.totalAmount;
-
   resourceManager.throwErrorIsResourceIsLock(['season']);
   dbProducts.remove(productId);
-  dbCompanies.update(companyId, { $inc: { productionFund: totalCost } });
 }
