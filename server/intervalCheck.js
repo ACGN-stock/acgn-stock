@@ -827,7 +827,7 @@ export function giveBonusByStocksFromProfit() {
 
           // 根據各項加成計算有效持股數
           const effectiveStocksFactor = noLoginDayBonusFactor * vipBonusFactor;
-          const effectiveStocks = Math.round(effectiveStocksFactor * directorData.stocks);
+          const effectiveStocks = effectiveStocksFactor * directorData.stocks;
 
           canReceiveProfitStocks += effectiveStocks;
           canReceiveProfitDirectorList.push({
