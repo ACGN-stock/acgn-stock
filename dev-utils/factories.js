@@ -35,6 +35,7 @@ export const companyFactory = new Factory()
     lastPrice: 128,
     listPrice: 128,
     profit: 0,
+    baseProductionFund: 0,
     candidateList: [],
     voteList: [],
     createdAt() {
@@ -46,9 +47,6 @@ export const companyFactory = new Factory()
   })
   .attr('capital', ['totalRelease', 'listPrice'], (totalRelease, listPrice) => {
     return totalRelease * listPrice;
-  })
-  .attr('productionFund', ['capital'], (capital) => {
-    return Math.round(capital * 0.7);
   })
   .attr('productPriceLimit', ['listPrice'], (listPrice) => {
     return listPrice;

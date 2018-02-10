@@ -36,7 +36,8 @@ import { dbRankCompanyValue } from '/db/dbRankCompanyValue';
 import { dbRankUserWealth } from '/db/dbRankUserWealth';
 import { updateLowPriceThreshold } from './functions/company/updateLowPriceThreshold';
 import { updateHighPriceThreshold } from './functions/company/updateHighPriceThreshold';
-import { updateCompanyProductionFunds } from './functions/company/updateCompanyProductionFunds';
+import { updateCompanyBaseProductionFunds } from './functions/company/updateCompanyBaseProductionFunds';
+import { updateCompanyProductPriceLimits } from './functions/company/updateCompanyProductPriceLimits';
 import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
 import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
 import { countDownRecordListPrice } from './functions/company/recordListPrice';
@@ -175,7 +176,9 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     // 更新所有公司的評級
     updateCompanyGrades();
     // 更新所有公司的生產資金
-    updateCompanyProductionFunds();
+    updateCompanyBaseProductionFunds();
+    // 更新所有公司的產品價格限制
+    updateCompanyProductPriceLimits();
     // 為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
     backupMongo('-roundAfter');
@@ -286,7 +289,9 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     // 更新所有公司的評級
     updateCompanyGrades();
     // 更新所有公司的生產資金
-    updateCompanyProductionFunds();
+    updateCompanyBaseProductionFunds();
+    // 更新所有公司的產品價格限制
+    updateCompanyProductPriceLimits();
     // 機率性降級沒有達成門檻的 VIP
     levelDownThresholdUnmetVips();
     // 為所有公司與使用者進行排名結算
@@ -827,7 +832,7 @@ export function giveBonusByStocksFromProfit() {
 
           // 根據各項加成計算有效持股數
           const effectiveStocksFactor = noLoginDayBonusFactor * vipBonusFactor;
-          const effectiveStocks = Math.round(effectiveStocksFactor * directorData.stocks);
+          const effectiveStocks = effectiveStocksFactor * directorData.stocks;
 
           canReceiveProfitStocks += effectiveStocks;
           canReceiveProfitDirectorList.push({

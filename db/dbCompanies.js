@@ -3,6 +3,8 @@ import { _ } from 'meteor/underscore';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
+import { dbProducts } from './dbProducts';
+
 // 公司資料集
 export const dbCompanies = new Mongo.Collection('companies');
 export default dbCompanies;
@@ -25,6 +27,30 @@ export const gradeFactorTable = {
     D: 0.1
   }
 };
+
+// 取得公司計劃上架的產品
+export function getPlanningProducts(companyData, options = {}) {
+  return dbProducts.find({ companyId: companyData._id, state: 'planning' }, options);
+}
+
+// 取得公司的總生產資金
+export function getTotalProductionFund(companyData) {
+  return Math.round(companyData.capital * 0.7 + companyData.baseProductionFund);
+}
+
+// 取得公司已使用的生產資金
+export function getUsedProductionFund(companyData) {
+  return getPlanningProducts(companyData, { fields: { price: 1, totalAmount: 1 } })
+    .fetch()
+    .reduce((sum, { price, totalAmount }) => {
+      return sum + price * totalAmount;
+    }, 0);
+}
+
+// 取得公司剩餘可用的生產資金
+export function getAvailableProductionFund(companyData) {
+  return getTotalProductionFund(companyData) - getUsedProductionFund(companyData);
+}
 
 const schema = new SimpleSchema({
   // 公司名稱
@@ -120,10 +146,11 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 0
   },
-  // 生產資金
-  productionFund: {
+  // 基礎生產資金
+  baseProductionFund: {
     type: SimpleSchema.Integer,
-    min: 0
+    min: 0,
+    defaultValue: 0
   },
   // 產品的售價上限
   productPriceLimit: {
