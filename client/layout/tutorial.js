@@ -2,6 +2,7 @@ import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 
+import { gradeNameList, gradeProportionMap } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
 import { VIP_LEVEL5_MAX_COUNT } from '/db/dbVips';
 import { importantAccuseLogTypeList } from '/db/dbLog';
@@ -68,5 +69,11 @@ Template.tutorial.helpers({
         stockBonusFactorPercent: Math.round(parameters.stockBonusFactor * 100)
       };
     });
+  },
+  companyGradeList() {
+    return gradeNameList;
+  },
+  getCompanyGradeProportionPercentage(grade) {
+    return Math.round(gradeProportionMap[grade] * 100);
   }
 });
