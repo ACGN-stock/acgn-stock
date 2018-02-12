@@ -91,8 +91,8 @@
               <li>除了公司創立時的初始釋股，尚有兩種釋股機制會讓一間公司的總釋出股份增多。</li>
               <li>因價格過高而釋股（高價釋股）：</li>
               <ol>
-                <li>每經過<span class="text-info">三到六小時</span>，系統會檢查一次全股市，以全股市最後成交價格作為排序，排位<span class="text-info">前百分之五</span>且當前<span class="text-info">不存在任何釋股賣單</span>在市場上的公司皆會釋出股票到市場上套利。此次釋股的數量上限為<span class="text-info">「該公司總釋股數量的平方根」</span>，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為該公司當時可下買單價格的最高上限。</li>
-                <li>舉例而言，若當前市面上有101家未被查封的公司，則所有最後成交價格排名前五的公司都會進行高價釋股。若該公司的總釋股數量為1000股，則進行高價釋股時將釋出1(最低釋股下限)到31(總釋股數量的平方根)之間的隨機數字。</li>
+                <li>每經過<span class="text-info">三到六小時</span>，系統會檢查一次全股市，以全股市最後成交價格作為排序，以排名在<span class="text-info">(14 - 1.5 ln(未查封公司總數))%</span>的最後成交價格為基準，並且當前<span class="text-info">不存在任何釋股賣單</span>在市場上的公司皆會釋出股票到市場上套利。此次釋股的數量上限為<span class="text-info">「該公司總釋股數量的平方根的一半」</span>，下限為<span class="text-info">1股</span>，取上限與下限之間的隨機整數作為真正的釋出數量。釋股價格則為該公司當時可下買單價格的最高上限。</li>
+                <li>舉例而言，若當前市面上有101家未被查封的公司，則所有最後成交價格排名前 7.1481% 的公司會進行高價釋股（約為 7 家公司）。若該公司的總釋股數量為1000股，則進行高價釋股時將釋出1(最低釋股下限)到15(總釋股數量的平方根之一半)之間的隨機數字。</li>
               </ol>
               <li>因成交量過低而釋股（低量釋股）：</li>
               <ol>
@@ -116,7 +116,14 @@
             <ol>
               <li>在新創公司創立成功之後，將以<span class="text-info">初始股份數量乘以初始股價</span>作為其<span class="text-info">初始資本額</span>，而<span class="text-info">初始公司評級</span>則為<span class="text-info">D級</span>。</li>
               <li>在公司後續的釋股過程裡，<span class="text-info">售賣股票獲得的金額</span>將增加至該公司的<span class="text-info">資本額</span>中。</li>
-              <li>在商業季度結束時，將把當前市場上<span class="text-info">所有未查封公司依照其資本額排序</span>，以<span class="text-info">四分位數</span>切分為由大到小的<span class="text-info">A, B, C, D</span>四群，以此更新該公司之<span class="text-info">公司評級</span>。</li>
+              <li>
+                在商業季度結束時，將把當前市場上<span class="text-info">所有未查封公司依照其資本額排序</span>，依比例切分為幾個群體：
+                <ul>
+                  {{#each grade in companyGradeList}}
+                    <li>{{grade}} 級 - 資本額排名在前 {{getCompanyGradeProportionPercentage grade}}% 者</li>
+                  {{/each}}
+                </ul>
+              </li>
             </ol>
           </div>
         </div>
@@ -251,7 +258,7 @@
               <li>
                 玩家在遊戲中可以取得不同種類的石頭：
                 <ul>
-                  <li><span class="text-info">{{stoneDisplayName 'saint'}}</span>（生產值 {{stonePower 'saint'}}） - 由系統發給，可繼承至下個賽季，但一次最多只能同時使用{{miningMachineSaintStoneLimit}}個。</li>
+                  <li><span class="text-info">{{stoneDisplayName 'saint'}}</span>（生產值 {{stonePower 'saint'}}） - 由系統發給，可繼承至下個賽季。</li>
                   <li><span class="text-info">{{stoneDisplayName 'birth'}}</span>（生產值 {{stonePower 'birth'}}） - 由系統發給，認證完成的帳號可以取得{{newUserBirthStoneCount}}個。</li>
                   <li><span class="text-info">{{stoneDisplayName 'rainbow'}}</span>（生產值 {{stonePower 'rainbow'}}） - 可用${{currencyFormat (stonePrice 'rainbow')}}購買取得，在挖礦機結算獲利後將轉換為<span class="text-info">{{stoneDisplayName 'rainbowFragment'}}</span>。</li>
                   <li><span class="text-info">{{stoneDisplayName 'rainbowFragment'}}</span>（生產值 {{stonePower 'rainbowFragment'}}） - 可用${{currencyFormat (stonePrice 'rainbowFragment')}}購買取得，在挖礦機結算獲利後將會<span class="text-danger">消失</span>。</li>
