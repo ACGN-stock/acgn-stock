@@ -87,7 +87,7 @@ export function releaseStocksForHighPrice() {
         }
 
         const releasePrice = getPriceLimits(companyData).upper;
-        const maxReleaseStocks = Math.floor(Math.sqrt(totalRelease));
+        const maxReleaseStocks = Math.floor(Math.sqrt(totalRelease) / 2);
         const releaseStocks = 1 + Math.floor(Math.random() * maxReleaseStocks);
 
         createOrder({
