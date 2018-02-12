@@ -10,17 +10,30 @@ export const dbCompanies = new Mongo.Collection('companies');
 export default dbCompanies;
 
 // 公司評等名稱
-export const gradeList = ['A', 'B', 'C', 'D'];
+export const gradeNameList = ['S', 'A', 'B', 'C', 'D'];
+
+// 公司評等排名切分比例
+export const gradeProportionMap = {
+  S: 0.05,
+  A: 0.25,
+  B: 0.50,
+  C: 0.75,
+  D: 1.00
+};
 
 // 公司評等係數
 export const gradeFactorTable = {
+  // 挖礦機獲利係數
   'miningMachine': {
+    S: 0.4,
     A: 0.3,
     B: 0.2,
     C: 0.1,
     D: 0
   },
+  // 員工獲利係數
   'dailyProfit': {
+    S: 0.4,
     A: 0.4,
     B: 0.3,
     C: 0.2,
@@ -117,8 +130,8 @@ const schema = new SimpleSchema({
   // 公司評等
   grade: {
     type: String,
-    allowedValues: gradeList,
-    defaultValue: _.last(gradeList)
+    allowedValues: gradeNameList,
+    defaultValue: _.last(gradeNameList)
   },
   // 目前總釋出股份
   totalRelease: {
