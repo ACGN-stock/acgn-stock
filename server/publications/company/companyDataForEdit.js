@@ -33,7 +33,10 @@ Meteor.publish('companyDataForEdit', function(companyId) {
           description: 1,
           baseProductionFund: 1,
           capital: 1, // NOTE 由於目前資本額變動機會較少，不太影響公司資訊編輯，故暫時加入在此
-          productPriceLimit: 1
+          productPriceLimit: 1,
+          managerBonusRatePercent: 1,
+          employeeBonusRatePercent: 1,
+          capitalIncreaseRatePercent: 1
         }
       }),
       dbProducts.find({ companyId, state: 'planning' })

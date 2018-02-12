@@ -223,12 +223,19 @@ Template.displayLog.helpers({
         return `【公司營利】「${company}」公司在本商業季度一共獲利$${currencyFormat(data.profit)}！`;
       }
       case '營利分紅': {
-        return `【營利分紅】${users[0]}得到了「${company}」公司的分紅$${currencyFormat(data.bonus)}！`;
+        const bonusTypeDisplayNameMap = {
+          managerBonus: '經理分紅',
+          employeeBonus: '員工分紅',
+          employeeProductVotingReward: '員工投票獎金',
+          directorBonus: '股東分紅'
+        };
+
+        const bonusType = bonusTypeDisplayNameMap[data.bonusType] || '分紅';
+
+        return `【營利分紅】${users[0]}得到了「${company}」公司的${bonusType}$${currencyFormat(data.amount)}！`;
       }
       case '推薦回饋': {
-        const source = companyId ? `「${company}」公司` : '系統';
-
-        return `【推薦回饋】${source}向${users[0]}發給了產品投票回饋金$${currencyFormat(data.reward)}！`;
+        return `【推薦回饋】系統向${users[0]}發給了產品投票回饋金$${currencyFormat(data.reward)}！`;
       }
       case '消費回饋': {
         return `【消費回饋】${users[0]}得到了「${company}」公司的產品消費回饋金$${currencyFormat(data.rebate)}！`;

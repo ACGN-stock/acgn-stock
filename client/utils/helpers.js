@@ -33,12 +33,13 @@ Template.registerHelper('currencyFormat', currencyFormat);
 export function getCompanyEPS(companyData) {
   let multiplier = 1;
 
-  multiplier -= (companyData.manager !== '!none') ? Meteor.settings.public.managerProfitPercent : 0;
+  multiplier -= (companyData.manager !== '!none') ? companyData.managerBonusRatePercent / 100 : 0;
   multiplier -= (dbEmployees.find({
     companyId: companyData._id,
     employed: true
-  }).count() > 0) ? (companyData.seasonalBonusPercent / 100) : 0;
-  multiplier -= Meteor.settings.public.costFromProfit;
+  }).count() > 0) ? companyData.employeeBonusRatePercent / 100 : 0;
+  multiplier -= companyData.capitalIncreaseRatePercent / 100;
+  multiplier -= Meteor.settings.public.companyProfitDistribution.incomeTaxRatePercent / 100;
 
   return (companyData.profit * multiplier / companyData.totalRelease).toFixed(2);
 }
@@ -235,3 +236,8 @@ export function markdown(content) {
   return converter.makeHtml(pureContent);
 }
 Template.registerHelper('markdown', markdown);
+
+export function toPercent(x) {
+  return `${Math.round(x * 100)}%`;
+}
+Template.registerHelper('toPercent', toPercent);

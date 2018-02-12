@@ -1426,6 +1426,32 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 22,
+    name: 'rewrite profit distribution',
+    up() {
+      // 調整欄位與設定新欄位的預設值
+      Promise.await(dbCompanies.rawCollection().update({}, {
+        $rename: {
+          seasonalBonusPercent: 'employeeBonusRatePercent'
+        },
+        $set: {
+          managerBonusRatePercent: Meteor.settings.public.companyProfitDistribution.managerBonusRatePercent.default,
+          capitalIncreaseRatePercent: Meteor.settings.public.companyProfitDistribution.capitalIncreaseRatePercent.default
+        }
+      }, { multi: true }));
+
+      dbLog.update({ logType: '營利分紅' }, { $rename: { 'data.bonus': 'data.amount' } }, { multi: true });
+      dbLog.update({ logType: '推薦回饋', companyId: { $exists: true } }, {
+        $set: {
+          logType: '營利分紅',
+          'data.bonusType': 'employeeProductVotingReward'
+        },
+        $rename: { 'data.reward': 'data.amount' }
+      }, { multi: true });
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });

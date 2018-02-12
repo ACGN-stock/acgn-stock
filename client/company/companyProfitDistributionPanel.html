@@ -1,0 +1,31 @@
+<template name="companyProfitDistributionPanel">
+  <div class="row my-2">
+    <div class="col-6 col-md-4 col-lg-2 p-2 d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">公司所得稅</span>
+      <span class="text-nowrap">{{incomeTaxRatePercent}}%</span>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2 p-2 d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">資本額注入</span>
+      <span class="text-nowrap">{{company.capitalIncreaseRatePercent}}%</span>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2 p-2 d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">經理分紅</span>
+      <span class="text-nowrap">{{company.managerBonusRatePercent}}%</span>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2 p-2 d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">員工分紅</span>
+      <span class="text-nowrap">{{company.employeeBonusRatePercent}}%</span>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2 p-2 d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">員工獎金</span>
+      <span class="text-nowrap">{{employeeProductVotingRewardRatePercent}}%</span>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2 p-2 d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">股東分紅</span>
+      <span class="text-nowrap">{{directorBonusRatePercent}}%</span>
+    </div>
+  </div>
+  {{#if isNotInLockTime}}
+    <div class="my-2 text-danger">本季度營利分配之最後修改期限尚未結束。</div>
+  {{/if}}
+</template>

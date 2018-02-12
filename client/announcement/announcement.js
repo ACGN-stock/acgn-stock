@@ -153,15 +153,10 @@ Template.systemStatusPanel.helpers({
 
     return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceSalaryTime) : null);
   },
-  updateBonusDeadline() {
-    const seasonData = dbSeason
-      .findOne({}, {
-        sort: {
-          beginDate: -1
-        }
-      });
+  updateProfitDistributionDeadline() {
+    const seasonData = dbSeason.findOne({}, { sort: { beginDate: -1 } });
 
-    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceBonusTime) : null);
+    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.companyProfitDistribution.lockTime) : null);
   },
   highPriceThreshold() {
     return currencyFormat(dbVariables.get('highPriceThreshold'));

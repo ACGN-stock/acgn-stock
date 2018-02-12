@@ -35,7 +35,8 @@ Template.editCompany.helpers({
       templatePrefix: 'editCompanySwitchContent',
       views: [
         { name: 'EditDetail', displayName: '公司資訊', default: true },
-        { name: 'ManageProducts', displayName: '產品管理' }
+        { name: 'ManageProducts', displayName: '產品管理' },
+        { name: 'ProfitDistribution', displayName: '營利分配' }
       ],
       data: {
         company: Template.instance().getCompany()

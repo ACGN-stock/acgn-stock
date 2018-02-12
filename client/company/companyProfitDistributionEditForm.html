@@ -1,0 +1,62 @@
+<template name="companyProfitDistributionEditForm">
+  <form>
+    <div class="form-group">
+      <label for="capitalIncreaseRatePercent">資本額注入比例 ({{minCapitalIncreaseRatePercent}}% ~ {{maxCapitalIncreaseRatePercent}}%)</label>
+      <div class="input-group">
+        <input
+          class="form-control"
+          type="number"
+          name="capitalIncreaseRatePercent"
+          min="{{minCapitalIncreaseRatePercent}}"
+          max="{{maxCapitalIncreaseRatePercent}}"
+          required="true"
+          {{lockTimeDisabledAttr}}
+          value="{{valueOf 'capitalIncreaseRatePercent'}}" />
+        <label class="input-group-addon">%</label>
+      </div>
+      {{{errorHtmlOf 'capitalIncreaseRatePercent'}}}
+    </div>
+
+    <div class="form-group">
+      <label for="managerBonusRatePercent">經理分紅比例 ({{minManagerBonusRatePercent}}% ~ {{maxManagerBonusRatePercent}}%)</label>
+      <div class="input-group">
+        <input
+          class="form-control"
+          type="number"
+          name="managerBonusRatePercent"
+          min="{{minManagerBonusRatePercent}}"
+          max="{{maxManagerBonusRatePercent}}"
+          required="true"
+          {{lockTimeDisabledAttr}}
+          value="{{valueOf 'managerBonusRatePercent'}}" />
+        <label class="input-group-addon">%</label>
+      </div>
+      {{{errorHtmlOf 'managerBonusRatePercent'}}}
+    </div>
+
+    <div class="form-group">
+      <label for="employeeBonusRatePercent">員工分紅比例 ({{minEmployeeBonusRatePercent}}% ~ {{maxEmployeeBonusRatePercent}}%)</label>
+      <div class="input-group">
+        <input
+          class="form-control"
+          type="number"
+          name="employeeBonusRatePercent"
+          min="{{minEmployeeBonusRatePercent}}"
+          max="{{maxEmployeeBonusRatePercent}}"
+          required="true"
+          {{lockTimeDisabledAttr}}
+          value="{{valueOf 'employeeBonusRatePercent'}}" />
+        <label class="input-group-addon">%</label>
+      </div>
+      {{{errorHtmlOf 'employeeBonusRatePercent'}}}
+    </div>
+
+    <div class="text-right">
+      {{#if isInLockTime}}
+        <span class="text-danger mr-2">修改時限已過！</span>
+      {{/if}}
+      <button type="submit" class="btn btn-primary" {{lockTimeDisabledAttr}}>送出</button>
+      <button type="reset" class="btn btn-secondary" {{lockTimeDisabledAttr}}>重設</button>
+    </div>
+  </form>
+</template>

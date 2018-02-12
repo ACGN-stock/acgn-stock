@@ -92,19 +92,6 @@ Template.companyDetailContentNormal.helpers({
 
     return Date.now() < seasonData.endDate.getTime() - Meteor.settings.public.announceSalaryTime;
   },
-  canUpdateSeasonalBonus() {
-    const seasonData = dbSeason
-      .findOne({}, {
-        sort: {
-          beginDate: -1
-        }
-      });
-    if (! seasonData) {
-      return false;
-    }
-
-    return Date.now() < seasonData.endDate.getTime() - Meteor.settings.public.announceBonusTime;
-  },
   isEmployee() {
     const userId = Meteor.userId();
     const companyId = FlowRouter.getParam('companyId');
@@ -200,7 +187,7 @@ Template.companyDetailContentNormal.events({
       }
     });
   },
-  'click [data-action="updateSeasonalBonus"]'(event) {
+  'click [data-action="setEmployeeBonusRate"]'(event) {
     event.preventDefault();
     const companyId = FlowRouter.getParam('companyId');
     const minBonus = Meteor.settings.public.minimumSeasonalBonusPercent;
@@ -220,7 +207,7 @@ Template.companyDetailContentNormal.events({
             return false;
           }
 
-          Meteor.customCall('updateSeasonalBonus', companyId, percentage);
+          Meteor.customCall('setEmployeeBonusRate', companyId, percentage);
         }
       }
     });
