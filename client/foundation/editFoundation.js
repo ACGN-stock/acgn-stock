@@ -13,7 +13,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { bigPicturePreviewModal } from '../layout/bigPicturePreviewModal';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat } from '../utils/helpers.js';
+import { currencyFormat, markdown } from '../utils/helpers.js';
 
 Template.createFoundationPlan.helpers({
   defaultData() {
@@ -137,6 +137,7 @@ function saveModel(model) {
 }
 
 const previewPictureType = new ReactiveVar('');
+const description = new ReactiveVar('');
 Template.foundCompanyForm.helpers({
   fscRuleURL() {
     return dbVariables.get('fscRuleURL');
@@ -157,6 +158,9 @@ Template.foundCompanyForm.helpers({
     }
 
     return FlowRouter.path('foundationList');
+  },
+  previewDescription() {
+    return markdown(description.get());
   }
 });
 
@@ -190,6 +194,9 @@ Template.foundCompanyForm.events({
         });
       }
     }
+  },
+  'keyup [name="description"]'(event) {
+    description.set($(event.currentTarget).val());
   }
 });
 
@@ -207,3 +214,4 @@ function addNewTag(event, templateInstance) {
   templateInstance.model.set(model);
   $input.val('');
 }
+

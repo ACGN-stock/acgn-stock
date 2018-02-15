@@ -10,6 +10,7 @@ import { dbVariables } from '/db/dbVariables';
 import { stoneDisplayName } from '/db/dbCompanyStones';
 import '../layout/highcharts-themes';
 
+
 Meteor.subscribe('variables');
 
 Template.registerHelper('getVariable', function(variableName) {
@@ -230,3 +231,14 @@ export function isCompanyManager(kwargs) {
 Template.registerHelper('isCompanyManager', isCompanyManager);
 
 Template.registerHelper('round', Math.round);
+
+export function markdown(content) {
+  const showdown = require('showdown');
+  const xssFilter = require('showdown-xss-filter');
+  const converter = new showdown.Converter({ extensions: [xssFilter] });
+  converter.setFlavor('github');
+  const pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+  return converter.makeHtml(pureContent);
+}
+Template.registerHelper('markdown', markdown);
