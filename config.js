@@ -59,7 +59,7 @@ export const config = {
     companyMarketingProducts: 10,
     companyVips: 10
   },
-  productFinalSaleTime: 43200000, // 產品最後出清時間 (ms)
+  productFinalSaleTime: 86400000, // 產品最後出清時間 (ms)
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
   employeeProductVotingRewardFactor: 0.01, // 員工投推薦票的回饋金比例
   productVoucherAmount: 7000, // 產品消費券的數量
