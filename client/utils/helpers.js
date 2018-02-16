@@ -1,4 +1,6 @@
 'use strict';
+import showdown from 'showdown';
+import xssFilter from 'showdown-xss-filter';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -9,7 +11,6 @@ import { dbEmployees } from '/db/dbEmployees';
 import { dbVariables } from '/db/dbVariables';
 import { stoneDisplayName } from '/db/dbCompanyStones';
 import '../layout/highcharts-themes';
-
 
 Meteor.subscribe('variables');
 
@@ -233,8 +234,6 @@ Template.registerHelper('isCompanyManager', isCompanyManager);
 Template.registerHelper('round', Math.round);
 
 export function markdown(content) {
-  const showdown = require('showdown');
-  const xssFilter = require('showdown-xss-filter');
   const converter = new showdown.Converter({ extensions: [xssFilter] });
   converter.setFlavor('github');
   const pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
