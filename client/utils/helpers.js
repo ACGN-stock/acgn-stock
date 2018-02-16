@@ -1,4 +1,6 @@
 'use strict';
+import showdown from 'showdown';
+import xssFilter from 'showdown-xss-filter';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -230,3 +232,12 @@ export function isCompanyManager(kwargs) {
 Template.registerHelper('isCompanyManager', isCompanyManager);
 
 Template.registerHelper('round', Math.round);
+
+export function markdown(content) {
+  const converter = new showdown.Converter({ extensions: [xssFilter] });
+  converter.setFlavor('github');
+  const pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+  return converter.makeHtml(pureContent);
+}
+Template.registerHelper('markdown', markdown);

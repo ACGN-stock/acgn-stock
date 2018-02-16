@@ -38,6 +38,8 @@
     "probability-distributions": "^0.9.1",
     "rosie": "^1.6.0",
     "shelljs": "^0.7.8",
+    "showdown": "^1.8.6",
+    "showdown-xss-filter": "^0.2.0",
     "simpl-schema": "0.3.2"
   },
   "devDependencies": {
