@@ -74,23 +74,23 @@ export const config = {
     },
     1: {
       productProfitFactor: 2.05,
-      stockBonusFactor: 1.01
+      stockBonusFactor: 1.02
     },
     2: {
       productProfitFactor: 2.20,
-      stockBonusFactor: 1.02
+      stockBonusFactor: 1.05
     },
     3: {
       productProfitFactor: 2.50,
-      stockBonusFactor: 1.03
+      stockBonusFactor: 1.10
     },
     4: {
       productProfitFactor: 3.00,
-      stockBonusFactor: 1.04
+      stockBonusFactor: 1.25
     },
     5: {
       productProfitFactor: 4.00,
-      stockBonusFactor: 1.05
+      stockBonusFactor: 2.00
     }
   },
   vipLevelCheckInterval: 1800000, // VIP 等級更新時間 (ms)
