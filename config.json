@@ -57,7 +57,7 @@
       "companyMarketingProducts": 10,
       "companyVips": 10
     },
-    "productFinalSaleTime": 43200000,
+    "productFinalSaleTime": 86400000,
     "systemProductVotingReward": 4096,
     "employeeProductVotingRewardFactor": 0.01,
     "productVoucherAmount": 7000,
