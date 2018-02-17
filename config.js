@@ -59,7 +59,7 @@ export const config = {
     companyMarketingProducts: 10,
     companyVips: 10
   },
-  productFinalSaleTime: 43200000, // 產品最後出清時間 (ms)
+  productFinalSaleTime: 86400000, // 產品最後出清時間 (ms)
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
   employeeProductVotingRewardFactor: 0.01, // 員工投推薦票的回饋金比例
   productVoucherAmount: 7000, // 產品消費券的數量
@@ -74,23 +74,23 @@ export const config = {
     },
     1: {
       productProfitFactor: 2.05,
-      stockBonusFactor: 1.01
+      stockBonusFactor: 1.02
     },
     2: {
       productProfitFactor: 2.20,
-      stockBonusFactor: 1.02
+      stockBonusFactor: 1.05
     },
     3: {
       productProfitFactor: 2.50,
-      stockBonusFactor: 1.03
+      stockBonusFactor: 1.10
     },
     4: {
       productProfitFactor: 3.00,
-      stockBonusFactor: 1.04
+      stockBonusFactor: 1.25
     },
     5: {
       productProfitFactor: 4.00,
-      stockBonusFactor: 1.05
+      stockBonusFactor: 2.00
     }
   },
   vipLevelCheckInterval: 1800000, // VIP 等級更新時間 (ms)
