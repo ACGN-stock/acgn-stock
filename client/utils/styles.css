@@ -124,6 +124,9 @@ body {
 .container-dark .company-card-default .btn-tab {
   color: #839496;
 }
+.container-dark pre code {
+  color: #839496
+}
 
 .btn {
   cursor: pointer;
@@ -161,7 +164,6 @@ body {
 }
 
 .company-description {
-  white-space: pre-wrap;
   word-break: break-all;
   padding: 5px 15px;
   height: 300px;
