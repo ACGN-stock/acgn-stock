@@ -193,10 +193,10 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
         {{/if}}
       </div>
-      <div class="media-body d-none d-md-block company-description"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="media-body d-none d-md-block company-description"><h4>角色簡介</h4>{{{markdown this.description}}}</div>
     </div>
     <div class="row border-grid-body" style="margin-top: 15px;">
-      <div class="col-12 border-grid d-block d-md-none company-description"><h4>角色簡介</h4>{{this.description}}</div>
+      <div class="col-12 border-grid d-block d-md-none company-description"><h4>角色簡介</h4>{{{markdown this.description}}}</div>
       <div class="col-12 border-grid stock-price-history">
         <a class="d-block h4 my-1" href="#" data-toggle-panel="chart">
           股價趨勢
@@ -1028,3 +1028,4 @@
     {{/with}}
   </div>
 </template>
+

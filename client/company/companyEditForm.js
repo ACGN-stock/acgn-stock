@@ -9,6 +9,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { alertDialog } from '../layout/alertDialog';
 import { bigPicturePreviewModal } from '../layout/bigPicturePreviewModal';
+import { markdown } from '../utils/helpers.js';
 
 inheritUtilForm(Template.companyEditForm);
 
@@ -16,7 +17,7 @@ Template.companyEditForm.onCreated(function() {
   this.validateModel = validateCompanyModel;
   this.handleInputChange = handleCompanyInputChange;
   this.saveModel = saveCompanyModel;
-
+  description.set(Template.currentData().description);
   this.autorun(() => {
     this.model.set(Template.currentData());
   });
@@ -80,12 +81,16 @@ function saveCompanyModel(model) {
 }
 
 const previewPictureType = new ReactiveVar('');
+const description = new ReactiveVar('');
 Template.companyEditForm.helpers({
   isPreview(pictureType) {
     return previewPictureType.get() === pictureType;
   },
   getCompanyHref(companyId) {
     return FlowRouter.path('companyDetail', { companyId });
+  },
+  previewDescription() {
+    return markdown(description.get());
   }
 });
 
@@ -119,6 +124,9 @@ Template.companyEditForm.events({
         });
       }
     }
+  },
+  'keyup [name="description"]'(event) {
+    description.set($(event.currentTarget).val());
   }
 });
 
@@ -136,3 +144,4 @@ function addNewTag(event, templateInstance) {
   templateInstance.model.set(model);
   $input.val('');
 }
+

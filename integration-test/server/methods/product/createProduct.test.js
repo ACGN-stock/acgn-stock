@@ -12,7 +12,8 @@ import { createProduct } from '/server/methods/product/createProduct';
 mustSinon(expect);
 
 describe('method createProduct', function() {
-  const productionFund = 10000;
+  const capital = 10000;
+  const baseProductionFund = 10000;
   const productPriceLimit = 100;
 
   let userId;
@@ -24,21 +25,19 @@ describe('method createProduct', function() {
     userId = Accounts.createUser(pttUserFactory.build());
     companyId = dbCompanies.insert(companyFactory.build({
       manager: userId,
-      productionFund,
+      capital,
+      baseProductionFund,
       productPriceLimit
     }));
   });
 
-  it('should create a new product and decrease the prodution fund of the company', function() {
+  it('should create a new product', function() {
     const inputProductData = productFactory.build({ companyId });
 
     createProduct(userId, inputProductData);
 
     const productData = dbProducts.findOne();
     productData.state.must.be.equal('planning');
-
-    const companyData = dbCompanies.findOne(companyId);
-    companyData.productionFund.must.be.equal(productionFund - productData.price * productData.totalAmount);
   });
 
   it('should fail if the price is over the product price limit', function() {
@@ -49,11 +48,11 @@ describe('method createProduct', function() {
   it('should fail if the user is not the manager of the company', function() {
     dbCompanies.update(companyId, { $set: { manager: 'someOtherUser' } });
     const inputProductData = productFactory.build({ companyId });
-    createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '使用者並非該公司的經理人！ [401]');
+    createProduct.bind(null, userId, inputProductData).must.throw(/使用者.*並非該公司的經理人！ \[401\]/);
   });
 
-  it('should fail if the total cost is over the production fund', function() {
-    const inputProductData = productFactory.build({ companyId, price: 1, totalAmount: productionFund + 1 });
+  it('should fail if the total cost is over the available production fund', function() {
+    const inputProductData = productFactory.build({ companyId, price: 1, totalAmount: 100000000 });
     createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '剩餘生產資金不足！ [403]');
   });
 
@@ -71,7 +70,7 @@ describe('method createProduct', function() {
     it('should fail if the user is not admin', function() {
       Meteor.users.update(userId, { $set: { 'profile.isAdmin': false } });
       const inputProductData = productFactory.build({ companyId });
-      createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '使用者並非金融管理會委員，無法進行此操作！ [401]');
+      createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '您並非金融管理會委員，無法進行此操作！ [403]');
     });
   });
 });

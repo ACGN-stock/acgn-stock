@@ -31,7 +31,8 @@ Meteor.publish('companyDataForEdit', function(companyId) {
           pictureSmall: 1,
           pictureBig: 1,
           description: 1,
-          productionFund: 1,
+          baseProductionFund: 1,
+          capital: 1, // NOTE 由於目前資本額變動機會較少，不太影響公司資訊編輯，故暫時加入在此
           productPriceLimit: 1
         }
       }),
