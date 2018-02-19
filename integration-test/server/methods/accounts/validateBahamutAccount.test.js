@@ -14,6 +14,8 @@ import '/server/methods/accounts/validateBahamutAccount';
 mustSinon(expect);
 
 describe('method validateBahamutAccount', function() {
+  this.timeout(10000);
+
   function validateBahamutAccount(username) {
     return promisify(Meteor.call)('validateBahamutAccount', username);
   }

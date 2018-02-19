@@ -9,6 +9,8 @@ import { recordListPrice } from '/server/functions/company/recordListPrice';
 mustSinon(expect);
 
 describe('function recordListPrice', function() {
+  this.timeout(10000);
+
   let companyId;
   const lastPrice = 100;
   const listPrice = 200;

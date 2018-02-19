@@ -13,6 +13,8 @@ import { releaseStocksForNoDeal } from '/server/functions/company/releaseStocksF
 mustSinon(expect);
 
 describe('function releaseStocksForNoDeal', function() {
+  this.timeout(10000);
+
   let companyId;
 
   const listPrice = 100;

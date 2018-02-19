@@ -24,6 +24,8 @@ const investorFactory = new Factory()
   });
 
 describe('function checkExpiredFoundations', function() {
+  this.timeout(10000);
+
   const successInvestors = investorFactory.buildList(Meteor.settings.public.foundationNeedUsers);
 
   let clock;
