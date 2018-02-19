@@ -9,6 +9,8 @@ import { toggleEndingVacation } from '/server/methods/vacation/toggleEndingVacat
 mustSinon(expect);
 
 describe('method toggleEndingVacation', function() {
+  this.timeout(10000);
+
   const userData = {
     username: 'someone',
     password: 'mypass',

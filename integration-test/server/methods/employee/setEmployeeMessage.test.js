@@ -6,6 +6,8 @@ import { dbEmployees } from '/db/dbEmployees';
 import { setEmployeeMessage } from '/server/methods/employee/setEmployeeMessage';
 
 describe('method setEmployeeMessage', function() {
+  this.timeout(10000);
+
   const companyId = 'someCompany';
   const userId = 'someUser';
   const message = 'Example message.';

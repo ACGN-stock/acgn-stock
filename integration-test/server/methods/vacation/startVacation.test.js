@@ -16,6 +16,8 @@ import { startVacation } from '/server/methods/vacation/startVacation';
 mustSinon(expect);
 
 describe('method startVacation', function() {
+  this.timeout(10000);
+
   const userData = {
     username: 'someone',
     password: 'mypass',

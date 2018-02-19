@@ -12,6 +12,8 @@ import { createProduct } from '/server/methods/product/createProduct';
 mustSinon(expect);
 
 describe('method createProduct', function() {
+  this.timeout(10000);
+
   const capital = 10000;
   const baseProductionFund = 10000;
   const productPriceLimit = 100;

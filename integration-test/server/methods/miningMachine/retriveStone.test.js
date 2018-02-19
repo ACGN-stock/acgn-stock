@@ -13,6 +13,8 @@ import { retrieveStone } from '/server/methods/miningMachine/retrieveStone';
 mustSinon(expect);
 
 describe('method retrieveStone', function() {
+  this.timeout(10000);
+
   let clock;
   let userId;
   let seasonId;

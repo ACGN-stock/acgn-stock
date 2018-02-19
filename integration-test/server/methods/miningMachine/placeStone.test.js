@@ -14,6 +14,8 @@ import { placeStone } from '/server/methods/miningMachine/placeStone';
 mustSinon(expect);
 
 describe('method placeStone', function() {
+  this.timeout(10000);
+
   let clock;
   let userId;
   let seasonId;
