@@ -12,6 +12,8 @@ import { releaseStocksForHighPrice } from '/server/functions/company/releaseStoc
 mustSinon(expect);
 
 describe('function releaseStocksForHighPrice', function() {
+  this.timeout(10000);
+
   let companyId;
   const lastPrice = 1000;
 

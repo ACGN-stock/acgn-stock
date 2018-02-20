@@ -14,6 +14,8 @@ import { doOnFoundationFailure } from '/server/functions/foundation/doOnFoundati
 mustSinon(expect);
 
 describe('function doOnFoundationFailure', function() {
+  this.timeout(10000);
+
   const investors = [
     { userId: 'aUser', amount: 1 },
     { userId: 'someUser', amount: 1234 },
