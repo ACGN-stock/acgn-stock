@@ -124,12 +124,6 @@
           </div>
         {{/if}}
         <hr style="margin: 0px;" />
-        <div class="row">
-          <button class="btn btn-tab accordion dropdown-toggle" data-expand-order="1">角色資訊</button>
-          <div class="order-panel">
-            <div class="description" style="max-height: 100px; overflow-y: auto">{{this.description}}</div>
-          </div>
-        </div>
         {{#if currentUser}}
           <hr class="m-0">
           <div class="row btn-group">
@@ -189,9 +183,6 @@
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總投資額：</div>
       <div class="col-8 col-lg-3 text-truncate text-right border-grid" title="{{getTotalInvest this.invest}}">
         $ {{currencyFormat (getTotalInvest this.invest)}}
-      </div>
-      <div class="col-12 border-grid"><h4>角色簡介：</h4>
-        <div class="px-0 py-1 company-description">{{this.description}}</div>
       </div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
