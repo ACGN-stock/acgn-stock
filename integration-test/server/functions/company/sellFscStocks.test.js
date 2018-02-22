@@ -12,6 +12,8 @@ import { sellFscStocks } from '/server/functions/company/sellFscStocks';
 mustSinon(expect);
 
 describe('function sellFscStocks', function() {
+  this.timeout(10000);
+
   beforeEach(function() {
     resetDatabase();
   });

@@ -42,14 +42,16 @@ function adjustVipLevelsByScore() {
 
       const maxLevel = index - 1;
 
-      // 低於 level 5 者不降級
-      if (maxLevel <= level && level < 5) {
+      // Level 4 以下只升不降、level 5 至多降至 level 4
+      const newLevel = Math.max(maxLevel, Math.min(4, level));
+
+      if (newLevel === level) {
         return;
       }
 
       vipModifyList.push({
         query: { userId, companyId },
-        update: { $set: { level: maxLevel } }
+        update: { $set: { level: newLevel } }
       });
     });
 

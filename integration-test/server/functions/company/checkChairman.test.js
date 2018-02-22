@@ -10,6 +10,8 @@ import { checkChairman } from '/server/functions/company/checkChairman';
 mustSinon(expect);
 
 describe('function checkChairman', function() {
+  this.timeout(10000);
+
   let companyId;
 
   beforeEach(function() {

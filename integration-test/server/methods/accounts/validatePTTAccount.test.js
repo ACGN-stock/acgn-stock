@@ -14,6 +14,8 @@ import '/server/methods/accounts/validatePTTAccount';
 mustSinon(expect);
 
 describe('method validatePTTAccount', function() {
+  this.timeout(10000);
+
   function validatePTTAccount(username) {
     return promisify(Meteor.call)('validatePTTAccount', username);
   }

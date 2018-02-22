@@ -12,6 +12,8 @@ import '/server/methods/accounts/loginOrRegister';
 mustSinon(expect);
 
 describe('method loginOrRegister', function() {
+  this.timeout(10000);
+
   function loginOrRegister(params) {
     return promisify(Meteor.call)('loginOrRegister', params);
   }

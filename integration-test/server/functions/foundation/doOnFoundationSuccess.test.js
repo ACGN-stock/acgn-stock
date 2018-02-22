@@ -29,6 +29,8 @@ const investorFactory = new Factory()
   });
 
 describe('function doOnFoundationSuccess', function() {
+  this.timeout(10000);
+
   const investors = investorFactory.buildList(Meteor.settings.public.foundationNeedUsers);
 
   let companyId;
