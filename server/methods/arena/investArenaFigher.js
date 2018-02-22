@@ -54,7 +54,7 @@ function investArenaFigher({ user, companyId, attribute, investMoney }) {
     throw new Meteor.Error(403, '現在並沒有舉辦最萌亂鬥大賽！');
   }
   if (Date.now() >= lastArenaData.endDate.getTime()) {
-    throw new Meteor.Error(403, '這一屆最萌亂鬥大賽的報名時間已過，下回請早！');
+    throw new Meteor.Error(403, '這一屆最萌亂鬥大賽的投資時間已過，下回請早！');
   }
   const arenaId = lastArenaData._id;
   const fighterData = dbArenaFighters.findOne({ arenaId, companyId });
