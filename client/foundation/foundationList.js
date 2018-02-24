@@ -157,17 +157,6 @@ const foundationListHelpers = {
   }
 };
 const foundationListEvents = {
-  'click [data-expand-order]'(event, templateInstance) {
-    event.preventDefault();
-    const panel = templateInstance.$('.order-panel');
-    const maxHeight = panel.css('max-height');
-    if (maxHeight === '0px') {
-      panel.css('max-height', panel.prop('scrollHeight'));
-    }
-    else {
-      panel.css('max-height', 0);
-    }
-  },
   'click [data-action="invest"]'(event, templateInstance) {
     event.preventDefault();
     investFoundCompany(templateInstance.data._id);
