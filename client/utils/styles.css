@@ -182,7 +182,9 @@ body {
   font-size: 1.15rem;
 }
 
-.company-description h5, h4 {
+.company-description h4,
+.company-description h5,
+.company-description h6 {
   font-size: 1rem;
 }
 
