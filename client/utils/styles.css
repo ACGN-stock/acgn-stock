@@ -170,6 +170,23 @@ body {
   overflow-y: auto;
 }
 
+.company-description h1 {
+  font-size: 1.5rem;
+}
+
+.company-description h2 {
+  font-size: 1.3rem;
+}
+
+.company-description h3 {
+  font-size: 1.15rem;
+}
+
+.company-description h5, h4 {
+  font-size: 1rem;
+}
+
+
 .company-card {
   padding: 0px;
   max-width: 270px;
