@@ -28,6 +28,8 @@ Meteor.methods({
   }
 });
 export function foundCompany(user, foundCompanyData) {
+  const { foundExpireTime, founderEarnestMoney, seasonTime } = Meteor.settings.public;
+
   debug.log('foundCompany', { user, foundCompanyData });
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
@@ -41,7 +43,7 @@ export function foundCompany(user, foundCompanyData) {
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
-  if (user.profile.money < Meteor.settings.public.founderEarnestMoney) {
+  if (user.profile.money < founderEarnestMoney) {
     throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
   }
   const userId = user._id;
@@ -53,8 +55,9 @@ export function foundCompany(user, foundCompanyData) {
       beginDate: -1
     }
   });
-  if (Date.now() >= (lastSeasonData.endDate.getTime() - Meteor.settings.public.foundExpireTime - 600000)) {
-    const hours = Math.ceil(Meteor.settings.public.foundExpireTime / 3600000);
+  // 防止換季動作與新創集資期間重疊，並預留足夠時間（10分鐘）以確保換季前最後一批新創處理完成
+  if (Date.now() >= (lastSeasonData.endDate.getTime() - foundExpireTime - 600000)) {
+    const hours = Math.ceil(foundExpireTime / 3600000);
     throw new Meteor.Error(403, '商業季度即將結束前' + hours + '小時，禁止新創計劃！');
   }
   const lastRoundData = dbRound.findOne({}, {
@@ -62,7 +65,7 @@ export function foundCompany(user, foundCompanyData) {
       beginDate: -1
     }
   });
-  if (Date.now() >= (lastRoundData.endDate.getTime() - Meteor.settings.public.seasonTime)) {
+  if (Date.now() >= (lastRoundData.endDate.getTime() - seasonTime)) {
     throw new Meteor.Error(403, '賽季度結束前的最後一個商業季度，禁止新創計劃！');
   }
   const companyName = foundCompanyData.companyName;
@@ -83,7 +86,7 @@ export function foundCompany(user, foundCompanyData) {
         'profile.money': 1
       }
     });
-    if (user.profile.money < Meteor.settings.public.founderEarnestMoney) {
+    if (user.profile.money < founderEarnestMoney) {
       throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
     }
     if (dbFoundations.find({ manager: userId }).count() > 0) {
@@ -120,13 +123,13 @@ export function foundCompany(user, foundCompanyData) {
     });
     Meteor.users.update(userId, {
       $inc: {
-        'profile.money': -1 * Meteor.settings.public.founderEarnestMoney
+        'profile.money': -1 * founderEarnestMoney
       }
     });
     foundCompanyData.invest = [
       {
         userId: userId,
-        amount: Meteor.settings.public.founderEarnestMoney
+        amount: founderEarnestMoney
       }
     ];
     dbFoundations.insert(foundCompanyData);
