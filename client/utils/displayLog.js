@@ -378,7 +378,7 @@ Template.displayLog.helpers({
       case '產品修正': {
         const diffString = Object.entries(data.diff)
           .map(([key, { before, after } ]) => {
-            return `${productInfoKeyToString(key)}從「${before}」改為「${after}」`;
+            return `${productInfoKeyToString(key)}從${before ? `「${before}」` : '無'}改為${after ? `「${after}」` : '無'}`;
           })
           .join('、');
 
