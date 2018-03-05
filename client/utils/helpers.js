@@ -237,6 +237,7 @@ Template.registerHelper('round', Math.round);
 export function markdown(content) {
   const converter = new showdown.Converter({ extensions: [xssFilter, footnotes] });
   converter.setFlavor('github');
+  converter.setOption('openLinksInNewWindow', true);
   const pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/!/g, '&excl;');
 
   return converter.makeHtml(pureContent);
