@@ -116,7 +116,14 @@
             <ol>
               <li>在新創公司創立成功之後，將以<span class="text-info">初始股份數量乘以初始股價</span>作為其<span class="text-info">初始資本額</span>，而<span class="text-info">初始公司評級</span>則為<span class="text-info">D級</span>。</li>
               <li>在公司後續的釋股過程裡，<span class="text-info">售賣股票獲得的金額</span>將增加至該公司的<span class="text-info">資本額</span>中。</li>
-              <li>在商業季度結束時，將把當前市場上<span class="text-info">所有未查封公司依照其資本額排序</span>，以<span class="text-info">四分位數</span>切分為由大到小的<span class="text-info">A, B, C, D</span>四群，以此更新該公司之<span class="text-info">公司評級</span>。</li>
+              <li>
+                在商業季度結束時，將把當前市場上<span class="text-info">所有未查封公司依照其資本額排序</span>，依比例切分為幾個群體：
+                <ul>
+                  {{#each grade in companyGradeList}}
+                    <li>{{grade}} 級 - 資本額排名在前 {{getCompanyGradeProportionPercentage grade}}% 者</li>
+                  {{/each}}
+                </ul>
+              </li>
             </ol>
           </div>
         </div>
