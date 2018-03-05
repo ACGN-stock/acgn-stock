@@ -4,7 +4,7 @@ import { $ } from 'meteor/jquery';
 
 import { dbProducts } from '/db/dbProducts';
 import { getAvailableProductTradeQuota } from '/db/dbUserOwnedProducts';
-import { voteProduct } from '../utils/methods';
+import { voteProduct, adminEditProduct } from '../utils/methods';
 import { currencyFormat } from '../utils/helpers';
 import { alertDialog } from '../layout/alertDialog';
 
@@ -41,6 +41,11 @@ Template.productCard.events({
         }
       }
     });
+  },
+  'click [data-edit-product]'(event) {
+    event.preventDefault();
+    const productId = $(event.currentTarget).attr('data-edit-product');
+    adminEditProduct(productId);
   },
   'click [data-buy-product]'(event) {
     event.preventDefault();

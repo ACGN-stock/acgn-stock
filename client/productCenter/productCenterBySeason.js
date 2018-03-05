@@ -7,7 +7,8 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbProducts } from '/db/dbProducts';
 import { dbSeason } from '/db/dbSeason';
 import { dbVoteRecord } from '/db/dbVoteRecord';
-import { voteProduct } from '../utils/methods';
+
+import { voteProduct, adminEditProduct } from '../utils/methods';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -211,5 +212,10 @@ Template.productInfoBySeasonTable.events({
         }
       }
     });
+  },
+  'click [data-edit-product]'(event) {
+    event.preventDefault();
+    const productId = $(event.currentTarget).attr('data-edit-product');
+    adminEditProduct(productId);
   }
 });

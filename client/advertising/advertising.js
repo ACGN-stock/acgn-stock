@@ -8,7 +8,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-import { formatDateText, currencyFormat, sanitizeHtml } from '../utils/helpers';
+import { formatDateText, currencyFormat } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -90,7 +90,7 @@ Template.advertising.events({
     const advertisingData = dbAdvertising.findOne(advertisingId);
     const message = `
       <div>確定要撤銷廣告？</div>
-      <div style="max-height: 100px; overflow-y: auto;">${sanitizeHtml(advertisingData.message)}</div>
+      <div style="max-height: 100px; overflow-y: auto;">${_.escape(advertisingData.message)}</div>
     `;
 
     alertDialog.confirm({
@@ -191,7 +191,7 @@ function saveAdvertisingModel(model) {
     totalPaid += 100;
     advertisingSample = `
       <a href="${submitData.url}" target="_blank">
-        ${sanitizeHtml(advertisingSample)}
+        ${_.escape(advertisingSample)}
       </a>
     `;
   }

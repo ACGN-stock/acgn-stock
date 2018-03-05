@@ -330,6 +330,11 @@ export const logTypeList = [
   '產品下架',
 
   /**
+   * 【產品修正】userId0以金管會的名義修改了「companyId」公司的產品「data.productId」，將{each d in data.diff}keyof(d)由「d.before」改為「d.after」(、){/each}。
+   */
+  '產品修正',
+
+  /**
    * 【撤銷廣告】userId0將userId1發布的廣告「data.message」給撤銷了。
    */
   '撤銷廣告',
