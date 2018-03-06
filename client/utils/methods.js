@@ -9,6 +9,7 @@ import { dbProducts } from '/db/dbProducts';
 import { dbResourceLock } from '/db/dbResourceLock';
 import { dbVariables } from '/db/dbVariables';
 import { dbVoteRecord } from '/db/dbVoteRecord';
+
 import { addTask, resolveTask } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { handleError } from './handleError';
@@ -337,5 +338,168 @@ export function investFoundCompany(companyId) {
         alertDialog.alert('不正確的金額數字！');
       }
     }
+  });
+}
+
+export function adminEditProduct(productId) {
+  const product = dbProducts.findOne(productId);
+  const schema = dbProducts.simpleSchema().pick('type', 'productName', 'url', 'description');
+
+  function askProductName(callback) {
+    const minLength = schema.get('productName', 'min');
+    const maxLength = schema.get('productName', 'max');
+
+    alertDialog.prompt({
+      title: '修改產品 - 產品名稱',
+      message: `請輸入產品名稱（${minLength}~${maxLength}字）：`,
+      defaultValue: _.escape(product.productName),
+      callback: (result) => {
+        if (result === false) {
+          return;
+        }
+
+        const trimmedResult = result.trim();
+
+        if (trimmedResult.length < minLength) {
+          alertDialog.alert(`產品名稱最少需 ${minLength} 字！`);
+
+          return;
+        }
+
+        if (trimmedResult.length > maxLength) {
+          alertDialog.alert(`產品名稱最多不超過 ${maxLength} 字！`);
+
+          return;
+        }
+
+        callback(trimmedResult);
+      }
+    });
+  }
+
+  function askProductType(callback) {
+    const allowedTypes = schema.get('type', 'allowedValues');
+
+    // TODO: alertDialog 加入下拉選單
+    alertDialog.prompt({
+      title: '修改產品 - 產品分類',
+      message: `請輸入產品分類（${allowedTypes.join('、')}）：`,
+      defaultValue: product.type,
+      callback: (result) => {
+        if (result === false && typeof result !== 'string') {
+          return;
+        }
+
+        const trimmedResult = result.trim();
+
+        if (! allowedTypes.includes(trimmedResult)) {
+          alertDialog.alert(`「${trimmedResult}」不是合法的產品分類！`);
+
+          return;
+        }
+
+        callback(trimmedResult);
+      }
+    });
+  }
+
+  function askProductUrl(callback) {
+    const urlPattern = schema.get('url', 'regEx');
+
+    alertDialog.prompt({
+      title: '修改產品 - 產品網址',
+      message: `請輸入產品網址：`,
+      defaultValue: _.escape(product.url),
+      callback: (result) => {
+        if (result === false && typeof result !== 'string') {
+          return;
+        }
+
+        const trimmedResult = result.trim();
+
+        if (! urlPattern.test(trimmedResult)) {
+          alertDialog.alert(`「${trimmedResult}」並非合法的網址！`);
+
+          return;
+        }
+
+        callback(trimmedResult);
+      }
+    });
+  }
+
+  function askProductDescription(callback) {
+    const maxLength = schema.get('description', 'max');
+
+    alertDialog.prompt({
+      title: '修改產品 - 產品描述',
+      message: `請輸入產品描述（${maxLength}字以內）：`,
+      defaultValue: _.escape(product.description),
+      callback: (result) => {
+        if (result === false) {
+          return;
+        }
+
+        if (typeof result !== 'string') { // 留空時
+          callback('');
+
+          return;
+        }
+
+        const trimmedResult = result.trim();
+
+        if (trimmedResult.length > maxLength) {
+          alertDialog.alert(`產品名稱最多不超過 ${maxLength} 字！`);
+
+          return;
+        }
+
+        callback(trimmedResult);
+      }
+    });
+  }
+
+  function confirmProductData(data, callback) {
+    if (_.isEmpty(data)) {
+      return;
+    }
+
+    const message = `
+          確定將產品資訊改為以下內容？
+          <ul>
+            <li>分類：「${data.type}」</li>
+            <li>名稱：「${data.productName}」</li>
+            <li>網址：「<a href="${data.url}" target="_blank">${data.url}</a>」</li>
+            <li>描述：「${data.description}」</li>
+          </ul>
+        `;
+
+    alertDialog.confirm({
+      title: '修改產品 - 確認修改',
+      message,
+      callback: (result) => {
+        if (! result) {
+          return;
+        }
+
+        callback(data);
+      }
+    });
+  }
+
+  askProductName((productName) => {
+    askProductType((type) => {
+      askProductUrl((url) => {
+        askProductDescription((description) => {
+          const data = _.omit({ type, productName, url, description }, (value) => {
+            return ! value;
+          });
+
+          confirmProductData(data, (newData) => {
+            Meteor.customCall('adminEditProduct', { productId, newData });
+          });
+        });
+      });
+    });
   });
 }

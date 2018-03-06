@@ -65,7 +65,7 @@
   {{#if this.illegalReason}}
     <div class="mb-1 bg-danger text-white">
       <i class="fa fa-warning"></i>
-      本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
+      本公司已被標記為違規！原因：{{this.illegalReason}}
     </div>
   {{/if}}
   <div class="col p-0">
@@ -1028,4 +1028,3 @@
     {{/with}}
   </div>
 </template>
-

@@ -55,7 +55,7 @@
           {{{getSortIcon 'voteCount'}}}
         </th>
         {{#if currentUser.profile.isAdmin}}
-          <th class="text-center" style="width: 70px;" title="管理">
+          <th class="text-center" style="width: 140px;" title="管理">
             管理
           </th>
         {{/if}}
@@ -105,13 +105,8 @@
     </td>
     {{#if currentUser.profile.isAdmin}}
       <td class="text-center text-nowrap" data-title="管理">
-        <button
-          class="btn btn-danger btn-sm"
-          type="button"
-          data-ban-product="{{this._id}}"
-        >
-          下架
-        </button>
+        <button class="btn btn-sm btn-danger" title="修改" data-edit-product="{{this._id}}">修改</button>
+        <button class="btn btn-sm btn-danger" title="下架" data-ban-product="{{this._id}}">下架</button>
       </td>
     {{/if}}
   </tr>
