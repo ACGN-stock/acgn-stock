@@ -188,6 +188,14 @@ body {
   font-size: 1rem;
 }
 
+.company-description blockquote {
+  font-weight: bold;
+  font-style: italic;
+  margin: 1rem 3rem; 
+  border-left: 2px solid #999;
+  padding-left: 1rem;
+}
+
 
 .company-card {
   padding: 0px;
