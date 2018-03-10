@@ -10,7 +10,6 @@ import { dbEmployees } from '/db/dbEmployees';
 
 import { registerEmployee } from '/server/methods/employee/registerEmployee';
 import { unregisterEmployee } from '/server/methods/employee/unregisterEmployee';
-import { setEmployeeBonusRate } from '/server/methods/employee/setEmployeeBonusRate';
 import { updateNextSeasonSalary } from '/server/methods/employee/updateNextSeasonSalary';
 
 test('Register employee test', function(t) {
@@ -103,89 +102,6 @@ test('Unregiser employee test', function(t) {
   t.pass('User can unregister as an employee');
 
   dbEmployees.remove.reset();
-
-  t.end();
-});
-
-test('Update employee seasonal bonus test', function(t) {
-  const user = {
-    _id: 'FOOUser'
-  };
-  const companyId = 'FooCompany';
-  const percentage = Meteor.settings.public.companyProfitDistribution.employeeBonusRate.min;
-
-  dbCompanies.findOne.returns({
-    companyName: companyId,
-    manager: 'FOOManager'
-  });
-
-  t.throws(function() {
-    setEmployeeBonusRate(user, companyId, percentage);
-  }, Meteor.Error, 'User who is not the manager of the company can\'t update bonus');
-
-  dbCompanies.findOne.returns({
-    companyName: companyId,
-    manager: user._id,
-    isSeal: true
-  });
-
-  t.throws(function() {
-    setEmployeeBonusRate(user, companyId, percentage);
-  }, Meteor.Error, 'Manager can\'t update bonus of sealed company');
-
-  dbCompanies.findOne.returns({
-    companyName: companyId,
-    manager: user._id,
-    isSeal: false
-  });
-
-  t.throws(function() {
-    setEmployeeBonusRate(user, companyId, Meteor.settings.companyProfitDistribution.employeeBonusRate.max + 1);
-  }, Meteor.Error, 'Manager can\'t set the bonus value over the range');
-
-  dbSeason.findOne.returns(undefined);
-
-  t.throws(function() {
-    setEmployeeBonusRate(user, companyId, percentage);
-  }, Meteor.Error, 'Manager can\'t update bonus when season has not started');
-
-  const clock = sinon.useFakeTimers(new Date());
-  let endTime = Date.now() + Meteor.settings.public.announceBonusTime / 2;
-  let beginTime = endTime - Meteor.settings.public.seasonTime;
-
-  dbSeason.findOne.returns({
-    beginDate: new Date(beginTime),
-    endDate: new Date(endTime)
-  });
-
-  t.throws(function() {
-    setEmployeeBonusRate(user, companyId, percentage);
-  }, Meteor.Error, 'Manager can\'t update bonus when the bonus-update deadline expires');
-
-  endTime = Date.now() + Meteor.settings.public.announceBonusTime * 2;
-  beginTime = endTime - Meteor.settings.public.seasonTime;
-
-  dbSeason.findOne.returns({
-    beginDate: new Date(beginTime),
-    endDate: new Date(endTime)
-  });
-
-  dbCompanies.update.callsFake(function(id, info) {
-    if (id !== companyId)
-      t.fail('Try to update bonus on incorrect company');
-    if (! deepequal(info, { $set: { employeeBonusRatePercent: percentage } }, { strict: true }))
-      t.fail('Try to update incorrect bonus on company');
-  });
-
-  setEmployeeBonusRate(user, companyId, percentage);
-
-  t.pass('Manager can update seasonal bonus except above conditions');
-
-  clock.restore();
-
-  dbCompanies.update.reset();
-  dbCompanies.findOne.reset();
-  dbSeason.findOne.reset();
 
   t.end();
 });
