@@ -88,7 +88,7 @@ Template.tutorial.helpers({
   minCapitalIncreaseRatePercent() {
     return Meteor.settings.public.companyProfitDistribution.capitalIncreaseRatePercent.min;
   },
-  cpitalIncreaseRatePercentLimit() {
+  capitalIncreaseRatePercentLimit() {
     return Meteor.settings.public.companyProfitDistribution.capitalIncreaseRatePercent.limit;
   },
   minManagerBonusRatePercent() {
@@ -102,5 +102,10 @@ Template.tutorial.helpers({
   },
   maxEmployeeBonusRatePercent() {
     return Meteor.settings.public.companyProfitDistribution.employeeBonusRatePercent.max;
+  },
+  profitDistributionLockTimeHours() {
+    const { lockTime } = Meteor.settings.public.companyProfitDistribution;
+
+    return Math.floor(lockTime / 1000 / 60 / 60);
   }
 });
