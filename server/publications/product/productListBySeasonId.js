@@ -20,8 +20,7 @@ Meteor.publish('productListBySeasonId', function({ seasonId, sortBy, sortDir, of
   const pageObserver = dbProducts
     .find(filter, {
       fields: {
-        productName: 0,
-        url: 0,
+        profit: 0,
         price: 0,
         stockAmount: 0,
         totalAmount: 0,

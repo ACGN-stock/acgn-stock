@@ -5,7 +5,6 @@ import footnotes from 'showdown-footnotes';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { $ } from 'meteor/jquery';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
@@ -158,13 +157,6 @@ Template.registerHelper('displayManager', function(manager) {
   return manager === '!none' ? '無' : manager;
 });
 
-export function sanitizeHtml(str) {
-  return $('<span></span>')
-    .text(str)
-    .html();
-}
-Template.registerHelper('sanitizeHtml', sanitizeHtml);
-
 export { stoneDisplayName };
 Template.registerHelper('stoneDisplayName', stoneDisplayName);
 
@@ -237,6 +229,7 @@ Template.registerHelper('round', Math.round);
 export function markdown(content) {
   const converter = new showdown.Converter({ extensions: [xssFilter, footnotes] });
   converter.setFlavor('github');
+  converter.setOption('openLinksInNewWindow', true);
   const pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/!/g, '&excl;');
 
   return converter.makeHtml(pureContent);

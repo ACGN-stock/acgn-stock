@@ -30,13 +30,13 @@
       <div class="card-subtitle product-description">{{product.description}}</div>
     </div>
     <div class="card-footer d-flex flex-wrap px-3">
-      <div>
+      <div class="mr-auto my-1">
         {{#if currentUser}}
           {{#if product.availableAmount}}
-          <button class="btn btn-sm btn-primary" title="購買產品" data-buy-product="{{product._id}}">
-            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-            購買
-          </button>
+            <button class="btn btn-sm btn-primary" title="購買產品" data-buy-product="{{product._id}}">
+              <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+              購買
+            </button>
           {{/if}}
         {{/if}}
         <button class="btn btn-sm btn-primary" title="推薦產品" data-vote-product="{{product._id}}">
@@ -46,7 +46,10 @@
         </button>
       </div>
       {{#if isAdmin}}
-        <button class="btn btn-sm btn-danger ml-auto" title="下架" data-ban-product="{{product._id}}">下架</button>
+        <div class="my-1">
+          <button class="btn btn-sm btn-danger" title="修改" data-edit-product="{{product._id}}">修改</button>
+          <button class="btn btn-sm btn-danger" title="下架" data-ban-product="{{product._id}}">下架</button>
+        </div>
       {{/if}}
     </div>
   </div>

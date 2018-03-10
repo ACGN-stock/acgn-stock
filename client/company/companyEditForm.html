@@ -99,8 +99,7 @@
         rows="5"
         minlength="10"
         maxlength="3000"
-        placeholder="請輸入對這個角色的完整介紹 (最少10字，最多3000字)">{{valueOf 'description'}}
-      </textarea>
+        placeholder="請輸入對這個角色的完整介紹 (最少10字，最多3000字)">{{valueOf 'description'}}</textarea>
       <small class="form-text text-warning">必須包括角色名稱以及原作品名稱，其餘內容由經理人自己增修，但不得有任何貶低角色的字眼出現。</small>
       {{{errorHtmlOf 'description'}}}
     </div>
@@ -109,6 +108,7 @@
       <a class="btn btn-secondary" href="{{getCompanyHref this._id}}">取消</a>
     </div>
   </form>
+  <hr />
   <div class="company-detail">
     <div class="media">
       <div class="d-sm-flex picture">
@@ -118,10 +118,10 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
         {{/if}}
       </div>
-      <div class="media-body d-none d-md-block company-description"><h4>預覽角色簡介</h4>{{{previewDescription}}}</div>
+      <div class="media-body d-none d-md-block company-description"><h1>預覽角色簡介</h1>{{{previewDescription}}}</div>
     </div>
     <div class="row " style="margin-top: 15px;">
-      <div class="col-12 d-md-none company-description"><h4>預覽角色簡介</h4>{{{previewDescription}}}</div>
+      <div class="col-12 d-md-none company-description"><h1>預覽角色簡介</h1>{{{previewDescription}}}</div>
     </div>
   </div>
 </template>

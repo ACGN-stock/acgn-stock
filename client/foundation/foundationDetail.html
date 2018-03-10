@@ -34,7 +34,7 @@
         {{#if this.illegalReason}}
           <div class="mb-1 text-danger">
             <i class="fa fa-warning"></i>
-            本公司已被標記為違規！原因：{{sanitizeHtml this.illegalReason}}
+            本公司已被標記為違規！原因：{{this.illegalReason}}
           </div>
         {{/if}}
         {{#if showAllTags this.tags}}
@@ -73,10 +73,10 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
         {{/if}}
       </div>
-      <div class="media-body d-none d-md-block company-description"><h4>角色簡介</h4>{{{markdown this.description}}}</div>
+      <div class="media-body d-none d-md-block company-description"><h1>角色簡介</h1>{{{markdown this.description}}}</div>
     </div>
     <div class="row border-grid-body" style="margin-top: 15px;">
-      <div class="col-12 border-grid d-block d-md-none company-description"><h4>角色簡介</h4>{{{markdown this.description}}}</div>
+      <div class="col-12 border-grid d-block d-md-none company-description"><h1>角色簡介</h1>{{{markdown this.description}}}</div>
       <div class="col-12 border-grid">
         <a class="d-block h4" href="#" data-toggle-panel="numbers">
           數據資訊
