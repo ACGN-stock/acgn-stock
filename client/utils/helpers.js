@@ -231,9 +231,10 @@ export function markdown(content, disableImage = true) {
   converter.setFlavor('github');
   converter.setOption('openLinksInNewWindow', true);
   let pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-  if(disableImage) {
+  if (disableImage) {
     pureContent = pureContent.replace(/!/g, '&excl;');
   }
+
   return converter.makeHtml(pureContent);
 }
 Template.registerHelper('markdown', markdown);
