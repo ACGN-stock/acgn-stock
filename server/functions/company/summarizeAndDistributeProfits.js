@@ -93,10 +93,29 @@ export function summarizeAndDistributeProfits() {
   // 執行營利注入資本額
   if (! _.isEmpty(capitalIncreaseMap)) {
     const companyBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
+    const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+    const logSchema = dbLog.simpleSchema();
+
     Object.entries(capitalIncreaseMap).forEach(([companyId, capitalIncrease]) => {
       companyBulk.find({ _id: companyId }).updateOne({ $inc: { capital: capitalIncrease } });
+
+      const logData = logSchema.clean({
+        logType: '營利分紅',
+        companyId,
+        data: {
+          bonusType: 'capitalIncrease',
+          amount: capitalIncrease
+        },
+        createdAt: baseLogTime + logTimeOffset
+      });
+      logSchema.validate(logData);
+      logBulk.insert(logData);
+
+      logTimeOffset += 1;
     });
+
     Meteor.wrapAsync(companyBulk.execute, companyBulk)();
+    Meteor.wrapAsync(logBulk.execute, logBulk)();
   }
 
   // 執行分紅與獎金發放

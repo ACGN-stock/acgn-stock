@@ -223,6 +223,10 @@ Template.displayLog.helpers({
         return `【公司營利】「${company}」公司在本商業季度一共獲利$${currencyFormat(data.profit)}！`;
       }
       case '營利分紅': {
+        if (data.bonusType === 'capitalIncrease') { // 資本額注入的 special case
+          return `【營利分紅】「${company}」公司的資本額增加了$${currencyFormat(data.amount)}！`;
+        }
+
         const bonusTypeDisplayNameMap = {
           managerBonus: '經理分紅',
           employeeBonus: '員工分紅',

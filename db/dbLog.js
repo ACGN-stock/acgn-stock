@@ -164,6 +164,7 @@ export const logTypeList = [
   '公司營利',
 
   /**
+   * 【營利分紅】「companyId」公司的資本額增加了$data.amount！
    * 【營利分紅】userId0得到了「companyId」公司的(data.bonusType || 分紅)$data.amount！
    */
   '營利分紅',
