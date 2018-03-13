@@ -1,5 +1,5 @@
 <template name="switchContent">
-  <ul class="nav nav-tabs mb-2">
+  <ul class="nav nav-tabs mb-2 flex-column flex-sm-row">
     {{#each view in views}}
     <li class="nav-item">
       <a href="#" class="nav-link {{activeIfViewSelected view.name}}" data-view="{{view.name}}">{{view.displayName}}</a>

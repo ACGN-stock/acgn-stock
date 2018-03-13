@@ -193,10 +193,20 @@ const schema = new SimpleSchema({
     defaultValue: Meteor.settings.public.defaultCompanySalaryPerDay,
     optional: true
   },
-  // 員工季末分紅占總營收百分比
-  seasonalBonusPercent: {
-    type: SimpleSchema.Integer,
-    defaultValue: Meteor.settings.public.defaultSeasonalBonusPercent
+  // 經理分紅佔比
+  managerBonusRatePercent: {
+    type: Number,
+    defaultValue: Meteor.settings.public.companyProfitDistribution.managerBonusRatePercent.default
+  },
+  // 員工分紅佔比
+  employeeBonusRatePercent: {
+    type: Number,
+    defaultValue: Meteor.settings.public.companyProfitDistribution.employeeBonusRatePercent.default
+  },
+  // 營利投入資本額佔比
+  capitalIncreaseRatePercent: {
+    type: Number,
+    defaultValue: Meteor.settings.public.companyProfitDistribution.capitalIncreaseRatePercent.default
   },
   // 是否被金管會查封關停
   isSeal: {

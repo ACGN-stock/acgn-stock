@@ -1,0 +1,19 @@
+<template name="editCompanySwitchContentProfitDistribution">
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <h4>目前分配</h4>
+      <ol>
+        <li>公司所得稅：{{incomeTaxRatePercent}}%</li>
+        <li>資本額注入比例：{{company.capitalIncreaseRatePercent}}%</li>
+        <li>經理分紅比例：{{company.managerBonusRatePercent}}%</li>
+        <li>員工分紅比例：{{company.employeeBonusRatePercent}}%</li>
+        <li>員工推薦票獎金比例：{{employeeProductVotingRewardRatePercent}}%</li>
+        <li>股東分紅比例：{{directorBonusRatePercent}}%</li>
+      </ol>
+    </div>
+    <div class="col-12 col-md-6">
+      <h4>修改分配</h4>
+      {{> companyProfitDistributionEditForm}}
+    </div>
+  </div>
+</template>

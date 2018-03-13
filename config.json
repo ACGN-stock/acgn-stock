@@ -24,8 +24,6 @@
     "arenaMinInvestedAmount": 10000,
     "seasonTime": 604800000,
     "electManagerTime": 86400000,
-    "managerProfitPercent": 0.05,
-    "costFromProfit": 0.15,
     "displayAdvertisingNumber": 5,
     "advertisingExpireTime": 259200000,
     "maximumFavorite": 60,
@@ -35,11 +33,7 @@
     "maximumCompanySalaryPerDay": 2000,
     "minimumCompanySalaryPerDay": 500,
     "defaultCompanySalaryPerDay": 1000,
-    "maximumSeasonalBonusPercent": 5,
-    "minimumSeasonalBonusPercent": 1,
-    "defaultSeasonalBonusPercent": 5,
     "announceSalaryTime": 259200000,
-    "announceBonusTime": 86400000,
     "vacationModeZombieTaxPerDay": 500,
     "minIntervalTimeBetweenVacations": 604800000,
     "taxExpireTime": 259200000,
@@ -93,6 +87,26 @@
     },
     "vipLevelCheckInterval": 1800000,
     "vipLevelDownChance": 0.05,
-    "vipPreviousSeasonScoreWeight": 0.80
+    "vipPreviousSeasonScoreWeight": 0.80,
+    "companyProfitDistribution": {
+      "lockTime": 86400000,
+      "incomeTaxRatePercent": 10,
+      "managerBonusRatePercent": {
+        "min": 1,
+        "max": 5,
+        "default": 5
+      },
+      "employeeBonusRatePercent": {
+        "min": 1,
+        "max": 5,
+        "default": 5
+      },
+      "employeeProductVotingRewardRatePercent": 1,
+      "capitalIncreaseRatePercent": {
+        "min": 1,
+        "limit": 15,
+        "default": 3
+      }
+    }
   }
 }
