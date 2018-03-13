@@ -227,11 +227,14 @@ Template.registerHelper('isCompanyManager', isCompanyManager);
 
 Template.registerHelper('round', Math.round);
 
-export function markdown(content) {
+export function markdown(content, disableImage = true) {
   const converter = new showdown.Converter({ extensions: [xssFilter, footnotes] });
   converter.setFlavor('github');
   converter.setOption('openLinksInNewWindow', true);
-  const pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/!/g, '&excl;');
+  let pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  if (disableImage) {
+    pureContent = pureContent.replace(/!/g, '&excl;');
+  }
 
   return converter.makeHtml(pureContent);
 }
