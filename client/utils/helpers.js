@@ -2,7 +2,7 @@
 import showdown from 'showdown';
 import xssFilter from 'showdown-xss-filter';
 import footnotes from 'showdown-footnotes';
-import katex from 'katex'
+import katex from 'katex';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -231,13 +231,13 @@ Template.registerHelper('round', Math.round);
 export function markdown(content, disableImage = true) {
   const katexExtension = {
     type: 'output',
-    filter: function (text, converter, options) {
-      const outputKatexHTML = text.replace(/\$\$((.|\r|\n)*?)\$\$/g, function (match, capture) {
+    filter: function(text) {
+      const outputKatexHTML = text.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
         const text = capture.replace(/<br \/>/g, '');
 
         return katex.renderToString(text);
       });
-  
+
       return outputKatexHTML;
     }
   };
@@ -245,8 +245,8 @@ export function markdown(content, disableImage = true) {
   const converter = new showdown.Converter({ extensions: [xssFilter, katexExtension, footnotes] });
   converter.setFlavor('github');
   converter.setOption('openLinksInNewWindow', true);
-  
-  const preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/\$\$((.|\r|\n)*?)\$\$/g, function (match, capture) {
+
+  let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
     const text = capture.replace(/\\/g, '\\\\');
 
     return `$$${text}$$`;
