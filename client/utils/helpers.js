@@ -228,32 +228,39 @@ Template.registerHelper('isCompanyManager', isCompanyManager);
 
 Template.registerHelper('round', Math.round);
 
-export function markdown(content, disableImage = true) {
-  const katexExtension = {
-    type: 'output',
-    filter: function(text) {
-      const outputKatexHTML = text.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
-        const text = capture.replace(/<br \/>/g, '');
+const katexExtension = {
+  type: 'output',
+  filter: function(text) {
+    const outputKatexHTML = text.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
+      const text = capture.replace(/<br \/>/g, '');
 
-        return katex.renderToString(text);
-      });
+      return katex.renderToString(text);
+    });
 
-      return outputKatexHTML;
-    }
-  };
-  showdown.extension('katexExtension', katexExtension);
-  const converter = new showdown.Converter({ extensions: [xssFilter, katexExtension, footnotes] });
-  converter.setFlavor('github');
-  converter.setOption('openLinksInNewWindow', true);
+    return outputKatexHTML;
+  }
+};
 
-  let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
-    const text = capture.replace(/\\/g, '\\\\');
+// Advance(KaTeX, image)
+export function markdown(content, disableAdvance = true) {
+  const extensionsArray = [xssFilter, footnotes];
 
-    return `$$${text}$$`;
-  });
-  if (disableImage) {
+  let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  if (disableAdvance) {
     preprocessContent = preprocessContent.replace(/!/g, '&excl;');
   }
+  else {
+    extensionsArray.push(katexExtension);
+    preprocessContent = preprocessContent.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
+      // \->\\避免showdown吃掉\符號導致KaTeX無法正確處理.
+      const text = capture.replace(/\\/g, '\\\\');
+
+      return `$$${text}$$`;
+    });
+  }
+  const converter = new showdown.Converter({ extensions: extensionsArray });
+  converter.setFlavor('github');
+  converter.setOption('openLinksInNewWindow', true);
 
   return converter.makeHtml(preprocessContent);
 }
