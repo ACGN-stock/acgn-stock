@@ -2,7 +2,6 @@
 import showdown from 'showdown';
 import xssFilter from 'showdown-xss-filter';
 import footnotes from 'showdown-footnotes';
-import renderMathInElement from 'katex/dist/contrib/auto-render.min'
 import katex from 'katex'
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
