@@ -2,6 +2,8 @@
 import showdown from 'showdown';
 import xssFilter from 'showdown-xss-filter';
 import footnotes from 'showdown-footnotes';
+import renderMathInElement from 'katex/dist/contrib/auto-render.min'
+import katex from 'katex'
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -228,15 +230,33 @@ Template.registerHelper('isCompanyManager', isCompanyManager);
 Template.registerHelper('round', Math.round);
 
 export function markdown(content, disableImage = true) {
-  const converter = new showdown.Converter({ extensions: [xssFilter, footnotes] });
+  const katexExtension = {
+    type: 'output',
+    filter: function (text, converter, options) {
+      const outputKatexHTML = text.replace(/\$\$((.|\r|\n)*?)\$\$/g, function (match, capture) {
+        const text = capture.replace(/<br \/>/g, '');
+
+        return katex.renderToString(text);
+      });
+  
+      return outputKatexHTML;
+    }
+  };
+  showdown.extension('katexExtension', katexExtension);
+  const converter = new showdown.Converter({ extensions: [xssFilter, katexExtension, footnotes] });
   converter.setFlavor('github');
   converter.setOption('openLinksInNewWindow', true);
-  let pureContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  
+  const preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/\$\$((.|\r|\n)*?)\$\$/g, function (match, capture) {
+    const text = capture.replace(/\\/g, '\\\\');
+
+    return `$$${text}$$`;
+  });
   if (disableImage) {
-    pureContent = pureContent.replace(/!/g, '&excl;');
+    preprocessContent = preprocessContent.replace(/!/g, '&excl;');
   }
 
-  return converter.makeHtml(pureContent);
+  return converter.makeHtml(preprocessContent);
 }
 Template.registerHelper('markdown', markdown);
 
