@@ -42,7 +42,7 @@ import { updateCompanyProductPriceLimits } from './functions/company/updateCompa
 import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
 import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
 import { countDownRecordListPrice } from './functions/company/recordListPrice';
-import { countDownCheckChairman } from './functions/company/checkChairman';
+import { countDownCheckChairman, checkChairman } from './functions/company/checkChairman';
 import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
 import { deliverProductVotingRewards } from './functions/season/deliverProductVotingRewards';
 import { deliverProductRebates } from './functions/product/deliverProductRebates';
@@ -149,8 +149,10 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
   console.info(`${new Date().toLocaleString()}: doRoundWorks`);
   resourceManager.request('doRoundWorks', ['season'], (release) => {
     // TODO 合併處理商業季度結束的 code
+
     // 備份資料庫
     backupMongo('-roundBefore');
+
     // 當賽季結束時，取消所有尚未交易完畢的訂單
     cancelAllOrder();
     // 結算挖礦機營利
@@ -182,7 +184,11 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     updateCompanyProductPriceLimits();
     // 為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
+    // 更新所有公司的董事長，避免最終資料出現與董事會清單不一致的狀況
+    checkChairman();
+
     backupMongo('-roundAfter');
+
     // 移除所有廣告
     dbAdvertising.remove({});
 
