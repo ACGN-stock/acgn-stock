@@ -42,7 +42,7 @@
       </a>
     </div>
 
-    <div class="agenda-description">{{this.description}}</div>
+    <div class="agenda-description">{{{markdown this.description false}}}</div>
     {{#each issue in getIssueList this.issues}}
       {{> ruleIssueVoteList index=@index issue=issue}}
     {{/each}}

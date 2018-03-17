@@ -8,6 +8,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, utilFormHelpers, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { alertDialog } from '../layout/alertDialog';
+import { markdown } from '../utils/helpers.js';
 
 const rIssueList = new ReactiveVar();
 const rIssueOptionList = new ReactiveVar();
@@ -30,6 +31,7 @@ Template.ruleAgendaForm.onCreated(function() {
   rIssueOptionList.set(defaultIssueOptionList());
 });
 
+const description = new ReactiveVar('');
 Template.ruleAgendaForm.helpers({
   getIssueInputName: getIssueInputName,
   getIssueInputMultipleName: getIssueInputMultipleName,
@@ -72,6 +74,9 @@ Template.ruleAgendaForm.helpers({
   },
   errorHtmlOfIssueOptionInput(issueId, optionId) {
     return utilFormHelpers.errorHtmlOf(getIssueOptionInputName(issueId, optionId));
+  },
+  previewDescription() {
+    return markdown(description.get(), false);
   }
 });
 
@@ -119,6 +124,9 @@ Template.ruleAgendaForm.events({
     const list = rIssueList.get();
     list[issueId].multiple = ! list[issueId].multiple;
     rIssueList.set(list);
+  },
+  'keyup [name="description"]'(event) {
+    description.set($(event.currentTarget).val());
   }
 });
 

@@ -101,7 +101,9 @@ Meteor.publish('companyList', function({ keyword, matchType, onlyShow, sortBy, o
     capital: 1,
     totalValue: 1,
     createdAt: 1,
-    seasonalBonusPercent: 1
+    employeeBonusRatePercent: 1,
+    managerBonusRatePercent: 1,
+    capitalIncreaseRatePercent: 1
   };
   const disableOplog = true;
 

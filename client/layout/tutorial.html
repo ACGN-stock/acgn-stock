@@ -140,8 +140,18 @@
               <li>當公司創立後，最初申請創立計劃的人即為該公司的經理人。</li>
               <li>除了申請創立公司成為經理人，使用者還競爭已存在公司的經理人位置，一但有驗證通過的使用者競爭經理人，在下個商業季度開始後，所有持有該公司股票的股東便可以對所有競爭者進行投票，各股東的票權與其持股比率相當，在下個商業季度結束時，所得票權最高的參選人便可成為經理人。</li>
               <li>除此之外，公司的經理人隨時可以辭職不幹。</li>
-              <li>經理人可以在商業季度結束前<span class="text-info">72</span>小時調整下個商業季度的員工薪資，調整範圍為<span class="text-info">$500~$2000</span>，以及在商業季度結束前<span class="text-info">24</span>小時調整本商業季度的員工分紅，調整範圍為總盈利額的<span class="text-info">1%~5%</span>。</li>
-              <li>商業季度結束後，公司的收益金額將分出<span class="text-info">5%</span>作為經理人的薪水、<span class="text-info">15%</span>作為營運成本、<span class="text-info">1%~5%</span>作為員工分紅。剩餘的收益金額作為董事會分紅，依照董事會成員個人之持股數量對所有董事的總持股數量之比例來分配。</li>
+              <li>經理人可以在商業季度結束前<span class="text-info">72</span>小時調整下個商業季度的員工薪資，調整範圍為<span class="text-info">$500~$2000</span></li>
+              <li>商業季度結束後，公司的收益金額將依序下列項目依序分配：
+                <ul>
+                  <li>公司所得稅：{{incomeTaxRatePercent}}%</li>
+                  <li>資本額注入：比例可由經理人調整，最低{{minCapitalIncreaseRatePercent}}%；與經理分紅比例及員工分紅比例之總和不得超過{{capitalIncreaseRatePercentLimit}}%</li>
+                  <li>經理分紅：比例可由經理人調整，{{minManagerBonusRatePercent}}%~{{maxManagerBonusRatePercent}}%，公司無經理人時跳過</li>
+                  <li>員工分紅：比例可由經理人調整，{{minEmployeeBonusRatePercent}}%~{{maxManagerBonusRatePercent}}%，由公司所有員工均分，但公司無任何員工時跳過</li>
+                  <li>員工推薦票獎金：{{employeeProductVotingRewardRatePercent}}%，由公司員工個人使用的推薦票數對公司所有員工總共使用的推薦票數之比例來分配，但公司無任何員工時跳過</li>
+                  <li>董事會分紅：以上項目分配完後，剩餘的所有收益金額，依照董事會成員個人之持股數量對所有董事的總持股數量之比例來分配</li>
+                </ul>
+                以上所有可由經理人調整的項目，需在商業季度結束{{profitDistributionLockTimeHours}}小時前更改完成。
+              </li>
               <li>
                 若該董事為公司的 VIP，持股數量將依據 VIP 等級來加成計算：
                 <ul>

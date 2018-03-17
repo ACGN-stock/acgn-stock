@@ -78,5 +78,34 @@ Template.tutorial.helpers({
   },
   getCompanyGradeProportionPercentage(grade) {
     return Math.round(gradeProportionMap[grade] * 100);
+  },
+  incomeTaxRatePercent() {
+    return Meteor.settings.public.companyProfitDistribution.incomeTaxRatePercent;
+  },
+  employeeProductVotingRewardRatePercent() {
+    return Meteor.settings.public.companyProfitDistribution.employeeProductVotingRewardRatePercent;
+  },
+  minCapitalIncreaseRatePercent() {
+    return Meteor.settings.public.companyProfitDistribution.capitalIncreaseRatePercent.min;
+  },
+  capitalIncreaseRatePercentLimit() {
+    return Meteor.settings.public.companyProfitDistribution.capitalIncreaseRatePercent.limit;
+  },
+  minManagerBonusRatePercent() {
+    return Meteor.settings.public.companyProfitDistribution.managerBonusRatePercent.min;
+  },
+  maxManagerBonusRatePercent() {
+    return Meteor.settings.public.companyProfitDistribution.managerBonusRatePercent.max;
+  },
+  minEmployeeBonusRatePercent() {
+    return Meteor.settings.public.companyProfitDistribution.employeeBonusRatePercent.min;
+  },
+  maxEmployeeBonusRatePercent() {
+    return Meteor.settings.public.companyProfitDistribution.employeeBonusRatePercent.max;
+  },
+  profitDistributionLockTimeHours() {
+    const { lockTime } = Meteor.settings.public.companyProfitDistribution;
+
+    return Math.floor(lockTime / 1000 / 60 / 60);
   }
 });
