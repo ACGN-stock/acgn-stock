@@ -83,10 +83,9 @@ export function summarizeAndDistributeProfits() {
       });
       logSchema.validate(logData);
       logBulk.insert(logData);
-
-      logTimeOffset += 1;
     });
 
+    logTimeOffset += 1;
     Meteor.wrapAsync(logBulk.execute, logBulk)();
   }
 
@@ -110,10 +109,9 @@ export function summarizeAndDistributeProfits() {
       });
       logSchema.validate(logData);
       logBulk.insert(logData);
-
-      logTimeOffset += 1;
     });
 
+    logTimeOffset += 1;
     Meteor.wrapAsync(companyBulk.execute, companyBulk)();
     Meteor.wrapAsync(logBulk.execute, logBulk)();
   }
@@ -138,12 +136,11 @@ export function summarizeAndDistributeProfits() {
           });
           logSchema.validate(logData);
           logBulk.insert(logData);
-
-          logTimeOffset += 1;
         });
       });
     });
 
+    logTimeOffset += 1;
     Meteor.wrapAsync(userBulk.execute, userBulk)();
     Meteor.wrapAsync(logBulk.execute, logBulk)();
   }
