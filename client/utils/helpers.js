@@ -241,9 +241,22 @@ const katexExtension = {
   }
 };
 
+const preTagEscapedCharacterTranser = {
+  type: 'output',
+  filter: function(text) {
+    const output = text.replace(/<code>((.|\r|\n)*?)<\/code>/g, function(match, capture) {
+      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/&excl;/g, '!');
+
+      return `<code>${text}</code>`;
+    });
+
+    return output;
+  }
+};
+
 // Advance(KaTeX, image)
 export function markdown(content, disableAdvance = true) {
-  const extensionsArray = [xssFilter, footnotes];
+  const extensionsArray = [xssFilter, footnotes, preTagEscapedCharacterTranser];
 
   let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   if (disableAdvance) {
