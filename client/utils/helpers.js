@@ -241,7 +241,7 @@ const katexExtension = {
   }
 };
 
-const preTagEscapedCharacterTranser = {
+const codeTagEscapedCharacterTranser = {
   type: 'output',
   filter: function(text) {
     const output = text.replace(/<code>((.|\r|\n)*?)<\/code>/g, function(match, capture) {
@@ -256,7 +256,7 @@ const preTagEscapedCharacterTranser = {
 
 // Advance(KaTeX, image)
 export function markdown(content, disableAdvance = true) {
-  const extensionsArray = [xssFilter, footnotes, preTagEscapedCharacterTranser];
+  const extensionsArray = [xssFilter, footnotes, codeTagEscapedCharacterTranser];
 
   let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   if (disableAdvance) {
