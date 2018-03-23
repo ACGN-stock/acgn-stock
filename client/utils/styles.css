@@ -197,7 +197,7 @@ body {
 .agenda-description blockquote {
   font-weight: bold;
   font-style: italic;
-  margin: 1rem 3rem; 
+  margin-left: 1rem; 
   border-left: 2px solid #999;
   padding-left: 1rem;
 }
