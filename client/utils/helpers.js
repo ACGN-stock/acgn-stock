@@ -32,17 +32,27 @@ export function currencyFormat(money) {
 Template.registerHelper('currencyFormat', currencyFormat);
 
 export function getCompanyEPS(companyData) {
-  let multiplier = 1;
+  const {
+    _id: companyId, manager, profit, totalRelease,
+    managerBonusRatePercent, employeeBonusRatePercent, capitalIncreaseRatePercent
+  } = companyData;
 
-  multiplier -= (companyData.manager !== '!none') ? companyData.managerBonusRatePercent / 100 : 0;
-  multiplier -= (dbEmployees.find({
-    companyId: companyData._id,
-    employed: true
-  }).count() > 0) ? companyData.employeeBonusRatePercent / 100 : 0;
-  multiplier -= companyData.capitalIncreaseRatePercent / 100;
-  multiplier -= Meteor.settings.public.companyProfitDistribution.incomeTaxRatePercent / 100;
+  const { incomeTaxRatePercent, employeeProductVotingRewardRatePercent } = Meteor.settings.public.companyProfitDistribution;
 
-  return (companyData.profit * multiplier / companyData.totalRelease).toFixed(2);
+  const hasManager = manager !== '!none';
+  const hasEmployees = dbEmployees.find({ companyId, employed: true }).count() > 0;
+
+  const directorBonusRatePercent = 100 - [
+    incomeTaxRatePercent,
+    capitalIncreaseRatePercent,
+    hasManager ? managerBonusRatePercent : 0,
+    hasEmployees ? employeeBonusRatePercent : 0,
+    hasEmployees ? employeeProductVotingRewardRatePercent : 0
+  ].reduce((a, b) => {
+    return a + b;
+  }, 0);
+
+  return (profit * directorBonusRatePercent / 100 / totalRelease).toFixed(2);
 }
 
 export function getCompanyPERatio(companyData) {
@@ -241,9 +251,22 @@ const katexExtension = {
   }
 };
 
+const codeTagEscapedCharacterTranser = {
+  type: 'output',
+  filter: function(text) {
+    const output = text.replace(/<code>((.|\r|\n)*?)<\/code>/g, function(match, capture) {
+      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/&excl;/g, '!');
+
+      return `<code>${text}</code>`;
+    });
+
+    return output;
+  }
+};
+
 // Advance(KaTeX, image)
 export function markdown(content, disableAdvance = true) {
-  const extensionsArray = [xssFilter, footnotes];
+  const extensionsArray = [xssFilter, footnotes, codeTagEscapedCharacterTranser];
 
   let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   if (disableAdvance) {
