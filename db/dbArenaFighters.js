@@ -10,21 +10,18 @@ export const MAX_MANNER_SIZE = 3;
 
 export const arenaFighterAttributeNameList = ['hp', 'sp', 'atk', 'def', 'agi'];
 
+const attributeParameters = {
+  hp: { cost: 200, base: 100 },
+  sp: { cost: 1000, base: 10 },
+  atk: { cost: 1000, base: 20 },
+  def: { cost: 1000, base: 5 },
+  agi: { cost: 1000, base: 0 }
+};
+
 export function getAttributeNumber(attribute, amount) {
-  switch (attribute) {
-    case 'hp': {
-      return Math.floor(amount / 200) + 50;
-    }
-    case 'sp': {
-      return Math.floor(amount / 1000) + 5;
-    }
-    case 'atk': {
-      return Math.floor(amount / 1000) + 1;
-    }
-    default: {
-      return Math.floor(amount / 1000);
-    }
-  }
+  const { cost, base } = attributeParameters[attribute];
+
+  return base + Math.floor(amount / cost);
 }
 
 // 取得總投資額
