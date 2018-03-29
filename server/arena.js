@@ -201,18 +201,21 @@ export function startArenaFight() {
           arenaLog.attackManner *= -1;
         }
       }
+
       // 決定造成的傷害
       arenaLog.damage = 0;
-      // 特殊攻擊時傷害等於攻擊者atk
       if (arenaLog.attackManner < 0) {
+        // 特殊攻擊時傷害等於攻擊者atk
         arenaLog.damage = attacker.atk;
       }
       else {
-        const randomAgi = Math.floor((Math.random() * 100) + 1);
-        if (randomAgi > 95 || attacker.agi + randomAgi >= defender.agi) {
+        // 普通攻擊，執行命中檢定
+        const hitRate = computeHitRate(attacker, defender);
+        if (Math.random() < hitRate) { // 成功命中
           arenaLog.damage = Math.max(attacker.atk - defender.def, 1);
         }
       }
+
       // 若有造成傷害
       if (arenaLog.damage > 0) {
         defender.currentHp -= arenaLog.damage;
@@ -281,4 +284,16 @@ export function startArenaFight() {
     }
   });
 }
+
+function computeHitRate(attacker, defender) {
+  const agiRate = (attacker.agi + 50) / (defender.agi + 50);
+
+  if (agiRate <= 1) {
+    return 0.05 + 0.7 * Math.tan(Math.pi * agiRate / 4) * agiRate * agiRate;
+  }
+  else {
+    return 0.95 - 1 / (20 * (agiRate - 0.5) * (agiRate - 0.5));
+  }
+}
+
 export default startArenaFight;
