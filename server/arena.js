@@ -205,14 +205,14 @@ export function startArenaFight() {
       // 決定造成的傷害
       arenaLog.damage = 0;
       if (arenaLog.attackManner < 0) {
-        // 特殊攻擊時傷害等於攻擊者atk
-        arenaLog.damage = attacker.atk;
+        // 特殊攻擊必定命中、防方 DEF 以 1/3 計算
+        arenaLog.damage = computeDamage(attacker, { def: defender.def / 3 });
       }
       else {
         // 普通攻擊，執行命中檢定
         const hitRate = computeHitRate(attacker, defender);
         if (Math.random() < hitRate) { // 成功命中
-          arenaLog.damage = Math.max(attacker.atk - defender.def, 1);
+          arenaLog.damage = computeDamage(attacker, defender);
         }
       }
 
@@ -294,6 +294,12 @@ function computeHitRate(attacker, defender) {
   else {
     return 0.95 - 1 / (20 * (agiRate - 0.5) * (agiRate - 0.5));
   }
+}
+
+function computeDamage(attacker, defender) {
+  const damageBase = Math.sqrt(attacker.atk * (attacker.atk + 1) / (defender.def + 1));
+
+  return Math.max(1, _.random(Math.ceil(damageBase * 0.9), Math.floor(damageBase * 1.1)));
 }
 
 export default startArenaFight;
