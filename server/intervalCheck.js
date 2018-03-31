@@ -163,11 +163,9 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
       .forEach(({ _id: companyId }) => {
         returnCompanyStones(companyId);
       });
-    // 若arenaCounter為0，則舉辦最萌亂鬥大賽
-    const arenaCounter = dbVariables.get('arenaCounter');
-    if (arenaCounter === 0) {
-      startArenaFight();
-    }
+    // 無論如何都要舉辦最萌亂鬥大賽
+    startArenaFight();
+    dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
     // 進行營利結算與分紅
     summarizeAndDistributeProfits();
     // 發放推薦票回饋金
@@ -597,7 +595,14 @@ function generateNewSeason() {
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
   // 若上一個商業季度為最萌亂鬥大賽的舉辦季度，則產生新的arena Data
   if (arenaCounter <= 0) {
-    const arenaEndDate = new Date(endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber);
+    const arenaShouldEndTime = endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber;
+    const lastRoundData = dbRound.findOne({}, {
+      sort: {
+        beginDate: -1
+      }
+    });
+    const lastRoundEndTime = lastRoundData.endDate.getTime();
+    const arenaEndDate = new Date(arenaShouldEndTime > lastRoundEndTime ? lastRoundEndTime : arenaShouldEndTime);
     dbArena.insert({
       beginDate: beginDate,
       endDate: arenaEndDate,

@@ -18,7 +18,7 @@
     "newUserInitialMoney": 10000,
     "newUserBirthStones": 1,
     "salaryPerPay": 1000,
-    "seasonNumberInRound": 12,
+    "seasonNumberInRound": 13,
     "arenaIntervalSeasonNumber": 1,
     "arenaMaximumRound": 1000,
     "arenaMinInvestedAmount": 10000,
