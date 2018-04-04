@@ -108,6 +108,7 @@ export const config = {
       limit: 15, // 經理人分紅、員工分紅、資本額增加三者的加總上限
       default: 3
     }
-  }
+  },
+  newRoundFoundationRestrictionTime: 0 // 新賽季禁止新創的時間 (ms)
 };
 export default config;

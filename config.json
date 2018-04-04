@@ -107,6 +107,7 @@
         "limit": 15,
         "default": 3
       }
-    }
+    },
+    "newRoundFoundationRestrictionTime": 0
   }
 }
