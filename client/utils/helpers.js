@@ -242,7 +242,7 @@ const katexExtension = {
   type: 'output',
   filter: function(text) {
     const outputKatexHTML = text.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
-      const text = capture.replace(/<br \/>/g, '');
+      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/<br \/>/g, '');
 
       return katex.renderToString(text);
     });
