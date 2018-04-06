@@ -109,6 +109,6 @@ export const config = {
       default: 3
     }
   },
-  newRoundFoundationRestrictionTime: 0 // 新賽季禁止新創的時間 (ms)
+  newRoundFoundationRestrictionTime: 3600000 // 新賽季禁止新創的時間 (ms)
 };
 export default config;

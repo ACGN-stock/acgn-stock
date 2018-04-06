@@ -108,6 +108,6 @@
         "default": 3
       }
     },
-    "newRoundFoundationRestrictionTime": 0
+    "newRoundFoundationRestrictionTime": 3600000
   }
 }
