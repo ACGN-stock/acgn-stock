@@ -17,3 +17,8 @@ const schema = new SimpleSchema({
   }
 });
 dbRound.attachSchema(schema);
+
+// 取得目前賽季
+export function getCurrentRound() {
+  return dbRound.findOne({}, { sort: { beginDate: -1 } }); // TODO 以實際開始時間取代對齊的開始時間
+}

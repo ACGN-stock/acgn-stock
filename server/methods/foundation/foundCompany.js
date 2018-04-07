@@ -5,8 +5,8 @@ import { check, Match } from 'meteor/check';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
-import { dbRound } from '/db/dbRound';
-import { dbSeason } from '/db/dbSeason';
+import { getCurrentRound } from '/db/dbRound';
+import { getCurrentSeason } from '/db/dbSeason';
 import { checkImageUrl } from '/server/imports/utils/checkImageUrl';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
@@ -28,7 +28,7 @@ Meteor.methods({
   }
 });
 export function foundCompany(user, foundCompanyData) {
-  const { foundExpireTime, founderEarnestMoney, seasonTime } = Meteor.settings.public;
+  const { foundExpireTime, founderEarnestMoney, seasonTime, newRoundFoundationRestrictionTime } = Meteor.settings.public;
 
   debug.log('foundCompany', { user, foundCompanyData });
   if (user.profile.isInVacation) {
@@ -50,24 +50,22 @@ export function foundCompany(user, foundCompanyData) {
   if (dbFoundations.find({ manager: userId }).count() > 0) {
     throw new Meteor.Error(403, '您現在已經有一家新創公司正在申請中，無法同時發起第二家新創公司！');
   }
-  const lastSeasonData = dbSeason.findOne({}, {
-    sort: {
-      beginDate: -1
-    }
-  });
+
+  const currentRound = getCurrentRound();
+  if (Date.now() <= (currentRound.beginDate.getTime() + newRoundFoundationRestrictionTime)) {
+    throw new Meteor.Error(403, '目前尚未開放新創計劃！');
+  }
+  if (Date.now() >= (currentRound.endDate.getTime() - seasonTime)) {
+    throw new Meteor.Error(403, '賽季度結束前的最後一個商業季度，禁止新創計劃！');
+  }
+
+  const currentSeason = getCurrentSeason();
   // 防止換季動作與新創集資期間重疊，並預留足夠時間（10分鐘）以確保換季前最後一批新創處理完成
-  if (Date.now() >= (lastSeasonData.endDate.getTime() - foundExpireTime - 600000)) {
+  if (Date.now() >= (currentSeason.endDate.getTime() - foundExpireTime - 600000)) {
     const hours = Math.ceil(foundExpireTime / 3600000);
     throw new Meteor.Error(403, '商業季度即將結束前' + hours + '小時，禁止新創計劃！');
   }
-  const lastRoundData = dbRound.findOne({}, {
-    sort: {
-      beginDate: -1
-    }
-  });
-  if (Date.now() >= (lastRoundData.endDate.getTime() - seasonTime)) {
-    throw new Meteor.Error(403, '賽季度結束前的最後一個商業季度，禁止新創計劃！');
-  }
+
   const companyName = foundCompanyData.companyName;
   if (dbCompanyArchive.find({ name: companyName }).count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
