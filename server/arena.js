@@ -201,18 +201,21 @@ export function startArenaFight() {
           arenaLog.attackManner *= -1;
         }
       }
+
       // 決定造成的傷害
       arenaLog.damage = 0;
-      // 特殊攻擊時傷害等於攻擊者atk
       if (arenaLog.attackManner < 0) {
-        arenaLog.damage = attacker.atk;
+        // 特殊攻擊必定命中、防方 DEF 以 1/3 計算
+        arenaLog.damage = computeDamage(attacker, { def: defender.def / 3 });
       }
       else {
-        const randomAgi = Math.floor((Math.random() * 100) + 1);
-        if (randomAgi > 95 || attacker.agi + randomAgi >= defender.agi) {
-          arenaLog.damage = Math.max(attacker.atk - defender.def, 1);
+        // 普通攻擊，執行命中檢定
+        const hitRate = computeHitRate(attacker, defender);
+        if (Math.random() < hitRate) { // 成功命中
+          arenaLog.damage = computeDamage(attacker, defender);
         }
       }
+
       // 若有造成傷害
       if (arenaLog.damage > 0) {
         defender.currentHp -= arenaLog.damage;
@@ -251,7 +254,7 @@ export function startArenaFight() {
   // 取的排名列表
   const winnerList = sortedWinnerIdList.concat(loser.reverse());
   // 計算排名獎勵
-  const rankReward = 0.177 * allFighterTotalInvest / (Math.log(winnerList.length) + 0.57722 + (1 / (2 * winnerList.length)));
+  const rankReward = sortedWinnerList[0].totalInvest + 0.177 * allFighterTotalInvest / (Math.log(winnerList.length) + 0.57722 + (1 / (2 * winnerList.length)));
   _.each(winnerList, (companyId, index) => {
     const rank = index + 1;
     gainProfitHash[companyId] += Math.floor(rankReward / rank);
@@ -281,4 +284,22 @@ export function startArenaFight() {
     }
   });
 }
+
+function computeHitRate(attacker, defender) {
+  const agiRate = (attacker.agi + 50) / (defender.agi + 50);
+
+  if (agiRate <= 1) {
+    return 0.05 + 0.7 * Math.tan(Math.pi * agiRate / 4) * agiRate * agiRate;
+  }
+  else {
+    return 0.95 - 1 / (20 * (agiRate - 0.5) * (agiRate - 0.5));
+  }
+}
+
+function computeDamage(attacker, defender) {
+  const damageBase = Math.sqrt(attacker.atk * (attacker.atk + 1) / (defender.def + 1));
+
+  return Math.max(1, _.random(Math.ceil(damageBase * 0.9), Math.floor(damageBase * 1.1)));
+}
+
 export default startArenaFight;
