@@ -52,6 +52,7 @@ import { rotateProducts } from './functions/product/rotateProducts';
 import { adjustPreviousSeasonVipScores } from './functions/vip/adjustPreviousSeasonVipScores';
 import { levelDownThresholdUnmetVips } from './functions/vip/levelDownThresholdUnmetVips';
 import { startArenaFight } from './arena';
+import { computeArenaAttackSequences } from './functions/arena/computeArenaAttackSequences';
 import { checkExpiredFoundations } from './functions/foundation/checkExpiredFoundations';
 import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
@@ -645,7 +646,8 @@ function electManager(seasonData) {
       beginDate: -1
     },
     fields: {
-      _id: 1
+      _id: 1,
+      endDate: 1
     }
   });
   const arenaId = lastArenaData._id;
@@ -802,46 +804,13 @@ function electManager(seasonData) {
     }
   });
 
+  // TODO 抽離經理人選舉並並使用新的事件排程方式
   // 若本商業季度為最萌亂鬥大賽的舉辦季度，則計算出所有報名者的攻擊次序
-  const arenaCounter = dbVariables.get('arenaCounter') || 0;
-  if (arenaCounter <= 0) {
-    if (lastArenaData) {
-      const fighterCompanyIdList = dbArenaFighters
-        .find({ arenaId }, {
-          fields: {
-            companyId: 1
-          }
-        })
-        .map((arenaFighter) => {
-          return arenaFighter.companyId;
-        });
-      const shuffledFighterCompanyIdList = _.shuffle(fighterCompanyIdList);
-      dbArena.update(arenaId, {
-        $set: {
-          shuffledFighterCompanyIdList
-        }
-      });
-      const attackSequence = _.range(shuffledFighterCompanyIdList.length);
-      dbArenaFighters
-        .find({}, {
-          fields: {
-            _id: 1,
-            companyId: 1
-          }
-        })
-        .forEach((fighter) => {
-          const thisFighterIndex = _.indexOf(shuffledFighterCompanyIdList, fighter.companyId);
-          const thisAttackSequence = _.without(attackSequence, thisFighterIndex);
-          const shuffledAttackSequence = _.shuffle(thisAttackSequence);
-          dbArenaFighters.update(fighter._id, {
-            $set: {
-              attackSequence: shuffledAttackSequence
-            }
-          });
-        });
-    }
+  if (lastArenaData && lastArenaData.endDate.getTime() === seasonData.endDate.getTime()) {
+    computeArenaAttackSequences();
   }
 }
+
 function convertDateToText(date) {
   const dateInTimeZone = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 * -1);
 
