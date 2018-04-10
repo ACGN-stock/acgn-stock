@@ -166,7 +166,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
       });
     // 無論如何都要舉辦最萌亂鬥大賽
     startArenaFight();
-    dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
+    dbVariables.set('arenaCounter', 0);
     // 進行營利結算與分紅
     summarizeAndDistributeProfits();
     // 發放推薦票回饋金
