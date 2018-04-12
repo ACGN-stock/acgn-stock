@@ -624,12 +624,14 @@ function generateNewSeason() {
           _id: 1
         }
       });
-      dbArena.update(lastArenaData._id, {
-        $set: {
-          endDate: endDate,
-          joinEndDate: new Date(electTime)
-        }
-      });
+      if (lastArenaData) {
+        dbArena.update(lastArenaData._id, {
+          $set: {
+            endDate: endDate,
+            joinEndDate: new Date(electTime)
+          }
+        });
+      }
     }
     dbVariables.set('arenaCounter', arenaCounter - 1);
   }
