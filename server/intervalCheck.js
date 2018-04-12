@@ -650,7 +650,7 @@ function electManager(seasonData) {
       endDate: 1
     }
   });
-  const arenaId = lastArenaData._id;
+  const arenaId = lastArenaData ? lastArenaData._id : null;
   const electMessage = (
     `${convertDateToText(seasonData.beginDate)
     }～${
@@ -713,16 +713,9 @@ function electManager(seasonData) {
                       voteList: [ [] ]
                     }
                   });
-                arenaFightersBulk
-                  .find({
-                    arenaId: arenaId,
-                    companyId: companyId
-                  })
-                  .updateOne({
-                    $set: {
-                      manager: newManager
-                    }
-                  });
+                if (arenaId) {
+                  arenaFightersBulk.find({ arenaId, companyId }).updateOne({ $set: { manager: newManager } });
+                }
               }
               break;
             }
@@ -779,16 +772,9 @@ function electManager(seasonData) {
                     voteList: [ [] ]
                   }
                 });
-              arenaFightersBulk
-                .find({
-                  arenaId: arenaId,
-                  companyId: companyId
-                })
-                .updateOne({
-                  $set: {
-                    manager: winnerData.userId
-                  }
-                });
+              if (arenaId) {
+                arenaFightersBulk.find({ arenaId, companyId }).updateOne({ $set: { manager: winnerData.userId } });
+              }
               break;
             }
           }
@@ -799,7 +785,9 @@ function electManager(seasonData) {
       if (needExecuteBulk) {
         logBulk.execute();
         companiesBulk.execute();
-        arenaFightersBulk.execute();
+        if (arenaId) {
+          arenaFightersBulk.execute();
+        }
       }
     }
   });
