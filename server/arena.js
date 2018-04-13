@@ -89,6 +89,10 @@ export function startArenaFight() {
     }
   });
 
+  if (! lastArenaData) {
+    return;
+  }
+
   // 正式開賽前，先移除未達成報名門檻的參賽者
   removeUnqualifiedArenaFighters(lastArenaData);
 
