@@ -4,13 +4,19 @@ export const config = {
   debugMode: false, // 是否為debug mode(紀錄一分鐘內的所有方法與訂閱動作，以備crash查看)
   websiteName: 'ACGN股票交易市場', // 網站名稱
   intervalTimer: 60000, // 每隔多少毫秒進行一次工作檢查
-  releaseStocksForHighPriceMinCounter: 180, // 公司檢查是否要因高股價而釋出股票的最小隨機工作檢查次數
-  releaseStocksForHighPriceMaxCounter: 360, // 公司檢查是否要因高股價而釋出股票的最大隨機工作檢查次數
-  releaseStocksForNoDealMinCounter: 1440, // 公司檢查是否要因無成交而釋出股票的最小隨機工作檢查次數
-  releaseStocksForNoDealMaxCounter: 2880, // 公司檢查是否要因無成交而釋出股票的最大隨機工作檢查次數
-  recordListPriceMinCounter: 180, // 為所有公司紀錄參考價格的最小隨機工作檢查次數
-  recordListPriceMaxCounter: 360, // 為所有公司紀錄參考價格的最大隨機工作檢查次數
-  checkChairmanCounter: 10, // 每隔多少次工作檢查，就重新檢查、設定一次各公司的董事長
+  releaseStocksForHighPriceInterval: { // 高價釋股的排程時間範圍 (ms)
+    min: 10800000,
+    max: 21600000
+  },
+  releaseStocksForNoDealInterval: { // 低成交量釋股的排程時間範圍 (ms)
+    min: 86400000,
+    max: 172800000
+  },
+  recordListPriceInterval: { // 參考價更新的排程時間範圍 (ms)
+    min: 10800000,
+    max: 21600000
+  },
+  checkChairmanInterval: 600000, // 董事長檢查的排程時間 (ms)
   founderEarnestMoney: 1024, // 創立公司者需付出的保證金
   foundExpireTime: 43200000, // 創立公司的投資時間期限，單位為毫秒
   maximumInvest: 4096, // 每個人對單一新創計劃的最大投資上限
@@ -23,6 +29,7 @@ export const config = {
   arenaIntervalSeasonNumber: 1, // 最萌亂鬥大賽的舉行會間隔多少個商業季度，0為每個商業季度都會舉辦一次
   arenaMaximumRound: 1000, // 最萌亂鬥大賽的最大回合數
   arenaMinInvestedAmount: 10000, // 最萌亂鬥大賽的參賽所需最小總投資金額
+  arenaJoinEndTime: 86400000, // 最萌亂鬥大賽的報名截止時間，距離舉辦大賽的商業季度的結束時間 (ms)
   seasonTime: 604800000, // 每個商業季度的持續時間，單位為毫秒
   electManagerTime: 86400000, // 每個商業季度結束前多久時間會進行經理競選，單位為毫秒
   displayAdvertisingNumber: 5, // 同時最多顯示的廣告筆數

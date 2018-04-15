@@ -1,7 +1,7 @@
 'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { dbArena } from '/db/dbArena';
+import { dbArena, getCurrentArena } from '/db/dbArena';
 import { dbArenaFighters, MAX_MANNER_SIZE, getAttributeNumber } from '/db/dbArenaFighters';
 import { dbArenaLog } from '/db/dbArenaLog';
 import { dbCompanies } from '/db/dbCompanies';
@@ -79,24 +79,16 @@ export function removeUnqualifiedArenaFighters(arenaData) {
 
 export function startArenaFight() {
   console.log('start arena fight...');
-  const lastArenaData = dbArena.findOne({}, {
-    sort: {
-      beginDate: -1
-    },
-    fields: {
-      _id: 1,
-      shuffledFighterCompanyIdList: 1
-    }
-  });
+  const currentArena = getCurrentArena();
 
-  if (! lastArenaData) {
+  if (! currentArena) {
     return;
   }
 
   // 正式開賽前，先移除未達成報名門檻的參賽者
-  removeUnqualifiedArenaFighters(lastArenaData);
+  removeUnqualifiedArenaFighters(currentArena);
 
-  const arenaId = lastArenaData._id;
+  const { _id: arenaId } = currentArena;
 
   // 取得所有參賽者的數值資料與統計總投入金額
   let allFighterTotalInvest = 0;
@@ -148,7 +140,7 @@ export function startArenaFight() {
 
   debug.log('startArenaFight', fighterListBySequence);
 
-  const shuffledFighterCompanyIdList = lastArenaData.shuffledFighterCompanyIdList;
+  const shuffledFighterCompanyIdList = currentArena.shuffledFighterCompanyIdList;
 
   // 輸家companyId陣列，依倒下的順序排列
   const loser = [];
