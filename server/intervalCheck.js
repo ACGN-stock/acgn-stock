@@ -6,7 +6,7 @@ import { resourceManager } from '/server/imports/threading/resourceManager';
 import { debug } from '/server/imports/utils/debug';
 import { backupMongo } from '/server/imports/utils/backupMongo';
 import { dbAdvertising } from '/db/dbAdvertising';
-import { dbArena } from '/db/dbArena';
+import { dbArena, getCurrentArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
 import { dbArenaLog } from '/db/dbArenaLog';
 import { dbCompanies } from '/db/dbCompanies';
@@ -20,7 +20,7 @@ import { dbOrders } from '/db/dbOrders';
 import { dbPrice } from '/db/dbPrice';
 import { dbProducts } from '/db/dbProducts';
 import { dbResourceLock } from '/db/dbResourceLock';
-import { dbRound } from '/db/dbRound';
+import { dbRound, getCurrentRound } from '/db/dbRound';
 import { dbSeason, getCurrentSeason, getInitialVoteTicketCount } from '/db/dbSeason';
 import { dbVips } from '/db/dbVips';
 import { dbTaxes } from '/db/dbTaxes';
@@ -39,10 +39,7 @@ import { updateHighPriceThreshold } from './functions/company/updateHighPriceThr
 import { summarizeAndDistributeProfits } from './functions/company/summarizeAndDistributeProfits';
 import { updateCompanyBaseProductionFunds } from './functions/company/updateCompanyBaseProductionFunds';
 import { updateCompanyProductPriceLimits } from './functions/company/updateCompanyProductPriceLimits';
-import { countDownReleaseStocksForHighPrice } from './functions/company/releaseStocksForHighPrice';
-import { countDownReleaseStocksForNoDeal } from './functions/company/releaseStocksForNoDeal';
-import { countDownRecordListPrice } from './functions/company/recordListPrice';
-import { countDownCheckChairman, checkChairman } from './functions/company/checkChairman';
+import { checkChairman } from './functions/company/checkChairman';
 import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
 import { deliverProductVotingRewards } from './functions/season/deliverProductVotingRewards';
 import { deliverProductRebates } from './functions/product/deliverProductRebates';
@@ -52,9 +49,7 @@ import { rotateProducts } from './functions/product/rotateProducts';
 import { adjustPreviousSeasonVipScores } from './functions/vip/adjustPreviousSeasonVipScores';
 import { levelDownThresholdUnmetVips } from './functions/vip/levelDownThresholdUnmetVips';
 import { startArenaFight } from './arena';
-import { computeArenaAttackSequences } from './functions/arena/computeArenaAttackSequences';
 import { checkExpiredFoundations } from './functions/foundation/checkExpiredFoundations';
-import { paySalaryAndCheckTax } from './paySalaryAndCheckTax';
 import { generateRankAndTaxesData } from './seasonRankAndTaxes';
 import { eventScheduler } from './imports/utils/eventScheduler';
 
@@ -62,16 +57,8 @@ import { eventScheduler } from './imports/utils/eventScheduler';
 export function doIntervalWork() {
   debug.log('doIntervalWork');
   const now = Date.now();
-  const lastRoundData = dbRound.findOne({}, {
-    sort: {
-      beginDate: -1
-    }
-  });
-  const lastSeasonData = dbSeason.findOne({}, {
-    sort: {
-      beginDate: -1
-    }
-  });
+  const lastRoundData = getCurrentRound();
+  const lastSeasonData = getCurrentSeason();
   if (! lastSeasonData) {
     // 產生新的商業季度
     generateNewSeason();
@@ -79,10 +66,6 @@ export function doIntervalWork() {
   if (now >= lastRoundData.endDate.getTime()) {
     // 賽季結束工作
     doRoundWorks(lastRoundData, lastSeasonData);
-  }
-  else if (now >= lastSeasonData.electTime) {
-    // 若有正在競選經理人的公司，則計算出選舉結果。
-    electManager(lastSeasonData);
   }
   else if (now >= lastSeasonData.endDate.getTime()) {
     // 商業季度結束工作
@@ -94,31 +77,16 @@ export function doIntervalWork() {
     updateHighPriceThreshold();
     // 檢查所有創立中且投資時間截止的公司是否成功創立
     checkExpiredFoundations();
-    // 當發薪時間到時，發給所有驗證通過的使用者薪水，並檢查賦稅、增加滯納罰金與強制繳稅
-    paySalaryAndCheckTax();
-    // 隨機時間讓符合條件的公司釋出股票
-    countDownReleaseStocksForHighPrice();
-    countDownReleaseStocksForNoDeal();
-    // 隨機時間售出金管會股票並紀錄公司的參考價格
-    countDownRecordListPrice();
-    // 檢查並更新各公司的董事長位置
-    countDownCheckChairman();
     // 觸發所有到期的排程事件
     eventScheduler.triggerOverdueEvents();
   }
   // 移除所有一分鐘以前的聊天發言紀錄
   dbLog.remove({
     logType: '聊天發言',
-    createdAt: {
-      $lt: new Date(Date.now() - 60000)
-    }
+    createdAt: { $lt: new Date(Date.now() - 60000) }
   });
   // 移除所有到期的廣告
-  dbAdvertising.remove({
-    createdAt: {
-      $lt: new Date(Date.now() - Meteor.settings.public.advertisingExpireTime)
-    }
-  });
+  dbAdvertising.remove({ createdAt: { $lt: new Date(Date.now() - Meteor.settings.public.advertisingExpireTime) } });
   // 移除5分鐘以上的resource lock
   // dbResourceLock
   //   .find({
@@ -133,11 +101,7 @@ export function doIntervalWork() {
   // 移除所有debug紀錄
   debug.clean();
   // 移除沒有IP地址的user connections
-  UserStatus.connections.remove({
-    ipAddr: {
-      $exists: false
-    }
-  });
+  UserStatus.connections.remove({ ipAddr: { $exists: false } });
 }
 
 // 賽季結束工作
@@ -166,7 +130,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
       });
     // 無論如何都要舉辦最萌亂鬥大賽
     startArenaFight();
-    dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
+    dbVariables.set('arenaCounter', 0);
     // 進行營利結算與分紅
     summarizeAndDistributeProfits();
     // 發放推薦票回饋金
@@ -303,60 +267,19 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     // 為所有公司與使用者進行排名結算
     generateRankAndTaxesData(lastSeasonData);
     // 所有公司當季正營利額歸零
-    dbCompanies.update(
-      {
-        profit: {
-          $gt: 0
-        }
-      },
-      {
-        $set: {
-          profit: 0
-        }
-      },
-      {
-        multi: true
-      }
-    );
+    dbCompanies.update({ profit: { $gt: 0 } }, { $set: { profit: 0 } }, { multi: true });
     // 遣散所有在職員工
-    dbEmployees.update(
-      {
-        employed: true
-      },
-      {
-        $set: {
-          employed: false,
-          resigned: true
-        }
-      },
-      {
-        multi: true
-      }
-    );
+    dbEmployees.update({ employed: true }, { $set: { employed: false, resigned: true } }, { multi: true });
     // 產生新的商業季度
     generateNewSeason();
     // 移除所有七天前的股價紀錄
-    dbPrice.remove({
-      createdAt: {
-        $lt: new Date(Date.now() - 604800000)
-      }
-    });
+    dbPrice.remove({ createdAt: { $lt: new Date(Date.now() - 604800000) } });
     // 移除所有待驗證註冊資料
     dbValidatingUsers.remove({});
     // 移除所有推薦票投票紀錄
     dbVoteRecord.remove({});
     // 本季度未登入天數歸0
-    Meteor.users.update(
-      {},
-      {
-        $set: {
-          'profile.noLoginDayCount': 0
-        }
-      },
-      {
-        multi: true
-      }
-    );
+    Meteor.users.update({}, { $set: { 'profile.noLoginDayCount': 0 } }, { multi: true });
     // 最後兩個商業季度強制使用者收假
     if (lastRoundData.endDate.getTime() - Date.now() <= Meteor.settings.public.seasonTime * 2) {
       Meteor.users.update({ 'profile.isInVacation': true }, {
@@ -540,19 +463,24 @@ function generateNewRound() {
 // 產生新的商業季度
 function generateNewSeason() {
   debug.log('generateNewSeason');
-  const beginDate = new Date();
-  const endDate = new Date(beginDate.setMinutes(0, 0, 0) + Meteor.settings.public.seasonTime);
-  const electTime = endDate.getTime() - Meteor.settings.public.electManagerTime;
-  const userCount = Meteor.users.find().count();
-  const productCount = dbProducts.find({ state: 'planning' }).count();
-  const companiesCount = dbCompanies.find({ isSeal: false }).count();
+  const seasonBeginDate = new Date();
+  const seasonEndDate = new Date(seasonBeginDate.setMinutes(0, 0, 0) + Meteor.settings.public.seasonTime);
 
-  const seasonId = dbSeason.insert({ beginDate, endDate, electTime, userCount, companiesCount, productCount });
+  const seasonId = dbSeason.insert({
+    beginDate: seasonBeginDate,
+    endDate: seasonEndDate,
+    userCount: Meteor.users.find().count(),
+    companiesCount: dbCompanies.find({ isSeal: false }).count(),
+    productCount: dbProducts.find({ state: 'planning' }).count()
+  });
 
-  // TODO 分離「產生新商業季度」與「新商業季度開始的動作」
-  const seasonData = getCurrentSeason();
-  const voteTickets = getInitialVoteTicketCount(seasonData);
+  const voteTickets = getInitialVoteTicketCount(getCurrentSeason());
 
+  // 排程經理人選舉事件
+  const electTime = seasonEndDate.getTime() - Meteor.settings.public.electManagerTime;
+  eventScheduler.scheduleEvent('season.electManager', electTime);
+
+  // 重設使用者推薦票與消費券數量
   Meteor.users.update({}, {
     $set: {
       'profile.vouchers': Meteor.settings.public.productVoucherAmount,
@@ -564,259 +492,50 @@ function generateNewSeason() {
   // 調整 VIP 分數
   adjustPreviousSeasonVipScores();
   // 排程最後出清時間
-  eventScheduler.scheduleEvent('product.finalSale', endDate.getTime() - Meteor.settings.public.productFinalSaleTime);
+  eventScheduler.scheduleEvent('product.finalSale', seasonEndDate.getTime() - Meteor.settings.public.productFinalSaleTime);
   // 雇用所有上季報名的使用者
   dbEmployees.update(
     {
       resigned: false,
       registerAt: {
-        $lt: new Date(endDate.getTime() - Meteor.settings.public.seasonTime)
+        $lt: new Date(seasonEndDate.getTime() - Meteor.settings.public.seasonTime)
       }
     },
-    {
-      $set: {
-        employed: true
-      }
-    },
-    {
-      multi: true
-    }
+    { $set: { employed: true } },
+    { multi: true }
   );
   // 更新所有公司員工薪資
   dbCompanies.find().forEach((companyData) => {
-    dbCompanies.update(
-      companyData,
-      {
-        $set: {
-          salary: companyData.nextSeasonSalary
-        }
-      }
-    );
+    dbCompanies.update(companyData, { $set: { salary: companyData.nextSeasonSalary } });
   });
   const arenaCounter = dbVariables.get('arenaCounter') || 0;
-  // 若上一個商業季度為最萌亂鬥大賽的舉辦季度，則產生新的arena Data
+  // 若上一個商業季度為最萌亂鬥大賽的舉辦季度，則產生新的arena Data，並排程相關事件
   if (arenaCounter <= 0) {
-    const arenaShouldEndTime = endDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber;
-    const lastRoundData = dbRound.findOne({}, {
-      sort: {
-        beginDate: -1
-      }
-    });
-    const lastRoundEndTime = lastRoundData.endDate.getTime();
-    const arenaEndDate = new Date(arenaShouldEndTime > lastRoundEndTime ? lastRoundEndTime : arenaShouldEndTime);
+    const arenaShouldEndTime = seasonEndDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber;
+    const arenaEndDate = new Date(arenaShouldEndTime > seasonEndDate.getTime() ? seasonEndDate.getTime() : arenaShouldEndTime);
+    const joinEndDate = new Date(arenaEndDate.getTime() - Meteor.settings.public.arenaJoinEndTime);
     dbArena.insert({
-      beginDate: beginDate,
+      beginDate: seasonBeginDate,
       endDate: arenaEndDate,
-      joinEndDate: new Date(arenaEndDate.getTime() - Meteor.settings.public.electManagerTime),
-      shuffledFighterCompanyIdList: [],
-      winnerList: []
+      joinEndDate
     });
     dbVariables.set('arenaCounter', Meteor.settings.public.arenaIntervalSeasonNumber);
+    eventScheduler.scheduleEvent('arena.joinEnded', joinEndDate);
   }
   else {
-    // 若下一個商業季度為最萌亂鬥大賽的舉辦季度，則以新產生的商業季度結束時間與選舉時間更新最萌亂鬥大賽的時間，以糾正季度更換時的時間偏差
+    // 若下一個商業季度為最萌亂鬥大賽的舉辦季度，則以新產生的商業季度結束時間與更新最萌亂鬥大賽的時間，以糾正季度更換時的時間偏差
     if (arenaCounter === 1) {
-      const lastArenaData = dbArena.findOne({}, {
-        sort: {
-          beginDate: -1
-        },
-        fields: {
-          _id: 1
-        }
-      });
-      if (lastArenaData) {
-        dbArena.update(lastArenaData._id, {
-          $set: {
-            endDate: endDate,
-            joinEndDate: new Date(electTime)
-          }
-        });
+      const currentArena = getCurrentArena();
+      const arenaId = currentArena ? currentArena._id : null;
+      if (arenaId) {
+        const joinEndDate = new Date(seasonEndDate.getTime() - Meteor.settings.public.arenaJoinEndTime);
+        dbArena.update(arenaId, { $set: { endDate: seasonEndDate, joinEndDate } });
+        eventScheduler.scheduleEvent('arena.joinEnded', joinEndDate);
       }
     }
+    // 無論如何都要倒數
     dbVariables.set('arenaCounter', arenaCounter - 1);
   }
 
   return seasonId;
-}
-
-// 選舉新的經理人與計算最萌亂鬥大賽所有報名者的攻擊次序
-function electManager(seasonData) {
-  console.log('start elect manager...');
-  debug.log('electManager');
-  const lastArenaData = dbArena.findOne({}, {
-    sort: {
-      beginDate: -1
-    },
-    fields: {
-      _id: 1,
-      endDate: 1
-    }
-  });
-  const arenaId = lastArenaData ? lastArenaData._id : null;
-  const electMessage = (
-    `${convertDateToText(seasonData.beginDate)
-    }～${
-      convertDateToText(seasonData.endDate)}`
-  );
-  dbSeason.update(seasonData._id, {
-    $unset: {
-      electTime: ''
-    }
-  });
-  resourceManager.request('electManager', ['elect'], (release) => {
-    if (dbCompanies.find({ isSeal: false }).count() > 0) {
-      const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-      const companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
-      const arenaFightersBulk = dbArenaFighters.rawCollection().initializeUnorderedBulkOp();
-      let needExecuteBulk = false;
-
-      dbCompanies
-        .find(
-          {
-            isSeal: false
-          },
-          {
-            fields: {
-              _id: 1,
-              manager: 1,
-              candidateList: 1,
-              voteList: 1
-            },
-            disableOplog: true
-          }
-        )
-        .forEach((companyData) => {
-          const companyId = companyData._id;
-          switch (companyData.candidateList.length) {
-            // 沒有候選人的狀況下，不進行處理
-            case 0: {
-              return false;
-            }
-            // 只有一位候選人，只有在原經理與現任經理不同的狀況下才需要處理
-            case 1: {
-              const newManager = companyData.candidateList[0];
-              if (companyData.manager !== newManager) {
-                needExecuteBulk = true;
-                logBulk.insert({
-                  logType: '就任經理',
-                  userId: [newManager],
-                  companyId: companyId,
-                  data: { seasonName: electMessage },
-                  createdAt: new Date()
-                });
-                companiesBulk
-                  .find({
-                    _id: companyId
-                  })
-                  .updateOne({
-                    $set: {
-                      manager: newManager,
-                      candidateList: [newManager],
-                      voteList: [ [] ]
-                    }
-                  });
-                if (arenaId) {
-                  arenaFightersBulk.find({ arenaId, companyId }).updateOne({ $set: { manager: newManager } });
-                }
-              }
-              break;
-            }
-            // 多位候選人的狀況下
-            default: {
-              needExecuteBulk = true;
-              const voteList = companyData.voteList;
-              const directorList = dbDirectors
-                .find({ companyId }, {
-                  fields: {
-                    userId: 1,
-                    stocks: 1
-                  },
-                  disableOplog: true
-                })
-                .fetch();
-
-              const voteStocksList = _.map(companyData.candidateList, (candidate, index) => {
-                const voteDirectorList = voteList[index];
-                const stocks = _.reduce(voteDirectorList, (stocks, userId) => {
-                  const directorData = _.findWhere(directorList, { userId });
-
-                  return stocks + (directorData ? directorData.stocks : 0);
-                }, 0);
-
-                return {
-                  userId: candidate,
-                  stocks: stocks
-                };
-              });
-              const sortedVoteStocksList = _.sortBy(voteStocksList, 'stocks');
-              const winnerStocks = _.last(sortedVoteStocksList).stocks;
-              const winnerData = _.findWhere(voteStocksList, {
-                stocks: winnerStocks
-              });
-              logBulk.insert({
-                logType: '就任經理',
-                userId: [winnerData.userId, companyData.manager],
-                companyId: companyId,
-                data: {
-                  seasonName: electMessage,
-                  stocks: winnerData.stocks
-                },
-                createdAt: new Date()
-              });
-              companiesBulk
-                .find({
-                  _id: companyId
-                })
-                .updateOne({
-                  $set: {
-                    manager: winnerData.userId,
-                    candidateList: [winnerData.userId],
-                    voteList: [ [] ]
-                  }
-                });
-              if (arenaId) {
-                arenaFightersBulk.find({ arenaId, companyId }).updateOne({ $set: { manager: winnerData.userId } });
-              }
-              break;
-            }
-          }
-        });
-
-      release();
-
-      if (needExecuteBulk) {
-        logBulk.execute();
-        companiesBulk.execute();
-        if (arenaId) {
-          arenaFightersBulk.execute();
-        }
-      }
-    }
-  });
-
-  // TODO 抽離經理人選舉並並使用新的事件排程方式
-  // 若本商業季度為最萌亂鬥大賽的舉辦季度，則計算出所有報名者的攻擊次序
-  if (lastArenaData && lastArenaData.endDate.getTime() === seasonData.endDate.getTime()) {
-    computeArenaAttackSequences();
-  }
-}
-
-function convertDateToText(date) {
-  const dateInTimeZone = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000 * -1);
-
-  return (
-    `${dateInTimeZone.getFullYear()}/${
-      padZero(dateInTimeZone.getMonth() + 1)}/${
-      padZero(dateInTimeZone.getDate())} ${
-      padZero(dateInTimeZone.getHours())}:${
-      padZero(dateInTimeZone.getMinutes())}`
-  );
-}
-function padZero(n) {
-  if (n < 10) {
-    return `0${n}`;
-  }
-  else {
-    return n;
-  }
 }

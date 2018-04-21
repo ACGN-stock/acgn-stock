@@ -33,3 +33,7 @@ const schema = new SimpleSchema({
   'winnerList.$': String
 });
 dbArena.attachSchema(schema);
+
+export function getCurrentArena() {
+  return dbArena.findOne({}, { sort: { beginDate: -1 } });
+}
