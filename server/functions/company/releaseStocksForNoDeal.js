@@ -7,7 +7,7 @@ import { dbVariables } from '/db/dbVariables';
 import { calculateHighPriceBuyAmount, calculateDealAmount, getPriceLimits } from './helpers';
 
 export function updateReleaseStocksForNoDealPeriod() {
-  const { min: intervalMin, max: intervalMax } = Meteor.settings.public.releaseStocksForHighPriceInterval;
+  const { min: intervalMin, max: intervalMax } = Meteor.settings.public.releaseStocksForNoDealInterval;
   const now = Date.now();
 
   dbVariables.set('releaseStocksForNoDealBegin', now + intervalMin);
