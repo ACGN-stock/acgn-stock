@@ -13,7 +13,7 @@ import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
-import { dbSeason } from '/db/dbSeason';
+import { dbSeason, getCurrentSeason } from '/db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, toggleFavorite } from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
@@ -960,6 +960,12 @@ Template.companyElectInfo.helpers({
     return candidateList && candidateList.length > 1;
   },
   canContendManager() {
+    const { beginDate: seasonBeginDate } = getCurrentSeason();
+
+    if (Date.now() - seasonBeginDate.getTime() > Meteor.settings.public.contendManagerEndTime) {
+      return false;
+    }
+
     const user = Meteor.user();
     if (user && ! user.profile.revokeQualification) {
       return ! _.contains(this.candidateList, user._id);

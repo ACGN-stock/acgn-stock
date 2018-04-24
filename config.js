@@ -31,7 +31,9 @@ export const config = {
   arenaMinInvestedAmount: 10000, // 最萌亂鬥大賽的參賽所需最小總投資金額
   arenaJoinEndTime: 86400000, // 最萌亂鬥大賽的報名截止時間，距離舉辦大賽的商業季度的結束時間 (ms)
   seasonTime: 604800000, // 每個商業季度的持續時間，單位為毫秒
-  electManagerTime: 86400000, // 每個商業季度結束前多久時間會進行經理競選，單位為毫秒
+  electManagerTime: 86400000, // 每個商業季度**結束前多久時間**會進行經理競選 (ms)
+  electManagerLastLoginTimeThreshold: 259200000, // 經理選舉時候選人或投票人判定為活躍玩家時，距離上次登入時間之上限 (ms)
+  contendManagerEndTime: 475200000, // 經理選舉的報名結束時間 (ms)
   displayAdvertisingNumber: 5, // 同時最多顯示的廣告筆數
   advertisingExpireTime: 259200000, // 廣告持續時間，單位為毫秒
   maximumFavorite: 60, // 每個人的最愛公司數量上限
