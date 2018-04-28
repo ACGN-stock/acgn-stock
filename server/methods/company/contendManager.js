@@ -2,6 +2,7 @@ import { _ } from 'meteor/underscore';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 
+import { getCurrentSeason } from '/db/dbSeason';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
 import { limitMethod } from '/server/imports/utils/rateLimit';
@@ -19,6 +20,12 @@ Meteor.methods({
 });
 export function contendManager(user, companyId) {
   debug.log('contendManager', { user, companyId });
+  const { beginDate: seasonBeginDate } = getCurrentSeason();
+
+  if (Date.now() - seasonBeginDate.getTime() > Meteor.settings.public.contendManagerEndTime) {
+    throw new Meteor.Error(403, '經理選舉報名時間已過！');
+  }
+
   if (user.profile.isInVacation) {
     throw new Meteor.Error(403, '您現在正在渡假中，請好好放鬆！');
   }

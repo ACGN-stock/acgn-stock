@@ -73,7 +73,7 @@ Template.companyMiningMachine.helpers({
     const { grade } = paramCompany();
     const gradeFactor = gradeFactorTable.miningMachine[grade];
 
-    return Math.round(6300 * Math.log10(totalPower + 1) * Math.pow(totalPower, gradeFactor));
+    return Math.round(6300 * Math.log10(totalPower + 1) * Math.pow(totalPower + 1, gradeFactor));
   },
   currentUserPlacedStoneType() {
     const companyId = paramCompanyId();
