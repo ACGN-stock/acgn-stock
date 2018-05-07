@@ -179,16 +179,10 @@
         {{/if}}
         <hr style="margin: 0px;" />
         <div class="row btn-group">
-          {{#if isUserId this.manager}}
+          {{#if currentUserCanManage this}}
             <a class="btn btn-tab" href="{{getManageHref this._id}}">
               經營管理
             </a>
-          {{else}}
-            {{#if currentUser.profile.isAdmin}}
-              <a class="btn btn-tab" href="{{getManageHref this._id}}">
-                經營管理
-              </a>
-            {{/if}}
           {{/if}}
           <button class="btn btn-tab" type="button" data-action="createBuyOrder">
             購入
@@ -272,7 +266,7 @@
       </div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
-          {{#if isUserId this.manager}}
+          {{#if isCurrentUser this.manager}}
             <div class="mb-1">
               您是該公司的經理人。
               <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
@@ -280,7 +274,7 @@
               </a>
             </div>
           {{else}}
-            {{#if currentUser.profile.isAdmin}}
+            {{#if currentUserHasRole 'fscMember'}}
               <div class="mb-1">
                 <a class="btn btn-primary btn-sm" href="{{getManageHref this._id}}">
                   經營管理

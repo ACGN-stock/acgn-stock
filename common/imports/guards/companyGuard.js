@@ -26,7 +26,7 @@ class CompanyGuard {
   checkIsManagableByUser(user) {
     if (! this.company.manager || this.company.manager === '!none') {
       // 無經理人的狀況下，可由金管會成員代為管理
-      guardUser(user).checkIsAdmin();
+      guardUser(user).checkHasRole('fscMember');
     }
     else {
       // 有經理人的狀況下，只有經理人可以管理

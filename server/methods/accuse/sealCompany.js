@@ -5,6 +5,7 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
 import { returnCompanyStones } from '/server/functions/miningMachine/returnCompanyStones';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   sealCompany({ companyId, message }) {
@@ -18,37 +19,22 @@ Meteor.methods({
 });
 function sealCompany(user, { companyId, message }) {
   debug.log('sealCompany', { user, companyId, message });
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
-  }
-  const companyData = dbCompanies.findOne(companyId, {
-    fields: {
-      companyName: 1,
-      isSeal: 1
-    }
+
+  guardUser(user).checkHasRole('fscMember');
+
+  const { isSeal } = dbCompanies.findByIdOrThrow(companyId, { fields: { isSeal: 1 } });
+
+  dbLog.insert({
+    logType: isSeal ? '解除查封' : '查封關停',
+    userId: [user._id],
+    companyId: companyId,
+    data: { reason: message },
+    createdAt: new Date()
   });
-  if (! companyData) {
-    throw new Meteor.Error(404, '找不到識別碼為「' + companyId + '」的公司！');
-  }
-  if (companyData.isSeal) {
-    dbLog.insert({
-      logType: '解除查封',
-      userId: [user._id],
-      companyId: companyId,
-      data: { reason: message },
-      createdAt: new Date()
-    });
-    dbCompanies.update(companyId, { $set: { isSeal: false } });
-  }
-  else {
-    dbLog.insert({
-      logType: '查封關停',
-      userId: [user._id],
-      companyId: companyId,
-      data: { reason: message },
-      createdAt: new Date()
-    });
-    dbCompanies.update(companyId, { $set: { isSeal: true } });
+  dbCompanies.update(companyId, { $set: { isSeal: ! isSeal } });
+
+  // 查封時歸還所有石頭
+  if (! isSeal) {
     returnCompanyStones(companyId);
   }
 }

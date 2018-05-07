@@ -18,9 +18,9 @@ Accounts.onCreateUser((options, user) => {
     voteTickets: 0,
     vouchers: 0,
     stones: { birth: newUserBirthStones },
-    isAdmin: false,
     ban: [],
-    noLoginDayCount: 0
+    noLoginDayCount: 0,
+    roles: []
   });
 
   if (user.services && user.services.google) {
@@ -37,7 +37,7 @@ Accounts.onCreateUser((options, user) => {
   if (existingArchiveUser) {
     user._id = existingArchiveUser._id;
     user.profile.name = existingArchiveUser.name;
-    user.profile.isAdmin = existingArchiveUser.isAdmin;
+    user.profile.roles = existingArchiveUser.roles;
     user.profile.stones.saint = existingArchiveUser.saintStones;
     user.profile.ban = existingArchiveUser.ban;
     dbUserArchive.update(existingArchiveUser._id, { $set: { status: 'registered' } });
@@ -51,7 +51,7 @@ Accounts.onCreateUser((options, user) => {
       status: 'registered',
       name: user.profile.name,
       validateType: user.profile.validateType,
-      isAdmin: user.profile.isAdmin,
+      roles: user.profile.roles,
       saintStones: user.profile.stones.saint,
       ban: user.profile.ban
     });

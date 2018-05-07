@@ -3,11 +3,10 @@ import { Mongo } from 'meteor/mongo';
 import { Match } from 'meteor/check';
 import SimpleSchema from 'simpl-schema';
 
-import { banTypeList } from './users';
+import { banTypeList, userRoleMap } from './users';
 
 // 使用者保管庫
 export const dbUserArchive = new Mongo.Collection('userArchive');
-export default dbUserArchive;
 
 const schema = new SimpleSchema({
   // 保管狀態
@@ -29,11 +28,6 @@ const schema = new SimpleSchema({
     type: String,
     optional: true
   },
-  // 是否為金管會委員
-  isAdmin: {
-    type: Boolean,
-    defaultValue: false
-  },
   // 聖晶石數量
   saintStones: {
     type: SimpleSchema.Integer,
@@ -47,6 +41,15 @@ const schema = new SimpleSchema({
   },
   'ban.$': {
     type: new Match.OneOf(...banTypeList)
+  },
+  // 使用者的系統權限組
+  roles: {
+    type: Array,
+    defaultValue: []
+  },
+  'roles.$': {
+    type: String,
+    allowedValues: Object.keys(userRoleMap)
   }
 });
 dbUserArchive.attachSchema(schema);

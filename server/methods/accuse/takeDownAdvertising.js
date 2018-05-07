@@ -4,6 +4,7 @@ import { check } from 'meteor/check';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   takeDownAdvertising(advertisingId) {
@@ -16,19 +17,15 @@ Meteor.methods({
 });
 function takeDownAdvertising(user, advertisingId) {
   debug.log('takeDownAdvertising', { user, advertisingId });
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
-  }
-  const advertisingData = dbAdvertising.findOne(advertisingId);
-  if (! advertisingData) {
-    throw new Meteor.Error(404, '找不到識別碼為「' + advertisingId + '」的廣告！');
-  }
+
+  guardUser(user).checkHasRole('fscMember');
+
+  const { userId, message } = dbAdvertising.findByIdOrThrow(advertisingId);
+
   dbLog.insert({
     logType: '撤銷廣告',
-    userId: [user._id, advertisingData.userId],
-    data: {
-      message: advertisingData.message
-    },
+    userId: [user._id, userId],
+    data: { message },
     createdAt: new Date()
   });
   dbAdvertising.remove(advertisingId);

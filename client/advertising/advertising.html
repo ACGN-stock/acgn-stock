@@ -38,7 +38,7 @@
             <th class="text-center text-truncate" title="廣告內容">廣告內容</th>
             <th class="text-center text-truncate" style="width: 120px;" title="費用">費用</th>
             <th class="text-center text-truncate" style="width: 160px;" title="終止日期">終止日期</th>
-            {{#if currentUser.profile.isAdmin}}
+            {{#if currentUserHasRole 'fscMember'}}
               <th class="text-center" style="width: 120px;" title="管理">管理</th>
             {{/if}}
           </tr>
@@ -68,7 +68,7 @@
               <td class="text-center text-truncate text-nowrap" data-title="終止日期">
                 {{formatExpireDate advertising}}
               </td>
-              {{#if currentUser.profile.isAdmin}}
+              {{#if currentUserHasRole 'fscMember'}}
                 <td class="text-center text-nowrap" data-title="管理">
                   <button class="btn btn-danger btn-sm" type="button" data-take-down="{{advertising._id}}">
                     撤銷
@@ -78,7 +78,7 @@
             </tr>
             {{else}}
             <tr class="default-content">
-              {{#if currentUser.profile.isAdmin}}
+              {{#if currentUserHasRole 'fscMember'}}
                 <td class="text-center text-truncate p-1" colspan="5">目前沒有發布中廣告！</td>
               {{else}}
                 <td class="text-center text-truncate p-1" colspan="4">目前沒有發布中廣告！</td>
