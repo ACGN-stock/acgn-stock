@@ -11,6 +11,8 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbVariables } from '/db/dbVariables';
 import { stoneDisplayName } from '/db/dbCompanyStones';
+import { hasRole, hasAnyRoles, hasAllRoles } from '/db/users';
+
 import '../layout/highcharts-themes';
 
 Meteor.subscribe('variables');
@@ -136,7 +138,7 @@ export function isChairman(companyId) {
 }
 Template.registerHelper('isChairman', isChairman);
 
-export function isUserId(userId) {
+export function isCurrentUser(userId) {
   const user = Meteor.user();
   if (user) {
     return user._id === userId;
@@ -145,7 +147,7 @@ export function isUserId(userId) {
     return false;
   }
 }
-Template.registerHelper('isUserId', isUserId);
+Template.registerHelper('isCurrentUser', isCurrentUser);
 
 export function isFavorite(companyId) {
   const user = Meteor.user();
@@ -293,3 +295,18 @@ export function toPercent(x) {
   return `${Math.round(x * 100)}%`;
 }
 Template.registerHelper('toPercent', toPercent);
+
+export function currentUserHasRole(role) {
+  return hasRole(Meteor.user(), role);
+}
+Template.registerHelper('currentUserHasRole', currentUserHasRole);
+
+export function currentUserHasAnyRoles(...roles) {
+  return hasAnyRoles(Meteor.user(), ...roles);
+}
+Template.registerHelper('currentUserHasAnyRoles', currentUserHasAnyRoles);
+
+export function currentUserHasAllRoles(...roles) {
+  return hasAllRoles(Meteor.user(), ...roles);
+}
+Template.registerHelper('currentUserHasAllRoles', currentUserHasAllRoles);

@@ -49,7 +49,7 @@
     </h1>
     <hr />
     {{#if currentUser}}
-      {{#if currentUser.profile.isAdmin}}
+      {{#if currentUserHasRole 'fscMember'}}
         <button class="btn btn-info btn-sm mt-1" type="button" data-action="fscAnnouncement">金管會通告</button>
         {{#if isBaned 'accuse'}}
           <button class="btn btn-success btn-sm mt-1" type="button" data-ban="accuse">解除舉報禁令</button>
@@ -148,11 +148,11 @@
         <div class="text-info">將於本商業季度結束渡假。</div>
       {{/if}}
     {{/if}}
-    {{#if this.profile.isAdmin}}
-      <div>
-        是<span class="bg-warning text-white">金融管理會委員</span>。
-      </div>
-    {{/if}}
+    <div>
+      {{#each role in this.profile.roles}}
+        <span class="badge badge-warning">{{roleDisplayName role}}</span>
+      {{/each}}
+    </div>
     {{#if this.profile.revokeQualification}}
       <div class="text-danger">
         被撤銷了擔任經理人的資格！

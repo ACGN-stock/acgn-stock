@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { _ } from 'meteor/underscore';
 
-import { banTypeDescription } from '/db/users';
+import { banTypeDescription, hasRole, hasAnyRoles } from '/db/users';
 
 class UserGuard {
   constructor(user) {
@@ -50,9 +50,17 @@ class UserGuard {
     return this;
   }
 
-  checkIsAdmin() {
-    if (! this.user.profile.isAdmin) {
-      throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  checkHasRole(role) {
+    if (! hasRole(this.user, role)) {
+      throw new Meteor.Error(403, '權限不符，無法進行此操作！');
+    }
+
+    return this;
+  }
+
+  checkHasAnyRoles(...roles) {
+    if (! hasAnyRoles(this.user, ...roles)) {
+      throw new Meteor.Error(403, '權限不符，無法進行此操作！');
     }
 
     return this;

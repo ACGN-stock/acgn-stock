@@ -6,6 +6,7 @@ import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbLog } from '/db/dbLog';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   changeFoundCompanyName(companyId, newCompanyName) {
@@ -19,39 +20,19 @@ Meteor.methods({
 });
 function changeFoundCompanyName(user, companyId, newCompanyName) {
   debug.log('changeFoundCompanyName', { user, companyId, newCompanyName });
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
-  }
-  const foundCompanyData = dbFoundations.findOne(companyId, {
-    fields: {
-      companyName: 1
-    }
-  });
-  if (! foundCompanyData) {
-    throw new Meteor.Error(404, '找不到要編輯的新創計劃，該新創計劃可能已經創立成功或失敗！');
-  }
 
-  const oldCompanyName = foundCompanyData.companyName;
+  guardUser(user).checkHasRole('fscMember');
+
+  const { companyName: oldCompanyName } = dbFoundations.findByIdOrThrow(companyId, { fields: { companyName: 1 } });
 
   dbLog.insert({
     logType: '公司更名',
     userId: [user._id],
     companyId: companyId,
-    data: {
-      oldCompanyName,
-      newCompanyName
-    },
+    data: { oldCompanyName, newCompanyName },
     createdAt: new Date()
   });
-  dbFoundations.update(companyId, {
-    $set: {
-      companyName: newCompanyName
-    }
-  });
-  dbCompanyArchive.update(companyId, {
-    $set: {
-      name: newCompanyName
-    }
-  });
+  dbFoundations.update(companyId, { $set: { companyName: newCompanyName } });
+  dbCompanyArchive.update(companyId, { $set: { name: newCompanyName } });
 }
 limitMethod('changeFoundCompanyName');

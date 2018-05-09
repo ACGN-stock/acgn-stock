@@ -64,15 +64,15 @@ describe('method createProduct', function() {
     });
 
     it('should success if the user is admin', function() {
-      Meteor.users.update(userId, { $set: { 'profile.isAdmin': true } });
+      Meteor.users.update(userId, { $addToSet: { 'profile.roles': 'fscMember' } });
       const inputProductData = productFactory.build({ companyId });
       createProduct.bind(null, userId, inputProductData).must.not.throw();
     });
 
     it('should fail if the user is not admin', function() {
-      Meteor.users.update(userId, { $set: { 'profile.isAdmin': false } });
+      Meteor.users.update(userId, { $pullAll: { 'profile.roles': 'fscMember' } });
       const inputProductData = productFactory.build({ companyId });
-      createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '您並非金融管理會委員，無法進行此操作！ [403]');
+      createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '權限不符，無法進行此操作！ [403]');
     });
   });
 });

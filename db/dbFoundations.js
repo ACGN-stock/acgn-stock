@@ -1,10 +1,9 @@
-'use strict';
+import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 // 新創公司資料集
 export const dbFoundations = new Mongo.Collection('foundations');
-export default dbFoundations;
 
 const schema = new SimpleSchema({
   // 公司名稱
@@ -75,3 +74,13 @@ const schema = new SimpleSchema({
   }
 });
 dbFoundations.attachSchema(schema);
+
+dbFoundations.findByIdOrThrow = function(id, options) {
+  const result = dbFoundations.findOne(id, options);
+
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的新創計劃，該新創計劃可能已經創立成功或失敗！`);
+  }
+
+  return result;
+};

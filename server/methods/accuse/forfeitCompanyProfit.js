@@ -4,6 +4,7 @@ import { check, Match } from 'meteor/check';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   forfeitCompanyProfit({ companyId, reason, amount }) {
@@ -20,21 +21,17 @@ Meteor.methods({
 function forfeitCompanyProfit(user, { companyId, reason, amount }) {
   debug.log('forfeitCompanyProfit', { user, companyId, reason, amount });
 
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
-  }
+  guardUser(user).checkHasRole('fscMember');
 
   if (amount === 0) {
     throw new Meteor.Error(403, '罰金不得為 0！');
   }
 
-  if (dbCompanies.find(companyId).count() < 1) {
-    throw new Meteor.Error(404, `找不到識別碼為「${companyId}」的公司！`);
-  }
+  dbCompanies.findByIdOrThrow(companyId, { fields: { _id: 1 } });
 
   dbLog.insert({
     logType: amount > 0 ? '課以罰款' : '退還罰款',
-    companyId: companyId,
+    companyId,
     userId: [user._id],
     data: {
       reason,

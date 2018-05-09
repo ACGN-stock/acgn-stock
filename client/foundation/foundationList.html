@@ -127,7 +127,7 @@
         {{#if currentUser}}
           <hr class="m-0">
           <div class="row btn-group">
-            {{#if currentUser.profile.isAdmin}}
+            {{#if currentUserHasRole 'fscMember'}}
               <a class="btn btn-tab" href="{{getEditHref this._id}}">
                 修改計劃
               </a>
@@ -186,12 +186,12 @@
       </div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
-          {{#if currentUser.profile.isAdmin}}
+          {{#if currentUserHasRole 'fscMember'}}
             <a class="btn btn-warning btn-sm" href="{{getEditHref this._id}}">
               修改計劃
             </a>
           {{/if}}
-          {{#if isUserId this.manager}}
+          {{#if isCurrentUser this.manager}}
             <div class="mb-1">
               您是此創立計劃的發起人。
             </div>
