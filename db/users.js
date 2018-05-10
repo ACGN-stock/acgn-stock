@@ -37,15 +37,45 @@ export const userRoleMap = {
     displayName: '營運總管'
   },
   developer: {
-    displayName: '工程部成員'
+    displayName: '工程部成員',
+    manageableBy: ['generalManager']
   },
   planner: {
-    displayName: '企劃部成員'
+    displayName: '企劃部成員',
+    manageableBy: ['generalManager']
   },
   fscMember: {
-    displayName: '金管會成員'
+    displayName: '金管會成員',
+    manageableBy: ['generalManager']
   }
 };
+
+export function getManageableRoles(user) {
+  // 超級管理員可管理所有除自身以外的身份組
+  if (hasRole(user, 'superAdmin')) {
+    return Object.keys(userRoleMap).filter((role) => {
+      return role !== 'superAdmin';
+    });
+  }
+
+  // 其餘身份組由 userRoleMap 的設定來決定
+  return Object.entries(userRoleMap)
+    .filter(([, { manageableBy } ]) => {
+      return manageableBy && hasAnyRoles(user, ...manageableBy);
+    })
+    .map(([role]) => {
+      return role;
+    });
+}
+
+export function isRoleManageable(user, role) {
+  // 超級管理員可管理所有除自身以外的身份組
+  if (hasRole(user, 'superAdmin')) {
+    return role !== 'superAdmin';
+  }
+
+  return getManageableRoles(user).includes(role);
+}
 
 export function hasRole(user, role) {
   return user && user.profile && user.profile.roles && user.profile.roles.includes(role);
