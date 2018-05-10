@@ -4,6 +4,13 @@
       {{> accountInfoBasic}}
       <div class="card-block">
         <div class="row border-grid-body">
+          {{#if currentUserHasManageableRoles}}
+            <div class="col-12 border-grid">
+              {{#panelFolder name='manageRole' title='身份組管理' }}
+                {{> accountInfoManageRolePanel}}
+              {{/panelFolder}}
+            </div>
+          {{/if}}
           <div class="col-12 border-grid">
             {{#panelFolder name='tax' title='稅務資訊' }}
               {{> accountInfoTaxList}}
@@ -114,6 +121,9 @@
       <hr />
     {{/if}}
 
+    <div>
+      使用者識別碼：{{this._id}}
+    </div>
     <div>
       帳號驗證方式：
       {{showValidateType}}

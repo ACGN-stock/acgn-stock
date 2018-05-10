@@ -70,7 +70,7 @@ describe('method createProduct', function() {
     });
 
     it('should fail if the user is not admin', function() {
-      Meteor.users.update(userId, { $pullAll: { 'profile.roles': 'fscMember' } });
+      Meteor.users.update(userId, { $pull: { 'profile.roles': 'fscMember' } });
       const inputProductData = productFactory.build({ companyId });
       createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '權限不符，無法進行此操作！ [403]');
     });

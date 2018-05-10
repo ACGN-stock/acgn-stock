@@ -368,7 +368,17 @@ export const logTypeList = [
   /**
    * 【礦機營利】「companyId」公司的挖礦機集結眾人之力努力運轉，使其獲得了$data.profit的營利額！
    */
-  '礦機營利'
+  '礦機營利',
+
+  /**
+   * 【身份指派】userId0以「data.reason」的理由將userId1指派了data.role的身份！
+   */
+  '身份指派',
+
+  /**
+   * 【身份解除】userId0以「data.reason」的理由將userId1解除了data.role的身份！
+   */
+  '身份解除'
 ];
 
 // 金管會相關紀錄

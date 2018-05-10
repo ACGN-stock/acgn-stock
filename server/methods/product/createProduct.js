@@ -44,7 +44,7 @@ export function createProduct(userId, productData) {
   });
 
   guardCompany(companyData)
-    .checkIsManagableByUser(user)
+    .checkIsManageableByUser(user)
     .checkNotSealed();
 
   const { productPriceLimit } = companyData;

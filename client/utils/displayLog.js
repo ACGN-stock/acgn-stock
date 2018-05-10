@@ -3,6 +3,7 @@ import { _ } from 'meteor/underscore';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
+import { roleDisplayName } from '/db/users';
 import { stoneDisplayName, currencyFormat } from './helpers.js';
 
 Template.displayLog.onRendered(function() {
@@ -73,6 +74,7 @@ Template.displayLog.onRendered(function() {
     });
   });
 });
+
 Template.displayLog.helpers({
   getDescriptionHtml({ logType, userId, companyId, data = {} }) {
     const company = companySpan(companyId);
@@ -415,6 +417,12 @@ Template.displayLog.helpers({
       }
       case '礦機營利': {
         return `【礦機營利】「${company}」公司的挖礦機集結眾人之力努力運轉，使其獲得了$${currencyFormat(data.profit)}的營利額！`;
+      }
+      case '身份指派': {
+        return `【身份指派】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}指派了${roleDisplayName(data.role)}的身份！`;
+      }
+      case '身份解除': {
+        return `【身份解除】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}解除了${roleDisplayName(data.role)}的身份！`;
       }
     }
   }

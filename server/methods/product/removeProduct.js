@@ -28,7 +28,7 @@ export function removeProduct(user, productId) {
     fields: { companyName: 1, manager: 1, isSeal: 1 }
   });
 
-  guardCompany(company).checkIsManagableByUser(user);
+  guardCompany(company).checkIsManageableByUser(user);
 
   resourceManager.throwErrorIsResourceIsLock(['season']);
   dbProducts.remove(productId);

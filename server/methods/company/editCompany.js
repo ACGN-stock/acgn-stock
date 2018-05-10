@@ -37,7 +37,7 @@ function editCompany(user, companyId, newCompanyData) {
   });
 
   guardCompany(companyData)
-    .checkIsManagableByUser(user)
+    .checkIsManageableByUser(user)
     .checkNotSealed();
 
   if (newCompanyData.pictureBig && companyData.pictureBig !== newCompanyData.pictureBig) {
