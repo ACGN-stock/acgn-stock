@@ -20,7 +20,6 @@ accounts-base@1.4.0
 accounts-password@1.5.0
 percolate:migrations
 kadira:flow-router
-aldeed:collection2-core
 kadira:dochead
 meteorhacks:aggregate
 mizzao:user-status
@@ -34,3 +33,5 @@ peerlibrary:reactive-publish
 teamgrid:reactive-interval
 reactive-dict
 promise
+aldeed:collection2@3.0.0
+tmeasday:publish-counts

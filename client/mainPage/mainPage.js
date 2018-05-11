@@ -7,23 +7,29 @@ import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
 import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateText, formatTimeText, currencyFormat } from '../utils/helpers';
+import { formatDateTimeText, formatShortDurationTimeText, currencyFormat } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 
-inheritedShowLoadingOnSubscribing(Template.announcement);
+Template.mainPage.helpers({
+  websiteName() {
+    return Meteor.settings.public.websiteName;
+  }
+});
+
+inheritedShowLoadingOnSubscribing(Template.legacyAnnouncement);
 const rInEditAnnouncementMode = new ReactiveVar(false);
-Template.announcement.onCreated(function() {
+Template.legacyAnnouncement.onCreated(function() {
   rInEditAnnouncementMode.set(false);
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
     }
-    this.subscribe('announcementDetail');
+    this.subscribe('legacyAnnouncementDetail');
     this.subscribe('currentRound');
     this.subscribe('currentSeason');
   });
 });
-Template.announcement.helpers({
+Template.legacyAnnouncement.helpers({
   getTutorialHref() {
     return FlowRouter.path('tutorial');
   },
@@ -34,23 +40,23 @@ Template.announcement.helpers({
     return dbVariables.get('announcementDetail');
   }
 });
-Template.announcement.events({
-  'click [data-action="editAnnouncement"]'(event) {
+Template.legacyAnnouncement.events({
+  'click [data-action="legacyEditAnnouncement"]'(event) {
     event.preventDefault();
     rInEditAnnouncementMode.set(true);
   }
 });
 
-Template.announcementForm.onRendered(function() {
+Template.legacyAnnouncementForm.onRendered(function() {
   this.$announcementShort = this.$('#announcement-short');
   this.$announcementDetail = this.$('#announcement-detail');
 });
-Template.announcementForm.events({
+Template.legacyAnnouncementForm.events({
   submit(event, templateInstance) {
     event.preventDefault();
     const announcement = templateInstance.$announcementShort.val();
     const announcementDetail = templateInstance.$announcementDetail.val();
-    Meteor.customCall('editAnnouncement', announcement, announcementDetail);
+    Meteor.customCall('legacyEditAnnouncement', announcement, announcementDetail);
   },
   reset(event) {
     event.preventDefault();
@@ -84,7 +90,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentRound ? formatDateText(currentRound.beginDate) : '????/??/?? ??:??:??';
+    return currentRound ? formatDateTimeText(currentRound.beginDate) : '????/??/?? ??:??:??';
   },
   roundEndTime() {
     const currentRound = dbRound.findOne({}, {
@@ -93,7 +99,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentRound ? formatDateText(currentRound.endDate) : '????/??/?? ??:??:??';
+    return currentRound ? formatDateTimeText(currentRound.endDate) : '????/??/?? ??:??:??';
   },
   seasonStartTime() {
     const currentSeason = dbSeason.findOne({}, {
@@ -102,7 +108,7 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentSeason ? formatDateText(currentSeason.beginDate) : '????/??/?? ??:??:??';
+    return currentSeason ? formatDateTimeText(currentSeason.beginDate) : '????/??/?? ??:??:??';
   },
   seasonEndTime() {
     const currentSeason = dbSeason.findOne({}, {
@@ -111,37 +117,37 @@ Template.systemStatusPanel.helpers({
       }
     });
 
-    return currentSeason ? formatDateText(currentSeason.endDate) : '????/??/?? ??:??:??';
+    return currentSeason ? formatDateTimeText(currentSeason.endDate) : '????/??/?? ??:??:??';
   },
   stockPriceUpdateBegin() {
     const time = dbVariables.get('recordListPriceBegin');
 
-    return formatDateText(time ? new Date(time) : null);
+    return formatDateTimeText(time ? new Date(time) : null);
   },
   stockPriceUpdateEnd() {
     const time = dbVariables.get('recordListPriceEnd');
 
-    return formatDateText(time ? new Date(time) : null);
+    return formatDateTimeText(time ? new Date(time) : null);
   },
   highPriceReleaseBegin() {
     const time = dbVariables.get('releaseStocksForHighPriceBegin');
 
-    return formatDateText(time ? new Date(time) : null);
+    return formatDateTimeText(time ? new Date(time) : null);
   },
   highPriceReleaseEnd() {
     const time = dbVariables.get('releaseStocksForHighPriceEnd');
 
-    return formatDateText(time ? new Date(time) : null);
+    return formatDateTimeText(time ? new Date(time) : null);
   },
   noDealReleaseBegin() {
     const time = dbVariables.get('releaseStocksForNoDealBegin');
 
-    return formatDateText(time ? new Date(time) : null);
+    return formatDateTimeText(time ? new Date(time) : null);
   },
   noDealReleaseEnd() {
     const time = dbVariables.get('releaseStocksForNoDealEnd');
 
-    return formatDateText(time ? new Date(time) : null);
+    return formatDateTimeText(time ? new Date(time) : null);
   },
   updateSalaryDeadline() {
     const seasonData = dbSeason
@@ -151,12 +157,12 @@ Template.systemStatusPanel.helpers({
         }
       });
 
-    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceSalaryTime) : null);
+    return formatDateTimeText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.announceSalaryTime) : null);
   },
   updateProfitDistributionDeadline() {
     const seasonData = dbSeason.findOne({}, { sort: { beginDate: -1 } });
 
-    return formatDateText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.companyProfitDistribution.lockTime) : null);
+    return formatDateTimeText(seasonData ? new Date(seasonData.endDate.getTime() - Meteor.settings.public.companyProfitDistribution.lockTime) : null);
   },
   highPriceThreshold() {
     return currencyFormat(dbVariables.get('highPriceThreshold'));
@@ -177,7 +183,7 @@ Template.systemStatusPanel.helpers({
   taskLeftInfo(end, hour) {
     const rest = (new Date(end).getTime() - nowTime.get());
 
-    return aboutToEnd(end, hour) ? '(' + formatTimeText(rest) + ')' : '';
+    return aboutToEnd(end, hour) ? `(${formatShortDurationTimeText(rest)})` : '';
   },
   taskIsAboutToEnd(end, hour) {
     return aboutToEnd(end, hour) ? 'text-danger' : '';

@@ -60,7 +60,8 @@ export const config = {
     companyStones: 10,
     userOwnedProducts: 10,
     companyMarketingProducts: 10,
-    companyVips: 10
+    companyVips: 10,
+    announcements: 20
   },
   productFinalSaleTime: 86400000, // 產品最後出清時間 (ms)
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
@@ -118,6 +119,31 @@ export const config = {
       default: 3
     }
   },
-  newRoundFoundationRestrictionTime: 3600000 // 新賽季禁止新創的時間 (ms)
+  newRoundFoundationRestrictionTime: 3600000, // 新賽季禁止新創的時間 (ms)
+  announcement: { // 系統公告相關設定
+    plannedRuleChanges: { // 規則更動計劃
+      rejectionPetition: { // 否決連署設定
+        durationDays: { // 持續時間 (天)
+          min: 3,
+          max: 7
+        },
+        thresholdPercent: 10 // 連署門檻 (%)
+      },
+      rejectionPoll: { // 否決投票設定
+        durationDays: 3, // 持續時間 (天)
+        thresholdPercent: 15 // 投票率門檻 (%)
+      }
+    },
+    appliedRuleChanges: { // 規則更動套用
+      rejectionPetition: { // 否決連署設定
+        durationDays: 14, // 持續時間 (天)
+        thresholdPercent: 20 // 連署門檻 (%)
+      },
+      rejectionPoll: { // 否決投票設定
+        durationDays: 3, // 持續時間 (天)
+        thresholdPercent: 30 // 投票率門檻 (%)
+      }
+    }
+  }
 };
 export default config;

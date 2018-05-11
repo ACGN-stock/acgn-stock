@@ -1,0 +1,38 @@
+<template name="announcementRejectionPetition">
+  <h3>否決連署</h3>
+  <div class="row p-2">
+    <div class="col-12 col-md-6 my-2">
+      <h4>連署資訊</h4>
+      <div class="my-2">
+        {{#if isPassed}}
+          <span class="text-nowrap text-success"><i class="fa fa-check"></i> 連署已通過（於 {{formatDateTimeText petition.passedAt}}）</span>
+        {{else if isOverdue}}
+          <span class="text-nowrap text-danger"><i class="fa fa-times"></i> 已截止，連署未通過</span>
+        {{else}}
+          <span class="text-nowrap text-info"><i class="fa fa-pencil"></i> 連署進行中（尚餘 {{formatLongDurationTimeText remainingTime}}）</span>
+        {{/if}}
+      </div>
+
+      <div class="my-2">
+        截止時間：{{formatDateTimeText petition.dueAt}} <br/>
+        連署門檻：{{threshold}} 人（活躍玩家 {{petition.activeUserCount}} 人中的 {{petition.thresholdPercent}}%） <br/>
+        目前連署人數：{{signerCount}} 人
+      </div>
+
+      {{#if canSign}}
+        <button class="btn btn-sm btn-warning my-2" data-action="signRejectionPetition">我要連署</button>
+      {{/if}}
+    </div>
+
+    <div class="col-12 col-md-6 my-2">
+      <h4>連署名單</h4>
+      <ol style="max-height: 300px; overflow-y: auto">
+        {{#each userId in petition.signers}}
+          <li>{{> userLink userId }}</li>
+        {{else}}
+          <em>裡面什麼都沒有呢…</em>
+        {{/each}}
+      </ol>
+    </div>
+  </div>
+</template>

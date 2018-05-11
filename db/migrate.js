@@ -6,6 +6,7 @@ import { Migrations } from 'meteor/percolate:migrations';
 import { Promise } from 'meteor/promise';
 
 import { dbAdvertising } from './dbAdvertising';
+import { dbAnnouncements } from './dbAnnouncements';
 import { dbArena } from './dbArena';
 import { dbArenaFighters } from './dbArenaFighters';
 import { dbCompanies } from './dbCompanies';
@@ -1523,6 +1524,18 @@ if (Meteor.isServer) {
 
       // 對權限組設定建立索引
       Promise.await(Meteor.users.rawCollection().createIndex({ roles: 1 }));
+    }
+  });
+
+  Migrations.add({
+    version: 25,
+    name: 'new announcement system',
+    up() {
+      Promise.await(Promise.all([
+        dbAnnouncements.rawCollection().createIndex({ categoty: 1 }),
+        dbAnnouncements.rawCollection().createIndex({ createdAt: -1 }),
+        dbAnnouncements.rawCollection().createIndex({ readers: 1 })
+      ]));
     }
   });
 

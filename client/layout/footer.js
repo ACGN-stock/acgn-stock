@@ -96,13 +96,13 @@ Template.unreadImportantAccuseLogsNotification.events({
 });
 
 const rIsDisplayAnnouncement = new ReactiveVar(true);
-Template.displayAnnouncement.onCreated(function() {
+Template.displayLegacyAnnouncement.onCreated(function() {
   this.autorun(() => {
     dbVariables.get('announcement');
     rIsDisplayAnnouncement.set(true);
   });
 });
-Template.displayAnnouncement.helpers({
+Template.displayLegacyAnnouncement.helpers({
   isDisplay() {
     return rIsDisplayAnnouncement.get() && dbVariables.get('announcement');
   },
@@ -111,7 +111,7 @@ Template.displayAnnouncement.helpers({
   }
 });
 
-Template.displayAnnouncement.events({
+Template.displayLegacyAnnouncement.events({
   'click .btn'(event) {
     event.preventDefault();
     rIsDisplayAnnouncement.set(false);

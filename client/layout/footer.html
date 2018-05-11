@@ -3,7 +3,7 @@
     <div class={{containerClass}}>
       <div class="snackbar-container">
         {{> unreadImportantAccuseLogsNotification}}
-        {{> displayAnnouncement}}
+        {{> displayLegacyAnnouncement}}
         {{#each advertisingList}}
           {{> displayAdvertising}}
         {{/each}}
@@ -38,7 +38,7 @@
   {{/if}}
 </template>
 
-<template name="displayAnnouncement">
+<template name="displayLegacyAnnouncement">
   {{#if isDisplay}}
     <div class="media bg-info px-2 py-1 my-2 rounded footer-message-container">
       <div class="media-body footer-message">

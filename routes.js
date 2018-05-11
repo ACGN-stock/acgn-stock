@@ -4,15 +4,9 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 
-// default route
-FlowRouter.route('/', {
-  name: 'announcement',
-  action() {
-    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 系統公告');
-  }
-});
 
 export const pageNameHash = {
+  mainPage: '首頁',
   announcement: '系統公告',
   tutorial: '遊戲規則',
   instantMessage: '即時訊息',
@@ -28,6 +22,37 @@ export const pageNameHash = {
   accuseRecord: '舉報違規紀錄',
   fscStock: '金管會持股'
 };
+
+// default route
+FlowRouter.route('/', {
+  name: 'mainPage',
+  action() {
+    DocHead.setTitle(Meteor.settings.public.websiteName);
+  }
+});
+
+const announcementRoute = FlowRouter.group({
+  prefix: '/announcement',
+  name: 'announcementRoute'
+});
+announcementRoute.route('/', {
+  name: 'announcementList',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 系統公告`);
+  }
+});
+announcementRoute.route('/view/:announcementId', {
+  name: 'announcementDetail',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 系統公告內容`);
+  }
+});
+announcementRoute.route('/new', {
+  name: 'createAnnouncement',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 新增系統公告`);
+  }
+});
 
 FlowRouter.route('/fscStock', {
   name: 'fscStock',
