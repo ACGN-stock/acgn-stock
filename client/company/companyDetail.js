@@ -960,9 +960,14 @@ Template.companyElectInfo.helpers({
     return candidateList && candidateList.length > 1;
   },
   canContendManager() {
-    const { beginDate: seasonBeginDate } = getCurrentSeason();
+    const { contendManagerEndTime, electManagerTime } = Meteor.settings.public;
+    const { beginDate: seasonBeginDate, endDate: seasonEndDate } = getCurrentSeason();
 
-    if (Date.now() - seasonBeginDate.getTime() > Meteor.settings.public.contendManagerEndTime) {
+    const contendManagerEndTimePassed = Date.now() - seasonBeginDate.getTime() > contendManagerEndTime;
+    const electManagerTimePassed = seasonEndDate.getTime() - Date.now() < electManagerTime;
+
+    // 在經理參選報名截止後，至經理完成選舉之前，禁止參選
+    if (contendManagerEndTimePassed && ! electManagerTimePassed) {
       return false;
     }
 
