@@ -9,7 +9,7 @@ import { dbDirectors } from '/db/dbDirectors';
 import { dbOrders } from '/db/dbOrders';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, toggleFavorite } from '../utils/methods';
-import { isUserId, isChairman } from '../utils/helpers';
+import { isCurrentUser, isChairman, currentUserHasRole } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 import { rCompanyListViewMode } from '../utils/styles';
 
@@ -164,7 +164,7 @@ const companyListHelpers = {
     if (isChairman(companyData._id)) {
       return 'company-card-chairman';
     }
-    if (isUserId(companyData.manager)) {
+    if (isCurrentUser(companyData.manager)) {
       return 'company-card-manager';
     }
     const amount = companyListHelpers.getStockAmount(companyData._id);
@@ -210,6 +210,9 @@ const companyListHelpers = {
     const userId = Meteor.user()._id;
 
     return dbOrders.find({ companyId, userId });
+  },
+  currentUserCanManage(company) {
+    return isCurrentUser(company.manager) || currentUserHasRole('fscMember');
   }
 };
 const companyListEvents = {

@@ -1,0 +1,46 @@
+<template name="accountInfoManageRolePanel">
+  <div class="row">
+    <div class="col-12 my-2">
+      <form class="form-inline align-items-center" name="assignRoleForm" action="#">
+        <select class="form-control form-control-sm" name="role">
+          <option value="" class="d-none" hidden>選擇身份組…</option>
+          {{#each role in assignableRoles}}
+            <option value="{{role}}">{{roleDisplayName role}}</option>
+          {{else}}
+            <option value="" disabled>沒有可指派的身份組！</option>
+          {{/each}}
+        </select>
+        <button type="submit" class="btn btn-sm btn-primary">指派身份組</button>
+      </form>
+    </div>
+    <div class="col-12 my-2">
+      <h5>已指派的身份組</h5>
+      <table class="table table-bordered mt-3 w-100 custom-responsive-table-md" style="table-layout: fixed;">
+        <thead>
+          <tr>
+            <th class="text-center text-nowrap">身份組</th>
+            <th class="text-center text-nowrap" style="width: 95px">管理</th>
+          </tr>
+        </thead>
+        <tbody>
+        {{#each role in this.profile.roles}}
+          <tr>
+            <td class="text-center text-truncate text-nowrap px-md-1 py-1" data-title="身份組">
+              {{roleDisplayName role}}
+            </td>
+            <td class="text-center text-truncate text-nowrap px-md-1 py-1" data-title="管理">
+              {{#if isRoleManageable role}}
+                <a href="#" class="btn btn-sm btn-danger" data-unassign-role="{{role}}"><i class="fa fa-times" aria-hidden="true"></i> 解除</a>
+              {{/if}}
+            </td>
+          </tr>
+        {{else}}
+          <tr class="default-content">
+            <td class="text-center text-truncate p-1" colspan="2">查無資料！</td>
+          </tr>
+        {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>

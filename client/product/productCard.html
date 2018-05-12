@@ -45,7 +45,7 @@
           {{product.voteCount}}
         </button>
       </div>
-      {{#if isAdmin}}
+      {{#if currentUserHasRole 'fscMember'}}
         <div class="my-1">
           <button class="btn btn-sm btn-danger" title="修改" data-edit-product="{{product._id}}">修改</button>
           <button class="btn btn-sm btn-danger" title="下架" data-ban-product="{{product._id}}">下架</button>

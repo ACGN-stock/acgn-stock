@@ -22,7 +22,7 @@ function banProduct({ userId, productId, message }) {
   debug.log('banProduct', { userId, productId, message });
 
   const user = Meteor.users.findByIdOrThrow(userId);
-  guardUser(user).checkIsAdmin();
+  guardUser(user).checkHasRole('fscMember');
 
   const { companyId, productName, profit } = dbProducts.findByIdOrThrow(productId);
 

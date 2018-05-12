@@ -7,6 +7,7 @@ import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { banTypeList } from '/db/users';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   banUser({ userId, message, banType }) {
@@ -21,19 +22,12 @@ Meteor.methods({
 });
 function banUser(user, { userId, message, banType }) {
   debug.log('banUser', { user, userId, message, banType });
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
-  }
-  const accuseUserData = Meteor.users.findOne(userId, {
-    fields: {
-      _id: 1,
-      'profile.ban': 1
-    }
-  });
-  if (! accuseUserData) {
-    throw new Meteor.Error(404, '找不到識別碼為「' + userId + '」的使用者！');
-  }
+
+  guardUser(user).checkHasRole('fscMember');
+
+  const accuseUserData = Meteor.users.findByIdOrThrow(userId, { fields: { 'profile.ban': 1 } });
   const oldBanList = accuseUserData.profile.ban;
+
   let logType;
   let newBanList;
   if (_.contains(oldBanList, banType)) {
@@ -83,26 +77,14 @@ function banUser(user, { userId, message, banType }) {
       case 'manager': {
         logType = '禁任經理';
         dbCompanies
-          .find(
-            {
-              $or: [
-                {
-                  manager: userId
-                },
-                {
-                  candidateList: userId
-                }
-              ]
-            },
-            {
-              fields: {
-                _id: 1,
-                manager: 1,
-                candidateList: 1,
-                voteList: 1
-              }
+          .find({ $or: [ { manager: userId }, { candidateList: userId } ] }, {
+            fields: {
+              _id: 1,
+              manager: 1,
+              candidateList: 1,
+              voteList: 1
             }
-          )
+          })
           .forEach((companyData) => {
             dbLog.insert({
               logType: '撤職紀錄',
@@ -126,27 +108,15 @@ function banUser(user, { userId, message, banType }) {
               }
             });
           });
-        dbFoundations.update(
-          {
-            manager: userId
-          },
-          {
-            $set: {
-              manager: '!none'
-            }
-          }
-        );
+        dbFoundations.update({ manager: userId }, { $set: { manager: '!none' } });
 
         break;
       }
     }
   }
+
   if (logType && newBanList) {
-    Meteor.users.update(userId, {
-      $set: {
-        'profile.ban': newBanList
-      }
-    });
+    Meteor.users.update(userId, { $set: { 'profile.ban': newBanList } });
     dbLog.insert({
       logType: logType,
       userId: [user._id, userId],

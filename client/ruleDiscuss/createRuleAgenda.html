@@ -3,7 +3,7 @@
     <div class="card-block">
       <h1 class="card-title mb-1">建立新議程</h1>
       <hr />
-      {{#if currentUser.profile.isAdmin}}
+      {{#if currentUserHasRole 'planner'}}
         {{#with defaultData}}
           {{> ruleAgendaForm}}
         {{/with}}

@@ -6,6 +6,7 @@ import { dbRuleIssues } from '/db/dbRuleIssues';
 import { dbRuleIssueOptions } from '/db/dbRuleIssueOptions';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   takeDownRuleAgenda(agendaId) {
@@ -18,17 +19,10 @@ Meteor.methods({
 });
 function takeDownRuleAgenda(user, agendaId) {
   debug.log('takeDownRuleAgenda', { user, agendaId });
-  const agenda = dbRuleAgendas.findOne(agendaId, {
-    fields: {
-      issues: 1
-    }
-  });
-  if (! agenda) {
-    throw new Meteor.Error(404, '議程不存在！');
-  }
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '非金管委員不得撤銷議程！');
-  }
+
+  guardUser(user).checkHasRole('planner');
+
+  const agenda = dbRuleAgendas.findByIdOrThrow(agendaId, { fields: { issues: 1 } });
 
   let options = [];
   agenda.issues.forEach((issueId) => {
@@ -38,16 +32,8 @@ function takeDownRuleAgenda(user, agendaId) {
     }
   });
 
-  dbRuleIssueOptions.remove({
-    _id: {
-      $in: options
-    }
-  });
-  dbRuleIssues.remove({
-    _id: {
-      $in: agenda.issues
-    }
-  });
+  dbRuleIssueOptions.remove({ _id: { $in: options } });
+  dbRuleIssues.remove({ _id: { $in: agenda.issues } });
   dbRuleAgendas.remove(agendaId);
 }
 // 二十秒鐘最多一次

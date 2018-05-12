@@ -119,20 +119,9 @@
               </ol>
               <li>要維持股市市場的健康運作，適當的人工介入是必需的，目前的金管會加入<a href="https://www.ptt.cc/bbs/ACGN_stock/M.1509025008.A.ABF.html" target="_blank">章程</a>在此，制定的規則<a href="https://docs.google.com/document/d/1INBDMg1MFOcEucdJDO57qIkTsFR7iNiZpC2JW2qoYso/edit" target="_blank">在此</a>，成員如下：</li>
               <ol>
-                <li>{{> userLink '2HFha7H4TviS3Pbra'}}</li>
-                <li>{{> userLink 'Kq6PFRE4MBoSrynNy'}}</li>
-                <li>{{> userLink 'XhF3mWuGjmkmtxb26'}}</li>
-                <li>{{> userLink '5twbaLu2q2KauA6n6'}}</li>
-                <li>{{> userLink 'bh7yDRqxmkvxWPox2'}}</li>
-                <li>{{> userLink '5yc4uqEmrauzHKGKH'}}</li>
-                <li>{{> userLink 'b9hfWqHMdEnnZfnmh'}}</li>
-                <li>{{> userLink 'JvTYK97p3K9Ff5DGS'}}</li>
-                <li>{{> userLink '2MnixRrWRWFsYuqa9'}}</li>
-                <li>{{> userLink 'phcAQGMJTXBWYTdBC'}}</li>
-                <li>{{> userLink 'Ep7qv65hM3x7jf3zR'}}</li>
-                <li>{{> userLink 'ysWH2DiKFG7gZWG5S'}}</li>
-                <li>{{> userLink 'RqQivWo4eSnFrKJTX'}}</li>
-                <li>{{> userLink 'LqeYNy7zE5sEAo3DQ'}}</li>
+                {{#each userId in fscMembers}}
+                  <li>{{> userLink userId}}</li>
+                {{/each}}
               </ol>
             </ol>
           </div>

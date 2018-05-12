@@ -3,6 +3,7 @@ import { check, Match } from 'meteor/check';
 
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   fscAnnouncement({ userIds, companyId, message }) {
@@ -17,9 +18,8 @@ Meteor.methods({
 });
 function fscAnnouncement(user, { userIds, companyId, message }) {
   debug.log('fscAnnouncement', { user, userIds, message });
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
-  }
+
+  guardUser(user).checkHasRole('fscMember');
 
   const nonEmptyUserIds = userIds.filter((id) => {
     return id && id !== '!none';

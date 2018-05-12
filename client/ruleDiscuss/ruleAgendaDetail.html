@@ -4,7 +4,7 @@
       <div class="card-block">
         <h1 class="card-title text-truncate">
           {{this.title}}
-          {{#if currentUser.profile.isAdmin}}
+          {{#if currentUserHasRole 'planner'}}
             <button class="btn btn-danger float-right" data-action="takeDownRuleAgenda">撤銷</button>
           {{/if}}
           {{#if currentUser}}
@@ -19,7 +19,7 @@
         <h3>
           提案人：
           {{>userLink this.proposer}}
-          {{#if currentUser.profile.isAdmin}}
+          {{#if currentUserHasRole 'planner'}}
             <button class="btn btn-primary btn-sm" data-action="updateAgendaProposer">修改</button>
           {{/if}}
         </h3>

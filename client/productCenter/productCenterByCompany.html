@@ -35,7 +35,7 @@
           推薦數
           {{{getSortIcon 'voteCount'}}}
         </th>
-        {{#if currentUser.profile.isAdmin}}
+        {{#if currentUserHasRole 'fscMember'}}
           <th class="text-center" style="width: 120px;" title="管理">
             管理
           </th>
@@ -62,7 +62,7 @@
               <i class="fa fa-ticket" aria-hidden="true"></i>
             </button>
           </td>
-          {{#if currentUser.profile.isAdmin}}
+          {{#if currentUserHasRole 'fscMember'}}
             <td class="text-center" data-title="管理">
               <button class="btn btn-sm btn-danger" title="修改" data-edit-product="{{product._id}}">修改</button>
               <button class="btn btn-sm btn-danger" title="下架" data-ban-product="{{product._id}}">下架</button>

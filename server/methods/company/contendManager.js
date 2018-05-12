@@ -20,10 +20,15 @@ Meteor.methods({
 });
 export function contendManager(user, companyId) {
   debug.log('contendManager', { user, companyId });
-  const { beginDate: seasonBeginDate } = getCurrentSeason();
+  const { contendManagerEndTime, electManagerTime } = Meteor.settings.public;
+  const { beginDate: seasonBeginDate, endDate: seasonEndDate } = getCurrentSeason();
 
-  if (Date.now() - seasonBeginDate.getTime() > Meteor.settings.public.contendManagerEndTime) {
-    throw new Meteor.Error(403, '經理選舉報名時間已過！');
+  const contendManagerEndTimePassed = Date.now() - seasonBeginDate.getTime() > contendManagerEndTime;
+  const electManagerTimePassed = seasonEndDate.getTime() - Date.now() < electManagerTime;
+
+  // 在經理參選報名截止後，至經理完成選舉之前，禁止參選
+  if (contendManagerEndTimePassed && ! electManagerTimePassed) {
+    throw new Meteor.Error(403, '本次經理選舉報名時間已過！');
   }
 
   if (user.profile.isInVacation) {

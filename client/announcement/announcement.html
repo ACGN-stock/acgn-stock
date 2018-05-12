@@ -5,7 +5,7 @@
         <div class="text-nowrap">
           系統公告
         </div>
-        {{#if currentUser.profile.isAdmin}}
+        {{#if currentUserHasAnyRoles 'developer' 'planner' 'fscMember'}}
           <div class="d-flex flex-wrap justify-content-end ml-auto">
             <button class="btn btn-warning btn-sm" type="button" data-action="editAnnouncement">
               <i class="fa fa-pencil-square-o" aria-hidden="true"></i>

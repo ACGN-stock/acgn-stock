@@ -9,6 +9,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbVips } from '/db/dbVips';
+import { roleDisplayName, getManageableRoles } from '/db/users';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -45,6 +46,9 @@ Template.accountInfo.helpers({
   ...accountInfoCommonHelpers,
   isDisplayPanel(panelType) {
     return _.contains(rDisplayPanelList.get(), panelType);
+  },
+  currentUserHasManageableRoles() {
+    return getManageableRoles(Meteor.user());
   }
 });
 Template.accountInfo.events({
@@ -64,6 +68,7 @@ Template.accountInfo.events({
 
 Template.accountInfoBasic.helpers({
   ...accountInfoCommonHelpers,
+  roleDisplayName,
   showValidateType() {
     switch (this.profile.validateType) {
       case 'Google': {
