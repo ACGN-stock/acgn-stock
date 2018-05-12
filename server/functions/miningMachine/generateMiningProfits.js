@@ -22,7 +22,7 @@ export function generateMiningProfits() {
           return sum + (stonePowerTable[stoneType] || 0);
         }, 0);
       const gradeFactor = gradeFactorTable.miningMachine[grade] || 0;
-      const profitIncrease = Math.round(6300 * Math.log10(totalPower + 1) * Math.pow(totalPower, gradeFactor));
+      const profitIncrease = Math.round(6300 * Math.log10(totalPower + 1) * Math.pow(totalPower + 1, gradeFactor));
 
       if (profitIncrease > 0) {
         companyProfitIncreaseMap[companyId] = profitIncrease;

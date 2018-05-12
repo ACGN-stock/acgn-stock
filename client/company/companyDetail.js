@@ -13,7 +13,7 @@ import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
-import { dbSeason } from '/db/dbSeason';
+import { dbSeason, getCurrentSeason } from '/db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, toggleFavorite } from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
@@ -960,6 +960,17 @@ Template.companyElectInfo.helpers({
     return candidateList && candidateList.length > 1;
   },
   canContendManager() {
+    const { contendManagerEndTime, electManagerTime } = Meteor.settings.public;
+    const { beginDate: seasonBeginDate, endDate: seasonEndDate } = getCurrentSeason();
+
+    const contendManagerEndTimePassed = Date.now() - seasonBeginDate.getTime() > contendManagerEndTime;
+    const electManagerTimePassed = seasonEndDate.getTime() - Date.now() < electManagerTime;
+
+    // 在經理參選報名截止後，至經理完成選舉之前，禁止參選
+    if (contendManagerEndTimePassed && ! electManagerTimePassed) {
+      return false;
+    }
+
     const user = Meteor.user();
     if (user && ! user.profile.revokeQualification) {
       return ! _.contains(this.candidateList, user._id);
