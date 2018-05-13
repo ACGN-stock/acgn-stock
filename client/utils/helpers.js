@@ -277,8 +277,7 @@ export function markdown(content, disableAdvance = true) {
   else {
     extensionsArray.push(katexExtension);
     // 利用<p></p>避免Markdown預先轉譯KaTeX轉譯區塊
-    preprocessContent = preprocessContent.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
-
+    preprocessContent = preprocessContent.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match) {
       return `<p>${match}</p>`;
     });
   }
