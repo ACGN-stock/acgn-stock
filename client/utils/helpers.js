@@ -276,11 +276,10 @@ export function markdown(content, disableAdvance = true) {
   }
   else {
     extensionsArray.push(katexExtension);
+    // 利用<p></p>避免Markdown預先轉譯KaTeX轉譯區塊
     preprocessContent = preprocessContent.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
-      // \->\\避免showdown吃掉\符號導致KaTeX無法正確處理.
-      const text = capture.replace(/\\/g, '\\\\');
 
-      return `$$${text}$$`;
+      return `<p>${match}</p>`;
     });
   }
   const converter = new showdown.Converter({ extensions: extensionsArray });
