@@ -117,8 +117,7 @@ const schema = new SimpleSchema({
         type: String
       }
     }),
-    optional: true,
-    defaultValue: undefined
+    optional: true
   },
   // 否決投票
   rejectionPoll: {
@@ -154,8 +153,7 @@ const schema = new SimpleSchema({
         type: String
       }
     }),
-    optional: true,
-    defaultValue: undefined
+    optional: true
   }
 });
 dbAnnouncements.attachSchema(schema);
