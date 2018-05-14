@@ -53,6 +53,12 @@ announcementRoute.route('/new', {
     DocHead.setTitle(`${Meteor.settings.public.websiteName} - 新增系統公告`);
   }
 });
+announcementRoute.route('/reject/:announcementId', {
+  name: 'rejectAnnouncement',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 系統公告否決`);
+  }
+});
 
 FlowRouter.route('/fscStock', {
   name: 'fscStock',

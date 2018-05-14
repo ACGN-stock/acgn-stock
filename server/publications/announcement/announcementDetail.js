@@ -16,26 +16,14 @@ Meteor.publish('announcementDetail', function(announcementId) {
   }
 
   const transformFields = (fields) => {
-    const result = { ...fields };
+    const result = { ..._.omit(fields, 'rejectionPetition', 'rejectionPoll') };
+
+    if (fields.rejectionPetition) {
+      result.hasRejectionPetition = !! fields.rejectionPetition;
+    }
 
     if (fields.rejectionPoll) {
-      const { dueAt, yesVotes, noVotes } = fields.rejectionPoll;
-
-      // 標記目前使用者的投票選項
-      if (this.userId) {
-        const hasVotedYes = yesVotes.includes(this.userId);
-        const hasVotedNo = noVotes.includes(this.userId);
-
-        Object.assign(result.rejectionPoll, {
-          currentUserChoice: hasVotedYes ? 'yes' : hasVotedNo ? 'no' : undefined
-        });
-      }
-
-      // 在尚未截止時隱藏投票名單
-      // NOTE: 由於此處判斷的方式，投票結束後，一般需要重新訂閱（i.e., 重新進入頁面），以正確拿到投票名單
-      if (Date.now() < dueAt.getTime()) {
-        result.rejectionPoll = _.omit(result.rejectionPoll, 'yesVotes', 'noVotes');
-      }
+      result.hasRejectionPoll = !! fields.rejectionPoll;
     }
 
     return result;
