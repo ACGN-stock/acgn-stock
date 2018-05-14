@@ -5,8 +5,11 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import { dbAnnouncements, announcementCategoryMap, categoryDisplayName } from '/db/dbAnnouncements';
+import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { canCreateAnnouncement } from './helpers';
+
+inheritedShowLoadingOnSubscribing(Template.announcementList);
 
 Template.announcementList.onCreated(function() {
   this.onlyUnread = new ReactiveVar(false);

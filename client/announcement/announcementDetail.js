@@ -4,8 +4,11 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { hasAnyRoles } from '/db/users';
 import { categoryDisplayName } from '/db/dbAnnouncements';
+import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { paramAnnouncementId, paramAnnouncement } from './helpers';
+
+inheritedShowLoadingOnSubscribing(Template.announcementDetail);
 
 Template.announcementDetail.onCreated(function() {
   this.autorunWithIdleSupport(() => {
