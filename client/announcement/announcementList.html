@@ -26,18 +26,22 @@
               {{/each}}
             </select>
           </div>
-          <button class="btn btn-sm btn-info ml-1" type="button" name="onlyUnread">
-            {{#if onlyUnread}}
-              <i class="fa fa-check-square-o"></i>
-            {{else}}
-              <i class="fa fa-square-o"></i>
-            {{/if}}
-            只顯示未讀
-          </button>
+          {{#if currentUser}}
+            <button class="btn btn-sm btn-info ml-1" type="button" name="onlyUnread">
+              {{#if onlyUnread}}
+                <i class="fa fa-check-square-o"></i>
+              {{else}}
+                <i class="fa fa-square-o"></i>
+              {{/if}}
+              只顯示未讀
+            </button>
+          {{/if}}
         </div>
-        <div class="ml-auto">
-          <a class="btn btn-sm btn-danger" href="#" data-action="markAllAsRead">全部標為已讀</a>
-        </div>
+        {{#if currentUser}}
+          <div class="ml-auto">
+            <a class="btn btn-sm btn-danger" href="#" data-action="markAllAsRead">全部標為已讀</a>
+          </div>
+        {{/if}}
       </div>
       <table class="table-bordered custom-responsive-table-md w-100">
         <thead>
