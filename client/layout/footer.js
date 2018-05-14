@@ -1,8 +1,9 @@
-'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
+import { Counts } from 'meteor/tmeasday:publish-counts';
+
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbVariables } from '/db/dbVariables';
 import { rMainTheme } from '../utils/styles';
@@ -123,5 +124,35 @@ Template.displayAdvertising.events({
     event.preventDefault();
     const closedAdvertisingIdList = rClosedAdvertisingIdList.get().slice();
     rClosedAdvertisingIdList.set(_.union(closedAdvertisingIdList, templateInstance.data._id));
+  }
+});
+
+Template.displayAnnouncementUnreadNotification.onCreated(function() {
+  this.rIsDisplay = new ReactiveVar(false);
+
+  this.autorunWithIdleSupport(() => {
+    const user = Meteor.user();
+    if (! user) {
+      return;
+    }
+
+    this.subscribe('currentUserUnreadAnnouncementCount');
+  });
+
+  this.autorunWithIdleSupport(() => {
+    this.rIsDisplay.set(Counts.get('currentUserUnreadAnnouncements') > 0);
+  });
+});
+
+Template.displayAnnouncementUnreadNotification.helpers({
+  isDisplay() {
+    return Template.instance().rIsDisplay.get();
+  }
+});
+
+Template.displayAnnouncementUnreadNotification.events({
+  'click .btn'(event, templateInstance) {
+    event.preventDefault();
+    templateInstance.rIsDisplay.set(false);
   }
 });
