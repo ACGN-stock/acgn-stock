@@ -55,7 +55,7 @@ Template.announcementRejectionPoll.helpers({
   remainingTime() {
     reactiveInterval(500);
 
-    const { dueAt } = paramAnnouncement().rejectionPetition;
+    const { dueAt } = paramAnnouncement().rejectionPoll;
 
     return Math.max(dueAt.getTime() - Date.now(), 0);
   }

@@ -36,7 +36,7 @@ export function signRejectionPetition(currentUser, args, resourceLocked = false)
   }
 
   const { dueAt, signers, thresholdPercent, activeUserCount } = petition;
-  const threshold = Math.floor(activeUserCount * thresholdPercent / 100);
+  const threshold = Math.ceil(activeUserCount * thresholdPercent / 100);
 
   if (nowDate.getTime() > dueAt.getTime()) {
     throw new Meteor.Error(403, '連署時間已過！');

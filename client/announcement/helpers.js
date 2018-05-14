@@ -14,7 +14,7 @@ export function paramAnnouncement() {
 }
 
 export function computeThreshold({ thresholdPercent, activeUserCount }) {
-  return Math.floor(activeUserCount * thresholdPercent / 100);
+  return Math.ceil(activeUserCount * thresholdPercent / 100);
 }
 
 

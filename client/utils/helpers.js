@@ -139,7 +139,7 @@ export function formatLongDurationTimeText(time) {
     time >= hourBase ? `${hours} 時` : '',
     time >= minuteBase ? `${minutes} 分` : '',
     time >= secondBase ? `${seconds} 秒` : ''
-  ].join(' ');
+  ].join(' ').trim();
 }
 Template.registerHelper('formatLongDurationTimeText', formatLongDurationTimeText);
 
