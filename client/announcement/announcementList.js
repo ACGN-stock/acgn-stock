@@ -5,6 +5,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import { dbAnnouncements, announcementCategoryMap, categoryDisplayName } from '/db/dbAnnouncements';
+import { alertDialog } from '../layout/alertDialog';
 import { canCreateAnnouncement } from './helpers';
 
 Template.announcementList.onCreated(function() {
@@ -29,6 +30,20 @@ Template.announcementList.events({
   'click button[name="onlyUnread"]'(event, templateInstance) {
     event.preventDefault();
     templateInstance.onlyUnread.set(! templateInstance.onlyUnread.get());
+  },
+  'click [data-action="markAllAsRead"]'(event) {
+    event.preventDefault();
+
+    alertDialog.confirm({
+      message: '確定要將所有公告標為已讀嗎？',
+      callback(result) {
+        if (! result) {
+          return;
+        }
+
+        Meteor.customCall('markAllAnnouncementsAsRead');
+      }
+    });
   }
 });
 

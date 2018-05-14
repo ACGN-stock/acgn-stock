@@ -13,20 +13,20 @@
         {{/if}}
       </h1>
       <hr />
-      <div class="form-inline my-2">
-        <div class="input-group input-group-sm">
-          <div class="input-group-addon">顯示分類</div>
-          <select class="form-control" name="category">
-            <option value="">全部分類</option>
-            {{#each category in categoryList}}
-              <option value="{{category}}" {{categorySelectedAttr category}}>
-                {{categoryDisplayName category}}
-              </option>
-            {{/each}}
-          </select>
-        </div>
-        <div class="ml-2">
-          <button class="btn btn-sm btn-info" type="button" name="onlyUnread">
+      <div class="d-flex flex-wrap align-items-center">
+        <div class="form-inline my-2">
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon">顯示分類</div>
+            <select class="form-control" name="category">
+              <option value="">全部分類</option>
+              {{#each category in categoryList}}
+                <option value="{{category}}" {{categorySelectedAttr category}}>
+                  {{categoryDisplayName category}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+          <button class="btn btn-sm btn-info ml-1" type="button" name="onlyUnread">
             {{#if onlyUnread}}
               <i class="fa fa-check-square-o"></i>
             {{else}}
@@ -34,6 +34,9 @@
             {{/if}}
             只顯示未讀
           </button>
+        </div>
+        <div class="ml-auto">
+          <a class="btn btn-sm btn-danger" href="#" data-action="markAllAsRead">全部標為已讀</a>
         </div>
       </div>
       <table class="table-bordered custom-responsive-table-md w-100">
