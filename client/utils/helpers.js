@@ -243,7 +243,7 @@ Template.registerHelper('round', Math.round);
 const katexExtension = {
   type: 'output',
   filter: function(text) {
-    const outputKatexHTML = text.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
+    const outputKatexHTML = text.replace(/<p>\$\$((.|\r|\n)*?)\$\$<\/p>/g, function(match, capture) {
       const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/<br \/>/g, '');
 
       return katex.renderToString(text);
