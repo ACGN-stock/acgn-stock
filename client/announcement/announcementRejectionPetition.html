@@ -20,12 +20,12 @@
       </div>
 
       {{#if canSign}}
-        <button class="btn btn-sm btn-warning my-2" data-action="signRejectionPetition">我要連署</button>
+        <button class="btn btn-sm btn-warning m-1" data-action="signRejectionPetition">連署支持本次否決</button>
       {{/if}}
     </div>
 
     <div class="col-12 col-md-6 my-2">
-      <h4>連署名單</h4>
+      <h4>支持否決名單</h4>
       <ol style="max-height: 300px; overflow-y: auto">
         {{#each userId in petition.signers}}
           <li>{{> userLink userId }}</li>

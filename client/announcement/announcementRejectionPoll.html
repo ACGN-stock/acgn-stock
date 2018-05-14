@@ -20,16 +20,20 @@
 
       {{#if choiceMatches 'yes'}}
         <div class="my-2">
-          您已經投下了<span class="text-success">贊成</span>票。
+          您已經對本次否決投下了<span class="text-success">贊成</span>票。
         </div>
       {{else if choiceMatches 'no'}}
         <div class="my-2">
-          您已經投下了<span class="text-danger">反對</span>票。
+          您已經對本次否決投下了<span class="text-danger">反對</span>票。
         </div>
       {{else if canVote}}
         <div class="my-2">
-          <button class="btn btn-sm btn-warning" data-vote="yes">贊成</button>
-          <button class="btn btn-sm btn-warning" data-vote="no">反對</button>
+          <button class="btn btn-sm btn-warning" data-vote="yes">
+            <i class="fa fa-check"></i> 贊成本次否決
+          </button>
+          <button class="btn btn-sm btn-warning" data-vote="no">
+            <i class="fa fa-times"></i> 反對本次否決
+          </button>
         </div>
       {{/if}}
     </div>
