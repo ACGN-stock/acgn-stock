@@ -243,10 +243,19 @@ Template.registerHelper('round', Math.round);
 const katexExtension = {
   type: 'output',
   filter: function(text) {
-    const outputKatexHTML = text.replace(/<p>\$\$((.|\r|\n)*?)\$\$<\/p>/g, function(match, capture) {
-      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/<br \/>/g, '');
+    const inlinePattern = '(.*?)';
+    const blockPattern = '((.|\\r|\\n)*?)';
+    const katexRegex = new RegExp(`<p>\\$\\$(${inlinePattern}|${blockPattern})\\$\\$</p>`, 'g');
 
-      return katex.renderToString(text);
+    const outputKatexHTML = text.replace(katexRegex, function(match, capture, inlineCapture) {
+      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/<br \/>/g, '');
+      let html = katex.renderToString(text);
+
+      if (inlineCapture === undefined) {
+        html = `<p>${html}</p>`;
+      }
+
+      return html;
     });
 
     return outputKatexHTML;
