@@ -18,7 +18,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, toggleFavorite } from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat, setChartTheme } from '../utils/helpers.js';
+import { currencyFormat, setChartTheme } from '../utils/helpers';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { globalVariable } from '../utils/globalVariable';
 

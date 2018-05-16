@@ -58,7 +58,8 @@
       "companyStones": 10,
       "userOwnedProducts": 10,
       "companyMarketingProducts": 10,
-      "companyVips": 10
+      "companyVips": 10,
+      "announcements": 20
     },
     "productFinalSaleTime": 86400000,
     "systemProductVotingReward": 4096,
@@ -117,6 +118,31 @@
         "default": 3
       }
     },
-    "newRoundFoundationRestrictionTime": 3600000
+    "newRoundFoundationRestrictionTime": 3600000,
+    "announcement": {
+      "plannedRuleChanges": {
+        "rejectionPetition": {
+          "durationDays": {
+            "min": 3,
+            "max": 7
+          },
+          "thresholdPercent": 10
+        },
+        "rejectionPoll": {
+          "durationDays": 3,
+          "thresholdPercent": 15
+        }
+      },
+      "appliedRuleChanges": {
+        "rejectionPetition": {
+          "durationDays": 14,
+          "thresholdPercent": 20
+        },
+        "rejectionPoll": {
+          "durationDays": 3,
+          "thresholdPercent": 30
+        }
+      }
+    }
   }
 }

@@ -176,10 +176,10 @@
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
         {{/if}}
       </div>
-      <div class="media-body d-none d-md-block company-description"><h1>角色簡介</h1>{{{markdown this.description}}}</div>
+      <div class="media-body d-none d-md-block company-description markdown-container"><h1>角色簡介</h1>{{{markdown this.description}}}</div>
     </div>
     <div class="row border-grid-body" style="margin-top: 15px;">
-      <div class="col-12 border-grid d-block d-md-none company-description"><h1>角色簡介</h1>{{{markdown this.description}}}</div>
+      <div class="col-12 border-grid d-block d-md-none company-description markdown-container"><h1>角色簡介</h1>{{{markdown this.description}}}</div>
       <div class="col-12 border-grid stock-price-history">
         <a class="d-block h4 my-1" href="#" data-toggle-panel="chart">
           股價趨勢
@@ -257,7 +257,7 @@
         </div>
         <div class="col-8 col-md-4 col-lg-3 border-grid d-flex flex-column align-items-center justify-content-between">
           <span class="text-nowrap">創立時間</span>
-          <span class="text-nowrap">{{formatDateText this.createdAt}}</span>
+          <span class="text-nowrap">{{formatDateTimeText this.createdAt}}</span>
         </div>
       {{/if}}
       <div class="col-12 border-grid">
@@ -630,8 +630,8 @@
             {{>userLink employee.userId}}
           </div>
           <div class="grid-table-hidden-title">報名時間</div>
-          <div class="col-md-3 grid-table-content" title="{{formatDateText employee.registerAt}}">
-            {{formatDateText employee.registerAt}}
+          <div class="col-md-3 grid-table-content" title="{{formatDateTimeText employee.registerAt}}">
+            {{formatDateTimeText employee.registerAt}}
           </div>
           <div class="grid-table-hidden-title">留言</div>
           <div class="col-md-7 grid-table-content" title="{{showMessage employee.message}}" style="word-break: break-all;">
@@ -683,7 +683,7 @@
           </div>
           <div class="grid-table-hidden-title">報名時間</div>
           <div class="col-md-3 grid-table-content">
-            {{formatDateText employee.registerAt}}
+            {{formatDateTimeText employee.registerAt}}
           </div>
           <div class="col-md-7 d-block d-md-none"></div>
         </div>
@@ -701,10 +701,10 @@
     {{#with currentArenaData}}
       <div>
         <a href="{{currentArenaLinkHref}}">本次最萌亂鬥大賽</a>起迄時間為：
-        {{formatDateText currentArenaData.beginDate}}~
-        {{formatDateText currentArenaData.endDate}}
+        {{formatDateTimeText currentArenaData.beginDate}}~
+        {{formatDateTimeText currentArenaData.endDate}}
       </div>
-      <div>報名截止時間為：{{formatDateText currentArenaData.joinEndDate}}</div>
+      <div>報名截止時間為：{{formatDateTimeText currentArenaData.joinEndDate}}</div>
       {{#if this.joinData}}
         <div>
           {{companyData.companyName}}已經報名參加這一屆的最萌亂鬥大賽。

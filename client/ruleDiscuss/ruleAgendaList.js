@@ -3,7 +3,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateText } from '../utils/helpers';
+import { formatDateTimeText } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.ruleAgendaList);
@@ -57,6 +57,6 @@ Template.ruleAgendaList.helpers({
   formatExpireDate(agenda) {
     const expireDate = new Date(agenda.createdAt.getTime() + (agenda.duration * 60 * 60 * 1000));
 
-    return formatDateText(expireDate);
+    return formatDateTimeText(expireDate);
   }
 });

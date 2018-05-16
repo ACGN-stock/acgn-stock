@@ -8,7 +8,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-import { formatDateText, currencyFormat } from '../utils/helpers';
+import { formatDateTimeText, currencyFormat } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -55,7 +55,7 @@ Template.advertising.helpers({
     const createdAtTime = advertisingData.createdAt.getTime();
     const expireTime = new Date(createdAtTime + Meteor.settings.public.advertisingExpireTime);
 
-    return formatDateText(expireTime);
+    return formatDateTimeText(expireTime);
   }
 });
 

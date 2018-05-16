@@ -1,25 +1,7 @@
-'use strict';
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { alertDialog } from '../layout/alertDialog';
-
-export function inheritUtilForm(template) {
-  template.onCreated(function() {
-    this.validateModel = $.noop;
-    this.handleInputChange = handleInputChange;
-    this.handleModelError = handleModelError;
-    this.saveModel = $.noop;
-    this.error = new ReactiveVar(null);
-    this.model = new ReactiveVar({});
-  });
-  template.onRendered(function() {
-    this.$input = this.$('[name]');
-    this.model.set(this.data);
-  });
-  template.helpers(utilFormHelpers);
-  template.events(utilFormEvents);
-}
 
 export function handleInputChange(event) {
   const $input = $(event.currentTarget);
@@ -35,64 +17,81 @@ export function handleModelError(error) {
   this.error.set(error);
 }
 
-export const utilFormHelpers = {
-  valueOf(fieldName) {
-    const templateInstance = Template.instance();
+export function inheritUtilForm(template) {
+  template.onCreated(function() {
+    this.validateModel = $.noop;
+    this.handleInputChange = handleInputChange;
+    this.handleModelError = handleModelError;
+    this.saveModel = $.noop;
+    this.error = new ReactiveVar(null);
+    this.model = new ReactiveVar({});
+  });
 
-    return templateInstance.model.get()[fieldName];
-  },
-  errorHtmlOf(fieldName) {
-    const templateInstance = Template.instance();
-    if (templateInstance.error && templateInstance.error.get()) {
-      const errorMessage = templateInstance.error.get()[fieldName];
+  template.onRendered(function() {
+    this.$input = this.$('[name]');
+    this.model.set(this.data || {});
 
-      if (errorMessage) {
-        templateInstance.$input.filter(`[name="${fieldName}"]`)
-          .closest('.form-group')
-          .addClass('has-danger')
-          .attr('title', errorMessage);
-
-        return `
-          <div class="form-control-feedback">
-            ${errorMessage}
-          </div>
-        `;
-      }
-    }
-
-    if (templateInstance.$input) {
-      templateInstance.$input.filter(`[name="${fieldName}"]`)
+    this.autorun(() => {
+      // 移除所有先前的表單 error 樣式
+      this.$('[name]')
         .closest('.form-group')
         .removeClass('has-danger')
         .removeAttr('title');
 
-      return '';
+      const error = this.error.get();
+
+      if (! error) {
+        return;
+      }
+
+      // 顯示表單 error 樣式
+      Object.entries(error).forEach(([key, message]) => {
+        this.$(`[name="${key}"]`)
+          .closest('.form-group')
+          .addClass('has-danger')
+          .attr('title', message);
+      });
+    });
+  });
+
+  template.helpers({
+    valueOf(fieldName) {
+      return Template.instance().model.get()[fieldName];
+    },
+    errorHtmlOf(fieldName) {
+      const templateInstance = Template.instance();
+      const error = templateInstance.error.get() || {};
+      const errorMessage = error[fieldName];
+
+      return errorMessage ? `<div class="form-control-feedback">${errorMessage}</div>` : '';
     }
-  }
-};
-const utilFormEvents = {
-  'click [for], touchstart [for]'(event, templateInstance) {
-    const forFieldName = $(event.currentTarget).attr('for');
-    templateInstance.$input.filter(`[name="${forFieldName}"]`)
-      .trigger('focus');
-  },
-  'change [name]'(event, templateInstance) {
-    templateInstance.handleInputChange(event);
-  },
-  reset(event, templateInstance) {
-    event.preventDefault();
-    templateInstance.model.set(templateInstance.data);
-  },
-  'submit'(event, templateInstance) {
-    event.preventDefault();
-    templateInstance.error.set(null);
-    const model = templateInstance.model.get();
-    const error = templateInstance.validateModel(model);
-    if (error) {
-      templateInstance.handleModelError(error);
+  });
+
+  template.events({
+    'click [for], touchstart [for]'(event, templateInstance) {
+      const forFieldName = $(event.currentTarget).attr('for');
+      templateInstance.$(`[name="${forFieldName}"]`).trigger('focus');
+    },
+    'change [name]'(event, templateInstance) {
+      templateInstance.handleInputChange(event);
+    },
+    reset(event, templateInstance) {
+      event.preventDefault();
+      templateInstance.model.set(templateInstance.data || {});
+    },
+    submit(event, templateInstance) {
+      event.preventDefault();
+      templateInstance.error.set(null);
+
+      const model = templateInstance.model.get();
+      const error = templateInstance.validateModel(model);
+
+      if (error) {
+        templateInstance.handleModelError(error);
+      }
+      else {
+        templateInstance.saveModel(model);
+      }
     }
-    else {
-      templateInstance.saveModel(model);
-    }
-  }
-};
+  });
+}

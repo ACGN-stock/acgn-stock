@@ -4,7 +4,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { roleDisplayName } from '/db/users';
-import { stoneDisplayName, currencyFormat } from './helpers.js';
+import { stoneDisplayName, currencyFormat } from './helpers';
 
 Template.displayLog.onRendered(function() {
   this.$('[data-user-link]').each((_, elem) => {

@@ -157,60 +157,51 @@ body {
   overflow-y: auto;
 }
 
+.company-description,
 .agenda-description {
   word-break: break-all;
   padding: 5px 15px;
 }
 
 .company-description {
-  word-break: break-all;
-  padding: 5px 15px;
   height: 300px;
   overflow-y: auto;
 }
 
-.company-description h1,
-.agenda-description h1 {
+.markdown-container h1 {
   font-size: 1.5rem;
 }
 
-.company-description h2,
-.agenda-description h2 {
+.markdown-container h2 {
   font-size: 1.3rem;
 }
 
-.company-description h3,
-.agenda-description h3 {
+.markdown-container h3 {
   font-size: 1.15rem;
 }
 
-.company-description h4,
-.company-description h5,
-.company-description h6,
-.agenda-description h4,
-.agenda-description h5,
-.agenda-description h6 {
+.markdown-container h4,
+.markdown-container h5,
+.markdown-container h6 {
   font-size: 1rem;
 }
 
-.company-description blockquote,
-.agenda-description blockquote {
+.markdown-container blockquote {
   font-weight: bold;
   font-style: italic;
-  margin-left: 1rem; 
+  margin-left: 1rem;
   border-left: 2px solid #999;
   padding-left: 1rem;
 }
 
-
-.company-description pre,
-.agenda-description pre {
+.markdown-container pre {
   white-space: pre-wrap;       /* Since CSS 2.1 */
   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
   white-space: -pre-wrap;      /* Opera 4-6 */
   white-space: -o-pre-wrap;    /* Opera 7 */
   word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+
 .company-card {
   padding: 0px;
   max-width: 270px;
