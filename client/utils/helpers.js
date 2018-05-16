@@ -1,5 +1,5 @@
 import showdown from 'showdown';
-import xssFilter from 'showdown-xss-filter';
+import xss from 'xss';
 import footnotes from 'showdown-footnotes';
 import katex from 'katex';
 import { Meteor } from 'meteor/meteor';
@@ -269,24 +269,31 @@ Template.registerHelper('isCompanyManager', isCompanyManager);
 Template.registerHelper('round', Math.round);
 
 const katexExtension = {
-  type: 'output',
-  filter: function(text) {
-    const inlinePattern = '(.*?)';
-    const blockPattern = '((.|\\r|\\n)*?)';
-    const katexRegex = new RegExp(`<p>\\$\\$(${inlinePattern}|${blockPattern})\\$\\$</p>`, 'g');
-
-    const outputKatexHTML = text.replace(katexRegex, function(match, capture, inlineCapture) {
-      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/<br \/>/g, '');
+  type: 'lang',
+  filter: function(text, converter) {
+    // lang模式會將$轉換為¨D      \r\n轉換為 \n
+    const outputKatexHTML = text.replace(/¨D¨D((.|\n)*?)¨D¨D/g, function(match, capture) {
+      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/\n/g, '\r\n');
       let html = katex.renderToString(text);
 
-      if (inlineCapture === undefined) {
-        html = `<p>${html}</p>`;
+      if (text.search('\n') !== -1) {
+        html = `<br/>${html}`;
       }
 
       return html;
     });
-
     return outputKatexHTML;
+  }
+};
+
+function escapeHtml(html) {
+  return html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}
+
+const xssFilter = {
+  type: 'lang',
+  filter: function(text) {
+    return xss(text, {escapeHtml});
   }
 };
 
@@ -310,24 +317,19 @@ export function markdown(content, { advanced = false } = {}) {
 
   const extensionsArray = [xssFilter, footnotes, codeTagEscapedCharacterTranser];
 
-  let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   if (advanced) {
     // 保留 KaTeX 和圖片
     extensionsArray.push(katexExtension);
-    // 利用<p></p>避免Markdown預先轉譯KaTeX轉譯區塊
-    preprocessContent = preprocessContent.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match) {
-      return `<p>${match}</p>`;
-    });
   }
   else {
-    preprocessContent = preprocessContent.replace(/!/g, '&excl;');
+    content = content.replace(/!/g, '&excl;');
   }
 
   const converter = new showdown.Converter({ extensions: extensionsArray });
   converter.setFlavor('github');
   converter.setOption('openLinksInNewWindow', true);
 
-  return converter.makeHtml(preprocessContent);
+  return converter.makeHtml(content);
 }
 Template.registerHelper('markdown', function(content, kw = { hash: {} }) {
   return markdown(content, kw.hash);

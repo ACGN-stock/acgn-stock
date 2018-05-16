@@ -41,8 +41,8 @@
     "shelljs": "^0.7.8",
     "showdown": "^1.8.6",
     "showdown-footnotes": "^2.1.2",
-    "showdown-xss-filter": "^0.2.0",
-    "simpl-schema": "1.5.0"
+    "simpl-schema": "1.5.0",
+    "xss": "^0.3.8"
   },
   "devDependencies": {
     "@meteorjs/eslint-config-meteor": "^1.0.5",
