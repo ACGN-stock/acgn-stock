@@ -1,29 +1,9 @@
-<template name="announcement">
+<template name="mainPage">
   <div class="card">
     <div class="card-block">
-      <h1 class="d-flex flex-wrap justify-content-start align-items-center mb-1">
-        <div class="text-nowrap">
-          系統公告
-        </div>
-        {{#if currentUserHasAnyRoles 'developer' 'planner' 'fscMember'}}
-          <div class="d-flex flex-wrap justify-content-end ml-auto">
-            <button class="btn btn-warning btn-sm" type="button" data-action="editAnnouncement">
-              <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-              修改系統公告
-            </button>
-          </div>
-        {{/if}}
-      </h1>
-      {{#if inEditAnnouncementMode}}
-        <hr />
-        {{> announcementForm}}
-      {{/if}}
+      <h1>{{websiteName}}</h1>
       <hr />
-      <div class="row">
-        <div class="col-12">
-          {{{announcementDetail}}}
-        </div>
-      </div>
+      {{> legacyAnnouncement}}
       <hr />
       {{> systemStatusPanel}}
       <hr />
@@ -36,19 +16,38 @@
   </div>
 </template>
 
-<template name="announcementForm">
+<template name="legacyAnnouncement">
+  {{#if currentUserHasAnyRoles 'developer' 'planner' 'fscMember'}}
+    <button class="btn btn-warning btn-sm" type="button" data-action="legacyEditAnnouncement">
+      <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+      修改系統通知
+    </button>
+  {{/if}}
+  {{#if inEditAnnouncementMode}}
+    <hr />
+    {{> legacyAnnouncementForm}}
+  {{/if}}
+  <hr />
+  <div class="row">
+    <div class="col-12">
+      {{{announcementDetail}}}
+    </div>
+  </div>
+</template>
+
+<template name="legacyAnnouncementForm">
   <form>
     <h3 class="card-subtitle text-muted">
-      修改系統公告
+      修改系統通知
     </h3>
     <hr />
     <div class="form-group">
       下方快訊內容
-      <textarea class="form-control" id="announcement-short" rows="1">{{getVariable 'announcement'}}</textarea>
+      <textarea class="form-control" id="announcement-short" rows="4">{{getVariable 'announcement'}}</textarea>
     </div>
     <div class="form-group">
-      公告頁面詳細內容
-      <textarea class="form-control" id="announcement-detail" rows="4">{{getVariable 'announcementDetail'}}</textarea>
+      主頁詳細公告內容
+      <textarea class="form-control" id="announcement-detail" rows="8">{{getVariable 'announcementDetail'}}</textarea>
     </div>
     <div class="text-right">
       <button class="btn btn-primary" type="submit">儲存</button>

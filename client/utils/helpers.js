@@ -1,4 +1,3 @@
-'use strict';
 import showdown from 'showdown';
 import xssFilter from 'showdown-xss-filter';
 import footnotes from 'showdown-footnotes';
@@ -71,7 +70,7 @@ Template.registerHelper('getCompanyEPS', getCompanyEPS);
 Template.registerHelper('getCompanyPERatio', getCompanyPERatio);
 Template.registerHelper('getCompanyEPRatio', getCompanyEPRatio);
 
-export function formatDateText(date) {
+export function formatDateTimeText(date) {
   if (! date) {
     return '????/??/?? ??:??:??';
   }
@@ -81,27 +80,22 @@ export function formatDateText(date) {
   );
 }
 function padZero(n) {
-  if (n < 10) {
-    return `0${n}`;
-  }
-  else {
-    return `${n}`;
-  }
-}
-Template.registerHelper('formatDateText', formatDateText);
-
-export function formatDateTimeText(date) {
-  if (! date) {
-    return '????/??/?? ??:??:??';
-  }
-
-  return (
-    `${padZero(date.getMonth() + 1)}/${padZero(date.getDate())} ${padZero(date.getHours())}:${padZero(date.getMinutes())}:${padZero(date.getSeconds())}`
-  );
+  return n < 10 ? `0${n}` : `${n}`;
 }
 Template.registerHelper('formatDateTimeText', formatDateTimeText);
 
-export function formatTimeText(time) {
+export function formatShortDateTimeText(date) {
+  if (! date) {
+    return '??/?? ??:??';
+  }
+
+  return (
+    `${padZero(date.getMonth() + 1)}/${padZero(date.getDate())} ${padZero(date.getHours())}:${padZero(date.getMinutes())}`
+  );
+}
+Template.registerHelper('formatShortDateTimeText', formatShortDateTimeText);
+
+export function formatShortDurationTimeText(time) {
   const timeBase = 1000 * 60;
 
   if (! time) {
@@ -114,6 +108,40 @@ export function formatTimeText(time) {
     `${padZero(Math.floor(time / 60))}:${padZero(time % 60)}`
   );
 }
+Template.registerHelper('formatShortDurationTimeText', formatShortDurationTimeText);
+
+export function formatLongDurationTimeText(time) {
+  if (! time) {
+    return '不明';
+  }
+
+  const secondBase = 1000;
+  const minuteBase = 60 * secondBase;
+  const hourBase = 60 * minuteBase;
+  const dayBase = 24 * hourBase;
+
+  let remainingTime = time;
+
+  const days = Math.floor(remainingTime / dayBase);
+  remainingTime -= days * dayBase;
+
+  const hours = Math.floor(remainingTime / hourBase);
+  remainingTime -= hours * hourBase;
+
+  const minutes = Math.floor(remainingTime / minuteBase);
+  remainingTime -= minutes * minuteBase;
+
+  const seconds = Math.floor(remainingTime / secondBase);
+  remainingTime -= seconds * secondBase;
+
+  return [
+    time >= dayBase ? `${days} 天` : '',
+    time >= hourBase ? `${hours} 時` : '',
+    time >= minuteBase ? `${minutes} 分` : '',
+    time >= secondBase ? `${seconds} 秒` : ''
+  ].join(' ').trim();
+}
+Template.registerHelper('formatLongDurationTimeText', formatLongDurationTimeText);
 
 export function currentUserId() {
   return Meteor.userId();
@@ -275,28 +303,35 @@ const codeTagEscapedCharacterTranser = {
   }
 };
 
-// Advance(KaTeX, image)
-export function markdown(content, disableAdvance = true) {
+export function markdown(content, { advanced = false } = {}) {
+  if (! content) {
+    return '';
+  }
+
   const extensionsArray = [xssFilter, footnotes, codeTagEscapedCharacterTranser];
 
   let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-  if (disableAdvance) {
-    preprocessContent = preprocessContent.replace(/!/g, '&excl;');
-  }
-  else {
+  if (advanced) {
+    // 保留 KaTeX 和圖片
     extensionsArray.push(katexExtension);
     // 利用<p></p>避免Markdown預先轉譯KaTeX轉譯區塊
     preprocessContent = preprocessContent.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match) {
       return `<p>${match}</p>`;
     });
   }
+  else {
+    preprocessContent = preprocessContent.replace(/!/g, '&excl;');
+  }
+
   const converter = new showdown.Converter({ extensions: extensionsArray });
   converter.setFlavor('github');
   converter.setOption('openLinksInNewWindow', true);
 
   return converter.makeHtml(preprocessContent);
 }
-Template.registerHelper('markdown', markdown);
+Template.registerHelper('markdown', function(content, kw = { hash: {} }) {
+  return markdown(content, kw.hash);
+});
 
 export function toPercent(x) {
   return `${Math.round(x * 100)}%`;
@@ -317,3 +352,10 @@ export function currentUserHasAllRoles(...roles) {
   return hasAllRoles(Meteor.user(), ...roles);
 }
 Template.registerHelper('currentUserHasAllRoles', currentUserHasAllRoles);
+
+export function pathFor(pathDef, kw = { hash: {} }) {
+  const { params, queryParams } = kw;
+
+  return FlowRouter.path(pathDef, params, queryParams);
+}
+Template.registerHelper('pathFor', pathFor);

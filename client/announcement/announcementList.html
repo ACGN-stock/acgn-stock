@@ -1,0 +1,84 @@
+<template name="announcementList">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title d-flex flex-wrap mb-1">
+        <div class="text-nowrap">系統公告</div>
+        {{#if canCreateAnnouncement}}
+          <div class="ml-auto">
+            <a class="btn btn-primary" href="{{pathFor 'createAnnouncement'}}">
+              <i class="fa fa-plus" aria-hidden="true"></i>
+              建立新公告
+            </a>
+          </div>
+        {{/if}}
+      </h1>
+      <hr />
+      <div class="d-flex flex-wrap align-items-center">
+        <div class="form-inline my-2">
+          <div class="input-group input-group-sm">
+            <div class="input-group-addon">顯示分類</div>
+            <select class="form-control" name="category">
+              <option value="">全部分類</option>
+              {{#each category in categoryList}}
+                <option value="{{category}}" {{categorySelectedAttr category}}>
+                  {{categoryDisplayName category}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+          {{#if currentUser}}
+            <button class="btn btn-sm btn-info ml-1" type="button" name="onlyUnread">
+              {{#if onlyUnread}}
+                <i class="fa fa-check-square-o"></i>
+              {{else}}
+                <i class="fa fa-square-o"></i>
+              {{/if}}
+              只顯示未讀
+            </button>
+          {{/if}}
+        </div>
+        {{#if currentUser}}
+          <div class="ml-auto">
+            <a class="btn btn-sm btn-danger" href="#" data-action="markAllAsRead">全部標為已讀</a>
+          </div>
+        {{/if}}
+      </div>
+      <table class="table-bordered custom-responsive-table-md w-100">
+        <thead>
+          <tr>
+            <th class="text-center text-truncate" title="分類">分類</th>
+            <th class="text-center text-truncate w-50" title="主旨">主旨</th>
+            <th class="text-center text-truncate" title="發佈人">發佈人</th>
+            <th class="text-center text-truncate" title="發佈日期">發佈日期</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each announcement in announcements}}
+            <tr style="">
+              <td class="text-center text-truncate px-md-2" data-title="分類">
+                {{categoryDisplayName announcement.category}}
+              </td>
+              <td class="text-left text-truncate px-md-2" data-title="主旨">
+                {{#if announcement.isUnread}}
+                  <span class="badge badge-danger">未讀</span>
+                {{/if}}
+                <a href="{{pathForAnnouncementDetail announcement._id}}">{{announcement.subject}}</a>
+              </td>
+              <td class="text-center text-truncate px-md-2" data-title="發佈人">
+                {{>userLink announcement.creator}}
+              </td>
+              <td class="text-center text-truncate px-md-2" data-title="發佈日期">
+                {{formatDateTimeText announcement.createdAt}}
+              </td>
+            </tr>
+          {{else}}
+            <tr class="default-content">
+              <td class="text-center p-1" colspan=4>查無資料！</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{> pagination paginationData}}
+    </div>
+  </div>
+</template>

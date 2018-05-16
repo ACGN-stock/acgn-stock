@@ -13,7 +13,7 @@ import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { bigPicturePreviewModal } from '../layout/bigPicturePreviewModal';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat, markdown } from '../utils/helpers.js';
+import { currencyFormat, markdown } from '../utils/helpers';
 
 Template.createFoundationPlan.helpers({
   defaultData() {
@@ -214,4 +214,3 @@ function addNewTag(event, templateInstance) {
   templateInstance.model.set(model);
   $input.val('');
 }
-

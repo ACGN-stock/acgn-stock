@@ -1,0 +1,13 @@
+<template name="createAnnouncement">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">建立新公告</h1>
+      <hr />
+      {{#if canCreateAnnouncement}}
+        {{> announcementForm}}
+      {{else}}
+        <p><em>你沒有權限建立任何公告，請儘速離開這裡！</em></p>
+      {{/if}}
+    </div>
+  </div>
+</template>

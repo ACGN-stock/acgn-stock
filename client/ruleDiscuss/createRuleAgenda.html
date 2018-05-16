@@ -62,7 +62,7 @@
             name="{{getIssueInputName issue.id}}"
             placeholder="請輸入議題名稱(最多100字)"
           />
-          {{{errorHtmlOfIssueInput issue.id}}}
+          {{{errorHtmlOf (getIssueInputName issue.id)}}}
         </div>
         {{#each option in getIssueOptionList issue.id}}
           <div class="form-group">
@@ -73,7 +73,7 @@
               name="{{getIssueOptionInputName issue.id option.id}}"
               placeholder="請輸入選項(最多100字)"
             />
-            {{{errorHtmlOfIssueOptionInput issue.id option.id}}}
+            {{{errorHtmlOf (getIssueOptionInputName issue.id option.id)}}}
           </div>
         {{/each}}
         {{#if showAddOptionButton issue.id}}
@@ -104,7 +104,7 @@
   <div class="agenda-detail">
     <div class="row" style="margin-top: 15px;">
       <div class="col-12">
-        <div class="agenda-description">{{{previewDescription}}}</div>
+        <div class="agenda-description markdown-container">{{{previewDescription}}}</div>
       </div>
     </div>
   </div>

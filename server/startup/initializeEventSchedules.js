@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { _ } from 'underscore';
+import { _ } from 'meteor/underscore';
 
 import { checkChairman } from '/server/functions/company/checkChairman';
 import { recordListPrice, updateRecordListPricePeriod } from '/server/functions/company/recordListPrice';

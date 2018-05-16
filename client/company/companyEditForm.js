@@ -9,7 +9,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { alertDialog } from '../layout/alertDialog';
 import { bigPicturePreviewModal } from '../layout/bigPicturePreviewModal';
-import { markdown } from '../utils/helpers.js';
+import { markdown } from '../utils/helpers';
 
 inheritUtilForm(Template.companyEditForm);
 
