@@ -287,8 +287,9 @@ const katexExtension = {
   }
 };
 
+// 防止 xss 幫我們跳脫字元
 function escapeHtml(html) {
-  return html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  return html;
 }
 
 const xssFilter = {
@@ -317,20 +318,20 @@ export function markdown(content, { advanced = false } = {}) {
   }
 
   const extensionsArray = [xssFilter, footnotes, codeTagEscapedCharacterTranser];
-
+  let processedContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   if (advanced) {
     // 保留 KaTeX 和圖片
     extensionsArray.push(katexExtension);
   }
   else {
-    content = content.replace(/!/g, '&excl;');
+    processedContent = processedContent.replace(/!/g, '&excl;');
   }
 
   const converter = new showdown.Converter({ extensions: extensionsArray });
   converter.setFlavor('github');
   converter.setOption('openLinksInNewWindow', true);
 
-  return converter.makeHtml(content);
+  return converter.makeHtml(processedContent);
 }
 Template.registerHelper('markdown', function(content, kw = { hash: {} }) {
   return markdown(content, kw.hash);
