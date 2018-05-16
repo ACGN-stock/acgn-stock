@@ -270,7 +270,7 @@ Template.registerHelper('round', Math.round);
 
 const katexExtension = {
   type: 'lang',
-  filter: function(text, converter) {
+  filter: function(text) {
     // lang模式會將$轉換為¨D      \r\n轉換為 \n
     const outputKatexHTML = text.replace(/¨D¨D((.|\n)*?)¨D¨D/g, function(match, capture) {
       const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/\n/g, '\r\n');
@@ -282,6 +282,7 @@ const katexExtension = {
 
       return html;
     });
+
     return outputKatexHTML;
   }
 };
@@ -293,7 +294,7 @@ function escapeHtml(html) {
 const xssFilter = {
   type: 'lang',
   filter: function(text) {
-    return xss(text, {escapeHtml});
+    return xss(text, { escapeHtml });
   }
 };
 
