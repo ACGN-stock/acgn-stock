@@ -292,10 +292,22 @@ function escapeHtml(html) {
   return html;
 }
 
+const whiteList = xss.getDefaultWhiteList();
+whiteList.span.push('class');
+whiteList.span.push('style');
+
 const xssFilter = {
-  type: 'lang',
+  type: 'output',
   filter: function(text) {
-    return xss(text, { escapeHtml });
+    return xss(text, { escapeHtml, whiteList, css: {
+      whiteList: {
+        'aria-hidden': true,
+        'vertical-align': true,
+        'top': true,
+        'position': true,
+        'height': true
+      }
+    } });
   }
 };
 
