@@ -53,8 +53,17 @@ Template.announcementList.events({
 Template.announcementList.helpers({
   canCreateAnnouncement,
   categoryDisplayName,
-  onlyUnread() {
-    return Template.instance().onlyUnread.get();
+  onlyUnreadButtonArgs() {
+    const templateInstance = Template.instance();
+
+    return {
+      class: 'btn btn-sm btn-info ml-1',
+      text: '只顯示未讀',
+      name: 'onlyUnread',
+      onChanged: (checked) => {
+        templateInstance.onlyUnread.set(checked);
+      }
+    };
   },
   categorySelectedAttr(category) {
     return Template.instance().category.get() === category ? 'selected' : '';

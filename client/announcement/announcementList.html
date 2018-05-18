@@ -27,14 +27,7 @@
             </select>
           </div>
           {{#if currentUser}}
-            <button class="btn btn-sm btn-info ml-1" type="button" name="onlyUnread">
-              {{#if onlyUnread}}
-                <i class="fa fa-check-square-o"></i>
-              {{else}}
-                <i class="fa fa-square-o"></i>
-              {{/if}}
-              只顯示未讀
-            </button>
+            {{>checkableButton onlyUnreadButtonArgs}}
           {{/if}}
         </div>
         {{#if currentUser}}

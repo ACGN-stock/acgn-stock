@@ -61,7 +61,8 @@ export const config = {
     userOwnedProducts: 10,
     companyMarketingProducts: 10,
     companyVips: 10,
-    announcements: 20
+    announcements: 20,
+    accountInfoLogs: 30
   },
   productFinalSaleTime: 86400000, // 產品最後出清時間 (ms)
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
