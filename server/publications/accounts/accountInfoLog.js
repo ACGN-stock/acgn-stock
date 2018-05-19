@@ -1,15 +1,26 @@
 import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
+import { Counts } from 'meteor/tmeasday:publish-counts';
 
 import { limitSubscription } from '/server/imports/utils/rateLimit';
-import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
-import { dbLog } from '/db/dbLog';
+import { dbLog, logTypeGroupMap } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
 
-Meteor.publish('accountInfoLog', function(userId, offset) {
-  debug.log('publish accountInfoLog', { userId, offset });
+Meteor.publish('accountInfoLog', function({ userId, logTypeGroups, offset }) {
+  debug.log('publish accountInfoLog', { userId, logTypeGroups, offset });
   check(userId, String);
+  check(logTypeGroups, Match.Optional([String]));
   check(offset, Match.Integer);
+
+  // 處理金管會紀錄最後讀取時間
+  // TODO: 將通知獨立於 log 機制
+  if (this.userId === userId && logTypeGroups && logTypeGroups.includes('fsc')) {
+    Meteor.users.update({
+      _id: userId
+    }, {
+      $set: { 'profile.lastReadAccuseLogDate': new Date() }
+    });
+  }
 
   const firstLogData = dbLog.findOne({ userId }, { sort: { createdAt: 1 } });
   const firstLogDate = firstLogData ? firstLogData.createdAt : new Date();
@@ -19,28 +30,23 @@ Meteor.publish('accountInfoLog', function(userId, offset) {
     createdAt: { $gte: firstLogDate }
   };
 
-  publishTotalCount('totalCountOfAccountInfoLog', dbLog.find(filter), this);
+  if (logTypeGroups) {
+    filter.logType = {
+      $in: logTypeGroups.reduce((logTypes, logTypeGroup) => {
+        return [...logTypes, ...logTypeGroupMap[logTypeGroup].logTypes];
+      }, [])
+    };
+  }
 
-  const pageObserver = dbLog
-    .find(filter, {
-      sort: { createdAt: -1 },
-      skip: offset,
-      limit: 30,
-      disableOplog: true
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('log', id, fields);
-      },
-      removed: (id) => {
-        this.removed('log', id);
-      }
-    });
+  Counts.publish(this, 'accountInfoLogs', dbLog.find(filter, { fields: { _id: 1 } }), { noReady: true });
 
-  this.ready();
-  this.onStop(() => {
-    pageObserver.stop();
+  return dbLog.find(filter, {
+    sort: { createdAt: -1 },
+    skip: offset,
+    limit: Meteor.settings.public.dataNumberPerPage.accountInfoLogs,
+    disableOplog: true
   });
 });
+
 // 一分鐘最多20次
 limitSubscription('accountInfoLog');

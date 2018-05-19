@@ -163,7 +163,8 @@ const schema = new SimpleSchema({
           };
 
           return obj;
-        }, {}))
+        }, {})),
+        defaultValue: {}
       },
       // 是否處於繳稅逾期的狀態
       notPayTax: {

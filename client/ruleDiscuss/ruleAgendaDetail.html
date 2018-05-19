@@ -52,7 +52,7 @@
           </a>
         </div>
 
-        <div class="agenda-description">{{{markdown this.description false}}}</div>
+        <div class="agenda-description markdown-container">{{{markdown this.description advanced=true}}}</div>
       </div>
     </div>
     {{#each issue in getIssueList this.issues}}

@@ -9,7 +9,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateTimeText } from '../utils/helpers';
+import { formatShortDateTimeText } from '../utils/helpers';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { investFoundCompany } from '../utils/methods';
@@ -177,7 +177,7 @@ Template.foundationDetailTable.helpers({
   getExpireDateText(createdAt) {
     const expireDate = new Date(createdAt.getTime() + Meteor.settings.public.foundExpireTime);
 
-    return formatDateTimeText(expireDate);
+    return formatShortDateTimeText(expireDate);
   },
   getStockPrice(investList) {
     if (investList.length < Meteor.settings.public.foundationNeedUsers) {

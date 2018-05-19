@@ -1,0 +1,20 @@
+<template name="accountInfoLogList">
+  <div class="mb-1">
+    顯示分類：
+    <a href="#" class="btn btn-sm btn-secondary" data-action="selectAll">全部選擇</a>
+    <a href="#" class="btn btn-sm btn-secondary" data-action="clearAll">清除全部</a>
+    <a href="#" class="btn btn-sm btn-primary" data-action="apply">套用</a>
+  </div>
+  <div class="mb-1">
+    {{#each logTypeGroup in logTypeGroups}}
+      {{>checkableButton (logTypeGroupButtonArgs logTypeGroup)}}
+    {{/each}}
+  </div>
+
+  {{#each logList}}
+    {{> displayLog}}
+  {{else}}
+    <em>查無資料！</em>
+  {{/each}}
+  {{> pagination paginationData}}
+</template>

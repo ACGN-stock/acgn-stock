@@ -2,8 +2,9 @@
   <div class="fixed-bottom">
     <div class={{containerClass}}>
       <div class="snackbar-container">
+        {{> displayAnnouncementUnreadNotification}}
         {{> unreadImportantAccuseLogsNotification}}
-        {{> displayAnnouncement}}
+        {{> displayLegacyAnnouncement}}
         {{#each advertisingList}}
           {{> displayAdvertising}}
         {{/each}}
@@ -38,7 +39,7 @@
   {{/if}}
 </template>
 
-<template name="displayAnnouncement">
+<template name="displayLegacyAnnouncement">
   {{#if isDisplay}}
     <div class="media bg-info px-2 py-1 my-2 rounded footer-message-container">
       <div class="media-body footer-message">
@@ -47,6 +48,21 @@
       </div>
       <div class="footer-message-close-button">
         <a class="btn btn-danger btn-sm" href="#">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  {{/if}}
+</template>
+
+<template name="displayAnnouncementUnreadNotification">
+  {{#if isDisplay}}
+    <div class="media bg-warning px-2 py-1 my-2 rounded footer-message-container">
+      <div class="media-body footer-message" style="color: white">
+        <strong>【注意】</strong> 您有 {{getPublishedCount 'currentUserUnreadAnnouncements'}} 則未讀的系統公告，請至<a style="color: yellow" href="{{pathFor 'announcementList'}}">系統公告</a>頁面查看！
+      </div>
+      <div class="footer-message-close-button">
+        <a class="btn btn-warning btn-sm" href="#">
           <i class="fa fa-times" aria-hidden="true"></i>
         </a>
       </div>

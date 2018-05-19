@@ -6,9 +6,9 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
-import { inheritUtilForm, utilFormHelpers, handleInputChange as inheritedHandleInputChange } from '../utils/form';
+import { inheritUtilForm } from '../utils/form';
 import { alertDialog } from '../layout/alertDialog';
-import { markdown } from '../utils/helpers.js';
+import { markdown } from '../utils/helpers';
 
 const rIssueList = new ReactiveVar();
 const rIssueOptionList = new ReactiveVar();
@@ -25,7 +25,6 @@ Template.createRuleAgenda.helpers({
 inheritUtilForm(Template.ruleAgendaForm);
 Template.ruleAgendaForm.onCreated(function() {
   this.validateModel = validateModel;
-  this.handleInputChange = handleInputChange;
   this.saveModel = saveModel;
   rIssueList.set(defaultIssueList());
   rIssueOptionList.set(defaultIssueOptionList());
@@ -33,9 +32,9 @@ Template.ruleAgendaForm.onCreated(function() {
 
 const description = new ReactiveVar('');
 Template.ruleAgendaForm.helpers({
-  getIssueInputName: getIssueInputName,
-  getIssueInputMultipleName: getIssueInputMultipleName,
-  getIssueOptionInputName: getIssueOptionInputName,
+  getIssueInputName,
+  getIssueInputMultipleName,
+  getIssueOptionInputName,
   getIssueList() {
     return rIssueList.get();
   },
@@ -69,14 +68,8 @@ Template.ruleAgendaForm.helpers({
 
     return list[issueId - 1].length > 2;
   },
-  errorHtmlOfIssueInput(issueId) {
-    return utilFormHelpers.errorHtmlOf(getIssueInputName(issueId));
-  },
-  errorHtmlOfIssueOptionInput(issueId, optionId) {
-    return utilFormHelpers.errorHtmlOf(getIssueOptionInputName(issueId, optionId));
-  },
   previewDescription() {
-    return markdown(description.get(), false);
+    return markdown(description.get(), { advanced: true });
   }
 });
 
@@ -139,15 +132,15 @@ function defaultIssueList() {
 }
 
 function getIssueInputName(issueId) {
-  return 'issue-' + issueId;
+  return `issue-${issueId}`;
 }
 
 function getIssueInputMultipleName(issueId) {
-  return 'issue-multiple-' + issueId;
+  return `issue-multiple-${issueId}`;
 }
 
 function getIssueOptionInputName(issueId, optionId) {
-  return 'option-' + issueId + '-' + optionId;
+  return `option-${issueId}-${optionId}`;
 }
 
 function validateModel(model) {
@@ -202,10 +195,6 @@ function validateModel(model) {
   if (_.size(error) > 0) {
     return error;
   }
-}
-
-function handleInputChange(event) {
-  inheritedHandleInputChange.call(this, event);
 }
 
 function saveModel(model) {

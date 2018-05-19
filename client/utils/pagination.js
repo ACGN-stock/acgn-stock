@@ -1,18 +1,19 @@
-'use strict';
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
+import { Counts } from 'meteor/tmeasday:publish-counts';
+
 import { dbVariables } from '/db/dbVariables';
 
 Template.pagination.helpers({
   haveData() {
-    const totalCount = dbVariables.get(this.useVariableForTotalCount);
+    const totalCount = Counts.get(this.counterName) || dbVariables.get(this.useVariableForTotalCount);
 
     return totalCount > 0;
   },
   pages() {
-    const totalCount = dbVariables.get(this.useVariableForTotalCount);
+    const totalCount = Counts.get(this.counterName) || dbVariables.get(this.useVariableForTotalCount);
     const totalPages = Math.ceil(totalCount / this.dataNumberPerPage);
     let displayCount = 6;
     displayCount = Math.max(3, displayCount);
@@ -43,7 +44,7 @@ Template.pagination.helpers({
     return (offset / this.dataNumberPerPage) + 1;
   },
   totalPages() {
-    const totalCount = dbVariables.get(this.useVariableForTotalCount);
+    const totalCount = Counts.get(this.counterName) || dbVariables.get(this.useVariableForTotalCount);
     const totalPages = Math.ceil(totalCount / this.dataNumberPerPage);
 
     return totalPages;
@@ -57,7 +58,7 @@ Template.pagination.helpers({
   pageLinkHref(page) {
     const templateInstance = Template.instance();
     const data = templateInstance.data;
-    const totalCount = dbVariables.get(data.useVariableForTotalCount);
+    const totalCount = Counts.get(this.counterName) || dbVariables.get(data.useVariableForTotalCount);
     const totalPages = Math.ceil(totalCount / data.dataNumberPerPage);
 
     if (page === 'end') {
