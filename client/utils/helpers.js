@@ -1,5 +1,5 @@
 import showdown from 'showdown';
-import xssFilter from 'showdown-xss-filter';
+import xss from 'xss';
 import footnotes from 'showdown-footnotes';
 import katex from 'katex';
 import { Meteor } from 'meteor/meteor';
@@ -269,15 +269,45 @@ Template.registerHelper('isCompanyManager', isCompanyManager);
 Template.registerHelper('round', Math.round);
 
 const katexExtension = {
-  type: 'output',
+  type: 'lang',
   filter: function(text) {
-    const outputKatexHTML = text.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
-      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/<br \/>/g, '');
+    // lang模式會將$轉換為¨D      \r\n轉換為 \n
+    const outputKatexHTML = text.replace(/¨D¨D((.|\n)*?)¨D¨D/g, function(match, capture) {
+      const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/\n/g, '\r\n');
+      let html = katex.renderToString(text);
 
-      return katex.renderToString(text);
+      if (text.search('\n') !== -1) {
+        html = `<br/>${html}`;
+      }
+
+      return html;
     });
 
     return outputKatexHTML;
+  }
+};
+
+// 防止 xss 幫我們跳脫字元
+function escapeHtml(html) {
+  return html;
+}
+
+const whiteList = xss.getDefaultWhiteList();
+whiteList.span.push('class');
+whiteList.span.push('style');
+
+const xssFilter = {
+  type: 'output',
+  filter: function(text) {
+    return xss(text, { escapeHtml, whiteList, css: {
+      whiteList: {
+        'aria-hidden': true,
+        'vertical-align': true,
+        'top': true,
+        'position': true,
+        'height': true
+      }
+    } });
   }
 };
 
@@ -300,27 +330,20 @@ export function markdown(content, { advanced = false } = {}) {
   }
 
   const extensionsArray = [xssFilter, footnotes, codeTagEscapedCharacterTranser];
-
-  let preprocessContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  let processedContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   if (advanced) {
     // 保留 KaTeX 和圖片
     extensionsArray.push(katexExtension);
-    preprocessContent = preprocessContent.replace(/\$\$((.|\r|\n)*?)\$\$/g, function(match, capture) {
-      // 將 \ 取代為 \\ 避免 showdown 因處理跳脫時吃掉\符號導致 KaTeX 無法正確處理。
-      const text = capture.replace(/\\/g, '\\\\');
-
-      return `$$${text}$$`;
-    });
   }
   else {
-    preprocessContent = preprocessContent.replace(/!/g, '&excl;');
+    processedContent = processedContent.replace(/!/g, '&excl;');
   }
 
   const converter = new showdown.Converter({ extensions: extensionsArray });
   converter.setFlavor('github');
   converter.setOption('openLinksInNewWindow', true);
 
-  return converter.makeHtml(preprocessContent);
+  return converter.makeHtml(processedContent);
 }
 Template.registerHelper('markdown', function(content, kw = { hash: {} }) {
   return markdown(content, kw.hash);
