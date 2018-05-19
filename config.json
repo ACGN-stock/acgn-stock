@@ -59,7 +59,8 @@
       "userOwnedProducts": 10,
       "companyMarketingProducts": 10,
       "companyVips": 10,
-      "announcements": 20
+      "announcements": 20,
+      "accountInfoLogs": 30
     },
     "productFinalSaleTime": 86400000,
     "systemProductVotingReward": 4096,
