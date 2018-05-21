@@ -1,4 +1,3 @@
-'use strict';
 import SimpleSchema from 'simpl-schema';
 import { Mongo } from 'meteor/mongo';
 

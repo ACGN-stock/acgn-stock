@@ -3,7 +3,8 @@ require('babel-register')({
   plugins: [
     'transform-es2015-modules-commonjs',
     'transform-runtime',
-    ['module-resolver', { root: ['./'] } ]
+    ['module-resolver', { root: ['./'] } ],
+    ['transform-strict-mode', { 'strict': true } ]
   ]
 });
 const libmock = require('mock-require');

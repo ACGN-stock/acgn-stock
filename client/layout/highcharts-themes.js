@@ -1,4 +1,3 @@
-'use strict';
 /**
  * (c) 2010-2017 Torstein Honsi
  *

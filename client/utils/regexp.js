@@ -1,5 +1,3 @@
-'use strict';
-
 export const regUsername = /^[0-9a-zA-Z]{2,20}$/;
 
 export const integerString = /^[0-9]+$/;

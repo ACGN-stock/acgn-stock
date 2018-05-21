@@ -1,4 +1,3 @@
-'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';

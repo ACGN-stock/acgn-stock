@@ -1,4 +1,3 @@
-'use strict';
 import shell from 'shelljs';
 
 // 備份mongo資料庫
@@ -37,4 +36,3 @@ function padZero(n) {
     return n;
   }
 }
-
