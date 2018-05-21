@@ -1,4 +1,3 @@
-'use strict';
 import { Meteor } from 'meteor/meteor';
 import { Blaze } from 'meteor/blaze';
 import { Tracker } from 'meteor/tracker';

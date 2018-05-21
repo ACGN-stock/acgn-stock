@@ -1,4 +1,3 @@
-'use strict';
 import test from 'tape';
 import deepequal from 'deep-equal';
 import { Meteor } from 'meteor/meteor';

@@ -1,4 +1,3 @@
-'use strict';
 import { dbVariables } from '/db/dbVariables';
 
 if (! dbVariables.initialized()) {

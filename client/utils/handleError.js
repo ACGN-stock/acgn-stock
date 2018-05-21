@@ -1,4 +1,3 @@
-'use strict';
 import { alertDialog } from '../layout/alertDialog';
 
 export function handleError(error) {

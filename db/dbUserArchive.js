@@ -1,4 +1,3 @@
-'use strict';
 import { Mongo } from 'meteor/mongo';
 import { Match } from 'meteor/check';
 import SimpleSchema from 'simpl-schema';

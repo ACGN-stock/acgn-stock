@@ -1,4 +1,3 @@
-'use strict';
 import { Meteor } from 'meteor/meteor';
 import { dbVariables } from '/db/dbVariables';
 import { limitSubscription } from '/server/imports/utils/rateLimit';

@@ -1,4 +1,3 @@
-'use strict';
 import { Mongo } from 'meteor/mongo';
 
 // 任意變數資料集
