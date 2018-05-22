@@ -1,0 +1,10 @@
+<template name="violatorDisplay">
+  {{#if isViolatorType 'user'}}
+    使用者 {{>userLink violatorId}}
+  {{else if isViolatorType 'company'}}
+    公司「{{>companyLink violatorId}}」
+  {{else if isViolatorType 'product'}}
+    產品「{{>productLink violatorId}}」
+  {{/if}}
+  ({{violatorId}})
+</template>

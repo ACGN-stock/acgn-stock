@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
@@ -12,7 +13,7 @@ import { roleDisplayName, getManageableRoles } from '/db/users';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { changeChairmanTitle } from '../utils/methods';
+import { changeChairmanTitle, confiscateUserMoney, sendFscNotice, banUser, confiscateAllUserStocks, returnUserMoney } from '../utils/methods';
 import { accountInfoCommonHelpers, paramUserId, paramUser, isCurrentUser } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
@@ -35,7 +36,7 @@ Template.accountInfo.onCreated(function() {
   this.autorun(() => {
     const user = paramUser();
     if (user) {
-      DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + user.profile.name + '」帳號資訊');
+      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${user.profile.name}」帳號資訊`);
     }
   });
 });
@@ -71,13 +72,13 @@ Template.accountInfoBasic.helpers({
   showValidateType() {
     switch (this.profile.validateType) {
       case 'Google': {
-        return '【Google帳號】' + this.services.google.email;
+        return `【Google帳號】${this.services.google.email}`;
       }
       case 'PTT': {
-        return '【PTT帳號】' + this.username;
+        return `【PTT帳號】${this.username}`;
       }
       case 'Bahamut': {
-        return '【巴哈姆特帳號】' + this.username.replace('?', '');
+        return `【巴哈姆特帳號】${this.username.replace('?', '')}`;
       }
     }
   },
@@ -87,7 +88,7 @@ Template.accountInfoBasic.helpers({
 
     return isCurrentUser() && dbEmployees.findOne({ userId, employed });
   },
-  isBaned(type) {
+  isBanned(type) {
     return _.contains(this.profile.ban, type);
   },
   isInVacation() {
@@ -95,147 +96,33 @@ Template.accountInfoBasic.helpers({
   },
   isEndingVacation() {
     return this.profile.isEndingVacation;
+  },
+  pathForReportUserViolation() {
+    return FlowRouter.path('reportViolation', null, { type: 'user', id: paramUserId() });
   }
 });
 
 Template.accountInfoBasic.events({
-  'click [data-action="fscAnnouncement"]'(event) {
+  'click [data-action="sendFscNotice"]'(event) {
     event.preventDefault();
-    const accuseUser = paramUser();
-    alertDialog.dialog({
-      type: 'prompt',
-      title: `金管會通告 - ${accuseUser.profile.name}`,
-      message: `請輸入要通告的訊息：`,
-      callback: (message) => {
-        if (message) {
-          const userIds = [accuseUser._id];
-          Meteor.customCall('fscAnnouncement', { userIds, message });
-        }
-      }
-    });
-  },
-  'click [data-action="accuse"]'(event) {
-    event.preventDefault();
-    const accuseUser = paramUser();
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '舉報違規 - ' + accuseUser.profile.name,
-      message: `請輸入您要舉報的內容：`,
-      callback: (message) => {
-        if (message) {
-          const userId = accuseUser._id;
-          Meteor.customCall('accuseUser', userId, message);
-        }
-      }
-    });
+    sendFscNotice({ userIds: [paramUserId()] });
   },
   'click [data-ban]'(event) {
     event.preventDefault();
     const banType = $(event.currentTarget).attr('data-ban');
-    let banActionText;
-    switch (banType) {
-      case 'accuse': {
-        banActionText = '禁止舉報違規';
-        break;
-      }
-      case 'deal': {
-        banActionText = '禁止投資下單';
-        break;
-      }
-      case 'chat': {
-        banActionText = '禁止聊天發言';
-        break;
-      }
-      case 'advertise': {
-        banActionText = '禁止廣告宣傳';
-        break;
-      }
-      case 'manager': {
-        banActionText = '禁止擔任經理';
-        break;
-      }
-    }
-    const accuseUserData = paramUser();
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '違規處理 - ' + accuseUserData.profile.name + ' - ' + banActionText,
-      message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
-          const userId = accuseUserData._id;
-          Meteor.customCall('banUser', { userId, message, banType });
-        }
-      }
-    });
+    banUser(paramUser(), banType);
   },
-  'click [data-action="forfeitUserMoney"]'(event) {
+  'click [data-action="confiscateUserMoney"]'(event) {
     event.preventDefault();
-    const accuseUserData = paramUser();
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '課以罰金 - ' + accuseUserData.profile.name,
-      message: `請輸入處理事由：`,
-      callback: (reason) => {
-        if (reason) {
-          alertDialog.dialog({
-            type: 'prompt',
-            title: '課以罰金 - ' + accuseUserData.profile.name,
-            message: `請輸入罰金數額：`,
-            inputType: 'number',
-            customSetting: `min="0"`,
-            callback: (amount) => {
-              amount = parseInt(amount, 10);
-              if (amount && amount >= 0) {
-                const userId = accuseUserData._id;
-                Meteor.customCall('forfeitUserMoney', { userId, reason, amount });
-              }
-            }
-          });
-        }
-      }
-    });
+    confiscateUserMoney(paramUser());
   },
-  'click [data-action="returnForfeitedUserMoney"]'(event) {
+  'click [data-action="returnUserMoney"]'(event) {
     event.preventDefault();
-    const accuseUserData = paramUser();
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '退還罰金 - ' + accuseUserData.profile.name,
-      message: `請輸入處理事由：`,
-      callback: (reason) => {
-        if (reason) {
-          alertDialog.dialog({
-            type: 'prompt',
-            title: '退還罰金 - ' + accuseUserData.profile.name,
-            message: `請輸入退還金額：`,
-            inputType: 'number',
-            customSetting: `min="0"`,
-            callback: (amount) => {
-              amount = parseInt(amount, 10);
-              if (amount && amount > 0) {
-                const userId = accuseUserData._id;
-                Meteor.customCall('forfeitUserMoney', { userId, reason, amount: -amount });
-              }
-            }
-          });
-        }
-      }
-    });
+    returnUserMoney(paramUser());
   },
-  'click [data-action="confiscateStocks"]'(event) {
+  'click [data-action="confiscateAllUserStocks"]'(event) {
     event.preventDefault();
-    const accuseUserData = paramUser();
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '沒收股份 - ' + accuseUserData.profile.name,
-      message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
-          const userId = accuseUserData._id;
-          Meteor.customCall('confiscateStocks', { userId, message });
-        }
-      }
-    });
+    confiscateAllUserStocks(paramUser());
   },
   'click [data-action="unregisterEmployee"]'(event) {
     event.preventDefault();

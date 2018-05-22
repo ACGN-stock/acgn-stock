@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Counts } from 'meteor/tmeasday:publish-counts';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbVariables } from '/db/dbVariables';
@@ -151,6 +152,39 @@ Template.displayAnnouncementUnreadNotification.helpers({
 });
 
 Template.displayAnnouncementUnreadNotification.events({
+  'click .btn'(event, templateInstance) {
+    event.preventDefault();
+    templateInstance.rIsDisplay.set(false);
+  }
+});
+
+Template.displayViolationCaseUnreadNotification.onCreated(function() {
+  this.rIsDisplay = new ReactiveVar(false);
+
+  this.autorunWithIdleSupport(() => {
+    const user = Meteor.user();
+    if (! user) {
+      return;
+    }
+
+    this.subscribe('currentUserUnreadViolationCaseCount');
+  });
+
+  this.autorunWithIdleSupport(() => {
+    this.rIsDisplay.set(Counts.get('currentUserUnreadViolationCases') > 0);
+  });
+});
+
+Template.displayViolationCaseUnreadNotification.helpers({
+  isDisplay() {
+    return Template.instance().rIsDisplay.get();
+  },
+  pathForUnreadViolationCaseList() {
+    return FlowRouter.path('violationCaseList', null, { onlyUnread: true });
+  }
+});
+
+Template.displayViolationCaseUnreadNotification.events({
   'click .btn'(event, templateInstance) {
     event.preventDefault();
     templateInstance.rIsDisplay.set(false);

@@ -1,4 +1,5 @@
 import { Mongo } from 'meteor/mongo';
+import { Meteor } from 'meteor/meteor';
 import SimpleSchema from 'simpl-schema';
 
 // 公司保管庫資料集
@@ -55,3 +56,13 @@ const schema = new SimpleSchema({
   }
 });
 dbCompanyArchive.attachSchema(schema);
+
+dbCompanyArchive.findByIdOrThrow = function(id, options) {
+  const result = dbCompanyArchive.findOne(id, options);
+
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的公司或新創資料！`);
+  }
+
+  return result;
+};

@@ -7,6 +7,7 @@ import { dbProducts } from '/db/dbProducts';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 import { debug } from '/server/imports/utils/debug';
+import { publishWithTransformation } from '/server/imports/utils/publishWithTransformation';
 
 Meteor.publish('companyMarketingProducts', function({ companyId, offset }) {
   debug.log('publish companyMarketingProducts', { companyId, offset });
@@ -15,46 +16,32 @@ Meteor.publish('companyMarketingProducts', function({ companyId, offset }) {
 
   const company = dbCompanies.findOne(companyId);
 
-  const transformFields = (fields) => {
-    const result = { ...fields };
-
-    if (fields.stockAmount) {
-      result.hasStockAmount = fields.stockAmount > 0;
-    }
-
-    if (! this.userId || this.userId !== company.manager) {
-      return _.omit(result, 'stockAmount', 'totalAmount');
-    }
-
-    return result;
-  };
-
   const filter = { companyId, state: 'marketing' };
 
   publishTotalCount('totalCountOfCompanyMarketingProducts', dbProducts.find(filter), this);
 
   const { companyMarketingProducts: dataNumberPerPage } = Meteor.settings.public.dataNumberPerPage;
 
-  const pageObserver = dbProducts
-    .find(filter, {
+  publishWithTransformation(this, {
+    collection: 'products',
+    cursor: dbProducts.find(filter, {
       sort: { voteCount: -1 },
       skip: offset,
       limit: dataNumberPerPage
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('products', id, transformFields(fields));
-      },
-      changed: (id, fields) => {
-        this.changed('products', id, transformFields(fields));
-      },
-      removed: (id) => {
-        this.removed('products', id);
-      }
-    });
+    }),
+    transform: (fields) => {
+      const result = { ...fields };
 
-  this.onStop(() => {
-    pageObserver.stop();
+      if (fields.stockAmount) {
+        result.hasStockAmount = fields.stockAmount > 0;
+      }
+
+      if (! this.userId || this.userId !== company.manager) {
+        return _.omit(result, 'stockAmount', 'totalAmount');
+      }
+
+      return result;
+    }
   });
 
   this.ready();

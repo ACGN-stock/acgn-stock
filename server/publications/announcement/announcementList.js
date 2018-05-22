@@ -6,6 +6,7 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { dbAnnouncements, announcementCategoryMap } from '/db/dbAnnouncements';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
+import { publishWithTransformation } from '/server/imports/utils/publishWithTransformation';
 
 Meteor.publish('announcementList', function({ category, onlyUnread, offset }) {
   debug.log('publish announcementList', { category, onlyUnread, offset });
@@ -26,20 +27,11 @@ Meteor.publish('announcementList', function({ category, onlyUnread, offset }) {
 
   Counts.publish(this, 'announcements', dbAnnouncements.find(filter, { fields: { _id: 1 } }), { noReady: true });
 
-  const transformFields = (fields) => {
-    const result = { ..._.omit(fields, 'readers') };
-
-    if (this.userId && fields.readers) {
-      result.isUnread = ! fields.readers.includes(this.userId);
-    }
-
-    return result;
-  };
-
   const { announcements: dataNumberPerPage } = Meteor.settings.public.dataNumberPerPage;
 
-  dbAnnouncements
-    .find(filter, {
+  publishWithTransformation(this, {
+    collection: 'announcements',
+    cursor: dbAnnouncements.find(filter, {
       fields: {
         creator: 1,
         category: 1,
@@ -50,18 +42,17 @@ Meteor.publish('announcementList', function({ category, onlyUnread, offset }) {
       sort: { createdAt: -1 },
       skip: offset,
       limit: dataNumberPerPage
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added('announcements', id, transformFields(fields));
-      },
-      changed: (id, fields) => {
-        this.changed('announcements', id, transformFields(fields));
-      },
-      removed: (id) => {
-        this.removed('announcements', id);
+    }),
+    transform: (fields) => {
+      const result = { ..._.omit(fields, 'readers') };
+
+      if (this.userId && fields.readers) {
+        result.isUnread = ! fields.readers.includes(this.userId);
       }
-    });
+
+      return result;
+    }
+  });
 
   this.ready();
 });

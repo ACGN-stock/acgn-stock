@@ -22,12 +22,13 @@
         </div>
       {{/if}}
     </div>
-    <div class="card-block p-3">
+    <div class="card-block px-3 pt-3 pb-1">
       <h5 class="card-title text-truncate">
         <div class="badge badge-default">{{product.type}}</div>
         {{> productLink product._id}}
       </h5>
       <div class="card-subtitle product-description">{{product.description}}</div>
+      <div class="text-right"><small>識別碼：{{product._id}}</small></div>
     </div>
     <div class="card-footer d-flex flex-wrap px-3">
       <div class="mr-auto my-1">
@@ -45,12 +46,14 @@
           {{product.voteCount}}
         </button>
       </div>
-      {{#if currentUserHasRole 'fscMember'}}
-        <div class="my-1">
+      <div class="my-1">
+        {{#if currentUserHasRole 'fscMember'}}
           <button class="btn btn-sm btn-danger" title="修改" data-edit-product="{{product._id}}">修改</button>
           <button class="btn btn-sm btn-danger" title="下架" data-ban-product="{{product._id}}">下架</button>
-        </div>
-      {{/if}}
+        {{else}}
+          <a class="btn btn-sm btn-danger" href="{{pathForReportProductViolation}}">舉報違規</a>
+        {{/if}}
+      </div>
     </div>
   </div>
 </template>

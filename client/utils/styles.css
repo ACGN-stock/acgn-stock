@@ -641,3 +641,12 @@ table.arena-fighter-body tr td:nth-child(9) {
 .footer-message-close-button {
   margin-top: auto;
 }
+
+.violation-case-card {
+  box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.25);
+}
+
+.violation-case-card.unread {
+  border-color: rgba(255, 0, 0, 0.5);
+  box-shadow: 6px 6px 6px rgba(255, 0, 0, 0.25);
+}
