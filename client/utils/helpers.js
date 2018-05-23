@@ -289,7 +289,6 @@ const katexExtension = {
 
 // 防止 xss 幫我們跳脫字元
 function escapeHtml(html) {
-console.log(html);
   return html;
 }
 
