@@ -62,13 +62,7 @@ export const categoryMap = {
   multipleAccounts: {
     displayName: '分身違規',
     allowedInitialViolatorTypes: ['user'],
-    descriptionTemplate: stripIndent(String.raw)`
-      分身違規案件樣版
-      第二行
-      第三行
-
-      第二段
-    `
+    descriptionTemplate: stripIndent(String.raw)``
   },
   miscellaneous: {
     displayName: '其他違規',
