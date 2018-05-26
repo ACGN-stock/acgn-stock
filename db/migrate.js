@@ -1538,6 +1538,17 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 26,
+    name: 'fix announcement index typo',
+    up() {
+      Promise.await(Promise.all([
+        dbAnnouncements.rawCollection().dropIndex({ categoty: 1 }),
+        dbAnnouncements.rawCollection().createIndex({ category: 1 })
+      ]));
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });
