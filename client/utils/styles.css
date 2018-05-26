@@ -650,3 +650,16 @@ table.arena-fighter-body tr td:nth-child(9) {
   border-color: rgba(255, 0, 0, 0.5);
   box-shadow: 6px 6px 6px rgba(255, 0, 0, 0.25);
 }
+
+.violation-case-action-reason {
+  border: 1px solid #999999;
+  border-radius: 1rem;
+  border-top-left-radius: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.violation-case-action-reason p:last-child {
+  margin-bottom: 0;
+}
