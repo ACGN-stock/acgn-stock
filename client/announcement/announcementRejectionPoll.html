@@ -1,0 +1,87 @@
+
+<template name="announcementRejectionPoll">
+  <h3>否決投票</h3>
+
+  <div class="row p-2">
+    <div class="col-12 col-md-6 my-2">
+      <h4>投票資訊</h4>
+      <div class="my-2">
+        {{#if isFinished}}
+          <span class="text-danger">投票已結束</span>
+        {{else}}
+          <span class="text-info">投票進行中（尚餘 {{formatLongDurationTimeText remainingTime}}）</span>
+        {{/if}}
+      </div>
+
+      <div class="my-2">
+        截止時間：{{formatDateTimeText poll.dueAt}} <br/>
+        投票門檻：{{threshold}} 人（活躍玩家 {{poll.activeUserCount}} 人中的 {{poll.thresholdPercent}}%）
+      </div>
+
+      {{#if choiceMatches 'yes'}}
+        <div class="my-2">
+          您已經對本次否決投下了<span class="text-success">贊成</span>票。
+        </div>
+      {{else if choiceMatches 'no'}}
+        <div class="my-2">
+          您已經對本次否決投下了<span class="text-danger">反對</span>票。
+        </div>
+      {{else if canVote}}
+        <div class="my-2">
+          <button class="btn btn-sm btn-warning" data-vote="yes">
+            <i class="fa fa-check"></i> 贊成本次否決
+          </button>
+          <button class="btn btn-sm btn-warning" data-vote="no">
+            <i class="fa fa-times"></i> 反對本次否決
+          </button>
+        </div>
+      {{/if}}
+    </div>
+
+    <div class="col-12 col-md-6 my-2">
+      <h4>投票結果</h4>
+
+      {{#if isFinished}}
+        <p>
+          <i class="fa fa-check-circle text-success"></i> 贊成：{{voteCount 'yes'}} 人<br/>
+          <i class="fa fa-times-circle text-danger"></i> 反對：{{voteCount 'no'}} 人<br/>
+        </p>
+        <p>
+          <span class="mr-2">總投票人數：{{totalVoteCount}} 人</span>
+
+          {{#if isThresholdPassed}}
+            <span class="text-success"><i class="fa fa-circle-o"></i> 已達投票門檻</span>
+          {{else}}
+            <span class="text-danger"><i class="fa fa-times"></i> 未達投票門檻</span>
+          {{/if}}
+        </p>
+      {{else}}
+        <em>投票截止後再回來看看吧！</em>
+      {{/if}}
+    </div>
+
+    {{#if showVoteLists}}
+      <div class="col-12 col-md-6 my-2">
+        <h4>贊成名單</h4>
+        <ol style="max-height: 300px; overflow-y: auto">
+          {{#each userId in poll.yesVotes}}
+            <li>{{> userLink userId }}</li>
+          {{else}}
+            <em>一個人都沒有呢！</em>
+          {{/each}}
+        </ol>
+      </div>
+
+      <div class="col-12 col-md-6 my-2">
+        <h4>反對名單</h4>
+        <ol style="max-height: 300px; overflow-y: auto">
+          {{#each userId in poll.noVotes}}
+            <li>{{> userLink userId }}</li>
+          {{else}}
+            <em>一個人都沒有呢！</em>
+          {{/each}}
+        </ol>
+      </div>
+    {{/if}}
+  </div>
+</template>

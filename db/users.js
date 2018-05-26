@@ -29,6 +29,74 @@ export function banTypeDescription(banType) {
   }
 }
 
+export const userRoleMap = {
+  superAdmin: {
+    displayName: '超級管理員'
+  },
+  generalManager: {
+    displayName: '營運總管'
+  },
+  developer: {
+    displayName: '工程部成員',
+    manageableBy: ['generalManager']
+  },
+  planner: {
+    displayName: '企劃部成員',
+    manageableBy: ['generalManager']
+  },
+  fscMember: {
+    displayName: '金管會成員',
+    manageableBy: ['generalManager']
+  }
+};
+
+export function getManageableRoles(user) {
+  // 超級管理員可管理所有除自身以外的身份組
+  if (hasRole(user, 'superAdmin')) {
+    return Object.keys(userRoleMap).filter((role) => {
+      return role !== 'superAdmin';
+    });
+  }
+
+  // 其餘身份組由 userRoleMap 的設定來決定
+  return Object.entries(userRoleMap)
+    .filter(([, { manageableBy } ]) => {
+      return manageableBy && hasAnyRoles(user, ...manageableBy);
+    })
+    .map(([role]) => {
+      return role;
+    });
+}
+
+export function isRoleManageable(user, role) {
+  // 超級管理員可管理所有除自身以外的身份組
+  if (hasRole(user, 'superAdmin')) {
+    return role !== 'superAdmin';
+  }
+
+  return getManageableRoles(user).includes(role);
+}
+
+export function hasRole(user, role) {
+  return user && user.profile && user.profile.roles && user.profile.roles.includes(role);
+}
+
+export function hasAnyRoles(user, ...roles) {
+  return user && user.profile && user.profile.roles && roles.some((role) => {
+    return user.profile.roles.includes(role);
+  });
+}
+
+export function hasAllRoles(user, ...roles) {
+  return user && user.profile && user.profile.roles && roles.every((role) => {
+    return user.profile.roles.includes(role);
+  });
+}
+
+export function roleDisplayName(role) {
+  return (userRoleMap[role] || { displayName: `未知的身份組成員(${role})` }).displayName;
+}
+
 const schema = new SimpleSchema({
   // 使用者PTT帳號名稱
   username: {
@@ -95,12 +163,8 @@ const schema = new SimpleSchema({
           };
 
           return obj;
-        }, {}))
-      },
-      // 是否為金管會委員
-      isAdmin: {
-        type: Boolean,
-        defaultValue: false
+        }, {})),
+        defaultValue: {}
       },
       // 是否處於繳稅逾期的狀態
       notPayTax: {
@@ -144,9 +208,19 @@ const schema = new SimpleSchema({
       lastVacationEndDate: {
         type: Date,
         optional: true
+      },
+      // 使用者的系統權限組
+      roles: {
+        type: Array,
+        defaultValue: []
+      },
+      'roles.$': {
+        type: String,
+        allowedValues: Object.keys(userRoleMap)
       }
     })
   },
+  // user-status 的欄位定義
   status: {
     type: new SimpleSchema({
       // 是否為上線狀態

@@ -209,7 +209,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
             status: 'archived',
             name: userData.profile.name,
             validateType: userData.profile.validateType,
-            isAdmin: userData.profile.isAdmin,
+            roles: userData.profile.roles,
             saintStones: userData.profile.stones.saint,
             ban: userData.profile.ban
           }

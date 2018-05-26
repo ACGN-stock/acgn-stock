@@ -13,7 +13,7 @@ import { dbSeason } from '/db/dbSeason';
 import { dbVariables } from '/db/dbVariables';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
-import { currencyFormat, setChartTheme } from '../utils/helpers.js';
+import { currencyFormat, setChartTheme } from '../utils/helpers';
 import { globalVariable } from '../utils/globalVariable';
 
 inheritedShowLoadingOnSubscribing(Template.seasonalReport);

@@ -6,6 +6,7 @@ import { Migrations } from 'meteor/percolate:migrations';
 import { Promise } from 'meteor/promise';
 
 import { dbAdvertising } from './dbAdvertising';
+import { dbAnnouncements } from './dbAnnouncements';
 import { dbArena } from './dbArena';
 import { dbArenaFighters } from './dbArenaFighters';
 import { dbCompanies } from './dbCompanies';
@@ -1486,6 +1487,66 @@ if (Meteor.isServer) {
       if (currentArena) {
         dbEventSchedules.upsert('arena.joinEnded', { $set: { scheduledAt: currentArena.joinEndDate } });
       }
+    }
+  });
+
+  Migrations.add({
+    version: 24,
+    name: 'migrate to advanced permission system',
+    up() {
+      // 廢除舊的 isAdmin 旗標，改用新的權限組設定並指定為金管會成員
+      const fscMembers = _.pluck(Meteor.users.find({ 'profile.isAdmin': true }, { fields: { _id: 1 } }).fetch(), '_id');
+
+      Promise.await(Meteor.users.rawCollection().update({}, {
+        $unset: { 'profile.isAdmin': 0 },
+        $set: { 'profile.roles': [] }
+      }, { multi: true }));
+
+      Promise.await(Meteor.users.rawCollection().update({
+        _id: { $in: fscMembers }
+      }, {
+        $addToSet: { 'profile.roles': 'fscMember' }
+      }, { multi: true }));
+
+      // 處理使用者保管庫的金管會權限設定
+      const archivedFscMembers = _.pluck(dbUserArchive.find({ isAdmin: true }, { fields: { _id: 1 } }).fetch(), '_id');
+
+      Promise.await(dbUserArchive.rawCollection().update({}, {
+        $unset: { isAdmin: 0 },
+        $set: { roles: [] }
+      }, { multi: true }));
+
+      Promise.await(dbUserArchive.rawCollection().update({
+        _id: { $in: archivedFscMembers }
+      }, {
+        $addToSet: { roles: 'fscMember' }
+      }, { multi: true }));
+
+      // 對權限組設定建立索引
+      Promise.await(Meteor.users.rawCollection().createIndex({ roles: 1 }));
+    }
+  });
+
+  Migrations.add({
+    version: 25,
+    name: 'new announcement system',
+    up() {
+      Promise.await(Promise.all([
+        dbAnnouncements.rawCollection().createIndex({ categoty: 1 }),
+        dbAnnouncements.rawCollection().createIndex({ createdAt: -1 }),
+        dbAnnouncements.rawCollection().createIndex({ readers: 1 })
+      ]));
+    }
+  });
+
+  Migrations.add({
+    version: 26,
+    name: 'fix announcement index typo',
+    up() {
+      Promise.await(Promise.all([
+        dbAnnouncements.rawCollection().dropIndex({ categoty: 1 }),
+        dbAnnouncements.rawCollection().createIndex({ category: 1 })
+      ]));
     }
   });
 

@@ -36,7 +36,7 @@ export function updateProfitDistribution({ userId, companyId, distribution }) {
 
   guardCompany(company)
     .checkNotSealed()
-    .checkIsManagableByUser(user);
+    .checkIsManageableByUser(user);
 
   const { min: minManagerBonusRatePercent, max: maxManagerBonusRatePercent } = Meteor.settings.public.companyProfitDistribution.managerBonusRatePercent;
   const { min: minEmployeeBonusRatePercent, max: maxEmployeeBonusRatePercent } = Meteor.settings.public.companyProfitDistribution.employeeBonusRatePercent;

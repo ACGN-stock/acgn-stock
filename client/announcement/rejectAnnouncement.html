@@ -1,0 +1,33 @@
+<template name="rejectAnnouncement">
+  <div class="card">
+    <div class="card-block">
+      {{#if announcement}}
+        <h1 class="card-title d-flex flex-wrap">
+          <div>否決{{categoryDisplayName announcement.category}}公告</div>
+        </h1>
+        <hr />
+        <h3 style="word-break: break-all">
+          主旨：
+          <a href="{{pathForAnnouncement}}">{{announcement.subject}}</a>
+        </h3>
+        <hr/>
+
+        {{#if canRejectAnnoumcenet}}
+          {{#if announcement.rejectionPetition}}
+            {{> announcementRejectionPetition}}
+          {{/if}}
+          {{#if announcement.rejectionPoll}}
+            <hr />
+            {{> announcementRejectionPoll}}
+          {{/if}}
+        {{else}}
+          本公告沒有進行否決程序！
+        {{/if}}
+
+      {{else}}
+        讀取中…
+      {{/if}}
+    </div>
+  </div>
+
+</template>

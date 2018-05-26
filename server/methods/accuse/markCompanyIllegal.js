@@ -5,6 +5,7 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   markCompanyIllegal(companyId, reason) {
@@ -18,13 +19,10 @@ Meteor.methods({
 });
 function markCompanyIllegal(user, companyId, reason) {
   debug.log('markCompanyIllegal', { user, companyId, reason });
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
-  }
 
-  if (dbCompanies.find(companyId).count() === 0) {
-    throw new Meteor.Error(404, `找不到識別碼為「${companyId}」的公司！`);
-  }
+  guardUser(user).checkHasRole('fscMember');
+
+  dbCompanies.findByIdOrThrow(companyId, { fields: { _id: 1 } });
 
   dbCompanies.update(companyId, { $set: { illegalReason: reason } });
   dbLog.insert({

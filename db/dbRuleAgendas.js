@@ -1,10 +1,9 @@
-'use strict';
+import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
 // 議程資料集
 export const dbRuleAgendas = new Mongo.Collection('ruleAgendas');
-export default dbRuleAgendas;
 
 const schema = new SimpleSchema({
   // 議程標題
@@ -59,3 +58,13 @@ const schema = new SimpleSchema({
   }
 });
 dbRuleAgendas.attachSchema(schema);
+
+dbRuleAgendas.findByIdOrThrow = function(id, options) {
+  const result = dbRuleAgendas.findOne(id, options);
+
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的提案！`);
+  }
+
+  return result;
+};

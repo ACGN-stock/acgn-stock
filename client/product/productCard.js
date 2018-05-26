@@ -9,11 +9,6 @@ import { currencyFormat } from '../utils/helpers';
 import { alertDialog } from '../layout/alertDialog';
 
 Template.productCard.helpers({
-  isAdmin() {
-    const user = Meteor.user();
-
-    return user && user.profile.isAdmin;
-  },
   soldAmount() {
     const { product } = Template.currentData();
     const { totalAmount, stockAmount, availableAmount } = product;

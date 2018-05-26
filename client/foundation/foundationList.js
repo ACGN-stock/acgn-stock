@@ -5,7 +5,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbFoundations } from '/db/dbFoundations';
-import { formatDateText, isUserId } from '../utils/helpers';
+import { formatDateTimeText, isCurrentUser } from '../utils/helpers';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -121,7 +121,7 @@ const foundationListHelpers = {
   getExpireDateText(createdAt) {
     const expireDate = new Date(createdAt.getTime() + Meteor.settings.public.foundExpireTime);
 
-    return formatDateText(expireDate);
+    return formatDateTimeText(expireDate);
   },
   getEditHref(foundationId) {
     return FlowRouter.path('editFoundationPlan', { foundationId });
@@ -143,7 +143,7 @@ const foundationListHelpers = {
     if (! Meteor.user()) {
       return 'company-card-default';
     }
-    if (isUserId(this.manager)) {
+    if (isCurrentUser(this.manager)) {
       return 'company-card-manager';
     }
     const invest = this.invest;

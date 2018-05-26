@@ -29,7 +29,7 @@ export function adminEditProduct({ userId, productId, newData }) {
   debug.log('adminEditProduct', { userId, productId, newData });
 
   const user = Meteor.users.findByIdOrThrow(userId);
-  guardUser(user).checkIsAdmin();
+  guardUser(user).checkHasRole('fscMember');
 
   const { url } = newData;
 

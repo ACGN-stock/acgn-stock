@@ -4,6 +4,7 @@ import { check } from 'meteor/check';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   updateAgendaProposer(agendaId, proposerId) {
@@ -17,23 +18,8 @@ Meteor.methods({
 });
 function updateAgendaProposer(user, agendaId, proposerId) {
   debug.log('updateAgendaProposer', { user, agendaId, proposerId });
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '非金管委員不得修改提案人！');
-  }
-
-  const proposer = Meteor.users.findOne({
-    _id: proposerId
-  });
-  if (! proposer) {
-    throw new Meteor.Error(404, '提案人帳號不存在！');
-  }
-
-  dbRuleAgendas.update({
-    _id: agendaId
-  }, {
-    $set: {
-      proposer: proposerId
-    }
-  });
+  guardUser(user).checkHasRole('planner');
+  Meteor.users.findByIdOrThrow({ _id: proposerId }, { fields: { _id: 1 } });
+  dbRuleAgendas.update({ _id: agendaId }, { $set: { proposer: proposerId } });
 }
 limitMethod('updateAgendaProposer');

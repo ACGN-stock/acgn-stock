@@ -1,0 +1,52 @@
+<template name="announcementForm">
+  <form>
+    <div class="form-group">
+      <label for="category">公告分類：</label>
+      <select class="form-control" name="category">
+        <option value="" class="d-none" hidden>選擇公告分類…</option>
+        {{#each category in announceableCategories}}
+          <option value="{{category}}">{{categoryDisplayName category}}</option>
+        {{else}}
+          <option value="" disabled>沒有可用的公告分類！</option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'category'}}}
+    </div>
+    <div class="form-group">
+      <label for="subject">公告主旨：</label>
+      <input class="form-control" type="text" name="subject" placeholder="請輸入公告主旨" />
+      {{{errorHtmlOf 'subject'}}}
+    </div>
+    <div class="form-group">
+      <label for="content">公告內文：</label>
+      <textarea class="form-control" name="content" rows="5" placeholder="請輸入公告內容"></textarea>
+      {{{errorHtmlOf 'content'}}}
+    </div>
+    {{#if showRejectionPetitionFields}}
+      <div class="form-group">
+        <label for="rejectionPetitionDurationDays">否決連署天數 ({{rejectionPetitionDurationDays.min}} ~ {{rejectionPetitionDurationDays.max}})：</label>
+        <input
+          class="form-control"
+          type="number"
+          min="{{rejectionPetitionDurationDays.min}}"
+          max="{{rejectionPetitionDurationDays.max}}"
+          name="rejectionPetitionDurationDays"
+          placeholder="請輸入天數" />
+        {{{errorHtmlOf 'rejectionPetitionDurationDays'}}}
+      </div>
+    {{/if}}
+    <div class="text-right">
+      <button class="btn btn-primary" type="submit">送出</button>
+      <a class="btn btn-secondary" href="{{pathFor 'announcementList'}}">取消</a>
+    </div>
+  </form>
+  <hr />
+  <div class="announcement-detail">
+    <div class="row" style="margin-top: 15px;">
+      <div class="col-12">
+        <h3>內文預覽</h3>
+        <div class="markdown-container">{{{contentPreview}}}</div>
+      </div>
+    </div>
+  </div>
+</template>

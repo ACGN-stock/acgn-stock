@@ -1,7 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { _ } from 'meteor/underscore';
 
-import { banTypeDescription } from '/db/users';
+import { banTypeList, banTypeDescription, hasRole, hasAnyRoles } from '/db/users';
+import { getCurrentRound } from '/db/dbRound';
 
 class UserGuard {
   constructor(user) {
@@ -27,7 +28,7 @@ class UserGuard {
   checkNotBanned(...banTypes) {
     banTypes.forEach((banType) => {
       if (_.contains(this.user.profile.ban, banType)) {
-        throw new Meteor.Error(403, `您現在被金融管理會禁止了${banTypeDescription(banType)}！`);
+        throw new Meteor.Error(403, `您現在被禁止了${banTypeDescription(banType)}！`);
       }
     });
 
@@ -50,9 +51,39 @@ class UserGuard {
     return this;
   }
 
-  checkIsAdmin() {
-    if (! this.user.profile.isAdmin) {
-      throw new Meteor.Error(403, '您並非金融管理會委員，無法進行此操作！');
+  checkHasRole(role) {
+    if (! hasRole(this.user, role)) {
+      throw new Meteor.Error(403, '權限不符，無法進行此操作！');
+    }
+
+    return this;
+  }
+
+  checkHasAnyRoles(...roles) {
+    if (! hasAnyRoles(this.user, ...roles)) {
+      throw new Meteor.Error(403, '權限不符，無法進行此操作！');
+    }
+
+    return this;
+  }
+
+  checkCanVote() {
+    this.checkNotBanned(...banTypeList)
+      .checkNoExpiredTaxes();
+
+    if (this.user.profile.money < 0) {
+      throw new Meteor.Error(403, '現金為負數者不可投票！');
+    }
+
+    const now = Date.now();
+    const { voteUserNeedCreatedIn } = Meteor.settings.public;
+    const { beginDate: roundBeginDate } = getCurrentRound();
+
+    if (now - roundBeginDate.getTime() > voteUserNeedCreatedIn * 2) { // XXX: why * 2 ?
+      const userCreatedAt = this.user.createdAt;
+      if (! userCreatedAt || (now - userCreatedAt.getTime() < voteUserNeedCreatedIn)) {
+        throw new Meteor.Error(403, '註冊時間不足，不可投票！');
+      }
     }
 
     return this;

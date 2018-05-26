@@ -1,10 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import { dbRound } from '/db/dbRound';
+
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { dbRuleIssueOptions } from '/db/dbRuleIssueOptions';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   voteAgenda(voteData) {
@@ -21,28 +22,8 @@ Meteor.methods({
 function voteAgenda(user, voteData) {
   debug.log('voteAgenda', { user, voteData });
   const userId = user._id;
-  if (user.profile.ban.length > 0) {
-    throw new Meteor.Error(403, '你已被禁止投票！');
-  }
-  if (user.profile.money < 0) {
-    throw new Meteor.Error(403, '現金為負數者不可投票！');
-  }
-  if (user.profile.notPayTax) {
-    throw new Meteor.Error(403, '有逾期稅單未繳納者不可投票！');
-  }
-  const now = Date.now();
-  const voteUserNeedCreatedIn = Meteor.settings.public.voteUserNeedCreatedIn;
-  const currentRound = dbRound.findOne({}, {
-    sort: {
-      beginDate: -1
-    }
-  });
-  if ((now - currentRound.beginDate.getTime()) > (voteUserNeedCreatedIn * 2)) {
-    const userCreatedAt = user.createdAt;
-    if (! userCreatedAt || ((now - userCreatedAt.getTime()) < voteUserNeedCreatedIn)) {
-      throw new Meteor.Error(403, '註冊未滿七日不可投票！');
-    }
-  }
+
+  guardUser(user).checkCanVote();
 
   const agendaId = voteData.agendaId;
   const agenda = dbRuleAgendas.findOne(agendaId, {

@@ -1,4 +1,4 @@
-'use strict';
+import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
@@ -33,3 +33,13 @@ const schema = new SimpleSchema({
   }
 });
 dbAdvertising.attachSchema(schema);
+
+dbAdvertising.findByIdOrThrow = function(id, options) {
+  const result = dbAdvertising.findOne(id, options);
+
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的廣告！`);
+  }
+
+  return result;
+};

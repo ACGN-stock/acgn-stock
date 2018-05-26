@@ -127,7 +127,7 @@
         {{#if currentUser}}
           <hr class="m-0">
           <div class="row btn-group">
-            {{#if currentUser.profile.isAdmin}}
+            {{#if currentUserHasRole 'fscMember'}}
               <a class="btn btn-tab" href="{{getEditHref this._id}}">
                 修改計劃
               </a>
@@ -167,8 +167,8 @@
         {{>userLink this.manager}}
       </div>
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">計劃日期：</div>
-      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateText this.createdAt}}">
-        {{formatDateText this.createdAt}}
+      <div class="col-8 col-lg-3 text-right text-truncate border-grid" title="{{formatDateTimeText this.createdAt}}">
+        {{formatDateTimeText this.createdAt}}
       </div>
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">截止日期：</div>
       <div class="col-8 col-lg-3 text-truncate text-right border-grid" title="{{getExpireDateText this.createdAt}}">
@@ -186,12 +186,12 @@
       </div>
       {{#if currentUser}}
         <div class="col-12 border-grid">
-          {{#if currentUser.profile.isAdmin}}
+          {{#if currentUserHasRole 'fscMember'}}
             <a class="btn btn-warning btn-sm" href="{{getEditHref this._id}}">
               修改計劃
             </a>
           {{/if}}
-          {{#if isUserId this.manager}}
+          {{#if isCurrentUser this.manager}}
             <div class="mb-1">
               您是此創立計劃的發起人。
             </div>

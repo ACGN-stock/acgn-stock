@@ -7,6 +7,7 @@ import { dbRuleIssues } from '/db/dbRuleIssues';
 import { dbRuleIssueOptions } from '/db/dbRuleIssueOptions';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
+import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
   createAgenda(agendaData) {
@@ -33,10 +34,8 @@ Meteor.methods({
 });
 function createAgenda(user, agendaData) {
   debug.log('createAgenda', { user, agendaData });
-  const userId = user._id;
-  if (! user.profile.isAdmin) {
-    throw new Meteor.Error(403, '非金管委員不得建立議程！');
-  }
+
+  guardUser(user).checkHasRole('planner');
 
   const issues = agendaData.issues;
   if (issues.length === 0) {
@@ -55,12 +54,7 @@ function createAgenda(user, agendaData) {
     }
   });
 
-  const proposer = Meteor.users.findOne({
-    _id: agendaData.proposer
-  });
-  if (! proposer) {
-    throw new Meteor.Error(404, '提案人帳號不存在！');
-  }
+  Meteor.users.findByIdOrThrow({ _id: agendaData.proposer });
 
   const issueIds = [];
   issues.forEach((issue, issueIndex) => {
@@ -88,7 +82,7 @@ function createAgenda(user, agendaData) {
     description: agendaData.description,
     discussionUrl: agendaData.discussionUrl,
     proposer: agendaData.proposer,
-    creator: userId,
+    creator: user._id,
     createdAt: createdAt,
     issues: issueIds
   });
