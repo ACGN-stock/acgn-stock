@@ -1,4 +1,3 @@
-'use strict';
 import { $ } from 'meteor/jquery';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';

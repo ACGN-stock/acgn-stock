@@ -1,4 +1,3 @@
-'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { MongoInternals } from 'meteor/mongo';
@@ -1535,6 +1534,17 @@ if (Meteor.isServer) {
         dbAnnouncements.rawCollection().createIndex({ categoty: 1 }),
         dbAnnouncements.rawCollection().createIndex({ createdAt: -1 }),
         dbAnnouncements.rawCollection().createIndex({ readers: 1 })
+      ]));
+    }
+  });
+
+  Migrations.add({
+    version: 26,
+    name: 'fix announcement index typo',
+    up() {
+      Promise.await(Promise.all([
+        dbAnnouncements.rawCollection().dropIndex({ categoty: 1 }),
+        dbAnnouncements.rawCollection().createIndex({ category: 1 })
       ]));
     }
   });

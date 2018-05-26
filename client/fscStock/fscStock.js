@@ -1,4 +1,3 @@
-'use strict';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { dbDirectors } from '/db/dbDirectors';

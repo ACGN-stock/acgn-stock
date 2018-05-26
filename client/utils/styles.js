@@ -1,4 +1,3 @@
-'use strict';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 export const rMainTheme = new ReactiveVar('light', function(oldValue, newValue) {

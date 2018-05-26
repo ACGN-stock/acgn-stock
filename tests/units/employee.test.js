@@ -1,4 +1,3 @@
-'use strict';
 import test from 'tape';
 import sinon from 'sinon';
 import deepequal from 'deep-equal';

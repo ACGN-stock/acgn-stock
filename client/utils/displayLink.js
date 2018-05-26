@@ -1,4 +1,3 @@
-'use strict';
 import { $ } from 'meteor/jquery';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
@@ -113,4 +112,3 @@ Template.productLink.onRendered(function() {
     });
   }
 });
-
