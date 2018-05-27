@@ -211,7 +211,7 @@ Template.violationCaseDetail.events({
 
     const path = FlowRouter.path('violationCaseDetail', { violationCaseId: relatedCaseId });
     const relatedCaseLink = `<a href="${path}" target="_blank">${relatedCaseId}</a>`;
-    const actionText = '移除相關案件';
+    const actionText = '合併違規名單';
     const confirmText = `確定要將相關案件 ${relatedCaseLink} 的違規名單合併至本案件嗎？`;
 
     askReasonAndConfirmAction({ actionText, confirmText }, (reason) => {
