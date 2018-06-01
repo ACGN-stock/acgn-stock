@@ -45,28 +45,103 @@ export function stateDisplayName(state) {
 export const categoryMap = {
   company: {
     displayName: '公司違規',
-    allowedInitialViolatorTypes: ['company']
+    allowedInitialViolatorTypes: ['company'],
+    descriptionTemplate: stripIndent(String.raw)`
+      > 以下請填入由 <…> 包起來的各項欄位。
+      > 公司法連結：https://goo.gl/b2sscm
+      > 違規事項不只一條時可條列式列出。
+      >
+      > 我已閱讀完以上注意事項，請將本行以上刪除。
+
+      公司【<請輸入公司名稱>】涉嫌違規如下：
+      <請輸入違規事項>
+      有違規嫌疑。
+    `
   },
   foundation: {
     displayName: '新創違規',
-    allowedInitialViolatorTypes: ['company']
+    allowedInitialViolatorTypes: ['company'],
+    descriptionTemplate: stripIndent(String.raw)`
+      > 以下請填入由 <…> 包起來的各項欄位。
+      > 公司法連結：https://goo.gl/b2sscm
+      > 違規事項不只一條時可條列式列出。
+      >
+      > 我已閱讀完以上注意事項，請將本行以上刪除。
+
+      新創計畫【<請輸入新創計畫名稱>】涉嫌違規如下：
+      <請輸入違規事項>
+      有違規嫌疑。
+    `
   },
   product: {
     displayName: '產品違規',
-    allowedInitialViolatorTypes: ['product']
+    allowedInitialViolatorTypes: ['product'],
+    descriptionTemplate: stripIndent(String.raw)`
+      > 以下請填入由 <…> 包起來的各項欄位。
+      > 公司法連結：https://goo.gl/b2sscm
+      > 違規事項不只一條時可條列式列出。
+      >
+      > 我已閱讀完以上注意事項，請將本行以上刪除。
+
+      公司【<請輸入公司名稱>】
+      產品【<請輸入產品名稱>】
+      其涉嫌違規如下：
+      <請輸入違規事項>
+      有違規嫌疑。
+    `
   },
   advertising: {
     displayName: '廣告違規',
-    allowedInitialViolatorTypes: ['user']
+    allowedInitialViolatorTypes: ['user'],
+    descriptionTemplate: stripIndent(String.raw)`
+      > 以下請填入由 <…> 包起來的各項欄位。
+      > ACGN股市廣告規則：https://hackmd.io/s/r1whDmSqM
+      > 違規事項不只一條時可條列式列出。
+      >
+      > 我已閱讀完以上注意事項，請將本行以上刪除。
+
+      玩家：[<請輸入玩家ID>](<請輸入玩家之帳號頁面連結>)
+      其所發布之廣告：
+      <請輸入廣告內容>
+      有違規嫌疑如下：
+      <請輸入檢舉事由>
+    `
   },
   multipleAccounts: {
     displayName: '分身違規',
     allowedInitialViolatorTypes: ['user'],
-    descriptionTemplate: stripIndent(String.raw)``
+    descriptionTemplate: stripIndent(String.raw)`
+      > 以下請填入由 <…> 包起來的各項欄位。
+      > ACGN股市個人法：https://goo.gl/TRC4jT
+      > 可增加玩家數量，請詳細敘述檢舉事由。
+      > 注意：IP相同並非判定分身之唯一依據。
+      >
+      > 我已閱讀完以上注意事項，請將本行以上刪除。
+
+      以下玩家疑似有分身之嫌疑：
+      1. 玩家[<請輸入玩家ID>](<請輸入玩家之帳號頁面連結>)
+      2. 玩家[<請輸入玩家ID>](<請輸入玩家之帳號頁面連結>)
+
+      以上ID疑似為分身，證據如下：
+      <請輸入檢舉事由>
+    `
   },
   miscellaneous: {
     displayName: '其他違規',
-    allowedInitialViolatorTypes: violatorTypeList
+    allowedInitialViolatorTypes: violatorTypeList,
+    descriptionTemplate: stripIndent(String.raw)`
+      > 以下請填入由 <…> 包起來的各項欄位。
+      > 公司法連結：https://goo.gl/b2sscm
+      > ACGN股市個人法：https://goo.gl/TRC4jT
+      > 請詳細輸入檢舉事由。
+      >
+      > 我已閱讀完以上注意事項，請將本行以上刪除。
+
+      公司【<請輸入公司名稱>】 *(檢舉對象非公司請將本行刪除)*
+      玩家[<請輸入玩家ID>](<請輸入玩家之帳號頁面連結>) *(檢舉對象非玩家請將本行刪除)*
+      涉嫌違規如下：
+      <請輸入檢舉事由>
+    `
   }
 };
 
