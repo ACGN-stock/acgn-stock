@@ -167,7 +167,7 @@ Template.foundationFounderList.helpers({
     return _.sortBy(invest, 'amount').reverse();
   },
   getPercentage(amount) {
-    const { invest } = paramFoundation;
+    const { invest } = paramFoundation();
 
     return (100 * amount / getTotalInvest(invest)).toFixed(2);
   }
