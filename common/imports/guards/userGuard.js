@@ -67,6 +67,14 @@ class UserGuard {
     return this;
   }
 
+  checkNotHasRole(role) {
+    if (hasRole(this.user, role)) {
+      throw new Meteor.Error(403, '權限不符，無法進行此操作！');
+    }
+
+    return this;
+  }
+
   checkCanVote() {
     this.checkNotBanned(...banTypeList)
       .checkNoExpiredTaxes();

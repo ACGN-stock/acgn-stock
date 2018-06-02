@@ -1,4 +1,3 @@
-'use strict';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { dbCompanies } from '/db/dbCompanies';
@@ -17,7 +16,13 @@ import { currencyFormat } from './helpers';
 
 Meteor.subscribe('isChangingSeason');
 
-function customCall(...args) {
+/*
+ * 在原本的 Meteor.call 外，包裝自訂的載入狀態與錯誤處理顯示
+ *
+ * 為了不影響到其他使用到 Meteor.call 的部分 (e.g., 3rd-party packages)，不直接覆蓋掉 Meteor.call，
+ * client 端要處理 error 時需直接使用此 function 替代 Meteor.call。
+ */
+Meteor.customCall = function(...args) {
   if (! Meteor.status().connected) {
     return false;
   }
@@ -47,8 +52,7 @@ function customCall(...args) {
   }
 
   Meteor.call(...args);
-}
-Meteor.customCall = customCall;
+};
 
 export function createBuyOrder(user, companyData) {
   if (user.profile.isInVacation) {
@@ -199,9 +203,9 @@ export function createSellOrder(user, companyData) {
 export function retrieveOrder(orderData) {
   const companyData = dbCompanies.findOne(orderData.companyId);
   if (companyData) {
-    const message = '' +
-      '確定要取消「以$' + orderData.unitPrice + orderData.orderType + orderData.amount + '股的「' +
-      companyData.companyName + '」公司股份」這筆訂單嗎？（將付出手續費$1）';
+    const message = `${'' +
+      '確定要取消「以$'}${orderData.unitPrice}${orderData.orderType}${orderData.amount}股的「${
+      companyData.companyName}」公司股份」這筆訂單嗎？（將付出手續費$1）`;
     alertDialog.confirm({
       message,
       callback: (result) => {
@@ -337,6 +341,34 @@ export function investFoundCompany(companyId) {
       else {
         alertDialog.alert('不正確的金額數字！');
       }
+    }
+  });
+}
+
+function askViolationCaseId(title, callback) {
+  alertDialog.prompt({
+    title,
+    message: '請輸入案件 ID （輸入「無」以跳過）',
+    callback: (result) => {
+      if (! result) {
+        return;
+      }
+
+      callback(result === '無' ? undefined : result);
+    }
+  });
+}
+
+function askReason(title, callback) {
+  alertDialog.prompt({
+    title,
+    message: '請輸入事由：',
+    callback: (reason) => {
+      if (! reason) {
+        return;
+      }
+
+      callback(reason);
     }
   });
 }
@@ -496,10 +528,211 @@ export function adminEditProduct(productId) {
           });
 
           confirmProductData(data, (newData) => {
-            Meteor.customCall('adminEditProduct', { productId, newData });
+            askViolationCaseId('修改產品', (violationCaseId) => {
+              Meteor.customCall('adminEditProduct', { productId, newData, violationCaseId });
+            });
           });
         });
       });
     });
+  });
+}
+
+export function markCompanyIllegal(companyId) {
+  const title = '設定違規標記';
+  askReason(title, (reason) => {
+    if (reason.length > 10) {
+      alertDialog.alert('違規標記事由不可大於十個字！');
+
+      return;
+    }
+
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('markCompanyIllegal', { companyId, reason, violationCaseId });
+    });
+  });
+}
+
+export function unmarkCompanyIllegal(companyId) {
+  alertDialog.confirm({
+    message: '是否解除違規標記？',
+    callback: (result) => {
+      if (! result) {
+        return;
+      }
+
+      askViolationCaseId('解除違規標記', (violationCaseId) => {
+        Meteor.customCall('unmarkCompanyIllegal', { companyId, violationCaseId });
+      });
+    }
+  });
+}
+
+export function sealCompany({ _id: companyId, companyName, isSeal }) {
+  const title = `${isSeal ? '解除查封' : '查封關停'} - ${companyName}`;
+
+  askReason(title, (reason) => {
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('sealCompany', { companyId, reason, violationCaseId });
+    });
+  });
+}
+
+export function sendFscNotice({ userIds, companyId }) {
+  const title = '金管會通告';
+
+  alertDialog.prompt({
+    title,
+    message: `請輸入要通告的訊息：`,
+    callback: (message) => {
+      if (! message) {
+        return;
+      }
+
+      askViolationCaseId(title, (violationCaseId) => {
+        Meteor.customCall('sendFscNotice', { userIds, companyId, message, violationCaseId });
+      });
+    }
+  });
+}
+
+export function changeCompanyName({ _id: companyId, companyName }) {
+  const title = '公司更名';
+  alertDialog.dialog({
+    type: 'prompt',
+    title,
+    message: `請輸入新的公司名稱：`,
+    defaultValue: companyName,
+    callback: (newCompanyName) => {
+      if (! newCompanyName) {
+        return;
+      }
+
+      askViolationCaseId(title, (violationCaseId) => {
+        Meteor.customCall('changeCompanyName', { companyId, newCompanyName, violationCaseId });
+      });
+    }
+  });
+}
+
+function askAmount(title, callback) {
+  alertDialog.prompt({
+    title,
+    message: '請輸入數量：',
+    inputType: 'number',
+    customSetting: 'min="0"',
+    callback: (amount) => {
+      amount = parseInt(amount, 10);
+      if (! amount || amount <= 0) {
+        return;
+      }
+      callback(amount);
+    }
+  });
+}
+
+export function confiscateCompanyProfit({ _id: companyId, companyName }) {
+  const title = `課以罰金 - 「${companyName}」公司`;
+
+  askReason(title, (reason) => {
+    askAmount(title, (amount) => {
+      askViolationCaseId(title, (violationCaseId) => {
+        Meteor.customCall('confiscateCompanyProfit', { companyId, reason, amount, violationCaseId });
+      });
+    });
+  });
+}
+
+export function returnCompanyProfit({ _id: companyId, companyName }) {
+  const title = `退還罰金 - 「${companyName}」公司`;
+
+  askReason(title, (reason) => {
+    askAmount(title, (amount) => {
+      askViolationCaseId(title, (violationCaseId) => {
+        Meteor.customCall('confiscateCompanyProfit', { companyId, reason, amount: -amount, violationCaseId });
+      });
+    });
+  });
+}
+
+export function banProduct(productId) {
+  const title = '違規處理 - 產品下架';
+  askReason(title, (reason) => {
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('banProduct', { productId, reason, violationCaseId });
+    });
+  });
+}
+
+export function confiscateUserMoney({ _id: userId, profile }) {
+  const title = `課以罰金 - ${profile.name}`;
+
+  askReason(title, (reason) => {
+    askAmount(title, (amount) => {
+      askViolationCaseId(title, (violationCaseId) => {
+        Meteor.customCall('confiscateUserMoney', { userId, reason, amount, violationCaseId });
+      });
+    });
+  });
+}
+
+export function returnUserMoney({ _id: userId, profile }) {
+  const title = `退還罰金 - ${profile.name}`;
+
+  askReason(title, (reason) => {
+    askAmount(title, (amount) => {
+      askViolationCaseId(title, (violationCaseId) => {
+        Meteor.customCall('confiscateUserMoney', { userId, reason, amount: -amount, violationCaseId });
+      });
+    });
+  });
+}
+
+const banActionTextMap = {
+  accuse: '禁止舉報違規',
+  deal: '禁止投資下單',
+  chat: '禁止聊天發言',
+  advertise: '禁止廣告宣傳',
+  manager: '禁止擔任經理'
+};
+
+export function banUser({ _id: userId, profile }, banType) {
+  const banActionText = banActionTextMap[banType];
+  const title = `違規處理 - ${profile.name} - ${banActionText}`;
+  askReason(title, (reason) => {
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('banUser', { userId, reason, banType, violationCaseId });
+    });
+  });
+}
+
+export function confiscateAllUserStocks({ _id: userId, profile }) {
+  const title = `沒收所有股份 - ${profile.name}`;
+  askReason(title, (reason) => {
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('confiscateAllUserStocks', { userId, reason, violationCaseId });
+    });
+  });
+}
+
+export function takeDownAdvertising({ _id: advertisingId, message }) {
+  const title = '撤銷廣告';
+  alertDialog.confirm({
+    title,
+    message: `
+      <div>確定要撤銷廣告？</div>
+      <div style="max-height: 100px; overflow-y: auto;">${_.escape(message)}</div>
+    `,
+    callback: (result) => {
+      if (! result) {
+        return;
+      }
+
+      askReason(title, (reason) => {
+        askViolationCaseId(title, (violationCaseId) => {
+          Meteor.customCall('takeDownAdvertising', { advertisingId, reason, violationCaseId });
+        });
+      });
+    }
   });
 }

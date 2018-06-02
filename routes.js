@@ -1,4 +1,3 @@
-'use strict';
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
@@ -19,7 +18,7 @@ export const pageNameHash = {
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
   ruleAgendaList: '規則討論',
-  accuseRecord: '舉報違規紀錄',
+  violationCaseList: '違規案件列表',
   fscStock: '金管會持股'
 };
 
@@ -57,6 +56,29 @@ announcementRoute.route('/reject/:announcementId', {
   name: 'rejectAnnouncement',
   action() {
     DocHead.setTitle(`${Meteor.settings.public.websiteName} - 系統公告否決`);
+  }
+});
+
+const violationRoute = FlowRouter.group({
+  prefix: '/violation',
+  name: 'violationRoute'
+});
+violationRoute.route('/', {
+  name: 'violationCaseList',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 違規案件列表`);
+  }
+});
+violationRoute.route('/report', {
+  name: 'reportViolation',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 舉報違規`);
+  }
+});
+violationRoute.route('/view/:violationCaseId', {
+  name: 'violationCaseDetail',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 違規案件內容`);
   }
 });
 
@@ -319,12 +341,5 @@ ruleDiscussRoute.route('/vote/:agendaId', {
   name: 'ruleAgendaVote',
   action() {
     DocHead.setTitle(Meteor.settings.public.websiteName + ' - 議程投票');
-  }
-});
-
-FlowRouter.route('/accuseRecord', {
-  name: 'accuseRecord',
-  action() {
-    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 舉報違規紀錄');
   }
 });

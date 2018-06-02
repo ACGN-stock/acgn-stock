@@ -1,0 +1,13 @@
+<template name="reportViolation">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title mb-1">舉報違規</h1>
+      <hr />
+      {{#if canReportViolation}}
+        {{> violationCaseForm formArgs}}
+      {{else}}
+        <p><em>你目前無權進行違規舉報，請儘速離開這裡！</em></p>
+      {{/if}}
+    </div>
+  </div>
+</template>

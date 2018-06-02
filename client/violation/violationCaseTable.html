@@ -1,0 +1,65 @@
+<template name="violationCaseTable">
+  <div class="form-inline my-2">
+    <div class="input-group input-group-sm mr-2">
+      <div class="input-group-addon">案件分類</div>
+      <select class="form-control" name="category">
+        <option value="">全部分類</option>
+        {{#each category in categoryList}}
+          <option value="{{category}}" {{categorySelectedAttr category}}>
+            {{categoryDisplayName category}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="input-group input-group-sm mr-2">
+      <div class="input-group-addon">案件狀態</div>
+      <select class="form-control" name="state">
+        <option value="">全部狀態</option>
+        {{#each state in stateList}}
+          <option value="{{state}}" {{stateSelectedAttr state}}>
+            {{stateDisplayName state}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+  
+  <table class="table table-bordered mt-3 w-100 custom-responsive-table-md" style="table-layout: fixed;">
+    <thead>
+      <tr>
+        <th class="text-center text-nowrap" style="width: 200px">舉報時間</th>
+        <th class="text-center text-nowrap">案件狀態</th>
+        <th class="text-center text-nowrap">違規類型</th>
+        <th class="text-center text-nowrap" style="width: 100px">查看</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each violationCase in violationCases}}
+        <tr>
+          <td class="text-md-center text-nowrap px-md-1 py-1" data-title="舉報時間">
+            {{formatDateTimeText violationCase.createdAt}}
+          </td>
+          <td class="text-md-center text-nowrap px-md-1 py-1" data-title="案件狀態">
+            {{#if violationCase.isReportedByCurrentUser}}
+              <span class="badge badge-info">我的舉報</span>
+            {{/if}}
+            <span class="badge {{stateBadgeClass violationCase.state}}">
+              {{stateDisplayName violationCase.state}}
+            </span>
+          </td>
+          <td class="text-md-center text-nowrap px-md-1 py-1" data-title="違規類型">
+            {{categoryDisplayName violationCase.category}}
+          </td>
+          <td class="text-md-center text-truncate text-nowrap px-md-1 py-1" data-title="查看">
+            <a class="btn btn-sm btn-primary" href="{{pathForViolationCaseDetail violationCase._id}}">查看</a>
+          </td>
+        </tr>
+      {{else}}
+        <tr class="default-content">
+          <td class="text-center text-truncate p-1" colspan="4">查無資料！</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{> pagination paginationData}}
+</template>

@@ -1,0 +1,122 @@
+<template name="violationCaseList">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title d-flex flex-wrap mb-1">
+        <div class="text-nowrap">違規案件列表</div>
+      </h1>
+      <hr />
+      <div class="d-flex flex-wrap align-items-center">
+        <div class="form-inline my-2">
+          <div class="input-group input-group-sm mr-2">
+            <div class="input-group-addon">案件分類</div>
+            <select class="form-control" name="category">
+              <option value="">全部分類</option>
+              {{#each category in categoryList}}
+                <option value="{{category}}" {{categorySelectedAttr category}}>
+                  {{categoryDisplayName category}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="input-group input-group-sm mr-2">
+            <div class="input-group-addon">案件狀態</div>
+            <select class="form-control" name="state">
+              <option value="">全部狀態</option>
+              {{#each state in stateList}}
+                <option value="{{state}}" {{stateSelectedAttr state}}>
+                  {{stateDisplayName state}}
+                </option>
+              {{/each}}
+            </select>
+          </div>
+          <div class="input-group input-group-sm mr-2">
+            <div class="input-group-addon">違規使用者</div>
+            <input
+              class="form-control"
+              type="text"
+              name="violatorUserId"
+              placeholder="輸入使用者識別碼"
+              value="{{violatorUserId}}" />
+            {{#if violatorUserId}}
+              <div class="input-group-btn">
+                <button class="btn btn-sm btn-secondary" data-action="clearViolatorUser">
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            {{/if}}
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-primary" data-action="searchViolatorUser">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+          {{#if currentUser}}
+            {{>checkableButton onlyUnreadButtonArgs}}
+          {{/if}}
+        </div>
+      </div>
+      {{> pagination paginationData}}
+      {{#each violationCase in violationCases}}
+        <div class="card my-3 {{violationCaseCardClass violationCase}}">
+          <div class="card-header">
+            <h4 class="d-flex flex-wrap align-items-center">
+              {{#if violationCase.isUnread}}
+                <div class="badge badge-pill badge-danger mr-1">未讀</div>
+              {{/if}}
+              {{#if violationCase.isReportedByCurrentUser}}
+                <small class="badge badge-pill badge-info mr-1">我的舉報</small>
+              {{/if}}
+              <div class="badge {{stateBadgeClass violationCase.state}}">{{stateDisplayName violationCase.state}}</div>
+              <div class="m-2 mr-auto">{{categoryDisplayName violationCase.category}}</div>
+              {{#if violationCase.informer}}
+                <small>
+                  舉報人：
+                  {{>userLink violationCase.informer}}
+                </small>
+              {{/if}}
+            </h4>
+            <div class="d-flex flex-column flex-lg-row flex-wrap justify-content-between align-items-start">
+              <div>
+                舉報時間：
+                <span class="text-nowrap">{{formatDateTimeText violationCase.createdAt}}</span>
+              </div>
+              <div>
+                更新時間：
+                <span class="text-nowrap">{{formatDateTimeText violationCase.updatedAt}}</span>
+              </div>
+              <div>
+                案件識別碼：
+                <span class="text-nowrap">{{violationCase._id}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-block row">
+            <div class="col-12 col-md-5">
+              <h4>違規名單</h4>
+              <ul>
+                {{#each violator in violationCase.violators}}
+                  <li>{{>violatorDisplay violator}}</li>
+                {{/each}}
+              </ul>
+            </div>
+            <div class="col-12 col-md-7">
+              <h4 class="border-bottom-0">案件描述</h4>
+              {{violationCase.descriptionDigest}}
+              {{#if violationCase.descriptionOmittedLength}}
+                <em class="text-nowrap">（…下略 {{violationCase.descriptionOmittedLength}} 字）</em>
+              {{/if}}
+            </div>
+          </div>
+          <div class="card-footer text-right">
+            <a class="btn btn-primary" href="{{pathForViolationCaseDetail violationCase._id}}">
+              詳細內容
+            </a>
+          </div>
+        </div>
+      {{else}}
+        <div class="text-center m-2"><em>沒有任何符合條件的案件！</em></div>
+      {{/each}}
+      {{> pagination paginationData}}
+    </div>
+  </div>
+</template>

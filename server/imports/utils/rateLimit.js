@@ -1,4 +1,3 @@
-'use strict';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 
 // 依名稱對個別 method 做額外限制

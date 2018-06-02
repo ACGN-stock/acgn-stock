@@ -97,6 +97,10 @@ export function roleDisplayName(role) {
   return (userRoleMap[role] || { displayName: `未知的身份組成員(${role})` }).displayName;
 }
 
+export function hasBanned(user, permission) {
+  return user && user.profile && user.profile.ban && user.profile.ban.includes(permission);
+}
+
 const schema = new SimpleSchema({
   // 使用者PTT帳號名稱
   username: {

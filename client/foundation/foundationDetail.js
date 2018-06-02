@@ -1,4 +1,3 @@
-'use strict';
 import { _ } from 'meteor/underscore';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
@@ -6,43 +5,40 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { dbFoundations } from '/db/dbFoundations';
+
 import { dbLog } from '/db/dbLog';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { formatShortDateTimeText } from '../utils/helpers';
-import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { investFoundCompany } from '../utils/methods';
+import { investFoundCompany, markCompanyIllegal, unmarkCompanyIllegal, changeCompanyName } from '../utils/methods';
+import { paramFoundation, paramFoundationId } from './helpers';
 
 const rShowAllTags = new ReactiveVar(false);
 
 inheritedShowLoadingOnSubscribing(Template.foundationDetail);
 Template.foundationDetail.onCreated(function() {
   rShowAllTags.set(false);
+
   this.autorun(() => {
-    const foundationId = FlowRouter.getParam('foundationId');
-    if (foundationId) {
-      const foundationData = dbFoundations.findOne(foundationId);
-      if (foundationData) {
-        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + foundationData.companyName + '」公司資訊');
-      }
+    const foundationData = paramFoundation();
+    if (foundationData) {
+      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${foundationData.companyName}」公司資訊`);
     }
   });
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const foundationId = FlowRouter.getParam('foundationId');
+
+  this.autorunWithIdleSupport(() => {
+    const foundationId = paramFoundationId();
     if (foundationId) {
       this.subscribe('foundationDetail', foundationId);
     }
   });
 });
 Template.foundationDetail.helpers({
+  pathForReportCompanyViolation() {
+    return FlowRouter.path('reportViolation', null, { type: 'company', id: paramFoundationId() });
+  },
   foundationData() {
-    const foundationId = FlowRouter.getParam('foundationId');
-
-    return dbFoundations.findOne(foundationId);
+    return paramFoundation();
   },
   getEditHref(foundationId) {
     return FlowRouter.path('editFoundationPlan', { foundationId });
@@ -61,72 +57,23 @@ Template.foundationDetail.helpers({
 Template.foundationDetail.events({
   'click [data-action="changeCompanyName"]'(event) {
     event.preventDefault();
-    const foundationId = FlowRouter.getParam('foundationId');
-    const companyData = dbFoundations.findOne(foundationId, {
-      fields: {
-        companyName: 1
-      }
-    });
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '公司更名',
-      message: `請輸入新的公司名稱：`,
-      defaultValue: companyData.companyName,
-      callback: (companyName) => {
-        if (companyName) {
-          Meteor.customCall('changeFoundCompanyName', foundationId, companyName);
-        }
-      }
-    });
+    changeCompanyName(paramFoundation());
   },
   'click [data-action="showAllTags"]'(event) {
     event.preventDefault();
     rShowAllTags.set(true);
   },
-  'click [data-action="markFoundationIllegal"]'(event) {
+  'click [data-action="markCompanyIllegal"]'(event) {
     event.preventDefault();
-    const foundationId = FlowRouter.getParam('foundationId');
-    const companyData = dbFoundations.findOne(foundationId, {
-      fields: {
-        companyName: 1
-      }
-    });
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '設定違規標記',
-      message: '請輸入違規事由：',
-      defaultValue: companyData.illegalReason,
-      customSetting: `maxlength="10"`,
-      callback: (reason) => {
-        if (! reason) {
-          return;
-        }
-        if (reason.length > 10) {
-          alertDialog.alert('違規標記事由不可大於十個字！');
-
-          return;
-        }
-
-        Meteor.customCall('markFoundationIllegal', foundationId, reason);
-      }
-    });
+    markCompanyIllegal(paramFoundationId());
   },
-  'click [data-action="unmarkFoundationIllegal"]'(event) {
+  'click [data-action="unmarkCompanyIllegal"]'(event) {
     event.preventDefault();
-    const foundationId = FlowRouter.getParam('foundationId');
-    alertDialog.confirm({
-      message: '是否解除違規標記？',
-      callback: (result) => {
-        if (result) {
-          Meteor.customCall('unmarkFoundationIllegal', foundationId);
-        }
-      }
-    });
+    unmarkCompanyIllegal(paramFoundationId());
   },
   'click [data-action="invest"]'(event) {
     event.preventDefault();
-    const foundationId = FlowRouter.getParam('foundationId');
-    investFoundCompany(foundationId);
+    investFoundCompany(paramFoundationId());
   }
 });
 
@@ -215,16 +162,14 @@ Template.foundationDetailTable.events({
 
 Template.foundationFounderList.helpers({
   orderedInvestList() {
-    const foundationId = FlowRouter.getParam('foundationId');
-    const foundation = dbFoundations.findOne(foundationId);
+    const { invest } = paramFoundation();
 
-    return _.sortBy(foundation.invest, 'amount').reverse();
+    return _.sortBy(invest, 'amount').reverse();
   },
   getPercentage(amount) {
-    const foundationId = FlowRouter.getParam('foundationId');
-    const foundation = dbFoundations.findOne(foundationId);
+    const { invest } = paramFoundation();
 
-    return (100 * amount / getTotalInvest(foundation.invest)).toFixed(2);
+    return (100 * amount / getTotalInvest(invest)).toFixed(2);
   }
 });
 
@@ -237,7 +182,7 @@ Template.foundationLogList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const companyId = FlowRouter.getParam('foundationId');
+    const companyId = paramFoundationId();
     if (companyId) {
       this.subscribe('companyLog', companyId, rIsOnlyShowMine.get(), rLogOffset.get());
     }
@@ -248,14 +193,9 @@ Template.foundationLogList.helpers({
     return rIsOnlyShowMine.get();
   },
   logList() {
-    const companyId = FlowRouter.getParam('foundationId');
+    const companyId = paramFoundationId();
 
-    return dbLog.find({ companyId }, {
-      sort: {
-        createdAt: -1
-      },
-      limit: 30
-    });
+    return dbLog.find({ companyId }, { sort: { createdAt: -1 }, limit: 30 });
   },
   paginationData() {
     return {

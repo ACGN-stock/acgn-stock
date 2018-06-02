@@ -176,7 +176,7 @@ Template.displayLog.helpers({
         return `【辭職紀錄】${users[0]}辭去了「${company}」公司的經理人職務！`;
       }
       case '撤職紀錄': {
-        return `【撤職紀錄】${users[0]}以金管會的名義撤除${users[1]}於「${company}」公司的經理人職務與候選資格！`;
+        return `【撤職紀錄】${users[0]}以「${_.escape(data.reason)}」的理由撤除${users[1]}於「${company}」公司的經理人職務與候選資格！${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '參選紀錄': {
         return `【參選紀錄】${users[0]}開始競選「${company}」公司的經理人職務！`;
@@ -310,69 +310,69 @@ Template.displayLog.helpers({
           result += `向${targetUsers.join('、')}`;
         }
 
-        result += `通告：「${_.escape(data.message)}」。`;
+        result += `通告：「${_.escape(data.message)}」。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
 
         return result;
       }
       case '通報金管': {
-        return `【通報金管】${users[0]}向金管會通報：「${_.escape(data.message)}」。`;
+        return `【通報金管】${users[0]}向金管會通報：「${_.escape(data.message)}」。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '禁止舉報': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【違規處理】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有舉報違規行為。`;
+        return `【玩家停權】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有舉報違規行為。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '禁止下單': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【違規處理】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有投資下單行為。`;
+        return `【玩家停權】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有投資下單行為。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '禁止聊天': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【違規處理】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有聊天發言行為。`;
+        return `【玩家停權】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有聊天發言行為。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '禁止廣告': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【違規處理】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有廣告宣傳行為。`;
+        return `【玩家停權】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有廣告宣傳行為。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '禁任經理': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【違規處理】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後擔任經理人的資格。`;
+        return `【玩家停權】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後擔任經理人的資格。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '解除舉報': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【解除禁令】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的舉報違規禁令。`;
+        return `【玩家復權】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的舉報違規禁令。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '解除下單': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【解除禁令】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的投資下單禁令。`;
+        return `【玩家復權】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的投資下單禁令。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '解除聊天': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【解除禁令】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的聊天發言禁令。`;
+        return `【玩家復權】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的聊天發言禁令。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '解除廣告': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【解除禁令】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的廣告宣傳禁令。`;
+        return `【玩家復權】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的廣告宣傳禁令。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '解除禁任': { // TODO 合併「禁止」系列與「解除」系列的 code
-        return `【解除禁令】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}禁任經理人的處置。`;
+        return `【玩家復權】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}禁任經理人的處置。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '課以罰款': {
         const target = users[1] || `「${company}」公司`;
 
-        return `【違規處理】${users[0]}以「${_.escape(data.reason)}」的理由向${target}課以總數為$${currencyFormat(data.fine)}的罰金。`;
+        return `【課以罰款】${users[0]}以「${_.escape(data.reason)}」的理由向${target}課以總數為$${currencyFormat(data.fine)}的罰金。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '退還罰款': {
         const target = users[1] || `「${company}」公司`;
 
-        return `【退還罰款】${users[0]}以「${_.escape(data.reason)}」的理由向${target}退還總數為$${currencyFormat(data.fine)}的罰金。`;
+        return `【退還罰款】${users[0]}以「${_.escape(data.reason)}」的理由向${target}退還總數為$${currencyFormat(data.fine)}的罰金。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '沒收股份': {
-        return `【違規處理】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}持有的「${company}」公司股份數量${data.stocks}給沒收了。`;
+        return `【沒收股份】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}持有的「${company}」公司股份數量${data.stocks}給沒收了。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '查封關停': {
         const companyDisplay = companyId ? company : '???'; // FIXME 保管庫更新期間資料錯誤的暫時處置
 
-        return `【查封關停】${users[0]}以「${_.escape(data.reason)}」的理由查封關停了「${companyDisplay}」公司。`;
+        return `【查封關停】${users[0]}以「${_.escape(data.reason)}」的理由查封關停了「${companyDisplay}」公司。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '解除查封': {
-        return `【解除查封】${users[0]}以「${_.escape(data.reason)}」的理由解除了「${company}」公司的查封關停狀態。`;
+        return `【解除查封】${users[0]}以「${_.escape(data.reason)}」的理由解除了「${company}」公司的查封關停狀態。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '違規標記': {
-        return `【違規標記】${users[0]}以「${_.escape(data.reason)}」的理由將「${company}」公司標記為違規！`;
+        return `【違規標記】${users[0]}以「${_.escape(data.reason)}」的理由將「${company}」公司標記為違規！${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '違規解標': {
-        return `【違規標記】${users[0]}移除了「${company}」公司的違規標記！`;
+        return `【違規標記】${users[0]}移除了「${company}」公司的違規標記！${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '公司更名': {
         return `【公司更名】${users[0]}將「${company}」公司的名稱由「${_.escape(data.oldCompanyName)}」改為「${_.escape(data.newCompanyName)}」。`;
@@ -384,7 +384,7 @@ Template.displayLog.helpers({
           result += `，並追回了因該產品所產生的營利$${currencyFormat(data.profit)}`;
         }
 
-        result += '。';
+        result += `。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
 
         return result;
       }
@@ -395,10 +395,10 @@ Template.displayLog.helpers({
           })
           .join('、');
 
-        return `【產品修正】${users[0]}以金管會的名義修改了「${company}」公司的產品「${productSpan(data.productId)}」，將${diffString}。`;
+        return `【產品修正】${users[0]}以金管會的名義修改了「${company}」公司的產品「${productSpan(data.productId)}」，將${diffString}。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '撤銷廣告': {
-        return `【撤銷廣告】${users[0]}將${users[1]}發布的廣告「${_.escape(data.message)}」給撤銷了。`;
+        return `【撤銷廣告】${users[0]}將${users[1]}發布的廣告「${_.escape(data.message)}」給撤銷了。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '亂鬥報名': {
         return `【最萌亂鬥】${users[0]}替「${company}」公司報名參加了這一屆的最萌亂鬥大賽！`;
@@ -438,6 +438,10 @@ function companySpan(companyId) {
 
 function productSpan(productId) {
   return `<span data-product-link="${productId}"></span>`;
+}
+
+function violationCaseLink(violationCaseId) {
+  return `<a href="${FlowRouter.path('violationCaseDetail', { violationCaseId })}">${violationCaseId}</a>`;
 }
 
 function productInfoKeyToString(key) {

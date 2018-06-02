@@ -1,4 +1,3 @@
-'use strict';
 import { $ } from 'meteor/jquery';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
@@ -8,9 +7,8 @@ import { dbProducts } from '/db/dbProducts';
 import { dbSeason } from '/db/dbSeason';
 import { dbVoteRecord } from '/db/dbVoteRecord';
 
-import { voteProduct, adminEditProduct } from '../utils/methods';
+import { voteProduct, adminEditProduct, banProduct } from '../utils/methods';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.productCenterBySeason);
@@ -200,18 +198,8 @@ Template.productInfoBySeasonTable.events({
   },
   'click [data-ban-product]'(event, templateInstance) {
     event.preventDefault();
-    const productData = templateInstance.data;
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '違規處理 - 產品下架',
-      message: `請輸入處理事由：`,
-      callback: function(message) {
-        if (message) {
-          const productId = productData._id;
-          Meteor.customCall('banProduct', { productId, message });
-        }
-      }
-    });
+    const { _id: productId } = templateInstance.data;
+    banProduct(productId);
   },
   'click [data-edit-product]'(event) {
     event.preventDefault();

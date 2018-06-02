@@ -312,12 +312,12 @@ const xssFilter = {
 };
 
 const codeTagEscapedCharacterTranser = {
-  type: 'output',
+  type: 'lang',
   filter: function(text) {
-    const output = text.replace(/<code>((.|\r|\n)*?)<\/code>/g, function(match, capture) {
+    const output = text.replace(/```((.|\r|\n)*?)```/g, function(match, capture) {
       const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/&excl;/g, '!');
 
-      return `<code>${text}</code>`;
+      return '```' + text + '```';
     });
 
     return output;

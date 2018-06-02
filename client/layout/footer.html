@@ -2,6 +2,7 @@
   <div class="fixed-bottom">
     <div class={{containerClass}}>
       <div class="snackbar-container">
+        {{> displayViolationCaseUnreadNotification}}
         {{> displayAnnouncementUnreadNotification}}
         {{> unreadImportantAccuseLogsNotification}}
         {{> displayLegacyAnnouncement}}
@@ -63,6 +64,21 @@
       </div>
       <div class="footer-message-close-button">
         <a class="btn btn-warning btn-sm" href="#">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  {{/if}}
+</template>
+
+<template name="displayViolationCaseUnreadNotification">
+  {{#if isDisplay}}
+    <div class="media bg-danger px-2 py-1 my-2 rounded footer-message-container">
+      <div class="media-body footer-message" style="color: white">
+        <strong>【警告】</strong> 您有 {{getPublishedCount 'currentUserUnreadViolationCases'}} 則未讀的違規案件，請至<a style="color: cyan" href="{{pathForUnreadViolationCaseList}}">違規案件列表</a>頁面查看！
+      </div>
+      <div class="footer-message-close-button">
+        <a class="btn btn-danger btn-sm" href="#">
           <i class="fa fa-times" aria-hidden="true"></i>
         </a>
       </div>

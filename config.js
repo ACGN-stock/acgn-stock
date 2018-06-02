@@ -1,4 +1,3 @@
-'use strict';
 // 真正的設定檔請寫在config.json，這邊只是註解用。
 export const config = {
   debugMode: false, // 是否為debug mode(紀錄一分鐘內的所有方法與訂閱動作，以備crash查看)
@@ -62,7 +61,12 @@ export const config = {
     companyMarketingProducts: 10,
     companyVips: 10,
     announcements: 20,
-    accountInfoLogs: 30
+    accountInfoLogs: 30,
+    violationCases: 10,
+    violationCaseAssociatedLogs: 30,
+    userViolationCases: 10,
+    userReportedViolationCases: 10,
+    compoanyViolationCases: 10
   },
   productFinalSaleTime: 86400000, // 產品最後出清時間 (ms)
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金

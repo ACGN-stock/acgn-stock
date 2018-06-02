@@ -115,7 +115,7 @@ export const logTypeList = [
   '辭職紀錄',
 
   /**
-   * 【撤職紀錄】userId0以金管會的名義撤除userId1於「companyId」公司的經理人職務與候選資格！
+   * 【撤職紀錄】userId0以「data.reason」的理由撤除userId1於「companyId」公司的經理人職務與候選資格！
    */
   '撤職紀錄',
 
@@ -233,57 +233,57 @@ export const logTypeList = [
   '通報金管',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由禁止userId1今後的所有舉報違規行為。
+   * 【玩家停權】userId0以「data.reason」的理由禁止userId1今後的所有舉報違規行為。
    */
   '禁止舉報',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由禁止userId1今後的所有投資下單行為。
+   * 【玩家停權】userId0以「data.reason」的理由禁止userId1今後的所有投資下單行為。
    */
   '禁止下單',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由禁止userId1今後的所有聊天發言行為。
+   * 【玩家停權】userId0以「data.reason」的理由禁止userId1今後的所有聊天發言行為。
    */
   '禁止聊天',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由禁止userId1今後的所有廣告宣傳行為。
+   * 【玩家停權】userId0以「data.reason」的理由禁止userId1今後的所有廣告宣傳行為。
    */
   '禁止廣告',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由向(userId1||「companyId」公司)課以總數為$data.fine的罰金。
+   * 【課以罰款】userId0以「data.reason」的理由向(userId1||「companyId」公司)課以總數為$data.fine的罰金。
    */
   '課以罰款',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由將userId1持有的「companyId」公司股份數量data.stocks給沒收了。
+   * 【沒收股份】userId0以「data.reason」的理由將userId1持有的「companyId」公司股份數量data.stocks給沒收了。
    */
   '沒收股份',
 
   /**
-   * 【違規處理】userId0以「data.reason」的理由禁止userId1今後擔任經理人的資格。
+   * 【玩家停權】userId0以「data.reason」的理由禁止userId1今後擔任經理人的資格。
    */
   '禁任經理',
 
   /**
-   * 【解除禁令】userId0以「data.reason」的理由中止了userId1的舉報違規禁令。
+   * 【玩家復權】userId0以「data.reason」的理由中止了userId1的舉報違規禁令。
    */
   '解除舉報',
 
   /**
-   * 【解除禁令】userId0以「data.reason」的理由中止了userId1的投資下單禁令。
+   * 【玩家復權】userId0以「data.reason」的理由中止了userId1的投資下單禁令。
    */
   '解除下單',
 
   /**
-   * 【解除禁令】userId0以「data.reason」的理由中止了userId1的聊天發言禁令。
+   * 【玩家復權】userId0以「data.reason」的理由中止了userId1的聊天發言禁令。
    */
   '解除聊天',
 
   /**
-   * 【解除禁令】userId0以「data.reason」的理由中止了userId1的廣告宣傳禁令。
+   * 【玩家復權】userId0以「data.reason」的理由中止了userId1的廣告宣傳禁令。
    */
   '解除廣告',
 
@@ -293,7 +293,7 @@ export const logTypeList = [
   '退還罰款',
 
   /**
-   * 【解除禁令】userId0以「data.reason」的理由中止了userId1禁任經理人的處置。
+   * 【玩家復權】userId0以「data.reason」的理由中止了userId1禁任經理人的處置。
    */
   '解除禁任',
 
