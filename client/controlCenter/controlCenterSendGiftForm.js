@@ -1,3 +1,4 @@
+import { $ } from 'meteor/jquery';
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
@@ -148,6 +149,14 @@ Template.controlCenterSendGiftForm.onCreated(function() {
 });
 
 Template.controlCenterSendGiftForm.events({
+  reset(event, templateInstance) {
+    event.preventDefault();
+    const model = templateInstance.model.get();
+    templateInstance.$('select[name]').each((i, e) => {
+      const name = $(e).attr('name');
+      $(e).val(model[name] || '');
+    });
+  },
   'click [data-action="addUser"]'(event, templateInstance) {
     event.preventDefault();
     templateInstance.onAddUser();
