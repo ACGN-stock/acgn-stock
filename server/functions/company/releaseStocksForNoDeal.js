@@ -18,17 +18,25 @@ export function updateReleaseStocksForNoDealPeriod() {
 export function releaseStocksForNoDeal() {
   dbCompanies
     .find({ isSeal: false }, {
-      fields: { _id: 1 },
+      fields: { _id: 1, createdAt: 1, totalRelease: 1 },
       disableOplog: true
     })
-    .forEach(({ _id: companyId }) => {
+    .forEach(({ _id: companyId, createdAt, totalRelease }) => {
       // 先鎖定資源，再重新讀取一次資料進行運算
       resourceManager.request('releaseStocksForNoDeal', [`companyOrder${companyId}`], (release) => {
+        const { releaseStocksForNoDealTradeLogLookbackIntervalTime: lookbackTime } = Meteor.settings.public;
+
         const companyData = dbCompanies.findOne(companyId, { fields: { _id: 1, listPrice: 1 } });
-        const dealAmount = calculateDealAmount(companyData, Meteor.settings.public.releaseStocksForNoDealTradeLogLookbackIntervalTime);
+        const dealAmount = calculateDealAmount(companyData, lookbackTime);
         const highPriceBuyAmount = calculateHighPriceBuyAmount(companyData);
 
-        if (highPriceBuyAmount <= dealAmount * 10) {
+        // 判斷是否為最近上市的公司
+        const isNewCompany = Date.now() - lookbackTime < createdAt.getTime();
+
+        // 低量實際門檻
+        const threshold = 10 * (dealAmount + (isNewCompany ? totalRelease : 0));
+
+        if (highPriceBuyAmount <= threshold) {
           release();
 
           return;

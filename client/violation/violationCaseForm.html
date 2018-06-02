@@ -1,0 +1,39 @@
+<template name="violationCaseForm">
+  <form>
+    <div class="form-group">
+      <h4>舉報對象：</h4>
+      {{#if violator}}
+        {{>violatorDisplay violator}}
+      {{/if}}
+    </div>
+    <div class="form-group">
+      <label class="h4" for="category">違規類型：</label>
+      <select class="form-control" name="category">
+        <option value="" class="d-none" hidden>選擇違規類型…</option>
+        {{#each category in violationCaseCategories}}
+          <option value="{{category}}">{{categoryDisplayName category}}</option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'category'}}}
+    </div>
+    <div class="form-group">
+      <label class="h4" for="description">違規描述：</label>
+      <textarea class="form-control" name="description" rows="10" placeholder="請輸入違規描述"></textarea>
+      <small class="form-text">支援部分 <a href="https://markdown.tw/" target="_blank">markdown</a> 語法</small>
+      {{{errorHtmlOf 'description'}}}
+    </div>
+    <div class="text-right">
+      <button class="btn btn-primary" type="submit">送出</button>
+      <a class="btn btn-secondary" href="{{pathFor 'violationCaseList'}}">取消</a>
+    </div>
+  </form>
+  <hr />
+  <div class="violation-detail">
+    <div class="row" style="margin-top: 15px;">
+      <div class="col-12">
+        <h3>描述預覽</h3>
+        <div class="markdown-container">{{{descriptionPreview}}}</div>
+      </div>
+    </div>
+  </div>
+</template>

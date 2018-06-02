@@ -1,0 +1,48 @@
+<template name="violationCaseActionLogDisplay">
+  <strong>{{formatDateTimeText executedAt}}</strong> -
+
+  <div class="mx-3">
+    {{#if isAction 'setState'}}
+      {{>userLink executor}} {{stateTransitionActionText data.state}}，理由如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else if isAction 'comment'}}
+      {{>userLink executor}} 對案件增加了註解如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else if isAction 'addRelatedCase'}}
+      {{>userLink executor}} 將案件
+      <a href="{{pathForViolationCaseDetail data.relatedCaseId}}">{{data.relatedCaseId}}</a>
+      加入為本案件的相關案件，理由如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else if isAction 'removeRelatedCase'}}
+      {{>userLink executor}} 把案件
+      <a href="{{pathForViolationCaseDetail data.relatedCaseId}}">{{data.relatedCaseId}}</a>
+      從本案件的相關案件中移除了，理由如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else if isAction 'mergeViolatorsFromRelatedCase'}}
+      {{>userLink executor}} 把相關案件
+      <a href="{{pathForViolationCaseDetail data.relatedCaseId}}">{{data.relatedCaseId}}</a>
+      的以下違規名單
+      <ul>
+        {{#each violator in data.newViolators}}
+          <li>{{>violatorDisplay violator}}</li>
+        {{/each}}
+      </ul>
+      合併至本案件了，理由如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else if isAction 'addViolator'}}
+      {{>userLink executor}} 將以下違規名單
+      <ul>
+        {{#each violator in data.newViolators}}
+          <li>{{>violatorDisplay violator}}</li>
+        {{/each}}
+      </ul>
+      加入至本案件了，理由如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else if isAction 'removeViolator'}}
+      {{>userLink executor}} 將 {{>violatorDisplay data.violator}} 從本案件的違規名單移除了，理由如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else}}
+      {{>userLink executor}} 進行了動作 {{action}}。
+    {{/if}}
+  </div>
+</template>

@@ -13,7 +13,7 @@ let funcAlertDialogCallback = null;
 let blAlertDialogOK = false;
 
 export const alertDialog = {
-  dialog: function(options) {
+  dialog(options) {
     strAlertDialogType = options.type;
     strAlertDialogTitle = options.title;
     strAlertDialogMessage = options.message;
@@ -24,7 +24,7 @@ export const alertDialog = {
     blAlertDialogOK = false;
     rShowAlertDialog.set(true);
   },
-  alert: function(options) {
+  alert(options) {
     const defaultOption = {
       type: 'alert',
       title: ''
@@ -38,7 +38,7 @@ export const alertDialog = {
     Object.assign(defaultOption, options);
     this.dialog(defaultOption);
   },
-  confirm: function(options) {
+  confirm(options) {
     const defaultOption = {
       type: 'confirm',
       title: ''
@@ -62,7 +62,8 @@ Template.alertDialog.onRendered(function() {
   const $form = this.$('form');
   if (strAlertDialogType === 'prompt') {
     $form
-      .find('input:first')
+      .find('input, textarea')
+      .first()
       .trigger('focus');
   }
   else {
@@ -72,7 +73,7 @@ Template.alertDialog.onRendered(function() {
   }
 
   $(document).on('keydown.alertDialog', (e) => {
-    if (e.which === 13) {
+    if (e.which === 13 && strAlertDialogInputType !== 'multilineText') {
       $form.trigger('submit');
     }
     else if (e.which === 27) {
@@ -86,8 +87,8 @@ Template.alertDialog.onDestroyed(function() {
   const callback = funcAlertDialogCallback;
   const ok = blAlertDialogOK;
   if (strAlertDialogType === 'prompt') {
-    const value = this.$('input').val();
-    this.$('input').val('');
+    const value = this.$('input, textarea').val();
+    this.$('input, textarea').val('');
     if (callback) {
       callback(ok && value);
     }
@@ -98,6 +99,13 @@ Template.alertDialog.onDestroyed(function() {
 });
 Template.alertDialog.helpers({
   customInput() {
+    if (strAlertDialogInputType === 'multilineText') {
+      return `
+        <textarea name="alert-dialog-custom-input" class="form-control" rows="5"
+          ${strAlertDialogCustomSetting}>${strAlertDialogDefaultValue || ''}</textarea>
+      `;
+    }
+
     return `
       <input name="alert-dialog-custom-input" class="form-control"
              type="${strAlertDialogInputType}"

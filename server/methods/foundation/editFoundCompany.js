@@ -47,9 +47,9 @@ export function editFoundCompany(user, foundCompanyData) {
     checkImageUrl(foundCompanyData.pictureSmall);
   }
 
-  resourceManager.throwErrorIsResourceIsLock(['foundation' + companyId]);
+  resourceManager.throwErrorIsResourceIsLock([`foundation${companyId}`]);
   // 先鎖定資源，再更新
-  resourceManager.request('editFoundCompany', ['foundation' + companyId], (release) => {
+  resourceManager.request('editFoundCompany', [`foundation${companyId}`], (release) => {
     dbFoundations.update(companyId, { $set: _.omit(foundCompanyData, '_id') });
     release();
   });

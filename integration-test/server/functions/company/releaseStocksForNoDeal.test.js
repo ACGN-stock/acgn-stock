@@ -1,5 +1,7 @@
+import { Meteor } from 'meteor/meteor';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import expect from 'must';
+import sinon from 'sinon';
 import mustSinon from 'must-sinon';
 import { Factory } from 'rosie';
 
@@ -17,9 +19,10 @@ describe('function releaseStocksForNoDeal', function() {
 
   let companyId;
 
-  const listPrice = 100;
-  const totalRelease = 1000;
-  const upperPriceLimit = Math.ceil(listPrice * 1.15);
+  const defaultListPrice = 100;
+  const defaultTotalRelease = 1000;
+  const defaultCreatedAt = new Date(0);
+  const defaultUpperPriceLimit = Math.ceil(defaultListPrice * 1.15);
 
   const buyOrderFactory = new Factory()
     .attrs({
@@ -28,16 +31,37 @@ describe('function releaseStocksForNoDeal', function() {
         return companyId;
       },
       userId: 'someUser',
-      unitPrice: upperPriceLimit,
-      amount: 1,
+      amount: defaultTotalRelease ** 2,
+      unitPrice: defaultUpperPriceLimit + 1,
       createdAt() {
         return new Date();
       }
     });
 
+  let clock;
+
   beforeEach(function() {
     resetDatabase();
-    companyId = dbCompanies.insert(companyFactory.build({ listPrice, totalRelease }));
+  });
+
+  beforeEach(function() {
+    resetDatabase();
+    clock = sinon.useFakeTimers(new Date());
+    companyId = dbCompanies.insert(companyFactory.build({
+      listPrice: defaultListPrice,
+      totalRelease: defaultTotalRelease,
+      createdAt: defaultCreatedAt
+    }));
+  });
+
+  afterEach(function() {
+    clock.restore();
+  });
+
+  it('should release stocks', function() {
+    dbOrders.insert(buyOrderFactory.build());
+    releaseStocksForNoDeal();
+    expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
   });
 
   it('should not release stocks if there exists no buy order', function() {
@@ -45,92 +69,87 @@ describe('function releaseStocksForNoDeal', function() {
     expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.not.exist();
   });
 
-  describe('with no recent trade volume', function() {
-    it('should not release stocks if the buy order price is less than the upper price limit', function() {
-      dbOrders.insert(buyOrderFactory.build({ unitPrice: upperPriceLimit - 1 }));
-      releaseStocksForNoDeal();
-      expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.not.exist();
-    });
-
-    it('should release stocks if the buy order price is equal to the upper price limit', function() {
-      dbOrders.insert(buyOrderFactory.build({ unitPrice: upperPriceLimit }));
-      releaseStocksForNoDeal();
-      expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
-    });
-
-    it('should release stocks if the buy order price is more than the upper price limit', function() {
-      dbOrders.insert(buyOrderFactory.build({ unitPrice: upperPriceLimit + 1 }));
-      releaseStocksForNoDeal();
-      expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
-    });
-
-    describe('with a low price company', function() {
-      const lowPriceCompanyUpperPriceLimit = Math.ceil(listPrice * 1.30);
-
-      beforeEach(function() {
-        dbVariables.set('lowPriceThreshold', listPrice * listPrice);
-      });
-
-      it('should not release stocks if the buy order price is less than the low-price-company upper price limit', function() {
-        dbOrders.insert(buyOrderFactory.build({ unitPrice: lowPriceCompanyUpperPriceLimit - 1 }));
+  describe('price threshold', function() {
+    function runTests({ upperPriceLimit }) {
+      it('should not release stocks if the buy order price is less than the upper price limit', function() {
+        dbOrders.insert(buyOrderFactory.build({ unitPrice: upperPriceLimit - 1 }));
         releaseStocksForNoDeal();
         expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.not.exist();
       });
 
-      it('should release stocks if the buy order price is equal to the low-price-company upper price limit', function() {
-        dbOrders.insert(buyOrderFactory.build({ unitPrice: lowPriceCompanyUpperPriceLimit }));
+      it('should release stocks if the buy order price is at least the upper price limit', function() {
+        dbOrders.insert(buyOrderFactory.build({ unitPrice: upperPriceLimit }));
         releaseStocksForNoDeal();
         expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
+      });
+    }
+
+    describe('with normal company', function() {
+      runTests({ upperPriceLimit: Math.ceil(defaultListPrice * 1.15) });
+    });
+
+    describe('with low-price company', function() {
+      beforeEach(function() {
+        dbVariables.set('lowPriceThreshold', defaultListPrice + 1);
       });
 
-      it('should release stocks if the buy order price is more than the low-price-company upper price limit', function() {
-        dbOrders.insert(buyOrderFactory.build({ unitPrice: lowPriceCompanyUpperPriceLimit + 1 }));
-        releaseStocksForNoDeal();
-        expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
-      });
+      runTests({ upperPriceLimit: Math.ceil(defaultListPrice * 1.30) });
     });
   });
 
-  describe('with a recent trade volume', function() {
-    const volume = 100;
-    const amountThreshold = volume * 10;
+  describe('amount threshold', function() {
+    const { releaseStocksForNoDealTradeLogLookbackIntervalTime: lookbackTime } = Meteor.settings.public;
 
-    beforeEach(function() {
-      dbLog.insert({
-        logType: '交易紀錄',
-        companyId,
-        userId: ['user1', 'user2'],
-        data: {
-          amount: volume,
-          price: 1
-        },
-        createdAt: new Date()
+    function runTests({ isNewCompany, recentTradeVolume }) {
+      const amountThreshold = 10 * (recentTradeVolume + (isNewCompany ? defaultTotalRelease : 0));
+
+      beforeEach(function() {
+        if (isNewCompany) {
+          dbCompanies.update(companyId, { $set: { createdAt: new Date(Date.now() - lookbackTime + 1) } });
+        }
+
+        if (recentTradeVolume) {
+          dbLog.insert({
+            logType: '交易紀錄',
+            companyId,
+            userId: ['user1', 'user2'],
+            data: {
+              amount: recentTradeVolume,
+              price: 1
+            },
+            createdAt: new Date()
+          });
+        }
       });
+
+      if (amountThreshold > 0) {
+        it('should not release stocks if the order amount is at most the amount threshold', function() {
+          dbOrders.insert(buyOrderFactory.build({ amount: amountThreshold }));
+          console.log('---------------------------', amountThreshold);
+          releaseStocksForNoDeal();
+          expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.not.exist();
+        });
+      }
+
+      it('should release stocks if the order amount is more than the amount threshold', function() {
+        dbOrders.insert(buyOrderFactory.build({ amount: amountThreshold + 1 }));
+        releaseStocksForNoDeal();
+        expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
+      });
+    }
+
+    describe('with new company', function() {
+      runTests({ isNewCompany: true, recentTradeVolume: 0 });
     });
 
-    it('should not release stocks if the order amount is less than the amount threshold', function() {
-      dbOrders.insert(buyOrderFactory.build({ amount: amountThreshold - 1 }));
-      releaseStocksForNoDeal();
-      expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.not.exist();
-    });
+    describe('with normal company', function() {
+      describe('with no recent trade volume', function() {
+        runTests({ isNewCompany: false, recentTradeVolume: 0 });
+      });
 
-    it('should not release stocks if the order amount is equal to the amount threshold', function() {
-      dbOrders.insert(buyOrderFactory.build({ amount: amountThreshold }));
-      releaseStocksForNoDeal();
-      expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.not.exist();
-    });
-
-    it('should release stocks if the order amount is more than the amount threshold', function() {
-      dbOrders.insert(buyOrderFactory.build({ amount: amountThreshold + 1 }));
-      releaseStocksForNoDeal();
-      expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
-    });
-
-    it('should release stocks if the sum of the upper-price-limit order amounts is more than the amount threshold', function() {
-      dbOrders.insert(buyOrderFactory.build({ amount: amountThreshold - 1 }));
-      dbOrders.insert(buyOrderFactory.build({ amount: 2 }));
-      releaseStocksForNoDeal();
-      expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
+      describe('with a recent trade volume', function() {
+        runTests({ isNewCompany: false, recentTradeVolume: 100 });
+      });
     });
   });
 });
