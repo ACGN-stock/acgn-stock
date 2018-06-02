@@ -343,10 +343,3 @@ ruleDiscussRoute.route('/vote/:agendaId', {
     DocHead.setTitle(Meteor.settings.public.websiteName + ' - 議程投票');
   }
 });
-
-FlowRouter.route('/accuseRecord', {
-  name: 'accuseRecord',
-  action() {
-    DocHead.setTitle(Meteor.settings.public.websiteName + ' - 舉報違規紀錄');
-  }
-});
