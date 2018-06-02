@@ -6,7 +6,7 @@ import { dbCompanyArchive } from '/db/dbCompanyArchive';
 
 export const pageNameHash = {
   mainPage: '首頁',
-  announcement: '系統公告',
+  announcementList: '系統公告',
   tutorial: '遊戲規則',
   instantMessage: '即時訊息',
   companyList: '股市總覽',
@@ -341,5 +341,17 @@ ruleDiscussRoute.route('/vote/:agendaId', {
   name: 'ruleAgendaVote',
   action() {
     DocHead.setTitle(Meteor.settings.public.websiteName + ' - 議程投票');
+  }
+});
+
+// 控制中心
+const controlCenterRoute = FlowRouter.group({
+  prefix: '/controlCenter',
+  name: 'controlCenterRoute'
+});
+controlCenterRoute.route('/sendGift', {
+  name: 'controlCenterSendGift',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 控制中心 - 發送禮物`);
   }
 });

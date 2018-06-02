@@ -1579,6 +1579,23 @@ if (Meteor.isServer) {
     }
   });
 
+  Migrations.add({
+    version: 28,
+    name: 'admin gift system',
+    up() {
+      // 將舊有的「免費得石」紀錄轉換成新的「營運送禮」格式
+      Promise.await(dbLog.rawCollection().update({ logType: '免費得石' }, {
+        $rename: { 'data.stones': 'data.amount' },
+        $set: {
+          logType: '營運送禮',
+          userId: ['!system', '!all'],
+          'data.userType': 'all',
+          'data.giftType': 'saintStone'
+        }
+      }, { multi: true }));
+    }
+  });
+
   Meteor.startup(() => {
     Migrations.migrateTo('latest');
   });

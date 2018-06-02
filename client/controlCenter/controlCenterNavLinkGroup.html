@@ -1,0 +1,11 @@
+<template name="controlCenterNavLinkGroup">
+  {{#navLinkGroup text="控制中心"}}
+    {{#each pageKey in getAccessibleControlCenterPageKeys}}
+      <li class="nav-item">
+        <a href="{{pathForControlCenterPage pageKey}}" class="nav-link">
+          {{controlCenterPageDisplayName pageKey}}
+        </a>
+      </li>
+    {{/each}}
+  {{/navLinkGroup}}
+</template>

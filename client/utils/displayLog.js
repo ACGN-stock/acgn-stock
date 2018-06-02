@@ -87,9 +87,6 @@ Template.displayLog.helpers({
       case '登入紀錄': {
         return `${users[0]}從${data.ipAddr}登入了系統！`;
       }
-      case '免費得石': {
-        return `【免費得石】因為「${_.escape(data.reason)}」的理由獲得了${data.stones}顆聖晶石！`;
-      }
       case '購買得石': {
         return `【購買得石】${users[0]}花費$${currencyFormat(data.cost)}購買了${data.amount}個${stoneDisplayName(data.stoneType)}！`;
       }
@@ -423,6 +420,52 @@ Template.displayLog.helpers({
       }
       case '身份解除': {
         return `【身份解除】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}解除了${roleDisplayName(data.role)}的身份！`;
+      }
+      case '營運送禮': {
+        let result = `【營運送禮】${users[0]}以「${_.escape(data.reason)}」的理由發給了`;
+
+        switch (data.userType) {
+          case 'all':
+            result += '所有玩家';
+            break;
+          case 'active':
+            result += '所有活躍玩家';
+            break;
+          case 'recentlyLoggedIn':
+            result += `最近 ${data.days} 日內有登入的玩家`;
+            break;
+          case 'specified':
+            result += users.slice(1).join('、');
+            break;
+        }
+
+        switch (data.giftType) {
+          case 'saintStone':
+            result += ` ${data.amount} 個聖晶石`;
+            break;
+          case 'rainbowStone':
+            result += ` ${data.amount} 個彩紅石`;
+            break;
+          case 'rainbowStoneFragment':
+            result += ` ${data.amount} 個彩虹石碎片`;
+            break;
+          case 'questStone':
+            result += ` ${data.amount} 個任務石`;
+            break;
+          case 'money':
+            result += ` $${currencyFormat(data.amount)} 的現金`;
+            break;
+          case 'voucher':
+            result += ` ${data.amount} 張消費券`;
+            break;
+          case 'voteTicket':
+            result += ` ${data.amount} 張推薦票`;
+            break;
+        }
+
+        result += '！';
+
+        return result;
       }
     }
   }
