@@ -16,7 +16,8 @@ WebApp.connectHandlers.use(function(req, res, next) {
       fields: {
         productName: 1,
         url: 1,
-        type: 1
+        type: 1,
+        companyId: 1
       }
     });
     if (productData) {

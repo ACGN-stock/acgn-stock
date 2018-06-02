@@ -33,6 +33,8 @@ import { dbValidatingUsers } from './dbValidatingUsers';
 import { dbVariables } from './dbVariables';
 import { dbVips, roundVipScore } from './dbVips';
 import { dbVoteRecord } from './dbVoteRecord';
+import { dbViolationCases } from './dbViolationCases';
+import { dbViolationCaseActionLogs } from './dbViolationCaseActionLogs';
 
 if (Meteor.isServer) {
   Migrations.add({
@@ -1545,6 +1547,34 @@ if (Meteor.isServer) {
       Promise.await(Promise.all([
         dbAnnouncements.rawCollection().dropIndex({ categoty: 1 }),
         dbAnnouncements.rawCollection().createIndex({ category: 1 })
+      ]));
+    }
+  });
+
+  Migrations.add({
+    version: 27,
+    name: 'violation case tracking system',
+    up() {
+      Promise.await(Promise.all([
+        dbViolationCases.rawCollection().createIndex({ category: 1 }),
+        dbViolationCases.rawCollection().createIndex({ state: 1 }),
+        dbViolationCases.rawCollection().createIndex({ createdAt: -1 }),
+        dbViolationCases.rawCollection().createIndex({ unreadUsers: 1 }),
+        dbViolationCases.rawCollection().createIndex({
+          'violators.violatorType': 1, 'violators.violatorId': 1
+        }),
+        dbViolationCases.rawCollection().createIndex({
+          _id: 1, 'violators.violatorType': 1, 'violators.violatorId': 1
+        }, { unique: true }),
+        dbViolationCaseActionLogs.rawCollection().createIndex({ violationCaseId: 1 }),
+        dbViolationCaseActionLogs.rawCollection().createIndex({ executedAt: 1 }),
+        dbLog.rawCollection().createIndex({ 'data.violationCaseId': 1 }),
+        dbLog.rawCollection().update({
+          logType: { $in: ['撤職紀錄', '撤銷廣告'] },
+          'data.reason': { $exists: false }
+        }, {
+          $set: { 'data.reason': '（未指定理由）' }
+        }, { multi: true })
       ]));
     }
   });

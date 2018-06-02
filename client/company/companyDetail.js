@@ -5,21 +5,26 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
+
 import { dbArena } from '/db/dbArena';
 import { dbArenaFighters, getAttributeNumber, getTotalInvestedAmount } from '/db/dbArenaFighters';
-import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
-import { dbSeason, getCurrentSeason } from '/db/dbSeason';
+import { getCurrentSeason } from '/db/dbSeason';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, toggleFavorite } from '../utils/methods';
+import {
+  createBuyOrder, createSellOrder, retrieveOrder, changeChairmanTitle, toggleFavorite,
+  sendFscNotice, sealCompany, markCompanyIllegal, unmarkCompanyIllegal, changeCompanyName,
+  confiscateCompanyProfit, returnCompanyProfit
+} from '../utils/methods';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
 import { currencyFormat, setChartTheme } from '../utils/helpers';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
 import { globalVariable } from '../utils/globalVariable';
+import { paramCompanyId, paramCompany } from './helpers';
 
 const rShowAllTags = new ReactiveVar(false);
 
@@ -27,19 +32,13 @@ inheritedShowLoadingOnSubscribing(Template.companyDetail);
 Template.companyDetail.onCreated(function() {
   rShowAllTags.set(false);
   this.autorun(() => {
-    const companyId = FlowRouter.getParam('companyId');
-    if (companyId) {
-      const companyData = dbCompanies.findOne(companyId);
-      if (companyData) {
-        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + companyData.companyName + '」公司資訊');
-      }
+    const companyData = paramCompany();
+    if (companyData) {
+      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${companyData.companyName}」公司資訊`);
     }
   });
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const companyId = FlowRouter.getParam('companyId');
+  this.autorunWithIdleSupport(() => {
+    const companyId = paramCompanyId();
     if (companyId) {
       this.subscribe('companyDetail', companyId);
     }
@@ -47,24 +46,22 @@ Template.companyDetail.onCreated(function() {
 });
 Template.companyDetail.helpers({
   companyData() {
-    const companyId = FlowRouter.getParam('companyId');
-
-    return dbCompanies.findOne(companyId);
+    return paramCompany();
   }
 });
 
 Template.companyDetailContentNormal.onCreated(function() {
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return false;
-    }
-    const companyId = FlowRouter.getParam('companyId');
+  this.autorunWithIdleSupport(() => {
+    const companyId = paramCompanyId();
     if (companyId) {
       this.subscribe('employeeListByCompany', companyId);
     }
   });
 });
 Template.companyDetailContentNormal.helpers({
+  pathForReportCompanyViolation() {
+    return FlowRouter.path('reportViolation', null, { type: 'company', id: paramCompanyId() });
+  },
   getManageHref(companyId) {
     return FlowRouter.path('editCompany', { companyId });
   },
@@ -79,21 +76,13 @@ Template.companyDetailContentNormal.helpers({
     return tags && tags.slice(0, 3);
   },
   canUpdateSalary() {
-    const seasonData = dbSeason
-      .findOne({}, {
-        sort: {
-          beginDate: -1
-        }
-      });
-    if (! seasonData) {
-      return false;
-    }
+    const { endDate: seasonEndDate } = getCurrentSeason() || {};
 
-    return Date.now() < seasonData.endDate.getTime() - Meteor.settings.public.announceSalaryTime;
+    return seasonEndDate && Date.now() < seasonEndDate.getTime() - Meteor.settings.public.announceSalaryTime;
   },
   isEmployee() {
     const userId = Meteor.userId();
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     const employed = false;
     const resigned = false;
 
@@ -101,21 +90,6 @@ Template.companyDetailContentNormal.helpers({
   }
 });
 Template.companyDetailContentNormal.events({
-  'click [data-action="accuseCompany"]'(event) {
-    event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, { fields: { companyName: 1 } });
-    alertDialog.dialog({
-      type: 'prompt',
-      title: `舉報違規 - 「${companyData.companyName}」公司`,
-      message: `請輸入您要舉報的內容：`,
-      callback: (message) => {
-        if (message) {
-          Meteor.customCall('accuseCompany', companyId, message);
-        }
-      }
-    });
-  },
   'click [data-action="showAllTags"]'(event) {
     event.preventDefault();
     rShowAllTags.set(true);
@@ -157,13 +131,11 @@ Template.companyDetailContentNormal.events({
   },
   'click [data-action="changeChairmanTitle"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId);
-    changeChairmanTitle(companyData);
+    changeChairmanTitle(paramCompany());
   },
   'click [data-action="updateSalary"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     const minSalary = Meteor.settings.public.minimumCompanySalaryPerDay;
     const maxSalary = Meteor.settings.public.maximumCompanySalaryPerDay;
     const message = `請輸入下季員工薪資：(${currencyFormat(minSalary)}~${currencyFormat(maxSalary)})`;
@@ -188,7 +160,7 @@ Template.companyDetailContentNormal.events({
   },
   'click [data-action="setEmployeeBonusRate"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     const minBonus = Meteor.settings.public.minimumSeasonalBonusPercent;
     const maxBonus = Meteor.settings.public.maximumSeasonalBonusPercent;
     const message = `請輸入本季員工分紅占營收百分比：(${minBonus}~${maxBonus})`;
@@ -213,11 +185,10 @@ Template.companyDetailContentNormal.events({
   },
   'click [data-action="resignManager"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId);
-    const companyName = companyData.companyName;
+    const companyId = paramCompanyId();
+    const { companyName } = paramCompany();
     const checkCompanyName = companyName.replace(/\s/g, '');
-    const message = '你確定要辭去「' + companyName + '」的經理人職務？\n請輸入「' + checkCompanyName + '」以表示確定。';
+    const message = `你確定要辭去「${companyName}」的經理人職務？\n請輸入「${checkCompanyName}」以表示確定。`;
 
     alertDialog.prompt({
       message,
@@ -230,194 +201,44 @@ Template.companyDetailContentNormal.events({
   },
   'click [data-action="markCompanyIllegal"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1
-      }
-    });
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '設定違規標記',
-      message: '請輸入違規事由：',
-      defaultValue: companyData.illegalReason,
-      callback: (reason) => {
-        if (! reason) {
-          return;
-        }
-        if (reason.length > 10) {
-          alertDialog.alert('違規標記事由不可大於十個字！');
-
-          return;
-        }
-
-        Meteor.customCall('markCompanyIllegal', companyId, reason);
-      }
-    });
+    markCompanyIllegal(paramCompanyId());
   },
   'click [data-action="unmarkCompanyIllegal"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    alertDialog.confirm({
-      message: '是否解除違規標記？',
-      callback: (result) => {
-        if (result) {
-          Meteor.customCall('unmarkCompanyIllegal', companyId);
-        }
-      }
-    });
+    unmarkCompanyIllegal(paramCompanyId());
   },
-  'click [data-action="forfeitCompanyProfit"]'(event) {
+  'click [data-action="confiscateCompanyProfit"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId);
-
-    const dialogTitle = `課以罰金 - 「${companyData.companyName}」公司`;
-
-    alertDialog.dialog({
-      type: 'prompt',
-      title: dialogTitle,
-      message: '請輸入處理事由：',
-      callback: (reason) => {
-        if (reason) {
-          alertDialog.dialog({
-            type: 'prompt',
-            title: dialogTitle,
-            message: '請輸入罰金數額：',
-            inputType: 'number',
-            customSetting: 'min="0"',
-            callback: (amount) => {
-              amount = parseInt(amount, 10);
-              if (amount && amount >= 0) {
-                Meteor.customCall('forfeitCompanyProfit', { companyId, reason, amount });
-              }
-            }
-          });
-        }
-      }
-    });
+    confiscateCompanyProfit(paramCompany());
   },
-  'click [data-action="returnForfeitedCompanyProfit"]'(event) {
+  'click [data-action="returnCompanyProfit"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const { companyName } = dbCompanies.findOne(companyId);
-
-    const dialogTitle = `退還罰金 - 「${companyName}」公司`;
-
-    alertDialog.dialog({
-      type: 'prompt',
-      title: dialogTitle,
-      message: `請輸入處理事由：`,
-      callback: (reason) => {
-        if (reason) {
-          alertDialog.dialog({
-            type: 'prompt',
-            title: dialogTitle,
-            message: `請輸入退還金額：`,
-            inputType: 'number',
-            customSetting: `min="0"`,
-            callback: (amount) => {
-              amount = parseInt(amount, 10);
-              if (amount && amount > 0) {
-                Meteor.customCall('forfeitCompanyProfit', { companyId, reason, amount: -amount });
-              }
-            }
-          });
-        }
-      }
-    });
+    returnCompanyProfit(paramCompany());
   }
 });
 
 Template.companyDetailContentSealed.events({
   'click [data-action="unseal"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1,
-        isSeal: 1
-      }
-    });
-    const companyName = companyData.companyName;
-    const title = '解除查封 - ' + companyName;
-    alertDialog.dialog({
-      type: 'prompt',
-      title: title,
-      message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
-          Meteor.customCall('sealCompany', { companyId, message });
-        }
-      }
-    });
+    sealCompany(paramCompany());
   }
 });
 
 Template.companyDetailAdminPanel.events({
   'click [data-action="changeCompanyName"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1
-      }
-    });
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '公司更名',
-      message: `請輸入新的公司名稱：`,
-      defaultValue: companyData.companyName,
-      callback: (companyName) => {
-        if (companyName) {
-          Meteor.customCall('changeCompanyName', companyId, companyName);
-        }
-      }
-    });
+    changeCompanyName(paramCompany());
   },
   'click [data-action="seal"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1,
-        isSeal: 1
-      }
-    });
-    const companyName = companyData.companyName;
-    const title = (companyData.isSeal ? '解除查封 - ' : '查封關停 - ') + companyName;
-    alertDialog.dialog({
-      type: 'prompt',
-      title: title,
-      message: `請輸入處理事由：`,
-      callback: (message) => {
-        if (message) {
-          Meteor.customCall('sealCompany', { companyId, message });
-        }
-      }
-    });
+    sealCompany(paramCompany());
   },
-  'click [data-action="fscAnnouncement"]'(event) {
+  'click [data-action="sendFscNotice"]'(event) {
     event.preventDefault();
-    const companyId = FlowRouter.getParam('companyId');
-    const companyData = dbCompanies.findOne(companyId, {
-      fields: {
-        companyName: 1,
-        manager: 1
-      }
-    });
+    const companyId = paramCompanyId();
+    const { manager } = paramCompany();
 
-    alertDialog.dialog({
-      type: 'prompt',
-      title: '金管會通告 - 輸入通知訊息',
-      message: `請輸入要通告的訊息：`,
-      callback: (message) => {
-        if (message) {
-          const userIds = [companyData.manager];
-          Meteor.customCall('fscAnnouncement', { userIds, companyId, message });
-        }
-      }
-    });
+    sendFscNotice({ userIds: [manager], companyId });
   }
 });
 
@@ -469,7 +290,7 @@ Template.companyChart.events({
     const chartType = $(event.currentTarget).attr('data-chart-type');
     $('.company-detail .company-chart-btn-group > .active').removeClass('active');
     $('.company-detail .company-chart-btn-group')
-      .find('[data-chart-type="' + chartType + '"]')
+      .find(`[data-chart-type="${chartType}"]`)
       .addClass('active');
     templateInstance.strChartType = chartType;
     drawChart(templateInstance);
@@ -504,7 +325,7 @@ function drawLineChart(templateInstance) {
 
   const toTime = Date.now();
   const fromTime = toTime - 1000 * 60 * 60 * 24;
-  const companyId = FlowRouter.getParam('companyId');
+  const companyId = paramCompanyId();
   Meteor.call('queryStocksPrice', companyId, { begin: fromTime }, (error, result) => {
     if (error) {
       return false;
@@ -526,7 +347,7 @@ function drawLineChart(templateInstance) {
         labels: {
           x: -4,
           formatter: function() {
-            return '$' + currencyFormat(this.value);
+            return `$${currencyFormat(this.value)}`;
           }
         },
         allowDecimals: false,
@@ -559,13 +380,7 @@ function drawLineChart(templateInstance) {
             valueDecimals: 0,
             xDateFormat: '%H:%M:%S',
             pointFormatter: function() {
-              return '<span style="color:' +
-                this.color +
-                '">\u25CF</span> ' +
-                this.series.name +
-                ': <b>$' +
-                currencyFormat(this.y) +
-                '</b><br/>';
+              return `<span style="color:${this.color}">\u25CF</span> ${this.series.name}: <b>$${currencyFormat(this.y)}</b><br/>`;
             }
           }
         }
@@ -592,7 +407,7 @@ function drawCandleStickChart(templateInstance) {
   const toTime = Math.floor(Date.now() / unitTime) * unitTime;
   const fromTime = toTime - unitTime * (count - 1);
 
-  const companyId = FlowRouter.getParam('companyId');
+  const companyId = paramCompanyId();
   Meteor.call('queryStocksCandlestick', companyId, { lastTime: toTime, unitTime: unitTime, count: count }, (error, result) => {
     if (error) {
       return false;
@@ -635,7 +450,7 @@ function drawCandleStickChart(templateInstance) {
           y: 3,
           align: 'right',
           formatter: function() {
-            return '$' + currencyFormat(this.value);
+            return `$${currencyFormat(this.value)}`;
           }
         },
         allowDecimals: false,
@@ -677,18 +492,18 @@ function drawCandleStickChart(templateInstance) {
             xDateFormat: '%m/%d %H:%M',
             pointFormatter: function() {
               return (
-                'Open: <b>$' +
-                currencyFormat(this.options.open) +
-                '</b><br/>' +
-                'High: <b>$' +
-                currencyFormat(this.options.high) +
-                '</b><br/>' +
-                'Low: <b>$' +
-                currencyFormat(this.options.low) +
-                '</b><br/>' +
-                'Close: <b>$' +
-                currencyFormat(this.options.close) +
-                '</b><br/>'
+                `Open: <b>$${
+                  currencyFormat(this.options.open)
+                }</b><br/>` +
+                `High: <b>$${
+                  currencyFormat(this.options.high)
+                }</b><br/>` +
+                `Low: <b>$${
+                  currencyFormat(this.options.low)
+                }</b><br/>` +
+                `Close: <b>$${
+                  currencyFormat(this.options.close)
+                }</b><br/>`
               );
             }
           }
@@ -704,7 +519,7 @@ Template.companyTodayDealAmount.onCreated(function() {
   if (! Meteor.status().connected) {
     return false;
   }
-  const companyId = FlowRouter.getParam('companyId');
+  const companyId = paramCompanyId();
   if (companyId) {
     Meteor.call('queryTodayDealAmount', companyId, (error, result) => {
       if (! error) {
@@ -738,7 +553,7 @@ Template.companyBuyOrderList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     if (companyId) {
       this.subscribe('companyOrderExcludeMe', companyId, '購入', rBuyOrderOffset.get());
       this.subscribe('companyOrderExcludeMe', companyId, '賣出', rSellOrderOffset.get());
@@ -893,7 +708,7 @@ Template.companyDirectorList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     if (companyId) {
       this.subscribe('companyDirector', companyId, rDirectorOffset.get());
     }
@@ -1005,7 +820,7 @@ Template.companyElectInfo.events({
     const instanceData = templateInstance.data;
     const companyName = instanceData.companyName;
     alertDialog.confirm({
-      message: '你確定要參與競爭「' + companyName + '」的經理人職位嗎？',
+      message: `你確定要參與競爭「${companyName}」的經理人職位嗎？`,
       callback: (result) => {
         if (result) {
           Meteor.customCall('contendManager', instanceData._id);
@@ -1033,11 +848,11 @@ Template.companyElectInfo.events({
       success: (userData) => {
         const userName = userData.name;
         if (_.contains(supportList, user._id)) {
-          alertDialog.alert('你已經正在支持使用者' + userName + '了，無法再次進行支持！');
+          alertDialog.alert(`你已經正在支持使用者${userName}了，無法再次進行支持！`);
         }
         else {
           alertDialog.confirm({
-            message: '你確定要支持候選人「' + userName + '」嗎？',
+            message: `你確定要支持候選人「${userName}」嗎？`,
             callback: (result) => {
               if (result) {
                 Meteor.customCall('supportCandidate', instanceData._id, candidate);
@@ -1094,7 +909,7 @@ Template.supporterListDialog.events({
 inheritedShowLoadingOnSubscribing(Template.companyEmployeeList);
 Template.companyEmployeeList.helpers({
   employeeList() {
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     const employed = true;
 
     return dbEmployees.find({ companyId, employed }, {
@@ -1104,7 +919,7 @@ Template.companyEmployeeList.helpers({
     });
   },
   nextSeasonEmployeeList() {
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     const employed = false;
 
     return dbEmployees.find({ companyId, employed }, {
@@ -1115,7 +930,7 @@ Template.companyEmployeeList.helpers({
   },
   isCurrentUserEmployed() {
     const userId = Meteor.userId();
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
 
     if (! userId) {
       return false;
@@ -1128,7 +943,7 @@ Template.companyEmployeeList.helpers({
   },
   getMyMessage() {
     const userId = Meteor.userId();
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
 
     const employeeData = dbEmployees.findOne({ companyId, userId, employed: true });
     if (! employeeData) {
@@ -1157,7 +972,7 @@ Template.companyArenaInfo.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     if (companyId) {
       this.subscribe('companyArenaInfo', companyId);
     }
@@ -1213,11 +1028,10 @@ Template.companyArenaInfo.events({
   'click [data-action="joinArena"]'(event, templateInstance) {
     const { _id, companyName } = templateInstance.data;
     const checkCompanyName = companyName.replace(/\s/g, '');
-    const message = '你確定要讓「' +
-      companyName +
-      '」報名這一屆的最萌亂鬥大賽嗎？\n報名後將無法取消，請輸入「' +
-      checkCompanyName +
-      '」以表示確定。';
+    const message = `
+      你確定要讓「${companyName}」報名這一屆的最萌亂鬥大賽嗎？<br/>
+      報名後將無法取消，請輸入「${checkCompanyName}」以表示確定。
+    `;
 
     alertDialog.prompt({
       message,
@@ -1246,8 +1060,8 @@ Template.companyArenaInfo.events({
       return false;
     }
     const message = (
-      '請輸入要您要投資在「' + companyName + '」' +
-      '的屬性「' + investTarget.toUpperCase() + '」的金錢：' +
+      `請輸入要您要投資在「${companyName}」` +
+      `的屬性「${investTarget.toUpperCase()}」的金錢：` +
       `(${currencyFormat(minimumUnitPrice)}~${currencyFormat(maximumUnitPrice)})`
     );
 
@@ -1362,7 +1176,7 @@ Template.arenaStrategyForm.helpers({
   },
   getManner(type, index) {
     const model = Template.instance().model.get();
-    const fieldName = type + 'Manner';
+    const fieldName = `${type}Manner`;
 
     return model[fieldName][index];
   },
@@ -1426,7 +1240,7 @@ Template.companyLogList.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
     if (companyId) {
       this.subscribe('companyLog', companyId, rIsOnlyShowMine.get(), rLogOffset.get());
     }
@@ -1437,7 +1251,7 @@ Template.companyLogList.helpers({
     return rIsOnlyShowMine.get();
   },
   logList() {
-    const companyId = FlowRouter.getParam('companyId');
+    const companyId = paramCompanyId();
 
     return dbLog.find({ companyId }, {
       sort: {

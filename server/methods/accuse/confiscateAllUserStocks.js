@@ -1,27 +1,34 @@
 import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
+import { check, Match } from 'meteor/check';
 
 import { dbDirectors } from '/db/dbDirectors';
+import { dbViolationCases } from '/db/dbViolationCases';
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
 import { guardUser } from '/common/imports/guards';
 
 Meteor.methods({
-  confiscateStocks({ userId, message }) {
+  confiscateAllUserStocks({ userId, reason, violationCaseId }) {
     check(this.userId, String);
     check(userId, String);
-    check(message, String);
-    confiscateStocks(Meteor.user(), { userId, message });
+    check(reason, String);
+    check(violationCaseId, Match.Optional(String));
+
+    confiscateAllUserStocks(Meteor.user(), { userId, reason, violationCaseId });
 
     return true;
   }
 });
-function confiscateStocks(user, { userId, message }) {
-  debug.log('confiscateStocks', { user, userId, message });
+function confiscateAllUserStocks(currentUser, { userId, reason, violationCaseId }) {
+  debug.log('confiscateAllUserStocks', { user: currentUser, userId, reason, violationCaseId });
 
-  guardUser(user).checkHasRole('fscMember');
+  guardUser(currentUser).checkHasRole('fscMember');
 
   Meteor.users.findByIdOrThrow(userId, { fields: { _id: 1 } });
+
+  if (violationCaseId) {
+    dbViolationCases.findByIdOrThrow(violationCaseId, { fields: { _id: 1 } });
+  }
 
   const cursor = dbDirectors.find({ userId });
   if (cursor.count() < 1) {
@@ -33,18 +40,16 @@ function confiscateStocks(user, { userId, message }) {
   const createdAt = new Date();
   cursor.forEach((directorData) => {
     const { companyId, stocks } = directorData;
+
     logBulk.insert({
       logType: '沒收股份',
-      userId: [user._id, userId],
+      userId: [currentUser._id, userId],
       companyId,
-      data: {
-        reason: message,
-        stocks
-      },
+      data: { reason, stocks, violationCaseId },
       createdAt
     });
+
     if (dbDirectors.find({ companyId, userId: '!FSC' }).count() > 0) {
-      // 由於directors主鍵為Mongo Object ID，在Bulk進行find會有問題，故以companyId+userId進行搜尋更新
       directorsBulk
         .find({ companyId, userId: '!FSC' })
         .updateOne({ $inc: { stocks } });
