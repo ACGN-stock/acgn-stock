@@ -22,11 +22,11 @@ export function violatorTypeDisplayName(violatorType) {
 export const stateMap = {
   pending: {
     displayName: '待處理',
-    nextStates: ['accepted', 'rejected']
+    nextStates: ['processing']
   },
-  accepted: {
-    displayName: '已受理',
-    nextStates: ['closed']
+  processing: {
+    displayName: '處理中',
+    nextStates: ['closed', 'rejected']
   },
   rejected: {
     displayName: '已駁回',
@@ -212,21 +212,6 @@ const schema = new SimpleSchema({
   // 最後更新日期
   updatedAt: {
     type: Date
-  },
-  // 受理日期
-  acceptedAt: {
-    type: Date,
-    optional: true
-  },
-  // 駁回日期
-  rejectedAt: {
-    type: Date,
-    optional: true
-  },
-  // 結案日期
-  closedAt: {
-    type: Date,
-    optional: true
   }
 });
 dbViolationCases.attachSchema(schema);

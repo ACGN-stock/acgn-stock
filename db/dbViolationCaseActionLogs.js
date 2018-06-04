@@ -34,7 +34,7 @@ export const actionMap = {
   },
   addRelatedCase: {
     displayName: '增加相關案件',
-    allowedStates: ['accepted'],
+    allowedStates: ['processing'],
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String
@@ -42,7 +42,7 @@ export const actionMap = {
   },
   removeRelatedCase: {
     displayName: '移除相關案件',
-    allowedStates: ['accepted'],
+    allowedStates: ['processing'],
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String
@@ -50,7 +50,7 @@ export const actionMap = {
   },
   mergeViolatorsFromRelatedCase: {
     displayName: '從相關案件合併違規名單',
-    allowedStates: ['accepted'],
+    allowedStates: ['processing'],
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String,
@@ -64,7 +64,7 @@ export const actionMap = {
   },
   addViolator: {
     displayName: '增加違規名單',
-    allowedStates: ['accepted'],
+    allowedStates: ['processing'],
     dataSchema: new SimpleSchema({
       // 加入的違規名單
       newViolators: {
@@ -76,7 +76,7 @@ export const actionMap = {
   },
   removeViolator: {
     displayName: '移除違規名單',
-    allowedStates: ['accepted'],
+    allowedStates: ['processing'],
     dataSchema: new SimpleSchema({
       violator: violatorSchema
     }).extend(reasonSchema)
