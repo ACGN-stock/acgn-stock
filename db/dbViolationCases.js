@@ -30,11 +30,11 @@ export const stateMap = {
   },
   rejected: {
     displayName: '已駁回',
-    nextStates: []
+    nextStates: ['processing']
   },
   closed: {
     displayName: '已結案',
-    nextStates: []
+    nextStates: ['processing']
   }
 };
 
@@ -119,7 +119,7 @@ export const categoryMap = {
       > 我已閱讀完以上注意事項，請將本行以上刪除。
 
       以下玩家疑似有分身之嫌疑：
-      
+
       1. 玩家 <請輸入玩家帳號名稱> (識別碼：<請輸入玩家識別碼>)
       2. 玩家 <請輸入玩家帳號名稱> (識別碼：<請輸入玩家識別碼>)
 
