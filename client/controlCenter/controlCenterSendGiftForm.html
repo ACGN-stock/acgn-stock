@@ -1,0 +1,82 @@
+<template name="controlCenterSendGiftForm">
+  <form class="form">
+    <div class="form-group">
+      <label for="userType">{{schema.label 'userType'}}：</label>
+      <select class="form-control" name="userType">
+        <option value="" class="d-none">選擇類型…</option>
+        {{#each userType in schema.getAllowedValuesForKey 'userType'}}
+          <option value="{{userType}}">{{userTypeDisplayName userType}}</option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'userType'}}}
+    </div>
+
+    {{#if userTypeMatches 'recentlyLoggedIn'}}
+      <div class="form-group">
+        <label for="days">{{schema.label 'days'}}：</label>
+        <input class="form-control" type="number" name="days"
+          min="{{schema.get 'days' 'min'}}"
+          placeholder="請輸入天數" value="{{valueOf 'days'}}">
+        {{{errorHtmlOf 'days'}}}
+      </div>
+    {{/if}}
+
+    {{#if userTypeMatches 'specified'}}
+      <div class="form-group">
+        {{schema.label 'users'}}：
+        <ol name='users'>
+          {{#each userId in valueOf 'users'}}
+            <li>
+              玩家 {{> userLink userId}} ({{userId}})
+              <a href="#" class="badge badge-danger" data-action="removeUser" data-user-id="{{userId}}">
+                <i class="fa fa-times"></i> 移除
+              </a>
+            </li>
+          {{else}}
+            <em>一個人都沒有！</em>
+          {{/each}}
+        </ol>
+        <div class="form-inline">
+          <div class="input-group input-group-sm">
+            <span class="input-group-addon">玩家識別碼</span>
+            <input type="text" class="form-control form-control-sm" name="userId" placeholder="請輸入識別碼">
+          </div>
+          <button type="button" data-action="addUser" class="btn btn-sm btn-primary">
+            <i class="fa fa-plus"></i> 加入列表
+          </button>
+        </div>
+        {{{errorHtmlOf 'users'}}}
+      </div>
+    {{/if}}
+
+    <div class="form-group">
+      <label for="giftType">{{schema.label 'giftType'}}：</label>
+      <select class="form-control" name="giftType">
+        <option value="" class="d-none">選擇類型…</option>
+        {{#each giftType in schema.getAllowedValuesForKey 'giftType'}}
+          <option value="{{giftType}}">{{giftTypeDisplayName giftType}}</option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'giftType'}}}
+    </div>
+
+    <div class="form-group">
+      <label for="amount">{{schema.label 'amount'}}：</label>
+      <input class="form-control" type="number" name="amount"
+        min="{{schema.get 'amount' 'min'}}"
+        placeholder="請輸入數量" value="{{valueOf 'amount'}}">
+      {{{errorHtmlOf 'amount'}}}
+    </div>
+
+    <div class="form-group">
+      <label for="reason">{{schema.label 'reason'}}：</label>
+      <input class="form-control" type="text" name="reason" placeholder="請輸入數量" value="{{valueOf 'reason'}}">
+      {{{errorHtmlOf 'reason'}}}
+    </div>
+
+    <div class="text-right">
+      <button class="btn btn-primary" type="submit">送出</button>
+      <button class="btn btn-secondary" type="reset">重設</button>
+    </div>
+  </form>
+</template>

@@ -17,11 +17,6 @@ export const logTypeList = [
   '登入紀錄',
 
   /**
-   * 因為「data.reason」的理由獲得了data.stones顆聖晶石！
-   */
-  '免費得石',
-
-  /**
    * 【購買得石】userId0花費$data.cost購買了data.amount個data.stoneType！
    */
   '購買得石',
@@ -375,7 +370,15 @@ export const logTypeList = [
   /**
    * 【身份解除】userId0以「data.reason」的理由將userId1解除了data.role的身份！
    */
-  '身份解除'
+  '身份解除',
+
+  /**
+   * 【營運送禮】userId0以「data.reason」的理由發給了所有玩家data.amount數量的data.giftType！
+   * 【營運送禮】userId0以「data.reason」的理由發給了所有活躍玩家data.amount數量的data.giftType！
+   * 【營運送禮】userId0以「data.reason」的理由發給了所有data.days天內有登入的玩家data.amount數量的data.giftType！
+   * 【營運送禮】userId0以「data.reason」的理由發給了玩家userId...data.amount數量的data.giftType！
+   */
+  '營運送禮'
 ];
 
 // log 的分組，方便以群組方式 filtering 之用
@@ -389,7 +392,6 @@ export const logTypeGroupMap = {
   miningMachines: {
     displayName: '挖礦機與石頭相關',
     logTypes: [
-      '免費得石',
       '購買得石',
       '礦機營利'
     ]
@@ -517,6 +519,7 @@ export const logTypeGroupMap = {
     logTypes: [
       '驗證通過',
       '發薪紀錄',
+      '營運送禮',
       '公司復活'
     ]
   }
