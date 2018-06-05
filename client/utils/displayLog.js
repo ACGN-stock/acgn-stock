@@ -265,7 +265,8 @@ Template.displayLog.helpers({
         return `【廣告宣傳】${users[0]}以$${currencyFormat(data.cost)}的價格發布了一則廣告：「${_.escape(data.message)}」！`;
       }
       case '廣告追加': {
-        return `【廣告競價】${users[0]}追加了$${currencyFormat(data.cost)}的廣告費用在廣告：「${_.escape(data.message)}」上！`;
+        // NOTE: users[1] 存在與否是第三賽季的過渡，以後將可省略
+        return `【廣告競價】${users[0]}追加了$${currencyFormat(data.cost)}的廣告費用在${users[1] ? `${users[1]}發佈的` : ''}廣告：「${_.escape(data.message)}」上！`;
       }
       case '舉報違規': {
         let result = `【舉報違規】${users[0]}以「${_.escape(data.reason)}」的理由向金融管理會舉報`;

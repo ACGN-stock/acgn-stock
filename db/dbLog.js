@@ -207,7 +207,7 @@ export const logTypeList = [
   '廣告宣傳',
 
   /**
-   * 【廣告競價】userId0追加了$data.cost的廣告費用在廣告：「data.message」上！
+   * 【廣告競價】userId0追加了$data.cost的廣告費用在userId1發佈的廣告：「data.message」上！
    */
   '廣告追加',
 
