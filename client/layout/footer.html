@@ -4,7 +4,7 @@
       <div class="snackbar-container">
         {{> displayViolationCaseUnreadNotification}}
         {{> displayAnnouncementUnreadNotification}}
-        {{> unreadImportantAccuseLogsNotification}}
+        {{> unreadImportantFscLogsNotification}}
         {{> displayLegacyAnnouncement}}
         {{#each advertisingList}}
           {{> displayAdvertising}}
@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<template name="unreadImportantAccuseLogsNotification">
+<template name="unreadImportantFscLogsNotification">
   {{#if isDisplay}}
     <div class="media bg-danger text-white px-2 py-1 my-2 rounded footer-message-container">
       <div class="media-body footer-message">

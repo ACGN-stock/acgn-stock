@@ -7,9 +7,9 @@ defineMigration({
   name: 'rename lastReadFscAnnouncementDate to lastReadAccuseLogDate in user profile',
   async up() {
     await Meteor.users.rawCollection().update({
-      lastReadFscAnnouncementDate: { $exists: true }
+      'profile.lastReadFscAnnouncementDate': { $exists: true }
     }, {
-      $rename: { lastReadFscAnnouncementDate: 'lastReadAccuseLogDate' }
-    });
+      $rename: { 'profile.lastReadFscAnnouncementDate': 'profile.lastReadAccuseLogDate' }
+    }, { multi: true });
   }
 });

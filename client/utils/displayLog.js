@@ -393,7 +393,9 @@ Template.displayLog.helpers({
           })
           .join('、');
 
-        return `【產品修正】${users[0]}以金管會的名義修改了「${company}」公司的產品「${productSpan(data.productId)}」，將${diffString}。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
+        return `【產品修正】${users[0]}以金管會的名義修改了「${company}」公司的產品「${productSpan(data.productId)}」，${
+          _.isEmpty(data.diff) ? '但並未造成任何改變' : `將${diffString}`
+        }。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '撤銷廣告': {
         return `【撤銷廣告】${users[0]}將${users[1]}發布的廣告「${_.escape(data.message)}」給撤銷了。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;

@@ -189,7 +189,7 @@ const schema = new SimpleSchema({
         defaultValue: 0
       },
       // 最後閱讀的金管會相關訊息時間
-      lastReadAccuseLogDate: {
+      lastReadFscLogDate: {
         type: Date,
         optional: true
       },

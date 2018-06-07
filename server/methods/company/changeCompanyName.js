@@ -31,7 +31,7 @@ function changeCompanyName(user, { companyId, newCompanyName, violationCaseId })
     dbViolationCases.findByIdOrThrow(violationCaseId, { fields: { _id: 1 } });
   }
 
-  const { name: oldCompanyName } = dbCompanyArchive.findByIdOrThrow(companyId, { fields: { companyName: 1 } });
+  const { name: oldCompanyName } = dbCompanyArchive.findByIdOrThrow(companyId, { fields: { name: 1 } });
 
   dbLog.insert({
     logType: '公司更名',

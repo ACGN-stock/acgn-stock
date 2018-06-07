@@ -526,10 +526,10 @@ export const logTypeGroupMap = {
 };
 
 // 金管會相關紀錄
-export const accuseLogTypeList = logTypeGroupMap.fsc.logTypes;
+export const fscLogTypeList = logTypeGroupMap.fsc.logTypes;
 
 // 重要的金管會相關紀錄，需要發出未讀通知給使用者
-export const importantAccuseLogTypeList = [
+export const importantFscLogTypeList = [
   '金管通告',
   '禁止舉報',
   '禁止下單',

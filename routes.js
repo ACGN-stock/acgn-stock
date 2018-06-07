@@ -19,6 +19,7 @@ export const pageNameHash = {
   accountInfo: '帳號資訊',
   ruleAgendaList: '規則討論',
   violationCaseList: '違規案件列表',
+  fscLogs: '金管會執行紀錄',
   fscStock: '金管會持股'
 };
 
@@ -79,6 +80,13 @@ violationRoute.route('/view/:violationCaseId', {
   name: 'violationCaseDetail',
   action() {
     DocHead.setTitle(`${Meteor.settings.public.websiteName} - 違規案件內容`);
+  }
+});
+
+FlowRouter.route('/fscLogs', {
+  name: 'fscLogs',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 違規處置紀錄`);
   }
 });
 
