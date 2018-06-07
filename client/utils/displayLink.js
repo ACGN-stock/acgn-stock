@@ -3,23 +3,33 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 Template.userLink.onRendered(function() {
-  let userId = this.data;
-
-  if (typeof userId === 'object') {
-    userId = this.data.id;
-  }
-
-  if (userId === '!none') {
-    this.$('a').text('無');
-  }
-  else if (userId === '!system') {
-    this.$('a').text('系統');
-  }
-  else if (userId === '!FSC') {
-    this.$('a').text('金管會');
-  }
-  else if (userId) {
+  this.refreshContent = (userId) => {
     const $link = this.$('a');
+
+    if (! userId) {
+      $link.text('（無資料）');
+
+      return;
+    }
+
+    if (userId === '!none') {
+      $link.text('無');
+
+      return;
+    }
+
+    if (userId === '!system') {
+      $link.text('系統');
+
+      return;
+    }
+
+    if (userId === '!FSC') {
+      $link.text('金管會');
+
+      return;
+    }
+
     $.ajax({
       url: '/userInfo',
       data: {
@@ -45,7 +55,13 @@ Template.userLink.onRendered(function() {
         $link.text('???');
       }
     });
-  }
+  };
+
+  this.autorun(() => {
+    const data = Template.currentData();
+    const userId = typeof data === 'object' ? data.id : data;
+    this.refreshContent(userId);
+  });
 });
 
 Template.companyLink.onRendered(function() {
