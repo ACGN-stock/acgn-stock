@@ -6,7 +6,7 @@ import { Template } from 'meteor/templating';
 import { gradeNameList, gradeProportionMap } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
 import { VIP_LEVEL5_MAX_COUNT } from '/db/dbVips';
-import { importantAccuseLogTypeList } from '/db/dbLog';
+import { importantFscLogTypeList } from '/db/dbLog';
 import { stonePowerTable } from '/db/dbCompanyStones';
 
 Template.tutorial.onCreated(function() {
@@ -22,8 +22,8 @@ Template.tutorial.events({
 });
 
 Template.tutorial.helpers({
-  importantAccuseLogTypeList() {
-    return importantAccuseLogTypeList;
+  importantFscLogTypeList() {
+    return importantFscLogTypeList;
   },
   fscRuleURL() {
     return dbVariables.get('fscRuleURL');

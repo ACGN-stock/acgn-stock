@@ -27,3 +27,4 @@ import './026-fix-announcements-index-typo';
 import './027-violation-case-tracking-system';
 import './028-admin-gift-sending-system';
 import './029-enhancing-violation-case-tracking-system';
+import './030-rename-lastReadAccuseLogDate-to-lastReadFscLogDate-in-user-profile';
