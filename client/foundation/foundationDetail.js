@@ -164,7 +164,12 @@ Template.foundationFounderList.helpers({
   orderedInvestList() {
     const { invest } = paramFoundation();
 
-    return _.sortBy(invest, 'amount').reverse();
+    return _.pluck(invest.map((x, i) => {
+      return [x, i];
+    }).sort(([a, ai], [b, bi]) => {
+      // 對 amount 反向排序，如相同則以原始順序決定前後
+      return b.amount - a.amount || ai - bi;
+    }), 0);
   },
   getPercentage(amount) {
     const { invest } = paramFoundation();

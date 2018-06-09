@@ -1,0 +1,15 @@
+<template name="fscLogs">
+  <div class="card">
+    <div class="card-block">
+      <h1 class="card-title">金管會執行紀錄</h1>
+      <hr />
+      {{> pagination paginationData}}
+      {{#each log in logList}}
+        {{> displayLog log}}
+      {{else}}
+        <em>沒有資料！</em>
+      {{/each}}
+      {{> pagination paginationData}}
+    </div>
+  </div>
+</template>

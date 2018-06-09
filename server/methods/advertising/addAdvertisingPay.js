@@ -36,6 +36,7 @@ function addAdvertisingPay(user, advertisingId, addPay) {
   }
   const advertisingData = dbAdvertising.findOne(advertisingId, {
     fields: {
+      userId: 1,
       message: 1
     }
   });
@@ -57,7 +58,7 @@ function addAdvertisingPay(user, advertisingId, addPay) {
     const createdAt = new Date();
     dbLog.insert({
       logType: '廣告追加',
-      userId: [userId],
+      userId: [userId, advertisingData.userId],
       data: {
         cost: addPay,
         message: advertisingData.message

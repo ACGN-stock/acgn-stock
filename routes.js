@@ -6,7 +6,7 @@ import { dbCompanyArchive } from '/db/dbCompanyArchive';
 
 export const pageNameHash = {
   mainPage: '首頁',
-  announcement: '系統公告',
+  announcementList: '系統公告',
   tutorial: '遊戲規則',
   instantMessage: '即時訊息',
   companyList: '股市總覽',
@@ -19,6 +19,7 @@ export const pageNameHash = {
   accountInfo: '帳號資訊',
   ruleAgendaList: '規則討論',
   violationCaseList: '違規案件列表',
+  fscLogs: '金管會執行紀錄',
   fscStock: '金管會持股'
 };
 
@@ -79,6 +80,13 @@ violationRoute.route('/view/:violationCaseId', {
   name: 'violationCaseDetail',
   action() {
     DocHead.setTitle(`${Meteor.settings.public.websiteName} - 違規案件內容`);
+  }
+});
+
+FlowRouter.route('/fscLogs', {
+  name: 'fscLogs',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 違規處置紀錄`);
   }
 });
 
@@ -341,5 +349,17 @@ ruleDiscussRoute.route('/vote/:agendaId', {
   name: 'ruleAgendaVote',
   action() {
     DocHead.setTitle(Meteor.settings.public.websiteName + ' - 議程投票');
+  }
+});
+
+// 控制中心
+const controlCenterRoute = FlowRouter.group({
+  prefix: '/controlCenter',
+  name: 'controlCenterRoute'
+});
+controlCenterRoute.route('/sendGift', {
+  name: 'controlCenterSendGift',
+  action() {
+    DocHead.setTitle(`${Meteor.settings.public.websiteName} - 控制中心 - 發送禮物`);
   }
 });

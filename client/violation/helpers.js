@@ -21,7 +21,7 @@ export function stateBadgeClass(state) {
   switch (state) {
     case 'pending':
       return 'badge-default';
-    case 'accepted':
+    case 'processing':
       return 'badge-info';
     case 'rejected':
       return 'badge-danger';

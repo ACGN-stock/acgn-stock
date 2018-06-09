@@ -87,9 +87,6 @@ Template.displayLog.helpers({
       case '登入紀錄': {
         return `${users[0]}從${data.ipAddr}登入了系統！`;
       }
-      case '免費得石': {
-        return `【免費得石】因為「${_.escape(data.reason)}」的理由獲得了${data.stones}顆聖晶石！`;
-      }
       case '購買得石': {
         return `【購買得石】${users[0]}花費$${currencyFormat(data.cost)}購買了${data.amount}個${stoneDisplayName(data.stoneType)}！`;
       }
@@ -268,7 +265,8 @@ Template.displayLog.helpers({
         return `【廣告宣傳】${users[0]}以$${currencyFormat(data.cost)}的價格發布了一則廣告：「${_.escape(data.message)}」！`;
       }
       case '廣告追加': {
-        return `【廣告競價】${users[0]}追加了$${currencyFormat(data.cost)}的廣告費用在廣告：「${_.escape(data.message)}」上！`;
+        // NOTE: users[1] 存在與否是第三賽季的過渡，以後將可省略
+        return `【廣告競價】${users[0]}追加了$${currencyFormat(data.cost)}的廣告費用在${users[1] ? `${users[1]}發佈的` : ''}廣告：「${_.escape(data.message)}」上！`;
       }
       case '舉報違規': {
         let result = `【舉報違規】${users[0]}以「${_.escape(data.reason)}」的理由向金融管理會舉報`;
@@ -395,7 +393,9 @@ Template.displayLog.helpers({
           })
           .join('、');
 
-        return `【產品修正】${users[0]}以金管會的名義修改了「${company}」公司的產品「${productSpan(data.productId)}」，將${diffString}。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
+        return `【產品修正】${users[0]}以金管會的名義修改了「${company}」公司的產品「${productSpan(data.productId)}」，${
+          _.isEmpty(data.diff) ? '但並未造成任何改變' : `將${diffString}`
+        }。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '撤銷廣告': {
         return `【撤銷廣告】${users[0]}將${users[1]}發布的廣告「${_.escape(data.message)}」給撤銷了。${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
@@ -423,6 +423,52 @@ Template.displayLog.helpers({
       }
       case '身份解除': {
         return `【身份解除】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}解除了${roleDisplayName(data.role)}的身份！`;
+      }
+      case '營運送禮': {
+        let result = `【營運送禮】${users[0]}以「${_.escape(data.reason)}」的理由發給了`;
+
+        switch (data.userType) {
+          case 'all':
+            result += '所有玩家';
+            break;
+          case 'active':
+            result += '所有活躍玩家';
+            break;
+          case 'recentlyLoggedIn':
+            result += `最近 ${data.days} 日內有登入的玩家`;
+            break;
+          case 'specified':
+            result += users.slice(1).join('、');
+            break;
+        }
+
+        switch (data.giftType) {
+          case 'saintStone':
+            result += ` ${data.amount} 個聖晶石`;
+            break;
+          case 'rainbowStone':
+            result += ` ${data.amount} 個彩紅石`;
+            break;
+          case 'rainbowStoneFragment':
+            result += ` ${data.amount} 個彩虹石碎片`;
+            break;
+          case 'questStone':
+            result += ` ${data.amount} 個任務石`;
+            break;
+          case 'money':
+            result += ` $${currencyFormat(data.amount)} 的現金`;
+            break;
+          case 'voucher':
+            result += ` ${data.amount} 張消費券`;
+            break;
+          case 'voteTicket':
+            result += ` ${data.amount} 張推薦票`;
+            break;
+        }
+
+        result += '！';
+
+        return result;
       }
     }
   }

@@ -22,19 +22,19 @@ export function violatorTypeDisplayName(violatorType) {
 export const stateMap = {
   pending: {
     displayName: '待處理',
-    nextStates: ['accepted', 'rejected']
+    nextStates: ['processing']
   },
-  accepted: {
-    displayName: '已受理',
-    nextStates: ['closed']
+  processing: {
+    displayName: '處理中',
+    nextStates: ['closed', 'rejected']
   },
   rejected: {
     displayName: '已駁回',
-    nextStates: []
+    nextStates: ['processing']
   },
   closed: {
     displayName: '已結案',
-    nextStates: []
+    nextStates: ['processing']
   }
 };
 
@@ -47,7 +47,7 @@ export const categoryMap = {
     displayName: '公司違規',
     allowedInitialViolatorTypes: ['company'],
     descriptionTemplate: stripIndent(String.raw)`
-      > 以下請填入由 <…> 包起來的各項欄位。
+      > 以下請將各個 <…> 欄位依照指示連同角括號取代為您所提供的內容。
       > 公司法連結：https://goo.gl/b2sscm
       > 違規事項不只一條時可條列式列出。
       >
@@ -62,7 +62,7 @@ export const categoryMap = {
     displayName: '新創違規',
     allowedInitialViolatorTypes: ['company'],
     descriptionTemplate: stripIndent(String.raw)`
-      > 以下請填入由 <…> 包起來的各項欄位。
+      > 以下請將各個 <…> 欄位依照指示連同角括號取代為您所提供的內容。
       > 公司法連結：https://goo.gl/b2sscm
       > 違規事項不只一條時可條列式列出。
       >
@@ -77,7 +77,7 @@ export const categoryMap = {
     displayName: '產品違規',
     allowedInitialViolatorTypes: ['product'],
     descriptionTemplate: stripIndent(String.raw)`
-      > 以下請填入由 <…> 包起來的各項欄位。
+      > 以下請將各個 <…> 欄位依照指示連同角括號取代為您所提供的內容。
       > 公司法連結：https://goo.gl/b2sscm
       > 違規事項不只一條時可條列式列出。
       >
@@ -94,13 +94,13 @@ export const categoryMap = {
     displayName: '廣告違規',
     allowedInitialViolatorTypes: ['user'],
     descriptionTemplate: stripIndent(String.raw)`
-      > 以下請填入由 <…> 包起來的各項欄位。
+      > 以下請將各個 <…> 欄位依照指示連同角括號取代為您所提供的內容。
       > ACGN股市廣告規則：https://hackmd.io/s/r1whDmSqM
       > 違規事項不只一條時可條列式列出。
       >
       > 我已閱讀完以上注意事項，請將本行以上刪除。
 
-      玩家：[<請輸入玩家ID>](<請輸入玩家之帳號頁面連結>)
+      玩家 <請輸入玩家帳號名稱> (識別碼：<請輸入玩家識別碼>)
       其所發布之廣告：
       <請輸入廣告內容>
       有違規嫌疑如下：
@@ -111,7 +111,7 @@ export const categoryMap = {
     displayName: '分身違規',
     allowedInitialViolatorTypes: ['user'],
     descriptionTemplate: stripIndent(String.raw)`
-      > 以下請填入由 <…> 包起來的各項欄位。
+      > 以下請將各個 <…> 欄位依照指示連同角括號取代為您所提供的內容。
       > ACGN股市個人法：https://goo.gl/TRC4jT
       > 可增加玩家數量，請詳細敘述檢舉事由。
       > 注意：IP相同並非判定分身之唯一依據。
@@ -119,8 +119,9 @@ export const categoryMap = {
       > 我已閱讀完以上注意事項，請將本行以上刪除。
 
       以下玩家疑似有分身之嫌疑：
-      1. 玩家[<請輸入玩家ID>](<請輸入玩家之帳號頁面連結>)
-      2. 玩家[<請輸入玩家ID>](<請輸入玩家之帳號頁面連結>)
+
+      1. 玩家 <請輸入玩家帳號名稱> (識別碼：<請輸入玩家識別碼>)
+      2. 玩家 <請輸入玩家帳號名稱> (識別碼：<請輸入玩家識別碼>)
 
       以上ID疑似為分身，證據如下：
       <請輸入檢舉事由>
@@ -130,7 +131,7 @@ export const categoryMap = {
     displayName: '其他違規',
     allowedInitialViolatorTypes: violatorTypeList,
     descriptionTemplate: stripIndent(String.raw)`
-      > 以下請填入由 <…> 包起來的各項欄位。
+      > 以下請將各個 <…> 欄位依照指示連同角括號取代為您所提供的內容。
       > 公司法連結：https://goo.gl/b2sscm
       > ACGN股市個人法：https://goo.gl/TRC4jT
       > 請詳細輸入檢舉事由。
@@ -138,7 +139,7 @@ export const categoryMap = {
       > 我已閱讀完以上注意事項，請將本行以上刪除。
 
       公司【<請輸入公司名稱>】 *(檢舉對象非公司請將本行刪除)*
-      玩家[<請輸入玩家ID>](<請輸入玩家之帳號頁面連結>) *(檢舉對象非玩家請將本行刪除)*
+      玩家 <請輸入玩家帳號名稱> (識別碼：<請輸入玩家識別碼>) *(檢舉對象非玩家請將本行刪除)*
       涉嫌違規如下：
       <請輸入檢舉事由>
     `
@@ -211,21 +212,6 @@ const schema = new SimpleSchema({
   // 最後更新日期
   updatedAt: {
     type: Date
-  },
-  // 受理日期
-  acceptedAt: {
-    type: Date,
-    optional: true
-  },
-  // 駁回日期
-  rejectedAt: {
-    type: Date,
-    optional: true
-  },
-  // 結案日期
-  closedAt: {
-    type: Date,
-    optional: true
   }
 });
 dbViolationCases.attachSchema(schema);
