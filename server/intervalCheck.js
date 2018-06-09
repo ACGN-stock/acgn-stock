@@ -171,12 +171,6 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
         $nin: fscLogTypeList
       }
     });
-    // 移除所有與金管會相關且與公司相關的紀錄資料
-    dbLog.remove({
-      companyId: {
-        $exists: true
-      }
-    });
     // 移除所有最萌亂鬥大賽資料
     dbArenaLog.dropAll();
     dbArenaFighters.remove({});
