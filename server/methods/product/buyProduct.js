@@ -51,7 +51,9 @@ export function buyProduct({ userId, productId, amount }, resourceLocked = false
   const voucherCost = Math.min(totalCost, user.profile.vouchers);
   const moneyCost = totalCost - voucherCost;
 
-  guardUser(user).checkHasMoney(moneyCost);
+  if (moneyCost) {
+    guardUser(user).checkHasMoney(moneyCost);
+  }
 
   const availableQuota = getAvailableProductTradeQuota({ userId, companyId });
 
