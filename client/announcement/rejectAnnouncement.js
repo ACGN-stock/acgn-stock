@@ -16,7 +16,7 @@ Template.rejectAnnouncement.onCreated(function() {
       return;
     }
 
-    Meteor.subscribe('announcementRejectionDetail', paramAnnouncementId());
+    this.subscribe('announcementRejectionDetail', paramAnnouncementId());
   });
 });
 
