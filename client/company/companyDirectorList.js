@@ -43,7 +43,7 @@ Template.companyDirectorList.helpers({
     };
   },
   getCurrentUserDirectorMessage() {
-    const userId = Meteor.user()._id;
+    const userId = Meteor.userId();
     const companyId = paramCompanyId();
 
     return dbDirectors.findOne({ companyId, userId }).message;
