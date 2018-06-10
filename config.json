@@ -66,7 +66,8 @@
       "userViolationCases": 10,
       "userReportedViolationCases": 10,
       "companyViolationCases": 10,
-      "fscLogs": 30
+      "fscLogs": 30,
+      "companyOrders": 10
     },
     "productFinalSaleTime": 86400000,
     "systemProductVotingReward": 4096,

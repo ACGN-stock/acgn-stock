@@ -1,0 +1,14 @@
+<template name="companyDetailAdminPanel">
+  <div class="d-flex flex-wrap">
+    <a class="btn btn-sm btn-info mt-1" href="#" data-action="sendFscNotice">金管會通告</a>
+    {{#if company.illegalReason}}
+      <a class="btn btn-sm btn-warning mt-1" href="#" data-action="unmarkCompanyIllegal">解除違規標記</a>
+    {{else}}
+      <a class="btn btn-sm btn-warning mt-1" href="#" data-action="markCompanyIllegal">標記違規</a>
+    {{/if}}
+    <a class="btn btn-sm btn-warning mt-1" href="#" data-action="changeCompanyName">更名</a>
+    <a class="btn btn-sm btn-warning mt-1" href="#" data-action="confiscateCompanyProfit">課以罰金</a>
+    <a class="btn btn-sm btn-warning mt-1" href="#" data-action="returnCompanyProfit">退還罰金</a>
+    <a class="btn btn-sm btn-danger mt-1" href="#" data-action="seal">查封關停</a>
+  </div>
+</template>

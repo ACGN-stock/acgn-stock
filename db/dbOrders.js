@@ -10,6 +10,12 @@ export const orderTypeList = [
   '賣出'
 ];
 
+// TODO 將資料換為 sell/buy
+export const orderTypeTranslateMap = {
+  buy: '購入',
+  sell: '賣出'
+};
+
 const schema = new SimpleSchema({
   // 訂單所有者的userId
   userId: {

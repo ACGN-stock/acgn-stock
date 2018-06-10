@@ -1,0 +1,82 @@
+<template name="companyDetailTable">
+  <div class="company-detail">
+    <div class="media">
+      <div class="d-sm-flex picture">
+        {{#if company.pictureBig}}
+          <img src="{{company.pictureBig}}" />
+        {{else}}
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png" />
+        {{/if}}
+      </div>
+      <div class="media-body d-none d-md-block company-description markdown-container">
+        <h1>角色簡介</h1>{{{markdown company.description}}}
+      </div>
+    </div>
+    <div class="row border-grid-body mt-2">
+      <div class="col-12 border-grid d-block d-md-none company-description markdown-container">
+        <h1>角色簡介</h1>{{{markdown company.description}}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyChart' title='股價趨勢'}}
+          {{> companyChart}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyMarketData' title='數據資訊'}}
+          {{> companyMarketDataPanel}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyProfitDistribution' title='營利分配資訊'}}
+          {{> companyProfitDistributionPanel}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyOrderBook' title='交易訂單'}}
+          {{> companyOrderBook}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyProductCenter' title='產品中心'}}
+          {{> companyProductCenterPanel}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyDirectorList' title='董事會'}}
+          {{> companyDirectorList}}
+          {{> companyElectInfo}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyVipList' title='VIP名冊'}}
+          {{> companyVipListPanel}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyEmployeeList' title='員工名冊'}}
+          {{> companyEmployeeList}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyArenaInfo' title='最萌亂鬥大賽'}}
+          {{> companyArenaInfo}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyMiningMachine' title='挖礦機'}}
+          {{> companyMiningMachine}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyViolationCaseList' title='違規案件列表'}}
+          {{> violationCaseTable listType='companyViolated' companyId=company._id}}
+        {{/panelFolder}}
+      </div>
+      <div class="col-12 border-grid">
+        {{#panelFolder name='companyLogList' title='所有紀錄'}}
+          {{> companyLogList}}
+        {{/panelFolder}}
+      </div>
+    </div>
+  </div>
+</template>

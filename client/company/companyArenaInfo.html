@@ -1,0 +1,159 @@
+<template name="companyArenaInfo">
+  {{#with currentArena}}
+    <div>
+      <a href="{{pathForCurrentArena}}">本次最萌亂鬥大賽</a>起迄時間為：
+      {{formatDateTimeText currentArena.beginDate}}~
+      {{formatDateTimeText currentArena.endDate}}
+    </div>
+    <div>報名截止時間為：{{formatDateTimeText currentArena.joinEndDate}}</div>
+    {{#if this.joinData}}
+      <div>
+        {{companyData.companyName}}已經報名參加這一屆的最萌亂鬥大賽。
+      </div>
+    {{else}}
+      <div style="word-break: break-all;">
+        {{companyData.companyName}}並沒有參加這一屆的最萌亂鬥大賽！
+        {{#if isCurrentUser companyData.manager}}
+          {{#if inCanJoinTime}}
+            <button class="btn btn-primary btn-sm" type="button" data-action="joinArena">
+              報名參賽
+            </button>
+          {{/if}}
+        {{/if}}
+      </div>
+    {{/if}}
+    {{#with this.joinData}}
+      <div class="mt-2">
+        總投資額：${{currencyFormat totalInvestedAmount}}
+        {{#if notEnoughInvestedAmount}}
+          <span class="text-danger">（總投資額未達${{currencyFormat arenaMinInvestedAmount}}，大賽開始時將會自動失去參賽資格！）</span>
+        {{/if}}
+      </div>
+      <div>目前的屬性值如下：</div>
+      <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+        <button
+          class="d-sm-none mr-auto btn btn-success btn-sm"
+          href="#"
+          title="投資加點"
+          data-invest="hp"
+        >
+          HP
+          <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+        </button>
+        <span class="d-none d-sm-inline-block mr-auto">HP：</span>
+        <span class="d-inline-block">
+          {{getAttributeNumber 'hp' this.hp}}
+          (已投資${{currencyFormat this.hp}})
+        </span>
+        &nbsp;
+        <button
+          class="btn btn-success btn-sm d-none d-sm-inline-block"
+          type="button"
+          data-invest="hp"
+        >
+          投資加點
+        </button>
+      </div>
+      <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+        <button
+          class="d-sm-none mr-auto btn btn-success btn-sm"
+          href="#"
+          title="投資加點"
+          data-invest="sp"
+        >
+          SP
+          <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+        </button>
+        <span class="d-none d-sm-inline-block mr-auto">SP：</span>
+        <span class="d-inline-block">
+          {{getAttributeNumber 'sp' this.sp}}
+          (已投資${{currencyFormat this.sp}})
+        </span>
+        &nbsp;
+        <button
+          class="btn btn-success btn-sm d-none d-sm-inline-block"
+          type="button"
+          data-invest="sp"
+        >
+          投資加點
+        </button>
+      </div>
+      <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+        <button
+          class="d-sm-none mr-auto btn btn-success btn-sm"
+          href="#"
+          title="投資加點"
+          data-invest="atk"
+        >
+          ATK
+          <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+        </button>
+        <span class="d-none d-sm-inline-block mr-auto">ATK：</span>
+        <span class="d-inline-block">
+          {{getAttributeNumber 'atk' this.atk}}
+          (已投資${{currencyFormat this.atk}})
+        </span>
+        &nbsp;
+        <button
+          class="btn btn-success btn-sm d-none d-sm-inline-block"
+          type="button"
+          data-invest="atk"
+        >
+          投資加點
+        </button>
+      </div>
+      <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+        <button
+          class="d-sm-none mr-auto btn btn-success btn-sm"
+          href="#"
+          title="投資加點"
+          data-invest="def"
+        >
+          DEF
+          <i class="fa fa-angle-double-up" aria-hidden="true"></i>
+        </button>
+        <span class="d-none d-sm-inline-block mr-auto">DEF：</span>
+        <span class="d-inline-block">
+          {{getAttributeNumber 'def' this.def}}
+          (已投資${{currencyFormat this.def}})
+        </span>
+        &nbsp;
+        <button
+          class="btn btn-success btn-sm d-none d-sm-inline-block"
+          type="button"
+          data-invest="def"
+        >
+          投資加點
+        </button>
+      </div>
+      <div class="mb-1 d-flex flex-wrap justify-content-end col-md-8 col-sm-12 p-0">
+        <button
+          class="d-sm-none mr-auto btn btn-success btn-sm"
+          href="#"
+          title="投資加點"
+          data-invest="agi"
+        >
+          AGI&nbsp;<i class="fa fa-angle-double-up" aria-hidden="true"></i>
+        </button>
+        <span class="d-none d-sm-inline-block mr-auto">AGI：</span>
+        <span class="d-inline-block">
+          {{getAttributeNumber 'agi' this.agi}}
+          (已投資${{currencyFormat this.agi}})
+        </span>
+        &nbsp;
+        <button
+          class="btn btn-success btn-sm d-none d-sm-inline-block"
+          type="button"
+          data-invest="agi"
+        >
+          投資加點
+        </button>
+      </div>
+    {{/with}}
+    {{#if isCurrentUser this.joinData.manager}}
+      {{> arenaStrategyForm}}
+    {{/if}}
+  {{else}}
+    <div>現在並沒有舉辦最萌亂鬥大賽！</div>
+  {{/with}}
+</template>
