@@ -5,7 +5,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbDirectors } from '/db/dbDirectors';
 import { inheritedShowLoadingOnSubscribing } from '/client/layout/loading';
 import { alertDialog } from '/client/layout/alertDialog';
-import { getCurrentUserOwnedStockAmount, paramCompany, paramCompanyId } from './helpers';
+import { paramCompany, paramCompanyId } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.companyDirectorList);
 
