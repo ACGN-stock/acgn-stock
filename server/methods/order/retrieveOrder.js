@@ -33,9 +33,9 @@ export function retrieveOrder(user, orderId) {
     throw new Meteor.Error(401, '該訂單並非使用者所有，撤回訂單失敗！');
   }
   const companyId = orderData.companyId;
-  resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'allCompanyOrders', `companyOrder${companyId}`, `user${userId}`]);
   // 先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('retrieveOrder', ['companyOrder' + companyId, 'user' + userId], (release) => {
+  resourceManager.request('retrieveOrder', [`companyOrder${companyId}`, `user${userId}`], (release) => {
     const user = Meteor.users.findOne(userId, {
       fields: {
         profile: 1

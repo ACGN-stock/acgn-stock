@@ -15,6 +15,10 @@ export const config = {
     min: 10800000,
     max: 21600000
   },
+  zeroVolumePriceDrop: { // 無量跌停設定
+    orderAgeThreshold: 21600000, // 賣單需要存在的時間 (ms)
+    tradeVolumeLookbackTime: 86400000 // 交易量的統計時間 (ms)
+  },
   checkChairmanInterval: 600000, // 董事長檢查的排程時間 (ms)
   founderEarnestMoney: 1024, // 創立公司者需付出的保證金
   foundExpireTime: 43200000, // 創立公司的投資時間期限，單位為毫秒

@@ -5,24 +5,12 @@ import { dbDirectors } from '/db/dbDirectors';
 
 // 金管會掛單賣出持股
 export function sellFscStocks() {
-  dbDirectors
-    .find({ userId: '!FSC' })
-    .forEach(({ companyId, stocks }) => {
-      resourceManager.request('sellFSCStocks', [`companyOrder${companyId}`], (release) => {
-        const companyData = dbCompanies.findOne({
-          _id: companyId,
-          isSeal: false
-        }, {
-          fields: {
-            _id: 1,
-            listPrice: 1,
-            isSeal: 1
-          }
-        });
+  return resourceManager.requestPromise('sellFscStocks', ['allCompanyOrders'], (release) => {
+    dbDirectors.find({ userId: '!FSC' })
+      .forEach(({ companyId, stocks }) => {
+        const companyData = dbCompanies.findOne({ _id: companyId, isSeal: false }, { fields: { listPrice: 1 } });
 
         if (! companyData) {
-          release();
-
           return;
         }
 
@@ -37,8 +25,7 @@ export function sellFscStocks() {
           unitPrice: listPrice,
           amount
         });
-
-        release();
       });
-    });
+    release();
+  });
 }

@@ -15,6 +15,10 @@
       "min": 10800000,
       "max": 21600000
     },
+    "zeroVolumePriceDrop": {
+      "orderAgeThreshold": 21600000,
+      "tradeVolumeLookbackTime": 86400000
+    },
     "checkChairmanInterval": 600000,
     "founderEarnestMoney": 1024,
     "foundExpireTime": 43200000,
