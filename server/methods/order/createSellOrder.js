@@ -69,7 +69,7 @@ export function createSellOrder(user, orderData) {
     throw new Meteor.Error(404, '不存在的公司股票，訂單無法成立！');
   }
   if (companyData.isSeal) {
-    throw new Meteor.Error(403, '「' + companyData.companyName + '」公司已被金融管理委員會查封關停了！');
+    throw new Meteor.Error(403, `「${companyData.companyName}」公司已被金融管理委員會查封關停了！`);
   }
   if (orderData.unitPrice < Math.max(Math.floor(companyData.listPrice * 0.85), 1)) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
@@ -82,9 +82,9 @@ export function createSellOrder(user, orderData) {
   else if (orderData.unitPrice > Math.max(Math.ceil(companyData.listPrice * 1.15), 1)) {
     throw new Meteor.Error(403, '每股單價不可偏離該股票參考價格的百分之十五！');
   }
-  resourceManager.throwErrorIsResourceIsLock(['season', 'companyOrder' + companyId, 'user' + userId]);
+  resourceManager.throwErrorIsResourceIsLock(['season', 'allCompanyOrders', `companyOrder${companyId}`, `user${userId}`]);
   // 先鎖定資源，再重新讀取一次資料進行運算
-  resourceManager.request('createSellOrder', ['companyOrder' + companyId, 'user' + userId], (release) => {
+  resourceManager.request('createSellOrder', [`companyOrder${companyId}`, `user${userId}`], (release) => {
     const directorData = dbDirectors.findOne({ companyId, userId }, {
       fields: {
         stocks: 1

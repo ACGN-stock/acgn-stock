@@ -43,11 +43,19 @@ export const resourceManager = {
       }
       catch (e) {
         release();
-        console.error('error happens while requesting resources, automatic release resources lock' + JSON.stringify({ resourceList, task, threadId, time }) + '!');
+        console.error(`error happens while requesting resources, automatic release resources lock${JSON.stringify({ resourceList, task, threadId, time })}!`);
 
         throw e;
       }
     }
+  },
+  requestPromise(task, resourceList, callback) {
+    return new Promise((resolve) => {
+      this.request(task, resourceList, (release) => {
+        callback(release);
+        resolve();
+      });
+    });
   },
   throwErrorIsResourceIsLock(resourceList) {
     const someResourceIsLock = _.some(resourceList, (resource) => {
