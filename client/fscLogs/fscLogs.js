@@ -12,7 +12,7 @@ Template.fscLogs.onCreated(function() {
 
   this.autorunWithIdleSupport(() => {
     const offset = this.offset.get();
-    Meteor.subscribe('fscLogs', { offset });
+    this.subscribe('fscLogs', { offset });
   });
 });
 
