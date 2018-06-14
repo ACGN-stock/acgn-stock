@@ -1,0 +1,27 @@
+<template name="companyChart">
+  <div class="row pt-1">
+    <div class="col px-1" style="overflow-x: auto; overflow-y: hidden;">
+      <div class="chart w-100" style="height: 300px; min-width: 590px; "></div>
+    </div>
+    <div class="col d-none d-md-flex" style="max-width: 80px;">
+      <div class="btn-group-vertical d-flex company-chart-btn-group" role="group">
+        <button type="button" class="btn btn-secondary btn-sm active" data-chart-type="trend">走勢</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="day">日K</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="12hr">12時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="4hr">4時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="2hr">2時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="1hr">1時</button>
+      </div>
+    </div>
+    <div class="col-12 d-md-none px-0 my-1">
+      <div class="btn-group d-flex justify-content-end company-chart-btn-group" role="group">
+        <button type="button" class="btn btn-secondary btn-sm active" data-chart-type="trend">走勢</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="day">日K</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="12hr">12時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="4hr">4時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="2hr">2時</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-chart-type="1hr">1時</button>
+      </div>
+    </div>
+  </div>
+</template>

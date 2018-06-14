@@ -1,0 +1,64 @@
+<template name="companyDirectorList">
+  <div class="row border-grid-body temp-fix">
+    <div class="col-12 border-grid grid-table">
+      <div class="row mb-1">
+        <div class="col-md-3 text-center text-nowrap d-none d-md-block">使用者帳號</div>
+        <div class="col-md-1 text-center text-nowrap d-none d-md-block">股份數</div>
+        <div class="col-md-1 text-center text-nowrap d-none d-md-block">比例</div>
+        <div class="col-md-7 text-center text-nowrap d-none d-md-block">留言</div>
+      </div>
+      {{#each director in directorList}}
+        <div class="row mb-1 grid-table-row">
+          <div class="grid-table-hidden-title">使用者帳號</div>
+          <div class="col-md-3 text-truncate grid-table-content">
+            {{#if isDirectorInVacation director.userId}}
+              <small><span class="badge badge-info">渡假中</span></small>
+            {{/if}}
+            {{>userLink director.userId}}
+          </div>
+          <div class="grid-table-hidden-title">股份數</div>
+          <div class="col-md-1 text-right grid-table-content" title="{{director.stocks}}">
+            {{director.stocks}}
+          </div>
+          <div class="grid-table-hidden-title">比例</div>
+          <div class="col-md-1 text-right grid-table-content" title="{{getPercentage director.stocks}}%">
+            {{getPercentage director.stocks}}%
+          </div>
+          <div class="grid-table-hidden-title">留言</div>
+          <div class="col-md-7 text-left grid-table-content"
+            style="word-break: break-all;"
+            title="{{getMessage director.message}}">
+            {{getMessage director.message}}
+          </div>
+        </div>
+      {{else}}
+        <div class="text-center">
+          沒有任何董事！
+        </div>
+    {{/each}}
+    {{> pagination paginationData}}
+    {{#if isCurrentUserDirectorOf company._id}}
+      <form>
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon">董事會留言</span>
+            <input
+            class="form-control"
+            type="text"
+            name="message"
+            placeholder="身為董事會成員，你可以留下一則不超過一百個字的留言，同一時間只能存在一則留言。"
+            maxlength="100"
+            value="{{getCurrentUserDirectorMessage}}"
+            />
+            <span class="input-group-btn">
+              <button class="btn btn-primary" type="submit">
+                送出
+              </button>
+            </span>
+          </div>
+        </div>
+      </form>
+      {{/if}}
+    </div>
+  </div>
+</template>

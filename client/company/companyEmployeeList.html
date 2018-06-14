@@ -1,0 +1,86 @@
+<template name="companyEmployeeList">
+  <div class="row border-grid-body temp-fix">
+    <div class="col-12 border-grid grid-table">
+      <h4 class="my-1">
+        在職員工
+      </h4>
+      <div class="row mb-1">
+        <div class="col-md-2 text-center d-none d-md-block">使用者帳號</div>
+        <div class="col-md-3 text-center d-none d-md-block">報名時間</div>
+        <div class="col-md-7 text-center d-none d-md-block">留言</div>
+      </div>
+
+      <div style="max-height: 240px; overflow-y: auto; margin-left: -15px; margin-right: -15px;">
+        {{#each employee in employeeList}}
+          <div class="d-flex flex-wrap mb-1 grid-table-row">
+            <div class="grid-table-hidden-title">使用者帳號</div>
+            <div class="col-md-2 text-truncate grid-table-content">
+              {{>userLink employee.userId}}
+            </div>
+            <div class="grid-table-hidden-title">報名時間</div>
+            <div class="col-md-3 grid-table-content" title="{{formatDateTimeText employee.registerAt}}">
+              {{formatDateTimeText employee.registerAt}}
+            </div>
+            <div class="grid-table-hidden-title">留言</div>
+            <div class="col-md-7 grid-table-content" title="{{showMessage employee.message}}" style="word-break: break-all;">
+              {{showMessage employee.message}}
+            </div>
+          </div>
+        {{else}}
+          <div class="col-12 text-center">
+            沒有在職員工！
+          </div>
+        {{/each}}
+      </div>
+
+      {{#if isCurrentUserEmployed}}
+        <form>
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon">員工留言</span>
+              <input
+                class="form-control"
+                type="text"
+                name="message"
+                placeholder="身為現任員工，你可以留下一則不超過一百個字的留言，同一時間只能存在一則留言。"
+                maxlength="100"
+                value="{{getMyMessage}}"/>
+              <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit">送出</button>
+              </span>
+            </div>
+          </div>
+        </form>
+      {{/if}}
+    </div>
+    <div class="col-12 border-grid grid-table">
+      <h4 class="my-1">
+        儲備員工
+      </h4>
+      <div class="row mb-1 grid-table-head">
+        <div class="col-md-2 text-center d-none d-md-block">使用者帳號</div>
+        <div class="col-md-3 text-center d-none d-md-block">報名時間</div>
+        <div class="col-md-7 d-none d-md-block"></div>
+      </div>
+      <div style="overflow-y: auto; max-height: 240px; margin-left: -15px; margin-right: -15px;">
+        {{#each employee in nextSeasonEmployeeList}}
+          <div class="d-flex flex-wrap mb-1 grid-table-row">
+            <div class="grid-table-hidden-title">使用者帳號</div>
+            <div class="col-md-2 text-truncate grid-table-content">
+              {{>userLink employee.userId}}
+            </div>
+            <div class="grid-table-hidden-title">報名時間</div>
+            <div class="col-md-3 grid-table-content">
+              {{formatDateTimeText employee.registerAt}}
+            </div>
+            <div class="col-md-7 d-block d-md-none"></div>
+          </div>
+        {{else}}
+          <div class="col-12 text-center">
+            沒有儲備員工！
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</template>

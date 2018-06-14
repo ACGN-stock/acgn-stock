@@ -1,0 +1,140 @@
+<template name="arenaStrategyForm">
+  <form class="row mt-2">
+    <h5 class="col-12">決定這一屆大賽的策略：</h5>
+    <div class="col-12 col-lg-6 form-group">
+      <div class="d-flex">
+        <label class="input-group-addon" for="spCost">設定特攻消耗數值(1~10)</label>
+        <input
+          class="form-control"
+          type="number"
+          name="spCost"
+          value="{{valueOf 'spCost'}}"
+          min="1"
+          max="10"
+        />
+      </div>
+      {{{errorHtmlOf 'spCost'}}}
+    </div>
+    <div class="col-12 text-info mb-1">
+      <div class="text-warning">特攻消耗數值越高越容易使出特殊攻擊，但也會越快耗盡SP。</div>
+      <div>{{spForecast}}</div>
+    </div>
+    <div class="form-group col-12 col-lg-6">
+      <label>設定普通攻擊招式名：</label>
+      <input
+        class="form-control"
+        type="text"
+        name="normalManner"
+        value="{{getManner 'normal' 0}}"
+        maxlength="150"
+        placeholder="第一招普通攻擊的招式名稱"
+      />
+      <input
+        class="form-control"
+        type="text"
+        name="normalManner"
+        value="{{getManner 'normal' 1}}"
+        maxlength="150"
+        placeholder="第二招普通攻擊的招式名稱"
+      />
+      <input
+        class="form-control"
+        type="text"
+        name="normalManner"
+        value="{{getManner 'normal' 2}}"
+        maxlength="150"
+        placeholder="第三招普通攻擊的招式名稱"
+      />
+    </div>
+    <div class="form-group col-12 col-lg-6">
+      <label>設定特殊攻擊招式名：</label>
+      <input
+        class="form-control"
+        type="text"
+        name="specialManner"
+        value="{{getManner 'special' 0}}"
+        maxlength="150"
+        placeholder="第一招特殊攻擊的招式名稱"
+      />
+      <input
+        class="form-control"
+        type="text"
+        name="specialManner"
+        value="{{getManner 'special' 1}}"
+        maxlength="150"
+        placeholder="第二招特殊攻擊的招式名稱"
+      />
+      <input
+        class="form-control"
+        type="text"
+        name="specialManner"
+        value="{{getManner 'special' 2}}"
+        maxlength="150"
+        placeholder="第三招特殊攻擊的招式名稱"
+      />
+    </div>
+    {{#if hasEnemy}}
+      <div class="form-group col-12 col-lg-6">
+        <div class="mb-2">
+          排列優先攻擊順序：
+          <button class="btn btn-success btn-sm float-right" type="button" data-action="sortAll">
+            自動排序
+            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="form-control" style="height: 400px; overflow-y: auto; border: 1px solid #999;">
+          {{#each enemyList}}
+            {{#if notSorted this._id}}
+              <div
+                class="px-1 py-1 d-flex justify-content-end"
+                style="border: 1px solid #ddd; line-height: 1.75rem;"
+              >
+                <div class="text-truncate mr-auto">{{>companyLink this.companyId}}</div>
+                <button
+                  class="btn btn-success btn-sm"
+                  type="button"
+                  data-add="{{this._id}}"
+                >
+                  <i class="fa fa-plus-square"></i>
+                </button>
+              </div>
+            {{/if}}
+          {{/each}}
+        </div>
+      </div>
+      <div class="form-group col-12 col-lg-6">
+        <div class="mb-2">
+          已排序：
+        </div>
+        <div class="form-control" style="height: 400px; overflow-y: auto; border: 1px solid #999;">
+          {{#each sortedEnemyList}}
+            <div
+              class="px-1 py-1 d-flex justify-content-end"
+              style="border: 1px solid #ddd; line-height: 1.75rem;"
+            >
+              <div class="text-truncate mr-auto">
+                {{>companyLink this.companyId}}
+              </div>
+              <button
+                class="btn btn-danger btn-sm"
+                type="button"
+                data-remove="{{this._id}}"
+              >
+                <i class="fa fa-minus-square"></i>
+              </button>
+            </div>
+          {{/each}}
+        </div>
+      </div>
+    {{else}}
+      <div class="col-12 text-info">報名尚未截止，暫時無法設定攻擊優先順序。</div>
+    {{/if}}
+    <hr />
+    <div class="col-12 text-right">
+      {{#if hasEnemy}}
+      <button class="btn btn-secondary" type="reset">重設</button>
+      {{/if}}
+      <button class="btn btn-primary" type="submit">送出</button>
+    </div>
+  </form>
+</template>

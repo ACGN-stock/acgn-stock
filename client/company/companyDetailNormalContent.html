@@ -1,0 +1,90 @@
+<template name="companyDetailNormalContent">
+  <h1 class="d-flex flex-wrap justify-content-start">
+    <div class="text-truncate" title="{{company.companyName}}">
+      {{company.companyName}}
+    </div>
+    <div class="d-flex flex-wrap justify-content-end ml-auto mt-1">
+      {{#if currentUser}}
+        <a class="btn btn-danger" href="{{pathForReportCompanyViolation}}">舉報違規</a>
+        <a class="btn btn-primary" href="#" data-toggle-employ="{{company._id}}">
+          {{#if isEmployee}}
+            取消員工報名
+          {{else}}
+            員工報名
+          {{/if}}
+        </a>
+        <a class="btn btn-primary" href="#" data-action="toggleFavorite" data-toggle-favorite="{{company._id}}">
+          {{#if isFavorite company._id}}
+            移除最愛
+          {{else}}
+            加入最愛
+          {{/if}}
+        </a>
+      {{/if}}
+    </div>
+  </h1>
+  {{#if company.illegalReason}}
+    <div class="mb-1 px-1 bg-danger text-white">
+      <i class="fa fa-warning"></i>
+      本公司已被標記為違規！原因：{{company.illegalReason}}
+    </div>
+  {{/if}}
+  <div class="col p-0">
+    {{#each tag in visibleTags}}
+      <span class="badge badge-default d-inline-flex flex-nowrap">
+        <div class="d-inline-block text-truncate">{{tag}}</div>
+      </span>
+    {{/each}}
+    {{#unless showAllTags}}
+      <a href="#" class="badge badge-primary text-nowrap" data-action="showAllTags">顯示全部標籤</a>
+    {{/unless}}
+  </div>
+  <div class="text-nowrap my-1"><small>公司識別碼：{{company._id}}</small></div>
+  <hr />
+  <h2 class="card-subtitle mb-2 text-muted" style="word-break: break-all;">
+    {{company.chairmanTitle}}：
+    {{>userLink company.chairman}}
+    {{#if isCurrentUserChairmanOf company._id}}
+      <a class="btn btn-primary btn-sm" href="#" data-action="changeChairmanTitle">修改頭銜</a>
+    {{/if}}
+  </h2>
+  <h3 style="word-break: break-all;">
+    經理人：
+    {{>userLink company.manager}}
+    {{#if isCurrentUser company.manager}}
+      <a class="btn btn-primary btn-sm" href="{{pathForEditCompany}}">經營管理</a>
+      {{! TODO 移至員工名冊}}
+      {{#if canUpdateSalary}}
+        <a class="btn btn-primary btn-sm" href="#" data-action="updateSalary">設定薪資</a>
+      {{else}}
+        <a class="btn btn-primary btn-sm disabled" href="#">設定薪資</a>
+      {{/if}}
+      <a class="btn btn-danger btn-sm" href="#" data-action="resignManager">辭去職務</a>
+    {{else if currentUserHasRole 'fscMember'}}
+      <a class="btn btn-primary btn-sm" href="{{pathForEditCompany}}">經營管理</a>
+    {{/if}}
+  </h3>
+  <hr />
+  {{#if currentUserHasRole 'fscMember'}}
+    {{> companyDetailAdminPanel}}
+    <hr/>
+  {{/if}}
+  {{! TODO 移至員工名冊}}
+  <div class="row">
+    <div class="col-12 col-sm-6">
+      <div class="text-success this-season-salary" title="{{company.salary}}">
+      本季度員工薪資：${{currencyFormat company.salary}}
+      </div>
+    </div>
+    <div class="col-12 col-sm-6">
+      <div class="text-success next-season-salary" title="{{company.nextSeasonSalary}}">
+        下季度員工薪資：${{currencyFormat company.nextSeasonSalary}}
+        {{#if canUpdateSalary}}
+          <span class="badge badge-pill badge-warning">暫定</span>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+  <hr />
+  {{> companyDetailTable}}
+</template>

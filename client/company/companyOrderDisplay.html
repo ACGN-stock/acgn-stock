@@ -1,0 +1,16 @@
+<template name="companyOrderDisplay">
+  <div class="d-flex flex-nowrap align-items-center">
+    <div class="d-inline-block text-truncate" style="max-width: calc(100% - 220px);">
+      {{>userLink userId}}
+    </div>
+    <div class="text-nowrap">
+      以 ${{currencyFormat unitPrice}} {{orderTypeDisplayName orderType}} {{unfilledAmount}} 股。
+
+      {{#if isCurrentUser userId}}
+        <a href="#" class="badge badge-danger" data-action="cancelOrder" data-order-id="{{_id}}">
+          <i class="fa fa-times" aria-hidden="true"></i> 取消
+        </a>
+      {{/if}}
+    </div>
+  </div>
+</template>
