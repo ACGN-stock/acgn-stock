@@ -55,6 +55,11 @@ const schema = new SimpleSchema({
   },
   'votes.$': {
     type: String
+  },
+  // 活躍玩家人數
+  activeUserCount: {
+    type: SimpleSchema.Integer,
+    min: 0
   }
 });
 dbRuleAgendas.attachSchema(schema);
