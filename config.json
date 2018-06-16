@@ -15,6 +15,10 @@
       "min": 10800000,
       "max": 21600000
     },
+    "zeroVolumePriceDrop": {
+      "orderAgeThreshold": 21600000,
+      "tradeVolumeLookbackTime": 86400000
+    },
     "checkChairmanInterval": 600000,
     "founderEarnestMoney": 1024,
     "foundExpireTime": 43200000,
@@ -66,7 +70,8 @@
       "userViolationCases": 10,
       "userReportedViolationCases": 10,
       "companyViolationCases": 10,
-      "fscLogs": 30
+      "fscLogs": 30,
+      "companyOrders": 10
     },
     "productFinalSaleTime": 86400000,
     "systemProductVotingReward": 4096,

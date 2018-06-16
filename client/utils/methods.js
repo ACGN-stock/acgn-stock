@@ -14,8 +14,6 @@ import { alertDialog } from '../layout/alertDialog';
 import { handleError } from './handleError';
 import { currencyFormat } from './helpers';
 
-Meteor.subscribe('isChangingSeason');
-
 /*
  * 在原本的 Meteor.call 外，包裝自訂的載入狀態與錯誤處理顯示
  *

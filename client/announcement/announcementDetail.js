@@ -18,7 +18,7 @@ Template.announcementDetail.onCreated(function() {
       return;
     }
 
-    Meteor.subscribe('announcementDetail', announcementId);
+    this.subscribe('announcementDetail', announcementId);
   });
 });
 

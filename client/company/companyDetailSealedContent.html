@@ -1,0 +1,21 @@
+<template name="companyDetailSealedContent">
+  <em>該公司已被金融管理委員會查封！</em>
+
+  {{#if currentUserHasRole 'fscMember'}}
+    <a class="btn btn-danger float-right" href="#" data-action="unseal">
+      解除查封
+    </a>
+  {{/if}}
+
+  {{#if currentUser}}
+    {{#if isFavorite company._id}}
+      <a class="btn btn-primary float-right" href="#" data-action="toggleFavorite" data-toggle-favorite="{{company._id}}">
+        移除最愛
+      </a>
+    {{/if}}
+  {{/if}}
+
+  <div class="row border-grid-body mt-5">
+    {{> companyLogList}}
+  </div>
+</template>

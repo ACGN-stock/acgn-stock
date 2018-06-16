@@ -20,12 +20,14 @@ export function isHighPriceCompany(companyData) {
 export function getPriceLimits(companyData) {
   if (isLowPriceCompany(companyData)) {
     return {
-      upper: Math.ceil(companyData.listPrice * 1.30)
+      upper: Math.ceil(companyData.listPrice * 1.30),
+      lower: Math.max(Math.floor(companyData.listPrice * 0.85), 1)
     };
   }
   else {
     return {
-      upper: Math.ceil(companyData.listPrice * 1.15)
+      upper: Math.ceil(companyData.listPrice * 1.15),
+      lower: Math.max(Math.floor(companyData.listPrice * 0.85), 1)
     };
   }
 }

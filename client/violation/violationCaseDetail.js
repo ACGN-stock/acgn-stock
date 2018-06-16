@@ -29,7 +29,7 @@ Template.violationCaseDetail.onCreated(function() {
       return;
     }
 
-    Meteor.subscribe('violationCaseDetail', violationCaseId);
+    this.subscribe('violationCaseDetail', violationCaseId);
   });
 
   this.autorunWithIdleSupport(() => {
@@ -41,7 +41,7 @@ Template.violationCaseDetail.onCreated(function() {
 
     const offset = this.associatedLogOffset.get();
 
-    Meteor.subscribe('violationCaseAssociatedLogs', { violationCaseId, offset });
+    this.subscribe('violationCaseAssociatedLogs', { violationCaseId, offset });
   });
 });
 

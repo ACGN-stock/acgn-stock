@@ -1,4 +1,3 @@
-import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
@@ -16,7 +15,7 @@ Template.rejectAnnouncement.onCreated(function() {
       return;
     }
 
-    Meteor.subscribe('announcementRejectionDetail', paramAnnouncementId());
+    this.subscribe('announcementRejectionDetail', paramAnnouncementId());
   });
 });
 

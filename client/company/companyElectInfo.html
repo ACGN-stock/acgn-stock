@@ -1,0 +1,48 @@
+<template name="companyElectInfo">
+  <div class="row border-grid-body temp-fix">
+    <div class="col-12 border-grid">
+      <h4 class="my-1">
+        選舉下個商業季度的負責經理人：
+        {{#if canContendManager}}
+        <button class="btn btn-primary btn-sm" type="button" data-action="contendManager">
+          我要參選
+        </button>
+        {{/if}}
+      </h4>
+      <div class="row mb-1">
+        <div class="col-5 col-sm-7 col-md-8 text-center">候選人</div>
+        <div class="col-3 col-sm-2 col-md-2 text-center p-0">支持率</div>
+        <div class="col-4 col-sm-3 col-md-2 text-center">支持者</div>
+      </div>
+      {{#each candidate in company.candidateList}}
+      <div class="row mb-1">
+        <div class="col-5 col-sm-7 col-md-8">
+          <div class="d-flex flex-nowrap justify-content-between">
+            <div class="d-inline-block text-truncate">{{>userLink candidate}}</div>
+            {{#if getCurrentUserOwnedStockAmount}}
+            <button class="btn btn-primary btn-sm" type="button" data-support-candidate="{{@index}}">
+              <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+            </button>
+            {{/if}}
+          </div>
+        </div>
+        <div class="col-3 col-sm-2 col-md-2 text-center p-0">
+          {{getSupportPercentage @index}} %
+        </div>
+        <div class="col-4 col-sm-3 col-md-2 text-center">
+          {{#if hasSupporters @index}}
+          <button class="btn btn-primary btn-sm" type="button" data-show-supporter="{{@index}}">
+            清單 <i class="fa fa-users" aria-hidden="true"></i>
+          </button>
+          {{else}}
+          無
+          {{/if}}
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+  {{#if showSupportListDialog}}
+    {{> companyElectInfoSupporterListDialog supporterListDialogArgs}}
+  {{/if}}
+</template>

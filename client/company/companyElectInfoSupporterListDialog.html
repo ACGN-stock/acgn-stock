@@ -1,0 +1,31 @@
+<template name="companyElectInfoSupporterListDialog">
+  <form class="modal show d-block" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title mw-100">
+            <div class="d-flex flex-nowrap">
+              <div class="text-nowrap">投給「</div>
+              <div class="d-inline-block text-truncate">{{>userLink candidateId}}</div>
+              <div class="text-nowrap">」的股東</div>
+            </div>
+          </h5>
+        </div>
+        <div class="modal-body">
+          <div style="max-height: 300px; overflow-y: auto;">
+            {{#each userId in voteList}}
+              <div class="text-truncate">{{plus @index 1}}.&nbsp;{{> userLink userId}}</div>
+            {{else}}
+              <p>無</p>
+            {{/each}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-action="dismiss">
+            關閉
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</template>

@@ -1,0 +1,57 @@
+<template name="companyMarketDataPanel">
+  <div class="row border-grid-body temp-fix">
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">參考價格</span>
+      <span class="text-nowrap">$ {{currencyFormat company.listPrice}}</span>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">最後價格</span>
+      <span class="text-nowrap {{priceDisplayClass company.lastPrice company.listPrice}}">$ {{currencyFormat company.lastPrice}}</span>
+    </div>
+
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">日成交量</span>
+      <span class="text-nowrap">{{tradeVolume24h}} 股</span>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">總釋股數</span>
+      <span class="text-nowrap">{{company.totalRelease}} 股</span>
+    </div>
+
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">資本額</span>
+      <span class="text-nowrap">$ {{currencyFormat company.capital}}</span>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">參考市值</span>
+      <span class="text-nowrap">$ {{currencyFormat company.totalValue}}</span>
+    </div>
+
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">本季營利</span>
+      <span class="text-nowrap">$ {{currencyFormat (round company.profit)}}</span>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">每股盈餘</span>
+      <span class="text-nowrap">$ {{currencyFormat (getCompanyEPS company)}}</span>
+    </div>
+
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">本益比</span>
+      <span class="text-nowrap">{{getCompanyPERatio company}}</span>
+    </div>
+    <div class="col-6 col-md-3 col-lg-2 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">益本比</span>
+      <span class="text-nowrap">{{getCompanyEPRatio company}}</span>
+    </div>
+
+    <div class="col-4 col-md-2 col-lg-1 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">公司評級</span>
+      <span class="text-nowrap">{{company.grade}}</span>
+    </div>
+    <div class="col-8 col-md-4 col-lg-3 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">創立時間</span>
+      <span class="text-nowrap">{{formatDateTimeText company.createdAt}}</span>
+    </div>
+  </div>
+</template>

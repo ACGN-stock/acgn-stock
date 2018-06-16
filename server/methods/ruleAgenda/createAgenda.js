@@ -5,6 +5,7 @@ import { check, Match } from 'meteor/check';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { dbRuleIssues } from '/db/dbRuleIssues';
 import { dbRuleIssueOptions } from '/db/dbRuleIssueOptions';
+import { computeActiveUserCount } from '/server/imports/utils/computeActiveUserCount';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 import { guardUser } from '/common/imports/guards';
@@ -76,6 +77,7 @@ function createAgenda(user, agendaData) {
     issueIds.push(issueId);
   });
 
+  const activeUserCount = computeActiveUserCount();
   const createdAt = new Date();
   dbRuleAgendas.insert({
     title: agendaData.title,
@@ -84,7 +86,8 @@ function createAgenda(user, agendaData) {
     proposer: agendaData.proposer,
     creator: user._id,
     createdAt: createdAt,
-    issues: issueIds
+    issues: issueIds,
+    activeUserCount
   });
 }
 // 二十秒鐘最多一次

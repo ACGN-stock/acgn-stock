@@ -11,6 +11,7 @@ import { replenishProducts } from '/server/functions/product/replenishProducts';
 import { checkVipLevels } from '/server/functions/vip/checkVipLevels';
 import { computeArenaAttackSequences } from '/server/functions/arena/computeArenaAttackSequences';
 import { eventScheduler } from '/server/imports/utils/eventScheduler';
+import { executeZeroVolumePriceDrop } from '/server/functions/company/executeZeroVolumePriceDrop';
 import { paySalaryAndCheckTax } from '../paySalaryAndCheckTax';
 
 Meteor.startup(() => {
@@ -28,8 +29,11 @@ Meteor.startup(() => {
   eventScheduler.defineRecurringEvent('company.recordListPrice', {
     onTriggered() {
       updateRecordListPricePeriod();
-      recordListPrice();
-      sellFscStocks(); // 參考價更新同時賣出金管會持股
+      (async() => {
+        await executeZeroVolumePriceDrop(); // 判定無量跌停
+        await recordListPrice(); // 更新參考價
+        await sellFscStocks(); // 賣出金管會持股
+      })();
       replenishProducts(); // 參考價更新同時補貨
     },
     nextScheduledAt() {
