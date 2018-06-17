@@ -15,7 +15,7 @@ import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbFoundations } from '/db/dbFoundations';
-import { dbLog, accuseLogTypeList } from '/db/dbLog';
+import { dbLog, fscLogTypeList } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
 import { dbPrice } from '/db/dbPrice';
 import { dbProducts } from '/db/dbProducts';
@@ -168,13 +168,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     // 移除所有除了金管會相關以外的紀錄資料
     dbLog.remove({
       logType: {
-        $nin: accuseLogTypeList
-      }
-    });
-    // 移除所有與金管會相關且與公司相關的紀錄資料
-    dbLog.remove({
-      companyId: {
-        $exists: true
+        $nin: fscLogTypeList
       }
     });
     // 移除所有最萌亂鬥大賽資料

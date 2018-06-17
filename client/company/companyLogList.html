@@ -1,0 +1,13 @@
+<template name="companyLogList">
+  {{#if onlyShowMine}}
+    <button class="btn btn-outline-info btn-sm mt-1">檢視所有紀錄</button>
+  {{else}}
+    <button class="btn btn-outline-info btn-sm mt-1">只檢視自身紀錄</button>
+  {{/if}}
+  {{#each logData in logList}}
+    {{>displayLog logData}}
+  {{else}}
+    查無資料！
+  {{/each}}
+  {{> pagination paginationData}}
+</template>

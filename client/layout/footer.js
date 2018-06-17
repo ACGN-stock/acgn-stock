@@ -49,7 +49,7 @@ Template.footer.helpers({
   }
 });
 
-Template.unreadImportantAccuseLogsNotification.onCreated(function() {
+Template.unreadImportantFscLogsNotification.onCreated(function() {
   this.rIsDisplay = new ReactiveVar(false);
 
   this.autorun(() => {
@@ -64,33 +64,33 @@ Template.unreadImportantAccuseLogsNotification.onCreated(function() {
       return;
     }
 
-    this.subscribe('lastImportantAccuseLogDate');
+    this.subscribe('lastImportantFscLogDate');
 
-    const lastImportantAccuseLogDate = dbVariables.get('lastImportantAccuseLogDate');
+    const lastImportantFscLogDate = dbVariables.get('lastImportantFscLogDate');
 
-    if (! lastImportantAccuseLogDate) {
+    if (! lastImportantFscLogDate) {
       this.rIsDisplay.set(false);
 
       return;
     }
 
-    if (! user.status || ! user.profile.lastReadAccuseLogDate) {
+    if (! user.status || ! user.profile.lastReadFscLogDate) {
       this.rIsDisplay.set(true);
 
       return false;
     }
 
-    const lastReadAccuseLogDate = user.profile.lastReadAccuseLogDate;
+    const lastReadFscLogDate = user.profile.lastReadFscLogDate;
 
-    this.rIsDisplay.set(lastReadAccuseLogDate < lastImportantAccuseLogDate);
+    this.rIsDisplay.set(lastReadFscLogDate < lastImportantFscLogDate);
   });
 });
-Template.unreadImportantAccuseLogsNotification.helpers({
+Template.unreadImportantFscLogsNotification.helpers({
   isDisplay() {
     return Template.instance().rIsDisplay.get();
   }
 });
-Template.unreadImportantAccuseLogsNotification.events({
+Template.unreadImportantFscLogsNotification.events({
   'click .btn'(event, templateInstance) {
     event.preventDefault();
     templateInstance.rIsDisplay.set(false);

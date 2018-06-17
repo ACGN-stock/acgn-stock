@@ -43,7 +43,6 @@ function setViolationCaseState(currentUser, { violationCaseId, nextState, reason
   dbViolationCases.update({ _id: violationCaseId }, {
     $set: {
       state: nextState,
-      [`${nextState}At`]: now,
       updatedAt: now
     },
     $addToSet: { unreadUsers: { $each: newUnreadUsers } }

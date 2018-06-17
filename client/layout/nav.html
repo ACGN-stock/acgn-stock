@@ -67,12 +67,8 @@
     </button>
     <div class="{{getNavLinkListClassList}}">
       <ul class="navbar-nav">
-        <li class="nav-item text-nowrap">
-          <a class="nav-link" href="{{pathFor 'mainPage'}}">{{getLinkText 'mainPage'}}</a>
-        </li>
-        <li class="nav-item text-nowrap">
-          <a class="nav-link" href="{{pathFor 'announcementList'}}">{{getLinkText 'announcement'}}</a>
-        </li>
+        {{> navLink page='mainPage'}}
+        {{> navLink page='announcementList'}}
         {{#navLinkGroup text='交易大廳'}}
           {{> navLink page='instantMessage'}}
           {{> navLink page='companyList' params=page1}}
@@ -98,8 +94,12 @@
           </li>
           {{> navLink page='ruleAgendaList'}}
           {{> navLink page='violationCaseList'}}
+          {{> navLink page='fscLogs'}}
           {{> navLink page='fscStock'}}
         {{/navLinkGroup}}
+        {{#if shouldShowControlCenter}}
+          {{> controlCenterNavLinkGroup}}
+        {{/if}}
         {{#navLinkGroup text='主題配置'}}
           <li class="nav-item">
             <a class="nav-link" href="#" data-theme="light" data-action="switch-theme">亮色</a>
@@ -120,7 +120,7 @@
   <div class="note">
     <li class="nav-item dropdown text-nowrap">
       <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-        {{{this.text}}}
+        {{{text}}}
       </a>
       <div class="dropdown-menu px-3 nav-dropdown-menu" style="{{style}}" aria-labelledby="navbarDropdownMenuLink">
         {{> Template.contentBlock}}

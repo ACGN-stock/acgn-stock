@@ -18,7 +18,7 @@ Meteor.publish('accountInfoLog', function({ userId, logTypeGroups, offset }) {
     Meteor.users.update({
       _id: userId
     }, {
-      $set: { 'profile.lastReadAccuseLogDate': new Date() }
+      $set: { 'profile.lastReadFscLogDate': new Date() }
     });
   }
 

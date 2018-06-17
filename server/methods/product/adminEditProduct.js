@@ -47,6 +47,12 @@ export function adminEditProduct(currentUser, { productId, newData, violationCas
     dbViolationCases.findByIdOrThrow(violationCaseId, { fields: { _id: 1 } });
   }
 
+  const diff = productDiff(oldData, newData);
+
+  if (_.isEmpty(diff)) {
+    throw new Meteor.Error(403, '產品資料並沒有任何改變！');
+  }
+
   dbProducts.update({ _id: productId }, { $set: newData });
 
   dbLog.insert({
@@ -55,7 +61,7 @@ export function adminEditProduct(currentUser, { productId, newData, violationCas
     companyId,
     data: {
       productId,
-      diff: productDiff(oldData, newData),
+      diff,
       violationCaseId
     },
     createdAt: new Date()

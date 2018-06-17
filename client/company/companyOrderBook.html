@@ -1,0 +1,47 @@
+<template name="companyOrderBook">
+  <div class="row border-grid-body temp-fix">
+    <div class="col-12 col-md-6 border-grid">
+      <h4 class="my-1">
+        市場買單
+        <button class="btn btn-info btn-sm" type="button" data-action="createBuyOrder">下單</button>
+      </h4>
+
+      <div class="mb-2">
+        {{> companyOrderList companyId=company._id type='buy'}}
+      </div>
+
+      {{#if hasCurrentUserOrders 'buy'}}
+        <hr/>
+        <div class="mb-2">
+          <h5>我的買單</h5>
+          {{#each order in currentUserOrders 'buy'}}
+            {{> companyOrderDisplay order}}
+          {{/each}}
+        </div>
+      {{/if}}
+    </div>
+
+    <div class="col-12 col-md-6 border-grid">
+      <h4 class="my-1">
+        市場賣單
+        {{#if canSellStocks}}
+          <button class="btn btn-info btn-sm" type="button" data-action="createSellOrder">下單</button>
+        {{/if}}
+      </h4>
+
+      <div class="mb-2">
+        {{> companyOrderList companyId=company._id type='sell'}}
+      </div>
+
+      {{#if hasCurrentUserOrders 'sell'}}
+        <hr/>
+        <div class="mb-2">
+          <h5>我的賣單</h5>
+          {{#each order in currentUserOrders 'sell'}}
+            {{> companyOrderDisplay order}}
+          {{/each}}
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</template>

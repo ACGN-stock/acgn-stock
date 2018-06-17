@@ -12,7 +12,7 @@ import { markdown, currentUserHasRole } from '../utils/helpers';
 import { paramViolationCase, paramViolationCaseId, stateBadgeClass, pathForViolationCaseDetail } from './helpers';
 
 const stateTransitionTextMap = {
-  accepted: '受理案件',
+  processing: '開始處理案件',
   rejected: '駁回案件',
   closed: '結束案件'
 };
@@ -29,7 +29,7 @@ Template.violationCaseDetail.onCreated(function() {
       return;
     }
 
-    Meteor.subscribe('violationCaseDetail', violationCaseId);
+    this.subscribe('violationCaseDetail', violationCaseId);
   });
 
   this.autorunWithIdleSupport(() => {
@@ -41,7 +41,7 @@ Template.violationCaseDetail.onCreated(function() {
 
     const offset = this.associatedLogOffset.get();
 
-    Meteor.subscribe('violationCaseAssociatedLogs', { violationCaseId, offset });
+    this.subscribe('violationCaseAssociatedLogs', { violationCaseId, offset });
   });
 });
 
@@ -69,7 +69,7 @@ Template.violationCaseDetail.helpers({
   },
   setStateButtonClass(state) {
     switch (state) {
-      case 'accepted':
+      case 'processing':
         return 'btn-success';
       case 'rejected':
         return 'btn-danger';

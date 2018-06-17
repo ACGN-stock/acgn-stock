@@ -7,14 +7,13 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbCompanies } from '/db/dbCompanies';
+import { dbDirectors } from '/db/dbDirectors';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbVariables } from '/db/dbVariables';
 import { stoneDisplayName } from '/db/dbCompanyStones';
 import { hasRole, hasAnyRoles, hasAllRoles } from '/db/users';
 
 import '../layout/highcharts-themes';
-
-Meteor.subscribe('variables');
 
 Template.registerHelper('getVariable', function(variableName) {
   return dbVariables.get(variableName);
@@ -153,7 +152,18 @@ export function accountInfoLink(userId) {
 }
 Template.registerHelper('accountInfoLink', accountInfoLink);
 
-export function isChairman(companyId) {
+export function isCurrentUserDirectorOf(companyId) {
+  const userId = Meteor.userId();
+
+  if (! userId) {
+    return false;
+  }
+
+  return !! dbDirectors.find({ userId, companyId }).count();
+}
+Template.registerHelper('isCurrentUserDirectorOf', isCurrentUserDirectorOf);
+
+export function isCurrentUserChairmanOf(companyId) {
   const user = Meteor.user();
   if (user) {
     const companyData = dbCompanies.findOne(companyId);
@@ -164,7 +174,7 @@ export function isChairman(companyId) {
     return false;
   }
 }
-Template.registerHelper('isChairman', isChairman);
+Template.registerHelper('isCurrentUserChairmanOf', isCurrentUserChairmanOf);
 
 export function isCurrentUser(userId) {
   const user = Meteor.user();
@@ -317,7 +327,7 @@ const codeTagEscapedCharacterTranser = {
     const output = text.replace(/```((.|\r|\n)*?)```/g, function(match, capture) {
       const text = capture.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&quot;/g, '"').replace(/&excl;/g, '!');
 
-      return '```' + text + '```';
+      return `\`\`\`${text}\`\`\``;
     });
 
     return output;

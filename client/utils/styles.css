@@ -152,6 +152,13 @@ body {
   border-right: 1px solid #dddddd;
 }
 
+/* XXX 暫時性修正使用 panelFolder 時舊的 border-grid 的邊框樣式 */
+.border-grid-body.temp-fix {
+  margin-left: -1rem;
+  margin-right: calc(-1rem - 0.5px);
+  margin-bottom: -1px;
+}
+
 .nav-dropdown-menu {
   max-height: 300px;
   overflow-y: auto;

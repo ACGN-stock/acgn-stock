@@ -9,8 +9,8 @@ Template.violationCaseActionLogDisplay.helpers({
   },
   stateTransitionActionText(state) {
     switch (state) {
-      case 'accepted':
-        return '受理了本案件';
+      case 'processing':
+        return '開始處理本案件';
       case 'rejected':
         return '駁回了本案件';
       case 'closed':

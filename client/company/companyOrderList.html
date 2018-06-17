@@ -1,0 +1,8 @@
+<template name="companyOrderList">
+  {{#each order in orders}}
+    {{> companyOrderDisplay order}}
+  {{else}}
+    <em>一個都沒有！</em>
+  {{/each}}
+  {{> pagination paginationData}}
+</template>
