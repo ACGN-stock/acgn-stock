@@ -2,6 +2,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import { dbDirectors } from '/db/dbDirectors';
+import { wrapScopeKey } from '/common/imports/utils/wrapScopeKey';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { paramUserId } from './helpers';
 
@@ -23,7 +24,7 @@ Template.accountInfoOwnStockList.helpers({
   directorList() {
     const userId = paramUserId();
 
-    return dbDirectors.find({ userId }, {
+    return dbDirectors.find({ userId, [wrapScopeKey('user')]: 1 }, {
       limit: 10
     });
   },

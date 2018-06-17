@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
+import { publishWithScope } from '/server/imports/utils/publishWithScope';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbCompanies } from '/db/dbCompanies';
 import { debug } from '/server/imports/utils/debug';
@@ -30,8 +31,10 @@ Meteor.publish('accountOwnStocks', function(userId, offset, { limit = 10, includ
 
     publishTotalCount('totalCountOfAccountOwnStocks', dbDirectors.find(filter), this);
 
-    return dbDirectors
-      .find(filter, {
+    publishWithScope(this, {
+      collection: 'directors',
+      scope: 'user',
+      cursor: dbDirectors.find(filter, {
         fields: {
           userId: 1,
           companyId: 1,
@@ -40,7 +43,10 @@ Meteor.publish('accountOwnStocks', function(userId, offset, { limit = 10, includ
         skip: offset,
         limit: limit,
         disableOplog: true
-      });
+      })
+    });
+
+    this.ready();
   });
 });
 
