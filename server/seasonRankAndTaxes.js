@@ -448,6 +448,7 @@ function generateNoStockUserWealthList() {
       $project: {
         userId: 1,
         totalWealth: '$profile.money',
+        money: '$profile.money',
         noLoginDayCount: '$profile.noLoginDayCount',
         lastLoginDate: '$status.lastLogin.date',
         isInVacation: '$profile.isInVacation'
@@ -600,6 +601,21 @@ const taxConfigList = [
   }
 ];
 
+function computeTax(money) {
+  const matchTaxConfig = _.find(taxConfigList, (taxConfig) => {
+    return (
+      money >= taxConfig.from &&
+      money < taxConfig.to
+    );
+  });
+  if (matchTaxConfig) {
+    return Math.ceil(money * matchTaxConfig.ratio / 100) - matchTaxConfig.balance;
+  }
+  else {
+    return 0;
+  }
+}
+
 function generateUserTaxes(userWealthList) {
   const createdAt = new Date();
   const expireDate = new Date(new Date().setHours(0, 0, 0, 0) + Meteor.settings.public.taxExpireTime);
@@ -611,48 +627,19 @@ function generateUserTaxes(userWealthList) {
       return;
     }
 
-    let totalWealth = wealthData.totalWealth;
-    if (wealthData.money < 0) {
-      totalWealth -= wealthData.money;
-    }
     const noLoginTime = createdAt.getTime() - (wealthData.lastLoginDate ? wealthData.lastLoginDate.getTime() : 0);
     const noLoginDay = Math.min(Math.floor(noLoginTime / 86400000), 7);
     const noLoginDayCount = Math.min(noLoginDay + (wealthData.noLoginDayCount || 0), Math.floor(Meteor.settings.public.seasonTime / 86400000));
     const zombieTaxPerDay = wealthData.isInVacation ? Meteor.settings.public.vacationModeZombieTaxPerDay : Meteor.settings.public.salaryPerPay;
-    const zombie = noLoginDayCount * zombieTaxPerDay;
-    const matchTaxConfig = _.find(taxConfigList, (taxConfig) => {
-      return (
-        totalWealth >= taxConfig.from &&
-        totalWealth < taxConfig.to
-      );
-    });
-    if (matchTaxConfig) {
-      const tax = Math.ceil(totalWealth * matchTaxConfig.ratio / 100) - matchTaxConfig.balance;
-      if (tax > 0) {
-        taxesBulk.insert({
-          userId: wealthData._id,
-          tax,
-          zombie,
-          fine: 0,
-          paid: 0,
-          expireDate
-        });
-        logBulk.insert({
-          logType: '季度賦稅',
-          userId: [wealthData._id],
-          data: {
-            assetTax: tax,
-            zombieTax: zombie
-          },
-          createdAt
-        });
-      }
-    }
-    else if (zombie > 0) {
+    const zombieTax = noLoginDayCount * zombieTaxPerDay;
+    const stockTax = computeTax(wealthData.totalWealth - wealthData.money);
+    const moneyTax = computeTax(wealthData.money * 1.3);
+    if (stockTax > 0 || moneyTax > 0 || zombieTax > 0) {
       taxesBulk.insert({
         userId: wealthData._id,
-        tax: 0,
-        zombie,
+        stockTax,
+        moneyTax,
+        zombieTax,
         fine: 0,
         paid: 0,
         expireDate
@@ -661,8 +648,9 @@ function generateUserTaxes(userWealthList) {
         logType: '季度賦稅',
         userId: [wealthData._id],
         data: {
-          assetTax: 0,
-          zombieTax: zombie
+          stockTax,
+          moneyTax,
+          zombieTax
         },
         createdAt
       });

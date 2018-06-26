@@ -12,15 +12,20 @@ const schema = new SimpleSchema({
   userId: {
     type: String
   },
-  // 需繳納的財產稅金
-  tax: {
+  // 需繳納的股票稅
+  stockTax: {
     type: SimpleSchema.Integer,
-    min: 1
+    min: 0
+  },
+  // 需繳納的現金稅
+  moneyTax: {
+    type: SimpleSchema.Integer,
+    min: 0
   },
   // 需繳納的殭屍稅金
-  zombie: {
+  zombieTax: {
     type: SimpleSchema.Integer,
-    min: 1
+    min: 0
   },
   // 因逾期未繳產生的罰金
   fine: {
