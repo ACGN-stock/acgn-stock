@@ -4,6 +4,9 @@ import { _ } from 'meteor/underscore';
 
 import { dbViolationCases, violatorTypeList, violatorTypeDisplayName } from '/db/dbViolationCases';
 import { dbViolationCaseActionLogs, actionMap } from '/db/dbViolationCaseActionLogs';
+import { dbCompanyArchive } from '/db/dbCompanyArchive';
+import { dbUserArchive } from '/db/dbUserArchive';
+import { dbProducts } from '/db/dbProducts';
 import { guardUser } from '/common/imports/guards';
 import { populateViolators } from './helpers';
 
@@ -35,6 +38,17 @@ function addViolatorToViolationCase(currentUser, { violationCaseId, violatorType
 
   if (_.findWhere(originalViolators, { violatorType, violatorId })) {
     throw new Meteor.Error(403, `${violatorTypeDisplayName(violatorType)} ${violatorId} 已經在名單中！`);
+  }
+
+  // 確保要新增的違規名單是既有的資料 ID
+  if (violatorType === 'user') {
+    dbUserArchive.findByIdOrThrow(violatorId, { fields: { _id: 1 } });
+  }
+  else if (violatorType === 'company') {
+    dbCompanyArchive.findByIdOrThrow(violatorId, { fields: { _id: 1 } });
+  }
+  else if (violatorType === 'product') {
+    dbProducts.findByIdOrThrow(violatorId, { fields: { _id: 1 } });
   }
 
   const newViolators = populateViolators({ violatorType, violatorId }).filter((violator) => {
