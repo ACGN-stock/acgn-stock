@@ -28,6 +28,10 @@ export const announcementCategoryMap = {
     displayName: '已知問題',
     announceableBy: ['developer']
   },
+  generalAnnouncements: {
+    displayName: '營運公告',
+    announceableBy: ['planner']
+  },
   miscellaneous: {
     displayName: '其他雜項',
     announceableBy: ['superAdmin', 'generalManager']
