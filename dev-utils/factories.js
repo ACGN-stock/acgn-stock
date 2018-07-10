@@ -92,10 +92,13 @@ export const productFactory = new Factory()
 
 export const taxFactory = new Factory()
   .attrs({
-    tax() {
+    stockTax() {
       return faker.random.number({ min: 1 });
     },
-    zombie() {
+    moneyTax() {
+      return faker.random.number({ min: 1 });
+    },
+    zombieTax() {
       return faker.random.number({ min: 1 });
     },
     fine: 0,

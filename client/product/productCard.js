@@ -57,7 +57,7 @@ Template.productCard.events({
     }
 
     const { money, vouchers } = Meteor.user().profile;
-    const spendables = money + vouchers;
+    const spendables = Math.max(money, 0) + vouchers;
     if (spendables < price) {
       alertDialog.alert('您的剩餘現金不足！');
 

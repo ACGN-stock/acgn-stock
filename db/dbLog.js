@@ -172,7 +172,7 @@ export const logTypeList = [
   '消費回饋',
 
   /**
-   * 【季度賦稅】userId0在此次商業季度中產生了$data.assetTax的財富稅與$data.zombieTax的殭屍稅！
+   * 【季度賦稅】userId0在此次商業季度中產生了$data.stockTax的股票資產稅、$data.moneyTax的現金資產稅與$data.zombieTax的殭屍稅！
    */
   '季度賦稅',
 
