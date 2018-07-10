@@ -3,7 +3,7 @@
     <div class="card-block">
       {{#if announcement}}
         <h1 class="card-title d-flex flex-wrap">
-          <div>{{categoryDisplayName announcement.category}}公告</div>
+          <div>公告 - {{categoryDisplayName announcement.category}}</div>
           <div class="ml-auto">
             {{#if canRejectAnnoumcenet}}
               <a class="btn btn-warning" href="{{pathForRejectAnnouncement}}">否決</a>

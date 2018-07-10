@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { Match } from 'meteor/check';
 import SimpleSchema from 'simpl-schema';
@@ -52,3 +53,12 @@ const schema = new SimpleSchema({
   }
 });
 dbUserArchive.attachSchema(schema);
+
+dbUserArchive.findByIdOrThrow = function(id, options) {
+  const result = this.findOne(id, options);
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的使用者封存資料！`);
+  }
+
+  return result;
+};
