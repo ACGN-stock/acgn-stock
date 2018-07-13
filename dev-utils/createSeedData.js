@@ -68,6 +68,9 @@ if (Meteor.isServer && Meteor.isDevelopment) {
       dbCompanies.insert(c);
     });
 
+    console.log('make user1 be the manager of all companies...');
+    setManagerOfAllCompanies(Meteor.users.find({ username: 'user1' }).fetch()[0]._id);
+
     console.log('add companies to archive...');
     const companyArchiveBulk = dbCompanyArchive.rawCollection().initializeUnorderedBulkOp();
     dbCompanies
@@ -87,4 +90,14 @@ if (Meteor.isServer && Meteor.isDevelopment) {
 
     console.log('done');
   };
+}
+
+function setManagerOfAllCompanies(userId) {
+  dbCompanies.update({}, {
+    $set: {
+      manager: userId,
+      candidateList: [userId],
+      voteList: [ [] ]
+    }
+  }, { multi: true });
 }
