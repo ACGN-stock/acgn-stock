@@ -42,7 +42,7 @@ function validateAllPTTAccounts() {
     const { username, validateCode, password } = validatingUser;
 
     const $userPushList = $pushList.find('.push-userid').filter(function() {
-      return cheerio(this).text() === username;
+      return cheerio(this).text().trim() === username;
     }).closest('.push');
 
     if ($userPushList.find(`.push-content:contains(${validateCode})`).length === 0) {
