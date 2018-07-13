@@ -49,4 +49,4 @@ Meteor.publish('productListBySeasonId', function({ seasonId, sortBy, sortDir, of
   });
 });
 // 一分鐘最多重複訂閱10次
-limitSubscription('allAdvertising', 10);
+limitSubscription('productListBySeasonId', 10);
