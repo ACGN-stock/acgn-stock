@@ -13,6 +13,16 @@ import '/server/methods/accounts/validatePTTAccount';
 
 mustSinon(expect);
 
+// 模擬 PTT 網頁版的推文紀錄
+function generatePushRecord(userid, content) {
+  return `
+    <div class="push">
+      <span class="push-userid">${userid}${' '.repeat(12 - userid.length)}</span>
+      <span class="push-content">: ${content}</span>
+    </div>
+  `;
+}
+
 describe('method validatePTTAccount', function() {
   this.timeout(10000);
 
@@ -46,14 +56,7 @@ describe('method validatePTTAccount', function() {
       createdAt: new Date()
     });
 
-    HTTP.get.returns({
-      content: `
-        <div class="push">
-          <span class="push-userid">${username}</span>
-          <span class="push-content">: ${correctValidateCode}</span>
-        </div>
-      `
-    });
+    HTTP.get.returns({ content: generatePushRecord(username, correctValidateCode) });
 
     return validatePTTAccount('otherPttUser').must.reject.with.an.error(Meteor.Error)
       .then(() => {
@@ -99,27 +102,13 @@ describe('method validatePTTAccount', function() {
     });
 
     it('should throw error if the user pushed wrong validation code', function() {
-      HTTP.get.returns({
-        content: `
-          <div class="push">
-            <span class="push-userid">${username}</span>
-            <span class="push-content">: ${wrongValidateCode}</span>
-          </div>
-        `
-      });
+      HTTP.get.returns({ content: generatePushRecord(username, wrongValidateCode) });
 
       return validatePTTAccount(username).must.reject.with.an.error(Meteor.Error);
     });
 
     it('should create a new user if the validation passed and the user does not exist', function() {
-      HTTP.get.returns({
-        content: `
-          <div class="push">
-            <span class="push-userid">${username}</span>
-            <span class="push-content">: ${correctValidateCode}</span>
-          </div>
-        `
-      });
+      HTTP.get.returns({ content: generatePushRecord(username, correctValidateCode) });
 
       return validatePTTAccount(username).must.resolve.with.true()
         .then(() => {
@@ -137,14 +126,7 @@ describe('method validatePTTAccount', function() {
         }
       });
 
-      HTTP.get.returns({
-        content: `
-          <div class="push">
-            <span class="push-userid">${username}</span>
-            <span class="push-content">: ${correctValidateCode}</span>
-          </div>
-        `
-      });
+      HTTP.get.returns({ content: generatePushRecord(username, correctValidateCode) });
 
       return validatePTTAccount(username).must.resolve.with.true()
         .then(() => {
@@ -165,7 +147,7 @@ describe('method validatePTTAccount', function() {
       });
 
       // 存在假帳號，其使用者名稱包含真帳號
-      const fakeUsername = `${username}_Fake`;
+      const fakeUsername = `${username}2`;
 
       // 假帳號同時存在於系統（完成驗證），且並不處於待驗證狀態
       Accounts.createUser({
@@ -178,14 +160,7 @@ describe('method validatePTTAccount', function() {
       });
 
       // 取得真帳號的驗證碼後用假帳號推文
-      HTTP.get.returns({
-        content: `
-          <div class="push">
-            <span class="push-userid">${fakeUsername}</span>
-            <span class="push-content">: ${correctValidateCode}</span>
-          </div>
-        `
-      });
+      HTTP.get.returns({ content: generatePushRecord(fakeUsername, correctValidateCode) });
 
       return validatePTTAccount(fakeUsername).then(() => {
         // 真帳號的密碼不應被重設
