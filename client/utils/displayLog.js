@@ -244,7 +244,7 @@ Template.displayLog.helpers({
         return `【消費回饋】${users[0]}得到了「${company}」公司的產品消費回饋金$${currencyFormat(data.rebate)}！`;
       }
       case '季度賦稅': {
-        return `【季度賦稅】${users[0]}在此次商業季度中產生了$${currencyFormat(data.assetTax)}的財富稅與$${currencyFormat(data.zombieTax)}的殭屍稅！`;
+        return `【季度賦稅】${users[0]}在此次商業季度中產生了$${currencyFormat(data.stockTax)}的股票資產稅、$${currencyFormat(data.moneyTax)}的現金資產稅與$${currencyFormat(data.zombieTax)}的殭屍稅！`;
       }
       case '繳納稅金': {
         return `【繳納稅金】${users[0]}向系統繳納了$${currencyFormat(data.paid)}的稅金！`;

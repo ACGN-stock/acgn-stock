@@ -158,7 +158,7 @@ function checkTax(todayBeginTime) {
       const createdAtBasicTime = Date.now();
       // 增加稅單罰金
       if (overdueDay < 7) {
-        const amount = Math.ceil(taxData.tax * 0.1);
+        const amount = Math.ceil((taxData.stockTax + taxData.moneyTax) * 0.1);
         taxesBulk
           .find({
             _id: taxId
@@ -177,7 +177,7 @@ function checkTax(todayBeginTime) {
       }
       // 開始強制徵收
       else {
-        const needPay = taxData.tax + taxData.zombie - taxData.paid + taxData.fine;
+        const needPay = taxData.stockTax + taxData.moneyTax + taxData.zombieTax + taxData.fine - taxData.paid;
         let imposedMoney = 0;
         // 先徵收使用者的現金
         const userData = Meteor.users.findOne(userId, {

@@ -33,7 +33,7 @@ function payTax(user, taxId, amount) {
   if (! taxData) {
     throw new Meteor.Error(404, '找不到識別碼為「' + taxId + '」的稅金資料！');
   }
-  const totalNeedPay = taxData.tax + taxData.zombie + taxData.fine - taxData.paid;
+  const totalNeedPay = taxData.stockTax + taxData.moneyTax + taxData.zombieTax + taxData.fine - taxData.paid;
   if (amount > totalNeedPay) {
     throw new Meteor.Error(403, '繳納金額與應納金額不相符！');
   }
@@ -53,7 +53,7 @@ function payTax(user, taxId, amount) {
     if (! taxData) {
       throw new Meteor.Error(404, '找不到識別碼為「' + taxId + '」的稅金資料！');
     }
-    const totalNeedPay = taxData.tax + taxData.zombie + taxData.fine - taxData.paid;
+    const totalNeedPay = taxData.stockTax + taxData.moneyTax + taxData.zombieTax + taxData.fine - taxData.paid;
     if (amount > totalNeedPay) {
       throw new Meteor.Error(403, '繳納金額與應納金額不相符！');
     }

@@ -50,7 +50,7 @@ Template.accountInfoTaxList.events({
     const taxData = dbTaxes.findOne(taxId);
     if (taxData) {
       const user = paramUser();
-      const totalNeedPay = taxData.tax + taxData.zombie + taxData.fine - taxData.paid;
+      const totalNeedPay = taxData.stockTax + taxData.moneyTax + taxData.zombieTax + taxData.fine - taxData.paid;
       const maxPayMoney = Math.min(user.profile.money, totalNeedPay);
       if (maxPayMoney < 1) {
         alertDialog.alert('您的金錢不足以繳納稅金！');
