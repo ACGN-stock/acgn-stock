@@ -373,7 +373,9 @@ Template.displayLog.helpers({
         return `【違規標記】${users[0]}移除了「${company}」公司的違規標記！${data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''}`;
       }
       case '公司更名': {
-        return `【公司更名】${users[0]}將「${company}」公司的名稱由「${_.escape(data.oldCompanyName)}」改為「${_.escape(data.newCompanyName)}」。`;
+        return `【公司更名】${users[0]}將「${company}」公司的名稱由「${_.escape(data.oldCompanyName)}」改為「${_.escape(data.newCompanyName)}」。${
+          data.violationCaseId ? `（案件 ${violationCaseLink(data.violationCaseId)}）` : ''
+        }`;
       }
       case '產品下架': {
         let result = `【產品下架】${users[0]}以「${_.escape(data.reason)}」的理由將「${company}」公司的產品「${_.escape(data.productName)}」給下架了`;
