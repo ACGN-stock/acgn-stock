@@ -37,7 +37,7 @@ function changeCompanyName(user, { companyId, newCompanyName, violationCaseId })
     logType: '公司更名',
     userId: [user._id],
     companyId: companyId,
-    data: { oldCompanyName, newCompanyName },
+    data: { oldCompanyName, newCompanyName, violationCaseId },
     createdAt: new Date()
   });
   dbCompanies.update(companyId, { $set: { companyName: newCompanyName } });
