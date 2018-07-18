@@ -18,18 +18,23 @@ export function isHighPriceCompany(companyData) {
 
 // 取得買賣單的上下限
 export function getPriceLimits(companyData) {
+  const upper = getPriceUpperLimit(companyData);
+  const lower = getPriceLowerLimit(companyData);
+
+  return { upper, lower };
+}
+
+function getPriceUpperLimit(companyData) {
   if (isLowPriceCompany(companyData)) {
-    return {
-      upper: Math.ceil(companyData.listPrice * 1.30),
-      lower: Math.max(Math.floor(companyData.listPrice * 0.85), 1)
-    };
+    return Math.ceil(companyData.listPrice * 1.30);
   }
   else {
-    return {
-      upper: Math.ceil(companyData.listPrice * 1.15),
-      lower: Math.max(Math.floor(companyData.listPrice * 0.85), 1)
-    };
+    return Math.ceil(companyData.listPrice * 1.15);
   }
+}
+
+function getPriceLowerLimit(companyData) {
+  return Math.max(Math.floor(companyData.listPrice * 0.85), 1);
 }
 
 // 統計一段時間之內的交易數量
