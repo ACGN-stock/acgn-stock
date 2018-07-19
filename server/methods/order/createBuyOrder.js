@@ -3,12 +3,11 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, getPriceLimits } from '/db/dbCompanies';
 import { dbOrders } from '/db/dbOrders';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { createOrder } from '/server/imports/createOrder';
 import { debug } from '/server/imports/utils/debug';
-import { getPriceLimits } from '/server/functions/company/helpers';
 
 Meteor.methods({
   createBuyOrder(orderData) {

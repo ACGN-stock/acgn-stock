@@ -1,9 +1,9 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, getPriceLimits } from '/db/dbCompanies';
 import { dbOrders } from '/db/dbOrders';
-import { calculateDealAmount, getPriceLimits } from '/server/functions/company/helpers';
+import { calculateDealAmount } from '/server/functions/company/helpers';
 import { resourceManager } from '/server/imports/threading/resourceManager';
 
 export function executeZeroVolumePriceDrop() {

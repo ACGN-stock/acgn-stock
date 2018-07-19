@@ -2,9 +2,9 @@ import { Meteor } from 'meteor/meteor';
 
 import { createOrder } from '/server/imports/createOrder';
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, getPriceLimits } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
-import { calculateHighPriceBuyAmount, calculateDealAmount, getPriceLimits } from './helpers';
+import { calculateHighPriceBuyAmount, calculateDealAmount } from './helpers';
 
 export function updateReleaseStocksForNoDealPeriod() {
   const { min: intervalMin, max: intervalMax } = Meteor.settings.public.releaseStocksForNoDealInterval;
