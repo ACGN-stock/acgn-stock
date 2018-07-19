@@ -59,7 +59,10 @@ export function createBuyOrder(user, orderData) {
       companyName: 1,
       listPrice: 1,
       lastPrice: 1,
-      isSeal: 1
+      isSeal: 1,
+      capital: 1,
+      totalValue: 1,
+      createdAt: 1
     }
   });
   if (! companyData) {
@@ -94,7 +97,10 @@ export function createBuyOrder(user, orderData) {
       fields: {
         _id: 1,
         listPrice: 1,
-        lastPrice: 1
+        lastPrice: 1,
+        capital: 1,
+        totalValue: 1,
+        createdAt: 1
       }
     });
     if (! companyData) {

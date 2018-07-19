@@ -22,7 +22,17 @@
       },
       "lowPriceCompany": {
         "upper": 1.30
+      },
+      "firstStageValueLowerThanCapitalCompany": {
+        "lower": 0.95
+      },
+      "secondStageValueLowerThanCapitalCompany": {
+        "lower": 0.9
       }
+    },
+    "valueLowerThanCapitalCompanyFallLimitTimes": {
+      "firstStageTime": 604800000,
+      "secondStageTime": 1209600000
     },
     "zeroVolumePriceDrop": {
       "orderAgeThreshold": 21600000,

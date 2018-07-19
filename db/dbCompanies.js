@@ -90,19 +90,59 @@ export function getPriceLimits(companyData) {
 
 function getPriceUpperLimit(companyData) {
   const priceLimits = Meteor.settings.public.priceLimits;
+  let upperPrice;
   if (isLowPriceCompany(companyData)) {
-    return Math.ceil(companyData.listPrice * priceLimits.lowPriceCompany.upper);
+    upperPrice = companyData.listPrice * priceLimits.lowPriceCompany.upper;
   }
   else {
-    return Math.ceil(companyData.listPrice * priceLimits.normal.upper);
+    upperPrice = companyData.listPrice * priceLimits.normal.upper;
   }
+
+  return Math.ceil(upperPrice);
 }
 
 function getPriceLowerLimit(companyData) {
   const priceLimits = Meteor.settings.public.priceLimits;
+  let lowerPrice;
+  if (isFirstStageValueLowerThanCapitalCompany(companyData)) {
+    lowerPrice = companyData.listPrice * priceLimits.firstStageValueLowerThanCapitalCompany.lower;
+  }
+  else if (isSecondStageValueLowerThanCapitalCompany(companyData)) {
+    lowerPrice = companyData.listPrice * priceLimits.secondStageValueLowerThanCapitalCompany.lower;
+  }
+  else {
+    lowerPrice = companyData.listPrice * priceLimits.normal.lower;
+  }
 
-  return Math.max(Math.floor(companyData.listPrice * priceLimits.normal.lower), 1);
+  return Math.max(Math.floor(lowerPrice), 1);
 }
+
+function isValueLowerThanCapital(companyData) {
+  return companyData.totalValue < companyData.capital;
+}
+
+function isFirstStageValueLowerThanCapitalCompany(companyData) {
+  const firstStageTime = Meteor.settings.public.valueLowerThanCapitalCompanyFallLimitTimes.firstStageTime;
+  const createdTime = Date.now() - companyData.createdAt.getTime();
+  if (createdTime < firstStageTime) {
+    return isValueLowerThanCapital(companyData);
+  }
+  else {
+    return false;
+  }
+}
+
+function isSecondStageValueLowerThanCapitalCompany(companyData) {
+  const secondStageTime = Meteor.settings.public.valueLowerThanCapitalCompanyFallLimitTimes.secondStageTime;
+  const createdTime = Date.now() - companyData.createdAt.getTime();
+  if (createdTime < secondStageTime) {
+    return isValueLowerThanCapital(companyData);
+  }
+  else {
+    return false;
+  }
+}
+
 
 const schema = new SimpleSchema({
   // 公司名稱

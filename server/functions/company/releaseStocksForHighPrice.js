@@ -35,7 +35,10 @@ export function releaseStocksForHighPrice() {
           fields: {
             _id: 1,
             listPrice: 1,
-            totalRelease: 1
+            totalRelease: 1,
+            capital: 1,
+            totalValue: 1,
+            createdAt: 1
           }
         });
 

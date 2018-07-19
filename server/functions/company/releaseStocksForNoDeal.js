@@ -26,7 +26,15 @@ export function releaseStocksForNoDeal() {
       resourceManager.request('releaseStocksForNoDeal', [`companyOrder${companyId}`], (release) => {
         const { releaseStocksForNoDealTradeLogLookbackIntervalTime: lookbackTime } = Meteor.settings.public;
 
-        const companyData = dbCompanies.findOne(companyId, { fields: { _id: 1, listPrice: 1 } });
+        const companyData = dbCompanies.findOne(companyId, {
+          fields: {
+            _id: 1,
+            listPrice: 1,
+            capital: 1,
+            totalValue: 1,
+            createdAt: 1
+          }
+        });
         const dealAmount = calculateDealAmount(companyData, lookbackTime);
         const highPriceBuyAmount = calculateHighPriceBuyAmount(companyData);
 
