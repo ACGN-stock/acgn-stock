@@ -15,6 +15,15 @@ export const config = {
     min: 10800000,
     max: 21600000
   },
+  priceLimits: { // 訂單漲跌停幅度設定
+    normal: { // 一般公司
+      upper: 1.15,
+      lower: 0.85
+    },
+    lowPriceCompany: {
+      upper: 1.30
+    }
+  },
   zeroVolumePriceDrop: { // 無量跌停設定
     orderAgeThreshold: 21600000, // 賣單需要存在的時間 (ms)
     tradeVolumeLookbackTime: 86400000 // 交易量的統計時間 (ms)

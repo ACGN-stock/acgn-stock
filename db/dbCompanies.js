@@ -89,16 +89,19 @@ export function getPriceLimits(companyData) {
 }
 
 function getPriceUpperLimit(companyData) {
+  const priceLimits = Meteor.settings.public.priceLimits;
   if (isLowPriceCompany(companyData)) {
-    return Math.ceil(companyData.listPrice * 1.30);
+    return Math.ceil(companyData.listPrice * priceLimits.lowPriceCompany.upper);
   }
   else {
-    return Math.ceil(companyData.listPrice * 1.15);
+    return Math.ceil(companyData.listPrice * priceLimits.normal.upper);
   }
 }
 
 function getPriceLowerLimit(companyData) {
-  return Math.max(Math.floor(companyData.listPrice * 0.85), 1);
+  const priceLimits = Meteor.settings.public.priceLimits;
+
+  return Math.max(Math.floor(companyData.listPrice * priceLimits.normal.lower), 1);
 }
 
 const schema = new SimpleSchema({
