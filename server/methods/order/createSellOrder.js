@@ -61,7 +61,10 @@ export function createSellOrder(user, orderData) {
       companyName: 1,
       listPrice: 1,
       lastPrice: 1,
-      isSeal: 1
+      isSeal: 1,
+      capital: 1,
+      totalValue: 1,
+      createdAt: 1
     }
   });
   if (! companyData) {
@@ -96,7 +99,10 @@ export function createSellOrder(user, orderData) {
         _id: 1,
         companyName: 1,
         listPrice: 1,
-        lastPrice: 1
+        lastPrice: 1,
+        capital: 1,
+        totalValue: 1,
+        createdAt: 1
       }
     });
     if (! companyData) {
