@@ -80,7 +80,11 @@ export function isHighPriceCompany(companyData) {
   return companyData.listPrice >= highPriceThreshold;
 }
 
-// 取得買賣單的上下限
+/**
+ * 取得買賣單的上下限
+ * @param {Object} companyData 內容必須包含 listPrice, capital, totalValue, createdAt
+ * @returns {Object} upper, lower
+ */
 export function getPriceLimits(companyData) {
   const upper = getPriceUpperLimit(companyData);
   const lower = getPriceLowerLimit(companyData);
