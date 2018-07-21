@@ -61,12 +61,18 @@ if (Meteor.isServer && Meteor.isDevelopment) {
     });
 
     console.log('make user1 be admin...');
-    Meteor.users.update({ username: 'user1' }, { $set: { 'profile.isAdmin': true } });
+    Meteor.users.update({ username: 'user1' }, { $set: { 'profile.roles': 'superAdmin' } });
 
     console.log('create companies...');
     companyFactory.buildList(100).forEach((c) => {
       dbCompanies.insert(c);
     });
+
+    console.log('make user1 be the manager of all companies...');
+    setManagerOfAllCompanies(Meteor.users.find({ username: 'user1' }).fetch()[0]._id);
+
+    console.log('randomly allocate stocks...');
+    randomlyAllocateStocks();
 
     console.log('add companies to archive...');
     const companyArchiveBulk = dbCompanyArchive.rawCollection().initializeUnorderedBulkOp();
@@ -87,4 +93,42 @@ if (Meteor.isServer && Meteor.isDevelopment) {
 
     console.log('done');
   };
+}
+
+function setManagerOfAllCompanies(userId) {
+  dbCompanies.update({}, {
+    $set: {
+      manager: userId,
+      candidateList: [userId],
+      voteList: [ [] ]
+    }
+  }, { multi: true });
+}
+
+function randomlyAllocateStocks() {
+  dbCompanies
+    .find({ isSeal: false })
+    .fetch()
+    .forEach(({ _id: companyId, totalRelease }) => {
+      const users = Meteor.users.find().fetch();
+      let notYetRelease = totalRelease - computeAlreadyRelease(companyId);
+      while (notYetRelease > 0) {
+        const userIndex = Math.floor(Math.random() * users.length);
+        const userId = users[userIndex]._id;
+        const stocks = users.length > 1 ? Math.floor(Math.random() * notYetRelease) + 1 : notYetRelease;
+        const createdAt = new Date();
+        dbDirectors.insert({ companyId, userId, stocks, createdAt });
+        notYetRelease -= stocks;
+        users.splice(userIndex, 1);
+      }
+    });
+}
+
+function computeAlreadyRelease(companyId) {
+  return dbDirectors
+    .find({ companyId })
+    .fetch()
+    .reduce((sum, { stocks }) => {
+      return sum + stocks;
+    }, 0);
 }

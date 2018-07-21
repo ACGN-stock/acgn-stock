@@ -15,6 +15,25 @@
       "min": 10800000,
       "max": 21600000
     },
+    "priceLimits": {
+      "normal": {
+        "upper": 1.15,
+        "lower": 0.85
+      },
+      "lowPriceCompany": {
+        "upper": 1.30
+      },
+      "firstStageValueLowerThanCapitalCompany": {
+        "lower": 0.95
+      },
+      "secondStageValueLowerThanCapitalCompany": {
+        "lower": 0.9
+      }
+    },
+    "valueLowerThanCapitalCompanyFallLimitTimes": {
+      "firstStageTime": 604800000,
+      "secondStageTime": 1209600000
+    },
     "zeroVolumePriceDrop": {
       "orderAgeThreshold": 21600000,
       "tradeVolumeLookbackTime": 86400000

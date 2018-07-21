@@ -50,7 +50,7 @@ export function summarizeAndDistributeProfits() {
 
     // 計算員工投票獎金
     const employeeProductVotingRewardMap = computeEmployeeProductVotingRewardMap(companyData, remainingProfit);
-    remainingProfit -= Object.values(employeeBonusMap).reduce(add, 0);
+    remainingProfit -= Object.values(employeeProductVotingRewardMap).reduce(add, 0);
     if (! _.isEmpty(employeeProductVotingRewardMap)) {
       companyBonusMap.employeeProductVotingReward = employeeProductVotingRewardMap;
     }

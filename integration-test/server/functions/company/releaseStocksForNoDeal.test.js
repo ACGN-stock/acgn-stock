@@ -22,7 +22,7 @@ describe('function releaseStocksForNoDeal', function() {
   const defaultListPrice = 100;
   const defaultTotalRelease = 1000;
   const defaultCreatedAt = new Date(0);
-  const defaultUpperPriceLimit = Math.ceil(defaultListPrice * 1.15);
+  const defaultUpperPriceLimit = Math.ceil(defaultListPrice * Meteor.settings.public.priceLimits.normal.upper);
 
   const buyOrderFactory = new Factory()
     .attrs({
@@ -85,7 +85,7 @@ describe('function releaseStocksForNoDeal', function() {
     }
 
     describe('with normal company', function() {
-      runTests({ upperPriceLimit: Math.ceil(defaultListPrice * 1.15) });
+      runTests({ upperPriceLimit: Math.ceil(defaultListPrice * Meteor.settings.public.priceLimits.normal.upper) });
     });
 
     describe('with low-price company', function() {
@@ -93,7 +93,7 @@ describe('function releaseStocksForNoDeal', function() {
         dbVariables.set('lowPriceThreshold', defaultListPrice + 1);
       });
 
-      runTests({ upperPriceLimit: Math.ceil(defaultListPrice * 1.30) });
+      runTests({ upperPriceLimit: Math.ceil(defaultListPrice * Meteor.settings.public.priceLimits.lowPriceCompany.upper) });
     });
   });
 

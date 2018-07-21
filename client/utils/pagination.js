@@ -15,8 +15,7 @@ Template.pagination.helpers({
   pages() {
     const totalCount = Counts.get(this.counterName) || dbVariables.get(this.useVariableForTotalCount);
     const totalPages = Math.ceil(totalCount / this.dataNumberPerPage);
-    let displayCount = 6;
-    displayCount = Math.max(3, displayCount);
+    const displayCount = 6;
 
     if (totalPages <= displayCount) {
       return _.range(1, totalPages + 1);

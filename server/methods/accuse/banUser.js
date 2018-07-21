@@ -82,9 +82,15 @@ function banUser(currentUser, { userId, reason, banType, violationCaseId }) {
         const candidateIndex = candidateList.indexOf(userId);
 
         if (candidateIndex !== -1) {
+          const newCandidateList = [...candidateList];
+          newCandidateList.splice(candidateIndex, 1);
+
+          const newVoteList = [...voteList];
+          newVoteList.splice(candidateIndex, 1);
+
           Object.assign(setFields, {
-            candidateList: candidateList.splice(candidateIndex, 1),
-            voteList: voteList.splice(candidateIndex, 1)
+            candidateList: newCandidateList,
+            voteList: newVoteList
           });
         }
 
