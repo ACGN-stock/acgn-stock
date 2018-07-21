@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import expect from 'must';
 import mustSinon from 'must-sinon';
@@ -42,7 +43,7 @@ describe('function releaseStocksForHighPrice', function() {
     });
 
     expect(orderData).to.exist();
-    orderData.unitPrice.must.be.equal(Math.ceil(listPrice * 1.15)); // 漲停價
+    orderData.unitPrice.must.be.equal(Math.ceil(listPrice * Meteor.settings.public.priceLimits.normal.upper)); // 漲停價
     orderData.amount.must.be.between(1, Math.floor(Math.sqrt(totalRelease)));
 
     const logData = dbLog.findOne({ logType: '公司釋股', companyId });

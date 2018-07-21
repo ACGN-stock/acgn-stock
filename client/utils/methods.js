@@ -1,6 +1,6 @@
 import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, getPriceLimits } from '/db/dbCompanies';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbOrders } from '/db/dbOrders';
@@ -71,14 +71,8 @@ export function createBuyOrder(user, companyData) {
     return false;
   }
   const userMoney = user.profile.money;
-  const minimumUnitPrice = Math.max(Math.floor(companyData.listPrice * 0.85), 1);
-  let maximumUnitPrice;
-  if (companyData.listPrice < dbVariables.get('lowPriceThreshold')) {
-    maximumUnitPrice = Math.min(userMoney, Math.ceil(companyData.listPrice * 1.3));
-  }
-  else {
-    maximumUnitPrice = Math.min(userMoney, Math.ceil(companyData.listPrice * 1.15));
-  }
+  const minimumUnitPrice = getPriceLimits(companyData).lower;
+  const maximumUnitPrice = getPriceLimits(companyData).upper;
   if (minimumUnitPrice > maximumUnitPrice) {
     alertDialog.alert('您的金錢不足以購買此公司的股票！');
 
@@ -149,14 +143,8 @@ export function createSellOrder(user, companyData) {
 
     return false;
   }
-  const minimumUnitPrice = Math.max(Math.floor(companyData.listPrice * 0.85), 1);
-  let maximumUnitPrice;
-  if (companyData.listPrice < dbVariables.get('lowPriceThreshold')) {
-    maximumUnitPrice = Math.ceil(companyData.listPrice * 1.3);
-  }
-  else {
-    maximumUnitPrice = Math.ceil(companyData.listPrice * 1.15);
-  }
+  const minimumUnitPrice = getPriceLimits(companyData).lower;
+  const maximumUnitPrice = getPriceLimits(companyData).upper;
   alertDialog.dialog({
     type: 'prompt',
     title: '股份賣出',
