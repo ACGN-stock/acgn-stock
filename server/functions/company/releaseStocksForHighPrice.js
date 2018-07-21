@@ -2,10 +2,9 @@ import { Meteor } from 'meteor/meteor';
 
 import { createOrder } from '/server/imports/createOrder';
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, getPriceLimits } from '/db/dbCompanies';
 import { dbOrders } from '/db/dbOrders';
 import { dbVariables } from '/db/dbVariables';
-import { getPriceLimits } from './helpers';
 
 // 記錄高價釋股時間
 export function updateReleaseStocksForHighPricePeriod() {
@@ -36,7 +35,10 @@ export function releaseStocksForHighPrice() {
           fields: {
             _id: 1,
             listPrice: 1,
-            totalRelease: 1
+            totalRelease: 1,
+            capital: 1,
+            totalValue: 1,
+            createdAt: 1
           }
         });
 

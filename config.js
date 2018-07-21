@@ -15,6 +15,25 @@ export const config = {
     min: 10800000,
     max: 21600000
   },
+  priceLimits: { // 訂單漲跌停幅度設定
+    normal: { // 一般公司
+      upper: 1.15,
+      lower: 0.85
+    },
+    lowPriceCompany: {
+      upper: 1.30
+    },
+    firstStageValueLowerThanCapitalCompany: {
+      lower: 0.95
+    },
+    secondStageValueLowerThanCapitalCompany: {
+      lower: 0.9
+    }
+  },
+  valueLowerThanCapitalCompanyFallLimitTimes: { // 公司創立多少時間內 市值低於資本額將進行跌幅限制
+    firstStageTime: 604800000, // 在多少時間(ms)內 進行第一階段的跌幅限制
+    secondStageTime: 1209600000
+  },
   zeroVolumePriceDrop: { // 無量跌停設定
     orderAgeThreshold: 21600000, // 賣單需要存在的時間 (ms)
     tradeVolumeLookbackTime: 86400000 // 交易量的統計時間 (ms)

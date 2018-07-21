@@ -2,9 +2,9 @@ import { Meteor } from 'meteor/meteor';
 
 import { createOrder } from '/server/imports/createOrder';
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, getPriceLimits } from '/db/dbCompanies';
 import { dbVariables } from '/db/dbVariables';
-import { calculateHighPriceBuyAmount, calculateDealAmount, getPriceLimits } from './helpers';
+import { calculateHighPriceBuyAmount, calculateDealAmount } from './helpers';
 
 export function updateReleaseStocksForNoDealPeriod() {
   const { min: intervalMin, max: intervalMax } = Meteor.settings.public.releaseStocksForNoDealInterval;
@@ -26,7 +26,15 @@ export function releaseStocksForNoDeal() {
       resourceManager.request('releaseStocksForNoDeal', [`companyOrder${companyId}`], (release) => {
         const { releaseStocksForNoDealTradeLogLookbackIntervalTime: lookbackTime } = Meteor.settings.public;
 
-        const companyData = dbCompanies.findOne(companyId, { fields: { _id: 1, listPrice: 1 } });
+        const companyData = dbCompanies.findOne(companyId, {
+          fields: {
+            _id: 1,
+            listPrice: 1,
+            capital: 1,
+            totalValue: 1,
+            createdAt: 1
+          }
+        });
         const dealAmount = calculateDealAmount(companyData, lookbackTime);
         const highPriceBuyAmount = calculateHighPriceBuyAmount(companyData);
 
