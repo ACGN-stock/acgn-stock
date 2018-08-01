@@ -74,7 +74,7 @@ function getCostList() {
   return costList;
 }
 
-function computeRebate(totalCost) {
+export function computeRebate(totalCost) {
   const { divisorAmount, deliverAmount } = Meteor.settings.public.productRebates;
 
   return deliverAmount * Math.floor(totalCost / divisorAmount);
