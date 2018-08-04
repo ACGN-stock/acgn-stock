@@ -7,37 +7,7 @@ import { getCurrentSeason } from '/db/dbSeason';
 
 // 發放產品滿額回饋金給使用者
 export function deliverProductRebates() {
-  const { divisorAmount, deliverAmount } = Meteor.settings.public.productRebates;
-
-  const { _id: seasonId } = getCurrentSeason();
-
-  const rebateList = dbUserOwnedProducts
-    .aggregate([ {
-      $match: { seasonId }
-    }, {
-      $lookup: {
-        from: 'companies',
-        localField: 'companyId',
-        foreignField: '_id',
-        as: 'companyData'
-      }
-    }, {
-      $unwind: '$companyData'
-    }, {
-      $match: { 'companyData.isSeal': false }
-    }, {
-      $group: {
-        _id: { userId: '$userId', companyId: '$companyId' },
-        totalCost: { $sum: { $multiply: ['$amount', '$price'] } }
-      }
-    }, {
-      $project: {
-        rebate: { $multiply: [deliverAmount, { $floor: { $divide: ['$totalCost', divisorAmount] } } ] }
-      }
-    }, {
-      $match: { rebate: { $gt: 0 } }
-    } ]);
-
+  const rebateList = getRebateList();
   if (_.isEmpty(rebateList)) {
     return;
   }
@@ -63,4 +33,57 @@ export function deliverProductRebates() {
 
   Meteor.wrapAsync(userBulk.execute, userBulk)();
   Meteor.wrapAsync(logBulk.execute, logBulk)();
+}
+
+function getRebateList() {
+  const costList = getCostList();
+  const rebateList = [];
+  costList.forEach(({ _id, totalCost }) => {
+    const rebate = computeRebate(totalCost);
+    if (rebate > 0) {
+      rebateList.push({ _id, rebate });
+    }
+  });
+
+  return rebateList;
+}
+
+function getCostList() {
+  const { _id: seasonId } = getCurrentSeason();
+  const costList = dbUserOwnedProducts
+    .aggregate([ {
+      $match: { seasonId }
+    }, {
+      $lookup: {
+        from: 'companies',
+        localField: 'companyId',
+        foreignField: '_id',
+        as: 'companyData'
+      }
+    }, {
+      $unwind: '$companyData'
+    }, {
+      $match: { 'companyData.isSeal': false }
+    }, {
+      $group: {
+        _id: { userId: '$userId', companyId: '$companyId' },
+        totalCost: { $sum: { $multiply: ['$amount', '$price'] } }
+      }
+    } ]);
+
+  return costList;
+}
+
+export function computeRebate(totalCost) {
+  const { divisorAmount, initialDeliverPercent, minDeliverPercent } = Meteor.settings.public.productRebates;
+  let rebate = 0;
+  for (let i = 1; i * divisorAmount <= totalCost; i += 1) {
+    const deliverPercent = Math.max(
+      initialDeliverPercent - Math.log10(i) / 7.7 * 100,
+      minDeliverPercent
+    );
+    rebate += divisorAmount * deliverPercent / 100;
+  }
+
+  return Math.floor(rebate);
 }

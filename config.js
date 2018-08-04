@@ -97,8 +97,9 @@ export const config = {
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
   productVoucherAmount: 7000, // 產品消費券的數量
   productRebates: { // 產品滿額回饋設定
-    divisorAmount: 3500, // 滿額條件
-    deliverAmount: 100 // 每達成一次滿額條件可得回饋
+    divisorAmount: 2000, // 滿額條件
+    initialDeliverPercent: 25, // 第一次達成滿額條件可得回饋百分比 (%)
+    minDeliverPercent: 2.5 // 最小可得回饋百分比 (%)
   },
   vipParameters: { // VIP 各等級的參數
     0: {

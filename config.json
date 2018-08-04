@@ -97,8 +97,9 @@
     "employeeProductVotingRewardFactor": 0.01,
     "productVoucherAmount": 7000,
     "productRebates": {
-      "divisorAmount": 3500,
-      "deliverAmount": 100
+      "divisorAmount": 2000,
+      "initialDeliverPercent": 25,
+      "minDeliverPercent": 2.5
     },
     "vipParameters": {
       "0": {
