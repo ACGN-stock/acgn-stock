@@ -6,6 +6,7 @@ import { resourceManager } from '/server/imports/threading/resourceManager';
 import { debug } from '/server/imports/utils/debug';
 import { backupMongo } from '/server/imports/utils/backupMongo';
 import { hireEmployees } from '/server/functions/employee/hireEmployees';
+import { autoRegisterEmployees } from '/server/functions/employee/autoRegisterEmployees';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena, getCurrentArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
@@ -490,6 +491,8 @@ function generateNewSeason() {
   eventScheduler.scheduleEvent('product.finalSale', seasonEndDate.getTime() - Meteor.settings.public.productFinalSaleTime);
   // 雇用所有上季報名的使用者
   hireEmployees();
+  // 幫所有活躍的正職員工報名儲備員工
+  autoRegisterEmployees();
   // 更新所有公司員工薪資
   dbCompanies.find().forEach((companyData) => {
     dbCompanies.update(companyData, { $set: { salary: companyData.nextSeasonSalary } });

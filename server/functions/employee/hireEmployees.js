@@ -1,5 +1,6 @@
 import { dbEmployees } from '/db/dbEmployees';
 
+// 將所有 儲備員工 更新為 在職員工
 export function hireEmployees() {
   dbEmployees.update(
     { employed: false, resigned: false },
