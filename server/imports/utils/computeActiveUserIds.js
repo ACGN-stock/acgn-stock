@@ -1,7 +1,6 @@
 import { _ } from 'meteor/underscore';
 
 import { dbLog } from '/db/dbLog';
-import { dbEmployees } from '/db/dbEmployees';
 
 /*
  * 計算系統中的活躍玩家數量
@@ -25,16 +24,5 @@ export function computeActiveUserIds() {
     '_id'
   );
 
-  // 有報名員工的玩家
-  const activeUsersByEmployee = _.pluck(
-    dbEmployees.aggregate([ {
-      $match: { registerAt: { $gte: lookbackDate } }
-    }, {
-      $group: { _id: '$userId' }
-    } ]),
-    '_id'
-  );
-
-  // 以上所有條件的聯集
-  return [...new Set([...activeUsersByLog, ...activeUsersByEmployee])];
+  return activeUsersByLog;
 }
