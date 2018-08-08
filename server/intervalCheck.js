@@ -9,6 +9,8 @@ import { clearAllUserProductVouchers } from '/server/functions/product/vouchers/
 import { deliverProductVouchers } from '/server/functions/product/vouchers/deliverProductVouchers';
 import { resetAllUserVoteTickets } from '/server/functions/product/voteTickets/resetAllUserVoteTickets';
 import { deliverProductVotingRewards } from '/server/functions/product/voteTickets/deliverProductVotingRewards';
+import { hireEmployees } from '/server/functions/employee/hireEmployees';
+import { autoRegisterEmployees } from '/server/functions/employee/autoRegisterEmployees';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena, getCurrentArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
@@ -447,16 +449,9 @@ function generateNewSeason() {
   // 排程最後出清時間
   eventScheduler.scheduleEvent('product.finalSale', seasonEndDate.getTime() - Meteor.settings.public.productFinalSaleTime);
   // 雇用所有上季報名的使用者
-  dbEmployees.update(
-    {
-      resigned: false,
-      registerAt: {
-        $lt: new Date(seasonEndDate.getTime() - Meteor.settings.public.seasonTime)
-      }
-    },
-    { $set: { employed: true } },
-    { multi: true }
-  );
+  hireEmployees();
+  // 幫所有活躍的正職員工報名儲備員工
+  autoRegisterEmployees();
   // 更新所有公司員工薪資
   dbCompanies.find().forEach((companyData) => {
     dbCompanies.update(companyData, { $set: { salary: companyData.nextSeasonSalary } });
