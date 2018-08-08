@@ -5,6 +5,10 @@ import { UserStatus } from 'meteor/mizzao:user-status';
 import { resourceManager } from '/server/imports/threading/resourceManager';
 import { debug } from '/server/imports/utils/debug';
 import { backupMongo } from '/server/imports/utils/backupMongo';
+import { clearAllUserProductVouchers } from '/server/functions/product/vouchers/clearAllUserProductVouchers';
+import { deliverProductVouchers } from '/server/functions/product/vouchers/deliverProductVouchers';
+import { resetAllUserVoteTickets } from '/server/functions/product/voteTickets/resetAllUserVoteTickets';
+import { deliverProductVotingRewards } from '/server/functions/product/voteTickets/deliverProductVotingRewards';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena, getCurrentArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
@@ -21,7 +25,7 @@ import { dbPrice } from '/db/dbPrice';
 import { dbProducts } from '/db/dbProducts';
 import { dbResourceLock } from '/db/dbResourceLock';
 import { dbRound, getCurrentRound } from '/db/dbRound';
-import { dbSeason, getCurrentSeason, getInitialVoteTicketCount } from '/db/dbSeason';
+import { dbSeason, getCurrentSeason } from '/db/dbSeason';
 import { dbVips } from '/db/dbVips';
 import { dbTaxes } from '/db/dbTaxes';
 import { dbUserArchive } from '/db/dbUserArchive';
@@ -41,7 +45,6 @@ import { updateCompanyBaseProductionFunds } from './functions/company/updateComp
 import { updateCompanyProductPriceLimits } from './functions/company/updateCompanyProductPriceLimits';
 import { checkChairman } from './functions/company/checkChairman';
 import { updateCompanyGrades } from './functions/company/updateCompanyGrades';
-import { deliverProductVotingRewards } from './functions/season/deliverProductVotingRewards';
 import { deliverProductRebates } from './functions/product/deliverProductRebates';
 import { returnCompanyStones } from './functions/miningMachine/returnCompanyStones';
 import { generateMiningProfits } from './functions/miningMachine/generateMiningProfits';
@@ -135,6 +138,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     summarizeAndDistributeProfits();
     // 發放推薦票回饋金
     deliverProductVotingRewards();
+    // 清除所有未用完的消費券
+    clearAllUserProductVouchers();
     // 發放產品購買回饋金
     deliverProductRebates();
     // 機率性降級沒有達成門檻的 VIP
@@ -248,6 +253,8 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     summarizeAndDistributeProfits();
     // 發放推薦票回饋金
     deliverProductVotingRewards();
+    // 清除所有未用完的消費券
+    clearAllUserProductVouchers();
     // 發放產品購買回饋金
     deliverProductRebates();
     // 更新所有公司的評級
@@ -468,19 +475,14 @@ function generateNewSeason() {
     productCount: dbProducts.find({ state: 'planning' }).count()
   });
 
-  const voteTickets = getInitialVoteTicketCount(getCurrentSeason());
-
   // 排程經理人選舉事件
   const electTime = seasonEndDate.getTime() - Meteor.settings.public.electManagerTime;
   eventScheduler.scheduleEvent('season.electManager', electTime);
 
-  // 重設使用者推薦票與消費券數量
-  Meteor.users.update({}, {
-    $set: {
-      'profile.vouchers': Meteor.settings.public.productVoucherAmount,
-      'profile.voteTickets': voteTickets
-    }
-  }, { multi: true });
+  // 重設使用者推薦票
+  resetAllUserVoteTickets();
+  // 發放新的消費券
+  deliverProductVouchers();
   // 產品輪替
   rotateProducts();
   // 調整 VIP 分數
