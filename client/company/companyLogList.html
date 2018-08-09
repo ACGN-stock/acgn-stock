@@ -1,9 +1,11 @@
 <template name="companyLogList">
-  {{#if onlyShowMine}}
-    <button class="btn btn-outline-info btn-sm mt-1">檢視所有紀錄</button>
-  {{else}}
-    <button class="btn btn-outline-info btn-sm mt-1">只檢視自身紀錄</button>
-  {{/if}}
+  <button class="btn btn-outline-info btn-sm mt-1" data-action="toggleOnlyShowMine">
+    {{#if onlyShowMine}}
+      檢視所有紀錄
+    {{else}}
+      只檢視自身紀錄
+    {{/if}}
+  </button>
   {{#each logData in logList}}
     {{>displayLog logData}}
   {{else}}
