@@ -28,6 +28,7 @@
           </div>
           {{#if currentUser}}
             {{>checkableButton onlyUnreadButtonArgs}}
+            {{>checkableButton showVoidedButtonArgs}}
           {{/if}}
         </div>
         {{#if currentUser}}
@@ -54,6 +55,9 @@
               <td class="text-left text-truncate px-md-2" data-title="主旨">
                 {{#if announcement.isUnread}}
                   <span class="badge badge-danger">未讀</span>
+                {{/if}}
+                {{#if announcement.voided}}
+                  <span class="badge badge-warning">已作廢</span>
                 {{/if}}
                 <a href="{{pathForAnnouncementDetail announcement._id}}">{{announcement.subject}}</a>
               </td>

@@ -13,15 +13,17 @@ inheritedShowLoadingOnSubscribing(Template.announcementList);
 
 Template.announcementList.onCreated(function() {
   this.onlyUnread = new ReactiveVar(false);
+  this.showVoided = new ReactiveVar(false);
   this.category = new ReactiveVar();
   this.offset = new ReactiveVar(0);
 
   this.autorunWithIdleSupport(() => {
     const onlyUnread = this.onlyUnread.get();
+    const showVoided = this.showVoided.get();
     const category = this.category.get();
     const offset = this.offset.get();
 
-    this.subscribe('announcementList', { category, onlyUnread, offset });
+    this.subscribe('announcementList', { category, onlyUnread, showVoided, offset });
   });
 });
 
@@ -33,6 +35,10 @@ Template.announcementList.events({
   'click button[name="onlyUnread"]'(event, templateInstance) {
     event.preventDefault();
     templateInstance.onlyUnread.set(! templateInstance.onlyUnread.get());
+  },
+  'click button[name="showVoided"]'(event, templateInstance) {
+    event.preventDefault();
+    templateInstance.showVoided.set(! templateInstance.showVoided.get());
   },
   'click [data-action="markAllAsRead"]'(event) {
     event.preventDefault();
@@ -62,6 +68,18 @@ Template.announcementList.helpers({
       name: 'onlyUnread',
       onChanged: (checked) => {
         templateInstance.onlyUnread.set(checked);
+      }
+    };
+  },
+  showVoidedButtonArgs() {
+    const templateInstance = Template.instance();
+
+    return {
+      class: 'btn btn-sm btn-info ml-1',
+      text: '顯示已作廢',
+      name: 'showVoided',
+      onChanged: (checked) => {
+        templateInstance.showVoided.set(checked);
       }
     };
   },

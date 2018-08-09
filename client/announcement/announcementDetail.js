@@ -5,7 +5,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { hasAnyRoles } from '/db/users';
 import { categoryDisplayName } from '/db/dbAnnouncements';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { alertDialog } from '../layout/alertDialog';
+import { voidAnnouncement } from '../utils/methods';
 import { paramAnnouncementId, paramAnnouncement } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.announcementDetail);
@@ -23,7 +23,7 @@ Template.announcementDetail.onCreated(function() {
 });
 
 Template.announcementDetail.events({
-  'click [data-action="deleteAnnouncement"]'(event) {
+  'click [data-action="voidAnnouncement"]'(event) {
     event.preventDefault();
 
     const announcementId = paramAnnouncementId();
@@ -32,21 +32,7 @@ Template.announcementDetail.events({
       return;
     }
 
-    alertDialog.confirm({
-      title: '刪除公告',
-      message: '刪除後將無法復原，確定要將此公告刪除嗎？',
-      callback(result) {
-        if (! result) {
-          return;
-        }
-
-        Meteor.customCall('deleteAnnouncement', { announcementId }, (error) => {
-          if (! error) {
-            FlowRouter.go('announcementList');
-          }
-        });
-      }
-    });
+    voidAnnouncement({ announcementId });
   }
 });
 
@@ -55,16 +41,18 @@ Template.announcementDetail.helpers({
   announcement() {
     return paramAnnouncement();
   },
-  canManageAnnouncement() {
+  canVoidAnnouncement() {
     const currentUser = Meteor.user();
 
     if (! currentUser) {
       return false;
     }
 
-    const { creator } = paramAnnouncement();
+    const { creator, voided } = paramAnnouncement();
 
-    return hasAnyRoles(currentUser, 'generalManager', 'superAdmin') || currentUser._id === creator;
+    const canManageAnnouncement = hasAnyRoles(currentUser, 'generalManager', 'superAdmin') || currentUser._id === creator;
+
+    return canManageAnnouncement && ! voided;
   },
   canRejectAnnoumcenet() {
     return Meteor.user() && paramAnnouncement().hasRejectionPetition;

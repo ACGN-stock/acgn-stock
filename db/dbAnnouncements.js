@@ -90,6 +90,28 @@ const schema = new SimpleSchema({
   createdAt: {
     type: Date
   },
+  // 是否已作廢
+  voided: {
+    type: Boolean,
+    defaultValue: false
+  },
+  // 作廢原因
+  voidedReason: {
+    type: String,
+    optional: true,
+    min: 1,
+    max: 100
+  },
+  // 作廢的使用者
+  voidedBy: {
+    type: String,
+    optional: true
+  },
+  // 作廢時間
+  voidedAt: {
+    type: Date,
+    optional: true
+  },
   // 否決連署
   rejectionPetition: {
     type: new SimpleSchema({

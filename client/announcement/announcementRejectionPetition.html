@@ -4,7 +4,9 @@
     <div class="col-12 col-md-6 my-2">
       <h4>連署資訊</h4>
       <div class="my-2">
-        {{#if isPassed}}
+        {{#if isVoided}}
+          <span class="text-nowrap text-warning"><i class="fa fa-warning"></i> 公告已作廢，連署中止</span>
+        {{else if isPassed}}
           <span class="text-nowrap text-success"><i class="fa fa-check"></i> 連署已通過（於 {{formatDateTimeText petition.passedAt}}）</span>
         {{else if isOverdue}}
           <span class="text-nowrap text-danger"><i class="fa fa-times"></i> 已截止，連署未通過</span>
