@@ -8,16 +8,22 @@
             {{#if canRejectAnnoumcenet}}
               <a class="btn btn-warning" href="{{pathForRejectAnnouncement}}">否決</a>
             {{/if}}
-            {{#if canManageAnnouncement}}
-              <button class="btn btn-danger" data-action="deleteAnnouncement">刪除</button>
+            {{#if canVoidAnnouncement}}
+              <button class="btn btn-danger" data-action="voidAnnouncement">作廢</button>
             {{/if}}
-        </div>
+          </div>
         </h1>
-        <hr />
         <h3 style="word-break: break-all">主旨：{{announcement.subject}}</h3>
         <p class="text-wrap">
           於 {{formatDateTimeText announcement.createdAt}} 由 {{>userLink announcement.creator}} 發佈
         </p>
+        {{#if announcement.voided}}
+          <p class="text-warning">
+            <i class="fa fa-warning"></i>
+            已於 {{formatDateTimeText announcement.voidedAt }} 由 {{>userLink announcement.voidedBy}}
+            以「{{announcement.voidedReason}}」的理由作廢！
+          </p>
+        {{/if}}
         <hr />
         <h3>內文：</h3>
         <div class="markdown-container">

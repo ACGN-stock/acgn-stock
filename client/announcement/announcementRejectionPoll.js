@@ -13,16 +13,22 @@ Template.announcementRejectionPoll.helpers({
     return computeThreshold(paramAnnouncement().rejectionPoll);
   },
   isFinished() {
-    return Date.now() > paramAnnouncement().rejectionPoll.dueAt;
+    const { voided, rejectionPoll } = paramAnnouncement();
+
+    return voided || Date.now() > rejectionPoll.dueAt;
+  },
+  isVoided() {
+    return paramAnnouncement().voided;
   },
   canVote() {
     const currentUser = Meteor.user();
+    const { voided } = paramAnnouncement();
     const { currentUserChoice, dueAt } = paramAnnouncement().rejectionPoll;
 
     const isOverdue = Date.now() > dueAt.getTime();
     const hasVoted = !! currentUserChoice;
 
-    return currentUser && ! isOverdue && ! hasVoted;
+    return currentUser && ! voided && ! isOverdue && ! hasVoted;
   },
   choiceMatches(choice) {
     const { currentUserChoice } = paramAnnouncement().rejectionPoll;

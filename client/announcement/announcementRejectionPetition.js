@@ -29,14 +29,17 @@ Template.announcementRejectionPetition.helpers({
   isOverdue() {
     return isRejectionPetitionOverdue(paramAnnouncement().rejectionPetition);
   },
+  isVoided() {
+    return paramAnnouncement().voided;
+  },
   canSign() {
     const currentUserId = Meteor.userId();
-    const { rejectionPetition } = paramAnnouncement();
+    const { rejectionPetition, voided } = paramAnnouncement();
     const { signers } = rejectionPetition;
     const isOverdue = isRejectionPetitionOverdue(rejectionPetition);
     const isPassed = isRejectionPetitionPassed(rejectionPetition);
 
-    return currentUserId && ! signers.includes(currentUserId) && ! isOverdue && ! isPassed;
+    return currentUserId && ! voided && ! signers.includes(currentUserId) && ! isOverdue && ! isPassed;
   },
   remainingTime() {
     reactiveInterval(500);

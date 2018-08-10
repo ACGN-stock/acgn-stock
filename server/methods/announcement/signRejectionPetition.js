@@ -27,12 +27,16 @@ export function signRejectionPetition(currentUser, args, resourceLocked = false)
 
   guardUser(currentUser).checkCanVote();
 
-  const { rejectionPetition: petition, category } = dbAnnouncements.findByIdOrThrow(announcementId, {
-    fields: { rejectionPetition: 1, category: 1 }
+  const { rejectionPetition: petition, category, voided } = dbAnnouncements.findByIdOrThrow(announcementId, {
+    fields: { rejectionPetition: 1, category: 1, voided: 1 }
   });
 
   if (! petition) {
     throw new Meteor.Error(403, '此公告並無進行否決連署！');
+  }
+
+  if (voided) {
+    throw new Meteor.Error(403, '此公告已作廢！');
   }
 
   const { dueAt, signers, thresholdPercent, activeUserCount } = petition;

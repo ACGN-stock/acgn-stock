@@ -30,3 +30,4 @@ import './029-enhancing-violation-case-tracking-system';
 import './030-rename-lastReadAccuseLogDate-to-lastReadFscLogDate-in-user-profile';
 import './031-add-activeUserCount-to-ruleAgendas';
 import './032-tax-separate';
+import './033-announcement-voiding';

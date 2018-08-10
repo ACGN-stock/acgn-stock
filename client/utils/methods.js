@@ -722,3 +722,24 @@ export function takeDownAdvertising({ _id: advertisingId, message }) {
     }
   });
 }
+
+export function voidAnnouncement({ announcementId }) {
+  const title = '作廢公告';
+
+  askReason(title, (reason) => {
+    alertDialog.confirm({
+      title,
+      message: `
+        <p>作廢原因：「<span class="text-info">${_.escape(reason)}</span>」</p>
+        <p>公告一旦作廢將無法復原，確定要將此公告作廢嗎？</p>
+      `,
+      callback(result) {
+        if (! result) {
+          return;
+        }
+
+        Meteor.customCall('voidAnnouncement', { announcementId, reason });
+      }
+    });
+  });
+}

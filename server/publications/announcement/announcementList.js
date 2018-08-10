@@ -8,11 +8,12 @@ import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 import { publishWithTransformation } from '/server/imports/utils/publishWithTransformation';
 
-Meteor.publish('announcementList', function({ category, onlyUnread, offset }) {
-  debug.log('publish announcementList', { category, onlyUnread, offset });
+Meteor.publish('announcementList', function({ category, onlyUnread, showVoided, offset }) {
+  debug.log('publish announcementList', { category, onlyUnread, showVoided, offset });
 
   check(category, Match.Optional(Match.OneOf(...Object.keys(announcementCategoryMap))));
   check(onlyUnread, Match.Optional(Boolean));
+  check(showVoided, Match.Optional(Boolean));
   check(offset, Match.Integer);
 
   const filter = {};
@@ -23,6 +24,10 @@ Meteor.publish('announcementList', function({ category, onlyUnread, offset }) {
 
   if (this.userId && onlyUnread) {
     Object.assign(filter, { readers: { $ne: this.userId } });
+  }
+
+  if (! showVoided) {
+    Object.assign(filter, { voided: false });
   }
 
   Counts.publish(this, 'announcements', dbAnnouncements.find(filter, { fields: { _id: 1 } }), { noReady: true });
@@ -37,7 +42,8 @@ Meteor.publish('announcementList', function({ category, onlyUnread, offset }) {
         category: 1,
         subject: 1,
         createdAt: 1,
-        readers: 1
+        readers: 1,
+        voided: 1
       },
       sort: { createdAt: -1 },
       skip: offset,
