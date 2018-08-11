@@ -12,7 +12,11 @@ Meteor.publish('currentUserUnreadAnnouncementCount', function() {
     return [];
   }
 
-  Counts.publish(this, 'currentUserUnreadAnnouncements', dbAnnouncements.find({ readers: { $ne: this.userId } }, { fields: { _id: 1 } }));
+  Counts.publish(
+    this,
+    'currentUserUnreadAnnouncements',
+    dbAnnouncements.find({ readers: { $ne: this.userId }, voided: false }, { fields: { _id: 1 } })
+  );
 });
 // 一分鐘最多20次
 limitSubscription('currentUserUnreadAnnouncementCount', 20);

@@ -45,7 +45,7 @@ export function createAnnouncement(currentUser, { data, rejectionPetitionDuratio
 
     if (category === 'plannedRuleChanges') {
       if (rejectionPetitionDurationDays < durationDays.min || rejectionPetitionDurationDays > durationDays.max) {
-        throw new Meteor.Error('不合法的否決連署持續時間！');
+        throw new Meteor.Error(403, '不合法的否決連署持續時間！');
       }
       rejectionPetitionDurationTime = rejectionPetitionDurationDays * oneDayTime;
     }

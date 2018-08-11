@@ -29,10 +29,16 @@ export function voteRejectionPoll(currentUser, args, resourceLocked = false) {
 
   guardUser(currentUser).checkCanVote();
 
-  const { rejectionPoll: poll } = dbAnnouncements.findByIdOrThrow(announcementId, { fields: { rejectionPoll: 1 } });
+  const { rejectionPoll: poll, voided } = dbAnnouncements.findByIdOrThrow(announcementId, {
+    fields: { rejectionPoll: 1, voided: 1 }
+  });
 
   if (! poll) {
     throw new Meteor.Error(403, '此公告並無進行否決投票！');
+  }
+
+  if (voided) {
+    throw new Meteor.Error(403, '此公告已作廢！');
   }
 
   const { dueAt, yesVotes, noVotes } = poll;
