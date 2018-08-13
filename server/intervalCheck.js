@@ -126,7 +126,7 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     // 無論如何都要舉辦最萌亂鬥大賽
     dbVariables.set('arenaCounter', 0);
     // 進行亂鬥, 營利, 分紅, 獎勵金, 稅金等結算
-    summarizeFinancialActivitiesResult(lastSeasonData);
+    finalizeCurrentSeason(lastSeasonData);
     // 更新所有公司的董事長，避免最終資料出現與董事會清單不一致的狀況
     checkChairman();
 
@@ -224,7 +224,7 @@ export function doSeasonWorks(lastRoundData, lastSeasonData) {
     backupMongo('-seasonBefore');
 
     // 進行亂鬥, 營利, 分紅, 獎勵金, 稅金等結算
-    summarizeFinancialActivitiesResult(lastSeasonData);
+    finalizeCurrentSeason(lastSeasonData);
 
     // 所有公司當季正營利額歸零
     dbCompanies.update({ profit: { $gt: 0 } }, { $set: { profit: 0 } }, { multi: true });
@@ -488,9 +488,8 @@ function generateNewSeason() {
   return seasonId;
 }
 
-// TODO need better name
 // 進行亂鬥, 營利, 分紅, 獎勵金, 稅金等結算
-function summarizeFinancialActivitiesResult(lastSeasonData) {
+function finalizeCurrentSeason(lastSeasonData) {
   // 當季度結束時，取消所有尚未交易完畢的訂單
   cancelAllOrder();
   // 結算挖礦機營利
