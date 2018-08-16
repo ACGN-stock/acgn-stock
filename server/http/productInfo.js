@@ -6,7 +6,7 @@ import { dbProducts } from '/db/dbProducts';
 import { debug } from '/server/imports/utils/debug';
 
 // 以Ajax方式發布產品名稱、連結
-WebApp.connectHandlers.use('/productInfo', function(req, res) {
+WebApp.connectHandlers.use('/productInfo', (req, res) => {
   debug.log('connectHandlers productInfo');
   const { query } = url.parse(req.url);
   const { id: productId } = querystring.parse(query);

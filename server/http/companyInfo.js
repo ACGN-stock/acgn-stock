@@ -9,7 +9,7 @@ import { dbFoundations } from '/db/dbFoundations';
 import { debug } from '/server/imports/utils/debug';
 
 // 以Ajax方式發布公司名稱
-WebApp.connectHandlers.use('/companyInfo', function(req, res) {
+WebApp.connectHandlers.use('/companyInfo', (req, res) => {
   debug.log('connectHandlers companyInfo');
 
   const { query } = url.parse(req.url);
