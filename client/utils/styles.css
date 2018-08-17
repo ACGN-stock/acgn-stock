@@ -241,8 +241,8 @@ body {
   background: linear-gradient(135deg, #eef2f3, #8e9eab);
 }
 .company-card .picture img {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   object-fit: cover;
 }
 .company-card .title {
@@ -258,6 +258,7 @@ body {
   margin: 0 5%;
   overflow: hidden;
   white-space: nowrap;
+  text-align: center;
   text-overflow: ellipsis;
   display: block;
 }
@@ -274,6 +275,7 @@ body {
   margin: 0 5%;
   overflow: hidden;
   white-space: nowrap;
+  text-align: center;
   text-overflow: ellipsis;
   display: block;
 }
@@ -298,13 +300,7 @@ body {
   margin: 0px 1rem;
 }
 .company-card .row-cover {
-  height: 120px;
-}
-.company-card .row-cover a, .company-card .row-cover h4, .company-card .row-cover small {
-  margin: 0rem;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  padding: 0.3rem 0px;
 }
 .company-card .btn-tab {
   color: #000;
@@ -669,4 +665,8 @@ table.arena-fighter-body tr td:nth-child(9) {
 
 .violation-case-action-reason p:last-child {
   margin-bottom: 0;
+}
+
+.user-link-container {
+  line-height: normal;
 }

@@ -385,3 +385,17 @@ export function pathFor(pathDef, kw = { hash: {} }) {
   return FlowRouter.path(pathDef, params, queryParams);
 }
 Template.registerHelper('pathFor', pathFor);
+
+function simpleValidateTypeText(validateType) {
+  switch (validateType) {
+    case 'PTT': return 'PTT';
+    case 'Bahamut': return '巴哈';
+    case 'Google': return 'G帳';
+    default: return '？';
+  }
+}
+
+export function styledValidateTypeMarkHtml(validateType) {
+  return `<sup>⟨${simpleValidateTypeText(validateType)}⟩</sup>`;
+}
+Template.registerHelper('styledValidateTypeMarkHtml', styledValidateTypeMarkHtml);

@@ -4,6 +4,7 @@
       <span class="navbar-brand dropdown" title="當前登入使用者：{{currentUser.profile.name}}">
         <a class="dropdown-toggle d-inline-block text-truncate mw-100" href="#">
           <i class="fa fa-user-o" aria-hidden="true"></i>
+          {{{styledValidateTypeMarkHtml currentUser.profile.validateType}}}
           {{currentUser.profile.name}}
         </a>
         <div class="dropdown-menu px-3 text-right">
