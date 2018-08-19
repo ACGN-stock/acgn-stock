@@ -663,6 +663,7 @@ table.arena-fighter-body tr td:nth-child(9) {
   margin-bottom: 0;
 }
 
-.user-link-container {
-  line-height: normal;
+.user-validate-type-mark {
+  font-size: 60%;
+  vertical-align: top;
 }
