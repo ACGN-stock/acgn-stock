@@ -128,7 +128,6 @@ export const config = {
     }
   },
   vipLevelCheckInterval: 1800000, // VIP 等級更新時間 (ms)
-  vipLevelDownChance: 0.05, // VIP 掉級的機率
   vipPreviousSeasonScoreWeight: 0.80, // VIP 上季分數的權重
   companyProfitDistribution: { // 公司營利的分配設定
     lockTime: 86400000, // 分配設定調整的封關時間 (ms)
