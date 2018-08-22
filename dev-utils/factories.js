@@ -158,6 +158,9 @@ export const seasonFactory = new Factory()
     return new Date(beginDate.setMinutes(0, 0, 0) + Meteor.settings.public.seasonTime);
   })
   .attrs({
+    ordinal() {
+      return 1;
+    },
     userCount() {
       return faker.random.number({ min: 0 });
     },
