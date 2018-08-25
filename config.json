@@ -128,7 +128,6 @@
       }
     },
     "vipLevelCheckInterval": 1800000,
-    "vipLevelDownChance": 0.05,
     "vipPreviousSeasonScoreWeight": 0.80,
     "companyProfitDistribution": {
       "lockTime": 86400000,

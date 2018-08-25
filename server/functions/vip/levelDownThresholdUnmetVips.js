@@ -16,7 +16,6 @@ export function levelDownThresholdUnmetVips() {
     }, {});
   const unsealedCompanyIds = Object.keys(companyVipThresholdsMap);
 
-  const { vipLevelDownChance } = Meteor.settings.public;
   const vipModifyList = [];
 
   dbVips
@@ -39,15 +38,10 @@ export function levelDownThresholdUnmetVips() {
         return;
       }
 
-      // 機率性降級
-      if (Math.random() > vipLevelDownChance) {
-        return;
-      }
-
-      // 符合條件的 VIP，調降一級
+      // 降級至最低符合的等級
       vipModifyList.push({
         query: { userId, companyId },
-        update: { $set: { level: level - 1 } }
+        update: { $set: { level: maxLevel } }
       });
     });
 
