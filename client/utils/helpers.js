@@ -396,6 +396,6 @@ function simpleValidateTypeText(validateType) {
 }
 
 export function styledValidateTypeMarkHtml(validateType) {
-  return `<sup>⟨${simpleValidateTypeText(validateType)}⟩</sup>`;
+  return `<span class="user-validate-type-mark">⟨${simpleValidateTypeText(validateType)}⟩</span>`;
 }
 Template.registerHelper('styledValidateTypeMarkHtml', styledValidateTypeMarkHtml);
