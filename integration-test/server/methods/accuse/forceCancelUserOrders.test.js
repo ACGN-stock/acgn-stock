@@ -4,13 +4,13 @@ import { Accounts } from 'meteor/accounts-base';
 import expect from 'must';
 import faker from 'faker';
 
-import { retrieveAllUserOrders } from '/server/methods/accuse/retrieveAllUserOrders';
+import { forceCancelUserOrders } from '/server/methods/accuse/forceCancelUserOrders';
 import { pttUserFactory, orderFactory, directorFactory } from '/dev-utils/factories';
 import { dbOrders } from '/db/dbOrders';
 import { dbLog } from '/db/dbLog';
 import { dbDirectors } from '/db/dbDirectors';
 
-describe('method retrieveAllUserOrders', function() {
+describe('method forceCancelUserOrders', function() {
   this.timeout(10000);
 
   let userId;
@@ -21,8 +21,8 @@ describe('method retrieveAllUserOrders', function() {
   const reason = 'some reason';
   let violationCaseId;
 
-  const runRetrieveAllUserOrders = () => {
-    return retrieveAllUserOrders.bind(null, currentUser, { userId, reason, violationCaseId });
+  const runForceCancelUserOrders = () => {
+    return forceCancelUserOrders.bind(null, currentUser, { userId, reason, violationCaseId });
   };
 
   beforeEach(function() {
@@ -51,7 +51,7 @@ describe('method retrieveAllUserOrders', function() {
   it('should fail if the current user is not fsc member', function() {
     currentUser.profile.roles = [];
 
-    runRetrieveAllUserOrders().must.throw(Meteor.Error, '權限不符，無法進行此操作！ [403]');
+    runForceCancelUserOrders().must.throw(Meteor.Error, '權限不符，無法進行此操作！ [403]');
     expect(findOrder({ userId })).to.exist();
     expect(findFscRetrieveOrderLog()).to.not.exist();
   });
@@ -59,7 +59,7 @@ describe('method retrieveAllUserOrders', function() {
   it('should fail if the user is not exist', function() {
     Meteor.users.remove({});
 
-    runRetrieveAllUserOrders().must.throw(Meteor.Error, `找不到識別碼為「${userId}」的使用者！ [404]`);
+    runForceCancelUserOrders().must.throw(Meteor.Error, `找不到識別碼為「${userId}」的使用者！ [404]`);
     expect(findOrder({ userId })).to.exist();
     expect(findFscRetrieveOrderLog()).to.not.exist();
   });
@@ -67,7 +67,7 @@ describe('method retrieveAllUserOrders', function() {
   it('should fail if the violation case is not exist', function() {
     violationCaseId = faker.random.uuid();
 
-    runRetrieveAllUserOrders().must.throw(Meteor.Error, `找不到識別碼為「${violationCaseId}」的違規案件！ [404]`);
+    runForceCancelUserOrders().must.throw(Meteor.Error, `找不到識別碼為「${violationCaseId}」的違規案件！ [404]`);
     expect(findOrder({ userId })).to.exist();
     expect(findFscRetrieveOrderLog()).to.not.exist();
   });
@@ -76,7 +76,7 @@ describe('method retrieveAllUserOrders', function() {
     const expectMoney = findUserById(userId).profile.money + buyOrder.unitPrice * buyOrder.amount;
     const expectStocks = findDirectorData({ userId, companyId: inDirectorsSellOrder.companyId }).stocks + inDirectorsSellOrder.amount;
 
-    runRetrieveAllUserOrders().must.not.throw();
+    runForceCancelUserOrders().must.not.throw();
 
 
     expect(findOrder({ userId })).to.not.exist();
@@ -103,7 +103,7 @@ describe('method retrieveAllUserOrders', function() {
     });
 
     it(`should success retrieve target user's orders, and do not retrieve other user's orders`, function() {
-      runRetrieveAllUserOrders().must.not.throw();
+      runForceCancelUserOrders().must.not.throw();
 
       expect(findOrder({ userId })).to.not.exist();
       expect(findFscRetrieveOrderLog({ userId: { $in: [userId] } })).to.exist();

@@ -9,19 +9,19 @@ import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
 
 Meteor.methods({
-  retrieveAllUserOrders({ userId, reason, violationCaseId }) {
+  forceCancelUserOrders({ userId, reason, violationCaseId }) {
     check(this.userId, String);
     check(userId, String);
     check(reason, String);
     check(violationCaseId, Match.Optional(String));
 
-    retrieveAllUserOrders(Meteor.user(), { userId, reason, violationCaseId });
+    forceCancelUserOrders(Meteor.user(), { userId, reason, violationCaseId });
 
     return true;
   }
 });
-export function retrieveAllUserOrders(currentUser, { userId, reason, violationCaseId }) {
-  debug.log('retrieveAllUserOrders', { user: currentUser, userId, reason, violationCaseId });
+export function forceCancelUserOrders(currentUser, { userId, reason, violationCaseId }) {
+  debug.log('forceCancelUserOrders', { user: currentUser, userId, reason, violationCaseId });
 
   checkError(currentUser, { userId, violationCaseId });
 
