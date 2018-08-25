@@ -2,10 +2,10 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { debug } from '/server/imports/utils/debug';
+import { dbBulks } from '/server/imports/utils/dbBulks';
 import { guardUser } from '/common/imports/guards';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbViolationCases } from '/db/dbViolationCases';
-import { dbLog } from '/db/dbLog';
 import { dbOrders } from '/db/dbOrders';
 
 Meteor.methods({
@@ -31,14 +31,13 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
   }
 
   let increaseMoney = 0;
-  const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
-  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  const bulks = dbBulks();
   const createdAt = new Date();
   cursor.forEach((orderData) => {
     const { companyId, orderType, unitPrice, amount, done } = orderData;
     const leftAmount = amount - done;
 
-    logBulk.insert({
+    bulks.logBulk.insert({
       logType: '金管撤單',
       userId: [currentUser._id, userId],
       companyId,
@@ -56,12 +55,12 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
     }
     else if (orderType === '賣出') {
       if (dbDirectors.findOne({ userId, companyId })) {
-        directorsBulk
+        bulks.directorsBulk
           .find({ userId, companyId })
           .updateOne({ $inc: { stocks: leftAmount } });
       }
       else {
-        directorsBulk.insert({
+        bulks.directorsBulk.insert({
           companyId: companyId,
           userId: userId,
           stocks: leftAmount,
@@ -72,8 +71,7 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
   });
   dbOrders.remove({ userId });
   Meteor.users.update(userId, { $inc: { 'profile.money': increaseMoney } });
-  logBulk.execute();
-  directorsBulk.execute();
+  bulks.execute();
 }
 
 // TODO need better name?
