@@ -6,6 +6,7 @@ import faker from 'faker';
 import expect from 'must';
 import mustSinon from 'must-sinon';
 
+import { dbVariables } from '/db/dbVariables';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
@@ -17,26 +18,35 @@ import { doOnFoundationSuccess } from '/server/functions/foundation/doOnFoundati
 
 mustSinon(expect);
 
-const investorFactory = new Factory()
-  .sequence('userId', (n) => {
-    return `user${n}`;
-  })
-  .attr('amount', () => {
-    return faker.random.number({
-      min: Math.ceil(Meteor.settings.public.minReleaseStock / Meteor.settings.public.foundationNeedUsers),
-      max: Meteor.settings.public.maximumInvest
-    });
-  });
-
 describe('function doOnFoundationSuccess', function() {
   this.timeout(10000);
 
-  const investors = investorFactory.buildList(Meteor.settings.public.foundationNeedUsers);
+  const { maximumInvest: maxAmountPerInvestor } = Meteor.settings.public;
+
+  const minInvestorCount = 10;
+  const minAmountPerInvestor = 100;
+
+  const investorFactory = new Factory()
+    .sequence('userId', (n) => {
+      return `user${n}`;
+    })
+    .attr('amount', () => {
+      return faker.random.number({
+        min: minAmountPerInvestor,
+        max: maxAmountPerInvestor
+      });
+    });
+
+
+  const investors = investorFactory.buildList(minInvestorCount);
 
   let companyId;
 
   beforeEach(function() {
     resetDatabase();
+
+    dbVariables.set('foundation.minInvestorCount', minInvestorCount);
+    dbVariables.set('foundation.minAmountPerInvestor', minAmountPerInvestor);
 
     companyId = dbFoundations.insert(foundationFactory.build({
       invest: investors

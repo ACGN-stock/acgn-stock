@@ -11,6 +11,7 @@ import { resetAllUserVoteTickets } from '/server/functions/product/voteTickets/r
 import { deliverProductVotingRewards } from '/server/functions/product/voteTickets/deliverProductVotingRewards';
 import { hireEmployees } from '/server/functions/employee/hireEmployees';
 import { autoRegisterEmployees } from '/server/functions/employee/autoRegisterEmployees';
+import { updateFoundationVariables } from '/server/functions/foundation/updateFoundationVariables';
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbArena, getCurrentArena } from '/db/dbArena';
 import { dbArenaFighters } from '/db/dbArenaFighters';
@@ -425,14 +426,21 @@ function generateNewSeason() {
   debug.log('generateNewSeason');
   const seasonBeginDate = new Date();
   const seasonEndDate = new Date(seasonBeginDate.setMinutes(0, 0, 0) + Meteor.settings.public.seasonTime);
+  const ordinal = dbSeason.find().count() + 1;
 
   const seasonId = dbSeason.insert({
+    ordinal,
     beginDate: seasonBeginDate,
     endDate: seasonEndDate,
     userCount: Meteor.users.find().count(),
     companiesCount: dbCompanies.find({ isSeal: false }).count(),
     productCount: dbProducts.find({ state: 'planning' }).count()
   });
+
+  // 更新新創相關變數設定
+  if (Meteor.settings.public.foundationVariablesUpdateSeasonOrdinals.includes(ordinal)) {
+    updateFoundationVariables();
+  }
 
   // 排程經理人選舉事件
   const electTime = seasonEndDate.getTime() - Meteor.settings.public.electManagerTime;
