@@ -41,8 +41,8 @@ export const config = {
   checkChairmanInterval: 600000, // 董事長檢查的排程時間 (ms)
   founderEarnestMoney: 1024, // 創立公司者需付出的保證金
   foundExpireTime: 43200000, // 創立公司的投資時間期限，單位為毫秒
+  foundationVariablesUpdateSeasonOrdinals: [2], // 新創相關變數的更新季度編號，於季度開始時更新
   maximumInvest: 4096, // 每個人對單一新創計劃的最大投資上限
-  foundationNeedUsers: 20, // 創立公司所需要的投資人數量
   minReleaseStock: 1000, // 公司初創時的最小釋出股份數量(可能會有些微誤差)
   newUserInitialMoney: 10000, // 所有使用者驗證通過後的起始資金數量
   newUserBirthStones: 1, // 所有使用者驗證通過後的誕生石數量
@@ -128,7 +128,6 @@ export const config = {
     }
   },
   vipLevelCheckInterval: 1800000, // VIP 等級更新時間 (ms)
-  vipLevelDownChance: 0.05, // VIP 掉級的機率
   vipPreviousSeasonScoreWeight: 0.80, // VIP 上季分數的權重
   companyProfitDistribution: { // 公司營利的分配設定
     lockTime: 86400000, // 分配設定調整的封關時間 (ms)

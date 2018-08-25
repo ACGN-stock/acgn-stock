@@ -31,3 +31,4 @@ import './030-rename-lastReadAccuseLogDate-to-lastReadFscLogDate-in-user-profile
 import './031-add-activeUserCount-to-ruleAgendas';
 import './032-tax-separate';
 import './033-announcement-voiding';
+import './034-add-ordinal-to-season';

@@ -6,6 +6,11 @@ export const dbSeason = new Mongo.Collection('season');
 export default dbSeason;
 
 const schema = new SimpleSchema({
+  // 賽季的第幾季度
+  ordinal: {
+    type: SimpleSchema.Integer,
+    min: 1
+  },
   // 起始日期
   beginDate: {
     type: Date

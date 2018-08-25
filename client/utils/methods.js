@@ -295,7 +295,7 @@ export function investFoundCompany(companyId) {
     return false;
   }
   const userId = user._id;
-  const minimumInvest = Math.ceil(Meteor.settings.public.minReleaseStock / Meteor.settings.public.foundationNeedUsers);
+  const minimumInvest = dbVariables.get('foundation.minAmountPerInvestor');
   const alreadyInvest = _.findWhere(foundationData.invest, { userId });
   const alreadyInvestAmount = alreadyInvest ? alreadyInvest.amount : 0;
   const maximumInvest = Math.min(Meteor.user().profile.money, Meteor.settings.public.maximumInvest - alreadyInvestAmount);

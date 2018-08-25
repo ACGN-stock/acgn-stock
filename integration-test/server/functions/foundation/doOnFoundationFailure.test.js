@@ -5,6 +5,7 @@ import faker from 'faker';
 import expect from 'must';
 import mustSinon from 'must-sinon';
 
+import { dbVariables } from '/db/dbVariables';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbLog } from '/db/dbLog';
@@ -16,6 +17,9 @@ mustSinon(expect);
 describe('function doOnFoundationFailure', function() {
   this.timeout(10000);
 
+  const minInvestorCount = 10;
+  const minAmountPerInvestor = 100;
+
   const investors = [
     { userId: 'aUser', amount: 1 },
     { userId: 'someUser', amount: 1234 },
@@ -26,6 +30,9 @@ describe('function doOnFoundationFailure', function() {
 
   beforeEach(function() {
     resetDatabase();
+
+    dbVariables.set('foundation.minInvestorCount', minInvestorCount);
+    dbVariables.set('foundation.minAmountPerInvestor', minAmountPerInvestor);
 
     companyId = dbFoundations.insert(foundationFactory.build({
       pictureSmall: faker.image.imageUrl(),
