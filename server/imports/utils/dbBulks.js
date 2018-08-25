@@ -31,71 +31,47 @@ class DbBulks {
   }
 
 
+  _getBulk(bulk, db) {
+    if (! this._bulks[bulk]) {
+      this._bulks[bulk] = db.rawCollection().initializeUnorderedBulkOp();
+    }
+
+    return this._bulks[bulk];
+  }
+
   // 依照原db的命名決定bulk用單複數
 
   get logBulk() {
-    if (! this._bulks.logBulk) {
-      this._bulks.logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-    }
-
-    return this._bulks.logBulk;
+    return this._getBulk('logBulk', dbLog);
   }
 
   get priceBulk() {
-    if (! this._bulks.priceBulk) {
-      this._bulks.priceBulk = dbPrice.rawCollection().initializeUnorderedBulkOp();
-    }
-
-    return this._bulks.priceBulk;
+    return this._getBulk('priceBulk', dbPrice);
   }
 
   // 不加s的db放上面, 有加s的放下面
 
   get usersBulk() {
-    if (! this._bulks.usersBulk) {
-      this._bulks.usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
-    }
-
-    return this._bulks.usersBulk;
+    return this._getBulk('usersBulk', Meteor.users);
   }
 
   get companiesBulk() {
-    if (! this._bulks.companiesBulk) {
-      this._bulks.companiesBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
-    }
-
-    return this._bulks.companiesBulk;
+    return this._getBulk('companiesBulk', dbCompanies);
   }
 
   get ordersBulk() {
-    if (! this._bulks.ordersBulk) {
-      this._bulks.ordersBulk = dbOrders.rawCollection().initializeUnorderedBulkOp();
-    }
-
-    return this._bulks.ordersBulk;
+    return this._getBulk('ordersBulk', dbOrders);
   }
 
   get directorsBulk() {
-    if (! this._bulks.directorsBulk) {
-      this._bulks.directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
-    }
-
-    return this._bulks.directorsBulk;
+    return this._getBulk('directorsBulk', dbDirectors);
   }
 
   get vipsBulk() {
-    if (! this._bulks.vipsBulk) {
-      this._bulks.vipsBulk = dbVips.rawCollection().initializeUnorderedBulkOp();
-    }
-
-    return this._bulks.vipsBulk;
+    return this._getBulk('vipsBulk', dbVips);
   }
 
   get taxesBulk() {
-    if (! this._bulks.taxesBulk) {
-      this._bulks.taxesBulk = dbTaxes.rawCollection().initializeUnorderedBulkOp();
-    }
-
-    return this._bulks.taxesBulk;
+    return this._getBulk('taxesBulk', dbTaxes);
   }
 }
