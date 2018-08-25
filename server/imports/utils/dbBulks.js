@@ -24,7 +24,7 @@ class DbBulks {
    */
   execute() {
     _.forEach(this._bulks, (bulk) => {
-      if (bulk) {
+      if (bulk && bulk.length > 0) {
         Meteor.wrapAsync(bulk.execute, bulk)();
       }
     });
