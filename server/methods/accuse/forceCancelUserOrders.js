@@ -2,11 +2,12 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { debug } from '/server/imports/utils/debug';
-import { dbBulks } from '/server/imports/utils/dbBulks';
+import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
 import { guardUser } from '/common/imports/guards';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbViolationCases } from '/db/dbViolationCases';
 import { dbOrders } from '/db/dbOrders';
+import { dbLog } from '/db/dbLog';
 
 Meteor.methods({
   forceCancelUserOrders({ userId, reason, violationCaseId }) {
@@ -31,13 +32,14 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
   }
 
   let increaseMoney = 0;
-  const bulks = dbBulks();
+  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  const directorsBulk = dbDirectors.rawCollection().initializeUnorderedBulkOp();
   const createdAt = new Date();
   cursor.forEach((orderData) => {
     const { companyId, orderType, unitPrice, amount, done } = orderData;
     const leftAmount = amount - done;
 
-    bulks.logBulk.insert({
+    logBulk.insert({
       logType: '金管撤單',
       userId: [currentUser._id, userId],
       companyId,
@@ -55,12 +57,12 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
     }
     else if (orderType === '賣出') {
       if (dbDirectors.findOne({ userId, companyId })) {
-        bulks.directorsBulk
+        directorsBulk
           .find({ userId, companyId })
           .updateOne({ $inc: { stocks: leftAmount } });
       }
       else {
-        bulks.directorsBulk.insert({
+        directorsBulk.insert({
           companyId: companyId,
           userId: userId,
           stocks: leftAmount,
@@ -71,7 +73,7 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
   });
   dbOrders.remove({ userId });
   Meteor.users.update(userId, { $inc: { 'profile.money': increaseMoney } });
-  bulks.execute();
+  executeBulksSync(logBulk, directorsBulk);
 }
 
 // TODO need better name?
