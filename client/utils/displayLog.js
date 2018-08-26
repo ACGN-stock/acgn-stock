@@ -147,17 +147,17 @@ Template.displayLog.helpers({
         return `【販賣下單】${users[0]}想要用每股$${currencyFormat(data.price)}的單價${orderType}${data.amount}數量的「${company}」公司股票！`;
       }
       case '取消下單': {
-        return `【取消下單】${users[0]}取消了以每股$${currencyFormat(data.price)}的單價${data.orderType}${data.amount}數量的「${company}」公司股票的訂單！`;
+        return `【取消下單】${users[0]}取消了${orderInfo(data, company)}！`;
       }
       case '系統撤單': {
-        return `【系統撤單】因商業季度結束，系統自動取消了${users[0]}以每股$${currencyFormat(data.price)}的單價${data.orderType}${data.amount}數量的「${company}」公司股票的訂單！`;
+        return `【系統撤單】因商業季度結束，系統自動取消了${users[0]}${orderInfo(data, company)}！`;
       }
       case '訂單完成': {
         if (userId[0] === '!system') {
           return `【訂單完成】${company}以每股$${currencyFormat(data.price)}的單價釋出${data.amount}數量股票的訂單已經全數交易完畢！`;
         }
         else {
-          return `【訂單完成】${users[0]}以每股$${currencyFormat(data.price)}的單價${data.orderType}${data.amount}數量的「${company}」公司股票的訂單已經全數交易完畢！`;
+          return `【訂單完成】${users[0]}${orderInfo(data, company)}已經全數交易完畢！`;
         }
       }
       case '公司釋股': {
@@ -487,6 +487,10 @@ function companySpan(companyId) {
 
 function productSpan(productId) {
   return `<span data-product-link="${productId}"></span>`;
+}
+
+function orderInfo({ price, orderType, amount }, company) {
+  return `以每股$${currencyFormat(price)}的單價${orderType}${amount}數量的「${company}」公司股票的訂單`;
 }
 
 function displayViolationCaseOrNot(violationCaseId) {
