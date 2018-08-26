@@ -692,6 +692,15 @@ export function banUser({ _id: userId, profile }, banType) {
   });
 }
 
+export function forceCancelUserOrders({ _id: userId, profile }) {
+  const title = `強制撤銷訂單 - ${profile.name}`;
+  askReason(title, (reason) => {
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('forceCancelUserOrders', { userId, reason, violationCaseId });
+    });
+  });
+}
+
 export function confiscateAllUserStocks({ _id: userId, profile }) {
   const title = `沒收所有股份 - ${profile.name}`;
   askReason(title, (reason) => {

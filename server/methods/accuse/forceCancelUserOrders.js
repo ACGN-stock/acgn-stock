@@ -45,6 +45,7 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
       companyId,
       data: {
         reason,
+        violationCaseId,
         price: unitPrice,
         orderType,
         amount: leftAmount

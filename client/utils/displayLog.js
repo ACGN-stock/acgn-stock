@@ -355,6 +355,8 @@ Template.displayLog.helpers({
 
         return `【退還罰款】${users[0]}以「${_.escape(data.reason)}」的理由向${target}退還總數為$${currencyFormat(data.fine)}的罰金。${displayViolationCaseOrNot(data.violationCaseId)}`;
       }
+      case '金管撤單': {
+        return `【金管撤單】${users[0]}以「${_.escape(data.reason)}」的理由取消了${users[1]}${orderInfo(data, company)}！${displayViolationCaseOrNot(data.violationCaseId)}`;
       }
       case '沒收股份': {
         return `【沒收股份】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}持有的「${company}」公司股份數量${data.stocks}給沒收了。${displayViolationCaseOrNot(data.violationCaseId)}`;
