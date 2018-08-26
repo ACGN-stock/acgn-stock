@@ -63,8 +63,9 @@
           text-overflow: ellipsis;
           min-height: 3.5rem;
           max-height: 8.4rem;
-          word-wrap: break-word;">
-      使用者「{{this.profile.name}}」帳號資訊
+          word-wrap: break-word;
+          line-height: normal;">
+      使用者「{{{styledValidateTypeMarkHtml this.profile.validateType}}}{{this.profile.name}}」帳號資訊
     </h1>
     <hr />
     {{#if currentUser}}

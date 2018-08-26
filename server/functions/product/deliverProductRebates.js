@@ -19,7 +19,7 @@ export function deliverProductRebates() {
   const nowDate = new Date();
 
   rebateList.forEach(({ _id: { userId, companyId }, rebate }) => {
-    userBulk.find({ _id: userId }).updateOne({ $inc: { 'profile.money': rebate } });
+    userBulk.find({ _id: userId }).updateOne({ $inc: { 'profile.vouchers': rebate } });
     const logData = logSchema.clean({
       logType: '消費回饋',
       userId: [userId],

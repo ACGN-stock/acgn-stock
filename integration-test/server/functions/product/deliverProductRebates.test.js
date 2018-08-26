@@ -29,16 +29,16 @@ describe('function deliverProductRebates', function() {
   });
 
   it('should not deliver product rebate if no one buys any product', function() {
-    const expectMoney = getUserMoney(userId);
+    const expectVouchers = getUserVouchers(userId);
 
     deliverProductRebates();
 
     expect(findProductRebateLog()).to.not.exist();
-    expect(getUserMoney(userId)).to.be.equal(expectMoney);
+    expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
   });
 
   it('should not deliver product rebate if no one buys enough product', function() {
-    const expectMoney = getUserMoney(userId);
+    const expectVouchers = getUserVouchers(userId);
 
     insertUserOwnedProducts(productIdData, {
       amount: 1,
@@ -47,11 +47,11 @@ describe('function deliverProductRebates', function() {
     deliverProductRebates();
 
     expect(findProductRebateLog()).to.not.exist();
-    expect(getUserMoney(userId)).to.be.equal(expectMoney);
+    expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
   });
 
   it('should not deliver product rebate if is not in current season', function() {
-    const expectMoney = getUserMoney(userId);
+    const expectVouchers = getUserVouchers(userId);
 
     insertUserOwnedProducts(productIdData, {
       amount: 10,
@@ -62,11 +62,11 @@ describe('function deliverProductRebates', function() {
     deliverProductRebates();
 
     expect(findProductRebateLog()).to.not.exist();
-    expect(getUserMoney(userId)).to.be.equal(expectMoney);
+    expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
   });
 
   it('should not deliver product rebate if company is sealed', function() {
-    const expectMoney = getUserMoney(userId);
+    const expectVouchers = getUserVouchers(userId);
 
     dbCompanies.update(companyId, { $set: { isSeal: true } });
     insertUserOwnedProducts(productIdData, {
@@ -76,26 +76,26 @@ describe('function deliverProductRebates', function() {
     deliverProductRebates();
 
     expect(findProductRebateLog()).to.not.exist();
-    expect(getUserMoney(userId)).to.be.equal(expectMoney);
+    expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
   });
 
   it('should deliver product rebate (one product)', function() {
     const amount = divisorAmount;
     const price = 1;
-    const expectMoney = getUserMoney(userId) + computeRebate(price * amount);
+    const expectVouchers = getUserVouchers(userId) + computeRebate(price * amount);
 
     insertUserOwnedProducts(productIdData, { amount, price });
     deliverProductRebates();
 
     expect(findProductRebateLog({ companyId })).to.exist();
-    expect(getUserMoney(userId)).to.be.equal(expectMoney);
+    expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
   });
 
   it('should deliver product rebate (multi products)', function() {
     const productNumber = 5; // 產品種數
     const amount = Math.ceil(divisorAmount / productNumber);
     const price = 1;
-    const expectMoney = getUserMoney(userId) + computeRebate(price * amount * productNumber);
+    const expectVouchers = getUserVouchers(userId) + computeRebate(price * amount * productNumber);
 
     for (let i = 0; i < productNumber; i += 1) {
       insertUserOwnedProducts(productIdData, { amount, price });
@@ -103,7 +103,7 @@ describe('function deliverProductRebates', function() {
     deliverProductRebates();
 
     expect(findProductRebateLog({ companyId })).to.exist();
-    expect(getUserMoney(userId)).to.be.equal(expectMoney);
+    expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
   });
 
 
@@ -117,7 +117,7 @@ describe('function deliverProductRebates', function() {
     });
 
     it('should not deliver product rebate if no one buys enough product', function() {
-      const expectMoney = getUserMoney(userId);
+      const expectVouchers = getUserVouchers(userId);
       const amount = 1;
       const price = divisorAmount - 1;
 
@@ -126,13 +126,13 @@ describe('function deliverProductRebates', function() {
       deliverProductRebates();
 
       expect(findProductRebateLog()).to.not.exist();
-      expect(getUserMoney(userId)).to.be.equal(expectMoney);
+      expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
     });
 
     it('should deliver product rebate', function() {
       const amount = divisorAmount;
       const price = 10;
-      const expectMoney = getUserMoney(userId) + computeRebate(price * amount) + computeRebate(price * amount);
+      const expectVouchers = getUserVouchers(userId) + computeRebate(price * amount) + computeRebate(price * amount);
       // 2間公司的回饋應該分開計算
 
       insertUserOwnedProducts(productIdData, { amount, price });
@@ -141,7 +141,7 @@ describe('function deliverProductRebates', function() {
 
       expect(findProductRebateLog({ companyId })).to.exist();
       expect(findProductRebateLog({ companyId: companyId2 })).to.exist();
-      expect(getUserMoney(userId)).to.be.equal(expectMoney);
+      expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
     });
   });
 
@@ -156,8 +156,8 @@ describe('function deliverProductRebates', function() {
     });
 
     it('should not deliver product rebate if no one buys enough product', function() {
-      const expectMoney = getUserMoney(userId);
-      const expectMoney2 = getUserMoney(userId2);
+      const expectVouchers = getUserVouchers(userId);
+      const expectVouchers2 = getUserVouchers(userId2);
       const amount = 1;
       const price = divisorAmount - 1;
 
@@ -166,23 +166,23 @@ describe('function deliverProductRebates', function() {
       deliverProductRebates();
 
       expect(findProductRebateLog()).to.not.exist();
-      expect(getUserMoney(userId)).to.be.equal(expectMoney);
-      expect(getUserMoney(userId2)).to.be.equal(expectMoney2);
+      expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
+      expect(getUserVouchers(userId2)).to.be.equal(expectVouchers2);
     });
 
     it('should deliver product rebate', function() {
       const amount = divisorAmount;
       const price = 10;
-      const expectMoney = getUserMoney(userId) + computeRebate(price * amount);
-      const expectMoney2 = getUserMoney(userId2) + computeRebate(price * amount);
+      const expectVouchers = getUserVouchers(userId) + computeRebate(price * amount);
+      const expectVouchers2 = getUserVouchers(userId2) + computeRebate(price * amount);
 
       insertUserOwnedProducts(productIdData, { amount, price });
       insertUserOwnedProducts(productIdDataWithUser2, { amount, price });
       deliverProductRebates();
 
       expect(findProductRebateLog({ companyId })).to.exist();
-      expect(getUserMoney(userId)).to.be.equal(expectMoney);
-      expect(getUserMoney(userId2)).to.be.equal(expectMoney2);
+      expect(getUserVouchers(userId)).to.be.equal(expectVouchers);
+      expect(getUserVouchers(userId2)).to.be.equal(expectVouchers2);
     });
   });
 });
@@ -204,8 +204,8 @@ function insertUserOwnedProducts(productIdData, customSetting) {
   return dbUserOwnedProducts.insert(userOwnedProduct);
 }
 
-function getUserMoney(userId) {
+function getUserVouchers(userId) {
   const user = Meteor.users.findOne(userId);
 
-  return user.profile.money;
+  return user.profile.vouchers;
 }

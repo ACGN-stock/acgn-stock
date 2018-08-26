@@ -4,6 +4,7 @@ import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { roleDisplayName } from '/db/users';
+import { populateUserLink } from '/client/utils/populateUserLink';
 import { stoneDisplayName, currencyFormat } from './helpers';
 
 Template.displayLog.onRendered(function() {
@@ -11,29 +12,7 @@ Template.displayLog.onRendered(function() {
     const $link = $(elem);
     const userId = $link.attr('data-user-link');
 
-    // TODO write a helper
-    if (userId === '!system') {
-      $link.text('系統');
-    }
-    else if (userId === '!FSC') {
-      $link.text('金管會');
-    }
-    else {
-      $.ajax({
-        url: '/userInfo',
-        data: { id: userId },
-        dataType: 'json',
-        success: ({ name: userName, status }) => {
-          if (status === 'registered') {
-            const path = FlowRouter.path('accountInfo', { userId });
-            $link.html(`<a href="${path}">${userName}</a>`);
-          }
-          else {
-            $link.text(userName);
-          }
-        }
-      });
-    }
+    populateUserLink($link, userId);
   });
 
   this.$('[data-company-link]').each((_, elem) => {

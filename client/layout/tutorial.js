@@ -61,9 +61,6 @@ Template.tutorial.helpers({
   productRebateDeliverAmount() {
     return Meteor.settings.public.productRebates.deliverAmount;
   },
-  vipLevelDownChancePercent() {
-    return Math.round(Meteor.settings.public.vipLevelDownChance * 100);
-  },
   vipPreviousSeasonScoreWeightPercent() {
     return Math.round(Meteor.settings.public.vipPreviousSeasonScoreWeight * 100);
   },

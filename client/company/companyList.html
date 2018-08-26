@@ -77,7 +77,7 @@
   <div class="col-12 col-md-6 col-lg-4 col-xl-3" style="margin-bottom: 25px;">
     <div class="company-card {{cardDisplayClass this}}">
       <div class="row row-info">
-        <small>{{formatDateTimeText this.createdAt}} 創立</small>
+        <small class="ml-3">{{formatDateTimeText this.createdAt}} 創立</small>
         {{#if currentUser}}
           {{#if isFavorite this._id}}
             <i class="fa fa-heart btn-favorite" aria-hidden="true" data-toggle-favorite="{{this._id}}"></i>
@@ -106,34 +106,33 @@
           {{/if}}
         </div>
         </div>
-        <div class="d-flex flex-column align-self-center">
-          <div class="d-flex flex-row-reverse">
-            <div class="member-panel">
-              <div class="d-flex flex-row-reverse">
-                {{#if isCurrentUserChairmanOf this._id}}
-                  <a class="small" href="#" data-action="changeChairmanTitle">
-                    {{this.chairmanTitle}}
-                  </a>
-                {{else}}
-                  <small>{{this.chairmanTitle}}</small>
-                {{/if}}
-              </div>
-              <div class="d-flex flex-row-reverse">
-                <h4>{{>userLink this.chairman}}</h4>
-              </div>
-              <div class="d-flex flex-row-reverse mt-2">
-                <small>經理人</small>
-              </div>
-              <div class="d-flex flex-row-reverse">
-                <h4>{{>userLink this.manager}}</h4>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="title">
         {{>companyLink this._id}}
       </div>
+      <div class="row row-info d-flex flex-column justify-content-between">
+        <div class="text-left mx-3">
+          {{#if isCurrentUserChairmanOf this._id}}
+            <a href="#" data-action="changeChairmanTitle">
+              {{this.chairmanTitle}}
+            </a>
+          {{else}}
+            {{this.chairmanTitle}}
+          {{/if}}
+        </div>
+        <div class="text-right mx-3">
+          <h4 class="text-truncate">{{>userLink this.chairman}}</h4>
+        </div>
+      </div>
+      <div class="row row-info d-flex flex-column justify-content-between">
+        <div class="text-left mx-3">
+          經理人
+        </div>
+        <div class="text-right mx-3 text-truncate">
+          <h4 class="text-truncate">{{>userLink this.manager}}</h4>
+        </div>
+      </div>
+      <hr class="m-0">
       <div class="row row-info d-flex justify-content-between">
         <p>股票價格</p>
         <p class="{{priceDisplayClass this.lastPrice this.listPrice}}">
@@ -162,7 +161,7 @@
           <p>{{getCurrentUserOwnedStockAmount this._id}} ({{getStockPercentage this._id this.totalRelease}}%)</p>
         </div>
         {{#if existOwnOrder this._id}}
-          <hr style="margin: 0px;" />
+          <hr class="m-0">
           <div class="row">
             <button class="btn btn-tab accordion dropdown-toggle" data-expand-order="1">顯示未完成訂單</button>
             <div class="order-panel">
@@ -177,7 +176,7 @@
             </div>
           </div>
         {{/if}}
-        <hr style="margin: 0px;" />
+        <hr class="m-0">
         <div class="row btn-group">
           {{#if currentUserCanManage this}}
             <a class="btn btn-tab" href="{{getManageHref this._id}}">

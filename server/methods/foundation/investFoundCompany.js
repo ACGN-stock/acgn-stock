@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { dbFoundations } from '/db/dbFoundations';
+import { dbVariables } from '/db/dbVariables';
 import { dbLog } from '/db/dbLog';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
@@ -29,7 +30,7 @@ export function investFoundCompany(user, companyId, amount) {
   if (_.contains(user.profile.ban, 'deal')) {
     throw new Meteor.Error(403, '您現在被金融管理會禁止了所有投資下單行為！');
   }
-  const minimumInvest = Math.ceil(Meteor.settings.public.minReleaseStock / Meteor.settings.public.foundationNeedUsers);
+  const minimumInvest = dbVariables.get('foundation.minAmountPerInvestor');
   if (amount < minimumInvest) {
     throw new Meteor.Error(403, '最低投資金額為' + minimumInvest + '！');
   }
