@@ -80,17 +80,23 @@ describe('util executeBulksSync', function() {
         };
       });
 
-      it('should throw error, but other normal bulk should success execute', function() {
+      it('should throw error, but other normal bulk should success execute', function(done) {
         const oldDb = getDbsData();
         runExecuteBulksSync(fakeBulk).must.throw();
-        const newDb = getDbsData();
 
-        expect(newDb.log).to.eql(oldDb.log);
-        expect(newDb.users).to.eql(oldDb.users);
-        expect(newDb.companies).to.not.eql(oldDb.companies);
-        expect(newDb.orders).to.not.eql(oldDb.orders);
-        expect(newDb.companies.length).to.equal(insertNumber);
-        expect(newDb.orders.length).to.equal(insertNumber);
+        // 過快讀取db可能造成bulk.execute還沒執行完成, 需要等待一段時間
+        const waitTime = 1000;
+        setTimeout(Meteor.bindEnvironment(() => {
+          const newDb = getDbsData();
+
+          expect(newDb.log).to.eql(oldDb.log);
+          expect(newDb.users).to.eql(oldDb.users);
+          expect(newDb.companies).to.not.eql(oldDb.companies);
+          expect(newDb.orders).to.not.eql(oldDb.orders);
+          expect(newDb.companies.length).to.equal(insertNumber);
+          expect(newDb.orders.length).to.equal(insertNumber);
+          done();
+        }), waitTime);
       });
     });
   });
