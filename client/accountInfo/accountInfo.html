@@ -99,6 +99,7 @@
         {{else}}
           <button class="btn btn-danger btn-sm mt-1" type="button" data-ban="manager">禁任經理</button>
         {{/if}}
+        <button class="btn btn-danger btn-sm mt-1" type="button" data-action="forceCancelUserOrders">強制撤銷訂單</button>
         <button class="btn btn-danger btn-sm mt-1" type="button" data-action="confiscateAllUserStocks">沒收所有股份</button>
       {{else}}
         {{#if isBanned 'accuse'}}

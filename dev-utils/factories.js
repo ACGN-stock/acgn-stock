@@ -136,6 +136,12 @@ export const taxFactory = new Factory()
 
 export const orderFactory = new Factory()
   .attrs({
+    userId() {
+      return faker.random.uuid();
+    },
+    companyId() {
+      return faker.random.uuid();
+    },
     orderType() {
       return faker.random.arrayElement(orderTypeList);
     },
@@ -169,5 +175,21 @@ export const seasonFactory = new Factory()
     },
     productCount() {
       return faker.random.number({ min: 0 });
+    }
+  });
+
+export const directorFactory = new Factory()
+  .attrs({
+    userId() {
+      return faker.random.uuid();
+    },
+    companyId() {
+      return faker.random.uuid();
+    },
+    stocks() {
+      return faker.random.number({ min: 1 });
+    },
+    createdAt() {
+      return new Date();
     }
   });
