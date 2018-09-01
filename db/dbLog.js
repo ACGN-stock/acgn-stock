@@ -258,6 +258,11 @@ export const logTypeList = [
   '沒收股份',
 
   /**
+   * 【金管撤單】userId0以「data.reason」的理由取消了userId1以每股$data.price的單價data.orderType data.amount數量的「companyId」公司股票的訂單！
+   */
+  '金管撤單',
+
+  /**
    * 【玩家停權】userId0以「data.reason」的理由禁止userId1今後擔任經理人的資格。
    */
   '禁任經理',
@@ -414,6 +419,7 @@ export const logTypeGroupMap = {
       '販賣下單',
       '取消下單',
       '系統撤單',
+      '金管撤單',
       '訂單完成',
       '交易紀錄',
       '公司釋股'
@@ -496,6 +502,7 @@ export const logTypeGroupMap = {
       '禁止廣告',
       '課以罰款',
       '沒收股份',
+      '金管撤單',
       '禁任經理',
       '解除舉報',
       '解除下單',
@@ -537,6 +544,7 @@ export const importantFscLogTypeList = [
   '禁止廣告',
   '課以罰款',
   '沒收股份',
+  '金管撤單',
   '禁任經理',
   '解除舉報',
   '解除下單',
