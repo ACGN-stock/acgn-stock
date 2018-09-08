@@ -174,6 +174,9 @@ export const config = {
         thresholdPercent: 30 // 投票率門檻 (%)
       }
     }
+  },
+  autoRedirectDomainPortSettings: { // 當前端domain符合設置且port不符合時，自動redirect
+    '8880': 'test.acgn-stock.com'
   }
 };
 export default config;
