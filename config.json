@@ -175,5 +175,8 @@
         }
       }
     }
+  },
+  "autoRedirectDomainPortSettings": {
+    "8880": "test.acgn-stock.com"
   }
 }
