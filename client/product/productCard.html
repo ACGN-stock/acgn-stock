@@ -25,7 +25,7 @@
     <div class="card-block px-3 pt-3 pb-1">
       <h5 class="card-title text-truncate">
         <div class="badge badge-default">{{product.type}}</div>
-        {{#if isRestrictedRating}}
+        {{#if isRestrictedRating product.rating}}
           <div class="badge badge-danger">{{product.rating}}</div>
         {{/if}}
         {{> productLink product._id}}

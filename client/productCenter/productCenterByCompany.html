@@ -60,7 +60,7 @@
           <td class="text-center text-truncate" data-title="類別">
             {{product.type}}
           </td>
-          {{#if isRestrictedRating}}
+          {{#if isRestrictedRating product.rating}}
             <td class="text-center text-truncate text-nowrap text-danger" data-title="分級">
               {{product.rating}}
             </td>

@@ -100,9 +100,9 @@
     <td class="text-center text-truncate text-nowrap" data-title="類別">
       {{this.type}}
     </td>
-    {{#if isRestrictedRating}}
+    {{#if isRestrictedRating this.rating}}
       <td class="text-center text-truncate text-nowrap text-danger" data-title="分級">
-        {{product.rating}}
+        {{this.rating}}
       </td>
     {{else}}
       <td class="text-center text-truncate text-nowrap" data-title="分級"></td>
