@@ -86,7 +86,11 @@
         </tr>
       {{else}}
         <tr class="default-content">
-          <td class="text-center text-truncate" colspan="4">這家公司尚未推出任何產品！</td>
+          {{#if currentUserHasRole 'fscMember'}}
+            <td class="text-center text-truncate" colspan="5">這家公司尚未推出任何產品！</td>
+          {{else}}
+            <td class="text-center text-truncate" colspan="4">這家公司尚未推出任何產品！</td>
+          {{/if}}
         </tr>
       {{/each}}
     </tbody>
