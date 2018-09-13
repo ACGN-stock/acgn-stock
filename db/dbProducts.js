@@ -7,12 +7,17 @@ export const dbProducts = new Mongo.Collection('products');
 export default dbProducts;
 
 export const productTypeList = [
+  '未分類',
   '繪圖',
   'ANSI',
   '影音',
   '文字',
-  '三次元',
-  '裏物'
+  '三次元'
+];
+
+export const productRatingList = [
+  '一般向',
+  '18禁'
 ];
 
 export const productStateList = [
@@ -59,6 +64,11 @@ const schema = new SimpleSchema({
   type: {
     type: String,
     allowedValues: productTypeList
+  },
+  // 產品分級
+  rating: {
+    type: String,
+    allowedValues: productRatingList
   },
   // 產品url
   url: {

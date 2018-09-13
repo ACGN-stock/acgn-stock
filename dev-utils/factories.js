@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Factory } from 'rosie';
 import faker from 'faker';
 
-import { productTypeList } from '/db/dbProducts';
+import { productTypeList, productRatingList } from '/db/dbProducts';
 import { orderTypeList } from '/db/dbOrders';
 
 export const pttUserFactory = new Factory()
@@ -77,6 +77,9 @@ export const productFactory = new Factory()
     },
     type() {
       return faker.random.arrayElement(productTypeList);
+    },
+    rating() {
+      return faker.random.arrayElement(productRatingList);
     },
     url() {
       return faker.internet.url();

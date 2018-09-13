@@ -30,6 +30,7 @@
       <tr>
         <th class="text-center text-truncate" title="產品">產品</th>
         <th class="text-center text-truncate" style="width: 60px;" title="類別">類別</th>
+        <th class="text-center text-truncate" style="width: 60px;" title="價格">分級</th>
         <th class="text-center text-truncate" style="width: 60px;" title="價格">價格</th>
         <th class="text-center text-truncate" style="width: 60px;" title="數量">數量</th>
         <th class="text-center text-truncate" style="width: 60px;" title="管理">管理</th>
@@ -50,6 +51,9 @@
           </td>
           <td class="text-center text-truncate text-nowrap align-middle" data-title="類別">
             {{product.type}}
+          </td>
+          <td class="text-center text-truncate text-nowrap align-middle" data-title="分級">
+            {{product.rating}}
           </td>
           <td class="text-center text-truncate text-nowrap align-middle" data-title="價格">
             ${{currencyFormat product.price}}
