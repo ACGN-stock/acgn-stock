@@ -49,12 +49,24 @@
               {{product.description}}
             </div>
           </td>
-          <td class="text-center text-truncate text-nowrap align-middle" data-title="類別">
-            {{product.type}}
-          </td>
-          <td class="text-center text-truncate text-nowrap align-middle" data-title="分級">
-            {{product.rating}}
-          </td>
+          {{#if isUntyped product.type}}
+            <td class="text-center text-truncate text-nowrap align-middle text-warning" data-title="類別">
+              {{product.type}}
+            </td>
+          {{else}}
+            <td class="text-center text-truncate text-nowrap align-middle" data-title="類別">
+              {{product.type}}
+            </td>
+          {{/if}}
+          {{#if isRestrictedRating product.rating}}
+            <td class="text-center text-truncate text-nowrap align-middle text-danger" data-title="分級">
+              {{product.rating}}
+            </td>
+          {{else}}
+            <td class="text-center text-truncate text-nowrap align-middle" data-title="分級">
+              {{product.rating}}
+            </td>
+          {{/if}}
           <td class="text-center text-truncate text-nowrap align-middle" data-title="價格">
             ${{currencyFormat product.price}}
           </td>

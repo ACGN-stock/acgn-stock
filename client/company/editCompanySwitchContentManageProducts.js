@@ -45,6 +45,9 @@ Template.editCompanySwitchContentManageProducts.helpers({
   },
   availableProductionFund() {
     return getTotalProductionFund(paramCompany()) - getUsedProductionFund(paramCompany());
+  },
+  isUntyped(type) {
+    return type === '未分類';
   }
 });
 
