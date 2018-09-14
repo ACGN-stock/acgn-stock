@@ -361,7 +361,7 @@ function askReason(title, callback) {
 
 export function adminEditProduct(productId) {
   const product = dbProducts.findOne(productId);
-  const schema = dbProducts.simpleSchema().pick('type', 'productName', 'url', 'description');
+  const schema = dbProducts.simpleSchema().pick('type', 'rating', 'productName', 'url', 'description');
 
   function askProductName(callback) {
     const minLength = schema.get('productName', 'min');
@@ -412,6 +412,32 @@ export function adminEditProduct(productId) {
 
         if (! allowedTypes.includes(trimmedResult)) {
           alertDialog.alert(`「${trimmedResult}」不是合法的產品分類！`);
+
+          return;
+        }
+
+        callback(trimmedResult);
+      }
+    });
+  }
+
+  function askProductRating(callback) {
+    const allowedTypes = schema.get('rating', 'allowedValues');
+
+    // TODO: alertDialog 加入下拉選單
+    alertDialog.prompt({
+      title: '修改產品 - 產品分級',
+      message: `請輸入產品分級（${allowedTypes.join('、')}）：`,
+      defaultValue: product.rating,
+      callback: (result) => {
+        if (result === false && typeof result !== 'string') {
+          return;
+        }
+
+        const trimmedResult = result.trim();
+
+        if (! allowedTypes.includes(trimmedResult)) {
+          alertDialog.alert(`「${trimmedResult}」不是合法的產品分級！`);
 
           return;
         }
@@ -507,15 +533,17 @@ export function adminEditProduct(productId) {
 
   askProductName((productName) => {
     askProductType((type) => {
-      askProductUrl((url) => {
-        askProductDescription((description) => {
-          const data = _.omit({ type, productName, url, description }, (value) => {
-            return ! value;
-          });
+      askProductRating((rating) => {
+        askProductUrl((url) => {
+          askProductDescription((description) => {
+            const data = _.omit({ type, rating, productName, url, description }, (value) => {
+              return ! value;
+            });
 
-          confirmProductData(data, (newData) => {
-            askViolationCaseId('修改產品', (violationCaseId) => {
-              Meteor.customCall('adminEditProduct', { productId, newData, violationCaseId });
+            confirmProductData(data, (newData) => {
+              askViolationCaseId('修改產品', (violationCaseId) => {
+                Meteor.customCall('adminEditProduct', { productId, newData, violationCaseId });
+              });
             });
           });
         });

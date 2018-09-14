@@ -488,6 +488,8 @@ function productInfoKeyToString(key) {
       return '名稱';
     case 'type':
       return '分類';
+    case 'rating':
+      return '分級';
     case 'url':
       return '網址';
     case 'description':
