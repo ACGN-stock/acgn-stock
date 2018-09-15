@@ -14,6 +14,7 @@ Meteor.methods({
       productName: String,
       companyId: String,
       type: String,
+      rating: String,
       url: String,
       price: Match.Integer,
       totalAmount: Match.Integer,

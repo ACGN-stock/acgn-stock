@@ -8,7 +8,7 @@ import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
 import { guardUser } from '/common/imports/guards';
 
-const editableFields = ['productName', 'type', 'url', 'description'];
+const editableFields = ['productName', 'type', 'rating', 'url', 'description'];
 
 Meteor.methods({
   adminEditProduct({ productId, newData, violationCaseId }) {
@@ -17,6 +17,7 @@ Meteor.methods({
     check(newData, {
       productName: String,
       type: String,
+      rating: String,
       url: String,
       description: new Match.Maybe(String)
     });

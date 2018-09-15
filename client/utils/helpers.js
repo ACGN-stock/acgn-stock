@@ -399,3 +399,8 @@ export function styledValidateTypeMarkHtml(validateType) {
   return `<span class="user-validate-type-mark">⟨${simpleValidateTypeText(validateType)}⟩</span>`;
 }
 Template.registerHelper('styledValidateTypeMarkHtml', styledValidateTypeMarkHtml);
+
+function isRestrictedRating(rating) {
+  return rating === '18禁';
+}
+Template.registerHelper('isRestrictedRating', isRestrictedRating);
