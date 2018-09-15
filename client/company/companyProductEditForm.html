@@ -31,6 +31,15 @@
       {{{errorHtmlOf 'type'}}}
     </div>
     <div class="form-group">
+      <label for="rating" data-required>產品分級</label>
+      <select class="form-control" name="rating">
+        {{#each rating in productRatingList}}
+          <option value="{{rating}}">{{rating}}</option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'rating'}}}
+    </div>
+    <div class="form-group">
       <label for="url" data-required>產品連結</label>
       <input
         class="form-control"

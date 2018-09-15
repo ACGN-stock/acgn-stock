@@ -18,6 +18,10 @@
       類別
       {{{getSortIcon 'type'}}}
     </button>
+    <button class="btn btn-sm btn-secondary {{getSortButtonClass 'rating'}}" data-sort="rating">
+      分級
+      {{{getSortIcon 'rating'}}}
+    </button>
     <button class="btn btn-sm btn-secondary {{getSortButtonClass 'voteCount'}}" data-sort="voteCount">
       推薦數
       {{{getSortIcon 'voteCount'}}}
@@ -30,6 +34,10 @@
         <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="類別" data-sort="type">
           類別
           {{{getSortIcon 'type'}}}
+        </th>
+        <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="分級" data-sort="rating">
+          分級
+          {{{getSortIcon 'rating'}}}
         </th>
         <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="股東評價" data-sort="voteCount">
           推薦數
@@ -52,6 +60,13 @@
           <td class="text-center text-truncate" data-title="類別">
             {{product.type}}
           </td>
+          {{#if isRestrictedRating product.rating}}
+            <td class="text-center text-truncate text-nowrap text-danger" data-title="分級">
+              {{product.rating}}
+            </td>
+          {{else}}
+            <td class="text-center text-truncate text-nowrap" data-title="分級"></td>
+          {{/if}}
           <td class="text-center text-truncate" data-title="得票數">
             <button
               class="btn btn-primary btn-sm"
@@ -71,7 +86,11 @@
         </tr>
       {{else}}
         <tr class="default-content">
-          <td class="text-center text-truncate" colspan="4">這家公司尚未推出任何產品！</td>
+          {{#if currentUserHasRole 'fscMember'}}
+            <td class="text-center text-truncate" colspan="5">這家公司尚未推出任何產品！</td>
+          {{else}}
+            <td class="text-center text-truncate" colspan="4">這家公司尚未推出任何產品！</td>
+          {{/if}}
         </tr>
       {{/each}}
     </tbody>

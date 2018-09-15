@@ -9,7 +9,7 @@ import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
 Meteor.publish('productListByCompany', function({ companyId, sortBy, sortDir, offset }) {
   debug.log('publish productListByCompany', { companyId, sortBy, sortDir, offset });
   check(companyId, String);
-  check(sortBy, new Match.OneOf('voteCount', 'type'));
+  check(sortBy, new Match.OneOf('voteCount', 'type', 'rating'));
   check(sortDir, new Match.OneOf(1, -1));
   check(offset, Match.Integer);
 
