@@ -22,9 +22,16 @@ function appendDefaultMetaTag(sink) {
 }
 
 function appendCompanyMetaTag(sink, companyData) {
-  sink.appendToHead(createMetaTag('og:title', companyData.companyName));
-  sink.appendToHead(createMetaTag('og:description', companyData.description));
-  sink.appendToHead(createMetaTag('og:image', companyData.pictureBig));
+  const { companyName, pictureSmall } = companyData;
+  sink.appendToHead(createMetaTag('og:title', companyName));
+  sink.appendToHead(createMetaTag('og:image', pictureSmall));
+  sink.appendToHead(createMetaTag('og:description', createCompanyDescription(companyData)));
+}
+
+function createCompanyDescription({ listPrice, capital, totalValue, description }) {
+  return `價格:${listPrice}   市值:${capital}   資本額:${totalValue}
+    ${description}
+  `;
 }
 
 
@@ -37,8 +44,11 @@ function getCompanyData(companyId) {
     {
       fileds: {
         companyName: 1,
-        pictureBig: 1,
-        description: 1
+        pictureSmall: 1,
+        description: 1,
+        listPrice: 1,
+        capital: 1,
+        totalValue: 1
       }
     });
 }
