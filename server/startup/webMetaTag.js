@@ -23,13 +23,15 @@ function appendDefaultMetaTag(sink) {
 
 function appendCompanyMetaTag(sink, companyData) {
   const { companyName, pictureSmall } = companyData;
+  sink.appendToHead(createMetaTag('og:site_name', 'acgn-stock'));
   sink.appendToHead(createMetaTag('og:title', companyName));
   sink.appendToHead(createMetaTag('og:image', pictureSmall));
   sink.appendToHead(createMetaTag('og:description', createCompanyDescription(companyData)));
 }
 
 function createCompanyDescription({ listPrice, capital, totalValue, description }) {
-  return `價格:${listPrice}   市值:${capital}   資本額:${totalValue}
+  return `價格: ${listPrice} ——— 市值: ${capital} ——— 資本額: ${totalValue}
+
     ${description}
   `;
 }
