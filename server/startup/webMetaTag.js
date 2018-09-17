@@ -29,7 +29,7 @@ function getCommonMetaTag() {
 
 function getDefaultMetaTag() {
   let metaTag = '';
-  metaTag += createMetaProperty('og:title', 'ACGN 股票交易市場');
+  metaTag += createMetaProperty('og:title', 'ACGN股票交易市場');
   metaTag += createMetaProperty('og:image', 'https://acgn-stock.com/ms-icon-310x310.png');
   metaTag += createMetaProperty('og:description', '漲停!!');
 
@@ -49,7 +49,7 @@ function getCompanyMetaTag(companyData) {
 
 
 function createCompanyDescription({ listPrice, capital, totalValue, description }) {
-  return `｜ 價格: ${listPrice} ｜ 市值: ${capital} ｜ 資本額: ${totalValue} ｜
+  return `｜ 價格: ${listPrice.toLocaleString()} ｜ 市值: ${capital.toLocaleString()} ｜ 資本額: ${totalValue.toLocaleString()} ｜
 
     ${description}
   `;
