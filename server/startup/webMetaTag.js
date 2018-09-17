@@ -21,6 +21,8 @@ function getCommonMetaTag() {
   let metaTag = '';
   metaTag += createMetaName('twitter:card', 'summary');
   metaTag += createMetaProperty('og:site_name', 'acgn-stock');
+  metaTag += createMetaProperty('og:image:width', 300);
+  metaTag += createMetaProperty('og:image:height', 300);
 
   return metaTag;
 }
@@ -39,8 +41,7 @@ function getCompanyMetaTag(companyData) {
   const { companyName, pictureSmall } = companyData;
   metaTag += createMetaProperty('og:title', companyName);
   metaTag += createMetaProperty('og:image', pictureSmall);
-  metaTag += createMetaProperty('og:image:width', 150);
-  metaTag += createMetaProperty('og:image:height', 150);
+  metaTag += createMetaProperty('og:image:url', pictureSmall);
   metaTag += createMetaProperty('og:description', createCompanyDescription(companyData));
 
   return metaTag;
@@ -48,7 +49,7 @@ function getCompanyMetaTag(companyData) {
 
 
 function createCompanyDescription({ listPrice, capital, totalValue, description }) {
-  return `價格: ${listPrice} ｜ 市值: ${capital} ｜ 資本額: ${totalValue}
+  return `｜ 價格: ${listPrice} ｜ 市值: ${capital} ｜ 資本額: ${totalValue} ｜
 
     ${description}
   `;
