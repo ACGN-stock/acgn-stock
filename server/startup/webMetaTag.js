@@ -30,7 +30,7 @@ function getCommonMetaTag() {
 function getDefaultMetaTag() {
   let metaTag = '';
   metaTag += createMetaProperty('og:title', 'ACGN 股票交易市場');
-  metaTag += createMetaProperty('og:image', '/ms-icon-310x310.png');
+  metaTag += createMetaProperty('og:image', 'https://acgn-stock.com/ms-icon-310x310.png');
   metaTag += createMetaProperty('og:description', '漲停!!');
 
   return metaTag;
