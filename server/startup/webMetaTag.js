@@ -39,6 +39,8 @@ function getCompanyMetaTag(companyData) {
   const { companyName, pictureSmall } = companyData;
   metaTag += createMetaProperty('og:title', companyName);
   metaTag += createMetaProperty('og:image', pictureSmall);
+  metaTag += createMetaProperty('og:image:width', 150);
+  metaTag += createMetaProperty('og:image:height', 150);
   metaTag += createMetaProperty('og:description', createCompanyDescription(companyData));
 
   return metaTag;
