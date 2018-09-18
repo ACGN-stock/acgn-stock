@@ -1,0 +1,69 @@
+import removeMd from 'remove-markdown';
+import { Meteor } from 'meteor/meteor';
+
+import { dbFoundations } from '/db/dbFoundations';
+import { createMetaProperty } from '/server/startup/metaTag/createMeta';
+
+export function getFoundationMetaTag(companyId) {
+  const foundationData = companyId ? getFoundationData(companyId) : null;
+  if (foundationData) {
+    return createFoundationMetaTag(foundationData);
+  }
+  else {
+    return null;
+  }
+}
+
+function createFoundationMetaTag(foundationData) {
+  let metaTag = '';
+  metaTag += createMetaProperty('og:site_name', Meteor.settings.public.websiteName);
+
+  const { companyName, pictureSmall } = foundationData;
+  metaTag += createMetaProperty('og:title', `(新創計劃) ${companyName}`);
+  metaTag += createMetaProperty('og:image', pictureSmall);
+  metaTag += createMetaProperty('og:image:url', pictureSmall);
+  metaTag += createMetaProperty('og:description', createFoundationDescription(foundationData));
+
+  return metaTag;
+}
+
+function createFoundationDescription({ createdAt, description }) {
+  return `｜ 新創投資截止時間: ${getExpireDateText(createdAt)} ｜
+
+    ${removeMd(description)}
+  `;
+}
+
+function getFoundationData(companyId) {
+  return dbFoundations.findOne({ _id: companyId },
+    {
+      fileds: {
+        companyName: 1,
+        pictureSmall: 1,
+        description: 1,
+        createdAt: 1
+      }
+    });
+}
+
+
+// TODO 讓client與server用共通的function來format時間
+function getExpireDateText(createdAt) {
+  const expireDate = new Date(createdAt.getTime() + Meteor.settings.public.foundExpireTime);
+
+  return formatShortDateTimeText(expireDate);
+}
+
+function formatShortDateTimeText(date) {
+  if (! date) {
+    return '??/?? ??:??';
+  }
+
+  return (
+    `${padZero(date.getMonth() + 1)}/${padZero(date.getDate())} ${padZero(date.getHours())}:${padZero(date.getMinutes())}`
+  );
+}
+
+function padZero(n) {
+  return n < 10 ? `0${n}` : `${n}`;
+}
