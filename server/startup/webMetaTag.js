@@ -1,4 +1,5 @@
 import removeMd from 'remove-markdown';
+import { Meteor } from 'meteor/meteor';
 import { onPageLoad } from 'meteor/server-render';
 
 import { dbCompanies } from '/db/dbCompanies';
@@ -21,7 +22,6 @@ onPageLoad((sink) => {
 function getCommonMetaTag() {
   let metaTag = '';
   metaTag += createMetaName('twitter:card', 'summary');
-  metaTag += createMetaProperty('og:site_name', 'acgn-stock');
   metaTag += createMetaProperty('og:image:width', 300);
   metaTag += createMetaProperty('og:image:height', 300);
 
@@ -30,8 +30,9 @@ function getCommonMetaTag() {
 
 function getDefaultMetaTag() {
   let metaTag = '';
-  metaTag += createMetaProperty('og:title', 'ACGN股票交易市場');
+  metaTag += createMetaProperty('og:title', Meteor.settings.public.websiteName);
   metaTag += createMetaProperty('og:image', 'https://acgn-stock.com/ms-icon-310x310.png');
+  metaTag += createMetaProperty('og:image:url', 'https://acgn-stock.com/ms-icon-310x310.png');
   metaTag += createMetaProperty('og:description', '漲停!!');
 
   return metaTag;
@@ -39,6 +40,8 @@ function getDefaultMetaTag() {
 
 function getCompanyMetaTag(companyData) {
   let metaTag = '';
+  metaTag += createMetaProperty('og:site_name', Meteor.settings.public.websiteName);
+
   const { companyName, pictureSmall } = companyData;
   metaTag += createMetaProperty('og:title', companyName);
   metaTag += createMetaProperty('og:image', pictureSmall);
