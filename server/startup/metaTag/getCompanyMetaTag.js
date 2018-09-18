@@ -1,8 +1,8 @@
-import removeMd from 'remove-markdown';
 import { Meteor } from 'meteor/meteor';
 
 import { dbCompanies } from '/db/dbCompanies';
 import { createMetaProperty } from '/server/startup/metaTag/createMeta';
+import { removeMarkdown } from '/server/startup/metaTag/removeMarkdown';
 
 export function getCompanyMetaTag(companyId) {
   const companyData = companyId ? getCompanyData(companyId) : null;
@@ -30,7 +30,7 @@ function createCompanyMetaTag(companyData) {
 function createCompanyDescription({ listPrice, capital, totalValue, description }) {
   return `｜ 價格: ${listPrice.toLocaleString()} ｜ 市值: ${capital.toLocaleString()} ｜ 資本額: ${totalValue.toLocaleString()} ｜
 
-    ${removeMd(description)}
+    ${removeMarkdown(description)}
   `;
 }
 

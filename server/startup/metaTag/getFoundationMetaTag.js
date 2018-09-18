@@ -1,8 +1,8 @@
-import removeMd from 'remove-markdown';
 import { Meteor } from 'meteor/meteor';
 
 import { dbFoundations } from '/db/dbFoundations';
 import { createMetaProperty } from '/server/startup/metaTag/createMeta';
+import { removeMarkdown } from '/server/startup/metaTag/removeMarkdown';
 
 export function getFoundationMetaTag(companyId) {
   const foundationData = companyId ? getFoundationData(companyId) : null;
@@ -30,7 +30,7 @@ function createFoundationMetaTag(foundationData) {
 function createFoundationDescription({ createdAt, description }) {
   return `｜ 新創投資截止時間: ${getExpireDateText(createdAt)} ｜
 
-    ${removeMd(description)}
+    ${removeMarkdown(description)}
   `;
 }
 
