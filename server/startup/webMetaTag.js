@@ -1,3 +1,4 @@
+import removeMd from 'remove-markdown';
 import { onPageLoad } from 'meteor/server-render';
 
 import { dbCompanies } from '/db/dbCompanies';
@@ -51,7 +52,7 @@ function getCompanyMetaTag(companyData) {
 function createCompanyDescription({ listPrice, capital, totalValue, description }) {
   return `｜ 價格: ${listPrice.toLocaleString()} ｜ 市值: ${capital.toLocaleString()} ｜ 資本額: ${totalValue.toLocaleString()} ｜
 
-    ${description}
+    ${removeMd(description)}
   `;
 }
 
