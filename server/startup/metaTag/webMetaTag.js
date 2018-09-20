@@ -33,7 +33,7 @@ function getDefaultMetaTag() {
   metaTag += createMetaProperty('og:title', Meteor.settings.public.websiteName);
   metaTag += createMetaProperty('og:image', 'https://acgn-stock.com/ms-icon-310x310.png');
   metaTag += createMetaProperty('og:image:url', 'https://acgn-stock.com/ms-icon-310x310.png');
-  metaTag += createMetaProperty('og:description', '漲停!!');
+  metaTag += createMetaProperty('og:description', '｜ 尋找你的老婆？ \n｜ 喜歡嗎？那麼就入股吧！');
 
   return metaTag;
 }
