@@ -21,7 +21,7 @@ Template.ruleAgendaVote.onCreated(function() {
     if (agendaId) {
       const agendaData = dbRuleAgendas.findOne(agendaId);
       if (agendaData) {
-        DocHead.setTitle(Meteor.settings.public.websiteName + ' - 「' + agendaData.title + '」議程資訊');
+        DocHead.setTitle(Meteor.settings.public.websiteInfo.websiteName + ' - 「' + agendaData.title + '」議程資訊');
       }
     }
   });

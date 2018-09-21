@@ -16,7 +16,7 @@ export function getCompanyMetaTag(companyId) {
 
 function createCompanyMetaTag(companyData) {
   let metaTag = '';
-  metaTag += createMetaProperty('og:site_name', Meteor.settings.public.websiteName);
+  metaTag += createMetaProperty('og:site_name', Meteor.settings.public.websiteInfo.websiteName);
 
   const { companyName, pictureSmall } = companyData;
   metaTag += createMetaProperty('og:title', companyName);
