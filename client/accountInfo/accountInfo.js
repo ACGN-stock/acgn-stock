@@ -36,7 +36,7 @@ Template.accountInfo.onCreated(function() {
   this.autorun(() => {
     const user = paramUser();
     if (user) {
-      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${user.profile.name}」帳號資訊`);
+      DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - 「${user.profile.name}」帳號資訊`);
     }
   });
 });

@@ -23,7 +23,7 @@ Template.foundationDetail.onCreated(function() {
   this.autorun(() => {
     const foundationData = paramFoundation();
     if (foundationData) {
-      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${foundationData.companyName}」公司資訊`);
+      DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - 「${foundationData.companyName}」公司資訊`);
     }
   });
 

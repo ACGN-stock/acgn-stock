@@ -11,7 +11,7 @@ import { shouldStopSubscribe } from '../utils/idle';
 
 Template.mainPage.helpers({
   websiteName() {
-    return Meteor.settings.public.websiteName;
+    return Meteor.settings.public.websiteInfo.websiteName;
   }
 });
 

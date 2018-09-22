@@ -16,7 +16,7 @@ export function getFoundationMetaTag(companyId) {
 
 function createFoundationMetaTag(foundationData) {
   let metaTag = '';
-  metaTag += createMetaProperty('og:site_name', Meteor.settings.public.websiteName);
+  metaTag += createMetaProperty('og:site_name', Meteor.settings.public.websiteInfo.websiteName);
 
   const { companyName, pictureSmall } = foundationData;
   metaTag += createMetaProperty('og:title', `(新創計劃) ${companyName}`);

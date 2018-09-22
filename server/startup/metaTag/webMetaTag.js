@@ -30,10 +30,11 @@ function getCommonMetaTag() {
 
 function getDefaultMetaTag() {
   let metaTag = '';
-  metaTag += createMetaProperty('og:title', Meteor.settings.public.websiteName);
-  metaTag += createMetaProperty('og:image', 'https://acgn-stock.com/ms-icon-310x310.png');
-  metaTag += createMetaProperty('og:image:url', 'https://acgn-stock.com/ms-icon-310x310.png');
-  metaTag += createMetaProperty('og:description', '｜ 尋找你的老婆？ \n｜ 喜歡嗎？那麼就入股吧！');
+  const { websiteName, image, description } = Meteor.settings.public.websiteInfo;
+  metaTag += createMetaProperty('og:title', websiteName);
+  metaTag += createMetaProperty('og:image', image);
+  metaTag += createMetaProperty('og:image:url', image);
+  metaTag += createMetaProperty('og:description', description);
 
   return metaTag;
 }
