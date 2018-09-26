@@ -20,7 +20,7 @@ function createAccountInfoMetaTag(userData) {
   metaTag += createMetaProperty('og:image', image);
   metaTag += createMetaProperty('og:image:url', image);
 
-  metaTag += createMetaProperty('og:title', `玩家 「${userData.profile.name}}」`);
+  metaTag += createMetaProperty('og:title', `玩家 「${userData.profile.name}」`);
   metaTag += createMetaProperty('og:description', createAccountInfoDescription(userData));
 
   return metaTag;
@@ -32,6 +32,7 @@ function createAccountInfoDescription(userData) {
     description += '｜ 渡假中 ｜\n';
   }
 
+  description += ' \n';
   description += createRolesText(userData.profile.roles);
   description += createBansText(userData.profile.ban);
 
