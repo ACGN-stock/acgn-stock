@@ -1,11 +1,11 @@
 import { getCompanyMetaTag } from '/server/startup/metaTag/getCompanyMetaTag';
 import { getFoundationMetaTag } from '/server/startup/metaTag/getFoundationMetaTag';
-import { getViolationMetaTag } from '/server/startup/metaTag/getViolationMetaTag';
+import { getViolationCaseMetaTag } from '/server/startup/metaTag/getViolationCaseMetaTag';
 
 const routeList = [
   { routePath: '/company/detail', getCustomMetaTag: getCompanyMetaTag },
   { routePath: '/foundation/view', getCustomMetaTag: getFoundationMetaTag },
-  { routePath: '/violation/view', getCustomMetaTag: getViolationMetaTag }
+  { routePath: '/violation/view', getCustomMetaTag: getViolationCaseMetaTag }
 ];
 
 export function getCustomMetaTagByPathname(pathname) {

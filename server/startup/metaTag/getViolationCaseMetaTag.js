@@ -4,7 +4,7 @@ import { dbViolationCases, stateMap, categoryMap } from '/db/dbViolationCases';
 import { createMetaProperty } from '/server/startup/metaTag/createMeta';
 import { removeMarkdown } from '/server/startup/metaTag/removeMarkdown';
 
-export function getViolationMetaTag(violationCaseId) {
+export function getViolationCaseMetaTag(violationCaseId) {
   const violationCase = violationCaseId ? getViolationCase(violationCaseId) : null;
   if (violationCase) {
     return createViolationCaseMetaTag(violationCase);
@@ -44,7 +44,7 @@ function createViolationCaseTitle({ state, category }) {
 }
 
 function createViolationCaseDescription({ description, createdAt, updatedAt }) {
-  return `｜ 舉報時間: ${formatDateTimeText(createdAt)} ｜ 更新時間: ${formatDateTimeText(updatedAt)} ｜
+  return `｜ 舉報時間: ${formatDateTimeText(createdAt)} \n｜ 更新時間: ${formatDateTimeText(updatedAt)}
 
     ${removeMarkdown(description)}
   `;
