@@ -1,5 +1,3 @@
-// TODO 讓client與server用共通的function來format時間
-
 export function formatDateTimeText(date) {
   if (! date) {
     return '????/??/?? ??:??:??';
