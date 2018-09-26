@@ -2,12 +2,14 @@ import { getCompanyMetaTag } from '/server/startup/metaTag/getCompanyMetaTag';
 import { getFoundationMetaTag } from '/server/startup/metaTag/getFoundationMetaTag';
 import { getViolationCaseMetaTag } from '/server/startup/metaTag/getViolationCaseMetaTag';
 import { getAnnouncementMetaTag } from '/server/startup/metaTag/getAnnouncementMetaTag';
+import { getRuleAgendaMetaTag } from '/server/startup/metaTag/getRuleAgendaMetaTag';
 
 const routeList = [
   { routePath: '/company/detail', getCustomMetaTag: getCompanyMetaTag },
   { routePath: '/foundation/view', getCustomMetaTag: getFoundationMetaTag },
   { routePath: '/violation/view', getCustomMetaTag: getViolationCaseMetaTag },
-  { routePath: '/announcement/view', getCustomMetaTag: getAnnouncementMetaTag }
+  { routePath: '/announcement/view', getCustomMetaTag: getAnnouncementMetaTag },
+  { routePath: '/ruleDiscuss/view', getCustomMetaTag: getRuleAgendaMetaTag }
 ];
 
 export function getCustomMetaTagByPathname(pathname) {
