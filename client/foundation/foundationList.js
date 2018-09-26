@@ -6,7 +6,9 @@ import { ReactiveVar } from 'meteor/reactive-var';
 
 import { dbFoundations } from '/db/dbFoundations';
 import { dbVariables } from '/db/dbVariables';
-import { formatDateTimeText, isCurrentUser } from '../utils/helpers';
+import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
+
+import { isCurrentUser } from '../utils/helpers';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';

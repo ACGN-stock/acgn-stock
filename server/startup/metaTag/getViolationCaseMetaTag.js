@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbViolationCases, stateMap, categoryMap } from '/db/dbViolationCases';
 import { createMetaProperty } from '/server/startup/metaTag/createMeta';
 import { removeMarkdown } from '/server/startup/metaTag/removeMarkdown';
+import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
 
 export function getViolationCaseMetaTag(violationCaseId) {
   const violationCase = violationCaseId ? getViolationCase(violationCaseId) : null;
@@ -61,19 +62,4 @@ function getViolationCase(violationCaseId) {
         updatedAt: 1
       }
     });
-}
-
-
-// TODO 讓client與server用共通的function來format時間
-function formatDateTimeText(date) {
-  if (! date) {
-    return '????/??/?? ??:??:??';
-  }
-
-  return (
-    `${date.getFullYear()}/${padZero(date.getMonth() + 1)}/${padZero(date.getDate())} ${padZero(date.getHours())}:${padZero(date.getMinutes())}:${padZero(date.getSeconds())}`
-  );
-}
-function padZero(n) {
-  return n < 10 ? `0${n}` : `${n}`;
 }
