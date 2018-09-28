@@ -1,9 +1,9 @@
-import { getCompanyMetaTag } from '/server/startup/metaTag/getCompanyMetaTag';
-import { getFoundationMetaTag } from '/server/startup/metaTag/getFoundationMetaTag';
-import { getAccountInfoMetaTag } from '/server/startup/metaTag/getAccountInfoMetaTag';
-import { getViolationCaseMetaTag } from '/server/startup/metaTag/getViolationCaseMetaTag';
-import { getAnnouncementMetaTag } from '/server/startup/metaTag/getAnnouncementMetaTag';
-import { getRuleAgendaMetaTag } from '/server/startup/metaTag/getRuleAgendaMetaTag';
+import { getCompanyMetaTag } from '/server/imports/metaTag/getCompanyMetaTag';
+import { getFoundationMetaTag } from '/server/imports/metaTag/getFoundationMetaTag';
+import { getAccountInfoMetaTag } from '/server/imports/metaTag/getAccountInfoMetaTag';
+import { getViolationCaseMetaTag } from '/server/imports/metaTag/getViolationCaseMetaTag';
+import { getAnnouncementMetaTag } from '/server/imports/metaTag/getAnnouncementMetaTag';
+import { getRuleAgendaMetaTag } from '/server/imports/metaTag/getRuleAgendaMetaTag';
 
 const routeList = [
   { routePath: '/company/detail', getCustomMetaTag: getCompanyMetaTag },

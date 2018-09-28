@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 
 import { roleDisplayName, banTypeDescription } from '/db/users';
-import { createMetaProperty } from '/server/startup/metaTag/createMeta';
+import { createMetaProperty } from '/server/imports/metaTag/createMeta';
 
 export function getAccountInfoMetaTag(userId) {
   const userData = userId ? getUserData(userId) : null;

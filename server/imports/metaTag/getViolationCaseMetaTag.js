@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 
 import { dbViolationCases, stateMap, categoryMap } from '/db/dbViolationCases';
-import { createMetaProperty } from '/server/startup/metaTag/createMeta';
-import { removeMarkdown } from '/server/startup/metaTag/removeMarkdown';
+import { createMetaProperty } from '/server/imports/metaTag/createMeta';
+import { removeMarkdown } from '/server/imports/metaTag/removeMarkdown';
 import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
 
 export function getViolationCaseMetaTag(violationCaseId) {
