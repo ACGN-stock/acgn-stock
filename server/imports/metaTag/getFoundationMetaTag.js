@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbFoundations } from '/db/dbFoundations';
 import { createMetaProperty } from '/server/imports/metaTag/createMeta';
 import { removeMarkdown } from '/server/imports/metaTag/removeMarkdown';
-import { formatShortDateTimeText } from '/common/imports/utils/formatTimeUtils';
+import { formatShortDateTimeText, toCustomTimezone } from '/common/imports/utils/formatTimeUtils';
 
 export function getFoundationMetaTag(companyId) {
   const foundationData = companyId ? getFoundationData(companyId) : null;
@@ -29,7 +29,7 @@ function createFoundationMetaTag(foundationData) {
 }
 
 function createFoundationDescription({ createdAt, description }) {
-  return `｜ 新創投資截止時間: ${getExpireDateText(createdAt)} ｜
+  return `｜ 新創投資截止時間: ${getExpireDateText(toCustomTimezone(createdAt))} ｜
 
     ${removeMarkdown(description)}
   `;

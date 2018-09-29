@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { createMetaProperty } from '/server/imports/metaTag/createMeta';
 import { removeMarkdown } from '/server/imports/metaTag/removeMarkdown';
-import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
+import { formatDateTimeText, toCustomTimezone } from '/common/imports/utils/formatTimeUtils';
 
 export function getRuleAgendaMetaTag(agendaId) {
   const agendaData = agendaId ? getAgendaData(agendaId) : null;
@@ -30,7 +30,7 @@ function createAgendaMetaTag(agendaData) {
 }
 
 function createAgendaDescription(agendaData) {
-  return `｜ 投票結束時間: ${formatExpireDate(agendaData)} ｜
+  return `｜ 投票結束時間: ${formatExpireDate(toCustomTimezone(agendaData))} ｜
 
     ${removeMarkdown(agendaData.description)}
   `;

@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbViolationCases, stateMap, categoryMap } from '/db/dbViolationCases';
 import { createMetaProperty } from '/server/imports/metaTag/createMeta';
 import { removeMarkdown } from '/server/imports/metaTag/removeMarkdown';
-import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
+import { formatDateTimeText, toCustomTimezone } from '/common/imports/utils/formatTimeUtils';
 
 export function getViolationCaseMetaTag(violationCaseId) {
   const violationCase = violationCaseId ? getViolationCase(violationCaseId) : null;
@@ -45,7 +45,7 @@ function createViolationCaseTitle({ state, category }) {
 }
 
 function createViolationCaseDescription({ description, createdAt, updatedAt }) {
-  return `｜ 舉報時間: ${formatDateTimeText(createdAt)} \n｜ 更新時間: ${formatDateTimeText(updatedAt)}
+  return `｜ 舉報時間: ${formatDateTimeText(toCustomTimezone(createdAt))} \n｜ 更新時間: ${formatDateTimeText(toCustomTimezone(updatedAt))}
 
     ${removeMarkdown(description)}
   `;
