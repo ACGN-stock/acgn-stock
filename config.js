@@ -1,7 +1,12 @@
 // 真正的設定檔請寫在config.json，這邊只是註解用。
 export const config = {
   debugMode: false, // 是否為debug mode(紀錄一分鐘內的所有方法與訂閱動作，以備crash查看)
-  websiteName: 'ACGN股票交易市場', // 網站名稱
+  websiteInfo: { // 網站資訊
+    websiteName: 'ACGN股票交易市場', // 網站名稱
+    description: '｜ 尋找你的老婆！ \n｜ 喜歡嗎？那麼就入股吧！',
+    domainName: 'acgn-stock.com',
+    image: 'https://acgn-stock.com/ms-icon-310x310.png'
+  },
   intervalTimer: 60000, // 每隔多少毫秒進行一次工作檢查
   releaseStocksForHighPriceInterval: { // 高價釋股的排程時間範圍 (ms)
     min: 10800000,

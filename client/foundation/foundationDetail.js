@@ -8,8 +8,8 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbLog } from '/db/dbLog';
 import { dbVariables } from '/db/dbVariables';
+import { formatShortDateTimeText } from '/common/imports/utils/formatTimeUtils';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatShortDateTimeText } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 import { investFoundCompany, markCompanyIllegal, unmarkCompanyIllegal, changeCompanyName } from '../utils/methods';
 import { paramFoundation, paramFoundationId } from './helpers';
@@ -23,7 +23,7 @@ Template.foundationDetail.onCreated(function() {
   this.autorun(() => {
     const foundationData = paramFoundation();
     if (foundationData) {
-      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${foundationData.companyName}」公司資訊`);
+      DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - 「${foundationData.companyName}」公司資訊`);
     }
   });
 

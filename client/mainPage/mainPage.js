@@ -5,13 +5,15 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbRound } from '/db/dbRound';
 import { dbSeason } from '/db/dbSeason';
 import { dbVariables } from '/db/dbVariables';
+import { formatDateTimeText, formatShortDurationTimeText } from '/common/imports/utils/formatTimeUtils';
+
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateTimeText, formatShortDurationTimeText, currencyFormat } from '../utils/helpers';
+import { currencyFormat } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 
 Template.mainPage.helpers({
   websiteName() {
-    return Meteor.settings.public.websiteName;
+    return Meteor.settings.public.websiteInfo.websiteName;
   }
 });
 

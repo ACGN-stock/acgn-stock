@@ -6,9 +6,11 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import { dbAdvertising } from '/db/dbAdvertising';
+import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
+
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { inheritUtilForm, handleInputChange as inheritedHandleInputChange } from '../utils/form';
-import { formatDateTimeText, currencyFormat } from '../utils/helpers';
+import { currencyFormat } from '../utils/helpers';
 import { integerString } from '../utils/regexp';
 import { alertDialog } from '../layout/alertDialog';
 import { takeDownAdvertising } from '../utils/methods';

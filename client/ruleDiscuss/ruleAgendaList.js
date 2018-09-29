@@ -1,8 +1,9 @@
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
+import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
+
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatDateTimeText } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 
 inheritedShowLoadingOnSubscribing(Template.ruleAgendaList);
