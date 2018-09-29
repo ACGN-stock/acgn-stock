@@ -1,13 +1,12 @@
 import { Meteor } from 'meteor/meteor';
-import { onPageLoad } from 'meteor/server-render';
 
-import { createMetaName, createMetaProperty } from '/server/startup/metaTag/createMeta';
-import { getCustomMetaTagByPathname } from '/server/startup/metaTag/getCustomMetaTagByPathname';
+import { createMetaName, createMetaProperty } from '/server/imports/metaTag/createMeta';
+import { getCustomMetaTagByPathname } from '/server/imports/metaTag/getCustomMetaTagByPathname';
 
-onPageLoad((sink) => {
+export function getMetaTag(url) {
   let metaTag = getCommonMetaTag();
 
-  const { pathname } = sink.request.url;
+  const { pathname } = url;
   const customeMetaTag = getCustomMetaTagByPathname(pathname);
   if (customeMetaTag) {
     metaTag += customeMetaTag;
@@ -16,8 +15,8 @@ onPageLoad((sink) => {
     metaTag += getDefaultMetaTag();
   }
 
-  sink.appendToHead(metaTag);
-});
+  return metaTag;
+}
 
 function getCommonMetaTag() {
   let metaTag = '';

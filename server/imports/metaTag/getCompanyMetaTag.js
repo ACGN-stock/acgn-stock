@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 
 import { dbCompanies } from '/db/dbCompanies';
-import { createMetaProperty } from '/server/startup/metaTag/createMeta';
-import { removeMarkdown } from '/server/startup/metaTag/removeMarkdown';
+import { createMetaProperty } from '/server/imports/metaTag/createMeta';
+import { removeMarkdown } from '/server/imports/metaTag/removeMarkdown';
 
 export function getCompanyMetaTag(companyId) {
   const companyData = companyId ? getCompanyData(companyId) : null;

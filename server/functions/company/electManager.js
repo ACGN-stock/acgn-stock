@@ -9,6 +9,7 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbLog } from '/db/dbLog';
 import { getCurrentSeason } from '/db/dbSeason';
+import { padZero } from '/common/imports/utils/formatTimeUtils';
 
 function computeUserActiveMap() {
   const nowTime = Date.now();
@@ -142,8 +143,4 @@ function convertDateToText(date) {
       padZero(dateInTimeZone.getHours())}:${
       padZero(dateInTimeZone.getMinutes())}`
   );
-}
-
-function padZero(n) {
-  return n < 10 ? `0${n}` : `${n}`;
 }

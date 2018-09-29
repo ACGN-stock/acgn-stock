@@ -1,4 +1,5 @@
 import shell from 'shelljs';
+import { padZero } from '/common/imports/utils/formatTimeUtils';
 
 // 備份mongo資料庫
 export function backupMongo(suffix = '') {
@@ -27,12 +28,3 @@ export function backupMongo(suffix = '') {
   }
 }
 export default backupMongo;
-
-function padZero(n) {
-  if (n < 10) {
-    return '0' + n;
-  }
-  else {
-    return n;
-  }
-}
