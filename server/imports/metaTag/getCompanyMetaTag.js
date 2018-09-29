@@ -28,7 +28,7 @@ function createCompanyMetaTag(companyData) {
 }
 
 function createCompanyDescription({ listPrice, capital, totalValue, description }) {
-  return `｜ 價格: ${listPrice.toLocaleString()} ｜ 市值: ${capital.toLocaleString()} ｜ 資本額: ${totalValue.toLocaleString()} ｜
+  return `｜ 價格: ${listPrice.toLocaleString()} ｜ 市值: ${totalValue.toLocaleString()} ｜ 資本額: ${capital.toLocaleString()} ｜
 
     ${removeMarkdown(description)}
   `;
