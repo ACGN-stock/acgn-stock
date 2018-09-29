@@ -30,7 +30,7 @@ function createAgendaMetaTag(agendaData) {
 }
 
 function createAgendaDescription(agendaData) {
-  return `｜ 投票結束時間: ${formatExpireDate(toCustomTimezone(agendaData))} ｜
+  return `｜ 投票結束時間: ${formatExpireDate(agendaData)} ｜
 
     ${removeMarkdown(agendaData.description)}
   `;
@@ -39,7 +39,7 @@ function createAgendaDescription(agendaData) {
 function formatExpireDate(agendaData) {
   const expireDate = new Date(agendaData.createdAt.getTime() + (agendaData.duration * 60 * 60 * 1000));
 
-  return formatDateTimeText(expireDate);
+  return formatDateTimeText(toCustomTimezone(expireDate));
 }
 
 function getAgendaData(agendaId) {

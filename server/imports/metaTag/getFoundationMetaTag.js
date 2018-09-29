@@ -29,7 +29,7 @@ function createFoundationMetaTag(foundationData) {
 }
 
 function createFoundationDescription({ createdAt, description }) {
-  return `｜ 新創投資截止時間: ${getExpireDateText(toCustomTimezone(createdAt))} ｜
+  return `｜ 新創投資截止時間: ${getExpireDateText(createdAt)} ｜
 
     ${removeMarkdown(description)}
   `;
@@ -52,5 +52,5 @@ function getFoundationData(companyId) {
 function getExpireDateText(createdAt) {
   const expireDate = new Date(createdAt.getTime() + Meteor.settings.public.foundExpireTime);
 
-  return formatShortDateTimeText(expireDate);
+  return formatShortDateTimeText(toCustomTimezone(expireDate));
 }
