@@ -77,7 +77,7 @@ export function padZero(n) {
  * @returns {Date} 轉換時區後的時間
  */
 export function toCustomTimezone(date, timezone) {
-  if (isNaN(timezone)) {
+  if (typeof timezone !== 'number') {
     timezone = Meteor.settings.public.websiteInfo.timezone;
   }
 
