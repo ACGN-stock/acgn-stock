@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbFoundations } from '/db/dbFoundations';
 import { createMetaProperty } from '/server/imports/metaTag/createMeta';
 import { removeMarkdown } from '/server/imports/metaTag/removeMarkdown';
-import { formatShortDateTimeText } from '/common/imports/utils/formatTimeUtils';
+import { formatShortDateTimeText, toCustomTimezone } from '/common/imports/utils/formatTimeUtils';
 
 export function getFoundationMetaTag(companyId) {
   const foundationData = companyId ? getFoundationData(companyId) : null;
@@ -52,5 +52,5 @@ function getFoundationData(companyId) {
 function getExpireDateText(createdAt) {
   const expireDate = new Date(createdAt.getTime() + Meteor.settings.public.foundExpireTime);
 
-  return formatShortDateTimeText(expireDate);
+  return formatShortDateTimeText(toCustomTimezone(expireDate));
 }
