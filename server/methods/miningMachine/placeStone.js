@@ -21,7 +21,7 @@ Meteor.methods({
 export function placeStone({ userId, companyId, stoneType }, resourceLocked = false) {
   debug.log('placeStone', { userId, companyId, stoneType });
 
-  const { miningMachineOperationTime, miningMachineSaintStoneLimit } = Meteor.settings.public;
+  const { miningMachineOperationTime } = Meteor.settings.public;
 
   const currentSeason = dbSeason.findOne({}, { sort: { beginDate: -1 } });
 
@@ -42,10 +42,6 @@ export function placeStone({ userId, companyId, stoneType }, resourceLocked = fa
   const availableStones = user.profile.stones[stoneType] || 0;
   if (availableStones < 1) {
     throw new Meteor.Error(403, `${stoneDisplayName(stoneType)}的數量不足！`);
-  }
-
-  if (stoneType === 'saint' && dbCompanyStones.find({ userId, stoneType }).count() >= miningMachineSaintStoneLimit) {
-    throw new Meteor.Error(403, `${stoneDisplayName(stoneType)}最多只能同時使用${miningMachineSaintStoneLimit}個！`);
   }
 
   if (! resourceLocked) {
