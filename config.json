@@ -77,7 +77,6 @@
     "taxExpireTime": 259200000,
     "releaseStocksForNoDealTradeLogLookbackIntervalTime": 86400000,
     "miningMachineOperationTime": 86400000,
-    "miningMachineSaintStoneLimit": 7,
     "stonePrice": {
       "rainbow": 100000,
       "rainbowFragment": 10000
