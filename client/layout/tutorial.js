@@ -40,9 +40,6 @@ Template.tutorial.helpers({
   miningMachineOperationHours() {
     return Math.floor(Meteor.settings.public.miningMachineOperationTime / 1000 / 60 / 60);
   },
-  miningMachineSaintStoneLimit() {
-    return Meteor.settings.public.miningMachineSaintStoneLimit;
-  },
   productFinalSaleHours() {
     return Math.floor(Meteor.settings.public.productFinalSaleTime / 1000 / 60 / 60);
   },
