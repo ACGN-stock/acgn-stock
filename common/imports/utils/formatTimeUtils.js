@@ -1,3 +1,5 @@
+import { Meteor } from 'meteor/meteor';
+
 export function formatDateTimeText(date) {
   if (! date) {
     return '????/??/?? ??:??:??';
@@ -66,4 +68,18 @@ export function formatLongDurationTimeText(time) {
 
 export function padZero(n) {
   return n < 10 ? `0${n}` : `${n}`;
+}
+
+/**
+ * 到指定的時區
+ * @param {Date} date 要轉換的時間
+ * @param {Number} [timezone] 時區，如 UTC+8 為 8，預設用config中的 websiteInfo.timezone
+ * @returns {Date} 轉換時區後的時間
+ */
+export function toCustomTimezone(date, timezone) {
+  if (typeof timezone !== 'number') {
+    timezone = Meteor.settings.public.websiteInfo.timezone;
+  }
+
+  return new Date(date.getTime() + date.getTimezoneOffset() * 60000 + timezone * 3600000);
 }

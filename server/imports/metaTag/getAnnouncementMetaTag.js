@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbAnnouncements, announcementCategoryMap } from '/db/dbAnnouncements';
 import { createMetaProperty } from '/server/imports/metaTag/createMeta';
 import { removeMarkdown } from '/server/imports/metaTag/removeMarkdown';
-import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
+import { formatDateTimeText, toCustomTimezone } from '/common/imports/utils/formatTimeUtils';
 
 export function getAnnouncementMetaTag(announcementId) {
   const announcementData = announcementId ? getAnnouncementData(announcementId) : null;
@@ -46,7 +46,7 @@ function createAnnouncementTitle({ category, subject, voided }) {
 }
 
 function createAnnouncementDescription({ content, createdAt, voided, voidedAt }) {
-  return `｜ 發佈時間: ${formatDateTimeText(createdAt)} ${voided ? `\n｜ 作廢時間: ${formatDateTimeText(voidedAt)}` : ''}
+  return `｜ 發佈時間: ${formatDateTimeText(toCustomTimezone(createdAt))} ${voided ? `\n｜ 作廢時間: ${formatDateTimeText(toCustomTimezone(voidedAt))}` : ''}
 
     ${removeMarkdown(content)}
   `;

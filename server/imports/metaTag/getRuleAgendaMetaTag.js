@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { createMetaProperty } from '/server/imports/metaTag/createMeta';
 import { removeMarkdown } from '/server/imports/metaTag/removeMarkdown';
-import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
+import { formatDateTimeText, toCustomTimezone } from '/common/imports/utils/formatTimeUtils';
 
 export function getRuleAgendaMetaTag(agendaId) {
   const agendaData = agendaId ? getAgendaData(agendaId) : null;
@@ -39,7 +39,7 @@ function createAgendaDescription(agendaData) {
 function formatExpireDate(agendaData) {
   const expireDate = new Date(agendaData.createdAt.getTime() + (agendaData.duration * 60 * 60 * 1000));
 
-  return formatDateTimeText(expireDate);
+  return formatDateTimeText(toCustomTimezone(expireDate));
 }
 
 function getAgendaData(agendaId) {

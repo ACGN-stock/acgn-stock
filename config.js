@@ -5,7 +5,8 @@ export const config = {
     websiteName: 'ACGN股票交易市場', // 網站名稱
     description: '｜ 尋找你的老婆！ \n｜ 喜歡嗎？那麼就入股吧！',
     domainName: 'acgn-stock.com',
-    image: 'https://acgn-stock.com/ms-icon-310x310.png'
+    image: 'https://acgn-stock.com/ms-icon-310x310.png',
+    timezone: 8 // 主要客群所在的時區 (可能與server的時區不同)
   },
   intervalTimer: 60000, // 每隔多少毫秒進行一次工作檢查
   releaseStocksForHighPriceInterval: { // 高價釋股的排程時間範圍 (ms)

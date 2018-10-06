@@ -17,7 +17,7 @@ export function updateCompanyGrades() {
       skip: splitPosition
     });
 
-    return companyData ? companyData.capital : 0;
+    return companyData ? companyData.capital : -Infinity;
   });
 
   gradeNameList.forEach((grade, i) => {
@@ -27,8 +27,8 @@ export function updateCompanyGrades() {
     dbCompanies.update({
       isSeal: false,
       capital: {
-        $lt: capitalUpperBound,
-        $gte: capitalLowerBound
+        $lte: capitalUpperBound,
+        $gt: capitalLowerBound
       }
     }, {
       $set: { grade }
