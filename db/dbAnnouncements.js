@@ -18,11 +18,11 @@ export const announcementCategoryMap = {
   },
   plannedRuleChanges: {
     displayName: '規則更動計劃',
-    announceableBy: ['planner']
+    announceableBy: ['planner', 'developer']
   },
   appliedRuleChanges: {
     displayName: '規則更動套用',
-    announceableBy: ['planner']
+    announceableBy: ['planner', 'developer']
   },
   knownProblems: {
     displayName: '已知問題',
