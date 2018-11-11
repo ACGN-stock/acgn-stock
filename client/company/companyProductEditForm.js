@@ -5,7 +5,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import { getAvailableProductionFund } from '/db/dbCompanies';
-import { dbProducts, productTypeList } from '/db/dbProducts';
+import { dbProducts, productTypeList, productRatingList } from '/db/dbProducts';
 import { inheritUtilForm, handleInputChange as baseHandleInputChange } from '../utils/form';
 import { paramCompany } from './helpers';
 
@@ -24,7 +24,7 @@ Template.companyProductEditFormInner.onCreated(function() {
   this.validateModel = (model) => {
     const error = {};
 
-    const schema = dbProducts.simpleSchema().pick('companyId', 'productName', 'type', 'url', 'description', 'price', 'totalAmount');
+    const schema = dbProducts.simpleSchema().pick('companyId', 'productName', 'type', 'rating', 'url', 'description', 'price', 'totalAmount');
     const cleanedModel = schema.clean(model);
 
     if (! cleanedModel.productName) {
@@ -68,7 +68,7 @@ Template.companyProductEditFormInner.onCreated(function() {
   };
 
   this.saveModel = (model) => {
-    const schema = dbProducts.simpleSchema().pick('companyId', 'productName', 'type', 'url', 'description', 'price', 'totalAmount');
+    const schema = dbProducts.simpleSchema().pick('companyId', 'productName', 'type', 'rating', 'url', 'description', 'price', 'totalAmount');
     const cleanedModel = schema.clean(model);
     Meteor.customCall('createProduct', cleanedModel, (error) => {
       if (! error) {
@@ -87,6 +87,9 @@ Template.companyProductEditFormInner.onCreated(function() {
 Template.companyProductEditFormInner.helpers({
   productTypeList() {
     return productTypeList;
+  },
+  productRatingList() {
+    return productRatingList;
   },
   requiredProductionFund() {
     return Template.instance().requiredProductionFund.get();

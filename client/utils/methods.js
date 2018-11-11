@@ -295,7 +295,7 @@ export function investFoundCompany(companyId) {
     return false;
   }
   const userId = user._id;
-  const minimumInvest = Math.ceil(Meteor.settings.public.minReleaseStock / Meteor.settings.public.foundationNeedUsers);
+  const minimumInvest = dbVariables.get('foundation.minAmountPerInvestor');
   const alreadyInvest = _.findWhere(foundationData.invest, { userId });
   const alreadyInvestAmount = alreadyInvest ? alreadyInvest.amount : 0;
   const maximumInvest = Math.min(Meteor.user().profile.money, Meteor.settings.public.maximumInvest - alreadyInvestAmount);
@@ -361,7 +361,7 @@ function askReason(title, callback) {
 
 export function adminEditProduct(productId) {
   const product = dbProducts.findOne(productId);
-  const schema = dbProducts.simpleSchema().pick('type', 'productName', 'url', 'description');
+  const schema = dbProducts.simpleSchema().pick('type', 'rating', 'productName', 'url', 'description');
 
   function askProductName(callback) {
     const minLength = schema.get('productName', 'min');
@@ -412,6 +412,32 @@ export function adminEditProduct(productId) {
 
         if (! allowedTypes.includes(trimmedResult)) {
           alertDialog.alert(`「${trimmedResult}」不是合法的產品分類！`);
+
+          return;
+        }
+
+        callback(trimmedResult);
+      }
+    });
+  }
+
+  function askProductRating(callback) {
+    const allowedTypes = schema.get('rating', 'allowedValues');
+
+    // TODO: alertDialog 加入下拉選單
+    alertDialog.prompt({
+      title: '修改產品 - 產品分級',
+      message: `請輸入產品分級（${allowedTypes.join('、')}）：`,
+      defaultValue: product.rating,
+      callback: (result) => {
+        if (result === false && typeof result !== 'string') {
+          return;
+        }
+
+        const trimmedResult = result.trim();
+
+        if (! allowedTypes.includes(trimmedResult)) {
+          alertDialog.alert(`「${trimmedResult}」不是合法的產品分級！`);
 
           return;
         }
@@ -507,15 +533,17 @@ export function adminEditProduct(productId) {
 
   askProductName((productName) => {
     askProductType((type) => {
-      askProductUrl((url) => {
-        askProductDescription((description) => {
-          const data = _.omit({ type, productName, url, description }, (value) => {
-            return ! value;
-          });
+      askProductRating((rating) => {
+        askProductUrl((url) => {
+          askProductDescription((description) => {
+            const data = _.omit({ type, rating, productName, url, description }, (value) => {
+              return ! value;
+            });
 
-          confirmProductData(data, (newData) => {
-            askViolationCaseId('修改產品', (violationCaseId) => {
-              Meteor.customCall('adminEditProduct', { productId, newData, violationCaseId });
+            confirmProductData(data, (newData) => {
+              askViolationCaseId('修改產品', (violationCaseId) => {
+                Meteor.customCall('adminEditProduct', { productId, newData, violationCaseId });
+              });
             });
           });
         });
@@ -692,6 +720,15 @@ export function banUser({ _id: userId, profile }, banType) {
   });
 }
 
+export function forceCancelUserOrders({ _id: userId, profile }) {
+  const title = `強制撤銷訂單 - ${profile.name}`;
+  askReason(title, (reason) => {
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('forceCancelUserOrders', { userId, reason, violationCaseId });
+    });
+  });
+}
+
 export function confiscateAllUserStocks({ _id: userId, profile }) {
   const title = `沒收所有股份 - ${profile.name}`;
   askReason(title, (reason) => {
@@ -720,5 +757,26 @@ export function takeDownAdvertising({ _id: advertisingId, message }) {
         });
       });
     }
+  });
+}
+
+export function voidAnnouncement({ announcementId }) {
+  const title = '作廢公告';
+
+  askReason(title, (reason) => {
+    alertDialog.confirm({
+      title,
+      message: `
+        <p>作廢原因：「<span class="text-info">${_.escape(reason)}</span>」</p>
+        <p>公告一旦作廢將無法復原，確定要將此公告作廢嗎？</p>
+      `,
+      callback(result) {
+        if (! result) {
+          return;
+        }
+
+        Meteor.customCall('voidAnnouncement', { announcementId, reason });
+      }
+    });
   });
 }

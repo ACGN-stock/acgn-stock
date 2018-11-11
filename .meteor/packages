@@ -35,3 +35,4 @@ reactive-dict
 promise
 aldeed:collection2@3.0.0
 tmeasday:publish-counts
+server-render

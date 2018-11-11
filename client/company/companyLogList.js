@@ -40,7 +40,7 @@ Template.companyLogList.helpers({
   }
 });
 Template.companyLogList.events({
-  'click button'(event) {
+  'click [data-action="toggleOnlyShowMine"]'(event) {
     event.preventDefault();
     rIsOnlyShowMine.set(! rIsOnlyShowMine.get());
   }

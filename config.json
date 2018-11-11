@@ -1,7 +1,13 @@
 {
   "public": {
     "debugMode": false,
-    "websiteName": "ACGN股票交易市場",
+    "websiteInfo": {
+      "websiteName": "ACGN股票交易市場",
+      "description": "｜ 尋找你的老婆！ \n｜ 喜歡嗎？那麼就入股吧！",
+      "domainName": "acgn-stock.com",
+      "image": "https://acgn-stock.com/ms-icon-310x310.png",
+      "timezone": 8
+    },
     "intervalTimer": 60000,
     "releaseStocksForHighPriceInterval": {
       "min": 10800000,
@@ -41,8 +47,8 @@
     "checkChairmanInterval": 600000,
     "founderEarnestMoney": 1024,
     "foundExpireTime": 43200000,
+    "foundationVariablesUpdateSeasonOrdinals": [2],
     "maximumInvest": 4096,
-    "foundationNeedUsers": 20,
     "minReleaseStock": 1000,
     "newUserInitialMoney": 10000,
     "newUserBirthStones": 1,
@@ -55,7 +61,7 @@
     "seasonTime": 604800000,
     "electManagerTime": 86400000,
     "electManagerLastLoginTimeThreshold": 259200000,
-    "contendManagerEndTime": 475200000,
+    "contendManagerEndTime": 129600000,
     "displayAdvertisingNumber": 5,
     "advertisingExpireTime": 259200000,
     "maximumFavorite": 60,
@@ -71,7 +77,6 @@
     "taxExpireTime": 259200000,
     "releaseStocksForNoDealTradeLogLookbackIntervalTime": 86400000,
     "miningMachineOperationTime": 86400000,
-    "miningMachineSaintStoneLimit": 7,
     "stonePrice": {
       "rainbow": 100000,
       "rainbowFragment": 10000
@@ -97,8 +102,9 @@
     "employeeProductVotingRewardFactor": 0.01,
     "productVoucherAmount": 7000,
     "productRebates": {
-      "divisorAmount": 3500,
-      "deliverAmount": 100
+      "divisorAmount": 2000,
+      "initialDeliverPercent": 25,
+      "minDeliverPercent": 2.5
     },
     "vipParameters": {
       "0": {
@@ -127,7 +133,6 @@
       }
     },
     "vipLevelCheckInterval": 1800000,
-    "vipLevelDownChance": 0.05,
     "vipPreviousSeasonScoreWeight": 0.80,
     "companyProfitDistribution": {
       "lockTime": 86400000,
@@ -175,5 +180,8 @@
         }
       }
     }
+  },
+  "autoRedirectDomainPortSettings": {
+    "8880": "test.acgn-stock.com"
   }
 }

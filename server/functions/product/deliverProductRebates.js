@@ -7,11 +7,50 @@ import { getCurrentSeason } from '/db/dbSeason';
 
 // 發放產品滿額回饋金給使用者
 export function deliverProductRebates() {
-  const { divisorAmount, deliverAmount } = Meteor.settings.public.productRebates;
+  const rebateList = getRebateList();
+  if (_.isEmpty(rebateList)) {
+    return;
+  }
 
+  const userBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
+  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
+  const logSchema = dbLog.simpleSchema();
+
+  const nowDate = new Date();
+
+  rebateList.forEach(({ _id: { userId, companyId }, rebate }) => {
+    userBulk.find({ _id: userId }).updateOne({ $inc: { 'profile.vouchers': rebate } });
+    const logData = logSchema.clean({
+      logType: '消費回饋',
+      userId: [userId],
+      companyId,
+      data: { rebate },
+      createdAt: nowDate
+    });
+    logSchema.validate(logData);
+    logBulk.insert(logData);
+  });
+
+  Meteor.wrapAsync(userBulk.execute, userBulk)();
+  Meteor.wrapAsync(logBulk.execute, logBulk)();
+}
+
+function getRebateList() {
+  const costList = getCostList();
+  const rebateList = [];
+  costList.forEach(({ _id, totalCost }) => {
+    const rebate = computeRebate(totalCost);
+    if (rebate > 0) {
+      rebateList.push({ _id, rebate });
+    }
+  });
+
+  return rebateList;
+}
+
+function getCostList() {
   const { _id: seasonId } = getCurrentSeason();
-
-  const rebateList = dbUserOwnedProducts
+  const costList = dbUserOwnedProducts
     .aggregate([ {
       $match: { seasonId }
     }, {
@@ -30,37 +69,21 @@ export function deliverProductRebates() {
         _id: { userId: '$userId', companyId: '$companyId' },
         totalCost: { $sum: { $multiply: ['$amount', '$price'] } }
       }
-    }, {
-      $project: {
-        rebate: { $multiply: [deliverAmount, { $floor: { $divide: ['$totalCost', divisorAmount] } } ] }
-      }
-    }, {
-      $match: { rebate: { $gt: 0 } }
     } ]);
 
-  if (_.isEmpty(rebateList)) {
-    return;
+  return costList;
+}
+
+export function computeRebate(totalCost) {
+  const { divisorAmount, initialDeliverPercent, minDeliverPercent } = Meteor.settings.public.productRebates;
+  let rebate = 0;
+  for (let i = 1; i * divisorAmount <= totalCost; i += 1) {
+    const deliverPercent = Math.max(
+      initialDeliverPercent - Math.log10(i) / 7.7 * 100,
+      minDeliverPercent
+    );
+    rebate += divisorAmount * deliverPercent / 100;
   }
 
-  const userBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
-  const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
-  const logSchema = dbLog.simpleSchema();
-
-  const nowDate = new Date();
-
-  rebateList.forEach(({ _id: { userId, companyId }, rebate }) => {
-    userBulk.find({ _id: userId }).updateOne({ $inc: { 'profile.money': rebate } });
-    const logData = logSchema.clean({
-      logType: '消費回饋',
-      userId: [userId],
-      companyId,
-      data: { rebate },
-      createdAt: nowDate
-    });
-    logSchema.validate(logData);
-    logBulk.insert(logData);
-  });
-
-  Meteor.wrapAsync(userBulk.execute, userBulk)();
-  Meteor.wrapAsync(logBulk.execute, logBulk)();
+  return Math.floor(rebate);
 }

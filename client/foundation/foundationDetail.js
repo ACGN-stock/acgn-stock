@@ -7,8 +7,9 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbLog } from '/db/dbLog';
+import { dbVariables } from '/db/dbVariables';
+import { formatShortDateTimeText } from '/common/imports/utils/formatTimeUtils';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
-import { formatShortDateTimeText } from '../utils/helpers';
 import { shouldStopSubscribe } from '../utils/idle';
 import { investFoundCompany, markCompanyIllegal, unmarkCompanyIllegal, changeCompanyName } from '../utils/methods';
 import { paramFoundation, paramFoundationId } from './helpers';
@@ -22,7 +23,7 @@ Template.foundationDetail.onCreated(function() {
   this.autorun(() => {
     const foundationData = paramFoundation();
     if (foundationData) {
-      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${foundationData.companyName}」公司資訊`);
+      DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - 「${foundationData.companyName}」公司資訊`);
     }
   });
 
@@ -113,10 +114,10 @@ Template.foundationDetailTable.helpers({
     return _.contains(rDisplayPanelList.get(), panelType);
   },
   investPplsNumberClass(investNumber) {
-    return (investNumber >= Meteor.settings.public.foundationNeedUsers) ? 'text-success' : 'text-danger';
+    return (investNumber >= dbVariables.get('foundation.minInvestorCount')) ? 'text-success' : 'text-danger';
   },
-  foundationNeedUsers() {
-    return Meteor.settings.public.foundationNeedUsers;
+  minInvestorCount() {
+    return dbVariables.get('foundation.minInvestorCount');
   },
   getTotalInvest(investList) {
     return getTotalInvest(investList);
@@ -127,14 +128,14 @@ Template.foundationDetailTable.helpers({
     return formatShortDateTimeText(expireDate);
   },
   getStockPrice(investList) {
-    if (investList.length < Meteor.settings.public.foundationNeedUsers) {
+    if (investList.length < dbVariables.get('foundation.minInvestorCount')) {
       return 0;
     }
 
     return getStockPrice(investList);
   },
   getStockRelease(investList) {
-    if (investList.length < Meteor.settings.public.foundationNeedUsers) {
+    if (investList.length < dbVariables.get('foundation.minInvestorCount')) {
       return 0;
     }
     const price = getStockPrice(investList);

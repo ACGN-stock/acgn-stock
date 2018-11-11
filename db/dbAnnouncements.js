@@ -18,11 +18,11 @@ export const announcementCategoryMap = {
   },
   plannedRuleChanges: {
     displayName: '規則更動計劃',
-    announceableBy: ['planner']
+    announceableBy: ['planner', 'developer']
   },
   appliedRuleChanges: {
     displayName: '規則更動套用',
-    announceableBy: ['planner']
+    announceableBy: ['planner', 'developer']
   },
   knownProblems: {
     displayName: '已知問題',
@@ -89,6 +89,28 @@ const schema = new SimpleSchema({
   // 建立日期
   createdAt: {
     type: Date
+  },
+  // 是否已作廢
+  voided: {
+    type: Boolean,
+    defaultValue: false
+  },
+  // 作廢原因
+  voidedReason: {
+    type: String,
+    optional: true,
+    min: 1,
+    max: 100
+  },
+  // 作廢的使用者
+  voidedBy: {
+    type: String,
+    optional: true
+  },
+  // 作廢時間
+  voidedAt: {
+    type: Date,
+    optional: true
   },
   // 否決連署
   rejectionPetition: {

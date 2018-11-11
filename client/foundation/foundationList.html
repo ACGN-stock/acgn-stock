@@ -65,7 +65,7 @@
     <div class="company-card {{cardDisplayClass this}}">
       <div class="company-card-mask">
         <div class="row row-info">
-          <small>{{getExpireDateText this.createdAt}} 截止</small>
+          <small class="ml-3">{{getExpireDateText this.createdAt}} 截止</small>
         </div>
         <hr class="m-0"/>
         {{#if this.illegalReason}}
@@ -87,26 +87,23 @@
               {{/if}}
             </div>
           </div>
-          <div class="d-flex flex-column align-self-center">
-            <div class="d-flex flex-row-reverse">
-              <div class="member-panel">
-                <div class="d-flex flex-row-reverse mt-2">
-                  <small>經理人</small>
-                </div>
-                <div class="d-flex flex-row-reverse">
-                  <h4>{{>userLink this.manager}}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-        <div class="row title-starter">
+        <div class="title-starter">
           {{>companyLink this._id}}
         </div>
+        <div class="row row-info d-flex flex-column justify-content-between">
+          <div class="text-left mx-3">
+            經理人
+          </div>
+          <div class="text-right mx-3 text-truncate">
+            <h4 class="text-truncate">{{>userLink this.manager}}</h4>
+          </div>
+        </div>
+        <hr class="m-0">
         <div class="row row-info d-flex justify-content-between">
           <p>投資人數</p>
           <p class="{{investPplsNumberClass this.invest.length}}">
-            {{this.invest.length}} / {{foundationNeedUsers}}
+            {{this.invest.length}} / {{minInvestorCount}}
           </p>
         </div>
         <div class="row row-info d-flex justify-content-between">
@@ -177,7 +174,7 @@
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">投資人數：</div>
       <div class="col-8 col-lg-3 text-truncate text-right border-grid">
         <span class="{{investPplsNumberClass this.invest.length}}">
-          {{this.invest.length}} / {{foundationNeedUsers}}
+          {{this.invest.length}} / {{minInvestorCount}}
         </span>
       </div>
       <div class="col-4 col-lg-3 text-truncate text-right border-grid row-title">總投資額：</div>

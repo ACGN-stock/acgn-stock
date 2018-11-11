@@ -11,7 +11,7 @@ Template.companyDetail.onCreated(function() {
   this.autorun(() => {
     const company = paramCompany();
     if (company) {
-      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${company.companyName}」公司資訊`);
+      DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - 「${company.companyName}」公司資訊`);
     }
   });
 

@@ -13,7 +13,7 @@ import { roleDisplayName, getManageableRoles } from '/db/users';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { changeChairmanTitle, confiscateUserMoney, sendFscNotice, banUser, confiscateAllUserStocks, returnUserMoney } from '../utils/methods';
+import { changeChairmanTitle, confiscateUserMoney, sendFscNotice, banUser, confiscateAllUserStocks, returnUserMoney, forceCancelUserOrders } from '../utils/methods';
 import { accountInfoCommonHelpers, paramUserId, paramUser, isCurrentUser } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
@@ -36,7 +36,7 @@ Template.accountInfo.onCreated(function() {
   this.autorun(() => {
     const user = paramUser();
     if (user) {
-      DocHead.setTitle(`${Meteor.settings.public.websiteName} - 「${user.profile.name}」帳號資訊`);
+      DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - 「${user.profile.name}」帳號資訊`);
     }
   });
 });
@@ -119,6 +119,10 @@ Template.accountInfoBasic.events({
   'click [data-action="returnUserMoney"]'(event) {
     event.preventDefault();
     returnUserMoney(paramUser());
+  },
+  'click [data-action="forceCancelUserOrders"]'(event) {
+    event.preventDefault();
+    forceCancelUserOrders(paramUser());
   },
   'click [data-action="confiscateAllUserStocks"]'(event) {
     event.preventDefault();

@@ -3,8 +3,12 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { ReactiveVar } from 'meteor/reactive-var';
+
 import { dbFoundations } from '/db/dbFoundations';
-import { formatDateTimeText, isCurrentUser } from '../utils/helpers';
+import { dbVariables } from '/db/dbVariables';
+import { formatDateTimeText } from '/common/imports/utils/formatTimeUtils';
+
+import { isCurrentUser } from '../utils/helpers';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -107,10 +111,10 @@ const foundationListHelpers = {
     return tagList.join('、');
   },
   investPplsNumberClass(investNumber) {
-    return (investNumber >= Meteor.settings.public.foundationNeedUsers) ? 'text-success' : 'text-danger';
+    return (investNumber >= dbVariables.get('foundation.minInvestorCount')) ? 'text-success' : 'text-danger';
   },
-  foundationNeedUsers() {
-    return Meteor.settings.public.foundationNeedUsers;
+  minInvestorCount() {
+    return dbVariables.get('foundation.minInvestorCount');
   },
   getTotalInvest(investList) {
     return _.reduce(investList, (totalInvest, investData) => {

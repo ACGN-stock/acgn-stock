@@ -1,7 +1,13 @@
 // 真正的設定檔請寫在config.json，這邊只是註解用。
 export const config = {
   debugMode: false, // 是否為debug mode(紀錄一分鐘內的所有方法與訂閱動作，以備crash查看)
-  websiteName: 'ACGN股票交易市場', // 網站名稱
+  websiteInfo: { // 網站資訊
+    websiteName: 'ACGN股票交易市場', // 網站名稱
+    description: '｜ 尋找你的老婆！ \n｜ 喜歡嗎？那麼就入股吧！',
+    domainName: 'acgn-stock.com',
+    image: 'https://acgn-stock.com/ms-icon-310x310.png',
+    timezone: 8 // 主要客群所在的時區 (可能與server的時區不同)
+  },
   intervalTimer: 60000, // 每隔多少毫秒進行一次工作檢查
   releaseStocksForHighPriceInterval: { // 高價釋股的排程時間範圍 (ms)
     min: 10800000,
@@ -41,8 +47,8 @@ export const config = {
   checkChairmanInterval: 600000, // 董事長檢查的排程時間 (ms)
   founderEarnestMoney: 1024, // 創立公司者需付出的保證金
   foundExpireTime: 43200000, // 創立公司的投資時間期限，單位為毫秒
+  foundationVariablesUpdateSeasonOrdinals: [2], // 新創相關變數的更新季度編號，於季度開始時更新
   maximumInvest: 4096, // 每個人對單一新創計劃的最大投資上限
-  foundationNeedUsers: 20, // 創立公司所需要的投資人數量
   minReleaseStock: 1000, // 公司初創時的最小釋出股份數量(可能會有些微誤差)
   newUserInitialMoney: 10000, // 所有使用者驗證通過後的起始資金數量
   newUserBirthStones: 1, // 所有使用者驗證通過後的誕生石數量
@@ -55,7 +61,7 @@ export const config = {
   seasonTime: 604800000, // 每個商業季度的持續時間，單位為毫秒
   electManagerTime: 86400000, // 每個商業季度**結束前多久時間**會進行經理競選 (ms)
   electManagerLastLoginTimeThreshold: 259200000, // 經理選舉時候選人或投票人判定為活躍玩家時，距離上次登入時間之上限 (ms)
-  contendManagerEndTime: 475200000, // 經理選舉的報名結束時間 (ms)
+  contendManagerEndTime: 129600000, // 每個商業季度**結束前多久時間**結束經理選舉的報名 (ms)
   displayAdvertisingNumber: 5, // 同時最多顯示的廣告筆數
   advertisingExpireTime: 259200000, // 廣告持續時間，單位為毫秒
   maximumFavorite: 60, // 每個人的最愛公司數量上限
@@ -72,7 +78,6 @@ export const config = {
   taxExpireTime: 259200000, // 稅單的繳費期限 (ms)
   releaseStocksForNoDealTradeLogLookbackIntervalTime: 86400000, // 低量釋股的成交量統計區間 (ms)
   miningMachineOperationTime: 86400000, // 挖礦機的運作時間 (ms)
-  miningMachineSaintStoneLimit: 7,
   stonePrice: { // 可供購買的石頭價格
     rainbow: 100000, // 彩虹石
     rainbowFragment: 10000 // 彩虹石碎片
@@ -97,8 +102,9 @@ export const config = {
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金
   productVoucherAmount: 7000, // 產品消費券的數量
   productRebates: { // 產品滿額回饋設定
-    divisorAmount: 3500, // 滿額條件
-    deliverAmount: 100 // 每達成一次滿額條件可得回饋
+    divisorAmount: 2000, // 滿額條件
+    initialDeliverPercent: 25, // 第一次達成滿額條件可得回饋百分比 (%)
+    minDeliverPercent: 2.5 // 最小可得回饋百分比 (%)
   },
   vipParameters: { // VIP 各等級的參數
     0: {
@@ -127,7 +133,6 @@ export const config = {
     }
   },
   vipLevelCheckInterval: 1800000, // VIP 等級更新時間 (ms)
-  vipLevelDownChance: 0.05, // VIP 掉級的機率
   vipPreviousSeasonScoreWeight: 0.80, // VIP 上季分數的權重
   companyProfitDistribution: { // 公司營利的分配設定
     lockTime: 86400000, // 分配設定調整的封關時間 (ms)
@@ -174,6 +179,9 @@ export const config = {
         thresholdPercent: 30 // 投票率門檻 (%)
       }
     }
+  },
+  autoRedirectDomainPortSettings: { // 當前端domain符合設置且port不符合時，自動redirect
+    '8880': 'test.acgn-stock.com'
   }
 };
 export default config;

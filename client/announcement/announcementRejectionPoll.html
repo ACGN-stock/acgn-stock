@@ -6,7 +6,9 @@
     <div class="col-12 col-md-6 my-2">
       <h4>投票資訊</h4>
       <div class="my-2">
-        {{#if isFinished}}
+        {{#if isVoided}}
+          <span class="text-warning"><i class="fa fa-warning"></i> 公告已作廢，投票中止</span>
+        {{else if isFinished}}
           <span class="text-danger">投票已結束</span>
         {{else}}
           <span class="text-info">投票進行中（尚餘 {{formatLongDurationTimeText remainingTime}}）</span>
@@ -48,7 +50,7 @@
         </p>
         <p>
           <span class="mr-2">總投票人數：{{totalVoteCount}} 人</span>
-
+          
           {{#if isThresholdPassed}}
             <span class="text-success"><i class="fa fa-circle-o"></i> 已達投票門檻</span>
           {{else}}

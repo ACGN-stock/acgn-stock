@@ -5,7 +5,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import { getTotalProductionFund, getUsedProductionFund, getPlanningProducts } from '/db/dbCompanies';
-import { dbProducts, productTypeList } from '/db/dbProducts';
+import { dbProducts, productTypeList, productRatingList } from '/db/dbProducts';
 import { alertDialog } from '../layout/alertDialog';
 import { paramCompany, paramCompanyId } from './helpers';
 
@@ -26,6 +26,7 @@ Template.editCompanySwitchContentManageProducts.helpers({
         productName: '',
         companyId: paramCompanyId(),
         type: productTypeList[0],
+        rating: productRatingList[0],
         url: ''
       },
       onReset() {
@@ -44,6 +45,9 @@ Template.editCompanySwitchContentManageProducts.helpers({
   },
   availableProductionFund() {
     return getTotalProductionFund(paramCompany()) - getUsedProductionFund(paramCompany());
+  },
+  isUntyped(type) {
+    return type === '未分類';
   }
 });
 
