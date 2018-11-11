@@ -61,7 +61,7 @@
     "seasonTime": 604800000,
     "electManagerTime": 86400000,
     "electManagerLastLoginTimeThreshold": 259200000,
-    "contendManagerEndTime": 475200000,
+    "contendManagerEndTime": 129600000,
     "displayAdvertisingNumber": 5,
     "advertisingExpireTime": 259200000,
     "maximumFavorite": 60,
