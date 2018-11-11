@@ -23,9 +23,9 @@ Template.companyElectInfo.helpers({
   },
   canContendManager() {
     const { contendManagerEndTime, electManagerTime } = Meteor.settings.public;
-    const { beginDate: seasonBeginDate, endDate: seasonEndDate } = getCurrentSeason();
+    const { endDate: seasonEndDate } = getCurrentSeason();
 
-    const contendManagerEndTimePassed = Date.now() - seasonBeginDate.getTime() > contendManagerEndTime;
+    const contendManagerEndTimePassed = seasonEndDate.getTime() - Date.now() < contendManagerEndTime;
     const electManagerTimePassed = seasonEndDate.getTime() - Date.now() < electManagerTime;
 
     // 在經理參選報名截止後，至經理完成選舉之前，禁止參選

@@ -61,7 +61,7 @@ export const config = {
   seasonTime: 604800000, // 每個商業季度的持續時間，單位為毫秒
   electManagerTime: 86400000, // 每個商業季度**結束前多久時間**會進行經理競選 (ms)
   electManagerLastLoginTimeThreshold: 259200000, // 經理選舉時候選人或投票人判定為活躍玩家時，距離上次登入時間之上限 (ms)
-  contendManagerEndTime: 475200000, // 經理選舉的報名結束時間 (ms)
+  contendManagerEndTime: 129600000, // 每個商業季度**結束前多久時間**結束經理選舉的報名 (ms)
   displayAdvertisingNumber: 5, // 同時最多顯示的廣告筆數
   advertisingExpireTime: 259200000, // 廣告持續時間，單位為毫秒
   maximumFavorite: 60, // 每個人的最愛公司數量上限
