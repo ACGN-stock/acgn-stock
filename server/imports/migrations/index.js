@@ -33,4 +33,4 @@ import './032-tax-separate';
 import './033-announcement-voiding';
 import './034-add-ordinal-to-season';
 import './035-product-rating';
-import './036-fix-forceCancelUserOrders';
+import './036-fix-dbDirectors-have-two-same-user-director-data-in-one-company';
