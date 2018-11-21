@@ -35,10 +35,11 @@ describe('method forceCancelUserOrders', function() {
       }
     };
 
-    buyOrder = orderFactory.build({ userId, orderType: '購入' });
+    buyOrder = orderFactory.build({ userId, orderType: '購入', amount: faker.random.number({ min: 2 }) });
+    buyOrder.done = faker.random.number({ min: 1, max: buyOrder.amount - 1 });
     dbOrders.insert(buyOrder);
 
-    sellOrder = orderFactory.build({ userId, orderType: '賣出' });
+    sellOrder = orderFactory.build({ userId, orderType: '賣出', amount: faker.random.number({ min: 2 }) });
     sellOrder.done = faker.random.number({ min: 1, max: sellOrder.amount - 1 });
     dbOrders.insert(sellOrder);
 
@@ -80,7 +81,7 @@ describe('method forceCancelUserOrders', function() {
   });
 
   it('should success retrieve all user orders', function() {
-    const expectMoney = findUserById(userId).profile.money + buyOrder.unitPrice * buyOrder.amount;
+    const expectMoney = findUserById(userId).profile.money + buyOrder.unitPrice * (buyOrder.amount - buyOrder.done);
     const expectStocks = findDirectorData({ userId, companyId: inDirectorsSellOrder.companyId }).stocks + inDirectorsSellOrder.amount;
 
     runForceCancelUserOrders().must.not.throw();
