@@ -18,6 +18,7 @@ describe('method forceCancelUserOrders', function() {
   let buyOrder;
   let sellOrder;
   let inDirectorsSellOrder;
+  let sameCompanySellOrders = [];
   const reason = 'some reason';
   let violationCaseId;
 
@@ -44,6 +45,12 @@ describe('method forceCancelUserOrders', function() {
     inDirectorsSellOrder = orderFactory.build({ userId, orderType: '賣出' });
     dbOrders.insert(inDirectorsSellOrder);
     dbDirectors.insert(directorFactory.build({ userId, companyId: inDirectorsSellOrder.companyId }));
+
+    sameCompanySellOrders = [];
+    sameCompanySellOrders.push(orderFactory.build({ userId, orderType: '賣出' }));
+    sameCompanySellOrders.push(orderFactory.build({ userId, orderType: '賣出', companyId: sameCompanySellOrders[0].companyId }));
+    dbOrders.insert(sameCompanySellOrders[0]);
+    dbOrders.insert(sameCompanySellOrders[1]);
 
     violationCaseId = undefined;
   });
@@ -82,15 +89,25 @@ describe('method forceCancelUserOrders', function() {
     expect(findOrder({ userId })).to.not.exist();
     expect(findFscRetrieveOrderLog()).to.exist();
 
+    // 確認money有正確歸還
     const userMoney = findUserById(userId).profile.money;
     expect(userMoney).to.equal(expectMoney);
 
+    // 確認股數有加進原本在dbDirectors中的資料
     const userStocks = findDirectorData({ userId, companyId: inDirectorsSellOrder.companyId }).stocks;
     expect(userStocks).to.equal(expectStocks);
 
+    // 確認股票資料有新寫入dbDirectors
     const directorData = findDirectorData({ userId, companyId: sellOrder.companyId });
     expect(directorData).to.exist();
     expect(directorData.stocks).to.equal(sellOrder.amount - sellOrder.done);
+
+    // 確認2筆同公司賣單會寫入同一條dbDirectors (原本在dbDirectors中沒有這筆資料)
+    const twoSellOrderCompanyDirectorData = findDirectorData({ userId, companyId: sameCompanySellOrders[0].companyId });
+    expect(twoSellOrderCompanyDirectorData).to.exist();
+    expect(twoSellOrderCompanyDirectorData.stocks).to.equal(sameCompanySellOrders[0].amount + sameCompanySellOrders[1].amount);
+    const twoSellOrderCompanyDirectorDataList = dbDirectors.find({ userId, companyId: sameCompanySellOrders[0].companyId }).fetch();
+    expect(twoSellOrderCompanyDirectorDataList.length).to.equal(1);
   });
 
   describe('when multi-user', function() {
