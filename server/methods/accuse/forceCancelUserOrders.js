@@ -57,19 +57,13 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
       increaseMoney += unitPrice * leftAmount;
     }
     else if (orderType === '賣出') {
-      if (dbDirectors.findOne({ userId, companyId })) {
-        directorsBulk
-          .find({ userId, companyId })
-          .updateOne({ $inc: { stocks: leftAmount } });
-      }
-      else {
-        directorsBulk.insert({
-          companyId: companyId,
-          userId: userId,
-          stocks: leftAmount,
-          createdAt: createdAt
+      directorsBulk
+        .find({ userId, companyId })
+        .upsert()
+        .updateOne({
+          $setOnInsert: { createdAt: createdAt },
+          $inc: { stocks: leftAmount }
         });
-      }
     }
   });
   dbOrders.remove({ userId });
