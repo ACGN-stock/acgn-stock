@@ -282,3 +282,14 @@ Meteor.users.findByIdOrThrow = function(id, options) {
 
   return result;
 };
+
+/*
+ * 防止直接從 client 端操作 collection 來更新數值（尤其是 profile 欄位）
+ * 參照 https://guide.meteor.com/accounts.html#dont-use-profile
+ */
+Meteor.users.deny({
+  update() {
+    return true;
+  }
+});
+
