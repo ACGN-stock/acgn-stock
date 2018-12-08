@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { _ } from 'meteor/underscore';
 
 import { createOrder } from '/server/imports/createOrder';
 import { resourceManager } from '/server/imports/threading/resourceManager';
@@ -51,7 +52,7 @@ export function releaseStocksForNoDeal() {
         }
 
         const releasePrice = getPriceLimits(companyData).upper;
-        const releaseStocks = 1 + Math.floor(Math.random() * highPriceBuyAmount / 2);
+        const releaseStocks = _.random(1, highPriceBuyAmount / 2);
 
         createOrder({
           userId: '!system',
