@@ -51,7 +51,7 @@ export function releaseStocksForNoDeal() {
         }
 
         const releasePrice = getPriceLimits(companyData).upper;
-        const releaseStocks = 1 + Math.floor(Math.random() * highPriceBuyAmount / 2);
+        const releaseStocks = 1 + Math.floor(Math.random() * Math.floor(highPriceBuyAmount / 2));
 
         createOrder({
           userId: '!system',
