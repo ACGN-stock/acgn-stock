@@ -101,6 +101,7 @@ export function doOnFoundationSuccess(foundationData) {
   const companySchema = dbCompanies.simpleSchema();
   const newCompanyData = companySchema.clean({
     companyName: foundationData.companyName,
+    creator: foundationData.creator,
     manager: foundationData.manager,
     chairman: '!none',
     chairmanTitle: '董事長',

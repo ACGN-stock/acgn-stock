@@ -153,6 +153,9 @@ const companyListHelpers = {
     if (isCurrentUser(companyData.manager)) {
       return 'company-card-manager';
     }
+    if (isCurrentUser(companyData.creator)) {
+      return 'company-card-creator';
+    }
     const amount = companyListHelpers.getCurrentUserOwnedStockAmount(companyData._id);
     if (amount > 0) {
       return 'company-card-holder';

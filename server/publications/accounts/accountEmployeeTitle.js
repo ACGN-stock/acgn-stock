@@ -15,10 +15,14 @@ Meteor.publish('accounEmployeeTitle', function(userId) {
   return [
     dbEmployees.find(filter),
     dbCompanies.find({
-      '_id': {
-        '$in': dbEmployees.find(filter).map((companyData) => {
+      _id: {
+        $in: dbEmployees.find(filter).map((companyData) => {
           return companyData.companyId;
         })
+      }
+    }, {
+      fields: {
+        isSeal: 1
       }
     })
   ];

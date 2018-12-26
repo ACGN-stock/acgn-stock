@@ -159,7 +159,7 @@ Template.accountInfoBasic.events({
   }
 });
 
-export const companyTitleView = new ReactiveVar('chairman');
+const companyTitleView = new ReactiveVar('chairman');
 Template.companyTitleTab.helpers({
   getClass(type) {
     if (companyTitleView.get() === type) {
@@ -184,7 +184,7 @@ Template.accountCompanyTitle.helpers({
   }
 });
 
-export const chairmanOffset = new ReactiveVar(0);
+const chairmanOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.chairmanTitleList);
 Template.chairmanTitleList.onCreated(function() {
   chairmanOffset.set(0);
@@ -225,7 +225,7 @@ Template.chairmanTitleList.events({
   }
 });
 
-export const managerOffset = new ReactiveVar(0);
+const managerOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.managerTitleList);
 Template.managerTitleList.onCreated(function() {
   managerOffset.set(0);
@@ -255,6 +255,40 @@ Template.managerTitleList.helpers({
       useVariableForTotalCount: 'totalCountOfManagerTitle',
       dataNumberPerPage: 10,
       offset: managerOffset
+    };
+  }
+});
+
+const creatorOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.creatorTitleList);
+Template.creatorTitleList.onCreated(function() {
+  creatorOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = paramUserId();
+    if (userId) {
+      this.subscribe('accountCreatorTitle', userId, creatorOffset.get());
+    }
+  });
+});
+Template.creatorTitleList.helpers({
+  titleList() {
+    return dbCompanies
+      .find({
+        creator: this._id,
+        isSeal: false
+      },
+      {
+        limit: 10
+      });
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfCreatorTitle',
+      dataNumberPerPage: 10,
+      offset: creatorOffset
     };
   }
 });
