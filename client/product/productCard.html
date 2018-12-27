@@ -32,6 +32,12 @@
       </h5>
       <div class="card-subtitle product-description">{{product.description}}</div>
       <div class="text-right"><small>識別碼：{{product._id}}</small></div>
+      {{#if currentUserHasRole 'fscMember'}}
+        <div class="text-right text-info"><small>由 {{> userLink product.creator }} 於 {{formatDateTimeText product.createdAt}} 建立</small></div>
+        {{#if product.updatedAt}}
+          <div class="text-right text-info"><small>由 {{> userLink product.updatedBy }} 於 {{formatDateTimeText product.updatedAt}} 最後更新</small></div>
+        {{/if}}
+      {{/if}}
     </div>
     <div class="card-footer d-flex flex-wrap px-3">
       <div class="mr-auto my-1">

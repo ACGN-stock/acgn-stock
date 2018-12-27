@@ -4,7 +4,6 @@ import SimpleSchema from 'simpl-schema';
 
 // 公司產品資料集
 export const dbProducts = new Mongo.Collection('products');
-export default dbProducts;
 
 export const productTypeList = [
   '未分類',
@@ -114,9 +113,23 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     defaultValue: 0
   },
+  // 建立人 userId
+  creator: {
+    type: String
+  },
   // 建立日期
   createdAt: {
     type: Date
+  },
+  // 最後更新產品的人 userId（金管會造成的修改除外）
+  updatedBy: {
+    type: String,
+    optional: true
+  },
+  // 更新日期（金管會造成的修改除外）
+  updatedAt: {
+    type: Date,
+    optional: true
   }
 });
 dbProducts.attachSchema(schema);

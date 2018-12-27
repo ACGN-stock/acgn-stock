@@ -20,6 +20,8 @@ inheritUtilForm(Template.companyProductEditFormInner);
 Template.companyProductEditFormInner.onCreated(function() {
   this.requiredProductionFund = new ReactiveVar(0);
   const parentData = Template.parentData();
+  const isNewProduct = ! parentData.product._id;
+  const oldRequiredProductionFund = (parentData.product.price || 0) * (parentData.product.totalAmount || 0);
 
   this.validateModel = (model) => {
     const error = {};
@@ -57,7 +59,7 @@ Template.companyProductEditFormInner.onCreated(function() {
     }
 
     const availableProductionFund = getAvailableProductionFund(paramCompany());
-    const requiredProductionFund = cleanedModel.price * cleanedModel.totalAmount;
+    const requiredProductionFund = cleanedModel.price * cleanedModel.totalAmount - oldRequiredProductionFund;
     if (requiredProductionFund && availableProductionFund < requiredProductionFund) {
       error.totalAmount = '生產資金不足！';
     }
@@ -70,7 +72,13 @@ Template.companyProductEditFormInner.onCreated(function() {
   this.saveModel = (model) => {
     const schema = dbProducts.simpleSchema().pick('companyId', 'productName', 'type', 'rating', 'url', 'description', 'price', 'totalAmount');
     const cleanedModel = schema.clean(model);
-    Meteor.customCall('createProduct', cleanedModel, (error) => {
+
+    const methodName = isNewProduct ? 'createProduct' : 'editProduct';
+    const methodArgs = [
+      isNewProduct ? cleanedModel : { productId: parentData.product._id, newData: cleanedModel }
+    ];
+
+    Meteor.customCall(methodName, ...methodArgs, (error) => {
       if (! error) {
         parentData.onSave();
       }
@@ -80,7 +88,7 @@ Template.companyProductEditFormInner.onCreated(function() {
   this.handleInputChange = (...args) => {
     baseHandleInputChange.call(this, ...args);
     const { totalAmount, price } = this.model.get();
-    this.requiredProductionFund.set(parseInt(totalAmount || 0, 10) * parseInt(price || 0, 10));
+    this.requiredProductionFund.set(parseInt(totalAmount || 0, 10) * parseInt(price || 0, 10) - oldRequiredProductionFund);
   };
 });
 
@@ -93,5 +101,8 @@ Template.companyProductEditFormInner.helpers({
   },
   requiredProductionFund() {
     return Template.instance().requiredProductionFund.get();
+  },
+  selectedAttr(expected, actual) {
+    return expected === actual ? 'selected' : '';
   }
 });

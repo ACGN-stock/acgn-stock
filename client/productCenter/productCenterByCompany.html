@@ -30,7 +30,7 @@
   <table class="table-bordered custom-responsive-table-md product-list-by-company w-100" style="table-layout: fixed;">
     <thead>
       <tr>
-        <th class="text-center text-truncate" title="產品名稱">產品名稱</th>
+        <th class="text-center text-truncate" title="產品">產品</th>
         <th class="text-center text-truncate" style="width: 120px; cursor: pointer;" title="類別" data-sort="type">
           類別
           {{{getSortIcon 'type'}}}
@@ -56,17 +56,28 @@
           <td class="text-left px-md-1" data-title="產品名稱">
             <div class="product-name">{{>productLink product._id}}</div>
             <div class="small product-description">{{product.description}}</div>
+            {{#if currentUserHasRole 'fscMember'}}
+              <div class="small text-info mt-2">
+                識別碼：{{product._id}}
+              </div>
+              <div class="small text-info">
+                由 {{> userLink product.creator}} 於 {{formatDateTimeText product.createdAt}} 建立
+              </div>
+              <div class="small text-info">
+                {{#if product.updatedAt}}
+                  由 {{> userLink product.updatedBy }} 於 {{formatDateTimeText product.createdAt}} 最後編輯
+                {{/if}}
+              </div>
+            {{/if}}
           </td>
           <td class="text-center text-truncate" data-title="類別">
             {{product.type}}
           </td>
-          {{#if isRestrictedRating product.rating}}
-            <td class="text-center text-truncate text-nowrap text-danger" data-title="分級">
-              {{product.rating}}
+            <td class="text-center text-truncate text-nowrap" data-title="分級">
+              {{#if isRestrictedRating product.rating}}
+                <span class="text-danger">{{product.rating}}</span>
+              {{/if}}
             </td>
-          {{else}}
-            <td class="text-center text-truncate text-nowrap" data-title="分級"></td>
-          {{/if}}
           <td class="text-center text-truncate" data-title="得票數">
             <button
               class="btn btn-primary btn-sm"

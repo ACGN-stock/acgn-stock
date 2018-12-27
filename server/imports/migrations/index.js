@@ -35,3 +35,4 @@ import './034-add-ordinal-to-season';
 import './035-product-rating';
 import './036-fix-dbDirectors-have-two-same-user-director-data-in-one-company';
 import './037-add-company-founder';
+import './038-add-creator-to-products';

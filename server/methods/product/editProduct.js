@@ -5,12 +5,13 @@ import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbProducts } from '/db/dbProducts';
 import { dbCompanies, getAvailableProductionFund } from '/db/dbCompanies';
 import { debug } from '/server/imports/utils/debug';
-import { guardCompany } from '/common/imports/guards';
+import { guardCompany, guardProduct } from '/common/imports/guards';
 
 Meteor.methods({
-  createProduct(productData) {
+  editProduct({ productId, newData }) {
     check(this.userId, String);
-    check(productData, {
+    check(productId, String);
+    check(newData, {
       productName: String,
       companyId: String,
       type: String,
@@ -20,18 +21,17 @@ Meteor.methods({
       totalAmount: Match.Integer,
       description: new Match.Maybe(String)
     });
-    createProduct(this.userId, productData);
+
+    editProduct(Meteor.user(), { productId, newData });
 
     return true;
   }
 });
 
-export function createProduct(userId, productData) {
-  debug.log('createProduct', { userId, productData });
+export function editProduct(currentUser, { productId, newData }) {
+  debug.log('editProduct', { currentUser, productId, newData });
 
-  const user = Meteor.users.findByIdOrThrow(userId);
-
-  const { companyId, url, price, totalAmount } = productData;
+  const { companyId } = newData;
 
   const companyData = dbCompanies.findByIdOrThrow(companyId, {
     fields: {
@@ -45,32 +45,38 @@ export function createProduct(userId, productData) {
   });
 
   guardCompany(companyData)
-    .checkIsManageableByUser(user)
+    .checkIsManageableByUser(currentUser)
     .checkNotSealed();
+
+  const oldData = dbProducts.findByIdOrThrow(productId);
 
   const { manager, productPriceLimit } = companyData;
 
-  if (dbProducts.find({ companyId, url }).count() > 0) {
+  guardProduct(oldData).checkInState('planning');
+
+  if (dbProducts.find({ _id: { $ne: productId }, companyId, url: newData.url }).count() > 0) {
     throw new Meteor.Error(403, '相同的產品已經被推出過了！');
   }
 
-  if (productPriceLimit < price) {
+  if (productPriceLimit < newData.price) {
     throw new Meteor.Error(403, '產品售價過高！');
   }
 
-  const totalCost = price * totalAmount;
-  const availableProductionFund = getAvailableProductionFund(companyData);
+  const oldTotalCost = oldData.price * oldData.totalAmount;
+  const newTotalCost = newData.price * newData.totalAmount;
+  const availableProductionFund = getAvailableProductionFund(companyData) + oldTotalCost;
 
-  if (availableProductionFund < totalCost) {
+  if (availableProductionFund < newTotalCost) {
     throw new Meteor.Error(403, '剩餘生產資金不足！');
   }
 
   resourceManager.throwErrorIsResourceIsLock(['season']);
 
-  dbProducts.insert({
-    ...productData,
-    state: 'planning',
-    creator: manager === userId ? userId : '!FSC',
-    createdAt: new Date()
+  dbProducts.update(productId, {
+    $set: {
+      ...newData,
+      updatedBy: manager === currentUser._id ? currentUser._id : '!FSC',
+      updatedAt: new Date()
+    }
   });
 }
