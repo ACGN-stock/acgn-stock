@@ -259,25 +259,25 @@ Template.managerTitleList.helpers({
   }
 });
 
-const creatorOffset = new ReactiveVar(0);
-inheritedShowLoadingOnSubscribing(Template.creatorTitleList);
-Template.creatorTitleList.onCreated(function() {
-  creatorOffset.set(0);
+const founderOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.founderTitleList);
+Template.founderTitleList.onCreated(function() {
+  founderOffset.set(0);
   this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
     }
     const userId = paramUserId();
     if (userId) {
-      this.subscribe('accountCreatorTitle', userId, creatorOffset.get());
+      this.subscribe('accountFounderTitle', userId, founderOffset.get());
     }
   });
 });
-Template.creatorTitleList.helpers({
+Template.founderTitleList.helpers({
   titleList() {
     return dbCompanies
       .find({
-        creator: this._id,
+        founder: this._id,
         isSeal: false
       },
       {
@@ -286,9 +286,9 @@ Template.creatorTitleList.helpers({
   },
   paginationData() {
     return {
-      useVariableForTotalCount: 'totalCountOfCreatorTitle',
+      useVariableForTotalCount: 'totalCountOfFounderTitle',
       dataNumberPerPage: 10,
-      offset: creatorOffset
+      offset: founderOffset
     };
   }
 });

@@ -155,7 +155,7 @@ const schema = new SimpleSchema({
     max: 100
   },
   // 創立者 userId
-  creator: {
+  founder: {
     type: String
   },
   // 經理人 userId

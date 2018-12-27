@@ -82,26 +82,26 @@ describe('function doOnFoundationFailure', function() {
     });
   });
 
-  it('should return only fund except "founderEarnestMoney" if the investor is the creator', function() {
+  it('should return only fund except "founderEarnestMoney" if the investor is the founder', function() {
     const extraAmount = 1000;
-    const creatorUserId = 'the-creator';
+    const founderUserId = 'the-founder';
 
-    const creatorInvestor = {
-      userId: creatorUserId,
+    const founderInvestor = {
+      userId: founderUserId,
       amount: Meteor.settings.public.founderEarnestMoney + extraAmount
     };
 
-    Meteor.users.rawCollection().insert({ _id: creatorUserId, profile: { money: 0 } });
+    Meteor.users.rawCollection().insert({ _id: founderUserId, profile: { money: 0 } });
 
     dbFoundations.update(companyId, {
-      $set: { creator: creatorUserId },
-      $push: { invest: creatorInvestor }
+      $set: { founder: founderUserId },
+      $push: { invest: founderInvestor }
     });
     const foundationData = dbFoundations.findOne(companyId);
     doOnFoundationFailure(foundationData);
 
-    const { refund } = dbLog.findOne({ logType: '創立退款', userId: creatorUserId }).data;
-    const { money } = Meteor.users.findOne(creatorUserId).profile;
+    const { refund } = dbLog.findOne({ logType: '創立退款', userId: founderUserId }).data;
+    const { money } = Meteor.users.findOne(founderUserId).profile;
 
     refund.must.be.equal(extraAmount);
     money.must.be.equal(extraAmount);

@@ -6,16 +6,16 @@ import { dbFoundations } from '/db/dbFoundations';
 
 defineMigration({
   version: 37,
-  name: 'add company creator',
+  name: 'add company founder',
   up() {
     const companyBulk = dbCompanies.rawCollection().initializeUnorderedBulkOp();
     const foundationBulk = dbFoundations.rawCollection().initializeUnorderedBulkOp();
 
     dbLog.find({ logType: '創立公司' }).forEach(({ companyId, userId }) => {
-      const creator = userId[0];
+      const founder = userId[0];
 
-      companyBulk.find({ _id: companyId }).updateOne({ $set: { creator } });
-      foundationBulk.find({ _id: companyId }).updateOne({ $set: { creator } });
+      companyBulk.find({ _id: companyId }).updateOne({ $set: { founder } });
+      foundationBulk.find({ _id: companyId }).updateOne({ $set: { founder } });
     });
 
     executeBulksSync(companyBulk, foundationBulk);

@@ -47,7 +47,7 @@ export function foundCompany(user, foundCompanyData) {
     throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
   }
   const userId = user._id;
-  if (dbFoundations.find({ creator: userId }).count() > 0) {
+  if (dbFoundations.find({ founder: userId }).count() > 0) {
     throw new Meteor.Error(403, '您現在已經有一家新創公司正在申請中，無法同時發起第二家新創公司！');
   }
 
@@ -87,7 +87,7 @@ export function foundCompany(user, foundCompanyData) {
     if (user.profile.money < founderEarnestMoney) {
       throw new Meteor.Error(401, '您的現金不足，不足以支付投資保證金！');
     }
-    if (dbFoundations.find({ creator: userId }).count() > 0) {
+    if (dbFoundations.find({ founder: userId }).count() > 0) {
       throw new Meteor.Error(403, '您現在已經有一家新創公司正在籌備中，無法同時發起第二家新創公司！');
     }
     // 存放進archive中並取得_id
@@ -99,7 +99,7 @@ export function foundCompany(user, foundCompanyData) {
       pictureBig: foundCompanyData.pictureBig,
       description: foundCompanyData.description
     });
-    foundCompanyData.creator = userId;
+    foundCompanyData.founder = userId;
     foundCompanyData.manager = userId;
     const createdAt = new Date();
     foundCompanyData.createdAt = createdAt;

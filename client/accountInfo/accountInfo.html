@@ -196,8 +196,8 @@
       {{#if viewType 'manager'}}
         {{> managerTitleList}}
       {{/if}}
-      {{#if viewType 'creator'}}
-        {{> creatorTitleList}}
+      {{#if viewType 'founder'}}
+        {{> founderTitleList}}
       {{/if}}
       {{#if viewType 'employee'}}
         {{> employeeTitleList}}
@@ -218,7 +218,7 @@
       <a class="{{getClass 'manager'}}" href="#" data-type="manager">經理人</a>
     </li>
     <li class="nav-item">
-      <a class="{{getClass 'creator'}}" href="#" data-type="creator">創立人</a>
+      <a class="{{getClass 'founder'}}" href="#" data-type="founder">創立人</a>
     </li>
     <li class="nav-item">
       <a class="{{getClass 'employee'}}" href="#" data-type="employee">員工</a>
@@ -265,7 +265,7 @@
   {{/with}}
 </template>
 
-<template name="creatorTitleList">
+<template name="founderTitleList">
   {{#each titleList}}
     {{> companyTitle companyId=this._id title='創立人'}}
   {{else}}

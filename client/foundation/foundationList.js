@@ -149,8 +149,8 @@ const foundationListHelpers = {
     if (isCurrentUser(this.manager)) {
       return 'company-card-manager';
     }
-    if (isCurrentUser(this.creator)) {
-      return 'company-card-creator';
+    if (isCurrentUser(this.founder)) {
+      return 'company-card-founder';
     }
     const invest = this.invest;
     const userId = Meteor.user()._id;

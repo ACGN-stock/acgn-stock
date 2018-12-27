@@ -7,7 +7,7 @@ import { dbCompanyArchive } from '/db/dbCompanyArchive';
 
 // 新創公司失敗之處理
 export function doOnFoundationFailure(foundationData) {
-  const { _id: companyId, invest, companyName, creator } = foundationData;
+  const { _id: companyId, invest, companyName, founder } = foundationData;
 
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   const usersBulk = Meteor.users.rawCollection().initializeUnorderedBulkOp();
@@ -22,7 +22,7 @@ export function doOnFoundationFailure(foundationData) {
   });
 
   invest.forEach(({ userId, amount }, index) => {
-    if (userId === creator) {
+    if (userId === founder) {
       amount -= Meteor.settings.public.founderEarnestMoney;
     }
 
