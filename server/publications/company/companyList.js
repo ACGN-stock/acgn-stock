@@ -89,6 +89,7 @@ Meteor.publish('companyList', function({ keyword, matchType, onlyShow, sortBy, o
   const fields = {
     _id: 1,
     companyName: 1,
+    founder: 1,
     manager: 1,
     chairmanTitle: 1,
     chairman: 1,

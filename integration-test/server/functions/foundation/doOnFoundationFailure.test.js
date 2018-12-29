@@ -60,7 +60,7 @@ describe('function doOnFoundationFailure', function() {
 
     const logData = dbLog.findOne({ logType: '創立失敗' });
     expect(logData).to.exist();
-    logData.userId.must.be.eql(_.union([foundationData.manager], _.pluck(investors, 'userId')));
+    logData.userId.must.be.eql(_.pluck(investors, 'userId'));
     logData.data.companyName.must.be.equal(foundationData.companyName);
   });
 
@@ -82,26 +82,26 @@ describe('function doOnFoundationFailure', function() {
     });
   });
 
-  it('should return only fund except "founderEarnestMoney" if the investor is the manager', function() {
+  it('should return only fund except "founderEarnestMoney" if the investor is the founder', function() {
     const extraAmount = 1000;
-    const managerUserId = 'manager';
+    const founderUserId = 'the-founder';
 
-    const managerInvestor = {
-      userId: managerUserId,
+    const founderInvestor = {
+      userId: founderUserId,
       amount: Meteor.settings.public.founderEarnestMoney + extraAmount
     };
 
-    Meteor.users.rawCollection().insert({ _id: managerUserId, profile: { money: 0 } });
+    Meteor.users.rawCollection().insert({ _id: founderUserId, profile: { money: 0 } });
 
     dbFoundations.update(companyId, {
-      $set: { manager: managerUserId },
-      $push: { invest: managerInvestor }
+      $set: { founder: founderUserId },
+      $push: { invest: founderInvestor }
     });
     const foundationData = dbFoundations.findOne(companyId);
     doOnFoundationFailure(foundationData);
 
-    const { refund } = dbLog.findOne({ logType: '創立退款', userId: managerUserId }).data;
-    const { money } = Meteor.users.findOne(managerUserId).profile;
+    const { refund } = dbLog.findOne({ logType: '創立退款', userId: founderUserId }).data;
+    const { money } = Meteor.users.findOne(founderUserId).profile;
 
     refund.must.be.equal(extraAmount);
     money.must.be.equal(extraAmount);

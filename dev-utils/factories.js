@@ -24,6 +24,7 @@ export const companyFactory = new Factory()
     companyName() {
       return faker.company.companyName();
     },
+    founder: 'some-user',
     manager: '!none',
     chairman: '!none',
     description() {
@@ -58,6 +59,7 @@ export const foundationFactory = new Factory()
     companyName() {
       return faker.company.companyName();
     },
+    founder: 'some-user',
     manager: '!none',
     description() {
       return faker.lorem.paragraph();
