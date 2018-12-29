@@ -12,7 +12,11 @@ const schema = new SimpleSchema({
     min: 1,
     max: 100
   },
-  // 創立人userId
+  // 創立人 userId
+  founder: {
+    type: String
+  },
+  // 經理人 userId
   manager: {
     type: String
   },

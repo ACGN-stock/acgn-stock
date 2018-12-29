@@ -45,13 +45,23 @@
       <span class="text-nowrap">{{getCompanyEPRatio company}}</span>
     </div>
 
-    <div class="col-4 col-md-2 col-lg-1 border-grid d-flex flex-column align-items-center justify-content-between">
+    <div class="col-6 col-md-2 col-lg-1 border-grid d-flex flex-column align-items-center justify-content-between">
       <span class="text-nowrap">公司評級</span>
       <span class="text-nowrap">{{company.grade}}</span>
     </div>
-    <div class="col-8 col-md-4 col-lg-3 border-grid d-flex flex-column align-items-center justify-content-between">
+
+    <div class="col-6 col-md-4 col-lg-3 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">識別碼</span>
+      <span class="text-nowrap">{{company._id}}</span>
+    </div>
+
+    <div class="col-6 border-grid d-flex flex-column align-items-center justify-content-between">
       <span class="text-nowrap">創立時間</span>
       <span class="text-nowrap">{{formatDateTimeText company.createdAt}}</span>
+    </div>
+    <div class="col-6 border-grid d-flex flex-column align-items-center justify-content-between">
+      <span class="text-nowrap">創立人</span>
+      <span class="text-nowrap">{{>userLink company.founder}}</span>
     </div>
   </div>
 </template>

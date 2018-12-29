@@ -17,6 +17,10 @@ Meteor.publish('accountManagerTitle', function(userId, offset) {
 
   return dbCompanies
     .find(filter, {
+      fields: {
+        isSeal: 1,
+        manager: 1
+      },
       skip: offset,
       limit: 10,
       disableOplog: true
@@ -24,4 +28,3 @@ Meteor.publish('accountManagerTitle', function(userId, offset) {
 });
 // 一分鐘最多20次
 limitSubscription('accountManagerTitle');
-
