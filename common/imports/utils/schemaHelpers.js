@@ -8,6 +8,7 @@ export const translatedMessages = {
     minCount: '{{label}}總數量不得少於 {{minCount}} 個！',
     maxCount: '{{label}}總數量不得超過 {{maxCount}} 個！',
     noDecimal: '{{label}}必須為整數！',
-    notAllowed: '{{value}}並非被允許的值！'
+    notAllowed: '{{value}}並非被允許的值！',
+    regEx: '{{label}}格式不符！'
   }
 };

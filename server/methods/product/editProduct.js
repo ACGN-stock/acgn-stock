@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbProducts } from '/db/dbProducts';
+import { dbProducts, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { dbCompanies, getAvailableProductionFund } from '/db/dbCompanies';
 import { debug } from '/server/imports/utils/debug';
 import { guardCompany, guardProduct } from '/common/imports/guards';
@@ -13,13 +13,14 @@ Meteor.methods({
     check(productId, String);
     check(newData, {
       productName: String,
-      companyId: String,
       type: String,
       rating: String,
       url: String,
       price: Match.Integer,
       totalAmount: Match.Integer,
-      description: new Match.Maybe(String)
+      description: new Match.Maybe(String),
+      replenishBatchSizeType: new Match.OneOf(...productReplenishBatchSizeTypeList),
+      replenishBaseAmountType: new Match.OneOf(...productReplenishBaseAmountTypeList)
     });
 
     editProduct(Meteor.user(), { productId, newData });
@@ -31,8 +32,8 @@ Meteor.methods({
 export function editProduct(currentUser, { productId, newData }) {
   debug.log('editProduct', { currentUser, productId, newData });
 
-  const { companyId } = newData;
-
+  const oldData = dbProducts.findByIdOrThrow(productId);
+  const { companyId } = oldData;
   const companyData = dbCompanies.findByIdOrThrow(companyId, {
     fields: {
       companyName: 1,
@@ -47,8 +48,6 @@ export function editProduct(currentUser, { productId, newData }) {
   guardCompany(companyData)
     .checkIsManageableByUser(currentUser)
     .checkNotSealed();
-
-  const oldData = dbProducts.findByIdOrThrow(productId);
 
   const { manager, productPriceLimit } = companyData;
 

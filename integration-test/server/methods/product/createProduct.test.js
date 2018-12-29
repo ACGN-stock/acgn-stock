@@ -21,6 +21,10 @@ describe('method createProduct', function() {
   let userId;
   let companyId;
 
+  function findUser() {
+    return Meteor.users.findOne(userId);
+  }
+
   beforeEach(function() {
     resetDatabase();
 
@@ -34,28 +38,40 @@ describe('method createProduct', function() {
   });
 
   it('should create a new product', function() {
-    const inputProductData = productFactory.build({ companyId });
+    const args = {
+      companyId,
+      data: productFactory.build({ companyId })
+    };
 
-    createProduct(userId, inputProductData);
+    createProduct(findUser(), args);
 
     const productData = dbProducts.findOne();
     productData.state.must.be.equal('planning');
   });
 
   it('should fail if the price is over the product price limit', function() {
-    const inputProductData = productFactory.build({ companyId, price: productPriceLimit + 1 });
-    createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '產品售價過高！ [403]');
+    const args = {
+      companyId,
+      data: productFactory.build({ companyId, price: productPriceLimit + 1 })
+    };
+    createProduct.bind(null, findUser(), args).must.throw(Meteor.Error, '產品售價過高！ [403]');
   });
 
   it('should fail if the user is not the manager of the company', function() {
     dbCompanies.update(companyId, { $set: { manager: 'someOtherUser' } });
-    const inputProductData = productFactory.build({ companyId });
-    createProduct.bind(null, userId, inputProductData).must.throw(/使用者.*並非該公司的經理人！ \[401\]/);
+    const args = {
+      companyId,
+      data: productFactory.build({ companyId })
+    };
+    createProduct.bind(null, findUser(), args).must.throw(/使用者.*並非該公司的經理人！ \[401\]/);
   });
 
   it('should fail if the total cost is over the available production fund', function() {
-    const inputProductData = productFactory.build({ companyId, price: 1, totalAmount: 100000000 });
-    createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '剩餘生產資金不足！ [403]');
+    const args = {
+      companyId,
+      data: productFactory.build({ companyId, price: 1, totalAmount: 100000000 })
+    };
+    createProduct.bind(null, findUser(), args).must.throw(Meteor.Error, '剩餘生產資金不足！ [403]');
   });
 
   context('when the company has no manager', function() {
@@ -65,14 +81,20 @@ describe('method createProduct', function() {
 
     it('should success if the user is admin', function() {
       Meteor.users.update(userId, { $addToSet: { 'profile.roles': 'fscMember' } });
-      const inputProductData = productFactory.build({ companyId });
-      createProduct.bind(null, userId, inputProductData).must.not.throw();
+      const args = {
+        companyId,
+        data: productFactory.build({ companyId })
+      };
+      createProduct.bind(null, findUser(), args).must.not.throw();
     });
 
     it('should fail if the user is not admin', function() {
       Meteor.users.update(userId, { $pull: { 'profile.roles': 'fscMember' } });
-      const inputProductData = productFactory.build({ companyId });
-      createProduct.bind(null, userId, inputProductData).must.throw(Meteor.Error, '權限不符，無法進行此操作！ [403]');
+      const args = {
+        companyId,
+        data: productFactory.build({ companyId })
+      };
+      createProduct.bind(null, findUser(), args).must.throw(Meteor.Error, '權限不符，無法進行此操作！ [403]');
     });
   });
 });

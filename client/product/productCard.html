@@ -1,24 +1,31 @@
 <template name="productCard">
   <div class="card my-2 product-card">
-    <div class="card-header d-flex flex-wrap py-2 px-3">
-      <div class="mr-3">價格：${{currencyFormat product.price}}</div>
-      <div class="mr-auto">
-        {{#if product.availableAmount}}
-          尚餘：{{product.availableAmount}}
-        {{else}}
-          {{#if product.hasStockAmount}}
-            <span class="text-warning">補貨中</span>
+    <div class="card-header py-2 px-3">
+      <div class="d-flex flex-wrap mr-auto">
+        <div class="mr-3">價格：${{currencyFormat product.price}}</div>
+        <div>
+          {{#if product.availableAmount}}
+            尚餘：{{product.availableAmount}}
           {{else}}
-            <span class="text-danger">已完售</span>
+            {{#if product.hasStockAmount}}
+              <span class="text-warning">補貨中</span>
+            {{else}}
+              <span class="text-danger">已完售</span>
+            {{/if}}
           {{/if}}
-        {{/if}}
+        </div>
       </div>
       {{#if isCompanyManager company=product.companyId user=currentUser}}
-        <div class="mr-3 text-info">
-          庫存：{{product.stockAmount}}
-        </div>
-        <div class="mr-3 text-info">
-          賣出：{{soldAmount}}
+        <div class="d-flex flex-wrap align-items-baseline mr-auto">
+          <div class="mr-3 text-info">
+            庫存：{{product.stockAmount}}
+          </div>
+          <div class="mr-auto text-info">
+            賣出：{{soldAmount}}
+          </div>
+          <div class="text-info small">
+            方案：{{replenishPolicyDescription}}
+          </div>
         </div>
       {{/if}}
     </div>

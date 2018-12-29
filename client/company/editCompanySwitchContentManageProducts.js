@@ -5,7 +5,11 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import { getTotalProductionFund, getUsedProductionFund, getPlanningProducts } from '/db/dbCompanies';
-import { dbProducts, productTypeList, productRatingList } from '/db/dbProducts';
+import {
+  dbProducts, productTypeList, productRatingList,
+  productReplenishBaseAmountTypeDisplayName, productReplenishBatchSizeTypeDisplayName,
+  productReplenishBatchSizeTypeList, productReplenishBaseAmountTypeList
+} from '/db/dbProducts';
 import { alertDialog } from '../layout/alertDialog';
 import { paramCompany, paramCompanyId } from './helpers';
 
@@ -15,6 +19,8 @@ Template.editCompanySwitchContentManageProducts.onCreated(function() {
 });
 
 Template.editCompanySwitchContentManageProducts.helpers({
+  productReplenishBatchSizeTypeDisplayName,
+  productReplenishBaseAmountTypeDisplayName,
   isFormVisible() {
     return Template.instance().productEditFormVisible.get();
   },
@@ -25,11 +31,11 @@ Template.editCompanySwitchContentManageProducts.helpers({
     const templateInstance = Template.instance();
 
     const emptyProductData = {
-      productName: '',
       companyId: paramCompanyId(),
       type: productTypeList[0],
       rating: productRatingList[0],
-      url: ''
+      replenishBaseAmountType: productReplenishBaseAmountTypeList[0],
+      replenishBatchSizeType: productReplenishBatchSizeTypeList[0]
     };
 
     const productId = templateInstance.editingProductId.get();

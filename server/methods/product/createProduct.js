@@ -2,36 +2,36 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbProducts } from '/db/dbProducts';
+import { dbProducts, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { dbCompanies, getAvailableProductionFund } from '/db/dbCompanies';
 import { debug } from '/server/imports/utils/debug';
 import { guardCompany } from '/common/imports/guards';
 
 Meteor.methods({
-  createProduct(productData) {
+  createProduct({ companyId, data }) {
     check(this.userId, String);
-    check(productData, {
+    check(companyId, String);
+    check(data, {
       productName: String,
-      companyId: String,
       type: String,
       rating: String,
       url: String,
       price: Match.Integer,
       totalAmount: Match.Integer,
-      description: new Match.Maybe(String)
+      description: new Match.Maybe(String),
+      replenishBatchSizeType: new Match.OneOf(...productReplenishBatchSizeTypeList),
+      replenishBaseAmountType: new Match.OneOf(...productReplenishBaseAmountTypeList)
     });
-    createProduct(this.userId, productData);
+    createProduct(Meteor.user(), { companyId, data });
 
     return true;
   }
 });
 
-export function createProduct(userId, productData) {
-  debug.log('createProduct', { userId, productData });
+export function createProduct(currentUser, { companyId, data }) {
+  debug.log('createProduct', { userId: currentUser._id, data });
 
-  const user = Meteor.users.findByIdOrThrow(userId);
-
-  const { companyId, url, price, totalAmount } = productData;
+  const { url, price, totalAmount } = data;
 
   const companyData = dbCompanies.findByIdOrThrow(companyId, {
     fields: {
@@ -45,7 +45,7 @@ export function createProduct(userId, productData) {
   });
 
   guardCompany(companyData)
-    .checkIsManageableByUser(user)
+    .checkIsManageableByUser(currentUser)
     .checkNotSealed();
 
   const { manager, productPriceLimit } = companyData;
@@ -68,9 +68,10 @@ export function createProduct(userId, productData) {
   resourceManager.throwErrorIsResourceIsLock(['season']);
 
   dbProducts.insert({
-    ...productData,
+    ...data,
+    companyId,
     state: 'planning',
-    creator: manager === userId ? userId : '!FSC',
+    creator: manager === currentUser._id ? currentUser._id : '!FSC',
     createdAt: new Date()
   });
 }
