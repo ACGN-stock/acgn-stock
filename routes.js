@@ -151,7 +151,7 @@ companyRoute.route('/detail/:companyId', {
     }
   }
 });
-FlowRouter.route('/edit/:companyId', {
+companyRoute.route('/edit/:companyId', {
   name: 'editCompany',
   action() {
     DocHead.setTitle(Meteor.settings.public.websiteInfo.websiteName + ' - 經營管理');
