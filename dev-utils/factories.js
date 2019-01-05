@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Factory } from 'rosie';
 import faker from 'faker';
 
-import { productTypeList, productRatingList } from '/db/dbProducts';
+import { productTypeList, productRatingList, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { orderTypeList } from '/db/dbOrders';
 
 export const pttUserFactory = new Factory()
@@ -88,6 +88,12 @@ export const productFactory = new Factory()
     },
     description() {
       return faker.lorem.sentence(20);
+    },
+    replenishBaseAmountType() {
+      return faker.random.arrayElement(productReplenishBaseAmountTypeList);
+    },
+    replenishBatchSizeType() {
+      return faker.random.arrayElement(productReplenishBatchSizeTypeList);
     },
     price: 1,
     totalAmount: 1,

@@ -488,6 +488,16 @@ table.company-next-season-product .product-description {
   max-height: 3.5rem;
 }
 
+table.company-next-season-product .product-editing-badge {
+  animation: fade-loop 2s linear infinite
+}
+
+@keyframes fade-loop {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 /* 產品卡 */
 .product-card .product-description {
   word-break: break-all;
