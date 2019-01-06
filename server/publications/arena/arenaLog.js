@@ -4,47 +4,52 @@ import { Meteor } from 'meteor/meteor';
 import { dbArenaLog } from '/db/dbArenaLog';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
-import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
+import { Counts } from 'meteor/tmeasday:publish-counts';
+import { dbArena } from '/db/dbArena';
+import { dbArenaFighters } from '/db/dbArenaFighters';
+import { publishWithScope } from '/server/imports/utils/publishWithScope';
 
-Meteor.publish('arenaLog', function(arenaId, companyId, offset) {
+Meteor.publish('arenaLog', function({ arenaId, companyId, offset }) {
   debug.log('publish arenaLog', { arenaId, companyId, offset });
 
   check(arenaId, String);
   check(companyId, String);
   check(offset, Match.Integer);
 
+  const arena = dbArena.findOne(arenaId, { fields: { endDate: 1 } });
+
+  // 大賽未結束前不開放檢視紀錄
+  if (! arena || arena.endDate.getTime() >= Date.now()) {
+    return [];
+  }
+
   const filter = {};
   if (companyId) {
     filter.companyId = companyId;
   }
 
-  publishTotalCount('totalCountOfArenaLog', dbArenaLog.find(arenaId, filter), this);
+  Counts.publish(this, 'arenaLog', dbArenaLog.find(arenaId, filter), { noReady: true });
 
-  const collectionName = dbArenaLog.getCollectionName(arenaId);
-  const pageObserver = dbArenaLog
-    .find(arenaId, filter, {
-      sort: {
-        sequence: 1
-      },
-      skip: offset,
-      limit: 30,
-      disableOplog: true
-    })
-    .observeChanges({
-      added: (id, fields) => {
-        this.added(collectionName, id, fields);
-      },
-      changed: (id, fields) => {
-        this.changed(collectionName, id, fields);
-      },
-      removed: (id) => {
-        this.removed(collectionName, id);
+  // 解讀 log 時所需的參賽者資訊
+  publishWithScope(this, {
+    collection: 'arenaFighters',
+    scope: 'log',
+    cursor: dbArenaFighters.find({ arenaId }, {
+      fields: {
+        arenaId: 1,
+        companyId: 1,
+        spCost: 1,
+        normalManner: 1,
+        specialManner: 1
       }
-    });
+    })
+  });
 
-  this.ready();
-  this.onStop(() => {
-    pageObserver.stop();
+  return dbArenaLog.find(arenaId, filter, {
+    sort: { sequence: 1 },
+    skip: offset,
+    limit: Meteor.settings.public.dataNumberPerPage.arenaLog,
+    disableOplog: true
   });
 });
 // 一分鐘最多20次

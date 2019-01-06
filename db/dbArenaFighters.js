@@ -3,11 +3,14 @@ import SimpleSchema from 'simpl-schema';
 
 // 最萌亂鬥大賽報名公司資料集
 export const dbArenaFighters = new Mongo.Collection('arenaFighters');
-export default dbArenaFighters;
 
 export const MAX_MANNER_SIZE = 3;
 
 export const arenaFighterAttributeNameList = ['hp', 'sp', 'atk', 'def', 'agi'];
+
+export const arenaFighterSortableFields = [
+  'hp', 'sp', 'atk', 'def', 'agi', 'rank', 'totalInvestedAmount'
+];
 
 const attributeParameters = {
   hp: { cost: 200, base: 100 },
@@ -23,13 +26,6 @@ export function getAttributeNumber(attribute, amount) {
   return base + Math.floor(amount / cost);
 }
 
-// 取得總投資額
-export function getTotalInvestedAmount(arenaFighterData) {
-  return arenaFighterAttributeNameList.reduce((sum, attrName) => {
-    return sum + arenaFighterData[attrName];
-  }, 0);
-}
-
 const schema = new SimpleSchema({
   // 對應的大賽id
   arenaId: {
@@ -43,6 +39,16 @@ const schema = new SimpleSchema({
   manager: {
     type: String,
     optional: true
+  },
+  // 亂鬥名次（於亂鬥結束時產生）
+  rank: {
+    type: SimpleSchema.Integer,
+    optional: true
+  },
+  // 總投資額
+  totalInvestedAmount: {
+    type: SimpleSchema.Integer,
+    defaultValue: 0
   },
   // 目前已投資在hp屬性上的總資金量
   hp: {

@@ -18,14 +18,7 @@ export const dbArenaLog = {
       // 加schema好像沒啥意義?  Bulk insert的不會被SimpleSchema檢查到
       // collection.attachSchema(schema);
       if (Meteor.isServer) {
-        collection.rawCollection().createIndex(
-          {
-            sequence: 1
-          },
-          {
-            unique: true
-          }
-        );
+        collection.rawCollection().createIndex({ sequence: 1 }, { unique: true });
       }
       collectionHash[arenaId] = collection;
     }

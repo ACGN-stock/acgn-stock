@@ -468,7 +468,8 @@ function generateNewSeason() {
   // 若上一個商業季度為最萌亂鬥大賽的舉辦季度，則產生新的arena Data，並排程相關事件
   if (arenaCounter <= 0) {
     const arenaShouldEndTime = seasonEndDate.getTime() + Meteor.settings.public.seasonTime * Meteor.settings.public.arenaIntervalSeasonNumber;
-    const arenaEndDate = new Date(arenaShouldEndTime > seasonEndDate.getTime() ? seasonEndDate.getTime() : arenaShouldEndTime);
+    const { endDate: roundEndDate } = getCurrentRound();
+    const arenaEndDate = new Date(arenaShouldEndTime > roundEndDate.getTime() ? roundEndDate.getTime() : arenaShouldEndTime);
     const joinEndDate = new Date(arenaEndDate.getTime() - Meteor.settings.public.arenaJoinEndTime);
     dbArena.insert({
       beginDate: seasonBeginDate,

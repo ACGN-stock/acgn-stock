@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { check, Match } from 'meteor/check';
 
 import { resourceManager } from '/server/imports/threading/resourceManager';
-import { dbArena } from '/db/dbArena';
+import { getCurrentArena } from '/db/dbArena';
 import { dbArenaFighters, arenaFighterAttributeNameList } from '/db/dbArenaFighters';
 import { dbLog } from '/db/dbLog';
 import { dbTaxes } from '/db/dbTaxes';
@@ -40,15 +40,7 @@ function investArenaFigher({ user, companyId, attribute, investMoney }) {
   if (dbTaxes.find({ userId }).count() > 0) {
     throw new Meteor.Error(403, '要先繳清稅單，才能在最萌亂鬥大賽中進行投注！');
   }
-  const lastArenaData = dbArena.findOne({}, {
-    sort: {
-      beginDate: -1
-    },
-    fields: {
-      _id: 1,
-      endDate: 1
-    }
-  });
+  const lastArenaData = getCurrentArena();
   if (! lastArenaData) {
     throw new Meteor.Error(403, '現在並沒有舉辦最萌亂鬥大賽！');
   }
@@ -65,11 +57,7 @@ function investArenaFigher({ user, companyId, attribute, investMoney }) {
   resourceManager.throwErrorIsResourceIsLock(['season', 'arena' + companyId, 'user' + userId]);
   // 先鎖定資源，再重新讀取一次資料進行運算
   resourceManager.request('investArenaFigher', ['arena' + companyId, 'user' + userId], (release) => {
-    const user = Meteor.users.findOne(userId, {
-      fields: {
-        profile: 1
-      }
-    });
+    const user = Meteor.users.findOne(userId, { fields: { profile: 1 } });
     if (user.profile.money < investMoney) {
       throw new Meteor.Error(403, '剩餘金錢不足！');
     }
@@ -88,7 +76,8 @@ function investArenaFigher({ user, companyId, attribute, investMoney }) {
 
     dbArenaFighters.update(fighterData._id, {
       $inc: {
-        [attribute]: investMoney
+        [attribute]: investMoney,
+        totalInvestedAmount: investMoney
       },
       $set: {
         investors
