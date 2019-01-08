@@ -1,9 +1,19 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { FlowRouter } from 'meteor/kadira:flow-router';
-import { rMainTheme } from '../utils/styles';
+import { DocHead } from 'meteor/kadira:dochead';
+
+import { rMainTheme } from '/client/utils/styles';
+import { pageNameHash } from '/routes';
 import { rAccountDialogMode } from './accountDialog';
 import { rShowAlertDialog, alertDialog } from './alertDialog';
+
+Template.layout.onCreated(function() {
+  this.autorun(() => {
+    const title = pageNameHash[FlowRouter.getRouteName()];
+    DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - ${title}`);
+  });
+});
 
 Template.layout.helpers({
   currentPage() {

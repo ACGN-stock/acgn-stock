@@ -1,6 +1,8 @@
 import { Template } from 'meteor/templating';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { inheritedShowLoadingOnSubscribing } from '/client/layout/loading';
+import { getCurrentArena } from '/db/dbArena';
 import { paramArenaId, paramArena, isArenaEnded, isArenaJoinEnded } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.arenaInfo);
@@ -10,6 +12,12 @@ Template.arenaInfo.onCreated(function() {
     const arenaId = paramArenaId();
 
     if (! arenaId) {
+      const currentArena = getCurrentArena();
+
+      if (currentArena) {
+        FlowRouter.setParams({ arenaId: currentArena._id });
+      }
+
       return;
     }
 

@@ -21,16 +21,18 @@ inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
   this.autorunWithIdleSupport(() => {
     const userId = paramUserId();
-    if (userId) {
-      this.subscribe('accountInfo', userId);
-    }
-  });
 
-  this.autorunWithIdleSupport(() => {
-    const userId = paramUserId();
-    if (userId) {
-      this.subscribe('employeeListByUser', userId);
+    if (! userId) {
+      const currentUserId = Meteor.userId();
+      if (currentUserId) {
+        FlowRouter.setParams({ userId: currentUserId });
+      }
+
+      return;
     }
+
+    this.subscribe('accountInfo', userId);
+    this.subscribe('employeeListByUser', userId);
   });
 
   this.autorun(() => {

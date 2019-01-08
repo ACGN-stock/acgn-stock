@@ -21,6 +21,12 @@ const rMatchType = new ReactiveVar('exact');
 export const rFoundationOffset = new ReactiveVar(0);
 Template.foundationList.onCreated(function() {
   this.autorun(() => {
+    const page = parseInt(FlowRouter.getParam('page'), 10) || 1;
+    FlowRouter.setParams({ page });
+    const offset = (page - 1) * 12;
+    rFoundationOffset.set(offset);
+  });
+  this.autorun(() => {
     if (shouldStopSubscribe()) {
       return false;
     }
