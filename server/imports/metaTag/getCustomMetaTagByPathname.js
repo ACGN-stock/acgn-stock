@@ -5,32 +5,42 @@ import { getViolationCaseMetaTag } from '/server/imports/metaTag/getViolationCas
 import { getAnnouncementMetaTag } from '/server/imports/metaTag/getAnnouncementMetaTag';
 import { getRuleAgendaMetaTag } from '/server/imports/metaTag/getRuleAgendaMetaTag';
 
-const routeList = [
-  { routePath: '/company/detail', getCustomMetaTag: getCompanyMetaTag },
-  { routePath: '/foundation/view', getCustomMetaTag: getFoundationMetaTag },
-  { routePath: '/accountInfo', getCustomMetaTag: getAccountInfoMetaTag },
-  { routePath: '/violation/view', getCustomMetaTag: getViolationCaseMetaTag },
-  { routePath: '/announcement/view', getCustomMetaTag: getAnnouncementMetaTag },
-  { routePath: '/ruleDiscuss/view', getCustomMetaTag: getRuleAgendaMetaTag }
-];
-
 export function getCustomMetaTagByPathname(pathname) {
-  for (const { routePath, getCustomMetaTag } of routeList) {
-    const id = matchPathnameWithRoutePath(pathname, routePath);
-    if (id) {
-      return getCustomMetaTag(id);
-    }
-  }
-
-  return null;
-}
-
-function matchPathnameWithRoutePath(pathname, routePath) {
-  const tripIdRegExp = new RegExp(`${routePath}/([0123456789ABCDEFGHJKLMNPQRSTWXYZabcdefghijkmnopqrstuvwxyz]{17})`);
-  const match = pathname.match(tripIdRegExp);
-  if (! match || match.length > 2) {
+  const routePathAndId = getRoutePathAndId(pathname);
+  if (! routePathAndId) {
     return null;
   }
 
-  return match[1];
+  return getCustomMetaTag(routePathAndId.routePath, routePathAndId.id);
+}
+
+
+const tripIdRegExp = new RegExp(`/([0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/]{1,})/([23456789ABCDEFGHJKLMNPQRSTWXYZabcdefghijkmnopqrstuvwxyz]{17})`);
+
+function getRoutePathAndId(pathname) {
+  const match = pathname.match(tripIdRegExp);
+  if (! match) {
+    return null;
+  }
+
+  return { routePath: match[1], id: match[2] };
+}
+
+function getCustomMetaTag(routePath, id) {
+  switch (routePath) {
+    case 'company/detail':
+      return getCompanyMetaTag(id);
+    case 'foundation/view':
+      return getFoundationMetaTag(id);
+    case 'accountInfo':
+      return getAccountInfoMetaTag(id);
+    case 'violation/view':
+      return getViolationCaseMetaTag(id);
+    case 'announcement/view':
+      return getAnnouncementMetaTag(id);
+    case 'ruleDiscuss/view':
+      return getRuleAgendaMetaTag(id);
+    default:
+      return null;
+  }
 }
