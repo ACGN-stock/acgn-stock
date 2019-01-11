@@ -18,6 +18,13 @@ const rFilterBy = new ReactiveVar('none');
 const rSortBy = new ReactiveVar('lastPrice');
 export const rCompanyOffset = new ReactiveVar(0);
 Template.companyList.onCreated(function() {
+  this.autorun(() => {
+    const page = parseInt(FlowRouter.getParam('page'), 10) || 1;
+    FlowRouter.setParams({ page });
+    const offset = (page - 1) * 12;
+    rCompanyOffset.set(offset);
+  });
+
   this.autorunWithIdleSupport(() => {
     const keyword = rKeyword.get();
     const matchType = rMatchType.get();

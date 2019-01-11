@@ -1,0 +1,77 @@
+<template name="arenaInfoFighterList">
+  {{> pagination paginationData}}
+  <table class="table-bordered custom-responsive-table-md w-100">
+    <thead>
+      <tr>
+        <th class="text-center text-truncate w-25">參賽選手</th>
+        <th class="text-center text-truncate w-25">決策者</th>
+        <th class="text-center text-truncate cursor-pointer" data-sort="hp">
+          HP
+          {{{getSortIcon 'hp'}}}
+        </th>
+        <th class="text-center text-truncate cursor-pointer" data-sort="sp">
+          SP
+          {{{getSortIcon 'sp'}}}
+        </th>
+        <th class="text-center text-truncate cursor-pointer" data-sort="atk">
+          ATK
+          {{{getSortIcon 'atk'}}}
+        </th>
+        <th class="text-center text-truncate cursor-pointer" data-sort="def">
+          DEF
+          {{{getSortIcon 'def'}}}
+        </th>
+        <th class="text-center text-truncate cursor-pointer" data-sort="agi">
+          AGI
+          {{{getSortIcon 'agi'}}}
+        </th>
+        <th class="text-center text-truncate cursor-pointer" data-sort="rank">
+          名次
+          {{{getSortIcon 'rank'}}}
+        </th>
+        <th class="text-center text-truncate cursor-pointer" data-sort="totalInvestedAmount">
+          總投資額
+          {{{getSortIcon 'totalInvestedAmount'}}}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each fighter in fighterList}}
+        <tr data-id="{{fighter.companyId}}">
+          <td class="text-left text-truncate" data-title="參賽選手">
+            {{> companyLink fighter.companyId}}
+          </td>
+          <td class="text-left text-nowrap text-truncate" data-title="決策者">
+            {{> userLink fighter.manager}}
+          </td>
+          <td class="text-center text-truncate" data-title="HP">
+            {{getAttributeNumber fighter 'hp'}}
+          </td>
+          <td class="text-center text-truncate" data-title="SP">
+            {{getAttributeNumber fighter 'sp'}}
+          </td>
+          <td class="text-center text-truncate" data-title="ATK">
+            {{getAttributeNumber fighter 'atk'}}
+          </td>
+          <td class="text-center text-truncate" data-title="DEF">
+            {{getAttributeNumber fighter 'def'}}
+          </td>
+          <td class="text-center text-truncate" data-title="AGI">
+            {{getAttributeNumber fighter 'agi'}}
+          </td>
+          <td class="text-center text-truncate" data-title="名次">
+            {{fighter.rank}}
+          </td>
+          <td class="text-right text-truncate {{totalInvestedAmountClass fighter}}" data-title="總投資額">
+            {{currencyFormat fighter.totalInvestedAmount}}
+          </td>
+        </tr>
+      {{else}}
+        <tr class="default-content">
+          <td class="text-center text-truncate" colspan="9"><em>沒有任何報名者！</em></td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{> pagination paginationData}}
+</template>

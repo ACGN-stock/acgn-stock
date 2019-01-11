@@ -1,37 +1,56 @@
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
+import { FlowRouter } from 'meteor/kadira:flow-router';
 
 const panelFolderStates = new ReactiveDict('panelFolderStates');
 
-function getExpandedStateKey(name) {
-  return `panelFolder_${name}_expanded`;
+function getPanelFolderKey(name) {
+  const routeName = FlowRouter.getRouteName();
+
+  return `${routeName}_${name}`;
 }
 
 Template.panelFolder.onCreated(function() {
-  panelFolderStates.setDefault(getExpandedStateKey(this.data.name), false);
+  this.key = getPanelFolderKey(this.data.name);
+
+  this.getState = () => {
+    return panelFolderStates.get(this.key);
+  };
+
+  this.setState = (state) => {
+    panelFolderStates.set(this.key, state);
+  };
+
+  this.toggleState = () => {
+    this.setState(! this.getState());
+  };
+
+  panelFolderStates.setDefault(this.key, false);
 });
 
 Template.panelFolder.helpers({
+  key() {
+    return Template.instance().key;
+  },
   isExpanded() {
-    return panelFolderStates.get(getExpandedStateKey(this.name));
+    return Template.instance().getState();
   },
   folderIconClass() {
-    return panelFolderStates.get(getExpandedStateKey(this.name)) ? 'fa-folder-open' : 'fa-folder';
+    return Template.instance().getState() ? 'fa-folder-open' : 'fa-folder';
   }
 });
 
 Template.panelFolder.events({
-  'click [data-toggle-panel-folder]'(event, templateInstance) {
+  'click [data-action="togglePanelFolder"]'(event, templateInstance) {
     event.preventDefault();
 
-    const { name } = templateInstance.data;
+    const currentTargetKey = templateInstance.$(event.currentTarget).attr('data-key');
 
-    // 防止內部的 panelFolder 開關外部的 panelFolder
-    if (templateInstance.$(event.currentTarget).attr('data-toggle-panel-folder') !== name) {
+    // 比對 key 是否一致，防止內部的 panelFolder 開關外部的 panelFolder
+    if (currentTargetKey !== templateInstance.key) {
       return;
     }
 
-    const key = getExpandedStateKey(templateInstance.data.name);
-    panelFolderStates.set(key, ! panelFolderStates.get(key));
+    templateInstance.toggleState();
   }
 });

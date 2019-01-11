@@ -1,0 +1,14 @@
+<template name="arenaInfoNav">
+  <div class="d-flex justify-content-between align-items-center text-center">
+      <a class="btn btn-info btn-sm {{prevButtonDisabledClass}}" href="{{prevButtonHref}}">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+      <div>
+        <div class="d-inline-block text-nowrap">{{formatDateTimeText arenaBegin}}～</div>
+        <div class="d-inline-block text-nowrap">{{formatDateTimeText arenaEnd}}</div>
+      </div>
+      <a class="btn btn-info btn-sm {{nextButtonDisabledClass}}" href="{{nextButtonHref}}">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </div>
+</template>
