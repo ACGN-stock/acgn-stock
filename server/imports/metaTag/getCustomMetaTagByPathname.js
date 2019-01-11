@@ -26,21 +26,21 @@ function getRoutePathAndId(pathname) {
   return { routePath: match[1], id: match[2] };
 }
 
+
+const routeMetaTagMap = {
+  'company/detail': getCompanyMetaTag,
+  'foundation/view': getFoundationMetaTag,
+  'accountInfo': getAccountInfoMetaTag,
+  'violation/view': getViolationCaseMetaTag,
+  'announcement/view': getAnnouncementMetaTag,
+  'ruleDiscuss/view': getRuleAgendaMetaTag
+};
+
 function getCustomMetaTag(routePath, id) {
-  switch (routePath) {
-    case 'company/detail':
-      return getCompanyMetaTag(id);
-    case 'foundation/view':
-      return getFoundationMetaTag(id);
-    case 'accountInfo':
-      return getAccountInfoMetaTag(id);
-    case 'violation/view':
-      return getViolationCaseMetaTag(id);
-    case 'announcement/view':
-      return getAnnouncementMetaTag(id);
-    case 'ruleDiscuss/view':
-      return getRuleAgendaMetaTag(id);
-    default:
-      return null;
+  const getRouteMetaTag = routeMetaTagMap[routePath];
+  if (! getRouteMetaTag) {
+    return null;
   }
+
+  return getRouteMetaTag(id);
 }
