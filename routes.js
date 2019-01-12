@@ -46,9 +46,9 @@ companyRoute.route('/detail/:companyId', { name: 'companyDetail' });
 companyRoute.route('/edit/:companyId', { name: 'editCompany' });
 
 const foundationRoute = FlowRouter.group({ prefix: '/foundation' });
+foundationRoute.route('/new', { name: 'createFoundationPlan' });
 foundationRoute.route('/:page?', { name: 'foundationList' });
 foundationRoute.route('/view/:foundationId', { name: 'foundationDetail' });
-foundationRoute.route('/new', { name: 'createFoundationPlan' });
 foundationRoute.route('/edit/:foundationId', { name: 'editFoundationPlan' });
 
 const productCenterRoute = FlowRouter.group({ prefix: '/productCenter' });
