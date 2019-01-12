@@ -47,9 +47,6 @@ Template.companyArenaInfo.helpers({
   inCanJoinTime() {
     return Date.now() < this.joinEndDate.getTime();
   },
-  totalInvestedAmount() {
-    return getTotalInvestedAmount(this);
-  },
   arenaMinInvestedAmount() {
     return Meteor.settings.public.arenaMinInvestedAmount;
   },

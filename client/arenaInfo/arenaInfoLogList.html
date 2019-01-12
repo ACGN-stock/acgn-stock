@@ -1,0 +1,49 @@
+<template name="arenaInfoLogList">
+  <div>
+    <form class="form-inline">
+      <div class="form-group">
+        <label>
+          篩選參賽者：
+          <div class="input-group show">
+            <input
+              class="form-control"
+              type="text"
+              name="companyId"
+              placeholder="全部參賽者"
+              autocomplete="off"
+            />
+            {{#if filterSuggestions}}
+              <div class="dropdown-menu">
+                {{#each suggestion in filterSuggestions}}
+                  <a class="dropdown-item" href="#" data-action="setLogFilter" data-company-id="{{suggestion.companyId}}">
+                    {{suggestion.companyName}}
+                  </a>
+                {{/each}}
+              </div>
+            {{/if}}
+          </div>
+        </label>
+      </div>
+    </form>
+    {{#each log in logList}}
+      <div style="word-break: break-all;">
+        【回合{{log.round}}】
+        {{>companyLink log.attackerId}}
+        {{{displaySp log}}}
+        的{{displayAttackManaer log}}
+        {{#if log.damage}}
+          對{{>companyLink log.defenderId}}造成了{{log.damage}}傷害
+        {{else}}
+          被{{>companyLink log.defenderId}}靈巧的閃避了
+        {{/if}}
+        {{#if log.profit}}
+          ，{{>companyLink log.defenderId}}無力再戰，{{>companyLink log.attackerId}}因此獲得了
+          ${{currencyFormat log.profit}}的競賽獎金！
+        {{else}}
+          (殘餘HP{{log.defenderHp}})。
+        {{/if}}
+      </div>
+    {{/each}}
+    {{> pagination paginationData}}
+  </div>
+</template>

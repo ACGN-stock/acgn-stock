@@ -1,9 +1,9 @@
 import SimpleSchema from 'simpl-schema';
 import { Mongo } from 'meteor/mongo';
+import { Meteor } from 'meteor/meteor';
 
 // 最萌亂鬥大賽資料集
 export const dbArena = new Mongo.Collection('arena');
-export default dbArena;
 
 const schema = new SimpleSchema({
   // 起始日期
@@ -23,16 +23,20 @@ const schema = new SimpleSchema({
     type: Array,
     defaultValue: []
   },
-  'shuffledFighterCompanyIdList.$': String,
-  // 所有參賽者companyId依存活時間排列，第一位為最後的勝利者
-  winnerList: {
-    type: Array,
-    defaultValue: []
-  },
-  'winnerList.$': String
+  'shuffledFighterCompanyIdList.$': String
 });
 dbArena.attachSchema(schema);
 
 export function getCurrentArena() {
   return dbArena.findOne({}, { sort: { beginDate: -1 } });
 }
+
+dbArena.findByIdOrThrow = function(id, options) {
+  const result = dbArena.findOne(id, options);
+
+  if (! result) {
+    throw new Meteor.Error(404, `找不到識別碼為「${id}」的亂鬥大賽資料！`);
+  }
+
+  return result;
+};

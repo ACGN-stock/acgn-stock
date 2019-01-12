@@ -96,7 +96,9 @@ export const config = {
     userReportedViolationCases: 10,
     compoanyViolationCases: 10,
     fscLogs: 30,
-    companyOrders: 10
+    companyOrders: 10,
+    arenaFighterList: 20,
+    arenaLog: 30
   },
   productFinalSaleTime: 86400000, // 產品最後出清時間 (ms)
   systemProductVotingReward: 4096, // 系統派發的推薦票回饋金

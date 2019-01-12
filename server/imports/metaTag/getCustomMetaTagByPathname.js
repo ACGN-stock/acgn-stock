@@ -5,32 +5,42 @@ import { getViolationCaseMetaTag } from '/server/imports/metaTag/getViolationCas
 import { getAnnouncementMetaTag } from '/server/imports/metaTag/getAnnouncementMetaTag';
 import { getRuleAgendaMetaTag } from '/server/imports/metaTag/getRuleAgendaMetaTag';
 
-const routeList = [
-  { routePath: '/company/detail', getCustomMetaTag: getCompanyMetaTag },
-  { routePath: '/foundation/view', getCustomMetaTag: getFoundationMetaTag },
-  { routePath: '/accountInfo', getCustomMetaTag: getAccountInfoMetaTag },
-  { routePath: '/violation/view', getCustomMetaTag: getViolationCaseMetaTag },
-  { routePath: '/announcement/view', getCustomMetaTag: getAnnouncementMetaTag },
-  { routePath: '/ruleDiscuss/view', getCustomMetaTag: getRuleAgendaMetaTag }
-];
-
 export function getCustomMetaTagByPathname(pathname) {
-  for (const { routePath, getCustomMetaTag } of routeList) {
-    const id = matchPathnameWithRoutePath(pathname, routePath);
-    if (id) {
-      return getCustomMetaTag(id);
-    }
-  }
-
-  return null;
-}
-
-function matchPathnameWithRoutePath(pathname, routePath) {
-  const tripIdRegExp = new RegExp(`${routePath}/([0123456789ABCDEFGHJKLMNPQRSTWXYZabcdefghijkmnopqrstuvwxyz]{17})`);
-  const match = pathname.match(tripIdRegExp);
-  if (! match || match.length > 2) {
+  const routePathAndId = getRoutePathAndId(pathname);
+  if (! routePathAndId) {
     return null;
   }
 
-  return match[1];
+  return getCustomMetaTag(routePathAndId.routePath, routePathAndId.id);
+}
+
+
+const tripIdRegExp = new RegExp(`/([0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/]{1,})/([23456789ABCDEFGHJKLMNPQRSTWXYZabcdefghijkmnopqrstuvwxyz]{17})`);
+
+function getRoutePathAndId(pathname) {
+  const match = pathname.match(tripIdRegExp);
+  if (! match) {
+    return null;
+  }
+
+  return { routePath: match[1], id: match[2] };
+}
+
+
+const routeMetaTagMap = {
+  'company/detail': getCompanyMetaTag,
+  'foundation/view': getFoundationMetaTag,
+  'accountInfo': getAccountInfoMetaTag,
+  'violation/view': getViolationCaseMetaTag,
+  'announcement/view': getAnnouncementMetaTag,
+  'ruleDiscuss/view': getRuleAgendaMetaTag
+};
+
+function getCustomMetaTag(routePath, id) {
+  const getRouteMetaTag = routeMetaTagMap[routePath];
+  if (! getRouteMetaTag) {
+    return null;
+  }
+
+  return getRouteMetaTag(id);
 }

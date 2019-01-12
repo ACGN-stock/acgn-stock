@@ -5,209 +5,29 @@
       <hr />
       {{> arenaInfoNav}}
       <hr />
-      {{#with arenaData}}
-        {{#if nowIsBeforeTimeOf this.endDate}}
-          {{#if nowIsBeforeTimeOf this.joinEndDate}}
-            <div class="text-info">本屆最萌亂鬥大賽正在報名中。</div>
-          {{else}}
-            <div>本屆最萌亂鬥大賽報名已經截止。</div>
-          {{/if}}
-          <hr />
-          <a class="d-block h3" href="#" data-toggle-panel="fighterList">
-            參賽者列表
-            {{#if isDisplayPanel 'fighterList'}}
-              <i class="fa fa-folder-open" aria-hidden="true"></i>
-            {{else}}
-              <i class="fa fa-folder" aria-hidden="true"></i>
-            {{/if}}
-          </a>
-          <hr />
-          {{#if isDisplayPanel 'fighterList'}}
-            {{> arenaFighterTable}}
-          {{/if}}
-        {{else}}
+
+      {{#if paramArena}}
+        {{#if isArenaEnded}}
           <div>本屆最萌亂鬥大賽已經結束！</div>
+        {{else if isArenaJoinEnded}}
+          <div class="text-warning">本屆最萌亂鬥大賽報名已經截止。</div>
+        {{else}}
+          <div class="text-info">本屆最萌亂鬥大賽正在報名中。</div>
+        {{/if}}
+        <hr />
+
+        <h4>{{fighterListTitle}}</h4>
+        {{> arenaInfoFighterList paramArena}}
+
+        {{#if isArenaEnded}}
           <hr />
-          <a class="d-block h3" href="#" data-toggle-panel="fighterList">
-            優勝者列表
-            {{#if isDisplayPanel 'fighterList'}}
-              <i class="fa fa-folder-open" aria-hidden="true"></i>
-            {{else}}
-              <i class="fa fa-folder" aria-hidden="true"></i>
-            {{/if}}
-          </a>
-          {{#if isDisplayPanel 'fighterList'}}
-            {{> arenaFighterTable}}
-          {{/if}}
-          <hr />
-          <a class="d-block h3" href="#" data-toggle-panel="logList">
-            戰鬥紀錄
-            {{#if isDisplayPanel 'logList'}}
-              <i class="fa fa-folder-open" aria-hidden="true"></i>
-            {{else}}
-              <i class="fa fa-folder" aria-hidden="true"></i>
-            {{/if}}
-          </a>
-          {{#if isDisplayPanel 'logList'}}
-            {{> arenaLogList}}
-          {{/if}}
+          {{#panelFolder name='logList' title='戰鬥紀錄'}}
+            {{> arenaInfoLogList paramArena}}
+          {{/panelFolder}}
         {{/if}}
       {{else}}
         <div>Loading...</div>
-      {{/with}}
+      {{/if}}
     </div>
-  </div>
-</template>
-
-<template name="arenaInfoNav">
-  <div class="d-flex justify-content-between align-items-center text-center">
-      <a {{arenaLinkAttrs 'prev'}}>
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-      <div>
-        <div class="d-inline-block text-nowrap">{{formatDateTimeText arenaBegin}}～</div>
-        <div class="d-inline-block text-nowrap">{{formatDateTimeText arenaEnd}}</div>
-      </div>
-      <a  {{arenaLinkAttrs 'next'}}>
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </div>
-</template>
-
-<template name="arenaFighterTable">
-  <div class="arena-fighter-outer">
-    <div class="arena-fighter-inner w-100 h-100">
-      <div class="arena-fighter-header-outer float-left">
-        <table class="table-bordered arena-fighter-header w-100">
-          <thead>
-            <tr class="w-100">
-              <th class="text-center text-truncate" title="參賽選手">參賽選手</th>
-              <th class="text-center text-truncate" title="決策者">決策者</th>
-              <th class="text-center text-truncate" style="cursor: pointer;" title="HP" data-sort="hp">
-                HP
-                {{{getSortIcon 'hp'}}}
-              </th>
-              <th class="text-center text-truncate" style="cursor: pointer;" title="SP" data-sort="sp">
-                SP
-                {{{getSortIcon 'sp'}}}
-              </th>
-              <th class="text-center text-truncate" style="cursor: pointer;" title="ATK" data-sort="atk">
-                ATK
-                {{{getSortIcon 'atk'}}}
-              </th>
-              <th class="text-center text-truncate" style="cursor: pointer;" title="DEF" data-sort="def">
-                DEF
-                {{{getSortIcon 'def'}}}
-              </th>
-              <th class="text-center text-truncate" style="cursor: pointer;" title="AGI" data-sort="agi">
-                AGI
-                {{{getSortIcon 'agi'}}}
-              </th>
-              <th class="text-center text-truncate" style="cursor: pointer;" title="名次" data-sort="index">
-                名次
-                {{{getSortIcon 'index'}}}
-              </th>
-              <th class="text-center text-truncate" style="cursor: pointer;" title="投資額" data-sort="amount">
-                投資額
-                {{{getSortIcon 'amount'}}}
-              </th>
-            </tr>
-          </thead>
-        </table>
-      </div>
-      <div class="arena-fighter-body-outer h-100 float-left"
-        onscroll="document.getElementsByClassName('arena-fighter-header-outer')[0].scrollLeft = this.scrollLeft;">
-        <table class="table-bordered arena-fighter-body w-100">
-          <tbody>
-            {{#each fighter in fighterList}}
-              <tr class="w-100" data-id="{{fighter.companyId}}">
-                <td class="text-left px-1 text-truncate">
-                  <a href="{{fighterUrl fighter.companyId}}">{{fighterName fighter.companyId}}</a>
-                </td>
-                <td class="text-left px-1 text-truncate">
-                  <a href="{{managerUrl fighter.manager}}">{{managerName fighter.manager}}</a>
-                </td>
-                <td class="text-right px-1 text-truncate">
-                  {{getAttributeNumber fighter 'hp'}}
-                </td>
-                <td class="text-right px-1 text-truncate">
-                  {{getAttributeNumber fighter 'sp'}}
-                </td>
-                <td class="text-right px-1 text-truncate">
-                  {{getAttributeNumber fighter 'atk'}}
-                </td>
-                <td class="text-right px-1 text-truncate">
-                  {{getAttributeNumber fighter 'def'}}
-                </td>
-                <td class="text-right px-1 text-truncate">
-                  {{getAttributeNumber fighter 'agi'}}
-                </td>
-                <td class="text-center px-1 text-truncate">
-                  {{fighter.index}}
-                </td>
-                <td class="text-right px-1 text-truncate {{investAmountClass fighter.amount}}">
-                  {{currencyFormat fighter.amount}}
-                </td>
-              </tr>
-            {{else}}
-              <tr>
-                <td class="text-center text-truncate" colspan="8">沒有任何報名者！</td>
-              </tr>
-            {{/each}}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</template>
-
-<template name="arenaLogList">
-  <div>
-    <form class="form-inline">
-      <div class="form-group">
-        <label>
-          篩選參賽者：
-          <div class="input-group show">
-            <input
-              class="form-control"
-              type="text"
-              name="companyId"
-              placeholder="全部參賽者"
-            />
-            {{#if hasFilterResult}}
-              <div class="dropdown-menu">
-                {{#each filterResultList}}
-                  <a class="dropdown-item" href="#" data-filter="{{this._id}}">
-                    {{this.name}}
-                  </a>
-                {{/each}}
-              </div>
-            {{/if}}
-          </div>
-        </label>
-      </div>
-    </form>
-    {{#each log in logList}}
-      <div style="word-break: break-all;">
-        【回合{{log.round}}】
-        {{>companyLink log.attackerId}}
-        {{{displaySp log}}}
-        的{{displayAttackManaer log}}
-        {{#if log.damage}}
-          對{{>companyLink log.defenderId}}造成了{{log.damage}}傷害
-        {{else}}
-          被{{>companyLink log.defenderId}}靈巧的閃避了
-        {{/if}}
-        {{#if log.profit}}
-          ，{{>companyLink log.defenderId}}無力再戰，{{>companyLink log.attackerId}}因此獲得了
-          ${{currencyFormat log.profit}}的競賽獎金！
-        {{else}}
-          (殘餘HP{{log.defenderHp}})。
-        {{/if}}
-      </div>
-    {{/each}}
-    {{#with paginationData}}
-      {{> pagination}}
-    {{/with}}
   </div>
 </template>

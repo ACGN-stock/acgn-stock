@@ -95,7 +95,9 @@
       "userReportedViolationCases": 10,
       "companyViolationCases": 10,
       "fscLogs": 30,
-      "companyOrders": 10
+      "companyOrders": 10,
+      "arenaFighterList": 20,
+      "arenaLog": 30
     },
     "productFinalSaleTime": 86400000,
     "systemProductVotingReward": 4096,

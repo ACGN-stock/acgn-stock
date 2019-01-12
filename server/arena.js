@@ -6,6 +6,7 @@ import { dbArenaLog } from '/db/dbArenaLog';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
+import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
 
 // 移除未達成報名門檻的參賽者
 export function removeUnqualifiedArenaFighters(arenaData) {
@@ -16,20 +17,7 @@ export function removeUnqualifiedArenaFighters(arenaData) {
   const userRefundMap = {};
   const logDataList = [];
 
-  dbArenaFighters
-    .aggregate([ {
-      $match: { arenaId }
-    }, {
-      $project: {
-        companyId: 1,
-        investors: 1,
-        totalInvestedAmount: { $sum: '$investors.amount' }
-      }
-    }, {
-      $match: {
-        totalInvestedAmount: { $lt: arenaMinInvestedAmount }
-      }
-    } ])
+  dbArenaFighters.find({ arenaId, totalInvestedAmount: { $lt: arenaMinInvestedAmount } })
     .forEach(({ _id: arenaFighterId, companyId, investors }) => {
       const logCreatedAt = new Date();
 
@@ -71,9 +59,6 @@ export function removeUnqualifiedArenaFighters(arenaData) {
     });
     Meteor.wrapAsync(logBulk.execute).call(logBulk);
   }
-
-  // 移除（剩下參賽者的）投資人資訊
-  dbArenaFighters.update({ arenaId }, { $unset: { investors: 1 } });
 }
 
 export function startArenaFight() {
@@ -93,26 +78,9 @@ export function startArenaFight() {
   let allFighterTotalInvest = 0;
   const fighterHashByCompanyId = {};
   const fighterListBySequence = dbArenaFighters
-    .find(
-      {
-        arenaId: arenaId
-      },
-      {
-        sort: {
-          agi: -1,
-          createdAt: 1
-        }
-      }
-    )
+    .find({ arenaId: arenaId }, { sort: { agi: -1, createdAt: 1 } })
     .map((arenaFighter) => {
-      arenaFighter.totalInvest = (
-        arenaFighter.hp +
-        arenaFighter.sp +
-        arenaFighter.atk +
-        arenaFighter.def +
-        arenaFighter.agi
-      );
-      allFighterTotalInvest += arenaFighter.totalInvest;
+      allFighterTotalInvest += arenaFighter.totalInvestedAmount;
       arenaFighter.hp = getAttributeNumber('hp', arenaFighter.hp);
       arenaFighter.sp = getAttributeNumber('sp', arenaFighter.sp);
       arenaFighter.atk = getAttributeNumber('atk', arenaFighter.atk);
@@ -127,14 +95,9 @@ export function startArenaFight() {
 
   // 實際參賽人數不足一人，直接結束大賽運算
   if (fighterListBySequence.length < 1) {
-    dbArena.update(arenaId, {
-      $set: {
-        winnerList: [],
-        endDate: new Date()
-      }
-    });
+    dbArena.update(arenaId, { $set: { endDate: new Date() } });
 
-    return true;
+    return;
   }
 
   debug.log('startArenaFight', fighterListBySequence);
@@ -218,7 +181,7 @@ export function startArenaFight() {
         if (defender.currentHp <= 0) {
           loser.push(defender.companyId);
           // 取得擊倒盈利＋擊倒獎勵
-          const reward = defender.totalInvest + 5000;
+          const reward = defender.totalInvestedAmount + 5000;
           arenaLog.profit = reward;
           gainProfitHash[attacker.companyId] += reward;
         }
@@ -249,35 +212,34 @@ export function startArenaFight() {
   // 取的排名列表
   const winnerList = sortedWinnerIdList.concat(loser.reverse());
   // 計算排名獎勵
-  const rankReward = sortedWinnerList[0].totalInvest + 0.177 * allFighterTotalInvest / (Math.log(winnerList.length) + 0.57722 + (1 / (2 * winnerList.length)));
+  const rankReward = sortedWinnerList[0].totalInvestedAmount + 0.177 * allFighterTotalInvest / (Math.log(winnerList.length) + 0.57722 + (1 / (2 * winnerList.length)));
   _.each(winnerList, (companyId, index) => {
     const rank = index + 1;
     gainProfitHash[companyId] += Math.floor(rankReward / rank);
   });
+
   // 將收益紀錄插入dbLog
   const logBulk = dbLog.rawCollection().initializeUnorderedBulkOp();
   _.each(gainProfitHash, (reward, companyId) => {
     logBulk.insert({
       logType: '亂鬥營利',
       companyId: companyId,
-      data: {
-        reward
-      },
+      data: { reward },
       createdAt: new Date()
     });
-    dbCompanies.update(companyId, {
-      $inc: {
-        profit: reward
-      }
-    });
+    dbCompanies.update(companyId, { $inc: { profit: reward } });
   });
-  logBulk.execute();
-  dbArena.update(arenaId, {
-    $set: {
-      winnerList: winnerList,
-      endDate: new Date()
-    }
+
+  // 記下比賽名次
+  const arenaFightersBulk = dbArenaFighters.rawCollection().initializeUnorderedBulkOp();
+  winnerList.forEach((companyId, index) => {
+    const rank = index + 1;
+    arenaFightersBulk.find({ arenaId, companyId }).updateOne({ $set: { rank } });
   });
+
+  executeBulksSync(arenaFightersBulk, logBulk);
+
+  dbArena.update(arenaId, { $set: { endDate: new Date() } });
 }
 
 function computeHitRate(attacker, defender) {
