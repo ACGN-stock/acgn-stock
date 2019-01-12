@@ -21,16 +21,18 @@ inheritedShowLoadingOnSubscribing(Template.accountInfo);
 Template.accountInfo.onCreated(function() {
   this.autorunWithIdleSupport(() => {
     const userId = paramUserId();
-    if (userId) {
-      this.subscribe('accountInfo', userId);
-    }
-  });
 
-  this.autorunWithIdleSupport(() => {
-    const userId = paramUserId();
-    if (userId) {
-      this.subscribe('employeeListByUser', userId);
+    if (! userId) {
+      const currentUserId = Meteor.userId();
+      if (currentUserId) {
+        FlowRouter.setParams({ userId: currentUserId });
+      }
+
+      return;
     }
+
+    this.subscribe('accountInfo', userId);
+    this.subscribe('employeeListByUser', userId);
   });
 
   this.autorun(() => {
@@ -159,7 +161,7 @@ Template.accountInfoBasic.events({
   }
 });
 
-export const companyTitleView = new ReactiveVar('chairman');
+const companyTitleView = new ReactiveVar('chairman');
 Template.companyTitleTab.helpers({
   getClass(type) {
     if (companyTitleView.get() === type) {
@@ -184,7 +186,7 @@ Template.accountCompanyTitle.helpers({
   }
 });
 
-export const chairmanOffset = new ReactiveVar(0);
+const chairmanOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.chairmanTitleList);
 Template.chairmanTitleList.onCreated(function() {
   chairmanOffset.set(0);
@@ -225,7 +227,7 @@ Template.chairmanTitleList.events({
   }
 });
 
-export const managerOffset = new ReactiveVar(0);
+const managerOffset = new ReactiveVar(0);
 inheritedShowLoadingOnSubscribing(Template.managerTitleList);
 Template.managerTitleList.onCreated(function() {
   managerOffset.set(0);
@@ -255,6 +257,40 @@ Template.managerTitleList.helpers({
       useVariableForTotalCount: 'totalCountOfManagerTitle',
       dataNumberPerPage: 10,
       offset: managerOffset
+    };
+  }
+});
+
+const founderOffset = new ReactiveVar(0);
+inheritedShowLoadingOnSubscribing(Template.founderTitleList);
+Template.founderTitleList.onCreated(function() {
+  founderOffset.set(0);
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    const userId = paramUserId();
+    if (userId) {
+      this.subscribe('accountFounderTitle', userId, founderOffset.get());
+    }
+  });
+});
+Template.founderTitleList.helpers({
+  titleList() {
+    return dbCompanies
+      .find({
+        founder: this._id,
+        isSeal: false
+      },
+      {
+        limit: 10
+      });
+  },
+  paginationData() {
+    return {
+      useVariableForTotalCount: 'totalCountOfFounderTitle',
+      dataNumberPerPage: 10,
+      offset: founderOffset
     };
   }
 });

@@ -3,7 +3,7 @@
     <h4 class="mb-0 mr-2">
       待上架產品
     </h4>
-    <button class="btn btn-sm btn-primary" type="button" data-action="addProduct">
+    <button class="btn btn-sm btn-primary {{disabledOnFormVisibleClass}}" type="button" data-action="addProduct">
       <i class="fa fa-plus" aria-hidden="true"></i>
       新增
     </button>
@@ -19,7 +19,7 @@
     <div class="mr-auto">產品價格上限：${{currencyFormat company.productPriceLimit}}</div>
   </div>
 
-  {{#if inAddMode}}
+  {{#if isFormVisible}}
     <div class="my-3">
       {{> companyProductEditForm formArgs}}
     </div>
@@ -33,21 +33,34 @@
         <th class="text-center text-truncate" style="width: 60px;" title="分級">分級</th>
         <th class="text-center text-truncate" style="width: 60px;" title="價格">價格</th>
         <th class="text-center text-truncate" style="width: 60px;" title="數量">數量</th>
+        <th class="text-center text-truncate" style="width: 60px;" title="補貨基準">補貨基準</th>
+        <th class="text-center text-truncate" style="width: 60px;" title="補貨量">補貨量</th>
         <th class="text-center text-truncate" style="width: 60px;" title="管理">管理</th>
       </tr>
     </thead>
     <tbody>
       {{#each product in productList}}
         <tr>
-          <td class="text-left " data-title="產品">
+          <td class="text-left" data-title="產品">
             <div class="product-name">
+              {{#if isEditingProduct product._id}}
+                <span class="product-editing-badge badge badge-sm badge-danger badge-pill">編輯中</span>
+              {{/if}}
               <a href="{{product.url}}" title="{{product.productName}}" target="_blank">
                 {{product.productName}}
               </a>
             </div>
-            <div class="small mt-2 product-description">
+            <div class="small my-2 product-description">
               {{product.description}}
             </div>
+            <div class="small text-info">
+              由 {{> userLink product.creator}} 於 {{formatDateTimeText product.createdAt}} 建立
+            </div>
+            {{#if product.updatedAt}}
+              <div class="small text-info">
+                由 {{> userLink product.updatedBy}} 於 {{formatDateTimeText product.updatedAt}} 進行最後更新
+              </div>
+            {{/if}}
           </td>
           {{#if isUntyped product.type}}
             <td class="text-center text-truncate text-nowrap align-middle text-warning" data-title="類別">
@@ -73,8 +86,18 @@
           <td class="text-center text-truncate text-nowrap align-middle" data-title="數量">
             {{product.totalAmount}}
           </td>
+          <td class="text-center text-truncate text-nowrap align-middle" data-title="補貨基準">
+            {{productReplenishBaseAmountTypeDisplayName product.replenishBaseAmountType}}
+          </td>
+          <td class="text-center text-truncate text-nowrap align-middle" data-title="補貨量">
+            {{productReplenishBatchSizeTypeDisplayName product.replenishBatchSizeType}}
+          </td>
           <td class="text-center text-truncate text-nowrap align-middle" data-title="管理">
-            <button class="btn btn-danger btn-sm" type="button" data-remove-product="{{product._id}}">
+            <button class="btn btn-info btn-sm {{disabledOnFormVisibleClass}}" type="button" data-action="editProduct" data-product-id="{{product._id}}">
+              <i class="fa fa-edit" aria-hidden="true"></i>
+              編輯
+            </button>
+            <button class="btn btn-danger btn-sm" type="button" data-action="removeProduct" data-product-id="{{product._id}}">
               <i class="fa fa-trash" aria-hidden="true"></i>
               刪除
             </button>
@@ -82,7 +105,7 @@
         </tr>
       {{else}}
         <tr class="default-content">
-          <td class="text-center text-truncate p-1" colspan="6">目前沒有預定產品！</td>
+          <td class="text-center text-truncate p-1" colspan="8">目前沒有預定產品！</td>
         </tr>
       {{/each}}
     </tbody>

@@ -5,13 +5,13 @@ import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbProducts, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { dbCompanies, getAvailableProductionFund } from '/db/dbCompanies';
 import { debug } from '/server/imports/utils/debug';
-import { guardCompany } from '/common/imports/guards';
+import { guardCompany, guardProduct } from '/common/imports/guards';
 
 Meteor.methods({
-  createProduct({ companyId, data }) {
+  editProduct({ productId, newData }) {
     check(this.userId, String);
-    check(companyId, String);
-    check(data, {
+    check(productId, String);
+    check(newData, {
       productName: String,
       type: String,
       rating: String,
@@ -22,17 +22,18 @@ Meteor.methods({
       replenishBatchSizeType: new Match.OneOf(...productReplenishBatchSizeTypeList),
       replenishBaseAmountType: new Match.OneOf(...productReplenishBaseAmountTypeList)
     });
-    createProduct(Meteor.user(), { companyId, data });
+
+    editProduct(Meteor.user(), { productId, newData });
 
     return true;
   }
 });
 
-export function createProduct(currentUser, { companyId, data }) {
-  debug.log('createProduct', { userId: currentUser._id, data });
+export function editProduct(currentUser, { productId, newData }) {
+  debug.log('editProduct', { currentUser, productId, newData });
 
-  const { url, price, totalAmount } = data;
-
+  const oldData = dbProducts.findByIdOrThrow(productId);
+  const { companyId } = oldData;
   const companyData = dbCompanies.findByIdOrThrow(companyId, {
     fields: {
       companyName: 1,
@@ -50,28 +51,31 @@ export function createProduct(currentUser, { companyId, data }) {
 
   const { manager, productPriceLimit } = companyData;
 
-  if (dbProducts.find({ companyId, url }).count() > 0) {
+  guardProduct(oldData).checkInState('planning');
+
+  if (dbProducts.find({ _id: { $ne: productId }, companyId, url: newData.url }).count() > 0) {
     throw new Meteor.Error(403, '相同的產品已經被推出過了！');
   }
 
-  if (productPriceLimit < price) {
+  if (productPriceLimit < newData.price) {
     throw new Meteor.Error(403, '產品售價過高！');
   }
 
-  const totalCost = price * totalAmount;
-  const availableProductionFund = getAvailableProductionFund(companyData);
+  const oldTotalCost = oldData.price * oldData.totalAmount;
+  const newTotalCost = newData.price * newData.totalAmount;
+  const availableProductionFund = getAvailableProductionFund(companyData) + oldTotalCost;
 
-  if (availableProductionFund < totalCost) {
+  if (availableProductionFund < newTotalCost) {
     throw new Meteor.Error(403, '剩餘生產資金不足！');
   }
 
   resourceManager.throwErrorIsResourceIsLock(['season']);
 
-  dbProducts.insert({
-    ...data,
-    companyId,
-    state: 'planning',
-    creator: manager === currentUser._id ? currentUser._id : '!FSC',
-    createdAt: new Date()
+  dbProducts.update(productId, {
+    $set: {
+      ...newData,
+      updatedBy: manager === currentUser._id ? currentUser._id : '!FSC',
+      updatedAt: new Date()
+    }
   });
 }

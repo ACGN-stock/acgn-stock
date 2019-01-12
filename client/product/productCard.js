@@ -3,7 +3,7 @@ import { Template } from 'meteor/templating';
 import { $ } from 'meteor/jquery';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
-import { dbProducts } from '/db/dbProducts';
+import { dbProducts, productReplenishBatchSizeTypeDisplayName, productReplenishBaseAmountTypeDisplayName } from '/db/dbProducts';
 import { getAvailableProductTradeQuota } from '/db/dbUserOwnedProducts';
 import { voteProduct, adminEditProduct, banProduct } from '../utils/methods';
 import { currencyFormat } from '../utils/helpers';
@@ -20,6 +20,13 @@ Template.productCard.helpers({
     const { product } = Template.currentData();
 
     return FlowRouter.path('reportViolation', null, { type: 'product', id: product._id });
+  },
+  replenishPolicyDescription() {
+    const { product } = Template.currentData();
+    const baseAmountType = productReplenishBaseAmountTypeDisplayName(product.replenishBaseAmountType);
+    const batchSizeType = productReplenishBatchSizeTypeDisplayName(product.replenishBatchSizeType);
+
+    return `依${baseAmountType}補${batchSizeType}`;
   }
 });
 

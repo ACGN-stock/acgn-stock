@@ -58,6 +58,10 @@ body {
   table.custom-responsive-table-md tr.default-content {
     border: none;
   }
+
+  table.custom-responsive-table-md tr.default-content td {
+    padding-left: 0;
+  }
 }
 
 /* navbar 使用者ID顯示 */
@@ -232,6 +236,13 @@ body {
   background: -o-linear-gradient(225deg, #fffbd5, #b20a2c);
   background: -moz-linear-gradient(225deg, #fffbd5, #b20a2c);
   background: linear-gradient(225deg, #fffbd5, #b20a2c);
+}
+.company-card-founder {
+  background: #39c5bb;
+  background: -webkit-linear-gradient(225deg, #fffbd5, #39c5bb);
+  background: -o-linear-gradient(225deg, #fffbd5, #39c5bb);
+  background: -moz-linear-gradient(225deg, #fffbd5, #39c5bb);
+  background: linear-gradient(225deg, #fffbd5, #39c5bb);
 }
 .company-card-holder {
   background: #8e9eab;
@@ -481,6 +492,16 @@ table.company-next-season-product .product-description {
   max-height: 3.5rem;
 }
 
+table.company-next-season-product .product-editing-badge {
+  animation: fade-loop 2s linear infinite
+}
+
+@keyframes fade-loop {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 /* 產品卡 */
 .product-card .product-description {
   word-break: break-all;
@@ -544,82 +565,6 @@ table.product-list-by-company .product-description {
   height: 2rem;
 }
 
-/* 最萌亂鬥大賽列表 */
-.arena-fighter-table-container {
-  width: calc(100% - 5rem);
-  overflow-x: scroll;
-  margin-left: 5rem;
-  overflow-y: visible;
-  padding: 0;
-}
-
-.arena-fighter-outer {
-  overflow: visible;
-  height: 300px;
-}
-
-.arena-fighter-inner {
-  position: relative;
-}
-
-.arena-fighter-header-outer {
-  overflow: hidden;
-}
-
-.arena-fighter-body-outer {
-  width: inherit;
-  overflow-y: scroll;
-}
-
-.arena-fighter-header-outer {
-  width: calc(100% - 16px);
-}
-
-@media (-moz-touch-enabled), (pointer:coarse) {
-  .arena-fighter-header-outer {
-    width: 100%;
-  }
-}
-
-table.arena-fighter-header th {
-  height: 35px;
-}
-
-table.arena-fighter-header tr th:nth-child(1),
-table.arena-fighter-body tr td:nth-child(1),
-table.arena-fighter-header tr th:nth-child(2),
-table.arena-fighter-body tr td:nth-child(2) {
-  min-width: 8rem;
-  width: 8rem;
-  max-width: 8rem;
-}
-
-table.arena-fighter-header tr th:nth-child(3),
-table.arena-fighter-body tr td:nth-child(3),
-table.arena-fighter-header tr th:nth-child(4),
-table.arena-fighter-body tr td:nth-child(4),
-table.arena-fighter-header tr th:nth-child(5),
-table.arena-fighter-body tr td:nth-child(5),
-table.arena-fighter-header tr th:nth-child(6),
-table.arena-fighter-body tr td:nth-child(6),
-table.arena-fighter-header tr th:nth-child(7),
-table.arena-fighter-body tr td:nth-child(7) {
-  width: 90px;
-  min-width: 90px;
-}
-
-table.arena-fighter-header tr th:nth-child(8),
-table.arena-fighter-body tr td:nth-child(8) {
-  width: 80px;
-  min-width: 80px;
-}
-
-table.arena-fighter-header tr th:nth-child(9),
-table.arena-fighter-body tr td:nth-child(9) {
-  width: 110px;
-  min-width: 110px;
-}
-
 /* 遊戲規則 */
 .tutorial-main ul,
 .tutorial-main ol {
@@ -666,4 +611,8 @@ table.arena-fighter-body tr td:nth-child(9) {
 .user-validate-type-mark {
   font-size: 60%;
   vertical-align: top;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

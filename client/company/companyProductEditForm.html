@@ -1,5 +1,4 @@
 <template name="companyProductEditForm">
-
   {{> companyProductEditFormInner product}}
 </template>
 
@@ -25,7 +24,7 @@
       <label for="type" data-required>產品類別</label>
       <select class="form-control" name="type">
         {{#each type in productTypeList}}
-          <option value="{{type}}">{{type}}</option>
+          <option value="{{type}}" {{selectedAttr type (valueOf 'type')}}>{{type}}</option>
         {{/each}}
       </select>
       {{{errorHtmlOf 'type'}}}
@@ -34,7 +33,7 @@
       <label for="rating" data-required>產品分級</label>
       <select class="form-control" name="rating">
         {{#each rating in productRatingList}}
-          <option value="{{rating}}">{{rating}}</option>
+          <option value="{{rating}}" {{selectedAttr rating (valueOf 'rating')}}>{{rating}}</option>
         {{/each}}
       </select>
       {{{errorHtmlOf 'rating'}}}
@@ -73,7 +72,7 @@
       {{{errorHtmlOf 'price'}}}
     </div>
     <div class="form-group">
-      <label for="totalAmount" data-required>產品數量</label>
+      <label for="totalAmount" data-required>產品總數</label>
       <input
         class="form-control"
         type="number"
@@ -81,7 +80,37 @@
         value="{{valueOf 'totalAmount'}}"
         min="1" />
       {{{errorHtmlOf 'totalAmount'}}}
-      <div class="mr-auto">需要生產資金：${{currencyFormat requiredProductionFund}}</div>
+    </div>
+    <div class="form-group">
+      <label for="replenishBaseAmountType" data-required>產品補貨基準</label>
+      <select class="form-control" name="replenishBaseAmountType">
+        {{#each replenishBaseAmountType in productReplenishBaseAmountTypeList}}
+          <option value="{{replenishBaseAmountType}}"
+              {{selectedAttr replenishBaseAmountType (valueOf 'replenishBaseAmountType')}}>
+            {{productReplenishBaseAmountTypeDisplayName replenishBaseAmountType}}
+          </option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'replenishBaseAmountType'}}}
+    </div>
+    <div class="form-group">
+      <label for="replenishBatchSizeType" data-required>產品補貨量</label>
+      <select class="form-control" name="replenishBatchSizeType">
+        {{#each replenishBatchSizeType in productReplenishBatchSizeTypeList}}
+          <option value="{{replenishBatchSizeType}}"
+              {{selectedAttr replenishBatchSizeType (valueOf 'replenishBatchSizeType')}}>
+            {{productReplenishBatchSizeTypeDisplayName replenishBatchSizeType}}
+          </option>
+        {{/each}}
+      </select>
+      {{{errorHtmlOf 'replenishBatchSizeType'}}}
+    </div>
+
+    <div class="form-group">
+      <div name="productionFund">
+        花費生產資金：${{currencyFormat requiredProductionFund}}
+      </div>
+      {{{errorHtmlOf 'productionFund'}}}
     </div>
 
     <div class="d-flex flex-wrap justify-content-end">
