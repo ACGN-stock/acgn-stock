@@ -1,13 +1,14 @@
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
-import { FlowRouter } from 'meteor/kadira:flow-router';
+
+import { getCurrentPage } from '/routes';
 
 const panelFolderStates = new ReactiveDict('panelFolderStates');
 
 function getPanelFolderKey(name) {
-  const routeName = FlowRouter.getRouteName();
+  const pageName = getCurrentPage();
 
-  return `${routeName}_${name}`;
+  return `${pageName}_${name}`;
 }
 
 Template.panelFolder.onCreated(function() {
