@@ -4,15 +4,14 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
 
 import { rMainTheme } from '/client/utils/styles';
-import { getCurrentPage, getCurrentPageTitle } from '/routes';
+import { getCurrentPage, getCurrentPageFullTitle } from '/routes';
 import { rAccountDialogMode } from './accountDialog';
 import { rShowAlertDialog, alertDialog } from './alertDialog';
 
 Template.layout.onRendered(function() {
   this.autorun(() => {
     FlowRouter.watchPathChange();
-    const title = getCurrentPageTitle();
-    DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - ${title}`);
+    DocHead.setTitle(getCurrentPageFullTitle());
   });
 });
 

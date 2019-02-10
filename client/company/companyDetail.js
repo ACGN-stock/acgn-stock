@@ -1,7 +1,7 @@
-import { Meteor } from 'meteor/meteor';
 import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 
+import { getCurrentPageFullTitle } from '/routes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { paramCompany, paramCompanyId } from './helpers';
 
@@ -11,7 +11,7 @@ Template.companyDetail.onCreated(function() {
   this.autorun(() => {
     const company = paramCompany();
     if (company) {
-      DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - 「${company.companyName}」公司資訊`);
+      DocHead.setTitle(getCurrentPageFullTitle(company.companyName));
     }
   });
 

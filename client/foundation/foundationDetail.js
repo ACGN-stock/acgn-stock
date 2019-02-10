@@ -6,6 +6,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
+import { getCurrentPageFullTitle } from '/routes';
 import { dbLog } from '/db/dbLog';
 import { dbVariables } from '/db/dbVariables';
 import { formatShortDateTimeText } from '/common/imports/utils/formatTimeUtils';
@@ -23,7 +24,7 @@ Template.foundationDetail.onCreated(function() {
   this.autorun(() => {
     const foundationData = paramFoundation();
     if (foundationData) {
-      DocHead.setTitle(`${Meteor.settings.public.websiteInfo.websiteName} - 「${foundationData.companyName}」公司資訊`);
+      DocHead.setTitle(getCurrentPageFullTitle(foundationData.companyName));
     }
   });
 
