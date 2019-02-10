@@ -61,6 +61,10 @@ export function getCurrentPageTitle() {
 }
 
 export function getCurrentPageFullTitle(detailName) {
+  if (getCurrentPage() === 'mainPage') {
+    return Meteor.settings.public.websiteInfo.websiteName;
+  }
+
   let title = `${getCurrentPageTitle()} - ${Meteor.settings.public.websiteInfo.websiteName}`;
   if (detailName) {
     title = `${detailName} - ${title}`;
