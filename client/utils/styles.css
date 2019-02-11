@@ -213,6 +213,15 @@ body {
   word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
 
+.markdown-container table {
+  margin-bottom: 0.5em;
+}
+
+.markdown-container table th, .markdown-container table td {
+  border: 1px solid;
+  padding: 0.25em;
+}
+
 .company-card {
   padding: 0px;
   max-width: 270px;
