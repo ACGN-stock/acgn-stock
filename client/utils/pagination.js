@@ -4,6 +4,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
 import { Counts } from 'meteor/tmeasday:publish-counts';
 
+import { getCurrentPage } from '/routes';
 import { dbVariables } from '/db/dbVariables';
 
 Template.pagination.helpers({
@@ -96,7 +97,7 @@ Template.pagination.events({
       .val());
 
     if (data.useHrefRoute) {
-      FlowRouter.go(FlowRouter.path(FlowRouter.getRouteName(), { page: targetPage }));
+      FlowRouter.go(FlowRouter.path(getCurrentPage(), { page: targetPage }));
     }
     else {
       const newOffset = (targetPage - 1) * data.dataNumberPerPage;

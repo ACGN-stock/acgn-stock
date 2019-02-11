@@ -5,6 +5,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbViolationCases, categoryMap, stateMap, categoryDisplayName, stateDisplayName } from '/db/dbViolationCases';
+import { getCurrentPage } from '/routes';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { stateBadgeClass, pathForViolationCaseDetail } from './helpers';
 
@@ -34,7 +35,7 @@ Template.violationCaseList.onCreated(function() {
   };
 
   this.autorun(() => {
-    if (FlowRouter.getRouteName() !== 'violationCaseList') {
+    if (getCurrentPage() !== 'violationCaseList') {
       return;
     }
 
