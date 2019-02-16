@@ -19,8 +19,12 @@ const rSortBy = new ReactiveVar('lastPrice');
 export const rCompanyOffset = new ReactiveVar(0);
 Template.companyList.onCreated(function() {
   this.autorun(() => {
-    const page = parseInt(FlowRouter.getParam('page'), 10) || 1;
-    FlowRouter.setParams({ page });
+    const page = parseInt(FlowRouter.getParam('page'), 10);
+
+    if (! page) {
+      return;
+    }
+
     const offset = (page - 1) * 12;
     rCompanyOffset.set(offset);
   });
