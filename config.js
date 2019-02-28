@@ -9,7 +9,7 @@ export const config = {
     timezone: 8 // 主要客群所在的時區 (可能與server的時區不同)
   },
   prerenderServer: {
-    'url': 'https://127.0.0.1', // prerender的server位置
+    'url': 'http://127.0.0.1', // prerender的server位置
     'port': '3900'
   },
   intervalTimer: 60000, // 每隔多少毫秒進行一次工作檢查

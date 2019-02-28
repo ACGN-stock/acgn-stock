@@ -9,7 +9,7 @@
       "timezone": 8
     },
     "prerenderServer": {
-      "url": "https://127.0.0.1",
+      "url": "http://127.0.0.1",
       "port": "3900"
     },
     "intervalTimer": 60000,
