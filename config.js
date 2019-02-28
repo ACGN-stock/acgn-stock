@@ -8,6 +8,10 @@ export const config = {
     image: 'https://acgn-stock.com/ms-icon-310x310.png',
     timezone: 8 // 主要客群所在的時區 (可能與server的時區不同)
   },
+  prerenderServer: {
+    'url': 'https://127.0.0.1', // prerender的server位置
+    'port': '3900'
+  },
   intervalTimer: 60000, // 每隔多少毫秒進行一次工作檢查
   releaseStocksForHighPriceInterval: { // 高價釋股的排程時間範圍 (ms)
     min: 10800000,
