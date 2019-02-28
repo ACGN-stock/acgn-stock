@@ -12,7 +12,7 @@ WebApp.connectHandlers.use('/robots.txt', (req, res) => {
   robotsTxt += `Disallow: /violation/view/* \n`;
   robotsTxt += `Disallow: /violation/report* \n`;
   robotsTxt += `Disallow: /fscLogs* \n`;
-  robotsTxt += `Crawl-deslay: 4 \n`;
+  robotsTxt += `Crawl-delay: 4 \n`;
 
   robotsTxt += `\n`;
   robotsTxt += `sitemap: https://${Meteor.settings.public.websiteInfo.domainName}/sitemap/sitemap-index.xml \n`;
