@@ -1,12 +1,17 @@
 {
   "public": {
     "debugMode": false,
+    "production": false,
     "websiteInfo": {
       "websiteName": "ACGN股票交易市場",
       "description": "｜ 尋找你的老婆！ \n｜ 喜歡嗎？那麼就入股吧！",
       "domainName": "acgn-stock.com",
       "image": "https://acgn-stock.com/ms-icon-310x310.png",
       "timezone": 8
+    },
+    "prerenderServer": {
+      "url": "http://127.0.0.1",
+      "port": "3900"
     },
     "intervalTimer": 60000,
     "releaseStocksForHighPriceInterval": {
