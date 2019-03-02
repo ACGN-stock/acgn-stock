@@ -6,11 +6,13 @@ let taskCount = 0;
 export function addTask() {
   taskCount += 1;
   isLoading.set(true);
+  window.prerenderReady = false;
 }
 export function resolveTask() {
   taskCount -= 1;
   if (taskCount <= 0) {
     isLoading.set(false);
+    window.prerenderReady = true;
   }
 }
 export function inheritedShowLoadingOnSubscribing(template) {
