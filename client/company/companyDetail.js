@@ -2,8 +2,6 @@ import { DocHead } from 'meteor/kadira:dochead';
 import { Template } from 'meteor/templating';
 
 import { getCurrentPageFullTitle } from '/routes';
-import { setPrerenderTitleReady } from '/client/utils/prerenderReady';
-
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { paramCompany, paramCompanyId } from './helpers';
 
@@ -14,10 +12,6 @@ Template.companyDetail.onCreated(function() {
     const company = paramCompany();
     if (company) {
       DocHead.setTitle(getCurrentPageFullTitle(company.companyName));
-      setPrerenderTitleReady(true);
-    }
-    else {
-      setPrerenderTitleReady(false);
     }
   });
 

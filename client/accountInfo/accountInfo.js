@@ -11,8 +11,6 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbEmployees } from '/db/dbEmployees';
 import { dbVips } from '/db/dbVips';
 import { roleDisplayName, getManageableRoles } from '/db/users';
-import { setPrerenderTitleReady } from '/client/utils/prerenderReady';
-
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -42,10 +40,6 @@ Template.accountInfo.onCreated(function() {
     const user = paramUser();
     if (user) {
       DocHead.setTitle(getCurrentPageFullTitle(user.profile.name));
-      setPrerenderTitleReady(true);
-    }
-    else {
-      setPrerenderTitleReady(false);
     }
   });
 });

@@ -9,8 +9,6 @@ import { dbRound } from '/db/dbRound';
 import { dbRuleAgendas } from '/db/dbRuleAgendas';
 import { dbRuleIssues } from '/db/dbRuleIssues';
 import { dbRuleIssueOptions } from '/db/dbRuleIssueOptions';
-import { setPrerenderTitleReady } from '/client/utils/prerenderReady';
-
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
@@ -26,10 +24,6 @@ Template.ruleAgendaVote.onCreated(function() {
       const agendaData = dbRuleAgendas.findOne(agendaId);
       if (agendaData) {
         DocHead.setTitle(getCurrentPageFullTitle(agendaData.title));
-        setPrerenderTitleReady(true);
-      }
-      else {
-        setPrerenderTitleReady(false);
       }
     }
   });
