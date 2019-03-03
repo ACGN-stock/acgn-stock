@@ -10,6 +10,8 @@ import { getCurrentPageFullTitle } from '/routes';
 import { dbLog } from '/db/dbLog';
 import { dbVariables } from '/db/dbVariables';
 import { formatShortDateTimeText } from '/common/imports/utils/formatTimeUtils';
+import { setPrerenderTitleReady } from '/client/utils/prerenderReady';
+
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { shouldStopSubscribe } from '../utils/idle';
 import { investFoundCompany, markCompanyIllegal, unmarkCompanyIllegal, changeCompanyName } from '../utils/methods';
@@ -25,6 +27,10 @@ Template.foundationDetail.onCreated(function() {
     const foundationData = paramFoundation();
     if (foundationData) {
       DocHead.setTitle(getCurrentPageFullTitle(foundationData.companyName));
+      setPrerenderTitleReady(true);
+    }
+    else {
+      setPrerenderTitleReady(false);
     }
   });
 
