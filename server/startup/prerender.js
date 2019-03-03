@@ -18,7 +18,18 @@ Meteor.startup(() => {
 });
 
 function getPrerenderServer() {
-  const { url, port } = Meteor.settings.public.prerenderServer;
+  let { url, port } = Meteor.settings.public.prerenderServer;
 
-  return `${url}${port ? `:${port}` : ''}/`;
+  if (url.indexOf('/', url.length - 1) !== -1) {
+    url = url.slice(0, -1);
+  }
+
+  if (port && port !== 80) {
+    port = `:${port}`;
+  }
+  else {
+    port = '';
+  }
+
+  return `${url}${port}/`;
 }
