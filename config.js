@@ -1,7 +1,6 @@
 // 真正的設定檔請寫在config.json，這邊只是註解用。
 export const config = {
   debugMode: false, // 是否為debug mode(紀錄一分鐘內的所有方法與訂閱動作，以備crash查看)
-  production: false, // 是否在 production mode (production設定下需要安裝chrome以啟用所有功能)
   websiteInfo: { // 網站資訊
     websiteName: 'ACGN股票交易市場', // 網站名稱
     description: '｜ 尋找你的老婆！ \n｜ 喜歡嗎？那麼就入股吧！',
