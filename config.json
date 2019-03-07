@@ -8,9 +8,9 @@
       "image": "https://acgn-stock.com/ms-icon-310x310.png",
       "timezone": 8
     },
-    "prerenderServer": {
-      "url": "http://127.0.0.1",
-      "port": "3900"
+    "prerender": {
+      "use": false,
+      "url": "http://127.0.0.1:3900/"
     },
     "intervalTimer": 60000,
     "releaseStocksForHighPriceInterval": {
