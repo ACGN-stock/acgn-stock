@@ -7,7 +7,6 @@ Meteor.startup(() => {
     return;
   }
 
-  prerenderNode.set('protocol', 'https');
   prerenderNode.set('prerenderServiceUrl', Meteor.settings.public.prerender.url);
   prerenderNode.set('crawlerUserAgents', [
     'googlebot',
