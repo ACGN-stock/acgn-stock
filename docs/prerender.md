@@ -1,28 +1,34 @@
 # Prerender
 
-We use [prerender](https://github.com/prerender/prerender-node) to do SEO.
+`acgn-stock` can use [prerender](https://github.com/prerender/prerender-node) to help its SEO process.
 
-But it's complicated to set, that's why we need this document.
+Since the setup process is a little bit complicated, we wrote down this how-to document to help those in need.
 
-## Get a prerender server
+## Setting Up a Prerender Server
 
-To use prerender, you need a prerender server to handle prerender request.
+To enable this functionality, you will need a **prerender server** to handle the request.
 
-You can easily use https://prerender.io/ to be prerender server.
+### Hosted Service
 
-Or, you can run your own server as follow these step.
+If you don't want to run your own prerender server, check out [PrerenderIO](https://prerender.io/) for their hosted service.
+
+### Run Your Own Prerender Server 
+
+If you choose to run your own prerender server, follow these steps:
 
 1. install [Chrome](https://www.google.com/chrome/)
 
-   [(How to install Chrome on Ubuntu server)](https://askubuntu.com/a/79284)
+   [(Guide for installing Chrome on a Ubuntu server)](https://askubuntu.com/a/79284)
 
-2. create a new project, and install [prerender](https://github.com/prerender/prerender)
+2. create a new node project and install [prerender](https://github.com/prerender/prerender)
+
    ```sh
    npm install prerender --save
    ```
-   **NOTE**: **Prerender server should run independently**, we don't recommend installing it in your `acgn-stock` project.
-
-   we already try it and got much error, so we remove it from this project. [(see pull request)](https://github.com/mrbigmouth/acgn-stock/pull/597)
+   
+   **IMPORTANT NOTE: Don't try to install prerender server in your `acgn-stock` project!**
+   
+   We tried to integrate prerender into this project (see #589, #591). Since then we encountered some serious issues which prevent `acgn-stock` from working, so we decided to remove it (see #597). 
 
 3. write `index.js`
    ```js
@@ -33,24 +39,23 @@ Or, you can run your own server as follow these step.
    });
    prerenderServer.start();
    ```
-   You can use other port, just make sure it's not be used.
 
-   [(about waitAfterLastRequest)](https://github.com/prerender/prerender#waitafterlastrequest)
+   For the port, we use `3900` here. Feel free to switch to the other port if you want. Just make sure it's not being used.
 
-4. run it
+   For the `waitAfterLastRequest`, we recommend `3000`ms here. [(Check the document about `waitAfterLastRequest`)](https://github.com/prerender/prerender#waitafterlastrequest)
+
+4. start the server
+
    ```sh
    node index.js
    ```
-
-Try to see your prerender server is working or not.
-```
-http://localhost:3900/https://github.com/
-```
+   
+After the server is started, you can connect to, for example, `http://localhost:3900/https://github.com/`, to see if it works.
 
 
-## Setting your acgn-stock
+## Setting Your `acgn-stock`
 
-Write your prerender setting in [config.json](../config.json)
+Update your prerender setting in [config.json](../config.json)
 
 ```json
 "prerender": {
@@ -59,11 +64,12 @@ Write your prerender setting in [config.json](../config.json)
 }
 ```
 
-`"use"` is prerender switch, it should be `true` if you want to use prerender.
+`"use"` must be `true` if you want to use prerender.
 
-`"url"` is prerender server's URL.
+`"url"` is the URL of the prerender server.
 
-Now you can run your acgn-stcok, and try to see prerender is working or not.
+Now you can run your `acgn-stock`, and visit the following URL to see if it's working or not.
+
 ```
-http://localhost:3900/company/1?_escaped_fragment_=
+http://localhost:3000/company/1?_escaped_fragment_=
 ```
