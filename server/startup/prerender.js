@@ -3,8 +3,11 @@ import { Meteor } from 'meteor/meteor';
 import { WebApp } from 'meteor/webapp';
 
 Meteor.startup(() => {
-  prerenderNode.set('protocol', 'https');
-  prerenderNode.set('prerenderServiceUrl', getPrerenderServer());
+  if (! Meteor.settings.public.prerender.use) {
+    return;
+  }
+
+  prerenderNode.set('prerenderServiceUrl', Meteor.settings.public.prerender.url);
   prerenderNode.set('crawlerUserAgents', [
     'googlebot',
     'Yahoo! Slurp',
@@ -16,9 +19,3 @@ Meteor.startup(() => {
   ]);
   WebApp.rawConnectHandlers.use(prerenderNode);
 });
-
-function getPrerenderServer() {
-  const { url, port } = Meteor.settings.public.prerenderServer;
-
-  return `${url}${port ? `:${port}` : ''}/`;
-}

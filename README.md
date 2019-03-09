@@ -21,11 +21,9 @@ A stock system simulator game which use acgn characters as company.
 3. type `meteor npm install` in project folder
 4. type `meteor run --settings config.json` in project folder
 
-### Turn to Production mode
+## Documentation
 
-Production mode requires `Headless Chrome`, so you need to install Chrome first.
-
-Set `"production": true` in [config.json](config.json).
+You can find more detail in [docs](docs).
 
 ## Contributors
 
