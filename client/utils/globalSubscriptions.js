@@ -13,4 +13,5 @@ Tracker.autorun(() => {
 
   Meteor.subscribe('currentUserDirectors');
   Meteor.subscribe('currentUserOrders');
+  Meteor.subscribe('currentUserNotificationCounts');
 });

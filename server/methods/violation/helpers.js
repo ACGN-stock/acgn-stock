@@ -4,6 +4,9 @@ import { dbProducts } from '/db/dbProducts';
 import { dbCompanies } from '/db/dbCompanies';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
+import { dbNotifications, notificationCategories } from '/db/dbNotifications';
+import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
+import { dbViolationCases } from '/db/dbViolationCases';
 
 // 從公司 ID 推導被檢舉時應負責的使用者 ID
 export function getResponsibleUserForCompany(companyId) {
@@ -52,4 +55,20 @@ export function populateViolators({ violatorType, violatorId }) {
   }
 
   return result;
+}
+
+export function notifyUnreadUsers(violationCaseId) {
+  const { unreadUsers } = dbViolationCases.findByIdOrThrow(violationCaseId, { fields: { unreadUsers: 1 } });
+  console.log(unreadUsers);
+  const bulkOp = dbNotifications.rawCollection().initializeUnorderedBulkOp();
+
+  unreadUsers.forEach((userId) => {
+    bulkOp.find({
+      category: notificationCategories.VIOLATION_CASE,
+      targetUser: userId,
+      'data.violationCaseId': violationCaseId
+    }).upsert().updateOne({ $set: { notifiedAt: new Date() } });
+  });
+
+  executeBulksSync(bulkOp);
 }

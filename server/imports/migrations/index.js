@@ -39,3 +39,4 @@ import './038-add-creator-to-products';
 import './039-default-product-replenish-options';
 import './040-arena-rewrite';
 import './041-add-voided-index-to-announcements';
+import './042-notification-system';
