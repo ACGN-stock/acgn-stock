@@ -4,6 +4,8 @@ import { check, Match } from 'meteor/check';
 import { dbAnnouncements, getAnnounceableCategories, announcementCategoryMap } from '/db/dbAnnouncements';
 import { computeActiveUserCount } from '/server/imports/utils/computeActiveUserCount';
 import { debug } from '/server/imports/utils/debug';
+import { dbNotifications, notificationCategories } from '/db/dbNotifications';
+import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
 
 Meteor.methods({
   createAnnouncement({ data, rejectionPetitionDurationDays }) {
@@ -65,10 +67,24 @@ export function createAnnouncement(currentUser, { data, rejectionPetitionDuratio
     });
   }
 
-  dbAnnouncements.insert({
+  const announcementId = dbAnnouncements.insert({
     ...data,
     ...extraData,
     creator: currentUser._id,
     createdAt: nowDate
   });
+
+  const notificationsBulkOp = dbNotifications.rawCollection().initializeUnorderedBulkOp();
+  const notificationSchema = dbNotifications.simpleSchema();
+  Meteor.users.find({}, { fields: { _id: 1 } }).forEach(({ _id: userId }) => {
+    const doc = {
+      category: notificationCategories.ANNOUNCEMENT,
+      targetUser: userId,
+      notifiedAt: nowDate,
+      data: { announcementId }
+    };
+    notificationSchema.validate(doc);
+    notificationsBulkOp.insert(doc);
+  });
+  executeBulksSync(notificationsBulkOp);
 }

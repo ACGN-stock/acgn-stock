@@ -111,25 +111,29 @@
         {{>companyLink this._id}}
       </div>
       <div class="row row-info d-flex flex-column justify-content-between">
-        <div class="text-left mx-3">
-          {{#if isCurrentUserChairmanOf this._id}}
-            <a href="#" data-action="changeChairmanTitle">
+        <div class="user-info">
+          <div class="text-left mx-3">
+            {{#if isCurrentUserChairmanOf this._id}}
+              <a href="#" data-action="changeChairmanTitle">
+                {{this.chairmanTitle}}
+              </a>
+            {{else}}
               {{this.chairmanTitle}}
-            </a>
-          {{else}}
-            {{this.chairmanTitle}}
-          {{/if}}
-        </div>
-        <div class="text-right mx-3">
-          <h4 class="text-truncate">{{>userLink this.chairman}}</h4>
+            {{/if}}
+          </div>
+          <div class="text-right mx-3">
+            <h4 class="text-truncate">{{>userLink this.chairman}}</h4>
+          </div>
         </div>
       </div>
       <div class="row row-info d-flex flex-column justify-content-between">
-        <div class="text-left mx-3">
-          經理人
-        </div>
-        <div class="text-right mx-3 text-truncate">
-          <h4 class="text-truncate">{{>userLink this.manager}}</h4>
+        <div class="user-info">
+          <div class="text-left mx-3">
+            經理人
+          </div>
+          <div class="text-right mx-3 text-truncate">
+            <h4 class="text-truncate">{{>userLink this.manager}}</h4>
+          </div>
         </div>
       </div>
       <hr class="m-0">

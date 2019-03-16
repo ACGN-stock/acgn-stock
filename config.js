@@ -1,7 +1,6 @@
 // 真正的設定檔請寫在config.json，這邊只是註解用。
 export const config = {
   debugMode: false, // 是否為debug mode(紀錄一分鐘內的所有方法與訂閱動作，以備crash查看)
-  production: false, // 是否在 production mode (production設定下需要安裝chrome以啟用所有功能)
   websiteInfo: { // 網站資訊
     websiteName: 'ACGN股票交易市場', // 網站名稱
     description: '｜ 尋找你的老婆！ \n｜ 喜歡嗎？那麼就入股吧！',
@@ -9,9 +8,9 @@ export const config = {
     image: 'https://acgn-stock.com/ms-icon-310x310.png',
     timezone: 8 // 主要客群所在的時區 (可能與server的時區不同)
   },
-  prerenderServer: {
-    'url': 'http://127.0.0.1', // prerender的server位置
-    'port': '3900'
+  prerender: {
+    use: false, // 是否使用prerender功能 (需要另外架設prerender server)
+    url: 'http://127.0.0.1:3900/' // prerender server的位置
   },
   intervalTimer: 60000, // 每隔多少毫秒進行一次工作檢查
   releaseStocksForHighPriceInterval: { // 高價釋股的排程時間範圍 (ms)

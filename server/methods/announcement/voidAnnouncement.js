@@ -5,6 +5,7 @@ import { dbAnnouncements } from '/db/dbAnnouncements';
 import { limitMethod } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 import { guardUser } from '/common/imports/guards';
+import { dbNotifications, notificationCategories } from '/db/dbNotifications';
 
 Meteor.methods({
   voidAnnouncement({ announcementId, reason }) {
@@ -43,6 +44,11 @@ export function voidAnnouncement(currentUser, args, resourceLocked = false) {
       voidedBy: currentUserId,
       voidedAt: new Date()
     }
+  });
+
+  dbNotifications.remove({
+    category: notificationCategories.ANNOUNCEMENT,
+    'data.announcementId': announcementId
   });
 }
 // 一分鐘鐘最多兩次

@@ -8,7 +8,7 @@ import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbUserArchive } from '/db/dbUserArchive';
 import { dbProducts } from '/db/dbProducts';
 import { guardUser } from '/common/imports/guards';
-import { populateViolators } from './helpers';
+import { populateViolators, notifyUnreadUsers } from './helpers';
 
 Meteor.methods({
   addViolatorToViolationCase({ violationCaseId, violatorType, violatorId, reason }) {
@@ -64,6 +64,7 @@ function addViolatorToViolationCase(currentUser, { violationCaseId, violatorType
     ..._.chain(newViolators).where({ violatorType: 'user' }).pluck('violatorId').value(),
     informer
   ];
+  console.log(newUnreadUsers);
 
   const now = new Date();
 
@@ -72,6 +73,7 @@ function addViolatorToViolationCase(currentUser, { violationCaseId, violatorType
     $addToSet: { unreadUsers: { $each: newUnreadUsers } },
     $push: { violators: { $each: newViolators } }
   });
+  notifyUnreadUsers(violationCaseId);
 
   dbViolationCaseActionLogs.insert({
     violationCaseId,

@@ -6,6 +6,7 @@ import { dbViolationCases } from '/db/dbViolationCases';
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
 import { guardUser } from '/common/imports/guards';
+import { notifyUsersForFscLog } from './helpers';
 
 Meteor.methods({
   confiscateUserStocks({ userId, companyId, reason, violationCaseId }) {
@@ -60,4 +61,5 @@ function confiscateUserStocks(currentUser, { userId, companyId, reason, violatio
     data: { reason, stocks, violationCaseId },
     createdAt: now
   });
+  notifyUsersForFscLog(userId);
 }

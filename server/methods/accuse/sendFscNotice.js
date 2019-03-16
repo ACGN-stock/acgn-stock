@@ -5,6 +5,7 @@ import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
 import { dbViolationCases } from '/db/dbViolationCases';
 import { guardUser } from '/common/imports/guards';
+import { notifyUsersForFscLog } from './helpers';
 
 Meteor.methods({
   sendFscNotice({ userIds, companyId, message, violationCaseId }) {
@@ -32,11 +33,13 @@ function sendFscNotice(currentUser, { userIds, companyId, message, violationCase
     dbViolationCases.findByIdOrThrow(violationCaseId, { fields: { _id: 1 } });
   }
 
+  const now = new Date();
   dbLog.insert({
     logType: '金管通告',
     userId: [currentUser._id, ...nonEmptyUserIds],
     companyId,
     data: { message, violationCaseId },
-    createdAt: new Date()
+    createdAt: now
   });
+  notifyUsersForFscLog(...nonEmptyUserIds);
 }

@@ -60,7 +60,7 @@
   {{#if isDisplay}}
     <div class="media bg-warning px-2 py-1 my-2 rounded footer-message-container">
       <div class="media-body footer-message" style="color: white">
-        <strong>【注意】</strong> 您有 {{getPublishedCount 'currentUserUnreadAnnouncements'}} 則未讀的系統公告，請至<a style="color: yellow" href="{{pathFor 'announcementList'}}">系統公告</a>頁面查看！
+        <strong>【注意】</strong> 您有 {{count}} 則未讀的系統公告，請至<a style="color: yellow" href="{{pathFor 'announcementList'}}">系統公告</a>頁面查看！
       </div>
       <div class="footer-message-close-button">
         <a class="btn btn-warning btn-sm" href="#">
@@ -75,7 +75,7 @@
   {{#if isDisplay}}
     <div class="media bg-danger px-2 py-1 my-2 rounded footer-message-container">
       <div class="media-body footer-message" style="color: white">
-        <strong>【警告】</strong> 您有 {{getPublishedCount 'currentUserUnreadViolationCases'}} 則未讀的違規案件，請至<a style="color: cyan" href="{{pathForUnreadViolationCaseList}}">違規案件列表</a>頁面查看！
+        <strong>【警告】</strong> 您有 {{count}} 則未讀的違規案件，請至<a style="color: cyan" href="{{pathForUnreadViolationCaseList}}">違規案件列表</a>頁面查看！
       </div>
       <div class="footer-message-close-button">
         <a class="btn btn-danger btn-sm" href="#">

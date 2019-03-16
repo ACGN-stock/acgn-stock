@@ -6,6 +6,7 @@ import { dbViolationCases } from '/db/dbViolationCases';
 import { dbViolationCaseActionLogs } from '/db/dbViolationCaseActionLogs';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
+import { dbNotifications, notificationCategories } from '/db/dbNotifications';
 
 const RESTRICTED_FIELDS = ['informer', 'unreadUsers'];
 
@@ -13,8 +14,13 @@ Meteor.publish('violationCaseDetail', function(violationCaseId) {
   debug.log('publish violationCaseDetail');
   check(violationCaseId, String);
 
-  // 消除未讀標記
+  // 消除未讀
   if (this.userId) {
+    dbNotifications.remove({
+      category: notificationCategories.VIOLATION_CASE,
+      targetUser: this.userId,
+      'data.violationCaseId': violationCaseId
+    });
     dbViolationCases.update(violationCaseId, { $pull: { unreadUsers: this.userId } });
   }
 

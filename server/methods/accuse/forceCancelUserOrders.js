@@ -8,6 +8,7 @@ import { dbDirectors } from '/db/dbDirectors';
 import { dbViolationCases } from '/db/dbViolationCases';
 import { dbOrders } from '/db/dbOrders';
 import { dbLog } from '/db/dbLog';
+import { notifyUsersForFscLog } from '/server/methods/accuse/helpers';
 
 Meteor.methods({
   forceCancelUserOrders({ userId, reason, violationCaseId }) {
@@ -69,6 +70,7 @@ export function forceCancelUserOrders(currentUser, { userId, reason, violationCa
   dbOrders.remove({ userId });
   Meteor.users.update(userId, { $inc: { 'profile.money': increaseMoney } });
   executeBulksSync(logBulk, directorsBulk);
+  notifyUsersForFscLog(userId);
 }
 
 // TODO need better name?
