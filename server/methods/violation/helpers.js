@@ -59,7 +59,6 @@ export function populateViolators({ violatorType, violatorId }) {
 
 export function notifyUnreadUsers(violationCaseId) {
   const { unreadUsers } = dbViolationCases.findByIdOrThrow(violationCaseId, { fields: { unreadUsers: 1 } });
-  console.log(unreadUsers);
   const bulkOp = dbNotifications.rawCollection().initializeUnorderedBulkOp();
 
   unreadUsers.forEach((userId) => {
