@@ -26,7 +26,6 @@ export function placeStone({ userId, companyId, stoneType }, resourceLocked = fa
   const currentSeason = dbSeason.findOne({}, { sort: { beginDate: -1 } });
 
   if (currentSeason.endDate.getTime() - Date.now() <= miningMachineOperationTime) {
-    console.log(currentSeason);
     throw new Meteor.Error(403, '現在是挖礦機運轉時間，無法放石！');
   }
 

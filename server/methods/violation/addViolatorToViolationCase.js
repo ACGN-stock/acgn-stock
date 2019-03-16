@@ -64,7 +64,6 @@ function addViolatorToViolationCase(currentUser, { violationCaseId, violatorType
     ..._.chain(newViolators).where({ violatorType: 'user' }).pluck('violatorId').value(),
     informer
   ];
-  console.log(newUnreadUsers);
 
   const now = new Date();
 
