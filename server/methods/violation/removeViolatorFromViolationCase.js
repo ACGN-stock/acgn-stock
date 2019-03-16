@@ -5,6 +5,7 @@ import { _ } from 'meteor/underscore';
 import { dbViolationCases, violatorTypeList, violatorTypeDisplayName } from '/db/dbViolationCases';
 import { dbViolationCaseActionLogs, actionMap } from '/db/dbViolationCaseActionLogs';
 import { guardUser } from '/common/imports/guards';
+import { notifyUnreadUsers } from './helpers';
 
 Meteor.methods({
   removeViolatorFromViolationCase({ violationCaseId, violatorType, violatorId, reason }) {
@@ -49,6 +50,7 @@ function removeViolatorFromViolationCase(currentUser, { violationCaseId, violato
     $addToSet: { unreadUsers: { $each: newUnreadUsers } },
     $pull: { violators: { violatorType, violatorId } }
   });
+  notifyUnreadUsers(violationCaseId);
 
   dbViolationCaseActionLogs.insert({
     violationCaseId,

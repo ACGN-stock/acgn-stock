@@ -6,6 +6,7 @@ import { dbViolationCases } from '/db/dbViolationCases';
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
 import { guardUser } from '/common/imports/guards';
+import { notifyUsersForFscLog } from './helpers';
 
 Meteor.methods({
   takeDownAdvertising({ advertisingId, reason, violationCaseId }) {
@@ -35,5 +36,6 @@ function takeDownAdvertising(currentUser, { advertisingId, reason, violationCase
     data: { message, reason, violationCaseId },
     createdAt: new Date()
   });
+  notifyUsersForFscLog(userId);
   dbAdvertising.remove(advertisingId);
 }
