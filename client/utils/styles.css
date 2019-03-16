@@ -311,6 +311,9 @@ body {
   vertical-align: middle;
   margin: 0px;
 }
+.company-card .row .user-info {
+  max-width: 100%;
+}
 .company-card .row-info p {
   color: #000;
   margin: 0.1rem 1rem;
