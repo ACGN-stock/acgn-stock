@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
+import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
 
 // 新創公司失敗之處理
 export function doOnFoundationFailure(foundationData) {
@@ -48,8 +49,5 @@ export function doOnFoundationFailure(foundationData) {
     .find({ companyId })
     .update({ $unset: { companyId: 1 } });
 
-  Meteor.wrapAsync(logBulk.execute).call(logBulk);
-  if (foundationData.invest.length > 0) {
-    Meteor.wrapAsync(usersBulk.execute).call(usersBulk);
-  }
+  executeBulksSync(logBulk, usersBulk);
 }
