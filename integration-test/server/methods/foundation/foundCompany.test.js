@@ -132,7 +132,7 @@ describe('method foundCompany', function() {
     const expectCompanyArchiveData = {
       _id: companyArchiveData._id,
       status: 'foundation',
-      name: foundCompanyData.companyName,
+      companyName: foundCompanyData.companyName,
       tags: foundCompanyData.tags,
       description: foundCompanyData.description,
       invest: []
