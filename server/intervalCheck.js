@@ -5,7 +5,6 @@ import { UserStatus } from 'meteor/mizzao:user-status';
 import { resourceManager } from '/server/imports/threading/resourceManager';
 import { debug } from '/server/imports/utils/debug';
 import { backupMongo } from '/server/imports/utils/backupMongo';
-import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
 import { clearAllUserProductVouchers } from '/server/functions/product/vouchers/clearAllUserProductVouchers';
 import { deliverProductVouchers } from '/server/functions/product/vouchers/deliverProductVouchers';
 import { resetAllUserVoteTickets } from '/server/functions/product/voteTickets/resetAllUserVoteTickets';
@@ -142,35 +141,29 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
     backupMongo('-roundAfter');
 
     // 保管所有未查封公司的狀態
-    const companyArchiveBulk = dbCompanyArchive.rawCollection().initializeUnorderedBulkOp();
     dbCompanies
-      .find({}, {
+      .find({ isSeal: false }, {
         fields: {
           _id: 1,
           tags: 1,
           pictureSmall: 1,
           pictureBig: 1,
-          description: 1,
-          isSeal: 1
+          description: 1
         }
       })
-      .forEach(({ _id, tags, pictureSmall, pictureBig, description, isSeal }) => {
-        if (isSeal) {
-          companyArchiveBulk.find({ _id }).removeOne();
-        }
-        else {
-          companyArchiveBulk.find({ _id }).updateOne({
-            $set: {
-              status: 'archived',
-              tags,
-              pictureSmall,
-              pictureBig,
-              description
-            }
-          });
-        }
+      .forEach(({ _id, tags, pictureSmall, pictureBig, description }) => {
+        dbCompanyArchive.update(_id, {
+          $set: {
+            status: 'archived',
+            tags,
+            pictureSmall,
+            pictureBig,
+            description
+          }
+        });
       });
-    executeBulksSync(companyArchiveBulk);
+    dbCompanyArchive.remove({ status: 'foundation' });
+    dbCompanyArchive.remove({ status: 'market' });
 
     // 移除所有廣告
     dbAdvertising.remove({});
