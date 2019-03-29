@@ -117,7 +117,7 @@ describe('method foundCompany', function() {
       status: 'market',
       name: foundCompanyData.companyName,
       tags: [],
-      description: faker.random.words()
+      description: faker.random.words(10)
     });
     foundCompany.bind(null, user, foundCompanyData)
       .must.throw(Meteor.Error, '已有相同名稱的公司上市或創立中，無法創立同名公司！ [403]');
