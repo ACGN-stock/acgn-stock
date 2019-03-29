@@ -43,7 +43,7 @@ export function doOnFoundationFailure(foundationData) {
   });
 
   dbFoundations.remove(companyId);
-  dbCompanyArchive.remove(companyId);
+  dbCompanyArchive.update(companyId, { $set: { status: 'archived' } });
 
   logBulk
     .find({ companyId })

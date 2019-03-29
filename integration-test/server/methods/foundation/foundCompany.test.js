@@ -127,15 +127,14 @@ describe('method foundCompany', function() {
   it('should success found company', function() {
     foundCompany.bind(null, user, foundCompanyData).must.not.throw();
 
-    const companyArchiveData = dbCompanyArchive.findOne({ companyName: foundCompanyData.companyName });
+    const companyArchiveData = dbCompanyArchive.findOne({ companyName: foundCompanyData.companyName, status: 'foundation' });
     expect(companyArchiveData).to.exist();
     const expectCompanyArchiveData = {
       _id: companyArchiveData._id,
       status: 'foundation',
       companyName: foundCompanyData.companyName,
       tags: foundCompanyData.tags,
-      description: foundCompanyData.description,
-      invest: []
+      description: foundCompanyData.description
     };
     if (foundCompanyData.pictureSmall) {
       expectCompanyArchiveData.pictureSmall = foundCompanyData.pictureSmall;
@@ -157,5 +156,17 @@ describe('method foundCompany', function() {
     const { founderEarnestMoney } = Meteor.settings.public;
     const userData = Meteor.users.findOne(user._id, { fields: { 'profile.money': 1 } });
     expect(userData.profile.money).to.equal(user.profile.money - founderEarnestMoney);
+  });
+
+  it('should inherit id if same name company is in archived', function() {
+    const expectId = dbCompanyArchive.insert({
+      status: 'archived',
+      companyName: foundCompanyData.companyName,
+      tags: [],
+      description: faker.random.words(10)
+    });
+    foundCompany.bind(null, user, foundCompanyData).must.not.throw();
+    expect(dbCompanyArchive.findOne(expectId).status).to.equal('foundation');
+    expect(dbFoundations.findOne({ companyName: foundCompanyData.companyName })._id).to.equal(expectId);
   });
 });

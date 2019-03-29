@@ -31,7 +31,11 @@ function changeCompanyName(user, { companyId, newCompanyName, violationCaseId })
     dbViolationCases.findByIdOrThrow(violationCaseId, { fields: { _id: 1 } });
   }
 
+  checkSameNameCompanyError(newCompanyName);
+
   const { companyName: oldCompanyName } = dbCompanyArchive.findByIdOrThrow(companyId, { fields: { companyName: 1 } });
+
+  dbCompanyArchive.remove({ companyName: newCompanyName, status: 'archived' });
 
   dbLog.insert({
     logType: '公司更名',
@@ -45,3 +49,12 @@ function changeCompanyName(user, { companyId, newCompanyName, violationCaseId })
   dbCompanyArchive.update(companyId, { $set: { companyName: newCompanyName } });
 }
 limitMethod('changeCompanyName');
+
+
+function checkSameNameCompanyError(newCompanyName) {
+  dbCompanyArchive.find({ companyName: newCompanyName }, { fields: { status: 1 } }).forEach(({ status }) => {
+    if (status !== 'archived') {
+      throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法使用相同名稱！');
+    }
+  });
+}

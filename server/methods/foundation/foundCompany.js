@@ -52,14 +52,7 @@ export function foundCompany(user, foundCompanyData) {
     checkSameNameCompanyError(companyName);
 
     // 存放進archive中並取得_id
-    foundCompanyData._id = dbCompanyArchive.insert({
-      status: 'foundation',
-      companyName: foundCompanyData.companyName,
-      tags: foundCompanyData.tags,
-      pictureSmall: foundCompanyData.pictureSmall,
-      pictureBig: foundCompanyData.pictureBig,
-      description: foundCompanyData.description
-    });
+    foundCompanyData._id = insertOrUpdateCompanyArchive(foundCompanyData);
     foundCompanyData.founder = userId;
     foundCompanyData.manager = userId;
     const createdAt = new Date();
@@ -149,9 +142,11 @@ function checkTimeFoundLimitError() {
 }
 
 function checkSameNameCompanyError(companyName) {
-  if (dbCompanyArchive.find({ companyName }, { fields: { _id: 1 } }).count() > 0) {
-    throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
-  }
+  dbCompanyArchive.find({ companyName }, { fields: { status: 1 } }).forEach(({ status }) => {
+    if (status !== 'archived') {
+      throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
+    }
+  });
 }
 
 function checkImageUrlError(foundCompanyData) {
@@ -161,4 +156,34 @@ function checkImageUrlError(foundCompanyData) {
   if (foundCompanyData.pictureSmall) {
     checkImageUrl(foundCompanyData.pictureSmall);
   }
+}
+
+
+function insertOrUpdateCompanyArchive({ companyName, tags, pictureSmall, pictureBig, description }) {
+  const companyArchiveData = dbCompanyArchive.findOne({ companyName }, { fields: { _id: 1 } });
+  let companyArchiveId;
+  if (companyArchiveData) {
+    dbCompanyArchive.update(companyArchiveData._id, {
+      $set: {
+        status: 'foundation',
+        tags,
+        pictureSmall,
+        pictureBig,
+        description
+      }
+    });
+    companyArchiveId = companyArchiveData._id;
+  }
+  else {
+    companyArchiveId = dbCompanyArchive.insert({
+      status: 'foundation',
+      companyName,
+      tags,
+      pictureSmall,
+      pictureBig,
+      description
+    });
+  }
+
+  return companyArchiveId;
 }

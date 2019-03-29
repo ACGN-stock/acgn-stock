@@ -49,8 +49,10 @@ describe('function doOnFoundationFailure', function() {
     const foundationData = dbFoundations.findOne(companyId);
     doOnFoundationFailure(foundationData);
 
+    const companyArchiveData = dbCompanyArchive.findOne(companyId);
+    expect(companyArchiveData).to.exist();
+    expect(companyArchiveData.status).to.equal('archived');
     expect(dbFoundations.findOne(companyId)).to.not.exist();
-    expect(dbCompanyArchive.findOne(companyId)).to.not.exist();
     expect(dbLog.findOne({ companyId })).to.not.exist();
   });
 
