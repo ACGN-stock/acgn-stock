@@ -22,7 +22,9 @@ Template.displayLog.onRendered(function() {
       url: '/companyInfo',
       data: { id: companyId },
       dataType: 'json',
-      success: ({ companyName, status }) => {
+      success: (companyData) => {
+        const { status } = companyData;
+        const companyName = companyData.companyName || companyData.name;
         let path;
         // TODO write a helper
         switch (status) {
