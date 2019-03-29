@@ -13,7 +13,7 @@ const schema = new SimpleSchema({
     allowedValues: ['archived', 'foundation', 'market']
   },
   // 公司名稱
-  name: {
+  companyName: {
     type: String
   },
   // 相關搜索用Tag

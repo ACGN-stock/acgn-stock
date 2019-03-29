@@ -104,7 +104,7 @@ describe('method foundCompany', function() {
   it('should fail if have the same name company is in foundation', function() {
     dbCompanyArchive.insert({
       status: 'foundation',
-      name: foundCompanyData.companyName,
+      companyName: foundCompanyData.companyName,
       tags: [],
       description: faker.random.words(10)
     });
@@ -115,7 +115,7 @@ describe('method foundCompany', function() {
   it('should fail if have the same name company is in market', function() {
     dbCompanyArchive.insert({
       status: 'market',
-      name: foundCompanyData.companyName,
+      companyName: foundCompanyData.companyName,
       tags: [],
       description: faker.random.words(10)
     });
@@ -127,7 +127,7 @@ describe('method foundCompany', function() {
   it('should success found company', function() {
     foundCompany.bind(null, user, foundCompanyData).must.not.throw();
 
-    const companyArchiveData = dbCompanyArchive.findOne({ name: foundCompanyData.companyName });
+    const companyArchiveData = dbCompanyArchive.findOne({ companyName: foundCompanyData.companyName });
     expect(companyArchiveData).to.exist();
     const expectCompanyArchiveData = {
       _id: companyArchiveData._id,

@@ -28,7 +28,7 @@ Template.companyLink.onRendered(function() {
       },
       dataType: 'json',
       success: (companyData) => {
-        const companyName = companyData.name;
+        const { companyName } = companyData;
         let path;
         switch (companyData.status) {
           case 'foundation': {

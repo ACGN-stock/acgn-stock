@@ -54,7 +54,7 @@ export function foundCompany(user, foundCompanyData) {
     // 存放進archive中並取得_id
     foundCompanyData._id = dbCompanyArchive.insert({
       status: 'foundation',
-      name: foundCompanyData.companyName,
+      companyName: foundCompanyData.companyName,
       tags: foundCompanyData.tags,
       pictureSmall: foundCompanyData.pictureSmall,
       pictureBig: foundCompanyData.pictureBig,
@@ -149,7 +149,7 @@ function checkTimeFoundLimitError() {
 }
 
 function checkSameNameCompanyError(companyName) {
-  if (dbCompanyArchive.find({ name: companyName }, { fields: { _id: 1 } }).count() > 0) {
+  if (dbCompanyArchive.find({ companyName }, { fields: { _id: 1 } }).count() > 0) {
     throw new Meteor.Error(403, '已有相同名稱的公司上市或創立中，無法創立同名公司！');
   }
 }

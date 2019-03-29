@@ -31,7 +31,7 @@ function changeCompanyName(user, { companyId, newCompanyName, violationCaseId })
     dbViolationCases.findByIdOrThrow(violationCaseId, { fields: { _id: 1 } });
   }
 
-  const { name: oldCompanyName } = dbCompanyArchive.findByIdOrThrow(companyId, { fields: { name: 1 } });
+  const { companyName: oldCompanyName } = dbCompanyArchive.findByIdOrThrow(companyId, { fields: { companyName: 1 } });
 
   dbLog.insert({
     logType: '公司更名',
@@ -42,6 +42,6 @@ function changeCompanyName(user, { companyId, newCompanyName, violationCaseId })
   });
   dbCompanies.update(companyId, { $set: { companyName: newCompanyName } });
   dbFoundations.update(companyId, { $set: { companyName: newCompanyName } });
-  dbCompanyArchive.update(companyId, { $set: { name: newCompanyName } });
+  dbCompanyArchive.update(companyId, { $set: { companyName: newCompanyName } });
 }
 limitMethod('changeCompanyName');
