@@ -8,13 +8,14 @@ import { dbEmployees } from '/db/dbEmployees';
 import { getCurrentSeason } from '/db/dbSeason';
 import { changeChairmanTitle, confiscateCompanyProfit, markCompanyIllegal, returnCompanyProfit, toggleFavorite, unmarkCompanyIllegal } from '/client/utils/methods';
 import { currencyFormat } from '/client/utils/helpers';
+import { isHeadlessChrome } from '/client/utils/isHeadlessChrome';
 import { alertDialog } from '/client/layout/alertDialog';
 import { paramCompany, paramCompanyId } from './helpers';
 
 const TAGS_LIMIT = 3;
 
 Template.companyDetailNormalContent.onCreated(function() {
-  this.showAllTags = new ReactiveVar(false);
+  this.showAllTags = new ReactiveVar(isHeadlessChrome());
   this.autorunWithIdleSupport(() => {
     const companyId = paramCompanyId();
     if (companyId) {
