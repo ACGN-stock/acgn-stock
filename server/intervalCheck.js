@@ -140,12 +140,36 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
 
     backupMongo('-roundAfter');
 
+    // 保管所有未查封公司的狀態
+    dbCompanies
+      .find({ isSeal: false }, {
+        fields: {
+          _id: 1,
+          tags: 1,
+          pictureSmall: 1,
+          pictureBig: 1,
+          description: 1
+        }
+      })
+      .forEach(({ _id, tags, pictureSmall, pictureBig, description }) => {
+        dbCompanyArchive.update(_id, {
+          $set: {
+            status: 'archived',
+            tags,
+            pictureSmall,
+            pictureBig,
+            description
+          }
+        });
+      });
+    dbCompanyArchive.remove({ status: 'foundation' });
+    dbCompanyArchive.remove({ status: 'market' });
+
     // 移除所有廣告
     dbAdvertising.remove({});
 
     // 移除所有公司資料
     dbCompanies.remove({});
-    dbCompanyArchive.remove({});
     dbCompanyStones.remove({});
     // 移除所有股份資料
     dbDirectors.remove({});
