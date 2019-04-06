@@ -38,3 +38,8 @@ import './037-add-company-founder';
 import './038-add-creator-to-products';
 import './039-default-product-replenish-options';
 import './040-arena-rewrite';
+import './041-add-voided-index-to-announcements';
+import './042-notification-system';
+import './043-rename-name-to-companyName-in-companyArchive';
+import './044-remove-unnecessary-field-in-companyArchive';
+import './045-fix-rename-name-to-companyName-in-companyArchive';

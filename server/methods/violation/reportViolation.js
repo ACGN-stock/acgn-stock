@@ -4,7 +4,7 @@ import { _ } from 'meteor/underscore';
 
 import { dbViolationCases, violatorTypeList, categoryMap } from '/db/dbViolationCases';
 import { guardUser } from '/common/imports/guards';
-import { populateViolators } from './helpers';
+import { populateViolators, notifyUnreadUsers } from './helpers';
 
 Meteor.methods({
   reportViolation({ category, description, violator }) {
@@ -39,7 +39,7 @@ function reportViolation(currentUser, { category, description, violator }) {
 
   const now = new Date();
 
-  dbViolationCases.insert({
+  const violationCaseId = dbViolationCases.insert({
     informer: currentUser._id,
     state: 'pending',
     category,
@@ -49,4 +49,5 @@ function reportViolation(currentUser, { category, description, violator }) {
     createdAt: now,
     updatedAt: now
   });
+  notifyUnreadUsers(violationCaseId);
 }

@@ -4,6 +4,7 @@ import { check } from 'meteor/check';
 import { dbViolationCases } from '/db/dbViolationCases';
 import { dbViolationCaseActionLogs, actionMap } from '/db/dbViolationCaseActionLogs';
 import { guardUser } from '/common/imports/guards';
+import { notifyUnreadUsers } from './helpers';
 
 Meteor.methods({
   removeRelatedCaseFromViolationCase({ violationCaseId, relatedCaseId, reason }) {
@@ -44,6 +45,7 @@ function removeRelatedCaseFromViolationCase(currentUser, { violationCaseId, rela
     $addToSet: { unreadUsers: informer },
     $pull: { relatedCases: relatedCaseId }
   });
+  notifyUnreadUsers(violationCaseId);
 
   dbViolationCaseActionLogs.insert({
     violationCaseId,
@@ -58,6 +60,7 @@ function removeRelatedCaseFromViolationCase(currentUser, { violationCaseId, rela
     $addToSet: { unreadUsers: relatedCaseInformer },
     $pull: { relatedCases: violationCaseId }
   });
+  notifyUnreadUsers(relatedCaseId);
 
   dbViolationCaseActionLogs.insert({
     violationCaseId: relatedCaseId,

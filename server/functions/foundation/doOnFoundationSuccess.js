@@ -7,6 +7,7 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 import { dbDirectors } from '/db/dbDirectors';
 import { dbPrice } from '/db/dbPrice';
+import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
 
 const { minReleaseStock } = Meteor.settings.public;
 
@@ -133,9 +134,6 @@ export function doOnFoundationSuccess(foundationData) {
     createdAt: basicCreatedAt
   });
 
-  let needExecuteDirectorsBulk = false;
-  let needExecuteUserBulk = false;
-
   directors.forEach(({ userId, stocks, refund }, index) => {
     const createdAt = new Date(basicCreatedAt.getTime() + index + 1);
     if (stocks > 0) {
@@ -149,7 +147,6 @@ export function doOnFoundationSuccess(foundationData) {
         },
         createdAt: createdAt
       });
-      needExecuteDirectorsBulk = true;
       directorsBulk.insert({ companyId, userId, stocks, createdAt });
     }
     if (refund > 0) {
@@ -163,24 +160,13 @@ export function doOnFoundationSuccess(foundationData) {
         },
         createdAt: createdAt
       });
-      needExecuteUserBulk = true;
       usersBulk
         .find({ _id: userId })
         .updateOne({ $inc: { 'profile.money': refund } });
     }
   });
 
-  Meteor.wrapAsync(companiesBulk.execute).call(companiesBulk);
-  Meteor.wrapAsync(logBulk.execute).call(logBulk);
-
-  if (needExecuteDirectorsBulk) {
-    Meteor.wrapAsync(directorsBulk.execute).call(directorsBulk);
-  }
-
-  if (needExecuteUserBulk) {
-    Meteor.wrapAsync(usersBulk.execute).call(usersBulk);
-  }
-
+  executeBulksSync(companiesBulk, logBulk, directorsBulk, usersBulk);
   dbFoundations.remove(companyId);
   dbCompanyArchive.update(companyId, { $set: { status: 'market' } });
 }

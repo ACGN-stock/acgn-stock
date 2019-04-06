@@ -188,11 +188,6 @@ const schema = new SimpleSchema({
         type: SimpleSchema.Integer,
         defaultValue: 0
       },
-      // 最後閱讀的金管會相關訊息時間
-      lastReadFscLogDate: {
-        type: Date,
-        optional: true
-      },
       // 是否處於渡假模式
       isInVacation: {
         type: Boolean,
@@ -292,4 +287,3 @@ Meteor.users.deny({
     return true;
   }
 });
-

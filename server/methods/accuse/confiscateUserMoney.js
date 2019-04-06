@@ -5,6 +5,7 @@ import { dbViolationCases } from '/db/dbViolationCases';
 import { dbLog } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
 import { guardUser } from '/common/imports/guards';
+import { notifyUsersForFscLog } from './helpers';
 
 Meteor.methods({
   confiscateUserMoney({ userId, reason, amount, violationCaseId }) {
@@ -45,6 +46,7 @@ function confiscateUserMoney(currentUser, { userId, reason, amount, violationCas
     },
     createdAt: new Date()
   });
+  notifyUsersForFscLog(userId);
 
   Meteor.users.update(userId, { $inc: { 'profile.money': -amount } });
 }

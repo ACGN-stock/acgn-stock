@@ -5,6 +5,7 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { dbLog, logTypeGroupMap } from '/db/dbLog';
 import { debug } from '/server/imports/utils/debug';
+import { dbNotifications, notificationCategories } from '/db/dbNotifications';
 
 Meteor.publish('accountInfoLog', function({ userId, logTypeGroups, offset }) {
   debug.log('publish accountInfoLog', { userId, logTypeGroups, offset });
@@ -12,13 +13,11 @@ Meteor.publish('accountInfoLog', function({ userId, logTypeGroups, offset }) {
   check(logTypeGroups, Match.Optional([String]));
   check(offset, Match.Integer);
 
-  // 處理金管會紀錄最後讀取時間
-  // TODO: 將通知獨立於 log 機制
+  // 消除未讀通知
   if (this.userId === userId && logTypeGroups && logTypeGroups.includes('fsc')) {
-    Meteor.users.update({
-      _id: userId
-    }, {
-      $set: { 'profile.lastReadFscLogDate': new Date() }
+    dbNotifications.remove({
+      category: notificationCategories.FSC_LOG,
+      targetUser: this.userId
     });
   }
 

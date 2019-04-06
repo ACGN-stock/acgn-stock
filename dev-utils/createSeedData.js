@@ -82,7 +82,7 @@ if (Meteor.isServer && Meteor.isDevelopment) {
         companyArchiveBulk.insert({
           _id: companyData._id,
           status: 'market',
-          name: companyData.companyName,
+          companyName: companyData.companyName,
           tags: companyData.tags,
           pictureSmall: companyData.pictureSmall,
           pictureBig: companyData.pictureSmall,

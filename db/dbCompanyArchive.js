@@ -13,7 +13,7 @@ const schema = new SimpleSchema({
     allowedValues: ['archived', 'foundation', 'market']
   },
   // 公司名稱
-  name: {
+  companyName: {
     type: String
   },
   // 相關搜索用Tag
@@ -45,14 +45,6 @@ const schema = new SimpleSchema({
     type: String,
     min: 10,
     max: 3000
-  },
-  // 投資人列表
-  invest: {
-    type: Array,
-    defaultValue: []
-  },
-  'invest.$': {
-    type: String
   }
 });
 dbCompanyArchive.attachSchema(schema);

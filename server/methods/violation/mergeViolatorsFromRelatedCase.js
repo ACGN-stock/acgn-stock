@@ -5,6 +5,7 @@ import { _ } from 'meteor/underscore';
 import { dbViolationCases } from '/db/dbViolationCases';
 import { dbViolationCaseActionLogs, actionMap } from '/db/dbViolationCaseActionLogs';
 import { guardUser } from '/common/imports/guards';
+import { notifyUnreadUsers } from './helpers';
 
 Meteor.methods({
   mergeViolatorsFromRelatedCase({ violationCaseId, relatedCaseId, reason }) {
@@ -60,6 +61,7 @@ function mergeViolatorsFromRelatedCase(currentUser, { violationCaseId, relatedCa
     $addToSet: { unreadUsers: { $each: newUnreadUsers } },
     $push: { violators: { $each: newViolators } }
   });
+  notifyUnreadUsers(violationCaseId);
 
   dbViolationCaseActionLogs.insert({
     violationCaseId,

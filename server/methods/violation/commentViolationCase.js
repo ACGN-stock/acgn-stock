@@ -5,6 +5,7 @@ import { _ } from 'meteor/underscore';
 import { dbViolationCases } from '/db/dbViolationCases';
 import { dbViolationCaseActionLogs, actionMap } from '/db/dbViolationCaseActionLogs';
 import { guardUser } from '/common/imports/guards';
+import { notifyUnreadUsers } from './helpers';
 
 Meteor.methods({
   commentViolationCase({ violationCaseId, reason }) {
@@ -43,6 +44,7 @@ function commentViolationCase(currentUser, { violationCaseId, reason }) {
     $set: { updatedAt: now },
     $addToSet: { unreadUsers: { $each: newUnreadUsers } }
   });
+  notifyUnreadUsers(violationCaseId);
 
   dbViolationCaseActionLogs.insert({
     violationCaseId,

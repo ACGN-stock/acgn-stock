@@ -7,6 +7,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 
 import { dbAdvertising } from '/db/dbAdvertising';
 import { dbVariables } from '/db/dbVariables';
+import { notificationCategories } from '/db/dbNotifications';
 import { rMainTheme } from '../utils/styles';
 import { shouldStopSubscribe } from '../utils/idle';
 
@@ -52,37 +53,8 @@ Template.footer.helpers({
 Template.unreadImportantFscLogsNotification.onCreated(function() {
   this.rIsDisplay = new ReactiveVar(false);
 
-  this.autorun(() => {
-    if (shouldStopSubscribe()) {
-      return;
-    }
-
-    const user = Meteor.user();
-    if (! user) {
-      this.rIsDisplay.set(false);
-
-      return;
-    }
-
-    this.subscribe('lastImportantFscLogDate');
-
-    const lastImportantFscLogDate = dbVariables.get('lastImportantFscLogDate');
-
-    if (! lastImportantFscLogDate) {
-      this.rIsDisplay.set(false);
-
-      return;
-    }
-
-    if (! user.status || ! user.profile.lastReadFscLogDate) {
-      this.rIsDisplay.set(true);
-
-      return false;
-    }
-
-    const lastReadFscLogDate = user.profile.lastReadFscLogDate;
-
-    this.rIsDisplay.set(lastReadFscLogDate < lastImportantFscLogDate);
+  this.autorunWithIdleSupport(() => {
+    this.rIsDisplay.set(Counts.get(`notification.${notificationCategories.FSC_LOG}`) > 0);
   });
 });
 Template.unreadImportantFscLogsNotification.helpers({
@@ -132,20 +104,14 @@ Template.displayAnnouncementUnreadNotification.onCreated(function() {
   this.rIsDisplay = new ReactiveVar(false);
 
   this.autorunWithIdleSupport(() => {
-    const user = Meteor.user();
-    if (! user) {
-      return;
-    }
-
-    this.subscribe('currentUserUnreadAnnouncementCount');
-  });
-
-  this.autorunWithIdleSupport(() => {
-    this.rIsDisplay.set(Counts.get('currentUserUnreadAnnouncements') > 0);
+    this.rIsDisplay.set(Counts.get(`notification.${notificationCategories.ANNOUNCEMENT}`) > 0);
   });
 });
 
 Template.displayAnnouncementUnreadNotification.helpers({
+  count() {
+    return Counts.get(`notification.${notificationCategories.ANNOUNCEMENT}`);
+  },
   isDisplay() {
     return Template.instance().rIsDisplay.get();
   }
@@ -162,20 +128,14 @@ Template.displayViolationCaseUnreadNotification.onCreated(function() {
   this.rIsDisplay = new ReactiveVar(false);
 
   this.autorunWithIdleSupport(() => {
-    const user = Meteor.user();
-    if (! user) {
-      return;
-    }
-
-    this.subscribe('currentUserUnreadViolationCaseCount');
-  });
-
-  this.autorunWithIdleSupport(() => {
-    this.rIsDisplay.set(Counts.get('currentUserUnreadViolationCases') > 0);
+    this.rIsDisplay.set(Counts.get(`notification.${notificationCategories.VIOLATION_CASE}`) > 0);
   });
 });
 
 Template.displayViolationCaseUnreadNotification.helpers({
+  count() {
+    return Counts.get(`notification.${notificationCategories.VIOLATION_CASE}`);
+  },
   isDisplay() {
     return Template.instance().rIsDisplay.get();
   },
