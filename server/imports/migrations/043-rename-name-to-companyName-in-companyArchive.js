@@ -7,8 +7,7 @@ defineMigration({
   async up() {
     await dbCompanyArchive.rawCollection().dropIndex({ name: 1 });
     await dbCompanyArchive.rawCollection().update({}, {
-      $rename: { name: 'companyName' },
-      $unset: { invest: 1 }
+      $rename: { name: 'companyName' }
     }, { multi: true });
     await dbCompanyArchive.rawCollection().createIndex({ companyName: 1 }, { unique: true });
   }
