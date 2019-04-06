@@ -1,7 +1,6 @@
 import { defineMigration } from '/server/imports/utils/defineMigration';
 import { dbCompanyArchive } from '/db/dbCompanyArchive';
 
-// 無效的Migration，由45修復
 defineMigration({
   version: 43,
   name: 'rename name to companyName in companyArchive',
