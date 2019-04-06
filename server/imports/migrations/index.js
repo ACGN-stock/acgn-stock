@@ -42,4 +42,3 @@ import './041-add-voided-index-to-announcements';
 import './042-notification-system';
 import './043-rename-name-to-companyName-in-companyArchive';
 import './044-remove-unnecessary-field-in-companyArchive';
-import './045-fix-rename-name-to-companyName-in-companyArchive';
