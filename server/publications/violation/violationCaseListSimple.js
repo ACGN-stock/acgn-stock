@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { Counts } from 'meteor/tmeasday:publish-counts';
 
 import { hasRole } from '/db/users';
+import { getCurrentRound } from '/db/dbRound';
 import { dbViolationCases, categoryMap, stateMap } from '/db/dbViolationCases';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { publishWithTransformation } from '/server/imports/utils/publishWithTransformation';
@@ -45,7 +46,11 @@ Meteor.publish('violationCaseListSimple', function({ listType, userId, companyId
       Object.assign(filter, { 'violators.violatorType': 'user', 'violators.violatorId': userId });
       break;
     case 'companyViolated':
-      Object.assign(filter, { 'violators.violatorType': 'company', 'violators.violatorId': companyId });
+      Object.assign(filter, {
+        'violators.violatorType': 'company',
+        'violators.violatorId': companyId,
+        createdAt: { $gt: getCurrentRound().beginDate }
+      });
       break;
     case 'userReported':
       Object.assign(filter, { informer: userId });
