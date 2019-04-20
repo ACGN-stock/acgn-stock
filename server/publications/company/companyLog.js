@@ -2,6 +2,7 @@ import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
 
 import { dbLog } from '/db/dbLog';
+import { getCurrentRound } from '/db/dbRound';
 import { limitSubscription } from '/server/imports/utils/rateLimit';
 import { debug } from '/server/imports/utils/debug';
 import { publishTotalCount } from '/server/imports/utils/publishTotalCount';
@@ -12,7 +13,7 @@ Meteor.publish('companyLog', function(companyId, onlyShowMine, offset) {
   check(onlyShowMine, Boolean);
   check(offset, Match.Integer);
 
-  const filter = { companyId };
+  const filter = { companyId, createdAt: { $gt: getCurrentRound().beginDate } };
   const userId = Meteor.userId();
   if (onlyShowMine && userId) {
     filter.userId = {
