@@ -41,6 +41,15 @@ function fixTaxesExpireDate(fixDateFunc) {
   });
 }
 
+function fixFoundations(fixDateFunc) {
+  db.foundations.find().forEach((oldFoundation) => {
+    db.foundations.update(
+      { _id: oldFoundation._id },
+      { $set: { createdAt: fixDateFunc(oldFoundation.createdAt) } }
+    );
+  });
+}
+
 
 const lastLog = db.log.find().sort({ createdAt: -1 }).limit(1)[0];
 const addTime = Date.now() - lastLog.createdAt.getTime();
@@ -61,6 +70,7 @@ fixEventSchedule('company.checkChairman', fixDateToNow);
 fixEventSchedule('vip.checkVipLevels', fixDateToNow);
 fixUsersLastLogin(fixDateToNow);
 fixTaxesExpireDate(fixDateToNow);
+fixFoundations(fixDateToNow);
 
 
 const lastSeason = db.season.find().sort({ endDate: -1 }).limit(1)[0];
