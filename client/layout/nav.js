@@ -241,7 +241,7 @@ Template.navCompanyLink.onRendered(function() {
         const path = FlowRouter.path('companyDetail', { companyId });
         $link
           .attr('href', path)
-          .text(companyData.companyName || companyData.name);
+          .text(companyData.companyName);
       },
       error: () => {
         $link.text('???');
