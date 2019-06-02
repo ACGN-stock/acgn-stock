@@ -20,7 +20,7 @@ function fixVariable(variableId, fixDateFunc) {
 
 function fixUsersLastLogin(fixDateFunc) {
   db.users.find().forEach((oldUserData) => {
-    if (! oldUserData.status) {
+    if (! oldUserData.status || ! oldUserData.status.lastLogin) {
       // 只登入一次的使用者
       // TODO 修正 Accounts.createUser 不會自帶 status 的問題後 刪除此判斷
       return;
