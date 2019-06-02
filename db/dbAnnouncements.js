@@ -10,7 +10,7 @@ export const dbAnnouncements = new Mongo.Collection('announcements');
 export const announcementCategoryMap = {
   maintenance: {
     displayName: '系統維護',
-    announceableBy: ['superAdmin']
+    announceableBy: ['superAdmin', 'developer']
   },
   fsc: {
     displayName: '金管會',
@@ -26,15 +26,15 @@ export const announcementCategoryMap = {
   },
   knownProblems: {
     displayName: '已知問題',
-    announceableBy: ['developer']
+    announceableBy: ['planner', 'developer']
   },
   generalAnnouncements: {
     displayName: '營運公告',
-    announceableBy: ['planner']
+    announceableBy: ['planner', 'developer']
   },
   miscellaneous: {
     displayName: '其他雜項',
-    announceableBy: ['superAdmin', 'generalManager']
+    announceableBy: ['superAdmin', 'generalManager', 'planner', 'developer', 'fscMember']
   }
 };
 
