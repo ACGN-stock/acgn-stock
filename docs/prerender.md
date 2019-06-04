@@ -4,6 +4,8 @@
 
 Since the setup process is a little bit complicated, we wrote down this how-to document to help those in need.
 
+**This is not necessary**, you can just skip this if you won't develop anything about SEO.
+
 ## Setting Up a Prerender Server
 
 To enable this functionality, you will need a **prerender server** to handle the request.
@@ -14,7 +16,7 @@ If you don't want to run your own prerender server, check out [PrerenderIO](http
 
 ### Run Your Own Prerender Server
 
-If you choose to run your own prerender server, follow these steps:
+If you choose to run your own prerender server, you can use our [prerender-server](https://github.com/ACGN-stock/acgn-stock-prerender-server) project, or follow these steps to develop your server:
 
 1. install [Chrome](https://www.google.com/chrome/)
 
