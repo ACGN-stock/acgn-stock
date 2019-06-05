@@ -4,6 +4,8 @@
 
 Since the setup process is a little bit complicated, we wrote down this how-to document to help those in need.
 
+**This is not necessary**, you can just skip this if you won't develop anything about SEO.
+
 ## Setting Up a Prerender Server
 
 To enable this functionality, you will need a **prerender server** to handle the request.
@@ -12,9 +14,9 @@ To enable this functionality, you will need a **prerender server** to handle the
 
 If you don't want to run your own prerender server, check out [PrerenderIO](https://prerender.io/) for their hosted service.
 
-### Run Your Own Prerender Server 
+### Run Your Own Prerender Server
 
-If you choose to run your own prerender server, follow these steps:
+If you choose to run your own prerender server, you can use our [prerender-server](https://github.com/ACGN-stock/acgn-stock-prerender-server) project, or follow these steps to develop your server:
 
 1. install [Chrome](https://www.google.com/chrome/)
 
@@ -25,10 +27,10 @@ If you choose to run your own prerender server, follow these steps:
    ```sh
    npm install prerender --save
    ```
-   
+
    **IMPORTANT NOTE: Don't try to install prerender server in your `acgn-stock` project!**
-   
-   We tried to integrate prerender into this project (see #589, #591). Since then we encountered some serious issues which prevent `acgn-stock` from working, so we decided to remove it (see #597). 
+
+   We tried to integrate prerender into this project (see [#589](https://github.com/ACGN-stock/acgn-stock/pull/589), [#591](https://github.com/ACGN-stock/acgn-stock/pull/591)). Since then we encountered some serious issues which prevent `acgn-stock` from working, so we decided to remove it (see [#597](https://github.com/ACGN-stock/acgn-stock/pull/597)).
 
 3. write `index.js`
    ```js
@@ -49,7 +51,7 @@ If you choose to run your own prerender server, follow these steps:
    ```sh
    node index.js
    ```
-   
+
 After the server is started, you can connect to, for example, `http://localhost:3900/https://github.com/`, to see if it works.
 
 
