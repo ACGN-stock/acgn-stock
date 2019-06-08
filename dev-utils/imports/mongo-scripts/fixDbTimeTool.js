@@ -66,6 +66,9 @@ fixVariable('releaseStocksForNoDealBegin', fixDateToNow);
 fixVariable('releaseStocksForNoDealEnd', fixDateToNow);
 
 fixEventSchedule('company.recordListPrice', fixDateToNow);
+fixVariable('recordListPriceEnd', fixDateToNow);
+fixVariable('recordListPriceBegin', fixDateToNow);
+
 fixEventSchedule('company.checkChairman', fixDateToNow);
 fixEventSchedule('vip.checkVipLevels', fixDateToNow);
 fixUsersLastLogin(fixDateToNow);
@@ -74,7 +77,7 @@ fixFoundations(fixDateToNow);
 
 
 const lastSeason = db.season.find().sort({ endDate: -1 }).limit(1)[0];
-const lostWeekTime = Math.ceil((Date.now() - lastSeason.beginDate.getTime()) / 604800000) * 604800000;
+const lostWeekTime = (Math.floor((Date.now() - lastSeason.beginDate.getTime()) / 604800000) + (new Date().getDay() >= 5 ? 1 : 0)) * 604800000;
 const fixDateToNextWeek = (oldDate) => {
   return new Date(oldDate.getTime() + lostWeekTime);
 };

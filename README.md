@@ -10,7 +10,7 @@ A stock system simulator game which use acgn characters as company.
 
 1. sign in your github account
 2. choose issue label
-3. click new issue 
+3. click new issue
 4. write title and body
 5. send and wait for contributors reponse
 
@@ -18,8 +18,9 @@ A stock system simulator game which use acgn characters as company.
 
 1. Install [Meteor](https://www.meteor.com/install)
 2. git clone this project from github
-3. type `meteor npm install` in project folder
-4. type `meteor run --settings config.json` in project folder
+3. type `meteor --version` in project folder (let meteor install right version for this project)
+4. type `meteor npm install` in project folder
+5. type `meteor run --settings config.json` in project folder
 
 ## Documentation
 
