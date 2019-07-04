@@ -109,32 +109,32 @@ export const config = {
   productVoucherAmount: 7000, // 產品消費券的數量
   productRebates: { // 產品滿額回饋設定
     divisorAmount: 2000, // 滿額條件
-    initialDeliverPercent: 25, // 第一次達成滿額條件可得回饋百分比 (%)
-    minDeliverPercent: 2.5 // 最小可得回饋百分比 (%)
+    initialDeliverPercent: 100.0, // 第一次達成滿額條件可得回饋百分比 (%)
+    minDeliverPercent: 77.5 // 最小可得回饋百分比 (%)
   },
   vipParameters: { // VIP 各等級的參數
     0: {
-      productProfitFactor: 2.00, // 產品營利乘數
+      productProfitFactor: 1.40, // 產品營利乘數
       stockBonusFactor: 1.00 // 分紅股權乘數
     },
     1: {
-      productProfitFactor: 2.05,
+      productProfitFactor: 1.45,
       stockBonusFactor: 1.02
     },
     2: {
-      productProfitFactor: 2.20,
+      productProfitFactor: 1.80,
       stockBonusFactor: 1.05
     },
     3: {
-      productProfitFactor: 2.50,
+      productProfitFactor: 2.15,
       stockBonusFactor: 1.10
     },
     4: {
-      productProfitFactor: 3.00,
+      productProfitFactor: 2.49,
       stockBonusFactor: 1.25
     },
     5: {
-      productProfitFactor: 4.00,
+      productProfitFactor: 2.50,
       stockBonusFactor: 2.00
     }
   },
