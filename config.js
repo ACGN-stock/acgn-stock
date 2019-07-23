@@ -12,6 +12,9 @@ export const config = {
     use: false, // 是否使用prerender功能 (需要另外架設prerender server)
     url: 'http://127.0.0.1:3900/' // prerender server的位置
   },
+  google: {
+    analytics: 'UA-143586675-2' // GA Tracking ID (結尾 -1: prod, -2: dev)
+  },
   intervalTimer: 60000, // 每隔多少毫秒進行一次工作檢查
   releaseStocksForHighPriceInterval: { // 高價釋股的排程時間範圍 (ms)
     min: 10800000,

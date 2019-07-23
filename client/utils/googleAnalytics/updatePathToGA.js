@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
 let lastPath = '';
@@ -9,7 +10,7 @@ export function updatePathToGA() {
   }
   lastPath = path;
 
-  const gaTrackingId = 'UA-143586675-1';
+  const gaTrackingId = Meteor.settings.public.google.analytics;
   gtag('config', gaTrackingId, { 'page_path': path });
 }
 
