@@ -1,9 +1,15 @@
 import { Meteor } from 'meteor/meteor';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 
+import { isHeadlessChrome } from '/client/utils/isHeadlessChrome';
+
 let lastPath = '';
 
 export function updatePathToGA() {
+  if (isHeadlessChrome()) {
+    return;
+  }
+
   const { path } = FlowRouter.current();
   if (path === lastPath) {
     return;
