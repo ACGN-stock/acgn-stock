@@ -4,6 +4,7 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { DocHead } from 'meteor/kadira:dochead';
 
 import { rMainTheme } from '/client/utils/styles';
+import { updatePathToGA } from '/client/utils/googleAnalytics/updatePathToGA';
 import { getCurrentPage, getCurrentPageFullTitle } from '/routes';
 import { rAccountDialogMode } from './accountDialog';
 import { rShowAlertDialog, alertDialog } from './alertDialog';
@@ -12,6 +13,7 @@ Template.layout.onRendered(function() {
   this.autorun(() => {
     FlowRouter.watchPathChange();
     DocHead.setTitle(getCurrentPageFullTitle());
+    updatePathToGA();
   });
 });
 

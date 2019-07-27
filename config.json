@@ -12,6 +12,9 @@
       "use": false,
       "url": "http://127.0.0.1:3900/"
     },
+    "google": {
+      "analytics": "UA-143586675-2"
+    },
     "intervalTimer": 60000,
     "releaseStocksForHighPriceInterval": {
       "min": 10800000,
