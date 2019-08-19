@@ -4,6 +4,7 @@ import faker from 'faker';
 
 import { productTypeList, productRatingList, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { orderTypeList } from '/db/dbOrders';
+import { stateMap, categoryMap, violatorTypeList } from '/db/dbViolationCases';
 
 export const pttUserFactory = new Factory()
   .sequence('username', (n) => {
@@ -203,4 +204,38 @@ export const directorFactory = new Factory()
     createdAt() {
       return new Date();
     }
+  });
+
+export const violationCasesFactory = new Factory()
+  .option('violatorsNumber', faker.random.number({ min: 0, max: 100 }))
+  .attr('violators', ['violatorsNumber'], function(violatorsNumber) {
+    const violators = new Array(violatorsNumber);
+    for (let i = 0; i < violatorsNumber; i += 1) {
+      violators[i] = {
+        violatorType: faker.random.arrayElement(violatorTypeList),
+        violatorId: faker.random.uuid()
+      };
+    }
+
+    return violators;
+  })
+  .attrs({
+    informer() {
+      return faker.random.uuid();
+    },
+    state() {
+      return faker.random.arrayElement(Object.keys(stateMap));
+    },
+    category() {
+      return faker.random.arrayElement(Object.keys(categoryMap));
+    },
+    description() {
+      return faker.lorem.words(10);
+    },
+    createdAt() {
+      return faker.date.past();
+    }
+  })
+  .attr('updatedAt', ['createdAt'], function(createdAt) {
+    return faker.date.between(createdAt, new Date());
   });
