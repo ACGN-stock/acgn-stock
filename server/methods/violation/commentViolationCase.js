@@ -19,7 +19,7 @@ Meteor.methods({
   }
 });
 
-function commentViolationCase(currentUser, { violationCaseId, reason }) {
+export function commentViolationCase(currentUser, { violationCaseId, reason }) {
   guardUser(currentUser).checkHasRole('fscMember');
 
   const { state, violators, informer } = dbViolationCases.findByIdOrThrow(violationCaseId, {
