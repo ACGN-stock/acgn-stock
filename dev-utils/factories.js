@@ -208,7 +208,7 @@ export const directorFactory = new Factory()
   });
 
 export const violationCasesFactory = new Factory()
-  .option('violatorsNumber', faker.random.number({ min: 0, max: 100 }))
+  .option('violatorsNumber', faker.random.number({ min: 1, max: 100 }))
   .attr('violators', ['violatorsNumber'], function(violatorsNumber) {
     const violators = new Array(violatorsNumber);
     for (let i = 0; i < violatorsNumber; i += 1) {
