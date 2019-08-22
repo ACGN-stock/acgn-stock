@@ -5,6 +5,7 @@ import faker from 'faker';
 import { productTypeList, productRatingList, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { orderTypeList } from '/db/dbOrders';
 import { stateMap, categoryMap, violatorTypeList } from '/db/dbViolationCases';
+import { actionMap } from '/db/dbViolationCaseActionLogs';
 
 export const pttUserFactory = new Factory()
   .sequence('username', (n) => {
@@ -238,4 +239,23 @@ export const violationCasesFactory = new Factory()
   })
   .attr('updatedAt', ['createdAt'], function(createdAt) {
     return faker.date.between(createdAt, new Date());
+  });
+
+export const violationCaseActionLogFactory = new Factory()
+  .attrs({
+    violationCaseId() {
+      return faker.random.uuid();
+    },
+    action() {
+      return faker.random.arrayElement(actionMap);
+    },
+    executor() {
+      return faker.random.uuid();
+    },
+    data() {
+      return {};
+    },
+    executedAt() {
+      return faker.date.past();
+    }
   });
