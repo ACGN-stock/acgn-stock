@@ -28,7 +28,7 @@ describe('function doOnFoundationFailure', function() {
 
   let companyId;
 
-  beforeEach(function() {
+  beforeEach(async function() {
     resetDatabase();
 
     dbVariables.set('foundation.minInvestorCount', minInvestorCount);
@@ -41,8 +41,8 @@ describe('function doOnFoundationFailure', function() {
       invest: investors
     }));
 
-    dbCompanyArchive.rawCollection().insert({ _id: companyId });
-    dbLog.rawCollection().insert({ companyId });
+    await dbCompanyArchive.rawCollection().insert({ _id: companyId });
+    await dbLog.rawCollection().insert({ companyId });
   });
 
   it('should remove the foundation data', function() {
