@@ -209,17 +209,7 @@ export const directorFactory = new Factory()
 
 export const violationCasesFactory = new Factory()
   .option('violatorsNumber', faker.random.number({ min: 1, max: 100 }))
-  .attr('violators', ['violatorsNumber'], function(violatorsNumber) {
-    const violators = new Array(violatorsNumber);
-    for (let i = 0; i < violatorsNumber; i += 1) {
-      violators[i] = {
-        violatorType: faker.random.arrayElement(violatorTypeList),
-        violatorId: faker.random.uuid()
-      };
-    }
-
-    return violators;
-  })
+  .attr('violators', ['violatorsNumber'], getFakeViolators)
   .attrs({
     informer() {
       return faker.random.uuid();
@@ -247,15 +237,75 @@ export const violationCaseActionLogFactory = new Factory()
       return faker.random.uuid();
     },
     action() {
-      return faker.random.arrayElement(actionMap);
+      return faker.random.arrayElement(Object.keys(actionMap));
     },
     executor() {
       return faker.random.uuid();
     },
-    data() {
-      return {};
-    },
     executedAt() {
       return faker.date.past();
     }
+  })
+  .attr('data', ['action'], (action) => {
+    switch (action) {
+      case 'setState': {
+        return {
+          reason: faker.lorem.words(),
+          state: faker.random.arrayElement(Object.keys(stateMap))
+        };
+      }
+      case 'comment': {
+        return { reason: faker.lorem.words() };
+      }
+      case 'addRelatedCase': {
+        return {
+          reason: faker.lorem.words(),
+          relatedCaseId: faker.random.uuid()
+        };
+      }
+      case 'removeRelatedCase': {
+        return {
+          reason: faker.lorem.words(),
+          relatedCaseId: faker.random.uuid()
+        };
+      }
+      case 'mergeViolatorsFromRelatedCase': {
+        return {
+          reason: faker.lorem.words(),
+          relatedCaseId: faker.random.uuid(),
+          newViolators: getFakeViolators()
+        };
+      }
+      case 'addViolator': {
+        return {
+          reason: faker.lorem.words(),
+          newViolators: getFakeViolators()
+        };
+      }
+      case 'removeViolator': {
+        return {
+          reason: faker.lorem.words(),
+          violator: getFakeViolator()
+        };
+      }
+    }
   });
+
+function getFakeViolators(violatorsNumber = -1) {
+  if (violatorsNumber < 0) {
+    violatorsNumber = faker.random.number({ min: 1, max: 100 });
+  }
+  const violators = new Array(violatorsNumber);
+  for (let i = 0; i < violators.length; i += 1) {
+    violators[i] = getFakeViolator();
+  }
+
+  return violators;
+}
+
+function getFakeViolator() {
+  return {
+    violatorType: faker.random.arrayElement(violatorTypeList),
+    violatorId: faker.random.uuid()
+  };
+}
