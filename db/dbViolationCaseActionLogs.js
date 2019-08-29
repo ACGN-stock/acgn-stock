@@ -30,7 +30,13 @@ export const actionMap = {
   comment: {
     displayName: '加註',
     allowedStates: Object.keys(stateMap),
-    dataSchema: reasonSchema
+    dataSchema: new SimpleSchema({
+      // 發言身分
+      commentIdentity: {
+        type: String,
+        allowedValues: ['fsc', 'informer', 'violator']
+      }
+    }).extend(reasonSchema)
   },
   addRelatedCase: {
     displayName: '增加相關案件',

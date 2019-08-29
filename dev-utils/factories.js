@@ -232,12 +232,10 @@ export const violationCasesFactory = new Factory()
   });
 
 export const violationCaseActionLogFactory = new Factory()
+  .option('executorIdentity', undefined) // ['fsc', 'informer', 'violator']
   .attrs({
     violationCaseId() {
       return faker.random.uuid();
-    },
-    action() {
-      return faker.random.arrayElement(Object.keys(actionMap));
     },
     executor() {
       return faker.random.uuid();
@@ -246,7 +244,14 @@ export const violationCaseActionLogFactory = new Factory()
       return faker.date.past();
     }
   })
-  .attr('data', ['action'], (action) => {
+  .attr('action', ['executorIdentity'], (executorIdentity) => {
+    if (['fsc', 'informer', 'violator'].includes(executorIdentity) && executorIdentity !== 'fsc') {
+      return 'comment';
+    }
+
+    return faker.random.arrayElement(Object.keys(actionMap));
+  })
+  .attr('data', ['action', 'executorIdentity'], (action, executorIdentity) => {
     switch (action) {
       case 'setState': {
         return {
@@ -255,7 +260,10 @@ export const violationCaseActionLogFactory = new Factory()
         };
       }
       case 'comment': {
-        return { reason: faker.lorem.words() };
+        return {
+          reason: faker.lorem.words(),
+          commentIdentity: ['fsc', 'informer', 'violator'].includes(executorIdentity) ? executorIdentity : faker.random.arrayElement(['fsc', 'informer', 'violator'])
+        };
       }
       case 'addRelatedCase': {
         return {
