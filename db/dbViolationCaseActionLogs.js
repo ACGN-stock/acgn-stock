@@ -15,6 +15,8 @@ const reasonSchema = new SimpleSchema({
   }
 });
 
+export const commentIdentityList = ['fsc', 'informer', 'violator'];
+
 export const actionMap = {
   setState: {
     displayName: '設定案件狀態',
@@ -34,7 +36,7 @@ export const actionMap = {
       // 發言身分
       commentIdentity: {
         type: String,
-        allowedValues: ['fsc', 'informer', 'violator']
+        allowedValues: commentIdentityList
       }
     }).extend(reasonSchema)
   },

@@ -5,7 +5,7 @@ import faker from 'faker';
 import { productTypeList, productRatingList, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { orderTypeList } from '/db/dbOrders';
 import { stateMap, categoryMap, violatorTypeList } from '/db/dbViolationCases';
-import { actionMap } from '/db/dbViolationCaseActionLogs';
+import { actionMap, commentIdentityList } from '/db/dbViolationCaseActionLogs';
 
 export const pttUserFactory = new Factory()
   .sequence('username', (n) => {
@@ -262,7 +262,7 @@ export const violationCaseActionLogFactory = new Factory()
       case 'comment': {
         return {
           reason: faker.lorem.words(),
-          commentIdentity: ['fsc', 'informer', 'violator'].includes(executorIdentity) ? executorIdentity : faker.random.arrayElement(['fsc', 'informer', 'violator'])
+          commentIdentity: commentIdentityList.includes(executorIdentity) ? executorIdentity : faker.random.arrayElement(commentIdentityList)
         };
       }
       case 'addRelatedCase': {

@@ -35,11 +35,10 @@ describe('method commentViolationCase', function() {
     if (lastActionFscMember) {
       expectUnreadUsers.push(lastActionFscMember);
     }
-    if (expectUnreadUsers.includes(currentUser)) {
-      expectUnreadUsers.splice(expectUnreadUsers.indexOf(currentUser), 1);
-    }
 
-    return expectUnreadUsers;
+    return expectUnreadUsers.filter((userId) => {
+      return userId !== currentUser._id;
+    });
   }
 
   /**
