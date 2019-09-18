@@ -15,12 +15,11 @@ const reasonSchema = new SimpleSchema({
   }
 });
 
-export const commentIdentityList = ['fsc', 'informer', 'violator'];
-
 export const actionMap = {
   setState: {
     displayName: '設定案件狀態',
     allowedStates: Object.keys(stateMap),
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 設定的狀態
       state: {
@@ -29,20 +28,28 @@ export const actionMap = {
       }
     }).extend(reasonSchema)
   },
-  comment: {
-    displayName: '加註',
+  fscComment: {
+    displayName: '以金管會身分加註',
     allowedStates: Object.keys(stateMap),
-    dataSchema: new SimpleSchema({
-      // 發言身分
-      commentIdentity: {
-        type: String,
-        allowedValues: commentIdentityList
-      }
-    }).extend(reasonSchema)
+    allowedIdentity: 'fsc',
+    dataSchema: reasonSchema
+  },
+  informerComment: {
+    displayName: '以檢舉人身分加註',
+    allowedStates: ['pending', 'processing'],
+    allowedIdentity: 'informer',
+    dataSchema: reasonSchema
+  },
+  violatorComment: {
+    displayName: '以違規人身分加註',
+    allowedStates: ['pending', 'processing'],
+    allowedIdentity: 'violator',
+    dataSchema: reasonSchema
   },
   addRelatedCase: {
     displayName: '增加相關案件',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String
@@ -51,6 +58,7 @@ export const actionMap = {
   removeRelatedCase: {
     displayName: '移除相關案件',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String
@@ -59,6 +67,7 @@ export const actionMap = {
   mergeViolatorsFromRelatedCase: {
     displayName: '從相關案件合併違規名單',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String,
@@ -73,6 +82,7 @@ export const actionMap = {
   addViolator: {
     displayName: '增加違規名單',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 加入的違規名單
       newViolators: {
@@ -85,6 +95,7 @@ export const actionMap = {
   removeViolator: {
     displayName: '移除違規名單',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       violator: violatorSchema
     }).extend(reasonSchema)

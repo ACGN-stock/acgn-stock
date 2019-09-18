@@ -5,7 +5,7 @@ import faker from 'faker';
 import { productTypeList, productRatingList, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { orderTypeList } from '/db/dbOrders';
 import { stateMap, categoryMap, violatorTypeList } from '/db/dbViolationCases';
-import { actionMap, commentIdentityList } from '/db/dbViolationCaseActionLogs';
+import { actionMap } from '/db/dbViolationCaseActionLogs';
 
 export const pttUserFactory = new Factory()
   .sequence('username', (n) => {
@@ -232,7 +232,7 @@ export const violationCasesFactory = new Factory()
   });
 
 export const violationCaseActionLogFactory = new Factory()
-  .option('executorIdentity', undefined) // ['fsc', 'informer', 'violator']
+  .option('executorIdentity', 'fsc') // ['fsc', 'informer', 'violator']
   .attrs({
     violationCaseId() {
       return faker.random.uuid();
@@ -245,56 +245,55 @@ export const violationCaseActionLogFactory = new Factory()
     }
   })
   .attr('action', ['executorIdentity'], (executorIdentity) => {
-    if (['fsc', 'informer', 'violator'].includes(executorIdentity) && executorIdentity !== 'fsc') {
-      return 'comment';
-    }
+    const allowActions = Object.keys(actionMap).filter((action) => {
+      return actionMap[action].allowedIdentity === executorIdentity;
+    });
 
-    return faker.random.arrayElement(Object.keys(actionMap));
+    return faker.random.arrayElement(allowActions);
   })
-  .attr('data', ['action', 'executorIdentity'], (action, executorIdentity) => {
+  .attr('data', ['action', 'executorIdentity'], (action) => {
+    const commonData = { reason: faker.lorem.words() };
+
     switch (action) {
       case 'setState': {
         return {
-          reason: faker.lorem.words(),
+          ...commonData,
           state: faker.random.arrayElement(Object.keys(stateMap))
-        };
-      }
-      case 'comment': {
-        return {
-          reason: faker.lorem.words(),
-          commentIdentity: commentIdentityList.includes(executorIdentity) ? executorIdentity : faker.random.arrayElement(commentIdentityList)
         };
       }
       case 'addRelatedCase': {
         return {
-          reason: faker.lorem.words(),
+          ...commonData,
           relatedCaseId: faker.random.uuid()
         };
       }
       case 'removeRelatedCase': {
         return {
-          reason: faker.lorem.words(),
+          ...commonData,
           relatedCaseId: faker.random.uuid()
         };
       }
       case 'mergeViolatorsFromRelatedCase': {
         return {
-          reason: faker.lorem.words(),
+          ...commonData,
           relatedCaseId: faker.random.uuid(),
           newViolators: getFakeViolators()
         };
       }
       case 'addViolator': {
         return {
-          reason: faker.lorem.words(),
+          ...commonData,
           newViolators: getFakeViolators()
         };
       }
       case 'removeViolator': {
         return {
-          reason: faker.lorem.words(),
+          ...commonData,
           violator: getFakeViolator()
         };
+      }
+      default: {
+        return commonData;
       }
     }
   });
