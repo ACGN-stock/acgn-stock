@@ -1,6 +1,9 @@
+import { Meteor } from 'meteor/meteor';
+import { _ } from 'meteor/underscore';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
+import { guardUser } from '/common/imports/guards';
 import { stateMap, violatorSchema } from './dbViolationCases';
 
 // 違規案件處理動作紀錄資料集
@@ -29,19 +32,19 @@ export const actionMap = {
     }).extend(reasonSchema)
   },
   fscComment: {
-    displayName: '以金管會身分加註',
+    displayName: '金管會加註',
     allowedStates: Object.keys(stateMap),
     allowedIdentity: 'fsc',
     dataSchema: reasonSchema
   },
   informerComment: {
-    displayName: '以檢舉人身分加註',
+    displayName: '舉報人說明',
     allowedStates: ['pending', 'processing'],
     allowedIdentity: 'informer',
     dataSchema: reasonSchema
   },
   violatorComment: {
-    displayName: '以違規人身分加註',
+    displayName: '違規人說明',
     allowedStates: ['pending', 'processing'],
     allowedIdentity: 'violator',
     dataSchema: reasonSchema
@@ -104,6 +107,42 @@ export const actionMap = {
 
 export function actionDisplayName(action) {
   return (actionMap[action] || { displayName: `未知(${action})` }).displayName;
+}
+
+export function checkUserIdentityAndCaseState(action, user, { informer, violators, state }) {
+  checkUserIdentity(action, user, { informer, violators });
+  checkCaseState(action, state);
+}
+
+function checkUserIdentity({ allowedIdentity }, user, { informer, violators }) {
+  switch (allowedIdentity) {
+    case 'fsc': {
+      return guardUser(user).checkHasRole('fscMember');
+    }
+    case 'informer': {
+      if (informer !== user._id) {
+        throw new Meteor.Error(403, '權限不符，無法進行此操作！');
+      }
+
+      return;
+    }
+    case 'violator': {
+      if (! _.findWhere(violators, { violatorId: user._id })) {
+        throw new Meteor.Error(403, '權限不符，無法進行此操作！');
+      }
+
+      return;
+    }
+    default: {
+      return;
+    }
+  }
+}
+
+function checkCaseState({ allowedStates }, state) {
+  if (allowedStates && ! allowedStates.includes(state)) {
+    throw new Meteor.Error(403, '案件狀態不符！');
+  }
 }
 
 const schema = new SimpleSchema({

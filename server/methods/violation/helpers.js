@@ -1,5 +1,4 @@
 import { Meteor } from 'meteor/meteor';
-import { _ } from 'meteor/underscore';
 
 import { dbProducts } from '/db/dbProducts';
 import { dbCompanies } from '/db/dbCompanies';
@@ -8,7 +7,6 @@ import { dbLog } from '/db/dbLog';
 import { dbNotifications, notificationCategories } from '/db/dbNotifications';
 import { dbViolationCases } from '/db/dbViolationCases';
 import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
-import { guardUser } from '/common/imports/guards';
 
 // 從公司 ID 推導被檢舉時應負責的使用者 ID
 export function getResponsibleUserForCompany(companyId) {
@@ -72,40 +70,4 @@ export function notifyUnreadUsers(violationCaseId) {
   });
 
   executeBulksSync(bulkOp);
-}
-
-export function checkUserIdentityAndCaseState(action, user, violationCaseData) {
-  checkUserIdentity(action, user, violationCaseData);
-  checkCaseState(action, violationCaseData);
-}
-
-function checkUserIdentity({ allowedIdentity }, user, { informer, violators }) {
-  switch (allowedIdentity) {
-    case 'fsc': {
-      return guardUser(user).checkHasRole('fscMember');
-    }
-    case 'informer': {
-      if (informer !== user._id) {
-        throw new Meteor.Error(403, '權限不符，無法進行此操作！');
-      }
-
-      return;
-    }
-    case 'violator': {
-      if (! _.findWhere(violators, { violatorId: user._id })) {
-        throw new Meteor.Error(403, '權限不符，無法進行此操作！');
-      }
-
-      return;
-    }
-    default: {
-      return;
-    }
-  }
-}
-
-function checkCaseState({ allowedStates }, { state }) {
-  if (allowedStates && ! allowedStates.includes(state)) {
-    throw new Meteor.Error(403, '案件狀態不符！');
-  }
 }

@@ -3,8 +3,8 @@ import { check } from 'meteor/check';
 import { _ } from 'meteor/underscore';
 
 import { dbViolationCases } from '/db/dbViolationCases';
-import { dbViolationCaseActionLogs, actionMap } from '/db/dbViolationCaseActionLogs';
-import { notifyUnreadUsers, checkUserIdentityAndCaseState } from './helpers';
+import { dbViolationCaseActionLogs, actionMap, checkUserIdentityAndCaseState } from '/db/dbViolationCaseActionLogs';
+import { notifyUnreadUsers } from './helpers';
 
 Meteor.methods({
   fscCommentViolationCase({ violationCaseId, reason }) {

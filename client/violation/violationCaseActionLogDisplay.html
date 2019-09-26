@@ -5,8 +5,18 @@
     {{#if isAction 'setState'}}
       {{>userLink executor}} {{stateTransitionActionText data.state}}，理由如下：
       {{>violationCaseActionLogReasonBlock reason=data.reason}}
-    {{else if isAction 'comment'}}
-      {{>userLink executor}} 對案件增加了註解如下：
+    {{else if isAction 'fscComment'}}
+      金管會成員 {{>userLink executor}} 對案件增加了註解如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else if isAction 'informerComment'}}
+      舉報人
+      {{#if executor}}
+        {{>userLink executor}}
+      {{/if}}
+      對案件增加了說明如下：
+      {{>violationCaseActionLogReasonBlock reason=data.reason}}
+    {{else if isAction 'violatorComment'}}
+      違規人 {{>userLink executor}} 對案件回報了說明如下：
       {{>violationCaseActionLogReasonBlock reason=data.reason}}
     {{else if isAction 'addRelatedCase'}}
       {{>userLink executor}} 將案件
