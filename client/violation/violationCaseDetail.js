@@ -5,10 +5,10 @@ import { ReactiveVar } from 'meteor/reactive-var';
 
 import { stateMap, categoryDisplayName, stateDisplayName, violatorTypeDisplayName, violatorTypeList } from '/db/dbViolationCases';
 import { dbLog } from '/db/dbLog';
-import { dbViolationCaseActionLogs, actionMap, actionDisplayName } from '/db/dbViolationCaseActionLogs';
+import { dbViolationCaseActionLogs, actionMap, actionDisplayName, checkUserIdentityAndCaseState } from '/db/dbViolationCaseActionLogs';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
-import { markdown, currentUserHasRole } from '../utils/helpers';
+import { markdown } from '../utils/helpers';
 import { paramViolationCase, paramViolationCaseId, stateBadgeClass, pathForViolationCaseDetail } from './helpers';
 
 const stateTransitionTextMap = {
@@ -59,7 +59,14 @@ Template.violationCaseDetail.helpers({
     return states.includes(paramViolationCase().state);
   },
   canExecuteAction(action) {
-    return currentUserHasRole('fscMember') && actionMap[action].allowedStates.includes(paramViolationCase().state);
+    try {
+      checkUserIdentityAndCaseState(actionMap[action], Meteor.user(), paramViolationCase());
+
+      return true;
+    }
+    catch (e) {
+      return false;
+    }
   },
   nextStateList() {
     return stateMap[paramViolationCase().state].nextStates || [];
@@ -88,8 +95,12 @@ Template.violationCaseDetail.helpers({
         return 'btn-success';
       case 'rejectCase':
         return 'btn-danger';
-      case 'comment':
+      case 'fscComment':
         return 'btn-primary';
+      case 'informerComment':
+        return 'btn-info';
+      case 'violatorComment':
+        return 'btn-info';
       case 'closeCase':
         return 'btn-warning';
       default:
@@ -111,10 +122,10 @@ Template.violationCaseDetail.helpers({
   }
 });
 
-function askReasonAndConfirmAction({ actionText, confirmText = `確定要${actionText}嗎？` }, callback) {
+function askReasonAndConfirmAction({ actionText, confirmText = `確定要${actionText}嗎？`, reasonText = '原因', note = '' }, callback) {
   alertDialog.prompt({
     title: actionText,
-    message: `請輸入${actionText}的原因：（支援 markdown 語法）`,
+    message: `請輸入${actionText}的${reasonText}：（支援 markdown 語法） ${note}`,
     inputType: 'multilineText',
     callback: (reason) => {
       if (! reason) {
@@ -157,13 +168,31 @@ Template.violationCaseDetail.events({
       Meteor.customCall('setViolationCaseState', { violationCaseId, nextState, reason });
     });
   },
-  'click [data-action="comment"]'(event) {
+  'click [data-action="fscComment"]'(event) {
     event.preventDefault();
 
     const violationCaseId = paramViolationCaseId();
 
-    askReasonAndConfirmAction({ actionText: '加註案件' }, (reason) => {
-      Meteor.customCall('commentViolationCase', { violationCaseId, reason });
+    askReasonAndConfirmAction({ actionText: '加註案件', reasonText: '內容' }, (reason) => {
+      Meteor.customCall('fscCommentViolationCase', { violationCaseId, reason });
+    });
+  },
+  'click [data-action="informerComment"]'(event) {
+    event.preventDefault();
+
+    const violationCaseId = paramViolationCaseId();
+
+    askReasonAndConfirmAction({ actionText: '增加說明', reasonText: '內容', note: '（在金管會再次處理前，僅能說明一次）' }, (reason) => {
+      Meteor.customCall('informerCommentViolationCase', { violationCaseId, reason });
+    });
+  },
+  'click [data-action="violatorComment"]'(event) {
+    event.preventDefault();
+
+    const violationCaseId = paramViolationCaseId();
+
+    askReasonAndConfirmAction({ actionText: '回報說明', reasonText: '內容', note: '（在金管會再次處理前，僅能說明一次）' }, (reason) => {
+      Meteor.customCall('violatorCommentViolationCase', { violationCaseId, reason });
     });
   },
   'submit [name="addRelatedCaseForm"]'(event, templateInstance) {

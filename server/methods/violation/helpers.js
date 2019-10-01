@@ -5,8 +5,8 @@ import { dbCompanies } from '/db/dbCompanies';
 import { dbFoundations } from '/db/dbFoundations';
 import { dbLog } from '/db/dbLog';
 import { dbNotifications, notificationCategories } from '/db/dbNotifications';
-import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
 import { dbViolationCases } from '/db/dbViolationCases';
+import { executeBulksSync } from '/server/imports/utils/executeBulksSync';
 
 // 從公司 ID 推導被檢舉時應負責的使用者 ID
 export function getResponsibleUserForCompany(companyId) {
