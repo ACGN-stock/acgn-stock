@@ -36,14 +36,13 @@ Meteor.publish('violationCaseDetail', function(violationCaseId) {
     }, {}));
   }
 
-  // TODO 解決舉報人增加說明後，前端 informer 會被暫時清空的BUG
   publishWithTransformation(this, {
     collection: 'violationCases',
     cursor: dbViolationCases.find(violationCaseId, { fields: excludedFields }),
     transform: (fields) => {
       const result = { ...fields };
       if (! isFscMember && result.informer !== this.userId) {
-        result.informer = '';
+        delete result.informer;
       }
 
       return result;
@@ -56,7 +55,7 @@ Meteor.publish('violationCaseDetail', function(violationCaseId) {
     transform: (fields) => {
       const result = { ...fields };
       if (actionMap[result.action].allowedIdentity === 'informer' && ! isFscMember && result.executor !== this.userId) {
-        result.executor = '';
+        delete result.executor;
       }
 
       return result;
