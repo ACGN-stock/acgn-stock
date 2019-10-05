@@ -31,21 +31,25 @@
           <span class="text-nowrap">{{violationCase._id}}</span>
         </div>
 
-        {{#if currentUserHasRole 'fscMember'}}
-          <hr/>
-          <div>
-            {{#if canExecuteAction 'comment'}}
-              <a href="#" class="btn btn-sm {{actionButtonClass 'comment'}}" data-action="comment">加入註解</a>
-            {{/if}}
-            {{#if canExecuteAction 'setState'}}
-              {{#each nextState in nextStateList}}
-                <a href="#" class="btn btn-sm {{setStateButtonClass nextState}}" data-action="setState" data-next-state="{{nextState}}">
-                  {{setStateButtonText nextState}}
-                </a>
-              {{/each}}
-            {{/if}}
-          </div>
-        {{/if}}
+        <hr/>
+        <div>
+          {{#if canExecuteAction 'informerComment'}}
+            <a href="#" class="btn btn-sm {{actionButtonClass 'informerComment'}}" data-action="informerComment">舉報人增加說明</a>
+          {{/if}}
+          {{#if canExecuteAction 'violatorComment'}}
+            <a href="#" class="btn btn-sm {{actionButtonClass 'violatorComment'}}" data-action="violatorComment">違規人回報說明</a>
+          {{/if}}
+          {{#if canExecuteAction 'fscComment'}}
+            <a href="#" class="btn btn-sm {{actionButtonClass 'fscComment'}}" data-action="fscComment">金管會加入註解</a>
+          {{/if}}
+          {{#if canExecuteAction 'setState'}}
+            {{#each nextState in nextStateList}}
+              <a href="#" class="btn btn-sm {{setStateButtonClass nextState}}" data-action="setState" data-next-state="{{nextState}}">
+                {{setStateButtonText nextState}}
+              </a>
+            {{/each}}
+          {{/if}}
+        </div>
 
         <hr/>
 

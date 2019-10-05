@@ -4,6 +4,8 @@ import faker from 'faker';
 
 import { productTypeList, productRatingList, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { orderTypeList } from '/db/dbOrders';
+import { stateMap, categoryMap, violatorTypeList } from '/db/dbViolationCases';
+import { actionMap } from '/db/dbViolationCaseActionLogs';
 
 export const pttUserFactory = new Factory()
   .sequence('username', (n) => {
@@ -204,3 +206,113 @@ export const directorFactory = new Factory()
       return new Date();
     }
   });
+
+export const violationCasesFactory = new Factory()
+  .option('violatorsNumber', faker.random.number({ min: 1, max: 100 }))
+  .attr('violators', ['violatorsNumber'], getFakeViolators)
+  .attrs({
+    informer() {
+      return faker.random.uuid();
+    },
+    state() {
+      return faker.random.arrayElement(Object.keys(stateMap));
+    },
+    category() {
+      return faker.random.arrayElement(Object.keys(categoryMap));
+    },
+    description() {
+      return faker.lorem.words(10);
+    },
+    createdAt() {
+      return faker.date.past();
+    }
+  })
+  .attr('updatedAt', ['createdAt'], function(createdAt) {
+    return faker.date.between(createdAt, new Date());
+  });
+
+export const violationCaseActionLogFactory = new Factory()
+  .option('executorIdentity', 'fsc') // ['fsc', 'informer', 'violator']
+  .attrs({
+    violationCaseId() {
+      return faker.random.uuid();
+    },
+    executor() {
+      return faker.random.uuid();
+    },
+    executedAt() {
+      return faker.date.past();
+    }
+  })
+  .attr('action', ['executorIdentity'], (executorIdentity) => {
+    const allowActions = Object.keys(actionMap).filter((action) => {
+      return actionMap[action].allowedIdentity === executorIdentity;
+    });
+
+    return faker.random.arrayElement(allowActions);
+  })
+  .attr('data', ['action', 'executorIdentity'], (action) => {
+    const commonData = { reason: faker.lorem.words() };
+
+    switch (action) {
+      case 'setState': {
+        return {
+          ...commonData,
+          state: faker.random.arrayElement(Object.keys(stateMap))
+        };
+      }
+      case 'addRelatedCase': {
+        return {
+          ...commonData,
+          relatedCaseId: faker.random.uuid()
+        };
+      }
+      case 'removeRelatedCase': {
+        return {
+          ...commonData,
+          relatedCaseId: faker.random.uuid()
+        };
+      }
+      case 'mergeViolatorsFromRelatedCase': {
+        return {
+          ...commonData,
+          relatedCaseId: faker.random.uuid(),
+          newViolators: getFakeViolators()
+        };
+      }
+      case 'addViolator': {
+        return {
+          ...commonData,
+          newViolators: getFakeViolators()
+        };
+      }
+      case 'removeViolator': {
+        return {
+          ...commonData,
+          violator: getFakeViolator()
+        };
+      }
+      default: {
+        return commonData;
+      }
+    }
+  });
+
+function getFakeViolators(violatorsNumber = -1) {
+  if (violatorsNumber < 0) {
+    violatorsNumber = faker.random.number({ min: 1, max: 100 });
+  }
+  const violators = new Array(violatorsNumber);
+  for (let i = 0; i < violators.length; i += 1) {
+    violators[i] = getFakeViolator();
+  }
+
+  return violators;
+}
+
+function getFakeViolator() {
+  return {
+    violatorType: faker.random.arrayElement(violatorTypeList),
+    violatorId: faker.random.uuid()
+  };
+}

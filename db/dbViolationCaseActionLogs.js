@@ -1,6 +1,9 @@
+import { Meteor } from 'meteor/meteor';
+import { _ } from 'meteor/underscore';
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
+import { guardUser } from '/common/imports/guards';
 import { stateMap, violatorSchema } from './dbViolationCases';
 
 // 違規案件處理動作紀錄資料集
@@ -19,6 +22,7 @@ export const actionMap = {
   setState: {
     displayName: '設定案件狀態',
     allowedStates: Object.keys(stateMap),
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 設定的狀態
       state: {
@@ -27,14 +31,28 @@ export const actionMap = {
       }
     }).extend(reasonSchema)
   },
-  comment: {
-    displayName: '加註',
+  fscComment: {
+    displayName: '金管會加註',
     allowedStates: Object.keys(stateMap),
+    allowedIdentity: 'fsc',
+    dataSchema: reasonSchema
+  },
+  informerComment: {
+    displayName: '舉報人說明',
+    allowedStates: ['pending', 'processing'],
+    allowedIdentity: 'informer',
+    dataSchema: reasonSchema
+  },
+  violatorComment: {
+    displayName: '違規人說明',
+    allowedStates: ['pending', 'processing'],
+    allowedIdentity: 'violator',
     dataSchema: reasonSchema
   },
   addRelatedCase: {
     displayName: '增加相關案件',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String
@@ -43,6 +61,7 @@ export const actionMap = {
   removeRelatedCase: {
     displayName: '移除相關案件',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String
@@ -51,6 +70,7 @@ export const actionMap = {
   mergeViolatorsFromRelatedCase: {
     displayName: '從相關案件合併違規名單',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 相關案件 ID
       relatedCaseId: String,
@@ -65,6 +85,7 @@ export const actionMap = {
   addViolator: {
     displayName: '增加違規名單',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       // 加入的違規名單
       newViolators: {
@@ -77,6 +98,7 @@ export const actionMap = {
   removeViolator: {
     displayName: '移除違規名單',
     allowedStates: ['processing'],
+    allowedIdentity: 'fsc',
     dataSchema: new SimpleSchema({
       violator: violatorSchema
     }).extend(reasonSchema)
@@ -85,6 +107,42 @@ export const actionMap = {
 
 export function actionDisplayName(action) {
   return (actionMap[action] || { displayName: `未知(${action})` }).displayName;
+}
+
+export function checkUserIdentityAndCaseState(action, user, { informer, violators, state }) {
+  checkUserIdentity(action, user, { informer, violators });
+  checkCaseState(action, state);
+}
+
+function checkUserIdentity({ allowedIdentity }, user, { informer, violators }) {
+  switch (allowedIdentity) {
+    case 'fsc': {
+      return guardUser(user).checkHasRole('fscMember');
+    }
+    case 'informer': {
+      if (informer !== user._id) {
+        throw new Meteor.Error(403, '權限不符，無法進行此操作！');
+      }
+
+      return;
+    }
+    case 'violator': {
+      if (! _.findWhere(violators, { violatorId: user._id })) {
+        throw new Meteor.Error(403, '權限不符，無法進行此操作！');
+      }
+
+      return;
+    }
+    default: {
+      return;
+    }
+  }
+}
+
+function checkCaseState({ allowedStates }, state) {
+  if (allowedStates && ! allowedStates.includes(state)) {
+    throw new Meteor.Error(403, '案件狀態不符！');
+  }
 }
 
 const schema = new SimpleSchema({
