@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 
+import { recordOneCompanyListPrice } from '/server/functions/company/recordListPrice';
 import { createOrder } from '/server/imports/createOrder';
 import { resourceManager } from '/server/imports/threading/resourceManager';
 import { dbCompanies, getPriceLimits } from '/db/dbCompanies';
@@ -62,6 +63,7 @@ export function releaseStocksForHighPrice() {
           unitPrice: releasePrice,
           amount: releaseStocks
         });
+        recordOneCompanyListPrice(companyId);
         release();
       });
     });

@@ -34,3 +34,12 @@ export function recordListPrice() {
     release();
   });
 }
+
+// TODO 在重構 createOrder 後，應嘗試由 createOrder 實作，減少 DB 更新次數
+export function recordOneCompanyListPrice(companyId) {
+  const { lastPrice, totalRelease } = dbCompanies.findOne(companyId, { fields: { lastPrice: 1, totalRelease: 1 } });
+  dbCompanies.update(companyId, { $set: {
+    listPrice: lastPrice,
+    totalValue: lastPrice * totalRelease
+  } });
+}
