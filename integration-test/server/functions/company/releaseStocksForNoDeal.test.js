@@ -60,7 +60,11 @@ describe('function releaseStocksForNoDeal', function() {
 
   it('should release stocks', function() {
     dbOrders.insert(buyOrderFactory.build());
+
     releaseStocksForNoDeal();
+
+    const companyData = dbCompanies.findOne(companyId);
+    companyData.listPrice.must.be.equal(companyData.lastPrice);
     expect(dbLog.findOne({ logType: '公司釋股', companyId })).to.exist();
   });
 

@@ -44,6 +44,7 @@ describe('function releaseStocksForHighPrice', function() {
     });
 
     expect(orderData).to.exist();
+    companyData.listPrice.must.be.equal(companyData.lastPrice); // 應更新股價
     orderData.unitPrice.must.be.equal(getPriceLimits(beforeCompanyData).upper); // 漲停價
     orderData.amount.must.be.between(1, Math.floor(Math.sqrt(totalRelease)));
 
