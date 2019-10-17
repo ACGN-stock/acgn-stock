@@ -20,9 +20,9 @@ export function recordListPrice() {
     dbCompanies
       .find({ isSeal: false }, { fields: { lastPrice: 1, totalRelease: 1 } })
       .fetch()
-      .forEach(({ _id: companyId, lastPrice, totalRelease }) => {
+      .forEach(({ _id, lastPrice, totalRelease }) => {
         companyBulk
-          .find({ _id: companyId })
+          .find({ _id })
           .updateOne({ $set: {
             listPrice: lastPrice,
             totalValue: lastPrice * totalRelease
