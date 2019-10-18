@@ -80,9 +80,18 @@ export function isHighPriceCompany(companyData) {
 }
 
 /**
+ * @typedef {Object} UpperAndLower
+ * @property {Number} upper
+ * @property {Number} lower
+ */
+/**
  * 取得買賣單的上下限
- * @param {Object} companyData 內容必須包含 listPrice, capital, totalValue, createdAt
- * @returns {Object} upper, lower
+ * @param {Object} companyData 計算上下限所需的資訊
+ * @param {Number} companyData.listPrice listPrice
+ * @param {Number} companyData.capital capital
+ * @param {Number} companyData.totalValue totalValue
+ * @param {Date} companyData.createdAt createdAt
+ * @returns {UpperAndLower} { upper, lower }
  */
 export function getPriceLimits(companyData) {
   const upper = getPriceUpperLimit(companyData);
@@ -101,6 +110,8 @@ function getPriceUpperLimit(companyData) {
     upperPrice = companyData.listPrice * priceLimits.normal.upper;
   }
 
+  upperPrice = Math.max(upperPrice, getFairPrice(companyData));
+
   return Math.ceil(upperPrice);
 }
 
@@ -118,6 +129,13 @@ function getPriceLowerLimit(companyData) {
   }
 
   return Math.max(Math.floor(lowerPrice), 1);
+}
+
+// 公允價格
+function getFairPrice({ totalValue, listPrice, capital }) {
+  const totalRelease = totalValue / listPrice;
+
+  return Math.ceil(capital / totalRelease);
 }
 
 function isValueLowerThanCapital(companyData) {
