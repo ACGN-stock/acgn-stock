@@ -1,9 +1,8 @@
-import { Meteor } from 'meteor/meteor';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import expect from 'must';
 import mustSinon from 'must-sinon';
 
-import { dbCompanies } from '/db/dbCompanies';
+import { dbCompanies, getPriceLimits } from '/db/dbCompanies';
 import { dbOrders } from '/db/dbOrders';
 import { dbLog } from '/db/dbLog';
 import { dbVariables } from '/db/dbVariables';
@@ -31,10 +30,12 @@ describe('function releaseStocksForHighPrice', function() {
   });
 
   it('should create a !system sell order', function() {
+    const beforeCompanyData = dbCompanies.findOne(companyId);
+
     releaseStocksForHighPrice();
 
     const companyData = dbCompanies.findOne(companyId);
-    const { totalRelease, listPrice } = companyData;
+    const { totalRelease } = companyData;
 
     const orderData = dbOrders.findOne({
       orderType: '賣出',
@@ -43,7 +44,8 @@ describe('function releaseStocksForHighPrice', function() {
     });
 
     expect(orderData).to.exist();
-    orderData.unitPrice.must.be.equal(Math.ceil(listPrice * Meteor.settings.public.priceLimits.normal.upper)); // 漲停價
+    companyData.listPrice.must.be.equal(companyData.lastPrice); // 應更新股價
+    orderData.unitPrice.must.be.equal(getPriceLimits(beforeCompanyData).upper); // 漲停價
     orderData.amount.must.be.between(1, Math.floor(Math.sqrt(totalRelease)));
 
     const logData = dbLog.findOne({ logType: '公司釋股', companyId });
