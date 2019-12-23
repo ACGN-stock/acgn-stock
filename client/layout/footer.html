@@ -6,19 +6,11 @@
         {{> displayAnnouncementUnreadNotification}}
         {{> unreadImportantFscLogsNotification}}
         {{> displayLegacyAnnouncement}}
-        {{#each advertisingList}}
-          {{> displayAdvertising}}
-        {{/each}}
       </div>
-      <div class="bg-faded text-primary text-right px-3 py-1 rounded">
-        <a
-          class="text-danger float-left"
-          href="https://github.com/ACGN-stock/acgn-stock/issues"
-          target="_blank"
-        >
-          Bug回報
-        </a>
-        伺服器連線數量：{{onlinePeopleNumber}}
+      <div class="bg-faded text-center px-3 py-1 rounded" style="max-height: 50px;">
+        {{#if advertising}}
+          {{> displayAdvertising advertising}}
+        {{/if}}
       </div>
     </div>
   </div>
@@ -87,22 +79,15 @@
 </template>
 
 <template name="displayAdvertising">
-  <div class="media bg-info px-2 py-1 my-2 rounded footer-message-container">
-    <div class="media-body footer-message">
-      來自
-      {{>userLink this.userId}}
-      的廣告：「
-      {{#if this.url}}
-        <a href="{{this.url}}" target="_blank">{{this.message}}</a>
-      {{else}}
-        {{this.message}}
-      {{/if}}
-      」
-    </div>
-    <div class="footer-message-close-button">
-      <a class="btn btn-danger btn-sm" href="#">
-        <i class="fa fa-times" aria-hidden="true"></i>
-      </a>
-    </div>
+  <div class="footer-message-container">
+    來自
+    {{>userLink this.userId}}
+    的廣告：「
+    {{#if this.url}}
+      <a href="{{this.url}}" target="_blank">{{this.message}}</a>
+    {{else}}
+      {{this.message}}
+    {{/if}}
+    」
   </div>
 </template>
