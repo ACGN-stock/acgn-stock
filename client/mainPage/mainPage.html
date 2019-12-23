@@ -95,11 +95,8 @@
       </span>
     </div>
     <div class="col-12 col-md-6">
-      <span class="font-weight-bold text-nowrap">最近低量釋股區間：</span>
-      <span class="{{taskIsReady noDealReleaseBegin noDealReleaseEnd}}">
-        <span class="text-nowrap">{{noDealReleaseBegin}}</span>
-        <span class="text-nowrap">~ {{noDealReleaseEnd}}</span>
-      </span>
+      <span class="font-weight-bold text-nowrap">伺服器連線數量：</span>
+      <span class="text-nowrap">{{onlinePeopleNumber}}</span>
     </div>
     <div class="col-12 col-md-6">
       <span class="font-weight-bold text-nowrap">最近高價釋股區間：</span>
@@ -109,10 +106,17 @@
       </span>
     </div>
     <div class="col-12 col-md-6">
+      <span class="font-weight-bold text-nowrap">最近低量釋股區間：</span>
+      <span class="{{taskIsReady noDealReleaseBegin noDealReleaseEnd}}">
+        <span class="text-nowrap">{{noDealReleaseBegin}}</span>
+        <span class="text-nowrap">~ {{noDealReleaseEnd}}</span>
+      </span>
+    </div>
+    <div class="col-12 col-md-6">
       <span class="font-weight-bold text-nowrap">高價公司價格下限：</span>
       <span>$ {{highPriceThreshold}}</span>
     </div>
-    <div class="col-12 offset-md-6 col-md-6">
+    <div class="col-12 col-md-6">
       <span class="font-weight-bold text-nowrap">低價公司價格上限：</span>
       <span>$ {{lowPriceThreshold}}</span>
     </div>

@@ -88,9 +88,13 @@ Template.systemStatusPanel.onCreated(function() {
     }
     this.subscribe('currentRound');
     this.subscribe('currentSeason');
+    this.subscribe('onlinePeopleNumber');
   });
 });
 Template.systemStatusPanel.helpers({
+  onlinePeopleNumber() {
+    return dbVariables.get('onlinePeopleNumber') || 0;
+  },
   roundStartTime() {
     const currentRound = dbRound.findOne({}, {
       sort: {
