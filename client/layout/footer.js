@@ -1,4 +1,3 @@
-import { _ } from 'meteor/underscore';
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -16,14 +15,12 @@ Template.footer.onCreated(function() {
     if (shouldStopSubscribe()) {
       return false;
     }
-    this.subscribe('onlinePeopleNumber');
     this.subscribe('displayAdvertising');
   });
 });
 
-const rClosedAdvertisingIdList = new ReactiveVar([]);
 Template.footer.helpers({
-  advertisingList() {
+  advertising() {
     const advertisingList = dbAdvertising
       .find({}, {
         sort: {
@@ -32,14 +29,9 @@ Template.footer.helpers({
         limit: Meteor.settings.public.displayAdvertisingNumber
       })
       .fetch();
-    const closedAdvertisingIdList = rClosedAdvertisingIdList.get();
+    const randomDisplayIndex = Math.floor(Math.random() * advertisingList.length);
 
-    return _.reject(advertisingList, (advertisingData) => {
-      return _.contains(closedAdvertisingIdList, advertisingData._id);
-    });
-  },
-  onlinePeopleNumber() {
-    return dbVariables.get('onlinePeopleNumber') || 0;
+    return advertisingList[randomDisplayIndex];
   },
   containerClass() {
     if (rMainTheme.get() === 'light') {
@@ -89,14 +81,6 @@ Template.displayLegacyAnnouncement.events({
   'click .btn'(event) {
     event.preventDefault();
     rIsDisplayAnnouncement.set(false);
-  }
-});
-
-Template.displayAdvertising.events({
-  'click .btn'(event, templateInstance) {
-    event.preventDefault();
-    const closedAdvertisingIdList = rClosedAdvertisingIdList.get().slice();
-    rClosedAdvertisingIdList.set(_.union(closedAdvertisingIdList, templateInstance.data._id));
   }
 });
 
