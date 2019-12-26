@@ -219,6 +219,22 @@ const schema = new SimpleSchema({
       }
     })
   },
+  about: {
+    type: new SimpleSchema({
+      description: {
+        type: String,
+        max: 3000,
+        defaultValue: ''
+      },
+      picture: {
+        type: String,
+        regEx: SimpleSchema.RegEx.Url,
+        max: 1000,
+        optional: true
+      }
+    }),
+    defaultValue: { description: '' }
+  },
   // user-status 的欄位定義
   status: {
     type: new SimpleSchema({
