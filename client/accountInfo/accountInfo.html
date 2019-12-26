@@ -135,36 +135,43 @@
       <hr />
     {{/if}}
 
-    <div>
-      使用者識別碼：{{this._id}}
-    </div>
-    <div>
-      帳號驗證方式：
-      {{showValidateType}}
-    </div>
-    <div>
-      帳號啟動日期：{{formatDateTimeText this.createdAt}}
-    </div>
-    <div>
-      上次登入時間：{{formatDateTimeText this.status.lastLogin.date}}
-    </div>
-    <div>
-      上次登入IP：{{this.status.lastLogin.ipAddr}}
-    </div>
-    <div>
-      本季度未登入天數：{{this.profile.noLoginDayCount}}
-    </div>
-    <div>
-      上季度財富統計：{{currencyFormat this.profile.lastSeasonTotalWealth}}
-    </div>
-    <div>
-      帳號當前餘額：{{currencyFormat this.profile.money}}
-    </div>
-    <div>
-      帳號剩餘消費券：{{currencyFormat this.profile.vouchers}}
-    </div>
-    <div>
-      帳號剩餘推薦票：{{this.profile.voteTickets}}
+    <div class="row">
+      <div class="col-12 col-lg-4">
+        <div>
+          使用者識別碼：{{this._id}}
+        </div>
+        <div>
+          帳號驗證方式：
+          {{showValidateType}}
+        </div>
+        <div>
+          帳號啟動日期：{{formatDateTimeText this.createdAt}}
+        </div>
+        <div>
+          上次登入時間：{{formatDateTimeText this.status.lastLogin.date}}
+        </div>
+        <div>
+          上次登入IP：{{this.status.lastLogin.ipAddr}}
+        </div>
+        <div>
+          本季度未登入天數：{{this.profile.noLoginDayCount}}
+        </div>
+        <div>
+          上季度財富統計：{{currencyFormat this.profile.lastSeasonTotalWealth}}
+        </div>
+        <div>
+          帳號當前餘額：{{currencyFormat this.profile.money}}
+        </div>
+        <div>
+          帳號剩餘消費券：{{currencyFormat this.profile.vouchers}}
+        </div>
+        <div>
+          帳號剩餘推薦票：{{this.profile.voteTickets}}
+        </div>
+      </div>
+      <div class="col-12 col-lg-8">
+        {{> accountCard this}}
+      </div>
     </div>
     {{#if this.profile.isInVacation}}
       <div class="text-info">目前正在渡假中。</div>

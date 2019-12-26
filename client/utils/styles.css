@@ -222,6 +222,61 @@ body {
   padding: 0.25em;
 }
 
+
+.account-card {
+  color: #000;
+  padding: 0px;
+  max-width: 600px;
+  border: 1px solid #dddddd;
+  border-radius: 5px;
+  box-shadow: 6px 6px 6px rgba(0,0,0,0.23);
+}
+.account-card-default {
+  background: #fff;
+}
+.account-card-super-admin {
+  background: #a80000;
+  background: -webkit-linear-gradient(160deg, #fffbd5, #a80000 100%);
+  background: -o-linear-gradient(160deg, #fffbd5, #a80000 100%);
+  background: -moz-linear-gradient(160deg, #fffbd5, #a80000 100%);
+  background: linear-gradient(160deg, #fffbd5, #a80000 100%);
+}
+.account-card-general-manager {
+  background: #a80000;
+  background: -webkit-linear-gradient(160deg, #fffbd5, #a80000 100%);
+  background: -o-linear-gradient(160deg, #fffbd5, #a80000 100%);
+  background: -moz-linear-gradient(160deg, #fffbd5, #a80000 100%);
+  background: linear-gradient(160deg, #fffbd5, #a80000 100%);
+}
+.account-card-developer {
+  background: #39c5bb;
+  background: -webkit-linear-gradient(160deg, #fffbd5, #39c5bb 120%);
+  background: -o-linear-gradient(160deg, #fffbd5, #39c5bb 120%);
+  background: -moz-linear-gradient(160deg, #fffbd5, #39c5bb 120%);
+  background: linear-gradient(160deg, #fffbd5, #39c5bb 120%);
+}
+.account-card-planner {
+  background: #ff1493;
+  background: -webkit-linear-gradient(160deg, #fffbd5, #ff1493 100%);
+  background: -o-linear-gradient(160deg, #fffbd5, #ff1493 100%);
+  background: -moz-linear-gradient(160deg, #fffbd5, #ff1493 100%);
+  background: linear-gradient(160deg, #fffbd5, #ff1493 100%);
+}
+.account-card-fsc {
+  background: #f1c40f;
+  background: -webkit-linear-gradient(160deg, #fffbd5, #f1c40f 100%);
+  background: -o-linear-gradient(160deg, #fffbd5, #f1c40f 100%);
+  background: -moz-linear-gradient(160deg, #fffbd5, #f1c40f 100%);
+  background: linear-gradient(160deg, #fffbd5, #f1c40f 100%);
+}
+
+.account-card .picture img {
+  width: 100%;
+  max-width: 100%;
+  object-fit: cover;
+}
+
+
 .company-card {
   padding: 0px;
   max-width: 270px;

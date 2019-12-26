@@ -1,0 +1,28 @@
+<template name="accountCard">
+  <div class="account-card {{cardDisplayClass this}}">
+    <div class="row my-2 mx-2">
+
+      <div class="picture col-4">
+        <img src="https://i.imgur.com/jAmLs5k.jpg">
+      </div>
+
+      <div class="user-info col-8">
+        <div class="my-2 ml-1">
+          <div class="text-left text-truncate">
+            <h3 class="text-truncate">
+              {{>userLink this._id}}
+            </h3>
+            <span style="font-size: small;">
+              {{this._id}}
+            </span>
+          </div>
+
+          <div class="text-right">
+            123456測試測試
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
