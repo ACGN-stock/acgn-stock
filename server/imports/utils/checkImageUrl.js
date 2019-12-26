@@ -12,7 +12,7 @@ function checkImageUrlAsync(url, callback) {
   debug.log('checkImageUrlAsync', url);
   check(url, String);
   if (! SimpleSchema.RegEx.Url.test(url)) {
-    callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
+    return callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
   }
   let req;
   if (url.indexOf('https://') === 0) {
