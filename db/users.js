@@ -226,7 +226,7 @@ const schema = new SimpleSchema({
     type: new SimpleSchema({
       description: {
         type: String,
-        max: 3000,
+        max: 300,
         defaultValue: ''
       },
       picture: {
