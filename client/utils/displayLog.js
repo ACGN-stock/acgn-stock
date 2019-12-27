@@ -347,7 +347,7 @@ Template.displayLog.helpers({
         return `【沒收股份】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}持有的「${company}」公司股份數量${data.stocks}給沒收了。${displayViolationCaseOrNot(data.violationCaseId)}`;
       }
       case '清除簡介': {
-        return `【沒收股份】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}的個人簡介給清空了。${displayViolationCaseOrNot(data.violationCaseId)}`;
+        return `【清除簡介】${users[0]}以「${_.escape(data.reason)}」的理由將${users[1]}的個人簡介給清空了。${displayViolationCaseOrNot(data.violationCaseId)}`;
       }
       case '查封關停': {
         const companyDisplay = companyId ? company : '???'; // FIXME 保管庫更新期間資料錯誤的暫時處置
