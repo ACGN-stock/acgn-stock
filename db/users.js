@@ -9,6 +9,7 @@ export const banTypeList = [
   'deal', // 所有投資下單行為
   'chat', // 所有聊天發言行為
   'advertise', // 所有廣告宣傳行為
+  'editUserAbout', // 編輯個人簡介
   'manager' // 擔任經理人的資格
 ];
 
@@ -22,6 +23,8 @@ export function banTypeDescription(banType) {
       return '所有聊天發言行為';
     case 'advertise':
       return '所有廣告宣傳行為';
+    case 'editUserAbout':
+      return '編輯個人簡介';
     case 'manager':
       return '擔任經理人的資格';
     default:
