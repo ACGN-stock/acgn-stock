@@ -258,6 +258,11 @@ export const logTypeList = [
   '沒收股份',
 
   /**
+   * 【清除簡介】userId0以「data.reason」的理由將userId1的個人簡介給清空了。
+   */
+  '清除簡介',
+
+  /**
    * 【金管撤單】userId0以「data.reason」的理由取消了userId1以每股$data.price的單價data.orderType data.amount數量的「companyId」公司股票的訂單！
    */
   '金管撤單',
@@ -501,6 +506,7 @@ export const logTypeGroupMap = {
       '禁止聊天',
       '禁止廣告',
       '課以罰款',
+      '清除簡介',
       '沒收股份',
       '金管撤單',
       '禁任經理',
@@ -543,6 +549,7 @@ export const importantFscLogTypeList = [
   '禁止聊天',
   '禁止廣告',
   '課以罰款',
+  '清除簡介',
   '沒收股份',
   '金管撤單',
   '禁任經理',
