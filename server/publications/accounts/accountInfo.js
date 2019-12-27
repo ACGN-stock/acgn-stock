@@ -15,6 +15,7 @@ Meteor.publish('accountInfo', function(userId) {
       'status.lastLogin.ipAddr': 1,
       username: 1,
       profile: 1,
+      about: 1,
       createdAt: 1
     }
   });

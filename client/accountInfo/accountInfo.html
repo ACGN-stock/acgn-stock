@@ -120,6 +120,7 @@
       {{/if}}
 
       {{#if isCurrentUser}}
+        <a class="btn btn-primary btn-sm mt-1" href="{{pathForEditAccount}}">編輯個人資訊</a>
         {{#if this.profile.isInVacation}}
           <button class="btn btn-info btn-sm mt-1" type="button" data-action="toggleEndingVacation">
             {{#if this.profile.isEndingVacation}}

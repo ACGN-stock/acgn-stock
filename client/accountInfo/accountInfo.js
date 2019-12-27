@@ -108,6 +108,9 @@ Template.accountInfoBasic.helpers({
   },
   pathForReportUserViolation() {
     return FlowRouter.path('reportViolation', null, { type: 'user', id: paramUserId() });
+  },
+  pathForEditAccount() {
+    return FlowRouter.path('editAccount', { userId: paramUserId() });
   }
 });
 
