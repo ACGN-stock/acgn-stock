@@ -707,6 +707,7 @@ const banActionTextMap = {
   deal: '禁止投資下單',
   chat: '禁止聊天發言',
   advertise: '禁止廣告宣傳',
+  editUserAbout: '禁止編輯個人簡介',
   manager: '禁止擔任經理'
 };
 

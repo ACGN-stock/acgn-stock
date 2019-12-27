@@ -306,6 +306,9 @@ Template.displayLog.helpers({
       case '禁止廣告': { // TODO 合併「禁止」系列與「解除」系列的 code
         return `【玩家停權】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後的所有廣告宣傳行為。${displayViolationCaseOrNot(data.violationCaseId)}`;
       }
+      case '禁止簡介': { // TODO 合併「禁止」系列與「解除」系列的 code
+        return `【玩家停權】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後編輯個人簡介。${displayViolationCaseOrNot(data.violationCaseId)}`;
+      }
       case '禁任經理': { // TODO 合併「禁止」系列與「解除」系列的 code
         return `【玩家停權】${users[0]}以「${_.escape(data.reason)}」的理由禁止${users[1]}今後擔任經理人的資格。${displayViolationCaseOrNot(data.violationCaseId)}`;
       }
@@ -320,6 +323,9 @@ Template.displayLog.helpers({
       }
       case '解除廣告': { // TODO 合併「禁止」系列與「解除」系列的 code
         return `【玩家復權】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的廣告宣傳禁令。${displayViolationCaseOrNot(data.violationCaseId)}`;
+      }
+      case '解除簡介': { // TODO 合併「禁止」系列與「解除」系列的 code
+        return `【玩家復權】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}的編輯個人簡介禁令。${displayViolationCaseOrNot(data.violationCaseId)}`;
       }
       case '解除禁任': { // TODO 合併「禁止」系列與「解除」系列的 code
         return `【玩家復權】${users[0]}以「${_.escape(data.reason)}」的理由中止了${users[1]}禁任經理人的處置。${displayViolationCaseOrNot(data.violationCaseId)}`;

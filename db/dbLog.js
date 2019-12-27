@@ -248,6 +248,11 @@ export const logTypeList = [
   '禁止廣告',
 
   /**
+   * 【玩家停權】userId0以「data.reason」的理由禁止userId1今後編輯個人簡介。
+   */
+  '禁止簡介',
+
+  /**
    * 【課以罰款】userId0以「data.reason」的理由向(userId1||「companyId」公司)課以總數為$data.fine的罰金。
    */
   '課以罰款',
@@ -291,6 +296,11 @@ export const logTypeList = [
    * 【玩家復權】userId0以「data.reason」的理由中止了userId1的廣告宣傳禁令。
    */
   '解除廣告',
+
+  /**
+   * 【玩家復權】userId0以「data.reason」的理由中止了userId1的編輯個人簡介禁令。
+   */
+  '解除簡介',
 
   /**
    * 【退還罰款】userId0以「data.reason」的理由向(userId1||「companyId」公司)退還總數為$data.fine的罰金。
@@ -505,6 +515,7 @@ export const logTypeGroupMap = {
       '禁止下單',
       '禁止聊天',
       '禁止廣告',
+      '禁止簡介',
       '課以罰款',
       '清除簡介',
       '沒收股份',
@@ -514,6 +525,7 @@ export const logTypeGroupMap = {
       '解除下單',
       '解除聊天',
       '解除廣告',
+      '解除簡介',
       '退還罰款',
       '解除禁任',
       '查封關停',
@@ -548,6 +560,7 @@ export const importantFscLogTypeList = [
   '禁止下單',
   '禁止聊天',
   '禁止廣告',
+  '禁止簡介',
   '課以罰款',
   '清除簡介',
   '沒收股份',
@@ -557,6 +570,7 @@ export const importantFscLogTypeList = [
   '解除下單',
   '解除聊天',
   '解除廣告',
+  '解除簡介',
   '退還罰款',
   '解除禁任',
   '撤銷廣告'

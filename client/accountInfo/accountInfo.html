@@ -92,6 +92,11 @@
         {{else}}
           <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="advertise">禁止廣告</button>
         {{/if}}
+        {{#if isBanned 'editUserAbout'}}
+          <button class="btn btn-success btn-sm mt-1" type="button" data-ban="editUserAbout">解除簡介禁令</button>
+        {{else}}
+          <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="editUserAbout">禁止簡介</button>
+        {{/if}}
         <button class="btn btn-warning btn-sm mt-1" type="button" data-action="confiscateUserMoney">課以罰金</button>
         <button class="btn btn-warning btn-sm mt-1" type="button" data-action="returnUserMoney">退還罰金</button>
         {{#if isBanned 'manager'}}
@@ -113,6 +118,9 @@
         {{/if}}
         {{#if isBanned 'advertise'}}
           <div class="text-danger">目前被禁止廣告宣傳。</div>
+        {{/if}}
+        {{#if isBanned 'editUserAbout'}}
+          <div class="text-danger">目前被禁止編輯個人簡介。</div>
         {{/if}}
       {{/if}}
       {{#if showUnregisterEmployee}}
