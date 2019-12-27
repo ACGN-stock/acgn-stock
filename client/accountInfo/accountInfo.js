@@ -16,7 +16,7 @@ import { setPrerenderTitleReady } from '/client/utils/prerenderReady';
 import { inheritedShowLoadingOnSubscribing } from '../layout/loading';
 import { alertDialog } from '../layout/alertDialog';
 import { shouldStopSubscribe } from '../utils/idle';
-import { changeChairmanTitle, confiscateUserMoney, sendFscNotice, banUser, confiscateAllUserStocks, returnUserMoney, forceCancelUserOrders } from '../utils/methods';
+import { changeChairmanTitle, confiscateUserMoney, sendFscNotice, banUser, confiscateAllUserStocks, returnUserMoney, forceCancelUserOrders, clearUserAbout } from '../utils/methods';
 import { accountInfoCommonHelpers, paramUserId, paramUser, isCurrentUser } from './helpers';
 
 inheritedShowLoadingOnSubscribing(Template.accountInfo);
@@ -123,6 +123,10 @@ Template.accountInfoBasic.events({
     event.preventDefault();
     const banType = $(event.currentTarget).attr('data-ban');
     banUser(paramUser(), banType);
+  },
+  'click [data-action="clearUserAbout"]'(event) {
+    event.preventDefault();
+    clearUserAbout(paramUser());
   },
   'click [data-action="confiscateUserMoney"]'(event) {
     event.preventDefault();

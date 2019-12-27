@@ -678,6 +678,16 @@ export function banProduct(productId) {
   });
 }
 
+export function clearUserAbout({ _id: userId, profile }) {
+  const title = `清除個人簡介 - ${profile.name}`;
+
+  askReason(title, (reason) => {
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('clearUserAbout', { userId, reason, violationCaseId });
+    });
+  });
+}
+
 export function confiscateUserMoney({ _id: userId, profile }) {
   const title = `課以罰金 - ${profile.name}`;
 
