@@ -84,6 +84,7 @@ const alwaysDisplayLogTypeList = [
   '課以罰款',
   '金管撤單',
   '沒收股份',
+  '清除簡介',
   '禁任經理',
   '解除舉報',
   '解除下單',
