@@ -26,8 +26,6 @@ Template.legacyAnnouncement.onCreated(function() {
       return false;
     }
     this.subscribe('legacyAnnouncementDetail');
-    this.subscribe('currentRound');
-    this.subscribe('currentSeason');
   });
 });
 Template.legacyAnnouncement.helpers({
@@ -83,7 +81,20 @@ function aboutToEnd(end, hour) {
   }
 }
 
+Template.systemStatusPanel.onCreated(function() {
+  this.autorun(() => {
+    if (shouldStopSubscribe()) {
+      return false;
+    }
+    this.subscribe('currentRound');
+    this.subscribe('currentSeason');
+    this.subscribe('onlinePeopleNumber');
+  });
+});
 Template.systemStatusPanel.helpers({
+  onlinePeopleNumber() {
+    return dbVariables.get('onlinePeopleNumber') || 0;
+  },
   roundStartTime() {
     const currentRound = dbRound.findOne({}, {
       sort: {

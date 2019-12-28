@@ -23,6 +23,7 @@ const pageNameHash = {
   arenaInfo: '最萌亂鬥大賽',
   seasonalReport: '季度報告',
   accountInfo: '帳號資訊',
+  editAccount: '編輯個人資訊',
   ruleAgendaList: '規則討論',
   ruleAgendaDetail: '議程資訊',
   createRuleAgenda: '建立新議程',
@@ -133,7 +134,9 @@ FlowRouter.route('/arenaInfo/:arenaId?', { name: 'arenaInfo' });
 
 FlowRouter.route('/seasonalReport/:seasonId?', { name: 'seasonalReport' });
 
-FlowRouter.route('/accountInfo/:userId?', { name: 'accountInfo' });
+const accountRoute = FlowRouter.group({ prefix: '/accountInfo' });
+accountRoute.route('/:userId?', { name: 'accountInfo' });
+accountRoute.route('/edit/:userId?', { name: 'editAccount' });
 
 const ruleDiscussRoute = FlowRouter.group({ prefix: '/ruleDiscuss' });
 ruleDiscussRoute.route('/', { name: 'ruleAgendaList' });

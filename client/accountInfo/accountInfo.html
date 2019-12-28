@@ -92,6 +92,12 @@
         {{else}}
           <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="advertise">禁止廣告</button>
         {{/if}}
+        {{#if isBanned 'editUserAbout'}}
+          <button class="btn btn-success btn-sm mt-1" type="button" data-ban="editUserAbout">解除簡介禁令</button>
+        {{else}}
+          <button class="btn btn-warning btn-sm mt-1" type="button" data-ban="editUserAbout">禁止簡介</button>
+        {{/if}}
+        <button class="btn btn-warning btn-sm mt-1" type="button" data-action="clearUserAbout">清除個人簡介</button>
         <button class="btn btn-warning btn-sm mt-1" type="button" data-action="confiscateUserMoney">課以罰金</button>
         <button class="btn btn-warning btn-sm mt-1" type="button" data-action="returnUserMoney">退還罰金</button>
         {{#if isBanned 'manager'}}
@@ -114,12 +120,16 @@
         {{#if isBanned 'advertise'}}
           <div class="text-danger">目前被禁止廣告宣傳。</div>
         {{/if}}
+        {{#if isBanned 'editUserAbout'}}
+          <div class="text-danger">目前被禁止編輯個人簡介。</div>
+        {{/if}}
       {{/if}}
       {{#if showUnregisterEmployee}}
         <button class="btn btn-danger btn-sm mt-1" type="button" data-action="unregisterEmployee">取消員工報名</button>
       {{/if}}
 
       {{#if isCurrentUser}}
+        <a class="btn btn-primary btn-sm mt-1" href="{{pathForEditAccount}}">編輯個人資訊</a>
         {{#if this.profile.isInVacation}}
           <button class="btn btn-info btn-sm mt-1" type="button" data-action="toggleEndingVacation">
             {{#if this.profile.isEndingVacation}}
@@ -135,36 +145,43 @@
       <hr />
     {{/if}}
 
-    <div>
-      使用者識別碼：{{this._id}}
-    </div>
-    <div>
-      帳號驗證方式：
-      {{showValidateType}}
-    </div>
-    <div>
-      帳號啟動日期：{{formatDateTimeText this.createdAt}}
-    </div>
-    <div>
-      上次登入時間：{{formatDateTimeText this.status.lastLogin.date}}
-    </div>
-    <div>
-      上次登入IP：{{this.status.lastLogin.ipAddr}}
-    </div>
-    <div>
-      本季度未登入天數：{{this.profile.noLoginDayCount}}
-    </div>
-    <div>
-      上季度財富統計：{{currencyFormat this.profile.lastSeasonTotalWealth}}
-    </div>
-    <div>
-      帳號當前餘額：{{currencyFormat this.profile.money}}
-    </div>
-    <div>
-      帳號剩餘消費券：{{currencyFormat this.profile.vouchers}}
-    </div>
-    <div>
-      帳號剩餘推薦票：{{this.profile.voteTickets}}
+    <div class="row">
+      <div class="col-12 col-lg-4">
+        <div>
+          使用者識別碼：{{this._id}}
+        </div>
+        <div>
+          帳號驗證方式：
+          {{showValidateType}}
+        </div>
+        <div>
+          帳號啟動日期：{{formatDateTimeText this.createdAt}}
+        </div>
+        <div>
+          上次登入時間：{{formatDateTimeText this.status.lastLogin.date}}
+        </div>
+        <div>
+          上次登入IP：{{this.status.lastLogin.ipAddr}}
+        </div>
+        <div>
+          本季度未登入天數：{{this.profile.noLoginDayCount}}
+        </div>
+        <div>
+          上季度財富統計：{{currencyFormat this.profile.lastSeasonTotalWealth}}
+        </div>
+        <div>
+          帳號當前餘額：{{currencyFormat this.profile.money}}
+        </div>
+        <div>
+          帳號剩餘消費券：{{currencyFormat this.profile.vouchers}}
+        </div>
+        <div>
+          帳號剩餘推薦票：{{this.profile.voteTickets}}
+        </div>
+      </div>
+      <div class="col-12 col-lg-8">
+        {{> accountCard this}}
+      </div>
     </div>
     {{#if this.profile.isInVacation}}
       <div class="text-info">目前正在渡假中。</div>
