@@ -1,0 +1,32 @@
+<template name="accountCard">
+  <div class="account-card {{cardDisplayClass this}}">
+    <div class="row my-2 mx-2">
+
+      <div class="picture col-4">
+        {{#if this.about.picture}}
+          <img src="{{this.about.picture}}" />
+        {{else}}
+          <img src="/ms-icon-310x310.png" />
+        {{/if}}
+      </div>
+
+      <div class="user-info col-8">
+        <div class="my-2 ml-1">
+          <div class="text-left text-truncate">
+            <h3 class="text-truncate">
+              {{>userLink this._id}}
+            </h3>
+            <span style="font-size: small;">
+              {{this._id}}
+            </span>
+          </div>
+
+          <div class="text-right">
+            {{this.about.description}}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>

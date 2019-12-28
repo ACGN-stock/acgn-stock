@@ -43,3 +43,4 @@ import './042-notification-system';
 import './043-rename-name-to-companyName-in-companyArchive';
 import './044-remove-unnecessary-field-in-companyArchive';
 import './045-comment-violation-case';
+import './046-add-user-about';

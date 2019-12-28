@@ -678,6 +678,16 @@ export function banProduct(productId) {
   });
 }
 
+export function clearUserAbout({ _id: userId, profile }) {
+  const title = `清除個人簡介 - ${profile.name}`;
+
+  askReason(title, (reason) => {
+    askViolationCaseId(title, (violationCaseId) => {
+      Meteor.customCall('clearUserAbout', { userId, reason, violationCaseId });
+    });
+  });
+}
+
 export function confiscateUserMoney({ _id: userId, profile }) {
   const title = `課以罰金 - ${profile.name}`;
 
@@ -707,6 +717,7 @@ const banActionTextMap = {
   deal: '禁止投資下單',
   chat: '禁止聊天發言',
   advertise: '禁止廣告宣傳',
+  editUserAbout: '禁止編輯個人簡介',
   manager: '禁止擔任經理'
 };
 

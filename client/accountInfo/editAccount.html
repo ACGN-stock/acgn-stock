@@ -1,0 +1,13 @@
+<template name="editAccount">
+  {{#if user}}
+    <div class="card">
+      <div class="card-block">
+        <h1 class="card-title mb-1">編輯個人資訊</h1>
+        <hr />
+        {{> accountAboutEditForm userAbout}}
+      </div>
+    </div>
+  {{else}}
+    Loading...
+  {{/if}}
+</template>

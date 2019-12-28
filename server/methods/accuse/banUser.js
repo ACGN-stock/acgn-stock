@@ -51,12 +51,14 @@ function banUser(currentUser, { userId, reason, banType, violationCaseId }) {
     deal:  '禁止下單',
     chat:  '禁止聊天',
     advertise:  '禁止廣告',
+    editUserAbout: '禁止簡介',
     manager:  '禁任經理'
   } : {
     accuse: '解除舉報',
     deal: '解除下單',
     chat: '解除聊天',
     advertise: '解除廣告',
+    editUserAbout: '解除簡介',
     manager: '解除禁任'
   };
 

@@ -1,0 +1,40 @@
+<template name="accountAboutEditForm">
+  <form>
+    <div class="form-group">
+      <label for="picture">大頭貼</label>
+      <div class="input-group">
+        <input
+          class="form-control"
+          type="text"
+          name="picture"
+          value="{{valueOf 'picture'}}"
+          placeholder="https://"
+        />
+        {{#if valueOf 'picture'}}
+          <span class="input-group-btn">
+            <button class="btn btn-info" data-preview="picture" type="button">
+              預覽
+            </button>
+          </span>
+        {{/if}}
+      </div>
+      <small class="form-text">建議大小300x300</small>
+      {{{errorHtmlOf 'picture'}}}
+    </div>
+    <div class="form-group">
+      <label for="description">個人簡介</label>
+      <textarea
+        class="form-control"
+        name="description"
+        rows="10"
+        maxlength="3000"
+        placeholder="關於您自己 (最多3000字)">{{valueOf 'description'}}</textarea>
+      <small class="form-text text-warning">請注意相關規範，不要違反法規</small>
+      {{{errorHtmlOf 'description'}}}
+    </div>
+    <div class="text-right">
+      <button class="btn btn-primary">送出</button>
+      <a class="btn btn-secondary" href="{{getAccountHref this._id}}">取消</a>
+    </div>
+  </form>
+</template>
