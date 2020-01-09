@@ -40,7 +40,10 @@ function validateAboutModel(model) {
 }
 
 function saveAboutModel(model) {
-  const submitData = _.pick(model, 'picture', 'description');
+  const submitData = {
+    picture: null,
+    ..._.pick(model, 'picture', 'description')
+  };
   Meteor.customCall('editUserAbout', submitData, (error) => {
     if (! error) {
       const path = FlowRouter.path('accountInfo', { userId: model._id });

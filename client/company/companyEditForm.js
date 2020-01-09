@@ -71,7 +71,11 @@ function handleCompanyInputChange(event) {
 
 function saveCompanyModel(model) {
   const companyId = model._id;
-  const submitData = _.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description');
+  const submitData = {
+    pictureSmall: null,
+    pictureBig: null,
+    ..._.pick(model, 'tags', 'pictureSmall', 'pictureBig', 'description')
+  };
   Meteor.customCall('editCompany', companyId, submitData, (error) => {
     if (! error) {
       const path = FlowRouter.path('companyDetail', { companyId });
