@@ -3,7 +3,7 @@ import { Mongo } from 'meteor/mongo';
 import { Match } from 'meteor/check';
 import SimpleSchema from 'simpl-schema';
 
-import { banTypeList, userRoleMap } from './users';
+import { banTypeList, userRoleMap, userAboutSchema } from './users';
 
 // 使用者保管庫
 export const dbUserArchive = new Mongo.Collection('userArchive');
@@ -33,6 +33,10 @@ const schema = new SimpleSchema({
     type: SimpleSchema.Integer,
     min: 0,
     defaultValue: 0
+  },
+  about: {
+    type: userAboutSchema,
+    defaultValue: { description: '' }
   },
   // 被禁止的權限
   ban: {

@@ -40,6 +40,7 @@ Accounts.onCreateUser((options, user) => {
     user.profile.roles = existingArchiveUser.roles;
     user.profile.stones.saint = existingArchiveUser.saintStones;
     user.profile.ban = existingArchiveUser.ban;
+    user.about = existingArchiveUser.about;
     dbUserArchive.update(existingArchiveUser._id, { $set: { status: 'registered' } });
   }
   else {
@@ -53,7 +54,8 @@ Accounts.onCreateUser((options, user) => {
       validateType: user.profile.validateType,
       roles: user.profile.roles,
       saintStones: user.profile.stones.saint,
-      ban: user.profile.ban
+      ban: user.profile.ban,
+      about: user.about
     });
   }
 
