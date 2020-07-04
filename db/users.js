@@ -104,6 +104,19 @@ export function hasBanned(user, permission) {
   return user && user.profile && user.profile.ban && user.profile.ban.includes(permission);
 }
 
+export const userAboutSchema = new SimpleSchema({
+  description: {
+    type: String,
+    max: 300,
+    defaultValue: ''
+  },
+  picture: {
+    type: String,
+    regEx: SimpleSchema.RegEx.Url,
+    max: 1000,
+    optional: true
+  }
+});
 const schema = new SimpleSchema({
   // 使用者PTT帳號名稱
   username: {
@@ -223,19 +236,7 @@ const schema = new SimpleSchema({
     })
   },
   about: {
-    type: new SimpleSchema({
-      description: {
-        type: String,
-        max: 300,
-        defaultValue: ''
-      },
-      picture: {
-        type: String,
-        regEx: SimpleSchema.RegEx.Url,
-        max: 1000,
-        optional: true
-      }
-    }),
+    type: userAboutSchema,
     defaultValue: { description: '' }
   },
   // user-status 的欄位定義

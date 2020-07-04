@@ -217,7 +217,8 @@ export function doRoundWorks(lastRoundData, lastSeasonData) {
             validateType: userData.profile.validateType,
             roles: userData.profile.roles,
             saintStones: userData.profile.stones.saint,
-            ban: userData.profile.ban
+            ban: userData.profile.ban,
+            about: userData.about
           }
         }
       );
