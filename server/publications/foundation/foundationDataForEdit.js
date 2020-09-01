@@ -11,6 +11,7 @@ Meteor.publish('foundationDataForEdit', function(foundationId) {
 
   return dbFoundations.find(foundationId, {
     fields: {
+      companyName: 1,
       tags: 1,
       pictureSmall: 1,
       pictureBig: 1,
