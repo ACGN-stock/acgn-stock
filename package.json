@@ -42,7 +42,7 @@
     "probability-distributions": "^0.9.1",
     "remove-markdown": "^0.3.0",
     "rosie": "^1.6.0",
-    "shelljs": "^0.7.8",
+    "shelljs": "^0.8.5",
     "showdown": "^1.9.1",
     "showdown-footnotes": "^2.1.2",
     "simpl-schema": "1.5.0",
