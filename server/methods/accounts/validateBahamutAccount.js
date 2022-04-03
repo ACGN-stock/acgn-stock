@@ -68,7 +68,7 @@ function checkBahamutPhoneValidation(username) {
     .filter((i, e) => {
       const children = e.children;
 
-      return children.length === 1 && (children[0].data === '手機認證：有' || children[0].data === '手機認證：永久');
+      return children.length === 1 && children[0].data.includes('手機認證：已完成');
     })
     .length > 0;
 }
