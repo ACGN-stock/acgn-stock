@@ -80,7 +80,7 @@ describe('method validateBahamutAccount', function() {
     it('should throw error if the user has passed phone validation but no validatation code reply found', function() {
       HTTP.get
         .withArgs(homeIndexUrl)
-        .returns({ content: '<li>手機認證：有</li>' })
+        .returns({ content: '<li>手機認證：已完成</li>' })
         .withArgs(homeReplyListUrl)
         .returns({ content: '' });
 
@@ -90,7 +90,7 @@ describe('method validateBahamutAccount', function() {
     it('should throw error if the user has passed phone validation but replied wrong validatation code', function() {
       HTTP.get
         .withArgs(homeIndexUrl)
-        .returns({ content: '<li>手機認證：有</li>' })
+        .returns({ content: '<li>手機認證：已完成</li>' })
         .withArgs(homeReplyListUrl)
         .returns({ content: `<span><a href="home.php?owner=${username}"></a>：${wrongValidateCode}</span>` });
 
@@ -100,7 +100,7 @@ describe('method validateBahamutAccount', function() {
     it('should create a new user if the validation process passed and the user does not exist', function() {
       HTTP.get
         .withArgs(homeIndexUrl)
-        .returns({ content: '<li>手機認證：有</li>' })
+        .returns({ content: '<li>手機認證：已完成</li>' })
         .withArgs(homeReplyListUrl)
         .returns({ content: `<span><a href="home.php?owner=${username}"></a>：${correctValidateCode}</span>` });
 
@@ -122,7 +122,7 @@ describe('method validateBahamutAccount', function() {
 
       HTTP.get
         .withArgs(homeIndexUrl)
-        .returns({ content: '<li>手機認證：有</li>' })
+        .returns({ content: '<li>手機認證：已完成 (2021-04-04)</li>' })
         .withArgs(homeReplyListUrl)
         .returns({ content: `<span><a href="home.php?owner=${username}"></a>：${correctValidateCode}</span>` });
 
