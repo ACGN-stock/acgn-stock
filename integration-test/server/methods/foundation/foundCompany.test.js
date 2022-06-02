@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import { Accounts } from 'meteor/accounts-base';
 import expect from 'must';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { foundCompany } from '/server/methods/foundation/foundCompany';
 import { foundationFactory, pttUserFactory, seasonFactory } from '/dev-utils/factories';

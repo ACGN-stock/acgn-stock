@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import { Factory } from 'rosie';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import expect from 'must';
 import mustSinon from 'must-sinon';
 import sinon from 'sinon';

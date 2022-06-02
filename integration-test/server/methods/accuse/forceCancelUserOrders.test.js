@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import { Accounts } from 'meteor/accounts-base';
 import expect from 'must';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 import { forceCancelUserOrders } from '/server/methods/accuse/forceCancelUserOrders';
 import { pttUserFactory, orderFactory, directorFactory } from '/dev-utils/factories';
