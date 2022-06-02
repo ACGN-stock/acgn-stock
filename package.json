@@ -28,6 +28,7 @@
     "watch": "npm-watch"
   },
   "dependencies": {
+    "@faker-js/faker": "^7.1.0",
     "babel-runtime": "6.26.0",
     "bcrypt": "^1.0.3",
     "cheerio": "1.0.0-rc.2",
