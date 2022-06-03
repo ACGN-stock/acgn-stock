@@ -21,7 +21,6 @@ accounts-password@1.5.1
 percolate:migrations
 kadira:flow-router
 kadira:dochead
-meteorhacks:aggregate
 mizzao:user-status
 ddp-rate-limiter@1.0.7
 mizzao:timesync
@@ -37,3 +36,4 @@ aldeed:collection2@3.0.0
 tmeasday:publish-counts
 server-render@0.3.1
 underscore@1.0.10
+sakulstra:aggregate
