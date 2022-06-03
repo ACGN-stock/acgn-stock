@@ -18,18 +18,18 @@
     }
   },
   "scripts": {
-    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 meteor run --settings ./config.json",
+    "start": "meteor run --settings ./config.json",
     "lint": "node ./node_modules/eslint/bin/eslint.js .",
     "pretest": "npm run lint --silent",
     "deploy": "DEPLOY_HOSTNAME=ap-southeast-2.galaxy.meteor.com meteor deploy acgn-stock.au.meteorapp.com --settings ./config.json",
     "postinstall": "opencollective postinstall",
-    "test": "NODE_TLS_REJECT_UNAUTHORIZED=0 TEST_BROWSER_DRIVER=puppeteer meteor test --once --driver-package meteortesting:mocha --settings ./config.json",
+    "test": "TEST_BROWSER_DRIVER=puppeteer meteor test --once --driver-package meteortesting:mocha --settings ./config.json",
     "test:units": "tape -r ./tests/mock-setting.js tests/units/**/*.js|tap-spec",
     "watch": "npm-watch"
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0",
-    "bcrypt": "^1.0.3",
+    "bcrypt": "^5.0.1",
     "cheerio": "1.0.0-rc.2",
     "common-tags": "^1.7.2",
     "image-type": "^4.1.0",
@@ -39,13 +39,13 @@
     "opencollective": "^1.0.3",
     "prerender-node": "^3.2.1",
     "probability-distributions": "^0.9.1",
-    "remove-markdown": "^0.3.0",
-    "rosie": "^1.6.0",
+    "remove-markdown": "^0.5.0",
+    "rosie": "^2.1.0",
     "shelljs": "^0.8.5",
     "showdown": "^1.9.1",
     "showdown-footnotes": "^2.1.2",
     "simpl-schema": "1.5.0",
-    "xss": "^0.3.8"
+    "xss": "^1.0.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^4.1.0",
@@ -67,10 +67,10 @@
     "must": "^0.13.4",
     "must-sinon": "0.0.0",
     "npm-watch": "^0.3.0",
-    "puppeteer": "^14.2.1",
+    "puppeteer": "^1.20.0",
     "sinon": "^4.1.2",
     "tap-spec": "^4.1.1",
-    "tape": "^4.8.0"
+    "tape": "^5.5.0"
   },
   "collective": {
     "type": "opencollective",
