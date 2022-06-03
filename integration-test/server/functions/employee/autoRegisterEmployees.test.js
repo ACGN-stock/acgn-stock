@@ -1,6 +1,6 @@
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import { Accounts } from 'meteor/accounts-base';
-import { faker } from '@faker-js/faker';
+import faker from '@faker-js/faker';
 import expect from 'must';
 
 import { autoRegisterEmployees } from '/server/functions/employee/autoRegisterEmployees';

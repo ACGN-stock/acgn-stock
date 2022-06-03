@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import expect from 'must';
-import { faker } from '@faker-js/faker';
+import faker from '@faker-js/faker';
 
 import { informerCommentViolationCase } from '/server/methods/violation/commentViolationCase';
 import { violationCasesFactory, violationCaseActionLogFactory } from '/dev-utils/factories';

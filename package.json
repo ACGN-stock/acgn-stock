@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@babel/runtime": "7.0.0-beta.55",
-    "@faker-js/faker": "^7.1.0",
     "bcrypt": "^1.0.3",
     "cheerio": "1.0.0-rc.2",
     "common-tags": "^1.7.2",
@@ -49,6 +48,7 @@
     "xss": "^0.3.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^4.1.0",
     "@meteorjs/eslint-config-meteor": "^1.0.5",
     "babel-eslint": "^7.2.3",
     "babel-plugin-module-resolver": "^3.0.0",

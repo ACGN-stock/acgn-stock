@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Factory } from 'rosie';
-import { faker } from '@faker-js/faker';
+import faker from '@faker-js/faker';
 
 import { productTypeList, productRatingList, productReplenishBaseAmountTypeList, productReplenishBatchSizeTypeList } from '/db/dbProducts';
 import { orderTypeList } from '/db/dbOrders';
