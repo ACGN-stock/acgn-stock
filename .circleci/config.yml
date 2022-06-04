@@ -43,7 +43,7 @@ jobs:
           when: on_fail
       - run:
           name: list meteor installed package
-          command: NODE_TLS_REJECT_UNAUTHORIZED=0 meteor list
+          command: meteor list
       - run:
           name: setup locale
           command: |
@@ -58,10 +58,10 @@ jobs:
           command: meteor npm run lint
       - run:
           name: run all unit tests
-          command: NODE_TLS_REJECT_UNAUTHORIZED=0  meteor npm run test:units
+          command: meteor npm run test:units
       - run:
           name: run integration tests
-          command: NODE_TLS_REJECT_UNAUTHORIZED=0  meteor npm test
+          command: meteor npm test
           environment:
               MONGO_URL: mongodb://localhost:27017/db
       - save_cache:
