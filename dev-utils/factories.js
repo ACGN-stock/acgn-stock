@@ -80,10 +80,10 @@ export const productFactory = new Factory()
       return faker.lorem.sentence();
     },
     type() {
-      return faker.random.arrayElement(productTypeList);
+      return faker.helpers.arrayElement(productTypeList);
     },
     rating() {
-      return faker.random.arrayElement(productRatingList);
+      return faker.helpers.arrayElement(productRatingList);
     },
     url() {
       return faker.internet.url();
@@ -92,10 +92,10 @@ export const productFactory = new Factory()
       return faker.lorem.sentence(20);
     },
     replenishBaseAmountType() {
-      return faker.random.arrayElement(productReplenishBaseAmountTypeList);
+      return faker.helpers.arrayElement(productReplenishBaseAmountTypeList);
     },
     replenishBatchSizeType() {
-      return faker.random.arrayElement(productReplenishBatchSizeTypeList);
+      return faker.helpers.arrayElement(productReplenishBatchSizeTypeList);
     },
     price: 1,
     totalAmount: 1,
@@ -107,22 +107,22 @@ export const productFactory = new Factory()
 export const userOwnedProductFactory = new Factory()
   .attrs({
     userId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     productId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     amount() {
-      return faker.random.number({ min: 1 });
+      return faker.datatype.number({ min: 1 });
     },
     price() {
-      return faker.random.number({ min: 1 });
+      return faker.datatype.number({ min: 1 });
     },
     companyId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     seasonId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     createdAt() {
       return new Date();
@@ -132,13 +132,13 @@ export const userOwnedProductFactory = new Factory()
 export const taxFactory = new Factory()
   .attrs({
     stockTax() {
-      return faker.random.number({ min: 1 });
+      return faker.datatype.number({ min: 1 });
     },
     moneyTax() {
-      return faker.random.number({ min: 1 });
+      return faker.datatype.number({ min: 1 });
     },
     zombieTax() {
-      return faker.random.number({ min: 1 });
+      return faker.datatype.number({ min: 1 });
     },
     fine: 0,
     paid: 0,
@@ -150,19 +150,19 @@ export const taxFactory = new Factory()
 export const orderFactory = new Factory()
   .attrs({
     userId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     companyId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     orderType() {
-      return faker.random.arrayElement(orderTypeList);
+      return faker.helpers.arrayElement(orderTypeList);
     },
     amount() {
-      return faker.random.number({ min: 1 });
+      return faker.datatype.number({ min: 1 });
     },
     unitPrice() {
-      return faker.random.number({ min: 1 });
+      return faker.datatype.number({ min: 1 });
     },
     createdAt() {
       return new Date();
@@ -181,26 +181,26 @@ export const seasonFactory = new Factory()
       return 1;
     },
     userCount() {
-      return faker.random.number({ min: 0 });
+      return faker.datatype.number({ min: 0 });
     },
     companiesCount() {
-      return faker.random.number({ min: 0 });
+      return faker.datatype.number({ min: 0 });
     },
     productCount() {
-      return faker.random.number({ min: 0 });
+      return faker.datatype.number({ min: 0 });
     }
   });
 
 export const directorFactory = new Factory()
   .attrs({
     userId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     companyId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     stocks() {
-      return faker.random.number({ min: 1 });
+      return faker.datatype.number({ min: 1 });
     },
     createdAt() {
       return new Date();
@@ -208,17 +208,17 @@ export const directorFactory = new Factory()
   });
 
 export const violationCasesFactory = new Factory()
-  .option('violatorsNumber', faker.random.number({ min: 1, max: 100 }))
+  .option('violatorsNumber', faker.datatype.number({ min: 1, max: 100 }))
   .attr('violators', ['violatorsNumber'], getFakeViolators)
   .attrs({
     informer() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     state() {
-      return faker.random.arrayElement(Object.keys(stateMap));
+      return faker.helpers.arrayElement(Object.keys(stateMap));
     },
     category() {
-      return faker.random.arrayElement(Object.keys(categoryMap));
+      return faker.helpers.arrayElement(Object.keys(categoryMap));
     },
     description() {
       return faker.lorem.words(10);
@@ -235,10 +235,10 @@ export const violationCaseActionLogFactory = new Factory()
   .option('executorIdentity', 'fsc') // ['fsc', 'informer', 'violator']
   .attrs({
     violationCaseId() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     executor() {
-      return faker.random.uuid();
+      return faker.datatype.uuid();
     },
     executedAt() {
       return faker.date.past();
@@ -249,7 +249,7 @@ export const violationCaseActionLogFactory = new Factory()
       return actionMap[action].allowedIdentity === executorIdentity;
     });
 
-    return faker.random.arrayElement(allowActions);
+    return faker.helpers.arrayElement(allowActions);
   })
   .attr('data', ['action', 'executorIdentity'], (action) => {
     const commonData = { reason: faker.lorem.words() };
@@ -258,25 +258,25 @@ export const violationCaseActionLogFactory = new Factory()
       case 'setState': {
         return {
           ...commonData,
-          state: faker.random.arrayElement(Object.keys(stateMap))
+          state: faker.helpers.arrayElement(Object.keys(stateMap))
         };
       }
       case 'addRelatedCase': {
         return {
           ...commonData,
-          relatedCaseId: faker.random.uuid()
+          relatedCaseId: faker.datatype.uuid()
         };
       }
       case 'removeRelatedCase': {
         return {
           ...commonData,
-          relatedCaseId: faker.random.uuid()
+          relatedCaseId: faker.datatype.uuid()
         };
       }
       case 'mergeViolatorsFromRelatedCase': {
         return {
           ...commonData,
-          relatedCaseId: faker.random.uuid(),
+          relatedCaseId: faker.datatype.uuid(),
           newViolators: getFakeViolators()
         };
       }
@@ -300,7 +300,7 @@ export const violationCaseActionLogFactory = new Factory()
 
 function getFakeViolators(violatorsNumber = -1) {
   if (violatorsNumber < 0) {
-    violatorsNumber = faker.random.number({ min: 1, max: 100 });
+    violatorsNumber = faker.datatype.number({ min: 1, max: 100 });
   }
   const violators = new Array(violatorsNumber);
   for (let i = 0; i < violators.length; i += 1) {
@@ -312,7 +312,7 @@ function getFakeViolators(violatorsNumber = -1) {
 
 function getFakeViolator() {
   return {
-    violatorType: faker.random.arrayElement(violatorTypeList),
-    violatorId: faker.random.uuid()
+    violatorType: faker.helpers.arrayElement(violatorTypeList),
+    violatorId: faker.datatype.uuid()
   };
 }

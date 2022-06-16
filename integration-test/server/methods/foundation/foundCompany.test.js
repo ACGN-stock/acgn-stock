@@ -25,7 +25,7 @@ describe('method foundCompany', function() {
     const { founderEarnestMoney, newRoundFoundationRestrictionTime, seasonTime, seasonNumberInRound } = Meteor.settings.public;
 
     const userId = Accounts.createUser(pttUserFactory.build());
-    const money = faker.random.number({ min: founderEarnestMoney });
+    const money = faker.datatype.number({ min: founderEarnestMoney });
     Meteor.users.update(userId, { $set: { 'profile.money': money } });
     user = Meteor.users.findOne(userId);
 
@@ -80,14 +80,14 @@ describe('method foundCompany', function() {
 
   it('should fail if is in new round foundation restriction time', function() {
     const { newRoundFoundationRestrictionTime } = Meteor.settings.public;
-    dbRound.update(roundId, { $set: { beginDate: new Date(Date.now() - faker.random.number({ max: newRoundFoundationRestrictionTime - 600000 })) } });
+    dbRound.update(roundId, { $set: { beginDate: new Date(Date.now() - faker.datatype.number({ max: newRoundFoundationRestrictionTime - 600000 })) } });
     foundCompany.bind(null, user, foundCompanyData)
       .must.throw(Meteor.Error, '目前尚未開放新創計劃！ [403]');
   });
 
   it('should fail if is in last season of current round', function() {
     const { seasonTime } = Meteor.settings.public;
-    dbRound.update(roundId, { $set: { endDate: new Date(Date.now() + faker.random.number({ max: seasonTime })) } });
+    dbRound.update(roundId, { $set: { endDate: new Date(Date.now() + faker.datatype.number({ max: seasonTime })) } });
     foundCompany.bind(null, user, foundCompanyData)
       .must.throw(Meteor.Error, '賽季度結束前的最後一個商業季度，禁止新創計劃！ [403]');
   });
@@ -95,7 +95,7 @@ describe('method foundCompany', function() {
   it('should fail if do not have enough time to found a company before current season end', function() {
     const { foundExpireTime } = Meteor.settings.public;
     const hours = Math.ceil(foundExpireTime / 3600000);
-    dbSeason.update(seasonId, { $set: { endDate: new Date(Date.now() + faker.random.number({ max: foundExpireTime })) } });
+    dbSeason.update(seasonId, { $set: { endDate: new Date(Date.now() + faker.datatype.number({ max: foundExpireTime })) } });
     foundCompany.bind(null, user, foundCompanyData)
       .must.throw(Meteor.Error, `商業季度即將結束前${hours}小時，禁止新創計劃！ [403]`);
   });

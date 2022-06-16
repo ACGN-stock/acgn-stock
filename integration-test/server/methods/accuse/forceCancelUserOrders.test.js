@@ -35,12 +35,12 @@ describe('method forceCancelUserOrders', function() {
       }
     };
 
-    buyOrder = orderFactory.build({ userId, orderType: '購入', amount: faker.random.number({ min: 2 }) });
-    buyOrder.done = faker.random.number({ min: 1, max: buyOrder.amount - 1 });
+    buyOrder = orderFactory.build({ userId, orderType: '購入', amount: faker.datatype.number({ min: 2 }) });
+    buyOrder.done = faker.datatype.number({ min: 1, max: buyOrder.amount - 1 });
     dbOrders.insert(buyOrder);
 
-    sellOrder = orderFactory.build({ userId, orderType: '賣出', amount: faker.random.number({ min: 2 }) });
-    sellOrder.done = faker.random.number({ min: 1, max: sellOrder.amount - 1 });
+    sellOrder = orderFactory.build({ userId, orderType: '賣出', amount: faker.datatype.number({ min: 2 }) });
+    sellOrder.done = faker.datatype.number({ min: 1, max: sellOrder.amount - 1 });
     dbOrders.insert(sellOrder);
 
     inDirectorsSellOrder = orderFactory.build({ userId, orderType: '賣出' });
@@ -73,7 +73,7 @@ describe('method forceCancelUserOrders', function() {
   });
 
   it('should fail if the violation case is not exist', function() {
-    violationCaseId = faker.random.uuid();
+    violationCaseId = faker.datatype.uuid();
 
     runForceCancelUserOrders().must.throw(Meteor.Error, `找不到識別碼為「${violationCaseId}」的違規案件！ [404]`);
     expect(findOrder({ userId })).to.exist();

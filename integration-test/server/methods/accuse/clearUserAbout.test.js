@@ -33,7 +33,7 @@ describe('method clearUserAbout', function() {
     Meteor.users.update(userId, { $set: { about } });
 
     currentUser = {
-      _id: faker.random.uuid(),
+      _id: faker.datatype.uuid(),
       profile: {
         roles: ['fscMember']
       }

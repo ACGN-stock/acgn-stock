@@ -33,8 +33,8 @@ describe('method informerCommentViolationCase', function() {
     resetDatabase();
 
     violationCase = violationCasesFactory.build(
-      { state: faker.random.arrayElement(actionMap.informerComment.allowedStates) },
-      { violatorsNumber: faker.random.number({ min: 5, max: 100 }) }
+      { state: faker.helpers.arrayElement(actionMap.informerComment.allowedStates) },
+      { violatorsNumber: faker.datatype.number({ min: 5, max: 100 }) }
     );
     violationCaseId = dbViolationCases.insert(violationCase);
     currentUser = { _id: violationCase.informer };
@@ -42,7 +42,7 @@ describe('method informerCommentViolationCase', function() {
 
   it('should fail if the violation case is not exist', function() {
     const originViolationCaseId = violationCaseId;
-    violationCaseId = faker.random.uuid();
+    violationCaseId = faker.datatype.uuid();
 
     runInformerCommentViolationCase().must.throw(Meteor.Error, `找不到識別碼為「${violationCaseId}」的違規案件！ [404]`);
 
@@ -54,7 +54,7 @@ describe('method informerCommentViolationCase', function() {
     const notAllowStates = Object.keys(stateMap).filter((state) => {
       return ! actionMap.informerComment.allowedStates.includes(state);
     });
-    violationCase.state = faker.random.arrayElement(notAllowStates);
+    violationCase.state = faker.helpers.arrayElement(notAllowStates);
     dbViolationCases.update(violationCaseId, { $set: { state: violationCase.state } });
 
     runInformerCommentViolationCase().must.throw(Meteor.Error, '案件狀態不符！ [403]');
@@ -65,7 +65,7 @@ describe('method informerCommentViolationCase', function() {
 
   it('should fail if the user is not informer', function() {
     currentUser.profile = { roles: ['fscMember'] };
-    currentUser._id = faker.random.arrayElement(violationCase.violators).violatorId;
+    currentUser._id = faker.helpers.arrayElement(violationCase.violators).violatorId;
 
     runInformerCommentViolationCase().must.throw(Meteor.Error, '權限不符，無法進行此操作！ [403]');
 
@@ -99,7 +99,7 @@ describe('method informerCommentViolationCase', function() {
   });
 
   it('should notification last action fsc member', function() {
-    const fscMemberId = faker.random.uuid();
+    const fscMemberId = faker.datatype.uuid();
     dbViolationCaseActionLogs.insert(violationCaseActionLogFactory.build(
       { violationCaseId, executor: fscMemberId },
       { executorIdentity: 'fsc' }

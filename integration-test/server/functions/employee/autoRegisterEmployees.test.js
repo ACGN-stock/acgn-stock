@@ -53,7 +53,7 @@ describe('function autoRegisterEmployees', function() {
       const newCompanyTest = 2;
       for (let i = 0; i < newCompanyTest; i += 1) {
         const newUserId = Accounts.createUser(pttUserFactory.build());
-        const newCompanyId = faker.random.uuid();
+        const newCompanyId = faker.datatype.uuid();
         const newTestGroup = { userId: newUserId, companyId: newCompanyId };
         testGroups.push(newTestGroup);
         dbEmployees.insert({ ...newTestGroup, registerAt, employed: true });

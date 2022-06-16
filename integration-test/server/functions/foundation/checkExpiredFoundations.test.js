@@ -26,7 +26,7 @@ describe('function checkExpiredFoundations', function() {
       return `user${n}`;
     })
     .attr('amount', () => {
-      return faker.random.number({
+      return faker.datatype.number({
         min: minAmountPerInvestor,
         max: maxAmountPerInvestor
       });

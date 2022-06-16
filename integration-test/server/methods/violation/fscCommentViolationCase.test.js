@@ -33,16 +33,16 @@ describe('method fscCommentViolationCase', function() {
     resetDatabase();
 
     currentUser = {
-      _id: faker.random.uuid(),
+      _id: faker.datatype.uuid(),
       profile: { roles: ['fscMember'] }
     };
-    violationCase = violationCasesFactory.build({}, { violatorsNumber: faker.random.number({ min: 5, max: 100 }) });
+    violationCase = violationCasesFactory.build({}, { violatorsNumber: faker.datatype.number({ min: 5, max: 100 }) });
     violationCaseId = dbViolationCases.insert(violationCase);
   });
 
   it('should fail if the violation case is not exist', function() {
     const originViolationCaseId = violationCaseId;
-    violationCaseId = faker.random.uuid();
+    violationCaseId = faker.datatype.uuid();
 
     runFscCommentViolationCase().must.throw(Meteor.Error, `找不到識別碼為「${violationCaseId}」的違規案件！ [404]`);
 
@@ -52,7 +52,7 @@ describe('method fscCommentViolationCase', function() {
 
   it('should fail if the user is not fsc member', function() {
     currentUser.profile = { roles: [] };
-    currentUser._id = faker.random.arrayElement(violationCase.violators).violatorId;
+    currentUser._id = faker.helpers.arrayElement(violationCase.violators).violatorId;
 
     runFscCommentViolationCase().must.throw(Meteor.Error, '權限不符，無法進行此操作！ [403]');
 
@@ -72,7 +72,7 @@ describe('method fscCommentViolationCase', function() {
   });
 
   it('should notification last action fsc member', function() {
-    const fscMemberId = faker.random.uuid();
+    const fscMemberId = faker.datatype.uuid();
     dbViolationCaseActionLogs.insert(violationCaseActionLogFactory.build(
       { violationCaseId, executor: fscMemberId },
       { executorIdentity: 'fsc' }
