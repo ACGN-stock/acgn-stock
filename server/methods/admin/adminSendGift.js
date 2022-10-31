@@ -51,8 +51,8 @@ function adminSendGift(currentUser, { userType, giftType, amount, reason, days, 
 
   guardUser(currentUser).checkHasAnyRoles('superAdmin', 'planner');
 
-  if (amount < 1) {
-    throw new Meteor.Error(403, '數量需至少為 1！');
+  if (amount < -10000) {
+    throw new Meteor.Error(403, '數量需至少為 1，但允許負數，負數情況請謹慎使用！');
   }
 
   if (reason.length < 1) {
