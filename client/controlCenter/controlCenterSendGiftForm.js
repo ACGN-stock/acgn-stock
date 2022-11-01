@@ -43,7 +43,7 @@ const baseFormModelSchema = new SimpleSchema({
   amount: {
     label: '數量',
     type: SimpleSchema.Integer,
-    min: 1
+    min: -10000
   },
 
   reason: {
