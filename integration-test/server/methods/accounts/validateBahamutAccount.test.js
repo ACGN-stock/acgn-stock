@@ -29,7 +29,7 @@ describe('method validateBahamutAccount', function() {
   const newPassword = 'newPassword';
 
   const homeIndexUrl = `https://home.gamer.com.tw/homeindex.php?owner=${username}`;
-  const homeReplyListUrl = `https://home.gamer.com.tw/homeReplyList.php?owner=${username}`;
+  const homeReplyListUrl = `https://m.gamer.com.tw/ajax/MB_homeReplyList_2k14.php?owner=${username}`;
 
   beforeEach(function() {
     resetDatabase();
@@ -92,7 +92,7 @@ describe('method validateBahamutAccount', function() {
         .withArgs(homeIndexUrl)
         .returns({ content: '<li>手機認證：已完成</li>' })
         .withArgs(homeReplyListUrl)
-        .returns({ content: `<span><a href="home.php?owner=${username}"></a>：${wrongValidateCode}</span>` });
+        .returns({ content: `<li id="msg_2954617"><span>前天01:57</span><a href="home.php?owner=${username}" class="name">${username}：</a><br>${wrongValidateCode}</li>` });
 
       return validateBahamutAccount(username).must.reject.with.an.error(Meteor.Error);
     });
@@ -102,7 +102,7 @@ describe('method validateBahamutAccount', function() {
         .withArgs(homeIndexUrl)
         .returns({ content: '<li>手機認證：已完成</li>' })
         .withArgs(homeReplyListUrl)
-        .returns({ content: `<span><a href="home.php?owner=${username}"></a>：${correctValidateCode}</span>` });
+        .returns({ content: `<li id="msg_123123"><span>1分內</span><a href="home.php?owner=${username}" class="name">${username}：</a><br>${correctValidateCode}</li>` });
 
       return validateBahamutAccount(username).must.resolve.with.true()
         .then(() => {
@@ -124,7 +124,7 @@ describe('method validateBahamutAccount', function() {
         .withArgs(homeIndexUrl)
         .returns({ content: '<li>手機認證：已完成 (2021-04-04)</li>' })
         .withArgs(homeReplyListUrl)
-        .returns({ content: `<span><a href="home.php?owner=${username}"></a>：${correctValidateCode}</span>` });
+        .returns({ content: `<li id="msg_456456"><span>1分內</span><a href="home.php?owner=${username}" class="name">${username}：</a><br>${correctValidateCode}</li>` });
 
       return validateBahamutAccount(username).must.resolve.with.true()
         .then(() => {

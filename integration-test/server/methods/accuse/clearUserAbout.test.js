@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import { Accounts } from 'meteor/accounts-base';
 import expect from 'must';
-import faker from 'faker';
+import faker from '@faker-js/faker';
 
 import { clearUserAbout } from '/server/methods/accuse/clearUserAbout';
 import { pttUserFactory, violationCasesFactory } from '/dev-utils/factories';
@@ -33,7 +33,7 @@ describe('method clearUserAbout', function() {
     Meteor.users.update(userId, { $set: { about } });
 
     currentUser = {
-      _id: faker.random.uuid(),
+      _id: faker.datatype.uuid(),
       profile: {
         roles: ['fscMember']
       }

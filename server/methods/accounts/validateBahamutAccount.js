@@ -75,10 +75,10 @@ function checkBahamutPhoneValidation(username) {
 
 // 檢查巴哈小屋的訪客留言是否有自己貼出的驗證碼
 function checkBahamutValidationCodeReply(username, validateCode) {
-  const { content } = HTTP.get(`https://home.gamer.com.tw/homeReplyList.php?owner=${username}`);
+  const { content } = HTTP.get(`https://m.gamer.com.tw/ajax/MB_homeReplyList_2k14.php?owner=${username}`);
 
   return cheerio.load(content)(`a[href="home.php?owner=${username}"]`)
     .parent()
     .text()
-    .indexOf(`：${validateCode}`) !== -1;
+    .indexOf(`${validateCode}`) !== -1;
 }

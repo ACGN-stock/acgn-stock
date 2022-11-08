@@ -14,29 +14,47 @@ function checkImageUrlAsync(url, callback) {
   if (! SimpleSchema.RegEx.Url.test(url)) {
     return callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
   }
-  let req;
-  if (url.indexOf('https://') === 0) {
-    req = https.get(url);
+  const urlObject = new URL(url);
+  if (urlObject.protocol === 'https:') {
+    https.get(url, (res) => {
+      const chunks = [];
+      res.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+      res.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        const type = imageType(buffer);
+        if (! type) {
+          return callback(new Meteor.Error(403, '「' + url + '」並非合法的圖片網址！'));
+        }
+        callback(null, true);
+      });
+
+      res.on('error', (err) => {
+        console.log(err);
+        callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
+      });
+    });
   }
   else {
-    req = http.get(url);
-  }
-  req.on('error', () => {
-    callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
-  });
-  req.on('response', (res) => {
-    let checkResult;
-    res.once('data', (chunk) => {
-      checkResult = imageType(chunk);
-      res.destroy();
-    });
-    res.once('end', () => {
-      if (checkResult) {
+    http.get(url, (res) => {
+      const chunks = [];
+      res.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+      res.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        const type = imageType(buffer);
+        if (! type) {
+          return callback(new Meteor.Error(403, '「' + url + '」並非合法的圖片網址！'));
+        }
         callback(null, true);
-      }
-      else {
+      });
+
+      res.on('error', (err) => {
+        console.log(err);
         callback(new Meteor.Error(403, '「' + url + '」並非合法的網址！'));
-      }
+      });
     });
-  });
+  }
 }

@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { _ } from 'meteor/underscore';
 import { resetDatabase } from 'meteor/xolvio:cleaner';
 import { Factory } from 'rosie';
-import faker from 'faker';
+import faker from '@faker-js/faker';
 import expect from 'must';
 import mustSinon from 'must-sinon';
 
@@ -31,7 +31,7 @@ describe('function doOnFoundationSuccess', function() {
       return `user${n}`;
     })
     .attr('amount', () => {
-      return faker.random.number({
+      return faker.datatype.number({
         min: minAmountPerInvestor,
         max: maxAmountPerInvestor
       });
